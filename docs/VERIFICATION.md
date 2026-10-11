@@ -119,3 +119,12 @@ ZIP исследовательского пакета 0.4 не читался и
 До и после выполнен одинаковый Start + Pause с 1918 импортированными типами плюс пять существовавших seed-типов (1923 строки), аудитом SQLite-триггеров, в Robolectric. До: 3846 DELETE + 3846 INSERT activity_types; после: 0 операций activity_types и vocabulary. После: по одному INSERT/UPDATE session и segment, служебные metadata/generation. Реальные одиночные elapsed samples — evidence/backend-v10/storage-before.txt и storage-after.txt; это не статистический benchmark, не измерение телефона и не обещание батареи. Исходная проба ошибочно подписывала только число импортированных типов; подпись уточнена по точному аудиту, численные результаты не менялись.
 
 Все исходные research-файлы и runtime-словарь v9 побайтно сохранены; fresh projection равна принятому словарю. Новые логи/SQL-аудит/XML/summary в evidence/backend-v10/; прежние доказательства не заменены. Room теперь 3, JSON 4 читает 1/2/3/4. Полный контракт/ограничения — BACKEND_V10.md.
+
+
+## Исправление приёмки v11
+
+Лимит 10 MiB UTF-8 проверяется до первого разбора и в parseToggl, и в parseCsv. Toggl передаёт уже разобранную таблицу общей обработке; второго полного разбора и повторного UTF-8 кодирования для хеша нет. README теперь описывает фактические delta writes/UPSERT и прежнее ограничение полного холодного чтения.
+
+Целевая регрессия в прежнем сценарии: строка с числом символов меньше лимита, но UTF-8 размером больше 10 MiB, содержит повреждённые кавычки; результат обязан быть UNSUPPORTED_IMPORT / CSV exceeds 10 MiB, до CSV parser. Это проверяет порядок проверок, а не только код ошибки.
+
+Команда `JAVA_HOME=/workspace/toolchains/jdk21 ANDROID_HOME=/workspace/toolchains/android-sdk ANDROID_USER_HOME=/workspace/toolchains/android-user GRADLE_USER_HOME=/workspace/toolchains/gradle-home ./gradlew --offline :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` — BUILD SUCCESSFUL in 29s, 60 tasks (21 executed). 3 Core + 3 Room/Robolectric сценария, 0 failures/errors/skips. Lint 0 errors / 10 warnings. APK пересобран; Room 3, JSON 4 и версия приложения 0.4.0 не менялись. Логи и XML: evidence/acceptance-v11/. Simple Time Tracker, UI и устройство не исследовались повторно, ограничение доступа не обходилось.

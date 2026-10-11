@@ -97,6 +97,12 @@ abstract class ScenarioContract {
     private fun historyTransfer() {
         val clock = FakeClock(); val tracker = Tracker(createStore(),clock); val disk = MemoryRollback()
         val transfer = HistoryTransfer(tracker,disk)
+        // UTF-8 exceeds the limit although character count does not. Malformed quoting
+        // would fail first if Toggl inspected its header/body before checking the byte limit.
+        val oversized = "\"x\"!" + "я".repeat(MAX_BACKUP_BYTES/2)
+        val sizeError = assertFailsWith<CoreError> { HistoryTransfer.parseToggl(oversized,"toggl:large","UTC") }
+        assertEquals(ErrorCode.UNSUPPORTED_IMPORT,sizeError.code)
+        assertEquals("CSV exceeds 10 MiB",sizeError.message)
         val csv = "Project,Client,Description,Start date,Start time,End date,End time,Duration,Tags\r\n"+
             "Language,Personal,\"Note, with \"\"quotes\"\"\nand newline\",2026-10-09,10:00:00,2026-10-09,10:20:00,0:20:00,reading\r\n"
         val file = HistoryTransfer.parseToggl(csv,"toggl:personal-workspace","Europe/Berlin")

@@ -80,18 +80,29 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
     }
     companion object {
         fun parseToggl(text: String,namespace: String,zone: String,datePattern: String = "uuuu-MM-dd"): TransferFile {
-            val headers = CsvTable.parse(text,',').firstOrNull().orEmpty()
+            val bytes = checkedCsvBytes(text)
+            val table = CsvTable.parse(text,',')
+            val headers = table.firstOrNull().orEmpty()
             val hasEnd = "End date" in headers || "End time" in headers
             val mapping = CsvMapping.toggl(namespace,zone,datePattern).let {
                 if(hasEnd) it.copy(end = "End date",endTime = "End time") else it
             }
-            return parseCsv(text,mapping)
+            return parseTable(table,mapping,researchHash(bytes))
         }
         fun parseCsv(text: String,mapping: CsvMapping): TransferFile {
-            ensure(text.toByteArray(Charsets.UTF_8).size <= MAX_BACKUP_BYTES,"CSV exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
+            val bytes = checkedCsvBytes(text)
+            return parseTable(CsvTable.parse(text,mapping.delimiter),mapping,researchHash(bytes))
+        }
+        private fun checkedCsvBytes(text: String): ByteArray {
+            // UTF-8 needs at least as many bytes as UTF-16 code units. Bound encoding too.
+            ensure(text.length <= MAX_BACKUP_BYTES,"CSV exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
+            return text.toByteArray(Charsets.UTF_8).also {
+                ensure(it.size <= MAX_BACKUP_BYTES,"CSV exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
+            }
+        }
+        private fun parseTable(table: List<List<String>>,mapping: CsvMapping,fileHash: String): TransferFile {
             ensure(mapping.namespace.isNotBlank(),"Stable source account/workspace namespace is required")
             ensure(mapping.clockToleranceMs in 0..1000,"Unsupported clock tolerance")
-            val table = CsvTable.parse(text,mapping.delimiter)
             ensure(table.isNotEmpty(),"Empty CSV",ErrorCode.UNSUPPORTED_IMPORT)
             val headers = table.first()
             ensure(headers.all { it.isNotBlank() } && headers.distinct().size == headers.size,"Duplicate/empty CSV header",ErrorCode.UNSUPPORTED_IMPORT)
@@ -101,7 +112,6 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
             val zone = try { ZoneId.of(mapping.zone) } catch(e: Exception) { fail(ErrorCode.INVALID_INPUT,"Unknown source zone") }
             val format = mapping.localPattern?.let { DateTimeFormatter.ofPattern(it).withResolverStyle(ResolverStyle.STRICT) }
             val rows = mutableListOf<TransferRow>(); val errors = mutableListOf<String>()
-            val fileHash = researchHash(text.toByteArray(Charsets.UTF_8))
             fun timestamp(value: String): Long {
                 val instant = if(format == null) OffsetDateTime.parse(value).toInstant() else {
                     val local = LocalDateTime.parse(value,format)

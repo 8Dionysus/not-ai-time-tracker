@@ -12,9 +12,14 @@ data class Filter(val cardId: String? = null, val partOf: String? = null,
 }
 data class ReportRow(val segmentId: String, val sessionId: String, val start: Long, val end: Long,
     val durationMs: Long, val selection: Classification, val note: String?)
+data class QuantityKey(val fieldId: String,val meaningVersion: Int,val unit: String,val scope: Scope)
 data class Report(val start: Long, val end: Long, val asOf: Long, val zone: String,
     val rows: List<ReportRow>, val unresolved: List<Segment>, val measurements: List<Measurement>,
     val recordedMs: Long, val calendarDays: Long, val recordedDays: Set<LocalDate>, val incomplete: Boolean) {
+    /** Whole-target quantities, not apportioned to this report window. Scope stays separate. */
+    fun quantityTotals(): Map<QuantityKey,Long> = measurements.distinctBy { it.id }
+        .groupBy { QuantityKey(it.fieldId,it.meaningVersion,it.unit,it.scope) }
+        .mapValues { (_,values) -> values.sumExact(ErrorCode.INVALID_INPUT) { it.value } }
     val hasRecords get() = rows.isNotEmpty()
     fun byCard(): Map<String?, Long> = rows.groupBy { it.selection.cardId }.mapValues { (_,v) -> v.sumExact { it.durationMs } }
     fun byDetail(key: String): Map<String?, Long> = rows.groupBy { it.selection.details[key] }.mapValues { (_,v) -> v.sumExact { it.durationMs } }
@@ -22,6 +27,7 @@ data class Report(val start: Long, val end: Long, val asOf: Long, val zone: Stri
 data class Comparison(val current: Report, val previous: Report, val absoluteDifferenceMs: Long, val percent: Double?)
 object Reports {
     fun report(d: Dataset, now: Moment, start: Long, end: Long, filter: Filter = Filter(), zone: String = d.settings.reportZone): Report {
+        validateMoment(now)
         ensure(start >= 0 && end > start && end <= MAX_TIME, "Invalid report window", ErrorCode.INVALID_INTERVAL)
         val zoneId = ZoneId.of(zone)
         val notes = d.sessions.associate { it.id to it.note }
@@ -47,19 +53,42 @@ object Reports {
             rows.sumExact { it.durationMs },java.time.temporal.ChronoUnit.DAYS.between(first,last)+1,days,end > now.wall)
     }
     fun day(d: Dataset,now: Moment,date: LocalDate,filter: Filter = Filter(),zone: String = d.settings.reportZone): Report {
-        val z = ZoneId.of(zone)
-        return report(d,now,date.atStartOfDay(z).toInstant().toEpochMilli(),date.plusDays(1).atStartOfDay(z).toInstant().toEpochMilli(),filter,zone)
+        val (start,end) = calendarBounds(date,1,zone)
+        return report(d,now,start,end,filter,zone)
     }
+    /** Explicit equal elapsed-time windows. Calendar-day windows have a separate DST-aware operation. */
     fun compare(d: Dataset,now: Moment,currentStart: Long,currentEnd: Long,previousStart: Long,previousEnd: Long,filter: Filter = Filter()): Comparison {
-        ensure(currentEnd-currentStart == previousEnd-previousStart, "Comparison windows must have equal physical duration")
         val a = report(d,now,currentStart,currentEnd,filter); val b = report(d,now,previousStart,previousEnd,filter)
-        val delta = a.recordedMs-b.recordedMs
+        ensure(currentEnd-currentStart == previousEnd-previousStart, "Comparison windows must have equal physical duration")
+        return comparison(a,b)
+    }
+    /** Same number of local calendar days, even when the windows contain 23/25-hour DST days.
+     * Incomplete windows are labeled; values are never extrapolated or silently scaled.
+     */
+    fun compareCalendarDays(d: Dataset,now: Moment,currentStart: LocalDate,previousStart: LocalDate,days: Int,
+        filter: Filter = Filter(),zone: String = d.settings.reportZone): Comparison {
+        val (a0,a1) = calendarBounds(currentStart,days,zone)
+        val (b0,b1) = calendarBounds(previousStart,days,zone)
+        return comparison(report(d,now,a0,a1,filter,zone),report(d,now,b0,b1,filter,zone))
+    }
+    private fun calendarBounds(start: LocalDate,days: Int,zone: String): Pair<Long,Long> {
+        ensure(days > 0,"Calendar day count must be positive",ErrorCode.INVALID_INTERVAL)
+        return try {
+            val z = ZoneId.of(zone)
+            start.atStartOfDay(z).toInstant().toEpochMilli() to start.plusDays(days.toLong()).atStartOfDay(z).toInstant().toEpochMilli()
+        } catch (_: java.time.DateTimeException) { fail(ErrorCode.INVALID_INTERVAL,"Calendar window out of range") }
+        catch (_: ArithmeticException) { fail(ErrorCode.INVALID_INTERVAL,"Calendar window out of range") }
+    }
+    private fun comparison(a: Report,b: Report): Comparison {
+        val delta = a.recordedMs-b.recordedMs // both nonnegative, so the difference fits Long
         return Comparison(a,b,delta,if (b.recordedMs == 0L) null else 100.0*delta/b.recordedMs)
     }
     private fun proportional(total: Long,numerator: Long,denominator: Long): Long =
         BigInteger.valueOf(total).multiply(BigInteger.valueOf(numerator)).divide(BigInteger.valueOf(denominator)).longValueExact()
 }
-internal fun <T> Iterable<T>.sumExact(value: (T)->Long) = fold(0L) { a,b -> Math.addExact(a,value(b)) }
+internal fun <T> Iterable<T>.sumExact(errorCode: ErrorCode = ErrorCode.INVALID_INTERVAL,value: (T)->Long): Long = try {
+    fold(0L) { a,b -> Math.addExact(a,value(b)) }
+} catch (_: ArithmeticException) { fail(errorCode,"Total exceeds supported integer range") }
 
 enum class CsvMode { EXACT, SPREADSHEET_SAFE }
 object Csv {

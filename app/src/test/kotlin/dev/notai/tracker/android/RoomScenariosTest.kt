@@ -19,5 +19,15 @@ class RoomScenariosTest: ScenarioContract() {
     override fun reopen(store: StateStore): StateStore {
         val (name,db) = databases.remove(store)!!; db.close(); return open(name)
     }
+    override fun assertImportRollback(tracker: Tracker,json: String,disk: RollbackStore) {
+        val db = databases.getValue(tracker.store).second
+        // Metadata is written last, after child tables were replaced: force a real SQLite write failure.
+        db.openHelper.writableDatabase.execSQL("CREATE TRIGGER fail_import BEFORE INSERT ON metadata BEGIN SELECT RAISE(ABORT, 'injected write failure'); END")
+        try {
+            val backups = Backups(tracker,disk)
+            val error = org.junit.Assert.assertThrows(CoreError::class.java) { backups.apply(backups.prepare(json)) }
+            org.junit.Assert.assertEquals(ErrorCode.STORAGE,error.code)
+        } finally { db.openHelper.writableDatabase.execSQL("DROP TRIGGER fail_import") }
+    }
     @After fun close() { databases.values.forEach { (name,db) -> db.close(); RuntimeEnvironment.getApplication().deleteDatabase(name) }; databases.clear() }
 }

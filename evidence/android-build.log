@@ -47,23 +47,23 @@
 > Task :core:compileTestFixturesJava NO-SOURCE
 > Task :core:testFixturesClasses UP-TO-DATE
 > Task :core:testFixturesJar
+> Task :app:kspDebugKotlin
 > Task :core:compileTestKotlin
 > Task :core:compileTestJava NO-SOURCE
 > Task :core:testClasses UP-TO-DATE
-> Task :core:test
-> Task :app:mergeLibDexDebug
-> Task :app:mergeDebugNativeLibs NO-SOURCE
-> Task :app:stripDebugDebugSymbols NO-SOURCE
-> Task :app:kspDebugKotlin
 > Task :app:compileDebugKotlin
+> Task :core:test
 > Task :app:compileDebugJavaWithJavac NO-SOURCE
 > Task :app:dexBuilderDebug UP-TO-DATE
 > Task :app:mergeDebugGlobalSynthetics UP-TO-DATE
 > Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:mergeLibDexDebug
 > Task :app:mergeProjectDexDebug UP-TO-DATE
+> Task :app:mergeDebugNativeLibs NO-SOURCE
+> Task :app:mergeDebugJavaResource
+> Task :app:stripDebugDebugSymbols NO-SOURCE
 > Task :app:bundleDebugClassesToRuntimeJar UP-TO-DATE
 > Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
-> Task :app:mergeDebugJavaResource
 > Task :app:packageDebug
 > Task :app:createDebugApkListingFileRedirect UP-TO-DATE
 > Task :app:assembleDebug
@@ -81,5 +81,5 @@
 > Task :app:lintReportDebug UP-TO-DATE
 > Task :app:lintDebug
 
-BUILD SUCCESSFUL in 18s
+BUILD SUCCESSFUL in 15s
 59 actionable tasks: 21 executed, 38 up-to-date

@@ -202,14 +202,18 @@ internal fun <T> storage(block: () -> T): T = try { block() } catch (e: CoreErro
 
 /** Returns an observed copy; never writes clock ticks. An old boot provides no elapsed-time evidence. */
 fun materialize(s: Segment,n: Moment): Segment {
+    validateMoment(n)
+    validateSegmentTime(s)
     if (s.end != null) return s
     val a = s.anchor
     if (a == null || a.bootId != n.bootId || n.elapsed < a.elapsedMs) return s.copy(anchor = null,uncertain = true)
     val duration = n.elapsed-a.elapsedMs
+    ensure(duration in 0..MAX_TIME,"Elapsed duration out of supported range",ErrorCode.INVALID_INTERVAL)
     return s.copy(durationMs = duration,observedUntil = n.wall,
         uncertain = s.uncertain || abs((n.wall-s.start)-duration) > 1000)
 }
 fun snapshot(d: Dataset,n: Moment): Snapshot {
+    validateMoment(n)
     val s = current(d)
     val segs = d.segments.filter { it.sessionId == s?.id }.map { materialize(it,n) }
     val active = segs.singleOrNull { it.end == null }
@@ -220,6 +224,6 @@ fun snapshot(d: Dataset,n: Moment): Snapshot {
         Mode.RUNNING -> setOf("pause","stop","switch","label","details","switchedEarlier")
         Mode.PAUSED -> setOf("resume","stop","switch","label","details")
         Mode.RECOVERY -> setOf("resolveTail","label") }
-    return Snapshot(token(d),mode,s,active,segs.fold(0L) { sum,seg -> Math.addExact(sum,seg.durationMs) },uncertain,
+    return Snapshot(token(d),mode,s,active,segs.sumExact { it.durationMs },uncertain,
         when(mode) { Mode.IDLE -> "Таймер остановлен"; Mode.RUNNING -> "Идёт учёт времени"; Mode.PAUSED -> "Таймер на паузе"; Mode.RECOVERY -> "Требуется уточнить время" },actions)
 }

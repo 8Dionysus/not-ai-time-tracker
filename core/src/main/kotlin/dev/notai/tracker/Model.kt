@@ -63,6 +63,22 @@ interface StateStore {
     val changes: Flow<Dataset>
 }
 
+internal fun validateMoment(n: Moment) {
+    ensure(n.wall in 0..MAX_TIME && n.elapsed >= 0 && n.bootId.isNotBlank(),"Clock out of supported range",ErrorCode.INVALID_INTERVAL)
+}
+internal fun validateSegmentTime(s: Segment) {
+    ensure(s.start in 0..MAX_TIME && s.durationMs in 0..MAX_TIME, "Time out of range", ErrorCode.INVALID_INTERVAL)
+    ensure(s.end == null || (s.end in s.start..MAX_TIME), "Invalid interval", ErrorCode.INVALID_INTERVAL)
+    ensure(s.observedUntil == null || s.observedUntil in 0..MAX_TIME, "Invalid observation")
+    ensure(s.anchor == null || (s.end == null && s.anchor.elapsedMs >= 0 && s.anchor.bootId.isNotBlank()), "Invalid monotonic anchor")
+    if (!s.uncertain) {
+        val finish = s.end ?: s.observedUntil
+        if (finish != null) ensure(finish >= s.start && (finish > s.start || s.durationMs == 0L) &&
+            kotlin.math.abs(s.durationMs-(finish-s.start)) <= 1000,"Duration contradicts certain calendar interval",ErrorCode.INVALID_INTERVAL)
+        else ensure(s.durationMs == 0L,"Unobserved open tail cannot have measured duration",ErrorCode.INVALID_INTERVAL)
+    }
+}
+
 fun validate(data: Dataset) {
     fun ids(values: List<String>) { ensure(values.all { it.isNotBlank() } && values.distinct().size == values.size, "Empty or duplicate ID") }
     ensure(data.datasetId.isNotBlank() && data.revision >= 0, "Invalid dataset metadata")
@@ -87,13 +103,10 @@ fun validate(data: Dataset) {
     data.segments.forEach { s ->
         val session = sessions[s.sessionId] ?: fail(ErrorCode.INVALID_INPUT, "Missing session")
         selection(s.selection)
-        ensure(s.start in 0..MAX_TIME && s.durationMs in 0..MAX_TIME, "Time out of range", ErrorCode.INVALID_INTERVAL)
-        ensure(s.end == null || (s.end in s.start..MAX_TIME), "Invalid interval", ErrorCode.INVALID_INTERVAL)
-        ensure(s.observedUntil == null || s.observedUntil in 0..MAX_TIME, "Invalid observation")
-        ensure(s.anchor == null || (s.end == null && s.anchor.elapsedMs >= 0 && s.anchor.bootId.isNotBlank()), "Invalid monotonic anchor")
+        validateSegmentTime(s)
         if (s.end == null) ensure(session.status == SessionStatus.RUNNING || session.status == SessionStatus.RECOVERY, "Open segment without running/recovery session")
-        if (s.end != null && !s.uncertain) ensure((s.end > s.start || s.durationMs == 0L) && kotlin.math.abs(s.durationMs - (s.end - s.start)) <= 1000, "Duration contradicts certain calendar interval")
     }
+    data.segments.sumExact { it.durationMs }
     val bySession = data.segments.groupBy { it.sessionId }
     val segmentIds = data.segments.map { it.id }.toSet()
     data.sessions.forEach { s ->

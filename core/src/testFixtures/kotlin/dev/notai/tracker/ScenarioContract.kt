@@ -51,8 +51,14 @@ abstract class ScenarioContract {
         val detail = card.classification().copy(details = mapOf("language" to "es","activity" to "listening"))
         tracker.changeDetails(token(),detail); clock.advance(10_000); tracker.stop(token())
         val favorite = Favorite(label = "Испанский",selection = detail)
-        tracker.saveFavorite(token(),favorite); tracker.startFavorite(token(),favorite.id)
+        tracker.saveFavorite(token(),favorite)
+        val repeatId = tracker.data().sessions.last().id
+        tracker.saveCard(token(),card.copy(name = "Renamed and archived",archived = true,details = mapOf("activity" to "reading")))
+        tracker.startFavorite(token(),favorite.id)
         assertEquals(detail,tracker.snapshot().session!!.selection)
+        clock.advance(1000); tracker.stop(token()); tracker.repeat(token(),repeatId)
+        assertEquals(detail,tracker.snapshot().session!!.selection) // archived card keeps saved parameters
+        assertEquals("Язык",tracker.snapshot().session!!.selection.name)
         clock.advance(10_000)
         // Competing commands share a revision: exactly one wins, the second is explicitly stale.
         val shared = token(); val gate = CountDownLatch(1); val pool = Executors.newFixedThreadPool(2)
@@ -71,6 +77,11 @@ abstract class ScenarioContract {
         assertEquals(Mode.RECOVERY,tracker.snapshot().mode)
         tracker.resolveTail(token(),null,null); assertEquals(Mode.IDLE,tracker.snapshot().mode)
         validate(tracker.data())
+        val beforeInvalidClock = tracker.data()
+        clock.wall = Long.MIN_VALUE
+        expect(ErrorCode.INVALID_INTERVAL) { tracker.snapshot() }
+        assertEquals(beforeInvalidClock,tracker.data())
+        expect(ErrorCode.INVALID_INTERVAL) { materialize(Segment(sessionId = "range",start = 1,anchor = Anchor("same",0)),Moment(1000,Long.MAX_VALUE,"same")) }
     }
 
     @Test fun smallHistoryAndExport() {
@@ -87,11 +98,28 @@ abstract class ScenarioContract {
         val all = Reports.report(d,clock.now(),windowStart,clock.wall)
         assertEquals(40*60_000,all.recordedMs); assertEquals(2,all.rows.size) // equal durations are not deduplicated
         assertEquals(20,all.measurements.single().value)
+        val pages = QuantityKey("pages",1,"page",Scope.SESSION)
+        assertEquals(20,all.quantityTotals()[pages])
+        assertEquals(20,Reports.day(d,clock.now(),LocalDate.parse("2026-10-10")).quantityTotals()[pages])
+        assertEquals(20,Reports.day(d,clock.now(),LocalDate.parse("2026-10-11")).quantityTotals()[pages])
+        val quantities = all.copy(measurements = all.measurements + listOf(
+            Measurement(id = "reps-a",fieldId = "reps",unit = "rep",scope = Scope.SEGMENT,targetId = d.segments[0].id,value = 8),
+            Measurement(id = "reps-b",fieldId = "reps",unit = "rep",scope = Scope.SEGMENT,targetId = d.segments[1].id,value = 12),
+            Measurement(id = "pages-zero",fieldId = "pages",meaningVersion = 2,unit = "page",scope = Scope.SESSION,targetId = sessionId,value = 0)))
+        assertEquals(20,quantities.quantityTotals()[QuantityKey("reps",1,"rep",Scope.SEGMENT)])
+        assertEquals(0,quantities.quantityTotals()[QuantityKey("pages",2,"page",Scope.SESSION)])
+        assertNull(quantities.quantityTotals()[QuantityKey("missing",1,"page",Scope.SESSION)])
+        val overflowQuantity = all.copy(measurements = listOf(all.measurements.single().copy(value = Long.MAX_VALUE),
+            all.measurements.single().copy(id = "other-target",targetId = "other-session",value = 1)))
+        expect(ErrorCode.INVALID_INPUT) { overflowQuantity.quantityTotals() }
+        val overflowTime = all.copy(rows = listOf(all.rows.first().copy(durationMs = Long.MAX_VALUE),all.rows.last().copy(durationMs = 1)))
+        expect(ErrorCode.INVALID_INTERVAL) { overflowTime.byCard() }
         assertEquals(10*60_000,Reports.day(d,clock.now(),LocalDate.parse("2026-10-10")).recordedMs)
         assertEquals(30*60_000,Reports.day(d,clock.now(),LocalDate.parse("2026-10-11")).recordedMs)
         for (tag in listOf("learning","health")) assertEquals(all.recordedMs,Reports.report(d,clock.now(),windowStart,clock.wall,Filter(tags = setOf(tag))).recordedMs)
         val csv = Csv.export(all)
         assertTrue(csv.contains("' =Language").not()); assertTrue(csv.contains("'=Language"))
+        assertEquals(20,csv.lineSequence().filter { it.startsWith("\"measurement\"") }.sumOf { it.split(',')[15].trim('"').toLong() })
         assertEquals(1,csv.lineSequence().count { it.startsWith("\"measurement\"") })
         assertEquals(all.recordedMs,csv.lineSequence().filter { it.startsWith("\"segment\"") }.sumOf { it.split(',')[5].trim('"').toLong() })
         val first = d.segments.first()
@@ -125,6 +153,19 @@ abstract class ScenarioContract {
         val dstSession = Session(status = SessionStatus.STOPPED)
         val dstData = Dataset(sessions = listOf(dstSession),segments = listOf(Segment(sessionId = dstSession.id,start = spring-23*3_600_000,end = spring,durationMs = 23*3_600_000)),settings = Settings("Europe/Berlin"))
         assertEquals(23*3_600_000,Reports.day(dstData,clock.now(),LocalDate.parse("2026-03-29")).recordedMs)
+        val calendar = Reports.compareCalendarDays(dstData,clock.now(),LocalDate.parse("2026-03-29"),LocalDate.parse("2026-03-28"),1)
+        assertEquals(23*3_600_000,calendar.current.end-calendar.current.start)
+        assertEquals(24*3_600_000,calendar.previous.end-calendar.previous.start)
+        assertEquals(23*3_600_000,calendar.absoluteDifferenceMs); assertNull(calendar.percent)
+        val autumn = Reports.compareCalendarDays(dstData,clock.now().copy(wall = Instant.parse("2026-10-27T00:00:00Z").toEpochMilli()),
+            LocalDate.parse("2026-10-25"),LocalDate.parse("2026-10-24"),1)
+        assertEquals(25*3_600_000,autumn.current.end-autumn.current.start)
+        assertEquals(24*3_600_000,autumn.previous.end-autumn.previous.start)
+        val incomplete = Reports.compareCalendarDays(dstData,clock.now().copy(wall = spring-12*3_600_000),LocalDate.parse("2026-03-29"),LocalDate.parse("2026-03-28"),1)
+        assertTrue(incomplete.current.incomplete); assertFalse(incomplete.previous.incomplete)
+        expect(ErrorCode.INVALID_INTERVAL) { Reports.day(dstData,clock.now(),LocalDate.MAX) }
+        val huge = dstData.copy(segments = listOf(dstData.segments.single().copy(start = 0,end = MAX_TIME,durationMs = MAX_TIME)))
+        assertEquals(3_600_000,Reports.report(huge,clock.now().copy(wall = MAX_TIME),MAX_TIME-3_600_000,MAX_TIME).recordedMs) // BigInteger intermediate, no multiplication overflow
     }
 
     @Test fun backupReplacementAndFailure() {
@@ -166,21 +207,43 @@ abstract class ScenarioContract {
         val stale = restore.prepare(json); clean.settings(clean.snapshot().token,Settings("UTC"))
         expect(ErrorCode.STALE) { restore.apply(stale) }
         val badDisk = object: RollbackStore { override fun save(json: String) = "bad"; override fun read(reference: String) = "damaged" }
+        clean.saveCard(clean.snapshot().token,Card(name = "Local data that replacement would delete"))
         val guarded = Backups(clean,badDisk); val before = clean.data()
         expect(ErrorCode.STORAGE) { guarded.apply(guarded.prepare(json)) }; assertEquals(before,clean.data())
-        // A persistence failure after the replacement is proposed must roll back the entire transaction.
-        val failingStore = object: StateStore {
-            override val changes = clean.store.changes
-            override fun read() = clean.store.read()
-            override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T = clean.store.transaction { live ->
-                block(live)
-                throw IllegalStateException("simulated disk failure")
-            }
-        }
-        val failingRestore = Backups(Tracker(failingStore,clock),disk)
-        expect(ErrorCode.STORAGE) { failingRestore.apply(failingRestore.prepare(json)) }; assertEquals(before,clean.data())
+        assertImportRollback(clean,json,disk)
+        assertEquals(before,clean.data())
+        val impossibleTail = raw.copy(data = raw.data.copy(segments = raw.data.segments.map { it.copy(durationMs = MAX_TIME) }))
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(codec.encodeToString(impossibleTail)) }; assertEquals(before,clean.data())
         clean.resolveTail(clean.snapshot().token,raw.data.segments.single().start,raw.asOf)
         assertEquals(42_000,Reports.report(clean.data(),clock.now(),clock.wall-60_000,clock.wall).recordedMs)
         validate(clean.data())
+        val raceDisk = object: RollbackStore {
+            override fun save(json: String): String {
+                val reference = disk.save(json)
+                clean.settings(clean.snapshot().token,Settings("Etc/UTC")) // legal concurrent change during external file IO
+                return reference
+            }
+            override fun read(reference: String) = disk.read(reference)
+        }
+        val racing = Backups(clean,raceDisk)
+        expect(ErrorCode.STALE) { racing.apply(racing.prepare(json)) }
+        assertEquals(Settings("Etc/UTC"),clean.data().settings)
+        assertTrue(clean.data().cards.any { it.name == "Local data that replacement would delete" })
+        val restoredQuantities = Reports.report(historical.data(),clock.now().copy(wall = historySample.asOf),
+            historySample.data.segments.single().start,historySample.asOf).quantityTotals()
+        assertEquals(20,restoredQuantities[QuantityKey("pages",1,"page",Scope.SESSION)])
+    }
+
+    protected open fun assertImportRollback(tracker: Tracker,json: String,disk: RollbackStore) {
+        val failingStore = object: StateStore {
+            override val changes = tracker.store.changes
+            override fun read() = tracker.store.read()
+            override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T = tracker.store.transaction { live ->
+                block(live)
+                throw IllegalStateException("simulated persistence failure")
+            }
+        }
+        val failing = Backups(Tracker(failingStore,tracker.clock),disk)
+        expect(ErrorCode.STORAGE) { failing.apply(failing.prepare(json)) }
     }
 }

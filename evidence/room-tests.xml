@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="dev.notai.tracker.android.RoomScenariosTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-11T05:21:53.598Z" hostname="442bbd4fc7a7" time="5.983">
+<testsuite name="dev.notai.tracker.android.RoomScenariosTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-11T05:34:02.655Z" hostname="442bbd4fc7a7" time="5.919">
   <properties/>
-  <testcase name="smallHistoryAndExport" classname="dev.notai.tracker.android.RoomScenariosTest" time="5.47"/>
-  <testcase name="backupReplacementAndFailure" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.265"/>
-  <testcase name="timerPath" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.246"/>
+  <testcase name="smallHistoryAndExport" classname="dev.notai.tracker.android.RoomScenariosTest" time="5.285"/>
+  <testcase name="backupReplacementAndFailure" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.339"/>
+  <testcase name="timerPath" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.294"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

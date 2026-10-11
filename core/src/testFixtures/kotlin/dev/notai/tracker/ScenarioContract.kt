@@ -519,6 +519,81 @@ abstract class ScenarioContract {
         reportDir.mkdirs()
         reportDir.resolve("adapter-outcomes.json").writeText(codec.encodeToString(plan.outcomes))
         reportDir.resolve("runtime-types.json").writeText(codec.encodeToString(vocabulary))
+        fullResearchProjection(plan,path.parentFile)
+    }
+
+    private fun fullResearchProjection(base: ResearchPlan,researchDir: java.io.File) {
+        val isco = researchDir.resolve("projections/isco_full_projection_v2.json").readBytes()
+        val sports = researchDir.resolve("projections/sports_additive_catalogue_projection.json").readBytes()
+        val iscoHash = "7dd02e406bb2c34260a73179b2b6a94f19d0141aa1bb06815277eb5e23bc2498"
+        val sportsHash = "6b5e4810622ff4af4af794b2ac8093d7135caad85f1ace51e99ced62a7373955"
+        val full = FullResearchCatalog.read(base,isco,iscoHash,sports,sportsHash)
+        assertContentEquals(isco,full.sourceBytes(FullResearchCatalog.ISCO))
+        assertContentEquals(sports,full.sourceBytes(FullResearchCatalog.SPORTS))
+        assertEquals(353,full.outcomes.count { it.file == FullResearchCatalog.ISCO && it.kind == "source-disposition" })
+        assertEquals(223,full.outcomes.count { it.file == FullResearchCatalog.SPORTS && it.kind == "source-disposition" })
+        assertTrue(full.vocabulary.types.size > base.candidateIds.size)
+        assertEquals(2092,full.vocabulary.types.size)
+        assertEquals(337,full.vocabulary.axes.size)
+        assertEquals(base.vocabulary(base.candidateIds,base.axisCandidateIds).types.toSet(),
+            full.vocabulary.types.filter { it.id in base.candidateIds }.toSet())
+        val held = full.outcomes.filter { it.file == FullResearchCatalog.SPORTS && it.kind == "source-disposition" && it.runtimeIds.isEmpty() }
+        assertEquals(listOf("arisf:arISF_075"),held.map { it.key })
+        val clock = FakeClock()
+        val t = Tracker(createStore(),clock)
+        val archive = FileResearchArchive(researchDir.parentFile.resolve("build/full-source-archives/${newId()}"))
+        val initial = full.apply(t,t.snapshot().token,archive)
+        assertTrue(initial.catalogImport!!.conflicts.isEmpty())
+        assertTrue(full.apply(t,t.snapshot().token,archive).catalogImport!!.added.isEmpty())
+        for((_,digest) in full.sourceHashes) assertEquals(digest,researchHash(archive.read(digest)))
+        // All 28 sports wholes and nine occupational families work without mandatory detail.
+        val wholes = full.outcomes.filter { it.kind == "whole-event" || (it.kind == "family-or-wrapper" && it.boundary.startsWith("Whole family")) }
+            .flatMap { it.runtimeIds }.distinct()
+        assertEquals(37,wholes.size)
+        val begin = clock.wall
+        for(id in wholes) {
+            t.start(t.snapshot().token,t.typeSelection(id))
+            clock.advance(1000); t.stop(t.snapshot().token)
+        }
+        val original = t.data().sessions.last()
+        t.repeat(t.snapshot().token,original.id)
+        clock.advance(1000); t.stop(t.snapshot().token)
+        assertEquals(original.selection,t.data().sessions.last().selection)
+        assertEquals(38,t.data().segments.size) // family/component links never manufacture time
+        assertEquals(38_000L,Reports.report(t.data(),clock.now(),begin,clock.wall).recordedMs)
+        val history = t.data().segments
+        val selected = t.data().types.single { it.id == wholes.first() }
+        t.saveType(t.snapshot().token,selected.copy(name = "My whole activity"))
+        val stale = t.snapshot().token
+        val conflict = full.apply(t,stale,archive)
+        assertEquals(listOf(selected.id),conflict.catalogImport!!.conflicts.map { it.id })
+        val after = t.data()
+        expect(ErrorCode.STALE) { full.apply(t,stale,archive) }
+        assertEquals(after,t.data())
+        assertEquals(conflict.catalogImport,full.apply(t,t.snapshot().token,archive).catalogImport)
+        assertEquals(history,t.data().segments)
+        assertEquals("My whole activity",t.data().types.single { it.id == selected.id }.name)
+        val json = Backups(t,MemoryRollback()).export()
+        assertEquals(t.data(),Backups.decode(json).data)
+        val receiver = Tracker(createStore(),clock)
+        val restore = Backups(receiver,MemoryRollback())
+        restore.apply(restore.prepare(json))
+        assertEquals(t.data().copy(revision = receiver.data().revision),receiver.data())
+        val before = receiver.data()
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.dropLast(1)) }
+        assertEquals(before,receiver.data())
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { FullResearchCatalog.read(base,isco,"0".repeat(64),sports,sportsHash) }
+        val broken = sports.toString(Charsets.UTF_8).replace("\"parentId\": \"", "\"parentId\": \"missing.").toByteArray()
+        expect(ErrorCode.INVALID_INPUT) { FullResearchCatalog.read(base,isco,iscoHash,broken,researchHash(broken)) }
+        val badArchive = object: ResearchArchive {
+            override fun put(sha256: String,bytes: ByteArray) {}
+            override fun read(sha256: String) = byteArrayOf(0)
+        }
+        expect(ErrorCode.STORAGE) { full.apply(receiver,receiver.snapshot().token,badArchive) }
+        assertEquals(before,receiver.data())
+        val output = researchDir.parentFile.resolve("build/full-projection-evidence"); output.mkdirs()
+        output.resolve("runtime-vocabulary.json").writeText(codec.encodeToString(full.vocabulary))
+        output.resolve("outcomes.json").writeText(codec.encodeToString(full.outcomes))
     }
 
     private fun repeatedRestoreAndReferences(sampleJson: String) {

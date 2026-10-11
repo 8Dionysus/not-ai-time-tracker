@@ -88,3 +88,10 @@ ZIP исследовательского пакета 0.4 не читался и
 ## Полный полученный корпус 0.5 · APK 0.3.0
 
 После снятия блокера через Library read API добавлен типизированный ResearchCatalog и FileResearchArchive. Фактический SHA-256 входа подтверждён; полный файл и результаты включены в research/ и evidence/research/. Новые проверки полного корпуса входят в прежние три сценария. Команда :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug прошла: BUILD SUCCESSFUL, 3 Core + 3 Room, 0 failures/errors/skips; lint 0 errors / 7 warnings. Это не device QA. JSON теперь 3 с чтением 1/2, SQL Room остаётся 2. Подробный контракт и непреобразованный остаток — RESEARCH_ADAPTER.md; предыдущие разделы о недоступности JSON/отсутствии адаптера являются историей прежних проходов.
+
+
+## Полный baseline + ISCO v2 + спорт 0.7
+
+11 октября 2026: `JAVA_HOME=/workspace/toolchains/jdk21 ANDROID_HOME=/workspace/toolchains/android-sdk ANDROID_USER_HOME=/workspace/toolchains/android-user GRADLE_USER_HOME=/workspace/toolchains/gradle-home ./gradlew :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` — **BUILD SUCCESSFUL in 2m 1s**, 60 tasks (19 executed). Три Core и три Room/Robolectric сценария: 0 failures/errors/skips. Lint: 0 errors, 7 прежних warnings. APK собран; устройство не запускалось. Логи, XML, summary и полные runtime/outcomes: `evidence/full-projection/`.
+
+Полный каталог: 2092 типа, 337 осей; baseline не изменён. Проверены все 353 ISCO и 223 спортивных строки, 37 целых занятий без деталей и Repeat (38 сегментов, ровно 38 секунд), полная установка, replay/conflict/stale, сохранность истории, JSON export/restore на чистой базе, отказ при повреждённом JSON/parent/hash/evidence. Прежние количественные и rollback проверки сохранены в трёх сценариях; schema Room 2 и JSON 3 не менялись. Контракт и неисполняемые связи описаны в FULL_CATALOG_07.md. Remote по-прежнему не настроен; репозиторий локальный, без публичной публикации.

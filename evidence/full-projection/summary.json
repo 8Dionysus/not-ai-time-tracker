@@ -1,0 +1,109 @@
+{
+  "baselineSourceRecords": 1584,
+  "baselineResearchNodes": 1587,
+  "runtimeTypes": 2092,
+  "runtimeAxes": 337,
+  "outcomesByKind": {
+    "typed-relation": 159,
+    "action-reference": 390,
+    "root-placement": 180,
+    "explicit-pair-reuse": 11,
+    "optional-component": 18,
+    "family-or-wrapper": 12,
+    "residual-resolution": 5,
+    "source-disposition": 576,
+    "activity": 168,
+    "whole-event": 28,
+    "components": 28,
+    "optional-facet": 37,
+    "explicit-reuse": 12,
+    "complete-source-section": 34
+  },
+  "sourceDispositions": {
+    "isco_full_projection_v2.json": 353,
+    "sports_additive_catalogue_projection.json": 223
+  },
+  "withoutDirectRuntimeBinding": [
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/315",
+      "key": "major67890.retired_action_candidate.ISCO.action.trade.engrave_or_etch",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Carving and printmaking provide recognizable engraving/etching analogs, but are partial: durable object engraving and glass etching are not declared fully covered. Paid/professional context alone is not the reason to create another action; keep technique residual explicit. Active component/residual link: residual.engrave_etch_surface_marking."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/317",
+      "key": "major67890.retired_action_candidate.ISCO.action.production.make_repair_footwear",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Leather craft overlaps making/repairing leather footwear/accessories, but custom fitting and orthopaedic footwear may be a distinct remainder. Work/life care exact and broad neighbors are embedded in source; do not treat the hobby node as total coverage. Active component/residual link: residual.custom_orthopaedic_footwear_fit_repair."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/318",
+      "key": "major67890.retired_action_candidate.ISCO.action.production.process_photographic_media",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Retain separate stage names; do not resurrect retired photo-processing candidate because a scanning candidate exists. Active component/residual link: residual.photosensitive_media_manufacture."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/334",
+      "key": "major345.action_candidate.distribute_promotional_samples_and_catalogues",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Keep printed handout and product-sample offering distinct components; preserve an active sample-distribution residual. No full candidate merge. Active component/residual link: residual.promotional_sample_goods_distribution."
+    },
+    {
+      "file": "sports_additive_catalogue_projection.json",
+      "pointer": "/rowDispositions/104",
+      "key": "arisf:arISF_075",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "bounded_semantic_or_source_hold; IFAF’s official page exposes only the guide title, while its current Rules page links tackle and flag rulebooks but no wheelchair-football rules. A first-party operational guide/ruleset is needed to distinguish the intended chair/game format (e.g. chair type and play/scoring/field/team mechanics) from generic American-football and flag variants before a precise selectable activity definition or alias is safe."
+    }
+  ],
+  "testResults": [
+    {
+      "backend": "core",
+      "name": "dev.notai.tracker.CoreScenariosTest",
+      "tests": "3",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-11T17:18:03.099Z",
+      "hostname": "442bbd4fc7a7",
+      "time": "35.925"
+    },
+    {
+      "backend": "room",
+      "name": "dev.notai.tracker.android.RoomScenariosTest",
+      "tests": "3",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-11T17:18:42.446Z",
+      "hostname": "442bbd4fc7a7",
+      "time": "75.903"
+    }
+  ],
+  "deviceTested": false,
+  "inputManifest": {
+    "role": "Authoritative corrected additions to unchanged research/catalog.research.json",
+    "baseSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+    "files": [
+      {
+        "file": "isco_full_projection_v2.json",
+        "bytes": 9861886,
+        "sha256": "7dd02e406bb2c34260a73179b2b6a94f19d0141aa1bb06815277eb5e23bc2498"
+      },
+      {
+        "file": "sports_additive_catalogue_projection.json",
+        "bytes": 3855880,
+        "sha256": "6b5e4810622ff4af4af794b2ac8093d7135caad85f1ace51e99ced62a7373955"
+      }
+    ]
+  }
+}

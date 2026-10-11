@@ -188,13 +188,16 @@ class ResearchPlan internal constructor(private val original: ByteArray,val sha2
     /** Evidence is verified before the only database mutation. A stale token cannot replace history. */
     fun apply(tracker: Tracker,expected: Token,selectedIds: Set<String>,archive: ResearchArchive,selectedAxisIds: Set<String> = emptySet()): ResearchImport = storage {
         val vocabulary = vocabulary(selectedIds,selectedAxisIds)
+        preserveEvidence(archive)
+        ResearchImport(tracker.addCatalog(expected,vocabulary),sha256,outcomes)
+    }
+    fun preserveEvidence(archive: ResearchArchive) = storage {
         for((_,bytes) in supporting) {
             val digest = researchHash(bytes); archive.put(digest,bytes.copyOf())
             ensure(researchHash(archive.read(digest)) == digest,"Supporting evidence readback failed",ErrorCode.STORAGE)
         }
         archive.put(sha256,sourceBytes())
         ensure(researchHash(archive.read(sha256)) == sha256,"Research evidence readback failed",ErrorCode.STORAGE)
-        ResearchImport(tracker.addCatalog(expected,vocabulary),sha256,outcomes)
     }
 }
 fun researchHash(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it.toInt() and 255) }

@@ -88,3 +88,6 @@ saveAxis/saveMetric/saveUnit/addCatalog работают через тот же 
 ### Адаптер корпуса 0.5
 
 ResearchCatalog.read проверяет полный источник и возвращает план без записи. plan.apply требует явных selectedIds/selectedAxisIds, текущего Token и ResearchArchive; результат Change.catalogImport по-прежнему показывает ADDED/UNCHANGED/CONFLICT. Новые researchOrigins в типах/осях сохраняют source-qualified provenance. JSON formatVersion=3 читает прежние 1/2; Room 2 совместим с прежними payload без origins. Исходный исследовательский файл хранится отдельно по SHA-256, не включается в обычную JSON-копию. Не считать успешный импорт выбранной проекции завершением всех исследовательских слоёв. Полный контракт — RESEARCH_ADAPTER.md.
+
+
+Полный корпус каталога 0.7 устанавливается через FullResearchCatalog / FullResearchPlan.apply; см. [FULL_CATALOG_07.md](FULL_CATALOG_07.md). UI использует тот же Tracker и не пересчитывает whole/component время самостоятельно.

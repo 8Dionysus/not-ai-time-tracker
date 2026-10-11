@@ -594,7 +594,42 @@ abstract class ScenarioContract {
         assertEquals(Mode.RECOVERY,view.snapshot().mode); assertEquals(readCount,reads)
     }
 
+    private fun draftBoundaryValidation() {
+        val clock = FakeClock(); val t = Tracker(createStore(),clock)
+        val interval = DraftInterval(clock.wall-10_000,clock.wall-9000)
+        val base = EntryDrafts.selectedText("x").copy(interval = interval)
+        val invalid = listOf(
+            base.copy(note = "a".repeat(16385)),
+            EntryDraft(Classification(),"a".repeat(16385),interval,DraftSource.CALENDAR_EVENT),
+            base.copy(note = ""),base.copy(note = " \t\n"),
+            base.copy(sourceReference = "event-reference"),
+            base.copy(source = DraftSource.CALENDAR_EVENT,sourceReference = "r".repeat(1025)),
+            base.copy(source = DraftSource.CALENDAR_EVENT,sourceReference = ""),
+            base.copy(source = DraftSource.CALENDAR_EVENT,sourceReference = "  "),
+            base.copy(source = DraftSource.CALENDAR_EVENT,sourceReference = "ref\nvalue"),
+            EntryDraft(Classification(),"valid",interval,DraftSource.CALENDAR_EVENT,"ref\u0000value")
+        )
+        invalid.forEach { draft ->
+            val before = t.data(); val token = t.snapshot().token
+            expect(ErrorCode.INVALID_INPUT) { t.startDraft(token,draft) }; assertEquals(before,t.data())
+            expect(ErrorCode.INVALID_INPUT) { t.recordDraft(token,draft) }; assertEquals(before,t.data())
+        }
+        expect(ErrorCode.INVALID_INPUT) { EntryDrafts.event("title",reference = "bad\nref") }
+        // Boundary-sized edited text is stored verbatim; null explicitly removes the note.
+        val exact = "=текст\n" + "a".repeat(16377)
+        assertEquals(16384,exact.length)
+        listOf(exact,null).forEach { note ->
+            val draft = EntryDraft(Classification(),note,DraftInterval(clock.wall-10_000,clock.wall-9000),DraftSource.CALENDAR_EVENT,"r".repeat(1024))
+            val saved = t.recordDraft(t.snapshot().token,draft)
+            assertEquals(note,saved.changedSessions.single().note)
+            val started = t.startDraft(t.snapshot().token,draft)
+            assertEquals(note,started.changedSessions.single().note)
+            clock.advance(1000); t.stop(t.snapshot().token); clock.advance(20_000)
+        }
+    }
+
     private fun localEntryLifecycle() {
+        draftBoundaryValidation()
         val clock = FakeClock(wall = Instant.parse("2026-03-30T00:00:00Z").toEpochMilli())
         val t = Tracker(createStore(),clock); fun token() = t.snapshot().token
         fun at(value: String) = Instant.parse(value).toEpochMilli()

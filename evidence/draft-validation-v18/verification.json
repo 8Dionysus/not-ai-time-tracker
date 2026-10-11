@@ -1,0 +1,17 @@
+{
+  "appVersion": "0.9.1",
+  "command": "./gradlew --offline :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug",
+  "result": "BUILD SUCCESSFUL in 33s",
+  "coreTests": 3,
+  "roomTests": 3,
+  "failures": 0,
+  "lint": {
+    "Fatal": 0,
+    "Error": 0,
+    "Warning": 12
+  },
+  "deviceTested": false,
+  "roomSchema": 3,
+  "backupFormat": 7,
+  "regression": "Both draft commands reject invalid constructor/copy note/reference without changing Dataset; exact 16384-unit text and null removal preserved; valid 1024-unit event reference accepted."
+}

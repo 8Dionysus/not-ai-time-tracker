@@ -26,6 +26,17 @@ enum class DraftSource { SELECTED_TEXT, CALENDAR_EVENT }
 data class EntryDraft(val selection: Classification,val note: String? = null,val interval: DraftInterval? = null,
     val source: DraftSource,val sourceReference: String? = null)
 
+/** Shared command boundary: null deliberately removes a note; blank strings are rejected.
+ * Opaque event references must be nonblank, bounded and free of control characters.
+ */
+internal fun EntryDraft.validateForApply() {
+    note?.let { ensure(it.isNotBlank() && it.length <= 16384,"Draft note must be null or contain 1..16384 characters") }
+    sourceReference?.let {
+        ensure(source == DraftSource.CALENDAR_EVENT,"Selected text cannot carry an event reference")
+        ensure(it.isNotBlank() && it.length <= 1024 && it.none(Char::isISOControl),"Invalid event reference: expected 1..1024 characters without controls")
+    }
+}
+
 object EntryDrafts {
     /** Keep text intact for review, including newlines. Caller explicitly selects classification. */
     fun selectedText(text: String,selection: Classification = Classification()): EntryDraft {
@@ -38,8 +49,7 @@ object EntryDrafts {
      */
     fun event(title: String,interval: DraftInterval? = null,selection: Classification = Classification(),reference: String? = null): EntryDraft {
         checkText(title)
-        ensure(reference == null || reference.length <= 1024,"Event reference exceeds 1024 characters")
-        return EntryDraft(selection.frozen(),title,interval,DraftSource.CALENDAR_EVENT,reference)
+        return EntryDraft(selection.frozen(),title,interval,DraftSource.CALENDAR_EVENT,reference).also { it.validateForApply() }
     }
     private fun checkText(text: String) { ensure(text.isNotBlank() && text.length <= 16384,"Input must contain 1..16384 characters") }
 }

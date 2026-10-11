@@ -42,25 +42,30 @@ for i,v in enumerate(x['axisValueMapping']['valueRecords']):
   representation+='Runtime may keep the whole source-local text or an explicitly registered source-local value; it never automatically treats components as synonyms or assigns multiple facets.'
  else: representation+='Explicit configureAxis is available only where source schema was absent; other domain-record/preferences remain outside facets.'
  values.append(dict(pointer=f'/axisValueMapping/valueRecords/{i}',original=v,coreConstraint='One facet carries one literal text or one registered value ID. Multiple facets require independent explicit values, not slash splitting.',representation=representation,componentReview=[dict(source=c,allowedRepresentation='Separate optional source-local value under the stated target concept only after explicit schema/value registration; retain original literal occurrence and component relation.',remainingGap=v.get('retainedAmbiguity')) for c in components],remainingGap=v.get('retainedAmbiguity') or ('Research component/alias proposal is not a migration; register chosen local IDs explicitly.' if structure!='single_value_candidate' else 'No cross-source identity inferred.')))
-quantities=[]
-for i,r in enumerate(x['quantitiesReview']['rows']):
- duration=r['proposedConcepts']==['quantity.elapsed_duration']
- bounded=r['sourceMeasureId'] in ['measure.distance','measure.elevation_gain','measure.sets','measure.repetitions','measure.pages']
- quantities.append(dict(pointer=f'/quantitiesReview/rows/{i}',original=r,coreConstraint='Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.',allowedRepresentation='Core segment duration, never another metric.' if duration else 'Implemented measureVocabulary: explicitly named bounded manual total, BY_TARGET, source provenance; not unique coverage or position.' if bounded else 'A separately named nonnegative manual scalar with explicit unit/basis/scope is possible; BY_TARGET avoids unjustified roll-up. Original multi-part quantity remains in source.',exactRemainingGap=None if duration else dict(requiredContext=r.get('requiredInterpretationContext'),meaning=r.get('meaningRu'),aggregation=r.get('aggregationRu'),disposition=r['disposition'])))
-# Each household candidate keeps its own definition, aggregation and the exact missing target context.
-for i,r in enumerate(x['householdQuantities']['candidateMeasures']):
- k=r['measureKind']
- if k=='state_plus_interval': rep='No scalar projection for recurrence/due-state; optional task records with recurrence convention needed.'
- elif k in ['quantity_state','quantity_context']: rep='One scalar snapshot/package size is storable BY_TARGET only as a session annotation, not stock state or package conversion. Need object ID, snapshot time/basis.'
- elif k=='money_amount':rep='A nonnegative amount in one chosen currency fits BY_TARGET; no exchange-rate conversion. Receipt/line identity, refunds and dedup need separate transaction semantics.'
- elif 'event' in k or k=='count_or_extent':rep='Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.'
- else:rep='A named count/mass/volume/area/length component fits scalar BY_TARGET. Compound units are separate metrics; source-specific product/site/stage/basis remains explicit, not inferred.'
- quantities.append(dict(pointer=f'/householdQuantities/candidateMeasures/{i}',original=r,coreConstraint='Only SESSION/SEGMENT numeric targets, not dated object/event/task state.',allowedRepresentation=rep,exactRemainingGap=dict(scope=r.get('measurementScope'),context=r.get('optionalContextFields'),aggregation=r['aggregationPolicyRu'],misleadingIf=r.get('misleadingIfRu'))))
+# No generic fallback: each of the 71 source occurrences has an explicit reviewed policy.
+policy=read(ROOT/'core/src/main/resources/research-quantity-projections.json')
+assert policy['packageSha256']==hashlib.sha256((ROOT/'research/catalog.research.json').read_bytes()).hexdigest()
+by_pointer={r['pointer']:r for r in policy['rows']}
+assert len(by_pointer)==71
+originals={}
+for i,r in enumerate(x['quantitiesReview']['rows']):originals[f'/quantitiesReview/rows/{i}']=r
+for i,r in enumerate(x['householdQuantities']['candidateMeasures']):originals[f'/householdQuantities/candidateMeasures/{i}']=r
 w=support['tracker_work_learning_core_v4_compatibility.json']
-scalar={'qneed.work.length_quantity','qneed.work.area_quantity','qneed.work.volume_quantity','qneed.work.mass_quantity','qneed.learning.response_attempt_count'}
 for group in ['quantities','reusedExistingDefinitions']:
- for i,r in enumerate(w[group]):
-  quantities.append(dict(pointer=f'supporting/tracker_work_learning_core_v4_compatibility.json/{group}/{i}',original=r,coreConstraint=w['actualCoreContract']['contractLimitations'],allowedRepresentation='Implemented scalarVocabulary: explicit local meaning/scope, SI unit or response count, BY_TARGET, verified provenance.' if r['id'] in scalar else r['coreMapping'],exactRemainingGap=r.get('exactGapOrBoundary',r.get('ruleRu')),wordBasisReview=r.get('wordCountVariants',[])))
+ for i,r in enumerate(w[group]):originals[f'/supporting/tracker_work_learning_core_v4_compatibility.json/{group}/{i}']=r
+assert by_pointer.keys()==originals.keys()
+quantities=[]
+for pointer,r in originals.items():
+ decision=by_pointer[pointer]
+ assert decision['sourceId']==r.get('sourceMeasureId',r.get('id'))
+ assert decision['definition']==r.get('meaningRu',r.get('definitionRu',r.get('ruleRu')))
+ quantities.append(dict(pointer=pointer,original=r,reviewedDefinition=decision['definition'],
+  coreConstraint='Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.',
+  allowedRepresentations=decision['variants'],exactRemainingGap=decision['remainingGap'],
+  api='quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection',
+  wordBasisReview=r.get('wordCountVariants',[])))
+scalar=[r['sourceId'] for r in policy['rows'] if any(v['kind']=='NUMBER' for v in r['variants'])]
+
 nodes=[]
 for r in x['lifeSourceKindReview']['items']:
  node=next(n for n in x['nodes'] if n['id']==r['sourceId'])
@@ -69,6 +74,6 @@ for r in x['lifeSourceKindReview']['items']:
  else:rep='Instant event log needs event ID/type/timestamp and optional links. Recommend separate event record; time spent documenting may be a separately created personal activity, never duration inferred from the event.'
  nodes.append(dict(original=node,decision=r,allowedRepresentation=rep,coreConstraint='One primary duration stream; facets are classifications, not event records.'))
 write('followup-axis-review.json',axes);write('followup-value-review.json',values);write('followup-quantity-review.json',quantities);write('followup-node-review.json',nodes)
-summary=dict(verifiedDocuments=verified,axesReviewed=len(axes),previouslyRemainingAxes=sum(a['previouslyRemaining'] for a in axes),runtimeAxes=sum(a['runtimeId'] is not None for a in axes),explicitSchemaAxes=sum('configureAxis' in a['representation'] for a in axes),valuesReviewed=len(values),valueStructures=dict(Counter(v['original']['mappingStructure'] for v in values)),quantityRecordsReviewed=len(quantities),wordBasesReviewed=6,nonRuntimeNodesReviewed=len(nodes),boundedScalarFactories=sorted(scalar),mobileScope=support['tracker_mobile_catalog_navigation_research.json']['scope'],mobileRemainder=support['tracker_mobile_catalog_navigation_research.json']['concrete_remainder'])
+summary=dict(verifiedDocuments=verified,axesReviewed=len(axes),previouslyRemainingAxes=sum(a['previouslyRemaining'] for a in axes),runtimeAxes=sum(a['runtimeId'] is not None for a in axes),explicitSchemaAxes=sum('configureAxis' in a['representation'] for a in axes),valuesReviewed=len(values),valueStructures=dict(Counter(v['original']['mappingStructure'] for v in values)),quantityRecordsReviewed=len(quantities),wordBasesReviewed=6,nonRuntimeNodesReviewed=len(nodes),numericSourceRecords=len(scalar),numericVariants=sum(v["kind"]=="NUMBER" for r in policy["rows"] for v in r["variants"]),facetVariants=sum(v["kind"]=="FACET" for r in policy["rows"] for v in r["variants"]),quantityPolicy="core/src/main/resources/research-quantity-projections.json",mobileScope=support['tracker_mobile_catalog_navigation_research.json']['scope'],mobileRemainder=support['tracker_mobile_catalog_navigation_research.json']['concrete_remainder'])
 write('followup-summary.json',summary)
 print(json.dumps({k:v for k,v in summary.items() if k not in ['verifiedDocuments','mobileRemainder']},ensure_ascii=False))

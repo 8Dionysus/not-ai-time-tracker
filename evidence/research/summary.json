@@ -58,5 +58,8 @@
   "verifiedSupportingDocuments": 5,
   "verifiedCrossDomainRelations": 357,
   "configuredAxes": 17,
-  "boundedScalarFactories": 10
+  "quantitySourceRecordsReviewed": 71,
+  "numericSourceRecords": 64,
+  "numericVariants": 115,
+  "facetVariants": 5
 }

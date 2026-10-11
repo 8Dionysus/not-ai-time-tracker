@@ -53,13 +53,10 @@
   "quantityRecordsReviewed": 71,
   "wordBasesReviewed": 6,
   "nonRuntimeNodesReviewed": 3,
-  "boundedScalarFactories": [
-    "qneed.learning.response_attempt_count",
-    "qneed.work.area_quantity",
-    "qneed.work.length_quantity",
-    "qneed.work.mass_quantity",
-    "qneed.work.volume_quantity"
-  ],
+  "numericSourceRecords": 64,
+  "numericVariants": 115,
+  "facetVariants": 5,
+  "quantityPolicy": "core/src/main/resources/research-quantity-projections.json",
   "mobileScope": "Mobile catalogue discovery, search, synonym/typo/multilingual retrieval, favorites/recents, folder/tree and facet navigation, user-setting transfer, and Android accessibility. This is research, not an implementation or product-scope approval.",
   "mobileRemainder": [
     {

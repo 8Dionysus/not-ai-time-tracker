@@ -411,15 +411,52 @@ abstract class ScenarioContract {
         val pages = plan.measureVocabulary("tracker_catalog_proposal.json","measure.pages","edition-a","Pages read of edition A (including rereads)",Scope.SESSION)
         assertEquals(NumberKind.INTEGER,pages.metrics.single().numberKind)
         expect(ErrorCode.INVALID_INPUT) { plan.measureVocabulary("tracker_leisure_sport_inventory.json","measure.media_progress","p","Progress",Scope.SESSION) }
+        val projections = plan.quantityProjections()
+        assertEquals(71,projections.size)
+        val numeric = projections.flatMap { row -> row.variants.filter { it.kind == QuantityRepresentation.NUMBER }.map { row to it } }
+        assertEquals(115,numeric.size)
+        val projected = numeric.mapIndexed { i,(row,basis) ->
+            val dimension = if(basis.dimension == "currency") "currency:USD" else basis.dimension
+            val unit = UnitDefinition("review-unit-$i",basis.id,dimension)
+            plan.quantityVocabulary(row.pointer,basis.id,"personal",basis.meaning,Scope.SESSION,unit)
+        }
+        val projectedCatalog = VocabularyData(emptyList(),metrics = projected.flatMap { it.metrics },units = projected.flatMap { it.units })
+        assertEquals(115,projectedCatalog.metrics.map { it.id }.toSet().size)
+        assertTrue(projectedCatalog.metrics.all { it.aggregation == Aggregation.BY_TARGET && it.researchOrigins.size == 1 })
+        val planting = projections.single { it.sourceId == "qneed.garden.planting_and_growing_quantity" }
+        assertFalse(planting.variants.single { it.id == "area" }.integer)
+        assertFalse(planting.variants.single { it.id == "row_length" }.integer)
+        val resources = projections.single { it.sourceId == "qneed.own_use.resource_quantity" }
+        assertFalse(resources.variants.single { it.id == "volume" }.integer)
+        val style = projections.single { it.sourceId == "measure.gait_style" }
+        val block = projections.single { it.sourceId == "measure.training_block" }
+        assertTrue((style.variants+block.variants).all { it.kind == QuantityRepresentation.FACET })
+        val styleCatalog = plan.quantityFacetVocabulary(style.pointer,"style","local",ValueKind.FREE_LABEL,Cardinality.MULTIPLE)
+        assertTrue(styleCatalog.metrics.isEmpty())
+        expect(ErrorCode.INVALID_INPUT) { plan.quantityVocabulary(style.pointer,"style","x","Style",Scope.SESSION,UnitDefinition("u","u","count")) }
+        expect(ErrorCode.INVALID_INPUT) { plan.quantityVocabulary(planting.pointer,"","x","Planting",Scope.SESSION,UnitDefinition("u","u","area")) }
+        expect(ErrorCode.INVALID_INPUT) { plan.quantityVocabulary(planting.pointer,"area","x","Area",Scope.SESSION,UnitDefinition("u","u","mass")) }
+        val words = projections.single { it.sourceId == "qneed.writing.word_count" }
+        expect(ErrorCode.INVALID_INPUT) { plan.quantityVocabulary(words.pointer,"net_delta","x","Net words",Scope.SESSION,UnitDefinition("u","u","count")) }
         val configured = plan.configureAxis("work_learning","axis.phase","personal",ValueKind.FREE_LABEL,Cardinality.MULTIPLE)
         val primary = plan.primarySupervisionVocabulary()
         assertTrue(primary.types.single().id !in plan.candidateIds)
         expect(ErrorCode.INVALID_INPUT) { plan.configureAxis("seed","axis.topic","x",ValueKind.LOCAL_CHOICE,Cardinality.SINGLE) }
         val clock = FakeClock(); val t = Tracker(createStore(),clock)
+        t.addCatalog(t.snapshot().token,projectedCatalog)
+        assertTrue(t.addCatalog(t.snapshot().token,projectedCatalog).catalogImport!!.added.isEmpty())
+        val edited = projectedCatalog.metrics.first().copy(name = "Personal retained label")
+        t.saveMetric(t.snapshot().token,edited)
+        assertEquals(listOf(edited.id),t.addCatalog(t.snapshot().token,projectedCatalog).catalogImport!!.conflicts.map { it.id })
+        t.addCatalog(t.snapshot().token,styleCatalog)
         t.addCatalog(t.snapshot().token,configured)
         t.addCatalog(t.snapshot().token,primary)
         t.start(t.snapshot().token); clock.advance(1000); t.stop(t.snapshot().token)
         val oldHistory = t.data().segments
+        for(metric in projectedCatalog.metrics) {
+            t.measure(t.snapshot().token,Measurement(fieldId = metric.id,unit = metric.canonicalUnitId,scope = Scope.SESSION,
+                targetId = t.data().sessions.single().id,value = Decimal(if(metric.numberKind == NumberKind.INTEGER) "2" else "1.25")))
+        }
         t.addCatalog(t.snapshot().token,scalar)
         val metric = scalar.metrics.single()
         t.measure(t.snapshot().token,Measurement(fieldId = metric.id,unit = metric.canonicalUnitId,
@@ -436,6 +473,9 @@ abstract class ScenarioContract {
         assertEquals(oldHistory,t.data().segments)
         assertEquals("Local meaning",t.data().types.single { it.id == selected.id }.definition)
         assertTrue(t.data().types.filter { it.id != selected.id && it.id in plan.candidateIds }.all { it.researchOrigins.isNotEmpty() })
+        val quantityReport = Reports.report(t.data(),clock.now(),clock.wall-2000,clock.wall)
+        assertEquals(116,quantityReport.measurements.size)
+        assertTrue(quantityReport.quantityTotals().isEmpty())
         val backupJson = Backups(t,MemoryRollback()).export()
         assertEquals(3,Backups.decode(backupJson).formatVersion)
         val copy = Backups.decode(backupJson).data
@@ -450,10 +490,18 @@ abstract class ScenarioContract {
         val facets = listOf(Facet(language.id,valueId = "es",valueMeaningVersion = 1),
             Facet("research:leisure_sport:axis.game_genre",text = "co-op / puzzle"),
             Facet("research:leisure_sport:axis.game_genre",text = "local personal genre"),
-            Facet(configured.axes.single().id,text = "publish/release"))
+            Facet(configured.axes.single().id,text = "publish/release"),
+            Facet(styleCatalog.axes.single().id,text = "freestyle"))
         receiver.start(receiver.snapshot().token,Classification(activityTypeId = primary.types.single().id,facets = facets))
         clock.advance(1000); receiver.stop(receiver.snapshot().token)
         assertEquals(facets,receiver.data().sessions.last().selection.facets)
+        receiver.repeat(receiver.snapshot().token,receiver.data().sessions.last().id)
+        assertEquals(facets,receiver.data().sessions.last().selection.facets)
+        clock.advance(1000); receiver.stop(receiver.snapshot().token)
+        val priorMeasurements = receiver.data().measurements
+        receiver.repeat(receiver.snapshot().token,copy.sessions.single().id)
+        clock.advance(1000); receiver.stop(receiver.snapshot().token)
+        assertEquals(priorMeasurements,receiver.data().measurements) // repeat never invents new measured output
         assertEquals(receiver.data(),Backups.decode(Backups(receiver,MemoryRollback()).export()).data)
         for((_,digest) in plan.supportingHashes) assertEquals(digest,researchHash(archive.read(digest)))
         val badArchive = object: ResearchArchive {

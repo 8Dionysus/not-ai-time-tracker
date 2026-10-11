@@ -37,9 +37,12 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "Core segment duration, never another metric.",
-    "exactRemainingGap": null
+    "reviewedDefinition": "Длительность фактически записанных отрезков. Полнота записи суток не подразумевается.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [],
+    "exactRemainingGap": "Use the existing unique Segment durations. A second Metric would duplicate elapsed time.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/1",
@@ -88,20 +91,20 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "Implemented measureVocabulary: explicitly named bounded manual total, BY_TARGET, source provenance; not unique coverage or position.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "subject_or_route",
-        "segment_or_session",
-        "measurement_id",
-        "unit",
-        "source"
-      ],
-      "meaning": "Пройденное расстояние, введённое или полученное из явно указанного источника. В текущем seed только ручной ввод.",
-      "aggregation": "Сумма независимых дистанций с совместимым смыслом и единицами. Повтор одного session total на каждом segment не складывается.",
-      "disposition": "retain_with_scope_guard"
-    }
+    "reviewedDefinition": "Пройденное расстояние, введённое или полученное из явно указанного источника. В текущем seed только ручной ввод.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "distance",
+        "meaning": "Travelled distance in the chosen route/surface basis",
+        "kind": "NUMBER",
+        "dimension": "length",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Manual distance total fits. Route identity and duplicate route imports are not resolved; do not repeat a session total on segments.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/2",
@@ -140,18 +143,20 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "Implemented measureVocabulary: explicitly named bounded manual total, BY_TARGET, source provenance; not unique coverage or position.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "exercise",
-        "session",
-        "count_semantics"
-      ],
-      "meaning": "Количество подходов выбранного упражнения.",
-      "aggregation": "Сумма отдельных подходов в выбранной области. Один ввод итогового числа не дублировать при разбиении таймера.",
-      "disposition": "retain"
-    }
+    "reviewedDefinition": "Количество подходов выбранного упражнения.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "sets",
+        "meaning": "Sets of one named exercise within the selected scope",
+        "kind": "NUMBER",
+        "dimension": "count:measure.sets:sets",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "No set identities or per-set load structure; total is not copied onto each segment.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/3",
@@ -190,18 +195,20 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "Implemented measureVocabulary: explicitly named bounded manual total, BY_TARGET, source provenance; not unique coverage or position.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "exercise",
-        "set_or_session",
-        "per_set_or_total"
-      ],
-      "meaning": "Количество повторов выбранного упражнения, отдельного подхода либо явного итога.",
-      "aggregation": "Сумма неперекрывающихся счётчиков одинакового действия. Число повторов на подход не умножать на число подходов без явного значения этой записи.",
-      "disposition": "retain"
-    }
+    "reviewedDefinition": "Количество повторов выбранного упражнения, отдельного подхода либо явного итога.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "repetitions",
+        "meaning": "Executions of one exercise; choose per-set or whole-target total explicitly",
+        "kind": "NUMBER",
+        "dimension": "count:measure.repetitions:repetitions",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "No set identity; never multiply repetitions by set count implicitly.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/4",
@@ -241,19 +248,20 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "Implemented measureVocabulary: explicitly named bounded manual total, BY_TARGET, source provenance; not unique coverage or position.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "work",
-        "edition",
-        "count_vs_position",
-        "rereading_policy"
-      ],
-      "meaning": "Количество прочитанных страниц конкретного издания. Номер последней страницы является другой величиной.",
-      "aggregation": "Сумма введённых объёмов в совместимом контексте; перечитывание учитывается как повторное чтение, но не новые уникальные страницы.",
-      "disposition": "retain_with_position_boundary"
-    }
+    "reviewedDefinition": "Количество прочитанных страниц конкретного издания. Номер последней страницы является другой величиной.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "pages_read",
+        "meaning": "Pages actually read of one named edition, with explicit rereading policy",
+        "kind": "NUMBER",
+        "dimension": "count:measure.pages:pages_read",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Count is reading volume, not final page number or deduplicated unique coverage.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/5",
@@ -278,9 +286,12 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "Core segment duration, never another metric.",
-    "exactRemainingGap": null
+    "reviewedDefinition": "То же календарное время, что в исходном seed.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [],
+    "exactRemainingGap": "Use the existing unique Segment durations. A second Metric would duplicate elapsed time.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/6",
@@ -310,18 +321,20 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "Implemented measureVocabulary: explicitly named bounded manual total, BY_TARGET, source provenance; not unique coverage or position.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "route",
-        "measurement_scope",
-        "unit"
-      ],
-      "meaning": "Расстояние; поверхностный или маршрутный смысл задаётся записью.",
-      "aggregation": "Те же правила области и уникальности, что у seed distance.",
-      "disposition": "reuse_existing"
-    }
+    "reviewedDefinition": "Расстояние; поверхностный или маршрутный смысл задаётся записью.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "distance",
+        "meaning": "Travelled distance in the chosen route/surface basis",
+        "kind": "NUMBER",
+        "dimension": "length",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Manual distance total fits. Route identity and duplicate route imports are not resolved; do not repeat a session total on segments.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/7",
@@ -348,19 +361,20 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "Implemented measureVocabulary: explicitly named bounded manual total, BY_TARGET, source provenance; not unique coverage or position.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "route",
-        "segment_or_session",
-        "method_or_manual",
-        "length_unit"
-      ],
-      "meaning": "Накопленный подъём; отличается от текущей высоты и разницы высот старта/финиша.",
-      "aggregation": "Сумма независимых участков при одинаковом методе учёта. Разные методы сглаживания или дубли пути не считать равнозначными.",
-      "disposition": "define_quantity"
-    }
+    "reviewedDefinition": "Накопленный подъём; отличается от текущей высоты и разницы высот старта/финиша.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "ascent",
+        "meaning": "Accumulated ascent using one stated smoothing/measurement method",
+        "kind": "NUMBER",
+        "dimension": "length",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Not altitude or signed start/end difference; overlapping routes and method differences need explicit reconciliation.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/8",
@@ -389,20 +403,27 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "A separately named nonnegative manual scalar with explicit unit/basis/scope is possible; BY_TARGET avoids unjustified roll-up. Original multi-part quantity remains in source.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "distance_inputs",
-        "duration_inputs",
-        "elapsed_vs_moving",
-        "unit",
-        "derivation_version"
-      ],
-      "meaning": "Скорость — расстояние/время; темп — время/расстояние. Отдельно выбирается записанное или движущееся время.",
-      "aggregation": "Средняя скорость = сумма расстояний / сумма соответствующих времён. Темп = сумма времён / сумма расстояний. Нулевой знаменатель даёт неопределённое значение, а не ноль. Не усреднять темпы разных дистанций простым средним.",
-      "disposition": "split_derived_quantities"
-    }
+    "reviewedDefinition": "Скорость — расстояние/время; темп — время/расстояние. Отдельно выбирается записанное или движущееся время.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "speed",
+        "meaning": "Manual distance/time using a stated recorded-or-moving time basis",
+        "kind": "NUMBER",
+        "dimension": "speed",
+        "integer": false
+      },
+      {
+        "id": "pace",
+        "meaning": "Manual time/distance using a stated recorded-or-moving time basis",
+        "kind": "NUMBER",
+        "dimension": "pace",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "No inferred averages or reciprocal unit conversion. Zero denominator is undefined and cannot be entered as an invented zero; moving-time input must be supplied separately.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/9",
@@ -429,18 +450,27 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "A separately named nonnegative manual scalar with explicit unit/basis/scope is possible; BY_TARGET avoids unjustified roll-up. Original multi-part quantity remains in source.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "course_or_pool",
-        "lap_definition",
-        "length_when_known"
-      ],
-      "meaning": "Круг маршрута и длина бассейна — разные единицы счёта.",
-      "aggregation": "Сумма в одном определении круга/длины. Расстояние выводить только при известной длине; не предполагать 25 или 50 метров.",
-      "disposition": "split_counts"
-    }
+    "reviewedDefinition": "Круг маршрута и длина бассейна — разные единицы счёта.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "laps",
+        "meaning": "Count of route laps of one stated lap definition",
+        "kind": "NUMBER",
+        "dimension": "count:measure.laps_lengths:laps",
+        "integer": true
+      },
+      {
+        "id": "pool_lengths",
+        "meaning": "Count of pool lengths of one stated pool definition",
+        "kind": "NUMBER",
+        "dimension": "count:measure.laps_lengths:pool_lengths",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Lap and pool-length counts are distinct. No distance conversion without an explicitly known length.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/10",
@@ -465,17 +495,20 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "A separately named nonnegative manual scalar with explicit unit/basis/scope is possible; BY_TARGET avoids unjustified roll-up. Original multi-part quantity remains in source.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "activity",
-        "style_vocabulary"
-      ],
-      "meaning": "Стиль плавания, шаг или техника — категориальный признак, не количество.",
-      "aggregation": "Числовая сумма неприменима; фильтр или разбиение записей.",
-      "disposition": "move_to_facet"
-    }
+    "reviewedDefinition": "Стиль плавания, шаг или техника — категориальный признак, не количество.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "style",
+        "meaning": "Chosen gait, swimming stroke or technique label",
+        "kind": "FACET",
+        "dimension": "",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Categorical only: use a facet/filter. No numeric Measurement or sum.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/11",
@@ -505,20 +538,34 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "A separately named nonnegative manual scalar with explicit unit/basis/scope is possible; BY_TARGET avoids unjustified roll-up. Original multi-part quantity remains in source.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "exercise",
-        "set",
-        "load_unit",
-        "per_implement_vs_total",
-        "repetition_count"
-      ],
-      "meaning": "Повторы и подходы уже есть. Внешняя нагрузка отдельна от числа повторов и от единицы времени.",
-      "aggregation": "Массу нагрузки не суммировать как выполненный объём. Производный объём возможен только из явно связанных подходов, повторов и сопоставимых нагрузок; не является универсальной мерой усилия.",
-      "disposition": "split_existing_counts_and_quantity"
-    }
+    "reviewedDefinition": "Повторы и подходы уже есть. Внешняя нагрузка отдельна от числа повторов и от единицы времени.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "repetitions",
+        "meaning": "Executions of one named exercise",
+        "kind": "NUMBER",
+        "dimension": "count:measure.repetitions_sets_load:repetitions",
+        "integer": true
+      },
+      {
+        "id": "sets",
+        "meaning": "Sets of one named exercise",
+        "kind": "NUMBER",
+        "dimension": "count:measure.repetitions_sets_load:sets",
+        "integer": true
+      },
+      {
+        "id": "load",
+        "meaning": "One explicitly chosen external load; non-additive",
+        "kind": "NUMBER",
+        "dimension": "mass",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Separate counts from load. Scalar load is not an ordered list of per-set weights or derived exercise volume; that needs set links.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/12",
@@ -548,20 +595,27 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "A separately named nonnegative manual scalar with explicit unit/basis/scope is possible; BY_TARGET avoids unjustified roll-up. Original multi-part quantity remains in source.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "event_id",
-        "game",
-        "ruleset",
-        "score_role",
-        "rating_system"
-      ],
-      "meaning": "Раунд — счёт событий; счёт/очки и handicap зависят от правил игры. Handicap может быть состоянием рейтинга, а не результатом одной сессии.",
-      "aggregation": "Число раундов складывается по независимым событиям. Счёт/рейтинг сохранять по матчу и системе правил; без универсальной суммы или направления «больше лучше».",
-      "disposition": "split_count_score_rating"
-    }
+    "reviewedDefinition": "Раунд — счёт событий; счёт/очки и handicap зависят от правил игры. Handicap может быть состоянием рейтинга, а не результатом одной сессии.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "rounds",
+        "meaning": "Explicitly known number of rounds under one event definition",
+        "kind": "NUMBER",
+        "dimension": "count:measure.rounds_score:rounds",
+        "integer": true
+      },
+      {
+        "id": "nonnegative_score",
+        "meaning": "One nonnegative score under one stated game/ruleset",
+        "kind": "NUMBER",
+        "dimension": "score",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "No universal score total. Negative scores and handicap/rating state require signed/state semantics; do not silently clamp or relabel them.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/13",
@@ -590,19 +644,34 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "A separately named nonnegative manual scalar with explicit unit/basis/scope is possible; BY_TARGET avoids unjustified roll-up. Original multi-part quantity remains in source.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "sport",
-        "event_type",
-        "attempt_vs_success",
-        "event_scope"
-      ],
-      "meaning": "Исходные примеры goals/serves/shots — действия или события, не универсальный итог победы/поражения.",
-      "aggregation": "Считать только одинаковый тип события с явно определённой успешностью/попыткой; попадание и попытка не тождественны.",
-      "disposition": "rename_semantic_role"
-    }
+    "reviewedDefinition": "Исходные примеры goals/serves/shots — действия или события, не универсальный итог победы/поражения.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "goals",
+        "meaning": "Goals under one explicit success criterion",
+        "kind": "NUMBER",
+        "dimension": "count:measure.game_outcomes:goals",
+        "integer": true
+      },
+      {
+        "id": "serves",
+        "meaning": "Serves under one explicit attempted/successful criterion",
+        "kind": "NUMBER",
+        "dimension": "count:measure.game_outcomes:serves",
+        "integer": true
+      },
+      {
+        "id": "shots",
+        "meaning": "Shots under one explicit attempted/successful criterion",
+        "kind": "NUMBER",
+        "dimension": "count:measure.game_outcomes:shots",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Attempts and successes use distinct local definitions; no unique event IDs or automatic win/loss inference.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/14",
@@ -630,20 +699,20 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "A separately named nonnegative manual scalar with explicit unit/basis/scope is possible; BY_TARGET avoids unjustified roll-up. Original multi-part quantity remains in source.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "scale_id",
-        "scale_version",
-        "anchors",
-        "observation_time",
-        "subject"
-      ],
-      "meaning": "Субъективная оценка по выбранной шкале. Никаких выводов о здоровье по времени.",
-      "aggregation": "Не суммировать. Показывать отдельные оценки/распределение; числовое среднее допустимо лишь если смысл выбранной шкалы это позволяет и правило явно указано.",
-      "disposition": "define_subjective_scale"
-    }
+    "reviewedDefinition": "Субъективная оценка по выбранной шкале. Никаких выводов о здоровье по времени.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "nonnegative_rating",
+        "meaning": "One manual nonnegative subjective rating on a named scale",
+        "kind": "NUMBER",
+        "dimension": "rating",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Metric maxScale is decimal precision, not range validation. Existing API can store a rating but cannot enforce scale endpoints or infer health; no automatic averaging.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/15",
@@ -668,17 +737,20 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "A separately named nonnegative manual scalar with explicit unit/basis/scope is possible; BY_TARGET avoids unjustified roll-up. Original multi-part quantity remains in source.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "plan_or_local_label",
-        "block_identity"
-      ],
-      "meaning": "Название тренировочного блока/фазы — контекст плана.",
-      "aggregation": "Фильтр или ссылка на блок; не числовая величина.",
-      "disposition": "move_to_reference_or_facet"
-    }
+    "reviewedDefinition": "Название тренировочного блока/фазы — контекст плана.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "block",
+        "meaning": "Training block/phase label or explicitly registered local block ID",
+        "kind": "FACET",
+        "dimension": "",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Categorical reference only. A facet stores label/value ID, not a training-plan entity or a number.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/16",
@@ -707,19 +779,34 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "A separately named nonnegative manual scalar with explicit unit/basis/scope is possible; BY_TARGET avoids unjustified roll-up. Original multi-part quantity remains in source.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "trip_or_site",
-        "event_or_observation_id",
-        "counted_entity",
-        "route_id"
-      ],
-      "meaning": "Ночёвка, наблюдение и выбор маршрута имеют разные предметы и границы.",
-      "aggregation": "Ночёвки считать по ночам/событиям проживания; наблюдения по явным уникальным записям. Число фото, особей и видов не заменяет число наблюдений. Маршрут — ссылка/выбор.",
-      "disposition": "split_count_record_reference"
-    }
+    "reviewedDefinition": "Ночёвка, наблюдение и выбор маршрута имеют разные предметы и границы.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "overnights",
+        "meaning": "Explicitly known nights/stay events",
+        "kind": "NUMBER",
+        "dimension": "count:measure.outdoor_observations:overnights",
+        "integer": true
+      },
+      {
+        "id": "observation_records",
+        "meaning": "Explicitly known unique observation-record total",
+        "kind": "NUMBER",
+        "dimension": "count:measure.outdoor_observations:observation_records",
+        "integer": true
+      },
+      {
+        "id": "route",
+        "meaning": "Chosen route label or local ID",
+        "kind": "FACET",
+        "dimension": "",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Nights, observation records and route references stay separate. No observation registry; photos, species and individuals are not observation records.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/17",
@@ -754,19 +841,20 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "A separately named nonnegative manual scalar with explicit unit/basis/scope is possible; BY_TARGET avoids unjustified roll-up. Original multi-part quantity remains in source.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "output_type",
-        "project_or_work",
-        "created_vs_edited",
-        "count_vs_cumulative_total"
-      ],
-      "meaning": "Количество явно названных результатов: фото, рисунков, сцен, песен или изделий. Разные предметы — разные определения счётчика.",
-      "aggregation": "Сумма независимых новых результатов одного типа; редактирование существующего объекта не создаёт новый объект автоматически. Время работы не выводит количество.",
-      "disposition": "split_object_scoped_counts"
-    }
+    "reviewedDefinition": "Количество явно названных результатов: фото, рисунков, сцен, песен или изделий. Разные предметы — разные определения счётчика.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "new_outputs",
+        "meaning": "New outputs of one explicitly named object type",
+        "kind": "NUMBER",
+        "dimension": "count:measure.creative_output:new_outputs",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Editing an existing output is not a new object. Known aggregate is possible; cross-session object identity/dedup is absent.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/18",
@@ -794,18 +882,41 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "A separately named nonnegative manual scalar with explicit unit/basis/scope is possible; BY_TARGET avoids unjustified roll-up. Original multi-part quantity remains in source.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "event_id",
-        "event_type",
-        "attempt_vs_completion"
-      ],
-      "meaning": "Раунды, матчи и решённые/начатые головоломки не совпадают с сегментами таймера.",
-      "aggregation": "Счёт уникальных событий. Пауза/переключение/исправление интервала не создаёт дополнительный матч. Для задачи различать попытку, решение и уникальную задачу.",
-      "disposition": "split_event_counts"
-    }
+    "reviewedDefinition": "Раунды, матчи и решённые/начатые головоломки не совпадают с сегментами таймера.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "rounds",
+        "meaning": "Known distinct rounds",
+        "kind": "NUMBER",
+        "dimension": "count:measure.game_sessions:rounds",
+        "integer": true
+      },
+      {
+        "id": "matches",
+        "meaning": "Known distinct matches",
+        "kind": "NUMBER",
+        "dimension": "count:measure.game_sessions:matches",
+        "integer": true
+      },
+      {
+        "id": "puzzle_attempts",
+        "meaning": "Puzzle attempts under one attempt convention",
+        "kind": "NUMBER",
+        "dimension": "count:measure.game_sessions:puzzle_attempts",
+        "integer": true
+      },
+      {
+        "id": "puzzles_solved",
+        "meaning": "Known distinct solved puzzles",
+        "kind": "NUMBER",
+        "dimension": "count:measure.game_sessions:puzzles_solved",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Timer segments are not events. Attempts and unique solved puzzles differ; user supplies deduplicated totals, no engine event registry.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/quantitiesReview/rows/19",
@@ -837,20 +948,41 @@
       ],
       "automaticMigrationAllowed": false
     },
-    "coreConstraint": "Nonnegative scalar SESSION/SEGMENT target; no event/object/position lineage.",
-    "allowedRepresentation": "A separately named nonnegative manual scalar with explicit unit/basis/scope is possible; BY_TARGET avoids unjustified roll-up. Original multi-part quantity remains in source.",
-    "exactRemainingGap": {
-      "requiredContext": [
-        "work",
-        "edition_or_release",
-        "count_vs_position",
-        "completion_status",
-        "replay_policy"
-      ],
-      "meaning": "Объём чтения/просмотра, текущая позиция и завершение произведения — разные сведения.",
-      "aggregation": "Не суммировать номера страниц/эпизодов. Объёмы сравнивать при совместимом произведении/издании; посещения и завершения считать по уникальным событиям. Частичный просмотр не объявлять завершением.",
-      "disposition": "split_volume_position_completion"
-    }
+    "reviewedDefinition": "Объём чтения/просмотра, текущая позиция и завершение произведения — разные сведения.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "pages_read",
+        "meaning": "Reading volume of a named edition",
+        "kind": "NUMBER",
+        "dimension": "count:measure.media_progress:pages_read",
+        "integer": true
+      },
+      {
+        "id": "chapters_consumed",
+        "meaning": "Chapters consumed under a stated partial/repeat convention",
+        "kind": "NUMBER",
+        "dimension": "count:measure.media_progress:chapters_consumed",
+        "integer": true
+      },
+      {
+        "id": "episodes_consumed",
+        "meaning": "Episodes consumed under a stated partial/repeat convention",
+        "kind": "NUMBER",
+        "dimension": "count:measure.media_progress:episodes_consumed",
+        "integer": true
+      },
+      {
+        "id": "performances_attended",
+        "meaning": "Known performance attendance events",
+        "kind": "NUMBER",
+        "dimension": "count:measure.media_progress:performances_attended",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Current position and completed-work state are not these totals. Numeric position alone can annotate a session via a custom BY_TARGET metric, but lacks object/version/snapshot semantics; no inferred completion.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/0",
@@ -1025,19 +1157,20 @@
       "parentId": "quantitative_need.life_care",
       "applicabilityInterpretationRu": "The broad activity links indicate where a generic optional event counter may apply if the user explicitly chooses one; they are not claims that each leaf needs its own field or that source evidence validates a metric for each activity."
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.",
-    "exactRemainingGap": {
-      "scope": "Occurrence event; daily/weekly/monthly summary only when period is explicitly selected",
-      "context": [
-        "task definition (optional)",
-        "status: scheduled/completed/deferred/cancelled/unknown",
-        "due date or period (optional)",
-        "household area/asset (optional)"
-      ],
-      "aggregation": "Count unique occurrences of the same task definition and period; keep task types separate. If derived from event records, deduplicate by occurrence ID.",
-      "misleadingIf": "A total mixing unrelated tasks, different recurrence rates, points or durations is not workload, fairness, cleanliness, or productivity. A due task, completed task and scheduled task are different counts."
-    }
+    "reviewedDefinition": "Счётчик выполненных (либо отдельно назначенных, отложенных, отменённых) экземпляров одного выбранного типа поручения: уборка, вынос отходов, кормление питомца/скота, стирка, проверка оборудования и т. п. Запись одной сессии может покрывать несколько экземпляров; каждый экземпляр не обязан иметь отдельный таймер.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known task occurrences of one task definition and one selected status",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.household.task_occurrence_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Task identity/state transitions absent; planned, postponed, cancelled and completed are separate views.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/1",
@@ -1121,19 +1254,12 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "No scalar projection for recurrence/due-state; optional task records with recurrence convention needed.",
-    "exactRemainingGap": {
-      "scope": "Task template/instance and an explicitly chosen calendar window",
-      "context": [
-        "task/asset (optional)",
-        "frequency and calendar rule",
-        "last-done date",
-        "status/due state"
-      ],
-      "aggregation": "Compare only the same task template and recurrence convention; do not sum due-ness scores across tasks.",
-      "misleadingIf": "A visual dirtiness/dueness score is a product-specific heuristic, not an objective cleanliness or labor measure; frequency can vary seasonally, by household and need."
-    }
+    "reviewedDefinition": "Не числовая шкала результата: настраиваемая частота/следующий срок, последнее явно отмеченное завершение и статус конкретного повторяющегося дела. Это служебное состояние расписания; по нему можно считать просроченные/выполненные экземпляры, но не длительность труда.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [],
+    "exactRemainingGap": "Recurrence, due date, last completion and task state require task/schedule data. No scalar or ordinal due-ness substitute.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/2",
@@ -1193,18 +1319,27 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.",
-    "exactRemainingGap": {
-      "scope": "Per machine load or batch, with optional session/day association",
-      "context": [
-        "wash/dry stage",
-        "load or batch ID (optional)",
-        "manual task vs machine stage"
-      ],
-      "aggregation": "Count each explicit load once for a given stage; one batch may have wash and dry stages, so avoid summing as two loads unless desired.",
-      "misleadingIf": "Machine run time is not personal effort. Batch count does not say how many items, how clean they became, nor how long the user was actively occupied."
-    }
+    "reviewedDefinition": "Явно отмеченные партии белья или циклы как хозяйственные события. Полезно отличать одну загрузку/партии от активных действий (сортировка, загрузка, развешивание, складывание) и от автоматического машинного цикла.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "loads",
+        "meaning": "Known distinct laundry batches at one stage",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.household.laundry_load_count:loads",
+        "integer": true
+      },
+      {
+        "id": "cycles",
+        "meaning": "Known machine cycles at one stage",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.household.laundry_load_count:cycles",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "One load may cross wash/dry/handling steps. Load and cycle identities differ; no automatic dedup across sessions.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/3",
@@ -1268,20 +1403,34 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "A named count/mass/volume/area/length component fits scalar BY_TARGET. Compound units are separate metrics; source-specific product/site/stage/basis remains explicit, not inferred.",
-    "exactRemainingGap": {
-      "scope": "Shopping-list item or recipe requirement; quantity planned, not acquired",
-      "context": [
-        "product/item label (optional)",
-        "unit",
-        "package size separately",
-        "recipe/list link (optional)",
-        "price basis if user chooses"
-      ],
-      "aggregation": "Sum only same item/compatible normalized unit, list/occasion and role (planned). Do not add distinct package sizes as if equal contents.",
-      "misleadingIf": "Planned amount is not amount purchased, on-hand stock, consumed, or wasted. Product synonyms/brand sizes and count-vs-weight may differ."
-    }
+    "reviewedDefinition": "Желаемая/запрошенная величина товара, до фактической покупки; счёт упаковок, штук, массы, объёма или другой указанной единицы.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "items",
+        "meaning": "Count of one named item/package definition",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.food.purchase_quantity:items",
+        "integer": true
+      },
+      {
+        "id": "mass",
+        "meaning": "Mass of one named material/product",
+        "kind": "NUMBER",
+        "dimension": "mass",
+        "integer": false
+      },
+      {
+        "id": "volume",
+        "meaning": "Volume of one named material/product",
+        "kind": "NUMBER",
+        "dimension": "volume",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Requested/planned quantity only, not acquired amount. Package sizes and product identity must be named; no automatic conversion of unequal packages.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/4",
@@ -1350,20 +1499,34 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "A named count/mass/volume/area/length component fits scalar BY_TARGET. Compound units are separate metrics; source-specific product/site/stage/basis remains explicit, not inferred.",
-    "exactRemainingGap": {
-      "scope": "Purchase/delivery transaction item, with event/receipt date if desired",
-      "context": [
-        "item",
-        "unit",
-        "package size/conversion (optional)",
-        "purchase event ID",
-        "received/returned/partial status"
-      ],
-      "aggregation": "Aggregate item amount only within compatible unit and source role; returns/refunds or split deliveries need separate signed/typed events, not erasure.",
-      "misleadingIf": "A quantity for a 15-oz can and count of cans are not the same measure; purchase quantity is not current stock."
-    }
+    "reviewedDefinition": "Количество товара, которое пользователь явно отмечает как купленное/полученное, отдельно от плановой потребности и упаковочного размера.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "items",
+        "meaning": "Count of one named item/package definition",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.food.purchase_quantity:items",
+        "integer": true
+      },
+      {
+        "id": "mass",
+        "meaning": "Mass of one named material/product",
+        "kind": "NUMBER",
+        "dimension": "mass",
+        "integer": false
+      },
+      {
+        "id": "volume",
+        "meaning": "Volume of one named material/product",
+        "kind": "NUMBER",
+        "dimension": "volume",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Actually acquired amount only. Returns/refunds need signed or separate typed events; purchase plan is not acquisition.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/5",
@@ -1419,19 +1582,34 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "One scalar snapshot/package size is storable BY_TARGET only as a session annotation, not stock state or package conversion. Need object ID, snapshot time/basis.",
-    "exactRemainingGap": {
-      "scope": "Product/variant/package specification, not a session measure",
-      "context": [
-        "product variant",
-        "amount per package",
-        "unit",
-        "conversion source/manual note"
-      ],
-      "aggregation": "Use for conversions only when package identity and quantity basis are explicit; retain entered package count separately.",
-      "misleadingIf": "Multiplying an ambiguous size by package count invents false stock; variable-weight items and drained/net weights may have distinct quantities."
-    }
+    "reviewedDefinition": "Описание количества содержимого в одной упаковке/контейнере. Это conversion/context for package count and is not itself an additional purchased amount.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "contents_count",
+        "meaning": "Item contents per one named package",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.food.package_size:contents_count",
+        "integer": true
+      },
+      {
+        "id": "contents_mass",
+        "meaning": "Mass per one named package",
+        "kind": "NUMBER",
+        "dimension": "mass",
+        "integer": false
+      },
+      {
+        "id": "contents_volume",
+        "meaning": "Volume per one named package",
+        "kind": "NUMBER",
+        "dimension": "volume",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Manual per-package annotation fits BY_TARGET, not an additional purchased quantity. No package identity or automatic package-count multiplication.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/6",
@@ -1512,20 +1690,12 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "One scalar snapshot/package size is storable BY_TARGET only as a session annotation, not stock state or package conversion. Need object ID, snapshot time/basis.",
-    "exactRemainingGap": {
-      "scope": "Product × storage location × inventory-check time, when user elects to track",
-      "context": [
-        "location (optional)",
-        "quantity unit",
-        "checked-at time",
-        "explicit zero vs unknown/unrecorded",
-        "expiration/use-by if intentionally tracked"
-      ],
-      "aggregation": "A stock balance is a dated state, not additive across snapshots; additions/consumption/transfer are separate events and must not be double-counted with the resulting balance.",
-      "misleadingIf": "Missing entry is not zero. Stock requires an update discipline and can become stale; no automatic inference from purchases or recipes."
-    }
+    "reviewedDefinition": "Явный снимок остатка продукта/расходного материала в конкретном месте хранения на указанное время; включает явный ноль и состояние «не проверено/неизвестно» как разные варианты.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [],
+    "exactRemainingGap": "Dated inventory balance requires item/location/snapshot-time and state semantics. A custom numeric session annotation is possible but is not stock management; unknown is absent, not zero.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/7",
@@ -1590,20 +1760,34 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "A named count/mass/volume/area/length component fits scalar BY_TARGET. Compound units are separate metrics; source-specific product/site/stage/basis remains explicit, not inferred.",
-    "exactRemainingGap": {
-      "scope": "Recipe × ingredient × explicitly selected yield/servings",
-      "context": [
-        "ingredient identity",
-        "recipe version",
-        "unit",
-        "base vs scaled yield",
-        "amount actually used vs amount needed"
-      ],
-      "aggregation": "Combine only same normalized ingredient/unit and same meal-plan scope; requested ingredient amount and actually used amount are separate.",
-      "misleadingIf": "Recipe scaling is not reliably linear; name-text packaging notes may not scale, and mixed units cannot be summed without declared conversion."
-    }
+    "reviewedDefinition": "Заданный рецептом или пользователем объём ингредиента для выбранного числа порций; сохранять базовый рецепт, размер порции и пользовательские корректировки.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "items",
+        "meaning": "Count of one named item/package definition",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.food.purchase_quantity:items",
+        "integer": true
+      },
+      {
+        "id": "mass",
+        "meaning": "Mass of one named material/product",
+        "kind": "NUMBER",
+        "dimension": "mass",
+        "integer": false
+      },
+      {
+        "id": "volume",
+        "meaning": "Volume of one named material/product",
+        "kind": "NUMBER",
+        "dimension": "volume",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "One planned ingredient amount for a named recipe version/portion count fits. Recipe scaling, substitutions and actual usage are separate; no automatic recipe engine.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/8",
@@ -1660,19 +1844,20 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.",
-    "exactRemainingGap": {
-      "scope": "Meal/batch/event and status (planned/prepared/served/leftover), not timer segment",
-      "context": [
-        "meal/batch (optional)",
-        "portion definition",
-        "state of portion",
-        "number served (only if user chooses)"
-      ],
-      "aggregation": "Keep planned, prepared, served and leftover counts separate; combine only same portion definition and meal context.",
-      "misleadingIf": "Portion counts do not indicate nutrition, calories, adequacy, equal serving size, or number of people named. Infant-feeding-specific records are excluded from general defaults due to child-sensitive data."
-    }
+    "reviewedDefinition": "Отдельный пользовательский счёт порций/приёмов еды: планируемых, приготовленных, поданных, отложенных или оставшихся. Состояние порции — контекст; объемы порций не обязаны быть одинаковыми.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Portions under one named portion definition and one stage",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.food.portion_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Planned/prepared/served/left are separate. Portion count does not assert equal volumes or identify meals.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/9",
@@ -1733,20 +1918,34 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "A named count/mass/volume/area/length component fits scalar BY_TARGET. Compound units are separate metrics; source-specific product/site/stage/basis remains explicit, not inferred.",
-    "exactRemainingGap": {
-      "scope": "Preservation batch, output product, container size, date",
-      "context": [
-        "batch/event ID",
-        "product",
-        "container size and count",
-        "weight/volume unit",
-        "origin/use (own/gift/donate) optional"
-      ],
-      "aggregation": "Count containers or sum compatible mass/volume; do not add raw harvest amount to processed output or assume 1:1 yield.",
-      "misleadingIf": "Batch output is not a measure of food safety, shelf life, nutrition, or yield unless inputs and conversion are separately recorded."
-    }
+    "reviewedDefinition": "Количество полученных банок/контейнеров и/или масса/объём готового продукта; партия и дата — event context. Операции приготовления, термообработки и маркировки являются отдельными шагами работы.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "containers",
+        "meaning": "Output containers under one container definition",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.food.preservation_batch_output:containers",
+        "integer": true
+      },
+      {
+        "id": "output_mass",
+        "meaning": "Processed output mass",
+        "kind": "NUMBER",
+        "dimension": "mass",
+        "integer": false
+      },
+      {
+        "id": "output_volume",
+        "meaning": "Processed output volume",
+        "kind": "NUMBER",
+        "dimension": "volume",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "No batch/date identity. Raw harvest and processed output are distinct, no assumed 1:1 yield or adding containers to mass.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/10",
@@ -1816,19 +2015,27 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "A nonnegative amount in one chosen currency fits BY_TARGET; no exchange-rate conversion. Receipt/line identity, refunds and dedup need separate transaction semantics.",
-    "exactRemainingGap": {
-      "scope": "Transaction/item, explicit currency and included fee/tax status",
-      "context": [
-        "currency",
-        "item vs receipt total",
-        "price basis and unit",
-        "refund/discount state"
-      ],
-      "aggregation": "Sum only transaction-level amounts with same currency and scope; receipt total plus line-item values double-count.",
-      "misleadingIf": "Money totals do not measure household effort, affordability, consumption or savings; avoid inferred personal financial profiles."
-    }
+    "reviewedDefinition": "Фактически уплаченная сумма либо оценка в отдельной валюте для одной покупки/чека, только если пользователь сам хочет связать расход с делом. Бюджетирование, активы и прогноз дохода не подразумеваются.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "paid",
+        "meaning": "Nonnegative amount actually paid in one explicit currency",
+        "kind": "NUMBER",
+        "dimension": "currency",
+        "integer": false
+      },
+      {
+        "id": "estimate",
+        "meaning": "Nonnegative estimate in one explicit currency",
+        "kind": "NUMBER",
+        "dimension": "currency",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "No foreign exchange, signed refund or transaction dedup. Receipt total and line items cannot both be counted as independent spending.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/11",
@@ -1889,19 +2096,20 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.",
-    "exactRemainingGap": {
-      "scope": "One task event or chosen date/season; not necessarily one timer segment",
-      "context": [
-        "crop/plant/bed/container optional",
-        "season/date",
-        "task type",
-        "scheduled vs completed status"
-      ],
-      "aggregation": "Aggregate only same task, context and time period. If one record logs “ten planters watered,” preserve the ten or the group event only as chosen.",
-      "misleadingIf": "Counting watering visits does not measure water volume; count of tasks does not equate difficulty, output or effort. Entry completeness varies."
-    }
+    "reviewedDefinition": "События посадки, полива, прополки, обрезки, обработки, осмотра, уборки/пересадки и других явно выбранных работ; отдельный учёт числа событий не подменяет календарь и не является оценкой качества.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known occurrences of one named gardening task",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.garden.task_occurrence_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Choose group event versus individual plants watered explicitly; not harvest amount or automatic quality score.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/12",
@@ -1982,20 +2190,34 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "A named count/mass/volume/area/length component fits scalar BY_TARGET. Compound units are separate metrics; source-specific product/site/stage/basis remains explicit, not inferred.",
-    "exactRemainingGap": {
-      "scope": "Harvest event, crop/resource, area/container and date if chosen",
-      "context": [
-        "crop/species/variety",
-        "date",
-        "bed/container or area (optional)",
-        "fresh/dried/processed basis",
-        "kept/shared/donated/waste destination optional"
-      ],
-      "aggregation": "Sum same crop/product, unit and basis; distinguish each harvest event from cumulative season total; convert only with known factors.",
-      "misleadingIf": "Fruit count versus weight, fresh vs dried and unlike crops are not interchangeable. Yield per area requires comparable area, time, crop and recording method; a count of visits is not harvest amount."
-    }
+    "reviewedDefinition": "Количество/масса/объём урожая, введённые для культуры, сорта и явно выбранной площадки/контейнера с датой; счётчик harvest event, вес и количество продукта — разные поля.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "items",
+        "meaning": "Count of one named harvested product",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.garden.harvest_quantity:items",
+        "integer": true
+      },
+      {
+        "id": "mass",
+        "meaning": "Harvest mass",
+        "kind": "NUMBER",
+        "dimension": "mass",
+        "integer": false
+      },
+      {
+        "id": "volume",
+        "meaning": "Harvest volume",
+        "kind": "NUMBER",
+        "dimension": "volume",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Choose crop/variety/site and harvest versus cumulative season basis. No harvest-event identity; event count differs from product amount.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/13",
@@ -2059,19 +2281,48 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.",
-    "exactRemainingGap": {
-      "scope": "Planting event or defined bed/plot and season",
-      "context": [
-        "variety/crop",
-        "seeded vs transplanted",
-        "area/linear length",
-        "planned vs established count"
-      ],
-      "aggregation": "Compare only same crop, bed/area convention, sowing vs surviving plants and season.",
-      "misleadingIf": "Seed count, plant count and growing area are distinct; input count does not imply survival or harvest. This is a specialty self-provisioning measure, not a home default."
-    }
+    "reviewedDefinition": "Необязательные показатели начала сезона: число посевов/растений, площадь, длина ряда/грядки или контейнер; это планово-посадочный контекст, не результат сбора.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "sowings",
+        "meaning": "Count of sowing events under one convention",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.garden.planting_and_growing_quantity:sowings",
+        "integer": true
+      },
+      {
+        "id": "plants",
+        "meaning": "Count of planted/surviving plants at one stated stage",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.garden.planting_and_growing_quantity:plants",
+        "integer": true
+      },
+      {
+        "id": "area",
+        "meaning": "Planted area under one plot convention",
+        "kind": "NUMBER",
+        "dimension": "area",
+        "integer": false
+      },
+      {
+        "id": "row_length",
+        "meaning": "Row/bed length under one convention",
+        "kind": "NUMBER",
+        "dimension": "length",
+        "integer": false
+      },
+      {
+        "id": "container",
+        "meaning": "Optional container/site label or local ID",
+        "kind": "FACET",
+        "dimension": "",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Fractional area and length are supported, not forced to integers. Crop/season/stage and plot identity remain user-declared; not harvested yield.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/14",
@@ -2144,19 +2395,34 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "A named count/mass/volume/area/length component fits scalar BY_TARGET. Compound units are separate metrics; source-specific product/site/stage/basis remains explicit, not inferred.",
-    "exactRemainingGap": {
-      "scope": "Product collection event or selected period; flock/hive/group if desired",
-      "context": [
-        "product",
-        "group/area not individual (optional)",
-        "date/period",
-        "collected vs kept/incubated/gifted/sold (optional)"
-      ],
-      "aggregation": "Keep products, groups, periods and units separate. If count is total for a day, do not add the same eggs again as individual entries.",
-      "misleadingIf": "Group output does not identify per-animal productivity; product count, sale, hatch/inventory and household use are separate roles. Avoid breeding, medication, treatment, body condition, or health tracking in this layer."
-    }
+    "reviewedDefinition": "Явное агрегированное количество собранного продукта за выбранный интервал: например яйца по стаду/курятнику, молоко объёмом, мёд массой; не требуется приписывать каждую единицу конкретному животному.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "items",
+        "meaning": "Count of one named item/package definition",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.food.purchase_quantity:items",
+        "integer": true
+      },
+      {
+        "id": "mass",
+        "meaning": "Mass of one named material/product",
+        "kind": "NUMBER",
+        "dimension": "mass",
+        "integer": false
+      },
+      {
+        "id": "volume",
+        "meaning": "Volume of one named material/product",
+        "kind": "NUMBER",
+        "dimension": "volume",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "One chosen product/group/period amount; no per-animal attribution required. Daily total must not be duplicated as individual amounts; group/period identity not structured.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/15",
@@ -2216,19 +2482,41 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.",
-    "exactRemainingGap": {
-      "scope": "Collection/transport event and resource; own-use is optional context, not an assumed purpose",
-      "context": [
-        "resource",
-        "amount/unit",
-        "collected vs delivered/used (optional)",
-        "source/route only if desired"
-      ],
-      "aggregation": "Never sum quantities of different resources/units; separate collected amount from carry loads, yield after processing and trip count.",
-      "misleadingIf": "Resource amount is niche and not supported as a common user demand by a broad survey; avoid implying the category is for every household. Exact well/source coordinates can be sensitive and unnecessary."
-    }
+    "reviewedDefinition": "Введённый объём или количество переносок/единиц при сборе воды, дров, дикоросов, рыбы/дичи или других ресурсов для дома. Единица зависит от ресурса и не универсальна.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "items",
+        "meaning": "Units of one named collected resource",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.own_use.resource_quantity:items",
+        "integer": true
+      },
+      {
+        "id": "carry_loads",
+        "meaning": "Number of explicitly defined carry loads",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.own_use.resource_quantity:carry_loads",
+        "integer": true
+      },
+      {
+        "id": "mass",
+        "meaning": "Collected resource mass",
+        "kind": "NUMBER",
+        "dimension": "mass",
+        "integer": false
+      },
+      {
+        "id": "volume",
+        "meaning": "Collected resource volume",
+        "kind": "NUMBER",
+        "dimension": "volume",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Fractional mass/volume supported. Resource quantity, loads, processed yield and trips are different; no generic cross-resource total.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/16",
@@ -2287,19 +2575,34 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.",
-    "exactRemainingGap": {
-      "scope": "Project or output; explicit artifact/repair identity and completion state",
-      "context": [
-        "item/project type",
-        "repair vs new make",
-        "started/in-progress/completed",
-        "destination own/community/gift optional"
-      ],
-      "aggregation": "Count each project/item once when state is explicit; do not add substeps such as weaving, sewing and finishing to finished-item count.",
-      "misleadingIf": "One completed object is not a unit of labor or quality; items vary in scale. Generic seed creative_output is only analogous, not interchangeable."
-    }
+    "reviewedDefinition": "Счётчик явно названных готовых вещей, повторно пригодных предметов или законченных ремонтов; если пользователь считает изделия, задача и результат должны различаться.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "made_items",
+        "meaning": "Known distinct newly made items",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.household.made_or_repaired_item_count:made_items",
+        "integer": true
+      },
+      {
+        "id": "repaired_items",
+        "meaning": "Known distinct repaired usable items",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.household.made_or_repaired_item_count:repaired_items",
+        "integer": true
+      },
+      {
+        "id": "repairs",
+        "meaning": "Known completed repair events under one convention",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.household.made_or_repaired_item_count:repairs",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Item and repair-event counts differ; substeps are not additional finished objects. No object lifecycle/dedup.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/17",
@@ -2381,20 +2684,20 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.",
-    "exactRemainingGap": {
-      "scope": "A named support task / date; recurring template expands to dated instances only if the coordinator chooses",
-      "context": [
-        "task category (meal/ride/visit/babysitting/etc.)",
-        "status",
-        "due date/time",
-        "responsible participant private or hidden",
-        "recurrence if applicable"
-      ],
-      "aggregation": "Count unique task instances by type/status in chosen period; filled, assigned and completed are distinct. One multi-action event may contain separate tasks, but time is not duplicated.",
-      "misleadingIf": "A count of care tasks is not care quality, caregiver effort, recipient status or fairness. Do not infer who needed help, collect diagnoses, contact names or medical details."
-    }
+    "reviewedDefinition": "Счётчики запрошенных, взятых на себя, заполненных, выполненных, перенесённых или не закрытых logistics-задач: еда, поездка, визит, присмотр, покупки, бытовая помощь. Запись фиксирует поручение, не диагноз/человека.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known logistics tasks of one kind and one status",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.care.support_task_status_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Requested/assigned/filled/completed remain distinct. No task identities, obligations timeline or medical/person data required.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/18",
@@ -2495,19 +2798,20 @@
       "parentId": "quantitative_need.life_care",
       "applicabilityInterpretationRu": "The broad activity links indicate where a generic optional event counter may apply if the user explicitly chooses one; they are not claims that each leaf needs its own field or that source evidence validates a metric for each activity."
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.",
-    "exactRemainingGap": {
-      "scope": "Explicit event/shift; may be part of one broader task occurrence",
-      "context": [
-        "help type",
-        "event date",
-        "planned vs completed",
-        "relationship or recipient absent by default"
-      ],
-      "aggregation": "Count explicit, unique episodes under same self-defined type; do not count concurrent observation as an extra active episode unless the user reports it.",
-      "misleadingIf": "One caregiving episode can include several actions and overlapping responsibilities; simply counting actions can exaggerate workload. Do not calculate care quality or rank carers."
-    }
+    "reviewedDefinition": "Необязательный счётчик явно выбранных встреч помощи/сопровождения/взаимной поддержки; это единица события, а не численность получателей/родственных связей и не «баллы заботы».",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known unique help/accompaniment episodes under one definition",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.care.direct_help_event_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Not recipient count or care points. Concurrent supervision is not an extra active episode without explicit event definition.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/19",
@@ -2572,19 +2876,20 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.",
-    "exactRemainingGap": {
-      "scope": "One administrative case/transaction and explicit state; not each email/click",
-      "context": [
-        "task type",
-        "status",
-        "due window",
-        "case/transaction ID only if user keeps one"
-      ],
-      "aggregation": "Count unique cases by type/status; calls, emails and outcome may be separate event counts, but should not be added into a count of cases without definition.",
-      "misleadingIf": "Form count/call count do not imply task complexity, success, legal outcome or money saved; sensitive financial/legal detail is not needed."
-    }
+    "reviewedDefinition": "Счётчик отдельных выполненных/ожидающих/назначенных дел (записаться, подать форму, оплатить счёт, получить документ, вернуть товар, дождаться ответа), с независимым состоянием и сроком.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known administrative cases/tasks of one kind and one status",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.personal_admin.task_occurrence_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Calls/emails/outcomes may differ from cases; no case identity, due date or task state machine.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/20",
@@ -2651,19 +2956,34 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.",
-    "exactRemainingGap": {
-      "scope": "Activity, event, or volunteer-shift object; session/participant count is not implied",
-      "context": [
-        "participating/preparing/serving/traveling/cleanup role",
-        "event or shift date",
-        "task status",
-        "cultural label user supplied only"
-      ],
-      "aggregation": "Count only the same semantic unit (one event, one task, or one shift); keep those unit types separate. If an attendance event and service task describe the same interval, don’t add them as two elapsed intervals. A user may separately choose to count personal visits/practice repetitions; that is not this communal event/shift measure and is not a score.",
-      "misleadingIf": "Не использовать как оценку гражданской вовлечённости, религиозной преданности, ценности общины или социальной связи. Этот qneed не считает личные молитвы/повторения как общинный event/shift; отдельный добровольный счётчик практики/посещений по выбору пользователя допустим и не предполагает оценки благочестия, обязательного поля или внешнего раскрытия."
-    }
+    "reviewedDefinition": "Явно записанные общинные события/посещения, волонтёрские поручения или смены. Attendance event, volunteer task и shift — разные единицы; этот кандидат охватывает общинный event/shift, а не личную повторяемость духовной практики.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "events",
+        "meaning": "Known communal attendance events",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.community.volunteer_shift_count:events",
+        "integer": true
+      },
+      {
+        "id": "tasks",
+        "meaning": "Known volunteer tasks",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.community.volunteer_shift_count:tasks",
+        "integer": true
+      },
+      {
+        "id": "shifts",
+        "meaning": "Known volunteer shifts",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.community.volunteer_shift_count:shifts",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Events/tasks/shifts are distinct units, not personal spiritual practice repetitions. Does not create extra elapsed time or rank contribution.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/21",
@@ -2737,20 +3057,20 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.",
-    "exactRemainingGap": {
-      "scope": "Trip/event ID; session/date; one or more stages if user separates them",
-      "context": [
-        "primary/mixed purpose (optional)",
-        "mode",
-        "trip vs leg vs stop",
-        "segment/session association",
-        "distance link if manually entered"
-      ],
-      "aggregation": "Count distinct trip IDs at chosen level only; do not sum trip totals, legs and stops in one field. If linked to `measure.distance`, that is an orthogonal measure of length.",
-      "misleadingIf": "Trips on a single route with multiple purposes or people cannot be inferred; trip count is not distance, active effort, service time, or number of activities completed."
-    }
+    "reviewedDefinition": "Счётчик явно заведённых поездок или маршрутов, отдельно от числа остановок/пересадок и отдельно от расстояния и времени. Для смешанной цели можно иметь одну поездку и несколько optional purpose facets без дублирования события.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known distinct trips under one chosen trip boundary",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.mobility.trip_event_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "No trip identities. Legs, stops and transfers are not extra trips; distance is independent.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/22",
@@ -2819,18 +3139,20 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.",
-    "exactRemainingGap": {
-      "scope": "Wait event; may coincide with caregiver responsibility/standby or trip episode",
-      "context": [
-        "queue/service/repair/courier/transport/access/person/reply",
-        "standby responsibility context",
-        "service relation optional but anonymous"
-      ],
-      "aggregation": "Count unique waiting intervals by the user’s chosen event definition; do not add duplicated wait intervals embedded in a trip or service session. Duration uses the core elapsed-time record.",
-      "misleadingIf": "ATUS coding may assign wait episodes according to linked travel/service/care rules; these are statistical coding rules only and must not force a personal activity or double-count minutes."
-    }
+    "reviewedDefinition": "Счётчик самостоятельных эпизодов очереди, ожидания доставки/мастера/транспорта/ответа или ожидания сопровождаемого человека; тип ожидания — категориальное поле, не количественная шкала.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known waiting episodes under one stated episode/type definition",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.wait.event_count_and_type:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Type is categorical, not numeric rank. No dedup of episodes already inside a trip/service event; duration uses Segment.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
     "pointer": "/householdQuantities/candidateMeasures/23",
@@ -2882,21 +3204,23 @@
       "externalSharingDefault": "none",
       "parentId": "quantitative_need.life_care"
     },
-    "coreConstraint": "Only SESSION/SEGMENT numeric targets, not dated object/event/task state.",
-    "allowedRepresentation": "Explicitly known aggregate fits integer SESSION/SEGMENT BY_TARGET, with separate unit/kind/stage. Full meaning needs unique event/object/batch IDs; never derive count from timer segments.",
-    "exactRemainingGap": {
-      "scope": "Unique task event, per day/session only when chosen",
-      "context": [
-        "task kind",
-        "pet/group alias optional",
-        "status"
-      ],
-      "aggregation": "Count only a same-type occurrence; distinguish visits from chores or products/services.",
-      "misleadingIf": "Do not translate count to animal health/quality or assume all tasks occur every day. Medication/dose, symptom, vaccination and clinical history are outside this non-medical layer."
-    }
+    "reviewedDefinition": "Счётчик явных выбранных бытовых действий по питомцу (кормление, прогулка/выпуск, уборка места, подготовка вещей, визит/услуга), без обязательного профиля животного.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known same-type pet-care task/visit occurrences",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.household.pet_care_occurrence_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Visit, chore, product and service are different units. No animal profile required; no event registry.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
+    "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/0",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/0",
     "original": {
       "id": "quantity.elapsed_duration",
       "nameRu": "Записанная длительность",
@@ -2922,13 +3246,15 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Not a Metric/Measurement. Segment.durationMs is the time quantity; Segment start/end and optional Anchor provide interval evidence. Scope is unique Segment; session/report duration is a deduplicated sum of unique segments, with explicit pauses represented by segment gaps.",
-    "exactRemainingGap": "No mandatory metadata.",
+    "reviewedDefinition": "Длительность фактически записанных интервалов; это единственная базовая количественная величина по таймеру. Не подразумевает полноту записи дня.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [],
+    "exactRemainingGap": "Use the existing unique Segment durations. A second Metric would duplicate elapsed time.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/1",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/1",
     "original": {
       "id": "quantity.output_count",
       "nameRu": "Количество явно названных результатов",
@@ -2958,13 +3284,23 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Metric INTEGER, maxScale=0, named canonical count unit, SESSION or SEGMENT Measurement. A metric ID/version can name one output class; scalar totals fit. No project/object-set scope or output-object identity.",
-    "exactRemainingGap": "A typed object/set target or output identity is needed for cross-session dedup/reconciliation; distinct metric IDs can represent user-selected aggregate classes now.",
+    "reviewedDefinition": "Количество независимых новых результатов одного выбранного типа (например, документ, рисунок, сцена, эпизод, модель или изделие), созданных в явно выбранной области. Точное определение того, что считать одним результатом, пользователь задаёт сам.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "new_outputs",
+        "meaning": "New outputs of one explicitly named object type",
+        "kind": "NUMBER",
+        "dimension": "count:measure.creative_output:new_outputs",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Editing an existing output is not a new object. Known aggregate is possible; cross-session object identity/dedup is absent.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/2",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/2",
     "original": {
       "id": "quantity.page_count",
       "nameRu": "Количество прочитанных страниц",
@@ -2990,13 +3326,23 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Metric INTEGER/maxScale=0/unit.page, SESSION or SEGMENT Measurement. A user aggregate pages-read value fits exactly; work/edition/count-vs-position/re-reading lineage is not a structured field.",
-    "exactRemainingGap": "A reading-object/version or passage identity would be needed for structured unique-page coverage; no blanket prohibition on aggregate pages read.",
+    "reviewedDefinition": "Количество реально прочитанных страниц конкретного произведения/издания; номер страницы/текущая позиция — отдельное значение.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "pages_read",
+        "meaning": "Pages actually read of one named edition, with explicit rereading policy",
+        "kind": "NUMBER",
+        "dimension": "count:measure.pages:pages_read",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Count is reading volume, not final page number or deduplicated unique coverage.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/3",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/3",
     "original": {
       "id": "qneed.work.event_count",
       "nameRu": "Счётчик явно названных рабочих событий",
@@ -3025,13 +3371,23 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Metric INTEGER/maxScale=0 can store a manual aggregate for one declared event kind/status on a SESSION or SEGMENT. event kind/status can be isolated through distinct metric IDs/versions, but event identity/state is not modeled.",
-    "exactRemainingGap": "Full event dedup and multi-state event records need event-target and state dimensions; session aggregate remains possible.",
+    "reviewedDefinition": "Количество уникальных экземпляров одного явно названного вида события. У события отдельно выбирается статус/исход: запланировано, состоялось/проведено, попытка, отменено, неявка и т.п.; отмена/неявка не являются состоявшимся выполнением. Люди/участники не подразумеваются.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known events of one kind and one status",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.work.event_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Planned/cancelled/no-show/attempted/held are distinct; no event identity or state transitions.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/4",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/4",
     "original": {
       "id": "qneed.work.item_count",
       "nameRu": "Счётчик обработанных рабочих объектов/дел",
@@ -3063,13 +3419,23 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Metric INTEGER count can store a manually chosen total per SESSION/SEGMENT; object class/stage can be encoded only informally in Metric ID/name. Object identity/list, project/batch scope, and status transitions are absent.",
-    "exactRemainingGap": "Full item lifecycle/dedup needs object identity, object class and selected stage/state in schema.",
+    "reviewedDefinition": "Количество уникальных рабочих объектов одного названного типа (например, task/issue/request/case/invoice/contract/order/application/document/sample order), с одним явно выбранным этапом/состоянием счёта: начато, затронуто, проверено, закрыто, подано, принято и т.п. Документ может быть самим выбранным объектом; несколько документов/действий по одному case не считаются новыми case автоматически. Люди не являются work items по этой семантике.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known work objects of one class and one selected stage",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.work.item_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Object identity/project/batch and multi-stage dedup absent. People are not work items.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/5",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/5",
     "original": {
       "id": "qneed.research.record_stage_count",
       "nameRu": "Количество исследовательских записей по этапу",
@@ -3098,13 +3464,23 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Integer aggregate fits Measurement. Record/report/study/source kind, research-set identity, stage and record ID do not have structured dimensions; separate metric IDs can name distinct aggregates.",
-    "exactRemainingGap": "Full record-stage counts across sets need entity kind/set/record/state or target references.",
+    "reviewedDefinition": "Количество записей одного выбранного entity type (например, record, report, study или source) в одном заданном наборе и на одной стадии: найдено, дедуплицировано, просмотрено/screened, retrieved, assessed, excluded, included. Record, полный report/publication и underlying study не взаимозаменяемы.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known records of one entity kind/set/version and one screening stage",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.research.record_stage_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Record/report/study/source are distinct; no set/record identity or stage transitions.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/6",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/6",
     "original": {
       "id": "qneed.research.respondent_status_count",
       "nameRu": "Количество respondent cases по выбранному статусу",
@@ -3132,13 +3508,23 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Integer aggregate fits for a user-selected respondent/case count. Sample/wave identity, participant identity, stage/state are not Measurement fields; optional free local info is not prohibited.",
-    "exactRemainingGap": "Full case state/dedup needs sample/wave and respondent-case identity/state dimensions. Treat privacy/minimization as a recommendation under the user's choice, never as an engine prohibition.",
+    "reviewedDefinition": "Количество respondent/participant cases в одном явно названном исследовательском sample/wave по одному отдельно выбранному disposition/status: приглашён, контактирован/попытка, ответил, частично/полностью завершил, отказался, не подошёл и т.п. Количество проведённых интервью/сессий — другая величина. Идентификационные/описательные данные не являются частью единицы или определения этого счётчика.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known respondent cases in one sample/wave and one status",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.research.respondent_status_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Not interview-session count. No respondent-case state/dedup; identity data is not required.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/7",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/7",
     "original": {
       "id": "qneed.work.sample_count",
       "nameRu": "Количество образцов/экземпляров материала",
@@ -3166,13 +3552,23 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Metric INTEGER count fits one chosen sample/specimen/test-item aggregate per SESSION/SEGMENT. Sample-class/batch identity and parent/subsample links are not represented.",
-    "exactRemainingGap": "Full parent/subsample/sample identity requires object target schema; user aggregate remains available.",
+    "reviewedDefinition": "Количество уникальных физических образцов/specimens/test items одного ясно названного типа, собранных, принятых или поданных в проверку. Один sample — объект, а не измерение, повторное наблюдение, test run, участник или строка данных.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known physical specimens of one named type and stage",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.work.sample_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Sample is not test run, observation or instrument reading; no parent/subsample identity.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/8",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/8",
     "original": {
       "id": "qneed.work.product_unit_count",
       "nameRu": "Количество произведённых/обработанных единиц изделия",
@@ -3203,13 +3599,23 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Metric INTEGER, canonical unit one named product piece/unit, SESSION/SEGMENT Measurement. Product class or stage can be separated by metric ID, not represented as fields; no individual product identity.",
-    "exactRemainingGap": "Full product/stage identity needs typed object/state target schema.",
+    "reviewedDefinition": "Количество физических единиц/штук одного названного product class, произведённых, собранных, установленных, упакованных, осмотренных или обработанных на одной явно выбранной стадии операции. Это повторяемые product units/pieces, не уникальные task/ticket/case; если exact unit уже записан как quantity.output_count, использовать одну семантику, не обе.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known product pieces of one class and one operation stage",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.work.product_unit_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Not unique tasks/cases. Reuse one definition if already counted as new outputs; no product identity.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/9",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/9",
     "original": {
       "id": "qneed.work.length_quantity",
       "nameRu": "Измеренная длина материала/установленного участка",
@@ -3237,13 +3643,23 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Implemented scalarVocabulary: explicit local meaning/scope, SI unit or response count, BY_TARGET, verified provenance.",
-    "exactRemainingGap": "No new schema for one scalar aggregate. Material/site/installed-vs-removed distinction is not a structured dimension; keep separate metrics or add metadata only if user needs it.",
+    "reviewedDefinition": "Длина одного названного материала, участка монтажа или завершённой линейной работы; installed/processed length must be distinguished from travel distance.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "length",
+        "meaning": "Installed/processed length of one named material/operation, not travel",
+        "kind": "NUMBER",
+        "dimension": "length",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Bounded manual amount fits; material/site/stage remain chosen local meaning, not structured object identity.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/10",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/10",
     "original": {
       "id": "qneed.work.area_quantity",
       "nameRu": "Измеренная площадь обработанной поверхности/участка",
@@ -3271,13 +3687,23 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Implemented scalarVocabulary: explicit local meaning/scope, SI unit or response count, BY_TARGET, verified provenance.",
-    "exactRemainingGap": "No new schema for a scalar. Surface/site identity and treatment type are not structured.",
+    "reviewedDefinition": "Area of one named surface/plot installed, treated, cleaned, painted, tiled, inspected or restored, with operation stage stated.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "area",
+        "meaning": "Area of one named treated surface and operation stage",
+        "kind": "NUMBER",
+        "dimension": "area",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Bounded manual amount fits; material/site/stage remain chosen local meaning, not structured object identity.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/11",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/11",
     "original": {
       "id": "qneed.work.volume_quantity",
       "nameRu": "Объём обработанного материала/продукта",
@@ -3305,13 +3731,23 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Implemented scalarVocabulary: explicit local meaning/scope, SI unit or response count, BY_TARGET, verified provenance.",
-    "exactRemainingGap": "No new schema for a scalar. Material/product class and source object are not structured.",
+    "reviewedDefinition": "Volume of one named material/product explicitly requested, handled, processed, produced, served, removed or accepted; operation/stage must be selected.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "volume",
+        "meaning": "Volume of one named material/product and operation stage",
+        "kind": "NUMBER",
+        "dimension": "volume",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Bounded manual amount fits; material/site/stage remain chosen local meaning, not structured object identity.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/12",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/12",
     "original": {
       "id": "qneed.work.mass_quantity",
       "nameRu": "Масса обработанного материала/продукта",
@@ -3339,13 +3775,23 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Implemented scalarVocabulary: explicit local meaning/scope, SI unit or response count, BY_TARGET, verified provenance.",
-    "exactRemainingGap": "No new schema for a scalar aggregate. Core does not assume cross-material aggregates are invalid; user selects the desired grouping.",
+    "reviewedDefinition": "Mass of one named material/product explicitly handled, processed, produced, accepted, reworked, scrapped, loaded or delivered, with operation stage specified.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "mass",
+        "meaning": "Mass of one named material/product and operation stage",
+        "kind": "NUMBER",
+        "dimension": "mass",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Bounded manual amount fits; material/site/stage remain chosen local meaning, not structured object identity.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/13",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/13",
     "original": {
       "id": "qneed.learning.unit_state_count",
       "nameRu": "Количество учебных единиц по выбранному состоянию",
@@ -3377,13 +3823,23 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Integer Measurement stores one manually counted unit-type/state aggregate per SESSION/SEGMENT. Unit kind/state can be namespaced via separate Metric IDs, but course/material version, unit identity, state transitions and unique units are absent.",
-    "exactRemainingGap": "Full state transition/dedup needs unit identity, material version and state dimension; no automatic inference from duration.",
+    "reviewedDefinition": "Количество уникальных учебных единиц одного заданного вида (например, lesson/module/exercise/problem/assignment) в одном выбранном состоянии: открыта, в работе, была попытка, завершена, прошла порог и т.п. Единство — это единица курса/материала, а не отдельный ответ/повтор; один и тот же unit может перейти в несколько статусов.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known learning units of one kind/material and one state",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.learning.unit_state_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Lesson/module/exercise differs from response attempt; no material version or unit lifecycle.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/14",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/14",
     "original": {
       "id": "qneed.learning.response_attempt_count",
       "nameRu": "Количество учебных ответов/попыток",
@@ -3411,13 +3867,23 @@
         "report aggregation": "core/src/main/kotlin/dev/notai/tracker/Reports.kt:19-28,46-66,115-120"
       }
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Implemented scalarVocabulary: explicit local meaning/scope, SI unit or response count, BY_TARGET, verified provenance.",
-    "exactRemainingGap": "No new schema for a manually known session total. Per-response material/card identity or event dedup needs added event targets.",
+    "reviewedDefinition": "Счётчик отдельных ответов на card/question или попыток решения practice item; one response/attempt is one event, not a distinct vocabulary word, card mastered or problem solved. Attempted/correct/incorrect can be separately user-defined states, but no correctness field is necessary.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known separate responses/attempts under one state convention",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.learning.response_attempt_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Not distinct cards/words mastered or problems solved. No response identity or correctness inference.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/quantities/15",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/quantities/15",
     "original": {
       "id": "qneed.writing.word_count",
       "nameRu": "Количество слов с явным basis и объектом текста",
@@ -3576,9 +4042,40 @@
         }
       ]
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Metric INTEGER/maxScale=0 with unit.word can store nonnegative word totals; different bases need distinct Metric IDs/versions. Measurement has only SESSION/SEGMENT targets and no text/version/basis dimension.",
-    "exactRemainingGap": "Use 6 explicit basis variants below; snapshots and signed net deltas require schema semantics, and other bases are aggregate-only without text identity.",
+    "reviewedDefinition": "Optional word-count family: every value identifies a text/version and exactly one counting basis. A document snapshot, session net change, session gross additions, source-side translation words, target-side delivered words, and reviewed/processed words are distinct quantities and must not share an unqualified total. Never infer session-written words from the final document length.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "gross_additions",
+        "meaning": "Words inserted in the selected session/text under an explicit paste/move/rewrite rule",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.writing.word_count:gross_additions",
+        "integer": true
+      },
+      {
+        "id": "translation_source",
+        "meaning": "Source-side words under one task/text/version basis",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.writing.word_count:translation_source",
+        "integer": true
+      },
+      {
+        "id": "translation_target",
+        "meaning": "Target-side delivered words under one task/text/version basis",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.writing.word_count:translation_target",
+        "integer": true
+      },
+      {
+        "id": "review_exposures",
+        "meaning": "Words reviewed in this pass; repeated exposure, not unique coverage",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.writing.word_count:review_exposures",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "No signed net delta or document snapshot/latest-state semantics. Four positive manual bases remain separate; no text/version/span identity or automatic unique-coverage dedup. Reviewed exposure is explicitly narrowed, not generic unique processed volume.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": [
       {
         "id": "basis.document_snapshot_word_count",
@@ -3703,7 +4200,7 @@
     ]
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/0",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/0",
     "original": {
       "id": "reuse.quantity.observation_count",
       "nameRu": "Количество явных наблюдательных записей",
@@ -3716,13 +4213,23 @@
       "coreMapping": "Integer event-record total can be entered per session/segment; core cannot hold distinct observation-record identities or the trip/site/record set. Do not substitute specimens, taxa, photographs, individuals or instrument readings.",
       "corePointers": "Model.kt:36-43; Vocabulary.kt:37-43,66-113; Reports.kt:19-28,46-66"
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Integer event-record total can be entered per session/segment; core cannot hold distinct observation-record identities or the trip/site/record set. Do not substitute specimens, taxa, photographs, individuals or instrument readings.",
-    "exactRemainingGap": "Использовать только если один считаемый элемент — уникальная observation record по тому же определению; sample, taxon/species count, photo count, individual objects and instrument readings are different.",
+    "reviewedDefinition": "Использовать только если один считаемый элемент — уникальная observation record по тому же определению; sample, taxon/species count, photo count, individual objects and instrument readings are different.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "observation_records",
+        "meaning": "Explicitly known unique observation-record total",
+        "kind": "NUMBER",
+        "dimension": "count:measure.outdoor_observations:observation_records",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Nights, observation records and route references stay separate. No observation registry; photos, species and individuals are not observation records.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/1",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/1",
     "original": {
       "id": "reuse.quantity.page_count",
       "nameRu": "Количество прочитанных страниц",
@@ -3735,13 +4242,23 @@
       "coreMapping": "Same page-count scalar as above. A user-selected total pages-read across works can SUM; unique page coverage needs work/edition/rereading identity and dedup. Do not substitute current/last page position.",
       "corePointers": "Model.kt:36-43; Vocabulary.kt:37-43,66-113; Reports.kt:19-28,46-66"
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Same page-count scalar as above. A user-selected total pages-read across works can SUM; unique page coverage needs work/edition/rereading identity and dedup. Do not substitute current/last page position.",
-    "exactRemainingGap": "Same reading-volume semantics; retain work/edition, count-vs-position, rereading; not a session completion count.",
+    "reviewedDefinition": "Same reading-volume semantics; retain work/edition, count-vs-position, rereading; not a session completion count.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "pages_read",
+        "meaning": "Pages actually read of one named edition, with explicit rereading policy",
+        "kind": "NUMBER",
+        "dimension": "count:measure.pages:pages_read",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Count is reading volume, not final page number or deduplicated unique coverage.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/2",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/2",
     "original": {
       "id": "quantity.output_count",
       "nameRu": "Количество новых named outputs",
@@ -3754,13 +4271,23 @@
       "coreMapping": "Same count of independent newly created named output type; edits are not new objects. Session aggregate fits; output identity/project-set is not structured.",
       "corePointers": "Model.kt:36-43; Vocabulary.kt:37-43,66-113; Reports.kt:19-28,46-66"
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Same count of independent newly created named output type; edits are not new objects. Session aggregate fits; output identity/project-set is not structured.",
-    "exactRemainingGap": "Reuse same new-output semantics across art, work and education; do not count edits as a new artifact.",
+    "reviewedDefinition": "Reuse same new-output semantics across art, work and education; do not count edits as a new artifact.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "new_outputs",
+        "meaning": "New outputs of one explicitly named object type",
+        "kind": "NUMBER",
+        "dimension": "count:measure.creative_output:new_outputs",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Editing an existing output is not a new object. Known aggregate is possible; cross-session object identity/dedup is absent.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/3",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/3",
     "original": {
       "id": "reuse.qneed.garden.harvest_quantity",
       "nameRu": "Количество/масса/объём собранного урожая",
@@ -3772,13 +4299,37 @@
       "coreMapping": "One quantity can be scalar count, mass or volume using matching units, but crop/variety/site/date/product dimensions and harvest-event identity are not first-class; reuse exact same crop/product/site/time meaning.",
       "corePointers": "Model.kt:36-43; Vocabulary.kt:37-43,66-113; Reports.kt:19-28,46-66"
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "One quantity can be scalar count, mass or volume using matching units, but crop/variety/site/date/product dimensions and harvest-event identity are not first-class; reuse exact same crop/product/site/time meaning.",
-    "exactRemainingGap": "For same crop/product, site, unit, dated harvest amount; use work/project context as an independent axis if applicable, do not create a second harvest amount.",
+    "reviewedDefinition": "For same crop/product, site, unit, dated harvest amount; use work/project context as an independent axis if applicable, do not create a second harvest amount.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "items",
+        "meaning": "Count of one named harvested product",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.garden.harvest_quantity:items",
+        "integer": true
+      },
+      {
+        "id": "mass",
+        "meaning": "Harvest mass",
+        "kind": "NUMBER",
+        "dimension": "mass",
+        "integer": false
+      },
+      {
+        "id": "volume",
+        "meaning": "Harvest volume",
+        "kind": "NUMBER",
+        "dimension": "volume",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Choose crop/variety/site and harvest versus cumulative season basis. No harvest-event identity; event count differs from product amount.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/4",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/4",
     "original": {
       "id": "reuse.qneed.garden.planting_and_growing_quantity",
       "nameRu": "Посадки/растения/площадь/длина участка",
@@ -3790,13 +4341,51 @@
       "coreMapping": "Decompose into count, area, or length metrics with matching unit dimensions; do not force into one metric. Crop/site/container/seedling identity is not structured; work/project remains contextual.",
       "corePointers": "Model.kt:36-43; Vocabulary.kt:37-43,66-113; Reports.kt:19-28,46-66"
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Decompose into count, area, or length metrics with matching unit dimensions; do not force into one metric. Crop/site/container/seedling identity is not structured; work/project remains contextual.",
-    "exactRemainingGap": "Reuse only same planting/crop amount and site semantics; production/business status remains context.",
+    "reviewedDefinition": "Reuse only same planting/crop amount and site semantics; production/business status remains context.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "sowings",
+        "meaning": "Count of sowing events under one convention",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.garden.planting_and_growing_quantity:sowings",
+        "integer": true
+      },
+      {
+        "id": "plants",
+        "meaning": "Count of planted/surviving plants at one stated stage",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.garden.planting_and_growing_quantity:plants",
+        "integer": true
+      },
+      {
+        "id": "area",
+        "meaning": "Planted area under one plot convention",
+        "kind": "NUMBER",
+        "dimension": "area",
+        "integer": false
+      },
+      {
+        "id": "row_length",
+        "meaning": "Row/bed length under one convention",
+        "kind": "NUMBER",
+        "dimension": "length",
+        "integer": false
+      },
+      {
+        "id": "container",
+        "meaning": "Optional container/site label or local ID",
+        "kind": "FACET",
+        "dimension": "",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "Fractional area and length are supported, not forced to integers. Crop/season/stage and plot identity remain user-declared; not harvested yield.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/5",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/5",
     "original": {
       "id": "reuse.qneed.garden.task_occurrence_count",
       "nameRu": "Количество выбранных аграрных действий/экземпляров задачи",
@@ -3808,13 +4397,23 @@
       "coreMapping": "Exact same selected planting/crop-care event can be a per-session integer aggregate; task/event identity cannot be deduplicated in core. Keep distinct from harvest amount.",
       "corePointers": "Model.kt:36-43; Vocabulary.kt:37-43,66-113; Reports.kt:19-28,46-66"
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Exact same selected planting/crop-care event can be a per-session integer aggregate; task/event identity cannot be deduplicated in core. Keep distinct from harvest amount.",
-    "exactRemainingGap": "Reuse for same explicit crop-care/planting event definition; distinct from harvest quantity.",
+    "reviewedDefinition": "Reuse for same explicit crop-care/planting event definition; distinct from harvest quantity.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known occurrences of one named gardening task",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.garden.task_occurrence_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Choose group event versus individual plants watered explicitly; not harvest amount or automatic quality score.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/6",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/6",
     "original": {
       "id": "reuse.qneed.animal_product_output",
       "nameRu": "Количество/масса/объём продукта животного происхождения",
@@ -3826,13 +4425,37 @@
       "coreMapping": "Numeric aggregate per animal group/site/product/time is storable with the correct count/mass/volume dimension. Core has no group/site/product/time target; no per-animal attribution is required by the source meaning.",
       "corePointers": "Model.kt:36-43; Vocabulary.kt:37-43,66-113; Reports.kt:19-28,46-66"
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Numeric aggregate per animal group/site/product/time is storable with the correct count/mass/volume dimension. Core has no group/site/product/time target; no per-animal attribution is required by the source meaning.",
-    "exactRemainingGap": "Reuse same aggregate by animal group/site/product/time; no per-animal attribution required.",
+    "reviewedDefinition": "Reuse same aggregate by animal group/site/product/time; no per-animal attribution required.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "items",
+        "meaning": "Count of one named item/package definition",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.food.purchase_quantity:items",
+        "integer": true
+      },
+      {
+        "id": "mass",
+        "meaning": "Mass of one named material/product",
+        "kind": "NUMBER",
+        "dimension": "mass",
+        "integer": false
+      },
+      {
+        "id": "volume",
+        "meaning": "Volume of one named material/product",
+        "kind": "NUMBER",
+        "dimension": "volume",
+        "integer": false
+      }
+    ],
+    "exactRemainingGap": "One chosen product/group/period amount; no per-animal attribution required. Daily total must not be duplicated as individual amounts; group/period identity not structured.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/7",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/7",
     "original": {
       "id": "reuse.qneed.mobility.trip_event_count",
       "nameRu": "Количество поездок/маршрутов",
@@ -3844,13 +4467,23 @@
       "coreMapping": "Integer trip-event total fits; trip identity is not a Session/Segment identity, and stops, distance and elapsed duration remain different measures. Reuse exact trip count rather than create another.",
       "corePointers": "Model.kt:36-43; Vocabulary.kt:37-43,66-113; Reports.kt:19-28,46-66"
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Integer trip-event total fits; trip identity is not a Session/Segment identity, and stops, distance and elapsed duration remain different measures. Reuse exact trip count rather than create another.",
-    "exactRemainingGap": "A trip is distinct from route stops, distance and duration; use one event identity in work context rather than duplicate the count.",
+    "reviewedDefinition": "A trip is distinct from route stops, distance and duration; use one event identity in work context rather than duplicate the count.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Known distinct trips under one chosen trip boundary",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.mobility.trip_event_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "No trip identities. Legs, stops and transfers are not extra trips; distance is independent.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/8",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/8",
     "original": {
       "id": "reuse.qneed.food.portion_count",
       "nameRu": "Количество порций/приёмов пищи в выбранной стадии",
@@ -3862,13 +4495,23 @@
       "coreMapping": "Integer total fits for one explicit portion stage/type; stage (planned/prepared/served/left) is not a field, and unlike portion sizes are not equivalent volumes. User may choose aggregate.",
       "corePointers": "Model.kt:36-43; Vocabulary.kt:37-43,66-113; Reports.kt:19-28,46-66"
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Integer total fits for one explicit portion stage/type; stage (planned/prepared/served/left) is not a field, and unlike portion sizes are not equivalent volumes. User may choose aggregate.",
-    "exactRemainingGap": "If counting portions prepared/served/left, reuse that exact stage and portion definition; portions need not be equal volume.",
+    "reviewedDefinition": "If counting portions prepared/served/left, reuse that exact stage and portion definition; portions need not be equal volume.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "count",
+        "meaning": "Portions under one named portion definition and one stage",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.food.portion_count:count",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "Planned/prepared/served/left are separate. Portion count does not assert equal volumes or identify meals.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/9",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/9",
     "original": {
       "id": "reuse.qneed.household.laundry_load_count",
       "nameRu": "Количество партий/циклов белья",
@@ -3880,13 +4523,30 @@
       "coreMapping": "Integer batch/cycle count fits; core cannot identify same laundry load as it moves through service steps or distinguish load from machine cycle. Reuse exact count semantics.",
       "corePointers": "Model.kt:36-43; Vocabulary.kt:37-43,66-113; Reports.kt:19-28,46-66"
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Integer batch/cycle count fits; core cannot identify same laundry load as it moves through service steps or distinguish load from machine cycle. Reuse exact count semantics.",
-    "exactRemainingGap": "Reuse exact batch/cycle count in professional laundry context if counted entity is still one laundry load/cycle; do not count service work steps as cycles.",
+    "reviewedDefinition": "Reuse exact batch/cycle count in professional laundry context if counted entity is still one laundry load/cycle; do not count service work steps as cycles.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "loads",
+        "meaning": "Known distinct laundry batches at one stage",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.household.laundry_load_count:loads",
+        "integer": true
+      },
+      {
+        "id": "cycles",
+        "meaning": "Known machine cycles at one stage",
+        "kind": "NUMBER",
+        "dimension": "count:qneed.household.laundry_load_count:cycles",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "One load may cross wash/dry/handling steps. Load and cycle identities differ; no automatic dedup across sessions.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   },
   {
-    "pointer": "supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/10",
+    "pointer": "/supporting/tracker_work_learning_core_v4_compatibility.json/reusedExistingDefinitions/10",
     "original": {
       "id": "reuse.quantity.repetition_count",
       "nameRu": "Количество повторов выбранного упражнения/движения",
@@ -3899,9 +4559,19 @@
       "coreMapping": "Metric INTEGER/unit.rep and a session/segment total fit; exercise/set identity and per-set vs total need explicit metric/scope choices. Do not reuse for cards, responses, learning units or generic retries.",
       "corePointers": "Model.kt:36-43; Vocabulary.kt:37-43,66-113; Reports.kt:19-28,46-66"
     },
-    "coreConstraint": "Aggregation labels do not validate semantic disjointness or object identity; `SUM` adds exactly what is present. No object/event/work-set target, state dimension, signed decimal, text/document lineage, or window-apportionment for quantities. This is a schema/contract boundary, not a claim that arbitrary user input is forbidden.",
-    "allowedRepresentation": "Metric INTEGER/unit.rep and a session/segment total fit; exercise/set identity and per-set vs total need explicit metric/scope choices. Do not reuse for cards, responses, learning units or generic retries.",
-    "exactRemainingGap": "Reuse only for explicit repeated executions of the same named exercise/movement and compatible session/set boundary. Do not reuse for flashcard answers, card reviews, language repetitions, completed units or arbitrary workflow retries; those have distinct semantics.",
+    "reviewedDefinition": "Reuse only for explicit repeated executions of the same named exercise/movement and compatible session/set boundary. Do not reuse for flashcard answers, card reviews, language repetitions, completed units or arbitrary workflow retries; those have distinct semantics.",
+    "coreConstraint": "Whole SESSION/SEGMENT scalar only for NUMBER variants; FACET variants use Axis. No automatic SUM, object/event registry, signed delta or state engine.",
+    "allowedRepresentations": [
+      {
+        "id": "repetitions",
+        "meaning": "Executions of one exercise; choose per-set or whole-target total explicitly",
+        "kind": "NUMBER",
+        "dimension": "count:measure.repetitions:repetitions",
+        "integer": true
+      }
+    ],
+    "exactRemainingGap": "No set identity; never multiply repetitions by set count implicitly.",
+    "api": "quantityVocabulary with explicit basis/unit/scope or quantityFacetVocabulary for category/reference; no variants means no projection",
     "wordBasisReview": []
   }
 ]

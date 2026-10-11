@@ -32,6 +32,58 @@ class ResearchPlan internal constructor(private val original: ByteArray,val sha2
     fun sourceBytes(): ByteArray = original.copyOf()
     val axisCandidateIds get() = candidateAxes.map { it.id }.toSet()
     val candidateIds get() = candidates.map { it.id }.toSet()
+    /** All decisions are source-qualified, explicit and version-bound to the reviewed corpus.
+     * Missing supporting originals are not advertised as verified quantity choices.
+     */
+    fun quantityProjections(): List<QuantityProjection> {
+        val policy = ResearchQuantities.policy
+        ensure(policy.packageSha256 == sha256,"Quantity policy does not match this source version",ErrorCode.UNSUPPORTED_IMPORT)
+        return policy.rows.filter { !it.pointer.startsWith("/supporting/") || it.sourceFile in supporting }
+    }
+    private fun quantityChoice(pointer: String,basisId: String): Pair<QuantityProjection,QuantityVariant> {
+        val row = quantityProjections().singleOrNull { it.pointer == pointer }
+            ?: fail(ErrorCode.INVALID_INPUT,"Unknown or unverified quantity source")
+        val basis = row.variants.singleOrNull { it.id == basisId }
+            ?: fail(ErrorCode.INVALID_INPUT,"Choose one explicit supported quantity basis")
+        return row to basis
+    }
+    private fun quantityOrigin(row: QuantityProjection): ResearchOrigin {
+        val digest = document.getValue("manifest").jsonObject.getValue("sourceManifest").jsonArray
+            .single { it.jsonObject.getValue("file").jsonPrimitive.content == row.sourceFile }.jsonObject.getValue("sha256").jsonPrimitive.content
+        return ResearchOrigin(sha256,row.sourceFile,digest,row.sourceId,row.pointer)
+    }
+    private fun quantityId(row: QuantityProjection,basis: QuantityVariant,localId: String): String {
+        ensure(localId.matches(Regex("[A-Za-z0-9_.-]+")),"Explicit local meaning ID required")
+        return "research:quantity:${researchHash(row.pointer.toByteArray()).take(16)}:${basis.id}:$localId"
+    }
+    /** One manually known whole-target value, never automatic SUM or inferred event identity.
+     * Unit dimension must match the selected basis; currency uses currency:XXX. Unit factor is
+     * explicit exact data. Name states the user's material/status/text/scale convention.
+     */
+    fun quantityVocabulary(pointer: String,basisId: String,localId: String,meaningLabel: String,
+        scope: Scope,unit: UnitDefinition,maxScale: Int = 6): VocabularyData {
+        val (row,basis) = quantityChoice(pointer,basisId)
+        ensure(basis.kind == QuantityRepresentation.NUMBER,"Categorical/reference source is not a number")
+        ensure(meaningLabel.isNotBlank() && maxScale in 0..1000,"Explicit meaning and valid precision required")
+        ensure(if(basis.dimension == "currency") unit.dimension.matches(Regex("currency:[A-Z]{3}"))
+            else unit.dimension == basis.dimension,"Unit dimension does not match the selected quantity basis")
+        val metric = Metric(quantityId(row,basis,localId),meaningLabel,numberKind = if(basis.integer) NumberKind.INTEGER else NumberKind.DECIMAL,
+            canonicalUnitId = unit.id,maxScale = if(basis.integer) 0 else maxScale,scopes = setOf(scope),
+            aggregation = Aggregation.BY_TARGET,researchOrigins = listOf(quantityOrigin(row)))
+        val result = VocabularyData(emptyList(),metrics = listOf(metric),units = listOf(unit))
+        validate(Dataset(metrics = result.metrics,units = result.units))
+        return result
+    }
+    /** Label or registered local reference, not an event/plan entity and never a Measurement. */
+    fun quantityFacetVocabulary(pointer: String,basisId: String,localId: String,kind: ValueKind,
+        cardinality: Cardinality,values: List<AxisValue> = emptyList()): VocabularyData {
+        val (row,basis) = quantityChoice(pointer,basisId)
+        ensure(basis.kind == QuantityRepresentation.FACET,"Numeric basis is not a category")
+        val axis = Axis(quantityId(row,basis,localId),basis.meaning,valueKind = kind,cardinality = cardinality,
+            values = values,researchOrigins = listOf(quantityOrigin(row)))
+        validate(Dataset(axes = listOf(axis)))
+        return VocabularyData(emptyList(),listOf(axis))
+    }
     /** For the 17 source proposals with no declared schema, the caller explicitly chooses an
      * existing core shape. This is a new source-local version, not a migration or inferred default.
      * Stable value IDs can represent local object/role identities; text is only a descriptive label.

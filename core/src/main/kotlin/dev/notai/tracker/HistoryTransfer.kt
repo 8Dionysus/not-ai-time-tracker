@@ -179,7 +179,7 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
 
 /** Small strict RFC-4180 reader/writer, including quoted commas, CRLF, embedded newlines and BOM. */
 internal object CsvTable {
-    fun parse(input: String,delimiter: Char): List<List<String>> {
+    fun parse(input: String,delimiter: Char,maxRows: Int? = null): List<List<String>> {
         ensure(delimiter !in charArrayOf('"','\r','\n'),"Invalid CSV delimiter")
         val text = input.removePrefix("\uFEFF"); val rows = mutableListOf<List<String>>()
         var row = mutableListOf<String>(); val cell = StringBuilder(); var quoted = false; var closed = false; var i = 0
@@ -195,7 +195,7 @@ internal object CsvTable {
                 else cell.append(c)
             } else when {
                 c == delimiter -> field()
-                c == '\r' || c == '\n' -> { field(); rows += row; row = mutableListOf(); if(c == '\r' && i < text.length && text[i] == '\n') i++ }
+                c == '\r' || c == '\n' -> { field(); rows += row; row = mutableListOf(); if(c == '\r' && i < text.length && text[i] == '\n') i++; if(maxRows != null && rows.size >= maxRows) return rows }
                 c == '"' && cell.isEmpty() && !closed -> quoted = true
                 c == '"' || closed -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed CSV quoting")
                 else -> cell.append(c)

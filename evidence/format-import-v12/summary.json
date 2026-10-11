@@ -1,0 +1,49 @@
+{
+  "baselineCommit": "ed34ef413a1298f38a40bdcfb9164bd5adccfd7a",
+  "testResults": [
+    {
+      "backend": "core",
+      "name": "dev.notai.tracker.CoreScenariosTest",
+      "tests": "3",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-11T21:02:43.153Z",
+      "hostname": "442bbd4fc7a7",
+      "time": "6.947"
+    },
+    {
+      "backend": "room",
+      "name": "dev.notai.tracker.android.RoomScenariosTest",
+      "tests": "3",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-11T21:02:51.523Z",
+      "hostname": "442bbd4fc7a7",
+      "time": "15.398"
+    }
+  ],
+  "supportedFormats": [
+    "UTF-8 CSV/delimited text with explicit mapping",
+    "own JSON backup versions 1/2/3/4"
+  ],
+  "unsupportedFormats": [
+    "arbitrary JSON",
+    "XLSX/binary",
+    "headerless tables",
+    "non-UTF-8"
+  ],
+  "inspectionSampleRecords": 5,
+  "e2e": {
+    "schemas": 2,
+    "importedIntervals": 2,
+    "totalMs": 1800000,
+    "replayAdded": 0
+  },
+  "runtimeTypes": 1918,
+  "runtimeAxes": 337,
+  "roomSchema": 3,
+  "backupFormat": 4,
+  "deviceTested": false
+}

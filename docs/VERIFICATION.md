@@ -128,3 +128,12 @@ ZIP исследовательского пакета 0.4 не читался и
 Целевая регрессия в прежнем сценарии: строка с числом символов меньше лимита, но UTF-8 размером больше 10 MiB, содержит повреждённые кавычки; результат обязан быть UNSUPPORTED_IMPORT / CSV exceeds 10 MiB, до CSV parser. Это проверяет порядок проверок, а не только код ошибки.
 
 Команда `JAVA_HOME=/workspace/toolchains/jdk21 ANDROID_HOME=/workspace/toolchains/android-sdk ANDROID_USER_HOME=/workspace/toolchains/android-user GRADLE_USER_HOME=/workspace/toolchains/gradle-home ./gradlew --offline :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` — BUILD SUCCESSFUL in 29s, 60 tasks (21 executed). 3 Core + 3 Room/Robolectric сценария, 0 failures/errors/skips. Lint 0 errors / 10 warnings. APK пересобран; Room 3, JSON 4 и версия приложения 0.4.0 не менялись. Логи и XML: evidence/acceptance-v11/. Simple Time Tracker, UI и устройство не исследовались повторно, ограничение доступа не обходилось.
+
+
+## Форматный импорт v12
+
+Основной вход HistoryFiles.inspect: UTF-8 и лимит до декодирования, предложения разделителя/колонок/примеров без записи. confirmCsv требует явного разделителя, схемы времени/зоны и формата длительности; затем прежний mapping→preview→apply. Свой JSON проходит прежний preview полного восстановления, произвольный JSON/XLSX не поддержаны. Брендовые адаптеры не являются обязательным остатком; исторические упоминания ограничения доступа выше не меняют эту границу.
+
+В тех же сценариях проверены две разные схемы CSV без бренда: comma + offset timestamps и semicolon + локальная дата/секунды. Apply добавил 2 интервала / 1800000 ms, replay — 0. Проверены пустая строка, неоднозначные разделители/колонки, явные dd/MM и MM/dd с разными результатами, отказ без timezone/duration choice, неизвестный JSON/не-UTF-8, JSON restore, повреждённая строка за пределами sample. Прежние stale/atomicity/dedup/provenance и oversized проверки сохранены.
+
+Команда `JAVA_HOME=/workspace/toolchains/jdk21 ANDROID_HOME=/workspace/toolchains/android-sdk ANDROID_USER_HOME=/workspace/toolchains/android-user GRADLE_USER_HOME=/workspace/toolchains/gradle-home ./gradlew --offline :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` — BUILD SUCCESSFUL in 27s, 60 tasks (21 executed). 3 Core + 3 Room, 0 failures/errors/skips. Lint 0 errors / 10 warnings. APK пересобран; каталог 1918/337, Room 3, JSON 4 сохранены. Логи в evidence/format-import-v12/. Устройства/UI/новых сервисов нет; доступ к внешним исходникам не повторялся.

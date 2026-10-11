@@ -29,6 +29,7 @@ abstract class ScenarioContract {
     @Test fun timerPath() {
         storageWorkload()
         historyTransfer()
+        formatInspection()
         val clock = FakeClock(); var tracker = Tracker(createStore(),clock)
         fun token() = tracker.snapshot().token
         val card = Card(name = "Язык",activityTypeId = "language",details = mapOf("language" to "es"),tags = setOf("learning","health"))
@@ -92,6 +93,55 @@ abstract class ScenarioContract {
         expect(ErrorCode.INVALID_INTERVAL) { tracker.snapshot() }
         assertEquals(beforeInvalidClock,tracker.data())
         expect(ErrorCode.INVALID_INTERVAL) { materialize(Segment(sessionId = "range",start = 1,anchor = Anchor("same",0)),Moment(1000,Long.MAX_VALUE,"same")) }
+    }
+
+    private fun formatInspection() {
+        val clock = FakeClock(); val tracker = Tracker(createStore(),clock)
+        val transfer = HistoryTransfer(tracker,MemoryRollback())
+        val first = "id,activity,start,end,note\n1,Read,2026-10-08T08:00:00Z,2026-10-08T08:20:00Z,Chapter one\n"
+        val second = "код;дело;начало;секунды;комментарий\n2;Walk;09.10.2026 10:00:00;600;Park\n"
+        val a = HistoryFiles.inspect((first+"\n").toByteArray())
+        assertEquals(ImportFormat.DELIMITED_TEXT,a.format); assertEquals(',',a.candidates.single().delimiter)
+        assertEquals(listOf("activity"),a.candidates.single().suggestions[ImportField.ACTIVITY])
+        assertEquals("Read",a.candidates.single().examples.single()[1])
+        val fa = a.confirmCsv(',',CsvMapping("source-a","activity","start",end = "end",note = "note",id = "id"),CsvTimeChoice(null,"UTC"),null)
+        val pa = transfer.preview(fa,fa.activities.associateWith { Classification(name = it.activity) })
+        assertTrue(pa.canApply); transfer.apply(pa)
+        val b = HistoryFiles.inspect(second.toByteArray())
+        assertEquals(';',b.candidates.single().delimiter)
+        val bm = CsvMapping("source-b","дело","начало",duration = "секунды",note = "комментарий",id = "код",delimiter = ';')
+        expect(ErrorCode.INVALID_INPUT) { b.confirmCsv(';',bm,CsvTimeChoice("dd.MM.uuuu HH:mm:ss","Europe/Berlin"),null) }
+        val fb = b.confirmCsv(';',bm,CsvTimeChoice("dd.MM.uuuu HH:mm:ss","Europe/Berlin"),DurationFormat.SECONDS)
+        val pb = transfer.preview(fb,fb.activities.associateWith { Classification(name = it.activity) })
+        assertTrue(pb.canApply); transfer.apply(pb)
+        assertEquals(1_800_000L,tracker.data().segments.sumOf { it.durationMs })
+        assertEquals(0,transfer.apply(transfer.preview(fb,emptyMap())).added)
+        assertEquals(2,tracker.data().sessions.size)
+        val ambiguous = HistoryFiles.inspect("activity,start;end\nRead,one;two\n".toByteArray())
+        assertEquals(setOf(',', ';'),ambiguous.candidates.map { it.delimiter }.toSet())
+        assertEquals(1,HistoryFiles.inspect("activity,start;end\nRead,one;two\n".toByteArray(),';').candidates.size)
+        val columns = HistoryFiles.inspect("activity,start,started,duration\nRead,x,y,60\n".toByteArray())
+        assertEquals(listOf("start","started"),columns.candidates.single().suggestions[ImportField.START])
+        val dates = HistoryFiles.inspect("activity;start;duration\nRead;03/04/2026 10:00:00;60\n".toByteArray())
+        val dm = CsvMapping("dates","activity","start",duration = "duration")
+        val dayFirst = dates.confirmCsv(';',dm,CsvTimeChoice("dd/MM/uuuu HH:mm:ss","UTC"),DurationFormat.SECONDS)
+        val monthFirst = dates.confirmCsv(';',dm,CsvTimeChoice("MM/dd/uuuu HH:mm:ss","UTC"),DurationFormat.SECONDS)
+        assertEquals(Instant.parse("2026-04-03T10:00:00Z").toEpochMilli(),dayFirst.rows.single().start)
+        assertEquals(Instant.parse("2026-03-04T10:00:00Z").toEpochMilli(),monthFirst.rows.single().start)
+        expect(ErrorCode.INVALID_INPUT) { dates.confirmCsv(';',dm,CsvTimeChoice("dd/MM/uuuu HH:mm:ss",""),DurationFormat.SECONDS) }
+        assertEquals(ImportFormat.UNSUPPORTED,HistoryFiles.inspect("{\"data\":[]}".toByteArray()).format)
+        assertEquals(ImportFormat.UNSUPPORTED,HistoryFiles.inspect(byteArrayOf(0xFF.toByte())).format)
+        val backup = Backups(tracker,MemoryRollback()).export()
+        val json = HistoryFiles.inspect(backup.toByteArray())
+        assertEquals(ImportFormat.BACKUP_JSON,json.format)
+        val receiver = Tracker(createStore(),clock); val restoration = Backups(receiver,MemoryRollback())
+        restoration.apply(json.prepareRestore(restoration))
+        assertEquals(tracker.data().sessions,receiver.data().sessions)
+        // Inspection is only a sample: a malformed later row is still rejected on confirmation.
+        val damaged = first + (2..7).joinToString("") { "$it,Read,2026-10-08T08:00:00Z,2026-10-08T08:20:00Z,note\n" } + "\"broken"
+        val sample = HistoryFiles.inspect(damaged.toByteArray())
+        assertEquals(ImportFormat.DELIMITED_TEXT,sample.format)
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { sample.confirmCsv(',',CsvMapping("bad","activity","start",end = "end"),CsvTimeChoice(null,"UTC"),null) }
     }
 
     private fun historyTransfer() {

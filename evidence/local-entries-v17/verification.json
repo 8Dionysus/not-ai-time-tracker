@@ -1,0 +1,27 @@
+{
+  "appVersion": "0.9.0",
+  "command": "./gradlew --offline :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug",
+  "result": "BUILD SUCCESSFUL in 29s",
+  "coreTests": 3,
+  "roomTests": 3,
+  "failures": 0,
+  "lint": {
+    "Fatal": 0,
+    "Error": 0,
+    "Warning": 12,
+    "Information": 0
+  },
+  "deviceTested": false,
+  "roomSchema": 3,
+  "backupFormat": 7,
+  "scenarios": [
+    "draft cancellation and verbatim text",
+    "explicit event copy; future/overlap/stale rejection",
+    "start now; pause/resume without duplicate sessions",
+    "calendar DST 23/25h; midnight; 1ms rounding conservation",
+    "Report/CSV consistency and scoped quantities once",
+    "exact grouping with distinct same-name IDs",
+    "correction/Undo and clean JSON replacement",
+    "unresolved reboot tail outside exact days"
+  ]
+}

@@ -2,7 +2,7 @@ plugins { id("com.android.application"); kotlin("android"); id("com.google.devto
 android {
     namespace = "dev.notai.tracker.android"
     compileSdk = 35
-    defaultConfig { applicationId = "dev.notai.tracker"; minSdk = 26; targetSdk = 35; versionCode = 8; versionName = "0.8.0" }
+    defaultConfig { applicationId = "dev.notai.tracker"; minSdk = 26; targetSdk = 35; versionCode = 9; versionName = "0.9.0" }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
     testOptions {

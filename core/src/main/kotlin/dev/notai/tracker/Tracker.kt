@@ -229,6 +229,12 @@ class Tracker(val store: StateStore, val clock: Clock) {
         ensure(segments.all { it.end != null && it.end <= n.wall },"Imported interval is in the future",ErrorCode.INVALID_INTERVAL)
         d.copy(sessions = d.sessions+sessions,segments = d.segments+segments)
     }
+    /** Called only after the caller's explicit confirmation. Event dates never backdate Start. */
+    fun startDraft(expected: Token,draft: EntryDraft) = start(expected,draft.selection,draft.note)
+    fun recordDraft(expected: Token,draft: EntryDraft): Change {
+        val interval = draft.interval ?: fail(ErrorCode.INVALID_INTERVAL,"Confirm explicit start and end before recording")
+        return manual(expected,interval.start,interval.end,draft.selection,draft.note)
+    }
     fun manual(expected: Token, start: Long, end: Long, selection: Classification, note: String? = null) = mutate(expected, true) { d,n ->
         val selected = d.classify(selection)
         interval(start,end,n)

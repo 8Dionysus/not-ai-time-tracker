@@ -79,7 +79,7 @@ internal class ChoiceCache {
         val ids = d.sessions.filter { it.status == SessionStatus.STOPPED }.map { it.id }.toSet()
         val segments = d.segments.filter { it.sessionId in ids }
         if(history == null || completedIds != ids || completedSegments != segments) {
-            val groups = segments.groupBy { canonical(it.selection) }
+            val groups = segments.groupBy { classificationKey(it.selection) }
             history = groups.map { (key,values) ->
                 val latest = values.maxWith(compareBy<Segment>({ it.end ?: it.start },{ it.start },{ it.id }))
                 val c = latest.selection
@@ -92,8 +92,6 @@ internal class ChoiceCache {
         sessionSource = d.sessions; segmentSource = d.segments
         return history!!
     }
-    private fun canonical(c: Classification): String = codec.encodeToString(c.copy(details = c.details.toSortedMap(),tags = c.tags.toSortedSet(),
-        facets = c.facets.sortedWith(compareBy({it.axisId},{it.meaningVersion},{it.valueId ?: ""},{it.valueMeaningVersion ?: 0},{it.text ?: ""}))))
 }
 
 /** Keep this snapshot while paging or typing. A cursor belongs to this view and exact request. */
@@ -196,3 +194,6 @@ class ChoiceView internal constructor(private val d: Dataset,private val cache: 
     }
     private fun kindOrder(kind: ChoiceKind) = when(kind) { ChoiceKind.FAVORITE -> 0; ChoiceKind.CARD -> 1; ChoiceKind.HISTORY -> 2; ChoiceKind.TYPE -> 3 }
 }
+
+internal fun classificationKey(c: Classification): String = codec.encodeToString(c.copy(details = c.details.toSortedMap(),tags = c.tags.toSortedSet(),
+        facets = c.facets.sortedWith(compareBy({it.axisId},{it.meaningVersion},{it.valueId ?: ""},{it.valueMeaningVersion ?: 0},{it.text ?: ""}))))

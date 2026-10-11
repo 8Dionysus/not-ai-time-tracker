@@ -594,7 +594,81 @@ abstract class ScenarioContract {
         assertEquals(Mode.RECOVERY,view.snapshot().mode); assertEquals(readCount,reads)
     }
 
+    private fun localEntryLifecycle() {
+        val clock = FakeClock(wall = Instant.parse("2026-03-30T00:00:00Z").toEpochMilli())
+        val t = Tracker(createStore(),clock); fun token() = t.snapshot().token
+        fun at(value: String) = Instant.parse(value).toEpochMilli()
+        val card = Card(name = "Практика",activityTypeId = "language",details = mapOf("language" to "es"),tags = setOf("learning","health"))
+        t.saveCard(token(),card)
+        val original = t.data()
+        val text = EntryDrafts.selectedText("=Лекция\n15 минут завтра",card.classification())
+        assertEquals("=Лекция\n15 минут завтра",text.note); assertNull(text.interval)
+        assertEquals(original,t.data()) // cancel/edit forms are never database mutations
+        expect(ErrorCode.INVALID_INTERVAL) { t.recordDraft(token(),text) }
+        expect(ErrorCode.INVALID_INPUT) { EntryDrafts.selectedText("   ") }
+        expect(ErrorCode.INVALID_INPUT) { EntryDrafts.selectedText("a".repeat(16385)) }
+        val event = EntryDrafts.event("=Календарная встреча",DraftInterval(at("2026-03-28T23:00:00Z"),at("2026-03-29T22:00:00Z")),card.classification(),"provider:opaque-instance")
+        assertEquals(original,t.data())
+        val copied = t.recordDraft(token(),event)
+        val session = copied.changedSessionIds.single()
+        assertEquals(SessionStatus.STOPPED,t.data().sessions.single().status)
+        assertEquals(event.note,t.data().sessions.single().note)
+        val unchanged = t.data()
+        expect(ErrorCode.OVERLAP) { t.recordDraft(token(),event) }
+        assertEquals(unchanged,t.data())
+        expect(ErrorCode.INVALID_INTERVAL) { t.recordDraft(token(),EntryDrafts.event("All day")) }
+        val future = event.copy(interval = DraftInterval(clock.wall+60_000,clock.wall+120_000))
+        expect(ErrorCode.INVALID_INTERVAL) { t.recordDraft(token(),future) }
+        t.measure(token(),Measurement(fieldId = "pages",unit = "page",scope = Scope.SESSION,targetId = session,value = 20))
+        val extra = event.copy(interval = DraftInterval(at("2026-03-29T22:10:00Z"),at("2026-03-29T22:20:00Z")))
+        t.recordDraft(token(),extra)
+        val other = card.copy(id = newId()); t.saveCard(token(),other)
+        t.recordDraft(token(),extra.copy(selection = other.classification(),interval = DraftInterval(at("2026-03-29T22:30:00Z"),at("2026-03-29T22:40:00Z"))))
+        val view = t.view(); val calendar = view.calendar(LocalDate.parse("2026-03-28"),3,zone = "Europe/Berlin")
+        assertEquals(23*60*60_000L,calendar.days[1].end-calendar.days[1].start)
+        assertEquals(calendar.window.recordedMs,calendar.days.sumOf { it.recordedMs })
+        calendar.days.forEach { day ->
+            val direct = Reports.day(t.data(),clock.now(),day.date,zone = "Europe/Berlin")
+            assertEquals(direct.rows,day.rows); assertEquals(direct.recordedMs,day.recordedMs)
+        }
+        assertEquals(Decimal("20"),calendar.window.quantityTotals().values.single())
+        val groups = calendar.window.groupSimilar()
+        assertEquals(2,groups.size) // identical display names, distinct card IDs
+        assertEquals(2,groups.single { it.selection.cardId == card.id }.sessionCount)
+        assertEquals(calendar.window.recordedMs,groups.sumOf { it.recordedMs })
+        assertEquals(calendar.window.rows.map { it.segmentId }.toSet(),groups.flatMap { it.rows }.map { it.segmentId }.toSet())
+        assertEquals(Csv.export(calendar.window),Csv.export(Reports.report(t.data(),clock.now(),calendar.window.start,calendar.window.end,zone = "Europe/Berlin")))
+        expect(ErrorCode.INVALID_INTERVAL) { view.calendar(LocalDate.parse("2026-03-28"),63) }
+        val first = t.data().segments.first()
+        t.correctSession(token(),first.sessionId,listOf(Tracker.SegmentEdit(first.id,first.start+60_000,first.end!!,first.selection)),event.note)
+        assertEquals(calendar.window.recordedMs-60_000,t.view().calendar(LocalDate.parse("2026-03-28"),3,zone = "Europe/Berlin").window.recordedMs)
+        t.undo(token())
+        assertEquals(groups,t.view().calendar(LocalDate.parse("2026-03-28"),3,zone = "Europe/Berlin").window.groupSimilar())
+        val stale = token(); t.startDraft(stale,future) // Start uses now, not proposed calendar time
+        assertEquals(clock.wall,t.snapshot().active!!.start)
+        assertEquals(card.details,t.snapshot().active!!.selection.details)
+        expect(ErrorCode.STALE) { t.startDraft(stale,text) }
+        clock.advance(1000); t.pause(token()); clock.advance(1000); t.resume(token()); clock.advance(1000); t.stop(token())
+        val after = t.view().calendar(LocalDate.parse("2026-03-28"),3,zone = "Europe/Berlin")
+        assertEquals(3,after.window.groupSimilar().single { it.selection.cardId == card.id }.sessionCount)
+        assertEquals(calendar.window.recordedMs+2000,after.window.recordedMs)
+        // Closed history and notes survive ordinary JSON. Draft/provider context is not stored.
+        val json = Backups(t,MemoryRollback()).export()
+        assertFalse(json.contains("provider:opaque-instance"))
+        val receiver = Tracker(createStore(),clock); val restore = Backups(receiver,MemoryRollback())
+        restore.apply(restore.prepare(json)); val restored = receiver.data()
+        assertEquals(after.window.rows,Reports.calendar(restored,clock.now(),LocalDate.parse("2026-03-28"),3,zone = "Europe/Berlin").window.rows)
+        // A rebooted active interval has no exact calendar placement and appears only once, outside days.
+        t.startDraft(token(),text); clock.advance(1000); clock.boot = "other-boot"
+        val unresolved = t.view().calendar(LocalDate.parse("2026-03-28"),3,zone = "Europe/Berlin")
+        assertEquals(1,unresolved.window.unresolved.size)
+        assertEquals(after.window.recordedMs,unresolved.days.sumOf { it.recordedMs })
+        // Calendar boundaries in autumn are 25 hours, without inventing recorded activity.
+        assertEquals(25*60*60_000L,t.view().calendar(LocalDate.parse("2026-10-25"),1,zone = "Europe/Berlin").days.single().let { it.end-it.start })
+    }
+
     @Test fun smallHistoryAndExport() {
+        localEntryLifecycle()
         researchPackageAdapter()
         hierarchyAndDecimals()
         val clock = FakeClock(); val tracker = Tracker(createStore(),clock)
@@ -609,6 +683,16 @@ abstract class ScenarioContract {
         val d = tracker.data(); val windowStart = Instant.parse("2026-10-10T00:00:00Z").toEpochMilli()
         val all = Reports.report(d,clock.now(),windowStart,clock.wall)
         assertEquals(40*60_000,all.recordedMs); assertEquals(2,all.rows.size) // equal durations are not deduplicated
+        val calendarPage = tracker.view().calendar(LocalDate.parse("2026-10-10"),2)
+        assertEquals(listOf(10*60_000L,30*60_000L),calendarPage.days.map { it.recordedMs })
+        assertEquals(3,calendarPage.days.sumOf { it.rows.size }) // one segment appears in two days, unchanged ID
+        assertEquals(1,calendarPage.window.groupSimilar().single().sessionCount)
+        assertEquals(all.recordedMs,calendarPage.window.recordedMs)
+        val drift = d.copy(segments = d.segments.mapIndexed { index,s -> if(index == 0) s.copy(durationMs = s.durationMs+1) else s })
+        validate(drift) // valid sub-second wall/elapsed discrepancy, not fabricated invalid input
+        val rounded = Reports.calendar(drift,clock.now(),LocalDate.parse("2026-10-10"),2)
+        assertEquals(all.recordedMs+1,rounded.days.sumOf { it.recordedMs })
+        assertEquals(rounded.window.recordedMs,rounded.days.sumOf { it.recordedMs })
         assertEquals(Decimal("20"),all.measurements.single().value)
         val pages = QuantityKey("pages",1,"page",Scope.SESSION)
         assertEquals(Decimal("20"),all.quantityTotals()[pages])

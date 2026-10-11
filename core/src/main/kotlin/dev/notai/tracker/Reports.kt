@@ -43,15 +43,13 @@ object Reports {
         validateMoment(now)
         ensure(start >= 0 && end > start && end <= MAX_TIME, "Invalid report window", ErrorCode.INVALID_INTERVAL)
         val zoneId = ZoneId.of(zone)
-        val notes = d.sessions.associate { it.id to it.note }
         val observed = d.segments.distinctBy { it.id }.filter { filter.matches(it.selection) }.map { materialize(it,now) }
-        val rows = observed.filterNot { it.uncertain }.mapNotNull { s ->
-            val finish = s.end ?: s.observedUntil ?: now.wall
-            val from = maxOf(start,s.start); val to = minOf(end,finish,now.wall)
-            if (to <= from || finish <= s.start) null else ReportRow(s.id,s.sessionId,from,to,
-                proportional(s.durationMs,to-s.start,finish-s.start)-proportional(s.durationMs,from-s.start,finish-s.start),
-                s.selection,notes[s.sessionId])
-        }.sortedWith(compareBy({it.start},{it.segmentId}))
+        return observedReport(d,now,start,end,zoneId,observed)
+    }
+    private fun observedReport(d: Dataset,now: Moment,start: Long,end: Long,zoneId: ZoneId,observed: List<Segment>): Report {
+        val zone = zoneId.id
+        val notes = d.sessions.associate { it.id to it.note }
+        val rows = windowRows(observed,now,start,end,notes)
         val sessions = rows.map { it.sessionId }.toSet(); val segments = rows.map { it.segmentId }.toSet()
         val measurements = d.measurements.filter { if (it.scope == Scope.SESSION) it.targetId in sessions else it.targetId in segments }
         val days = mutableSetOf<LocalDate>()
@@ -64,6 +62,32 @@ object Reports {
         val last = Instant.ofEpochMilli(end-1).atZone(zoneId).toLocalDate()
         return Report(start,end,now.wall,zone,rows,observed.filter { it.uncertain },measurements,
             rows.sumExact { it.durationMs },java.time.temporal.ChronoUnit.DAYS.between(first,last)+1,days,end > now.wall,d.metrics)
+    }
+    private fun windowRows(observed: List<Segment>,now: Moment,start: Long,end: Long,notes: Map<String,String?>): List<ReportRow> =
+        observed.filterNot { it.uncertain }.mapNotNull { s ->
+            val finish = s.end ?: s.observedUntil ?: now.wall
+            val from = maxOf(start,s.start); val to = minOf(end,finish,now.wall)
+            if (to <= from || finish <= s.start) null else ReportRow(s.id,s.sessionId,from,to,
+                proportional(s.durationMs,to-s.start,finish-s.start)-proportional(s.durationMs,from-s.start,finish-s.start),
+                s.selection,notes[s.sessionId])
+        }.sortedWith(compareBy({it.start},{it.segmentId}))
+    /** One physical observation, bounded calendar page; DST boundaries come from the explicit zone. */
+    fun calendar(d: Dataset,now: Moment,first: LocalDate,days: Int,filter: Filter = Filter(),zone: String = d.settings.reportZone): CalendarHistory {
+        ensure(days in 1..62,"Calendar page must contain 1..62 days",ErrorCode.INVALID_INTERVAL)
+        validateMoment(now)
+        val (start,end) = calendarBounds(first,days,zone)
+        ensure(start >= 0 && end <= MAX_TIME,"Calendar window out of range",ErrorCode.INVALID_INTERVAL)
+        val zoneId = ZoneId.of(zone)
+        val observed = d.segments.distinctBy { it.id }.filter { filter.matches(it.selection) }.map { materialize(it,now) }
+        val whole = observedReport(d,now,start,end,zoneId,observed)
+        val notes = d.sessions.associate { it.id to it.note }
+        val pages = (0 until days).map { offset ->
+            val date = first.plusDays(offset.toLong()); val (a,b) = calendarBounds(date,1,zone)
+            val rows = windowRows(observed,now,a,b,notes)
+            // Uncertain attribution and whole-target quantities are exposed once at the window level.
+            CalendarDay(date,a,b,frozenList(rows),rows.sumExact { it.durationMs },b > now.wall)
+        }
+        return CalendarHistory(token(d),whole,frozenList(pages))
     }
     fun day(d: Dataset,now: Moment,date: LocalDate,filter: Filter = Filter(),zone: String = d.settings.reportZone): Report {
         val (start,end) = calendarBounds(date,1,zone)

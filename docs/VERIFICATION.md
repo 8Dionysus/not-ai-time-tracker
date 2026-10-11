@@ -56,7 +56,7 @@ GRADLE_USER_HOME=/workspace/toolchains/gradle-home \
 
 Исходный manifest статически разобран: allowBackup=false, fullBackupContent=false, нет uses-permission. [Свидетельство](../evidence/source-manifest-check.txt). Проверка merged manifest и APK ещё не выполнена. Политика системного backup задана, но её работа на телефоне не проверена.
 
-`adb`/эмулятор изначально отсутствовали. Навык android-emulator-qa по переданному package дал `skill package is not available`; его нет ни в полном cloud-каталоге, ни в executor-каталоге. Подключение плагина в родительском чате не доказало наличие Android-target в этой среде. Никаких замеров физического телефона, батареи или performance не проводилось.
+`adb`/эмулятор изначально отсутствовали. На этапе первой сборки навык android-emulator-qa по переданному package дал `skill package is not available`; тогда его не было в cloud/executor-каталоге. При последующей приёмке навык появился в обновлённом каталоге; это не установило SDK или adb-target. Подключение плагина в родительском чате не доказало наличие Android-target в этой среде. Никаких замеров физического телефона, батареи или performance не проводилось.
 
 ## GitHub
 

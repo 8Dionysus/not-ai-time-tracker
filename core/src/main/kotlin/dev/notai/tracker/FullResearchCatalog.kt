@@ -25,7 +25,13 @@ class FullResearchPlan internal constructor(val vocabulary: VocabularyData,val o
 object FullResearchCatalog {
     const val ISCO = "isco_full_projection_v2.json"
     const val SPORTS = "sports_additive_catalogue_projection.json"
+    private const val BASE_SHA256 = "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19"
+    private val requiredSupporting = setOf("tracker_catalog_identity_resolution.json",
+        "tracker_mobile_catalog_navigation_research.json", "tracker_catalog_core_compatibility.md",
+        "tracker_work_learning_core_v4_compatibility.json", "tracker_cross_domain_relations_v2_1.json")
     fun read(base: ResearchPlan,iscoBytes: ByteArray,iscoHash: String,sportsBytes: ByteArray,sportsHash: String): FullResearchPlan {
+        ensure(base.sha256 == BASE_SHA256,"Full projection requires the reviewed baseline",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(base.supportingHashes.keys.containsAll(requiredSupporting),"Full projection requires all five verified supporting documents",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(researchHash(iscoBytes) == iscoHash && researchHash(sportsBytes) == sportsHash,"Projection hash mismatch",ErrorCode.UNSUPPORTED_IMPORT)
         return try { prepare(base,mapOf(ISCO to iscoBytes.copyOf(),SPORTS to sportsBytes.copyOf())) }
         catch(e: CoreError) { throw e }
@@ -113,15 +119,16 @@ object FullResearchCatalog {
             }
             val reuse = p.rows("reuseActionRefs").map(::resolve).distinct()
             val wrapper = p.text("kind") in setOf("role_context_workflow_no_standalone_activity","nonselectable_source_compound_wrapper","split_source_compound_reuse_named_components_only")
+            // Frozen source decisions and bounded definitions alone never authorize a new type.
             val proposal = proposals[key]
             if(reuse.isNotEmpty() && proposal == null) sourceTargets[key] = reuse
-            else if(!inactive(r) && !wrapper) {
-                val definition = proposal?.s("definition") ?: p.s("boundedDefinition")
+            else if(proposal != null && !inactive(r) && !wrapper) {
+                val definition = proposal.s("definition")
                 ensure(!definition.isNullOrBlank(),"Active action has no bounded definition: $key")
-                val id = proposal?.text("researchProposalRef") ?: "isco.research.$key"
-                val parent = proposal?.s("parentId") ?: p.s("parentRecommendation")
+                val id = proposal.text("researchProposalRef")
+                val parent = proposal.s("parentId")
                 ensure(parent == null || parent in types,"Missing corrected ISCO parent: $parent")
-                add(ActivityType(id,proposal?.text("label") ?: p.text("actionLabel"),definition = definition!!,parentId = parent,
+                add(ActivityType(id,proposal.text("label"),definition = definition!!,parentId = parent,
                     researchOrigins = listOf(origin(ISCO,"/candidateDispositions/$i",r.text("sourceId")))))
                 sourceTargets[key] = listOf(id)
                 if(parent == null) emit(ISCO,"/candidateDispositions/$i",key,"root-placement",listOf(id),"No semantic parent explicitly specified in corrected source: kept as a root action, not guessed from nearby actions")
@@ -176,13 +183,10 @@ object FullResearchCatalog {
         }
         isco.rows("residualResolutions").forEachIndexed { i,r ->
             val active = r.s("activeSourceRecordKey")
-            val target = if(active != null) sourceTargets[active].orEmpty() else if(r.bool("isNewActivityProposal")) {
-                val id = r.text("residualId")
-                add(ActivityType(id,r.text("residualAction"),definition = r.text("proposedOrReusedDefinition"),parentId = r.text("recommendedParentId"),
-                    researchOrigins = listOf(origin(ISCO,"/residualResolutions/$i",id))))
-                listOf(id)
-            } else emptyList()
-            emit(ISCO,"/residualResolutions/$i",r.text("residualId"),"residual-resolution",target,"${r.text("recommendedNextDisposition")}; retired compound not revived")
+            // A residual research ID is not a runtime ID. Only an already accepted mapping
+            // can be reused; pending proposals remain intact in the source and outcomes.
+            val target = if(active != null) sourceTargets[active].orEmpty() else emptyList()
+            emit(ISCO,"/residualResolutions/$i",r.text("residualId"),"residual-resolution",target,"${r.text("recommendedNextDisposition")}; no runtime ID minted from residualId; ${if(target.isEmpty()) "open proposal without accepted runtime mapping" else "reuse of accepted active-source mapping"}")
         }
         rows.forEachIndexed { i,r ->
             val targets = sourceTargets.getValue(r.text("recordKey"))

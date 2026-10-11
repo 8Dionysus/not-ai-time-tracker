@@ -1,5 +1,6 @@
 package dev.notai.tracker
 
+import kotlinx.serialization.json.*
 import org.junit.Test
 import kotlin.test.*
 import java.time.Instant
@@ -527,14 +528,45 @@ abstract class ScenarioContract {
         val sports = researchDir.resolve("projections/sports_additive_catalogue_projection.json").readBytes()
         val iscoHash = "7dd02e406bb2c34260a73179b2b6a94f19d0141aa1bb06815277eb5e23bc2498"
         val sportsHash = "6b5e4810622ff4af4af794b2ac8093d7135caad85f1ace51e99ced62a7373955"
+        val supporting = researchDir.resolve("supporting").listFiles()!!.associate { it.name to it.readBytes() }
+        // Both inputs are valid ResearchPlans; full projection has stricter evidence requirements.
+        val otherBytes = base.sourceBytes() + byteArrayOf(10)
+        val wrongBase = ResearchCatalog.read(otherBytes,researchHash(otherBytes),supporting)
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { FullResearchCatalog.read(wrongBase,isco,iscoHash,sports,sportsHash) }
+        val missingCompanion = ResearchCatalog.read(base.sourceBytes(),base.sha256,
+            supporting - "tracker_catalog_core_compatibility.md")
+        assertEquals(4,missingCompanion.supportingHashes.size)
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { FullResearchCatalog.read(missingCompanion,isco,iscoHash,sports,sportsHash) }
         val full = FullResearchCatalog.read(base,isco,iscoHash,sports,sportsHash)
         assertContentEquals(isco,full.sourceBytes(FullResearchCatalog.ISCO))
         assertContentEquals(sports,full.sourceBytes(FullResearchCatalog.SPORTS))
         assertEquals(353,full.outcomes.count { it.file == FullResearchCatalog.ISCO && it.kind == "source-disposition" })
         assertEquals(223,full.outcomes.count { it.file == FullResearchCatalog.SPORTS && it.kind == "source-disposition" })
         assertTrue(full.vocabulary.types.size > base.candidateIds.size)
-        assertEquals(2092,full.vocabulary.types.size)
+        assertEquals(1918,full.vocabulary.types.size)
         assertEquals(337,full.vocabulary.axes.size)
+        // Every new ISCO runtime ID must come from an explicit action/component proposal.
+        // Frozen/no-mutation rows and residual research IDs must never become fallback types.
+        val source = codec.parseToJsonElement(isco.toString(Charsets.UTF_8)).jsonObject
+        val explicitIds = source.getValue("proposedActions").jsonArray.map { it.jsonObject.getValue("researchProposalRef").jsonPrimitive.content }.toSet() +
+            source.getValue("componentActionProposals").jsonArray.map { it.jsonObject.getValue("componentProposalRef").jsonPrimitive.content }
+        val iscoTypes = full.vocabulary.types.filter { type -> type.researchOrigins.any { it.sourceFile == FullResearchCatalog.ISCO } }
+        assertEquals(explicitIds,iscoTypes.map { it.id }.toSet())
+        val residualIds = source.getValue("residualResolutions").jsonArray.map { it.jsonObject.getValue("residualId").jsonPrimitive.content }.toSet()
+        assertTrue(full.vocabulary.types.none { it.id in residualIds })
+        val pendingResiduals = full.outcomes.filter { it.kind == "residual-resolution" && it.runtimeIds.isEmpty() }
+        assertEquals(setOf("residual.engrave_etch_surface_marking", "residual.custom_orthopaedic_footwear_fit_repair",
+            "residual.photosensitive_media_manufacture", "residual.promotional_sample_goods_distribution"),pendingResiduals.map { it.key }.toSet())
+        val frozenRows = source.getValue("candidateDispositions").jsonArray.map { it.jsonObject }.filter {
+            it.getValue("projection").jsonObject["status"]?.jsonPrimitive?.content == "use_frozen_source_decision_no_new_action_proposal"
+        }
+        assertTrue(frozenRows.isNotEmpty())
+        val runtimeIds = full.vocabulary.types.map { it.id }.toSet()
+        for(row in frozenRows) {
+            val key = row.getValue("recordKey").jsonPrimitive.content
+            assertFalse("isco.research.$key" in runtimeIds)
+            assertEquals(1,full.outcomes.count { it.kind == "source-disposition" && it.key == key })
+        }
         assertEquals(base.vocabulary(base.candidateIds,base.axisCandidateIds).types.toSet(),
             full.vocabulary.types.filter { it.id in base.candidateIds }.toSet())
         val held = full.outcomes.filter { it.file == FullResearchCatalog.SPORTS && it.kind == "source-disposition" && it.runtimeIds.isEmpty() }

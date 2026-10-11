@@ -1,13 +1,11 @@
 {
   "baselineSourceRecords": 1584,
   "baselineResearchNodes": 1587,
-  "runtimeTypes": 2092,
+  "runtimeTypes": 1918,
   "runtimeAxes": 337,
   "outcomesByKind": {
     "typed-relation": 159,
     "action-reference": 390,
-    "root-placement": 180,
-    "explicit-pair-reuse": 11,
     "optional-component": 18,
     "family-or-wrapper": 12,
     "residual-resolution": 5,
@@ -24,6 +22,1222 @@
     "sports_additive_catalogue_projection.json": 223
   },
   "withoutDirectRuntimeBinding": [
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/11",
+      "key": "base.unit_action_proposal.isco08.unit.5161.action.divinatory_reading",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "merge_or_consolidate_only_for_explicit_pairwise_merge_eligible_relations; No whole-action mapping; any targets are named components only. Consolidate proposal provenance; no new action ID."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/12",
+      "key": "base.unit_action_proposal.isco08.unit.1113.action.conduct_community_ceremony",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Preserve common ceremony-conduct core and distinguish funeral planning, logistics, and religious/customary facets; do not equate all funerals with the generic ceremony action."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/13",
+      "key": "base.unit_action_proposal.isco08.action.healthcare.perform_surgical_procedure",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep actual clinical procedure separate from preparation/assistance. Keep assistance role/action separate from procedure performed by clinician."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/14",
+      "key": "base.unit_action_proposal.isco08.action.healthcare.perform_autopsy",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep forensic/pathology examination distinct from funeral preparation."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/15",
+      "key": "base.unit_action_proposal.isco08.action.healthcare.administer_medication",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Split compound candidate and preserve performing vs assisting as context where it changes the observable action. Keep dispensing and administration separate. Retain first aid as a broader context-specific service only with explicit non-overlap to medication administration."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/16",
+      "key": "base.unit_action_proposal.isco08.action.healthcare.compound_medication",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "merge_or_consolidate_only_for_explicit_pairwise_merge_eligible_relations; No whole-action mapping; any targets are named components only. Reuse one medication-compounding action; retain pharmacist/setting/recipient facets."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/18",
+      "key": "base.unit_action_proposal.isco08.action.healthcare.dispense_medication",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "merge_or_consolidate_only_for_explicit_pairwise_merge_eligible_relations; No whole-action mapping; any targets are named components only. Consolidate as one dispensing action; preserve all source refs."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/23",
+      "key": "base.unit_action_proposal.isco08.unit.2411.action.investigate_financial_irregularity",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Do not merge by the word investigation; preserve client/authority/purpose facets and any formal financial-analysis remainder."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/25",
+      "key": "base.unit_action_proposal.isco08.unit.2412.action.arrange_securities_transaction",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Do not merge to one unrestricted label until boundary is written; use purpose/transaction-type facet or retain capital-raising as subtype. Keep transaction arrangement separate from order execution/transmission."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/26",
+      "key": "base.unit_action_proposal.isco08.unit.2423.action.analyze_jobs",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep job analysis distinct from vacancy matching/placement."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/28",
+      "key": "base.unit_action_proposal.isco08.unit.2612.action.preside_judicial_hearing",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep judicial presiding and courtroom order distinct."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/29",
+      "key": "base.unit_action_proposal.isco08.unit.2612.action.adjudicate_case",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep judicial decision and courtroom management distinct."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/30",
+      "key": "base.unit_action_proposal.isco08.unit.2619.action.conduct_legal_inquest",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep witness testimony distinct from chairing/conducting the inquest."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/31",
+      "key": "base.unit_action_proposal.isco08.unit.1346.action.underwrite_financial_application",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Retain assessment as a potentially distinct stage; avoid representing all underwriting as only credit-score/creditworthiness assessment. Preserve assessment, recommendation and final underwriting/decision boundaries; avoid redundant same-stage candidates. Keep application intake separate from underwriting."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/32",
+      "key": "base.unit_action_proposal.isco08.unit.1412.action.compose_service_menu",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Split compound candidate: reuse/merge menu planning; keep recipe development as distinct remainder if no catalog node covers it."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/33",
+      "key": "base.unit_action_proposal.isco08.unit.2120.action.actuarial_risk_valuation",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Use valuation as the broader action with a calculation facet/sub-action only if independently selectable and not already covered by statistical/calculation actions."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/34",
+      "key": "base.unit_action_proposal.isco08.unit.2131.action.identify_classify_organisms",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Reuse general identification with agricultural-threat facet if action scope is same; otherwise retain pest identification as selectable subtype."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/36",
+      "key": "base.unit_action_proposal.isco08.unit.2622.action.circulate_library_material",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Reuse a general circulation action; decide whether interlibrary loan coordination is a selectable subtype or separate action after preserving the remainder. Retain as mode/variant or separate stage by user selection; preserve the coordination scope."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/39",
+      "key": "base.unit_action_proposal.isco08.unit.2635.action.conduct_counselling_session",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Share a broad conversation/support family only as a relation; retain purpose and practice facets."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/44",
+      "key": "base.unit_action_proposal.isco08.unit.2659.action.train_animal_for_performance",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Reuse a general animal-training action with purpose/behavior facets if the core training action matches. Keep training distinct from care/grooming."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/46",
+      "key": "base.minor_action_proposal.isco08.minor.421.action.operate_gambling_game",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "merge_or_consolidate_only_for_explicit_pairwise_merge_eligible_relations; No whole-action mapping; any targets are named components only. Consolidate/reuse a single operator-side game action; preserve distinction from personal gambling."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/47",
+      "key": "base.minor_action_proposal.isco08.minor.421.action.collect_overdue_debt",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Use one overdue-debt collection action, with loan/secured loan as context or subtype. Keep collection and legal/escalation recommendation distinct; no broad debt label closes both. Keep the referral/escalation stage distinct from pursuing payment."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/48",
+      "key": "base.minor_action_proposal.isco08.minor.516.action.perform_mortuary_body_preparation",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Consolidate body preparation; keep funeral arranging/conduct distinct. Keep funeral service/conduct separate from body preparation."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/49",
+      "key": "base.minor_action_proposal.isco08.minor.524.action.pose_as_model_for_image_or_advertisement",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "merge_or_consolidate_only_for_explicit_pairwise_merge_eligible_relations; No whole-action mapping; any targets are named components only. Consolidate as one model/pose action with visual-medium facets."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/50",
+      "key": "base.minor_action_proposal.isco08.minor.541.action.enforce_law_and_apprehend_person",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Retain a broad authorized enforcement/custody action and an optional arrest subtype only if tests support it; preserve the transfer/remainder and source IDs. No automatic merge. Do not auto-merge. Preserve source-specific authority, identification/pursuit, apprehension and transfer scope; reconsider a shared umbrella only after explicit inclusion rules are tested."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/51",
+      "key": "base.minor_action_proposal.isco08.minor.541.action.supervise_custodial_population",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Keep supervision distinct from authorized transport/escort. Retain source duty remainder (institution-wide observation, event record and handoff) and contextual relation; do not auto-merge the broad base proposal into the activity-specific v2_1 candidate. Map only the in-activity supervision component; keep remaining facility responsibilities in the base source record. No total coverage claim."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/52",
+      "key": "base.minor_action_proposal.isco08.action.production.slaughter_animal_for_food",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Split composite: reuse slaughter action and assess the separate animal-product preparation action."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/54",
+      "key": "major345.action_candidate.calculate_experimental_results",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Retain experimental-result specificity as a typed subtype; do not merge with general data analysis."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/55",
+      "key": "major345.action_candidate.general_data_analysis",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Keep outcome evaluation as purpose-specific action if user logs evaluation; link general analysis as method/adjacent, not exact."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/56",
+      "key": "major345.action_candidate.equipment_calibration",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "merge_or_consolidate_only_for_explicit_pairwise_merge_eligible_relations; No whole-action mapping; any targets are named components only. Use one calibration concept; do not require or imply adjustment. Keep adjustment as a distinct related operation."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/58",
+      "key": "major345.action_candidate.operate_electronic_system",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Keep both source IDs and their distinct scopes. If the electronic subset is useful, record only an explicitly electronically operated clinical-device facet/subtype. Preserve mechanical/non-electronic clinical equipment and nonclinical electronic systems as distinct remainder; no automatic merge. Pairwise cross-candidate relation(s) added: crossrel.158. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/59",
+      "key": "major345.action_candidate.develop_safety_procedure",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Keep office procedure and safety procedure actions separate; do not infer general-specific coverage. Keep safety procedure development separate from implementation and monitoring. Pairwise cross-candidate relation(s) added: crossrel.154. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/60",
+      "key": "major345.action_candidate.technical_drawing_digitization",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Use a common digitization action with source-object/required-output facets; keep vectorization/technical interpretation separate if present. Reuse common scanning/digitization action with object/output facets; do not claim it covers editing/vectorizing."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/62",
+      "key": "major345.action_candidate.facility_layout_planning",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Informational non-dependency only. Do not use this pair for candidate linkage, canonical grouping, coverage, or merge decisions."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/63",
+      "key": "major345.action_candidate.implement_safety_controls",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep safety procedure development separate from implementation and monitoring. Retain control implementation vs monitoring with work/recreation setting facets."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/64",
+      "key": "major345.action_candidate.agricultural_pest_identification",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Keep identification and protective treatment distinct; avoid assuming a protective action solely from pest identification. Reuse general identification with agricultural-threat facet if action scope is same; otherwise retain pest identification as selectable subtype. Keep diagnosis separate from intervention and preserve the crop-vs-facility remainder. Pairwise cross-candidate relation(s) added: crossrel.149. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/66",
+      "key": "major345.action_candidate.pilot_navigate_vessel",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Consolidate common vessel-control action and preserve navigation/command/working-vessel facets or sub-action where independently selectable."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/69",
+      "key": "major345.action_candidate.certify_operational_equipment",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Preserve source-shard candidate disposition and full v2_1 source record; no runtime or catalog admission is assigned. Pairwise cross-candidate relation(s) added: crossrel.157. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/70",
+      "key": "major345.action_candidate.patient_procedure_positioning",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Split positioning from general preparation only if independently selectable; one should not imply the other. Keep actual clinical procedure separate from preparation/assistance. Keep patient preparation and positioning distinct and preserve the boundary."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/73",
+      "key": "major345.action_candidate.pharmaceutical_compounding",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "merge_or_consolidate_only_for_explicit_pairwise_merge_eligible_relations; No whole-action mapping; any targets are named components only. Reuse one medication-compounding action; retain pharmacist/setting/recipient facets."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/74",
+      "key": "major345.action_candidate.dispense_prescribed_medication",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Consolidate as one dispensing action; preserve all source refs. Keep dispensing and administration separate."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/77",
+      "key": "major345.action_candidate.wound_care_dressing",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Do not treat the broad care-assistance candidate as exact coverage of clinical wound dressing; split/reuse only the supported task portion and retain the clinical remainder."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/79",
+      "key": "major345.action_candidate.postnatal_care_support",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Consolidate under postnatal support with home-care/recipient facets if action scopes match."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/81",
+      "key": "major345.action_candidate.routine_dental_care",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep treatment distinct from assistance."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/82",
+      "key": "major345.action_candidate.financial_information_intake",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep application intake separate from underwriting. Keep data intake separate from evaluation. Keep intake and recommendation distinct."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/83",
+      "key": "major345.action_candidate.arrange_capital_raising_transaction",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Do not merge to one unrestricted label until boundary is written; use purpose/transaction-type facet or retain capital-raising as subtype."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/84",
+      "key": "major345.action_candidate.execute_financial_market_order",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep transaction arrangement separate from order execution/transmission."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/85",
+      "key": "major345.action_candidate.loan_creditworthiness_assessment",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Retain assessment as a potentially distinct stage; avoid representing all underwriting as only credit-score/creditworthiness assessment. Keep separate stages if each can be logged independently. Split loan intake, assessment, recommendation and origination/closing if each remains distinguishable; no profession clone. Keep data intake separate from evaluation."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/86",
+      "key": "major345.action_candidate.loan_credit_recommendation",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Preserve assessment, recommendation and final underwriting/decision boundaries; avoid redundant same-stage candidates. Keep separate stages if each can be logged independently. Review and split composite process stages rather than combine by occupation. Keep intake and recommendation distinct."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/87",
+      "key": "major345.action_candidate.refer_overdue_accounts_for_legal_action",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep the referral/escalation stage distinct from pursuing payment."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/88",
+      "key": "major345.action_candidate.actuarial_calculation",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Use valuation as the broader action with a calculation facet/sub-action only if independently selectable and not already covered by statistical/calculation actions. Preserve actuarial-specific selector if useful; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/90",
+      "key": "major345.action_candidate.asset_appraisal",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Prefer general appraisal action with object/value-purpose facets unless users need a clearly separate selection shortcut. Pairwise cross-candidate relation(s) added: crossrel.156. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/96",
+      "key": "major345.action_candidate.customs_tariff_classification",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Preserve classification as a narrower decision/task; do not merge it into full customs-clearance action."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/98",
+      "key": "major345.action_candidate.event_participant_registration",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep registration separate from audience ticket issuance; role and audience matter."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/99",
+      "key": "major345.action_candidate.match_jobseekers_to_vacancies",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep job analysis distinct from vacancy matching/placement."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/103",
+      "key": "major345.action_candidate.office_procedure_development",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Keep office procedure and safety procedure actions separate; do not infer general-specific coverage. Pairwise cross-candidate relation(s) added: crossrel.155. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/104",
+      "key": "major345.action_candidate.authorized_enforcement_detention",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Retain legal action and authority facets; relation is overlap, not exact equivalence. Keep detention and intake tasks separate."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/106",
+      "key": "major345.action_candidate.testify_in_court_as_witness",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep witness testimony distinct from chairing/conducting the inquest."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/107",
+      "key": "major345.action_candidate.assess_tax_liability",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep tax liability and benefit entitlement distinct; shared calculation method is not a canonical activity."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/108",
+      "key": "major345.action_candidate.calculate_social_benefit_entitlement",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep tax liability and benefit entitlement distinct; shared calculation method is not a canonical activity."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/112",
+      "key": "major345.action_candidate.authorized_arrest",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Retain a broad authorized enforcement/custody action and an optional arrest subtype only if tests support it; preserve the transfer/remainder and source IDs. No automatic merge. Retain legal action and authority facets; relation is overlap, not exact equivalence."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/114",
+      "key": "major345.action_candidate.serve_court_process",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep process service and citation issuance separate; preserve legal effect/authority facet."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/115",
+      "key": "major345.action_candidate.maintain_courtroom_order",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Keep judicial presiding and courtroom order distinct. Keep judicial decision and courtroom management distinct."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/117",
+      "key": "major345.action_candidate.client_requested_business_investigation",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Do not merge by the word investigation; preserve client/authority/purpose facets and any formal financial-analysis remainder."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/118",
+      "key": "major345.action_candidate.social_needs_strengths_assessment",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep assessment separate from service delivery/support."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/119",
+      "key": "major345.action_candidate.support_community_functioning",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep assessment separate from service delivery/support."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/120",
+      "key": "major345.action_candidate.social_service_action_planning",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Use a general collaborative plan action with transition/reentry facet if the activity is same; preserve service coordination remainder. Keep faith-based support distinct from case planning; user-selected purpose/context matters."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/121",
+      "key": "major345.action_candidate.supervise_social_program_participants",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Use one supervision/monitoring action only if definitions align; retain welfare/conduct/client-program context facets and non-overlap. Keep program/recipient/authority as context facets; do not create a separate action solely for program setting."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/122",
+      "key": "major345.action_candidate.support_reentry_transition_planning",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Use a general collaborative plan action with transition/reentry facet if the activity is same; preserve service coordination remainder."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/123",
+      "key": "major345.action_candidate.social_crisis_intervention",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep crisis response and shelter provision distinct."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/124",
+      "key": "major345.action_candidate.emergency_shelter_service",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep crisis response and shelter provision distinct."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/125",
+      "key": "major345.action_candidate.deliver_social_service_program",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Keep direct aid provision visible as a concrete component and retain the program-delivery remainder."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/126",
+      "key": "major345.action_candidate.evaluate_social_service_outcomes",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Keep outcome evaluation as purpose-specific action if user logs evaluation; link general analysis as method/adjacent, not exact."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/127",
+      "key": "major345.action_candidate.preach_religious_teachings",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep ritual performance and preaching/teaching separate; no action merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/128",
+      "key": "major345.action_candidate.provide_spiritual_guidance",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Keep separate. Record only as a weak contextual near-neighbor, not overlap, reuse, or dependency. Share a broad conversation/support family only as a relation; retain purpose and practice facets. Keep faith-based support distinct from case planning; user-selected purpose/context matters."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/129",
+      "key": "major345.action_candidate.administer_community_aid_program",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Preserve beneficiary-facing aid provision and program administration as separate action scopes; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/131",
+      "key": "major345.action_candidate.participate_in_sports_promotion",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep competition and public promotion distinct; promotion may reuse general marketing/communication actions with a sports/ambassador facet."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/134",
+      "key": "major345.action_candidate.assess_athlete_performance",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Keep distinct selectable actions or facets only if users can select both; do not treat general assessment as full coverage."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/137",
+      "key": "major345.action_candidate.lead_fitness_recreation_activity",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Preserve plan versus delivery roles and timing."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/138",
+      "key": "major345.action_candidate.monitor_recreation_activity_safety",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Retain control implementation vs monitoring with work/recreation setting facets. Keep monitor vs enforce as distinct actions. Preserve safety-specific selector/context where useful; no equivalence to all active supervision."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/139",
+      "key": "major345.action_candidate.assess_client_fitness_and_recommend_activity",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Keep distinct selectable actions or facets only if users can select both; do not treat general assessment as full coverage. Keep domains distinct; no generic “assess needs” clone without meaningful umbrella semantics."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/140",
+      "key": "major345.action_candidate.enforce_recreation_safety_rules",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Keep monitor vs enforce as distinct actions. Keep active supervision and rule enforcement distinct; no action merge. Treat recreation safety enforcement as a useful subtype/context; preserve rule domain and setting distinctions."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/141",
+      "key": "major345.action_candidate.operate_ict_equipment",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Use a general technical-system operation concept only if its scope is useful; keep device/system/object facet and avoid generic `operate_machine` overreach. Split operate vs maintain and distinguish device vs system scale. Pairwise cross-candidate relation(s) added: crossrel.159. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/144",
+      "key": "major345.action_candidate.assist_ict_product_development_test",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Preserve source-shard candidate disposition and full v2_1 source record; no runtime or catalog admission is assigned. Pairwise cross-candidate relation(s) added: crossrel.160. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/145",
+      "key": "major345.action_candidate.operate_maintain_ict_systems",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Split ICT operation from maintenance if a shared operation selector is used; retain maintenance as distinct and preserve the electronic-system breadth. No whole-candidate auto-merge. Split operate vs maintain and distinguish device vs system scale."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/147",
+      "key": "major345.action_candidate.operate_broadcast_transmission_systems",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Preserve telecom vs broadcast system purpose; only merge common operating equipment actions if definitions coincide."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/148",
+      "key": "major345.action_candidate.operate_radio_telecom_systems",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Preserve telecom vs broadcast system purpose; only merge common operating equipment actions if definitions coincide. Keep distinct communication operations unless a broad system-operation parent is introduced as non-selectable taxonomy, not as a generic time entry."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/149",
+      "key": "major345.action_candidate.digitize_photographic_images",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Prefer one document/image reproduction action with media/object facets; keep fax transmission as a separate remainder. Use a common digitization action with source-object/required-output facets; keep vectorization/technical interpretation separate if present. Retain separate stage names; do not resurrect retired photo-processing candidate because a scanning candidate exists. Keep manufacture and digitization distinct; retain existing leisure developing/printing leaf as another distinct phase."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/152",
+      "key": "major345.action_candidate.design_stage_scenery",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Do not clone by “design/decorate”; keep object and purpose facets or actions separate."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/153",
+      "key": "major345.action_candidate.design_retail_window_display",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Do not clone by “design/decorate”; keep object and purpose facets or actions separate."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/154",
+      "key": "major345.action_candidate.prepare_collection_objects_for_display",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep object preparation and exhibit design/arrangement distinct."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/155",
+      "key": "major345.action_candidate.design_arrange_exhibition",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep object preparation and exhibit design/arrangement distinct."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/156",
+      "key": "major345.action_candidate.maintain_library_circulation",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep system-record maintenance separate from patron-facing circulation if duties are independently selected."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/161",
+      "key": "major345.action_candidate.copy_fax_work_documents",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Split photocopy from fax transmission; reuse general reproduction for photocopying and keep fax/send action remainder."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/162",
+      "key": "major345.action_candidate.digitize_work_documents",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Do not auto-merge as same-core. Reuse the scan sub-action if useful and retain the photocopy/reproduction remainder and output-purpose facets."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/165",
+      "key": "major345.action_candidate.process_bank_counter_transactions",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Preserve source-shard candidate disposition and full v2_1 source record; no runtime or catalog admission is assigned. Pairwise cross-candidate relation(s) added: crossrel.152. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/168",
+      "key": "major345.action_candidate.deal_casino_game",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "merge_or_consolidate_only_for_explicit_pairwise_merge_eligible_relations; No whole-action mapping; any targets are named components only. Consolidate/reuse a single operator-side game action; preserve distinction from personal gambling."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/169",
+      "key": "major345.action_candidate.originate_customer_loan",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Split loan intake, assessment, recommendation and origination/closing if each remains distinguishable; no profession clone. Review and split composite process stages rather than combine by occupation."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/171",
+      "key": "major345.action_candidate.collect_loan_debt_payments",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Use one overdue-debt collection action, with loan/secured loan as context or subtype. Pairwise cross-candidate relation(s) added: crossrel.153. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/172",
+      "key": "major345.action_candidate.recommend_collection_enforcement",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep collection and legal/escalation recommendation distinct; no broad debt label closes both."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/173",
+      "key": "major345.action_candidate.issue_travel_tickets_vouchers",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Keep travel-ticket and event-admission issuance as separate object/right variants; do not infer a hierarchy from shared word “ticket”. Keep travel arrangement separate from ticket issuance."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/174",
+      "key": "major345.action_candidate.operate_telephone_switchboard",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep distinct communication operations unless a broad system-operation parent is introduced as non-selectable taxonomy, not as a generic time entry."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/181",
+      "key": "major345.action_candidate.circulate_library_materials",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Reuse a general circulation action; decide whether interlibrary loan coordination is a selectable subtype or separate action after preserving the remainder. Prefer one circulation umbrella with an interlibrary-loan mode only if activity tests show the same core act; otherwise retain distinct coordination stage. Keep system-record maintenance separate from patron-facing circulation if duties are independently selected."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/185",
+      "key": "major345.action_candidate.coordinate_interlibrary_loans",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Prefer one circulation umbrella with an interlibrary-loan mode only if activity tests show the same core act; otherwise retain distinct coordination stage. Retain as mode/variant or separate stage by user selection; preserve the coordination scope."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/186",
+      "key": "major345.action_candidate.perform_postal_mail_handling",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Use general postal handling with sorting/routing as task subtype unless independently selected. Keep addressing separate from handling/route operations."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/187",
+      "key": "major345.action_candidate.sort_and_route_postal_mail",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Use general postal handling with sorting/routing as task subtype unless independently selected."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/188",
+      "key": "major345.action_candidate.assign_processing_codes_to_records",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Check definitions before consolidation; preserve coding, sequencing and physical sorting as distinguishable operations."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/189",
+      "key": "major345.action_candidate.sort_and_number_forms",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Check definitions before consolidation; preserve coding, sequencing and physical sorting as distinguishable operations."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/190",
+      "key": "major345.action_candidate.address_mail_pieces",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep addressing separate from handling/route operations."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/191",
+      "key": "major345.action_candidate.read_or_interpret_text_for_client",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep reading/interpretation distinct from form completion; capture a compound only if both are explicitly performed."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/192",
+      "key": "major345.action_candidate.assist_client_with_official_forms",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep reading/interpretation distinct from form completion; capture a compound only if both are explicitly performed."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/193",
+      "key": "major345.action_candidate.reproduce_or_digitize_documents",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Prefer one document/image reproduction action with media/object facets; keep fax transmission as a separate remainder. Reuse common scanning/digitization action with object/output facets; do not claim it covers editing/vectorizing. Split photocopy from fax transmission; reuse general reproduction for photocopying and keep fax/send action remainder. Do not auto-merge as same-core. Reuse the scan sub-action if useful and retain the photocopy/reproduction remainder and output-purpose facets."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/198",
+      "key": "major345.action_candidate.assess_passenger_assistance_needs",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep domains distinct; no generic “assess needs” clone without meaningful umbrella semantics."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/206",
+      "key": "major345.action_candidate.supervise_housekeeping_staff",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Reuse general hiring/training/supervision actions; do not keep department-specific profession clones; preserve unresolved grievance/selection actions separately."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/207",
+      "key": "major345.action_candidate.monitor_institutional_resident_welfare_and_conduct",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Use one supervision/monitoring action only if definitions align; retain welfare/conduct/client-program context facets and non-overlap. Retain institutional welfare/condition scope separately; do not close it using the activity supervision candidate alone."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/210",
+      "key": "major345.action_candidate.manage_tenant_and_visitor_conduct",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Preserve building/recipient facets and the additional conduct-resolution scope; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/211",
+      "key": "major345.action_candidate.provide_astrology_or_divination_reading",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "merge_or_consolidate_only_for_explicit_pairwise_merge_eligible_relations; No whole-action mapping; any targets are named components only. Consolidate proposal provenance; no new action ID."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/214",
+      "key": "major345.action_candidate.prepare_deceased_for_funeral",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Consolidate body preparation; keep funeral arranging/conduct distinct. Keep forensic/pathology examination distinct from funeral preparation."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/216",
+      "key": "major345.action_candidate.assist_veterinary_care",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. No source-qualified whole-candidate reuse is established in the current four-catalog search; retain current source candidate as a review record, not an accepted runtime node. Pairwise cross-candidate relation(s) added: crossrel.161. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/218",
+      "key": "major345.action_candidate.train_animals_for_behavioural_tasks",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Reuse a general animal-training action with purpose/behavior facets if the core training action matches."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/220",
+      "key": "major345.action_candidate.supervise_kitchen_helpers",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Reuse general hiring/training/supervision actions; do not keep department-specific profession clones; preserve unresolved grievance/selection actions separately."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/224",
+      "key": "major345.action_candidate.issue_event_admission_tickets",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Keep travel-ticket and event-admission issuance as separate object/right variants; do not infer a hierarchy from shared word “ticket”. Keep registration separate from audience ticket issuance; role and audience matter."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/226",
+      "key": "major345.action_candidate.model_for_fashion_and_visual_media",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "merge_or_consolidate_only_for_explicit_pairwise_merge_eligible_relations; No whole-action mapping; any targets are named components only. Consolidate as one model/pose action with visual-medium facets."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/228",
+      "key": "major345.action_candidate.guide_child_behavior_and_social_development",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Active behavioral/social guidance is a caregiving/teaching act whether done by a parent or paid childcare worker; use child-development purpose and provider/recipient facets rather than occupation-only clone."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/229",
+      "key": "major345.action_candidate.maintain_childcare_daily_records",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Keep animal-care and childcare records as separate source candidates or typed recordkeeping variants; no general-specific merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/230",
+      "key": "major345.action_candidate.assist_with_prescribed_care_tasks",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Split compound candidate and preserve performing vs assisting as context where it changes the observable action. Do not treat the broad care-assistance candidate as exact coverage of clinical wound dressing; split/reuse only the supported task portion and retain the clinical remainder."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/232",
+      "key": "major345.action_candidate.provide_postpartum_home_support",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Consolidate under postnatal support with home-care/recipient facets if action scopes match."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/233",
+      "key": "major345.action_candidate.prepare_patient_for_examination",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Split positioning from general preparation only if independently selectable; one should not imply the other. Preserve a preparation remainder; use procedural assistance only when that action is selected. Recommend one neutral patient-preparation concept while preserving all source codes/pages; no runtime change is applied."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/234",
+      "key": "major345.action_candidate.assist_dental_or_imaging_procedure",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Keep assistance role/action separate from procedure performed by clinician. Keep acquisition distinct from assisting/positioning/preparing. Preserve a preparation remainder; use procedural assistance only when that action is selected. Keep treatment distinct from assistance. Preserve role-specific/dental-imaging selector if useful; do not confuse assistant action with clinician performing treatment."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/235",
+      "key": "major345.action_candidate.perform_diagnostic_imaging",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep acquisition distinct from assisting/positioning/preparing. Keep assistant and procedure-performer roles distinct."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/238",
+      "key": "major345.action_candidate.enforce_public_law_and_apprehend_suspects",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Do not auto-merge. Preserve source-specific authority, identification/pursuit, apprehension and transfer scope; reconsider a shared umbrella only after explicit inclusion rules are tested."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/239",
+      "key": "major345.action_candidate.process_prisoner_admission_and_property",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep detention and intake tasks separate."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/240",
+      "key": "major345.action_candidate.escort_detainees_in_custody",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Keep supervision distinct from authorized transport/escort. Do not merge people-escort with valuables transport."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/241",
+      "key": "major345.action_candidate.transport_and_guard_valuables",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Do not merge people-escort with valuables transport."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/243",
+      "key": "major345.action_candidate.issue_protective_service_citations",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep process service and citation issuance separate; preserve legal effect/authority facet."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/245",
+      "key": "major345.action_candidate.sterilize_professional_instruments",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep clean equipment and sterilization separate; do not close sterilization with generic cleaning."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/247",
+      "key": "major67890.active_action_candidate.ISCO.action.field.prepare_soil",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Informational non-dependency only. Do not use this pair for candidate linkage, canonical grouping, coverage, or merge decisions."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/248",
+      "key": "major67890.active_action_candidate.ISCO.action.field.protect_crops",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Do not keep two unrelated candidates: merge shared action or represent crop/grounds as purpose/object facets, retain explicit crop-disease remainder only. Keep identification and protective treatment distinct; avoid assuming a protective action solely from pest identification. Pairwise cross-candidate relation(s) added: crossrel.150. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/249",
+      "key": "major67890.active_action_candidate.ISCO.action.field.collect_animal_products",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep collection and processing distinct; never let a broad livestock-production node close both."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/255",
+      "key": "major67890.active_action_candidate.ISCO.action.transport.operate_work_vessel",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Consolidate common vessel-control action and preserve navigation/command/working-vessel facets or sub-action where independently selectable."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/257",
+      "key": "major67890.active_action_candidate.ISCO.action.field.process_animal_products",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Retain post-slaughter processing as separate concept; remove duplicate slaughter wording from that proposal. Keep collection and processing distinct; never let a broad livestock-production node close both."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/267",
+      "key": "major67890.active_action_candidate.ISCO.action.trade.calibrate_instrument",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Use one calibration concept; do not require or imply adjustment. Keep adjustment as a distinct related operation. Keep separate activity IDs; a calibration interval can end before/without adjustment, while an adjustment interval is a distinct operation. Current major345 calibration wording follows VIM 2.39 and must not imply adjustment. This relation is adjacent-only and is not a calibration canonical membership."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/268",
+      "key": "major67890.active_action_candidate.ISCO.action.work.appraise_gem_or_valuables",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Prefer general appraisal action with object/value-purpose facets unless users need a clearly separate selection shortcut."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/272",
+      "key": "major67890.active_action_candidate.ISCO.action.field.slaughter_and_prepare_animal_products",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Split composite: reuse slaughter action and assess the separate animal-product preparation action. Retain post-slaughter processing as separate concept; remove duplicate slaughter wording from that proposal."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/276",
+      "key": "major67890.active_action_candidate.ISCO.action.trade.tailor_fit_alter_garment",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep construction/sewing and fitting/alteration distinguishable; reuse only an explicitly shared stitch/repair task."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/277",
+      "key": "major67890.active_action_candidate.ISCO.action.design.garment_patternmaking",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep patternmaking and sewing as sequential distinct actions; do not collapse into generic garment work."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/281",
+      "key": "major67890.active_action_candidate.ISCO.action.service.control_pests_weeds",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Do not keep two unrelated candidates: merge shared action or represent crop/grounds as purpose/object facets, retain explicit crop-disease remainder only. Keep diagnosis separate from intervention and preserve the crop-vs-facility remainder. Pairwise cross-candidate relation(s) added: crossrel.151. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/282",
+      "key": "major67890.active_action_candidate.ISCO.action.creative.arrange_flowers",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Keep as a possible action gap, but retain explicit evidence and avoid claiming absence from all sources without row-level source search."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/305",
+      "key": "major67890.active_action_candidate.ISCO.action.service.specialized_surface_cleaning",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Keep common cleaning-action family linked while preserving target/object facets and distinct residual scope."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/309",
+      "key": "major67890.active_action_candidate.ISCO.action.service.wash_dishes_cookware",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Work kitchen context alone does not create a new action; retain as a selector/refinement only if existing household wash-dish leaf does not supply the relevant wash/cookware scope."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/313",
+      "key": "major67890.active_action_candidate.ISCO.action.trade.adjust_measuring_system",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep separate activity IDs; a calibration interval can end before/without adjustment, while an adjustment interval is a distinct operation. Current major345 calibration wording follows VIM 2.39 and must not imply adjustment. This relation is adjacent-only and is not a calibration canonical membership."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/314",
+      "key": "major67890.active_action_candidate.ISCO.action.production.produce_photographic_media",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep manufacture and digitization distinct; retain existing leisure developing/printing leaf as another distinct phase. Active component/residual link: residual.photosensitive_media_manufacture."
+    },
     {
       "file": "isco_full_projection_v2.json",
       "pointer": "/candidateDispositions/315",
@@ -50,11 +1264,235 @@
     },
     {
       "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/319",
+      "key": "major345.action_candidate.actively_supervise_people_during_activities",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Only the typed partial/conditional coverage is established; preserve the action distinction, all candidate IDs and any remainder. "
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/320",
+      "key": "major345.action_candidate.arrange_staff_training",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Preserve the source decision as a bounded no-exact-match finding; nearest items are not synonyms and no runtime admission is implied."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/321",
+      "key": "major345.action_candidate.assist_clinician_during_procedure",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. No source-qualified whole-candidate reuse is established in the current four-catalog search; retain current source candidate as a review record, not an accepted runtime node. Pairwise cross-candidate relation(s) added: crossrel.161. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/323",
+      "key": "major345.action_candidate.assist_religious_service_or_rite",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Preserve assistant and officiant actions separately; do not make assisting a ritual alias."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/324",
+      "key": "major345.action_candidate.assist_with_patient_exercise_practice",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Reuse only the active oversight component if the user tracks it separately; retain exercise instruction/assistance as the candidate remainder."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/325",
+      "key": "major345.action_candidate.change_bed_linen",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. The broad textile_other node covers bedding care; the source candidate may remain a useful narrower change-linen selector. Bed making/washing are adjacent, not equivalent. The bed-making node is an adjacent action, and textile washing is a later/different stage; textile_other is the broadest household reuse anchor."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/327",
+      "key": "major345.action_candidate.collect_lesson_materials",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep distribution and collection as separately selectable actions; shared teaching-material object is a facet, not identity."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/328",
+      "key": "major345.action_candidate.create_or_edit_web_pages",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Only the stated part/specific subset is covered. Do not claim full-candidate equivalence; preserve source remainder or selectable subtype as described in each typed ref. "
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/329",
+      "key": "major345.action_candidate.customs_clearance",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Preserve classification as a narrower decision/task; do not merge it into full customs-clearance action."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/330",
+      "key": "major345.action_candidate.deliver_community_aid",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Preserve beneficiary-facing aid provision and program administration as separate action scopes; no automatic merge. Keep direct aid provision visible as a concrete component and retain the program-delivery remainder."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/331",
+      "key": "major345.action_candidate.design_sport_fitness_training_program",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_distinct_adjacent_actions; No whole-action mapping; any targets are named components only. Keep planning separate from teaching the session. Preserve plan versus delivery roles and timing."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/332",
+      "key": "major345.action_candidate.dismantle_temporary_market_stall",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Preserve the source decision as a bounded no-exact-match finding; nearest items are not synonyms and no runtime admission is implied."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/333",
+      "key": "major345.action_candidate.distribute_lesson_materials",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Prefer one generic physical handout concept with material/recipient/purpose facets only if the source medium is confirmed; retain a separate modality/educational scope note. No automatic merge. Keep distribution and collection as separately selectable actions; shared teaching-material object is a facet, not identity."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
       "pointer": "/candidateDispositions/334",
       "key": "major345.action_candidate.distribute_promotional_samples_and_catalogues",
       "kind": "source-disposition",
       "runtimeIds": [],
       "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Keep printed handout and product-sample offering distinct components; preserve an active sample-distribution residual. No full candidate merge. Active component/residual link: residual.promotional_sample_goods_distribution."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/335",
+      "key": "major345.action_candidate.enforce_establishment_rules",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Keep observation/responsibility separate from intervention/enforcement. Preserve building/recipient facets and the additional conduct-resolution scope; no automatic merge. Treat recreation safety enforcement as a useful subtype/context; preserve rule domain and setting distinctions."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/336",
+      "key": "major345.action_candidate.hand_out_printed_information_materials",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Keep printed handout and product-sample offering distinct components; preserve an active sample-distribution residual. No full candidate merge. Prefer one generic physical handout concept with material/recipient/purpose facets only if the source medium is confirmed; retain a separate modality/educational scope note. No automatic merge. Active component/residual link: residual.promotional_sample_goods_distribution."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/337",
+      "key": "major345.action_candidate.lead_tour_and_interpret_sites",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Preserve the source decision as a bounded no-exact-match finding; nearest items are not synonyms and no runtime admission is implied."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/338",
+      "key": "major345.action_candidate.operate_and_control_cooking_equipment",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Only the stated part/specific subset is covered. Do not claim full-candidate equivalence; preserve source remainder or selectable subtype as described in each typed ref. "
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/339",
+      "key": "major345.action_candidate.operate_clinical_support_equipment",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_partial_scope_overlap_and_explicit_residual; No whole-action mapping; any targets are named components only. Keep both source IDs and their distinct scopes. If the electronic subset is useful, record only an explicitly electronically operated clinical-device facet/subtype. Preserve mechanical/non-electronic clinical equipment and nonclinical electronic systems as distinct remainder; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/340",
+      "key": "major345.action_candidate.perform_quantitative_calculations",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Preserve actuarial-specific selector if useful; no automatic merge. Retain experimental-result specificity as a typed subtype; do not merge with general data analysis."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/341",
+      "key": "major345.action_candidate.prepare_patient_for_exam_or_treatment",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Recommend one neutral patient-preparation concept while preserving all source codes/pages; no runtime change is applied. Keep patient preparation and positioning distinct and preserve the boundary. Keep encounter preparation and intra-procedure support distinct."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/342",
+      "key": "major345.action_candidate.supervise_children_during_activities",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "merge_or_consolidate_only_for_explicit_pairwise_merge_eligible_relations; No whole-action mapping; any targets are named components only. Retain the general candidate and source child ID/provenance as a context variant; do not silently delete the row or claim the existing Life/Care child node is exact under its current narrower definition."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/343",
+      "key": "major345.action_candidate.supervise_people_in_custody",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. Keep custody and authority as facets; preserve the old source ID and its narrower source context. Do not create a prison-role clone. Retain source duty remainder (institution-wide observation, event record and handoff) and contextual relation; do not auto-merge the broad base proposal into the activity-specific v2_1 candidate."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/344",
+      "key": "major345.action_candidate.arrange_customer_order_payment",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. A payment-arrangement step remains useful for findability when recording how or when an order will be paid. Existing sales coverage is broad, negotiation covers the term-agreement subset, and actual cashier settlement is a separate action; do not count this candidate as an uncovered core action. The source author has added broader existing-action coverage; treat this as an optional findability/context/method refinement, not an uncovered core action."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/345",
+      "key": "major345.action_candidate.develop_agricultural_harmful_organism_control_methods",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. No source-qualified whole-candidate reuse is established in the current four-catalog search; retain current source candidate as a review record, not an accepted runtime node. Pairwise cross-candidate relation(s) added: crossrel.149, crossrel.150, crossrel.151. Preserve relation-specific action boundaries; no automatic merge. Pairwise cross-candidate relation(s) added: crossrel.149, crossrel.150, crossrel.151. Preserve relation-specific action boundaries; no automatic merge. Pairwise cross-candidate relation(s) added: crossrel.149, crossrel.150, crossrel.151. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/346",
+      "key": "major345.action_candidate.develop_or_revise_work_policy",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. No source-qualified whole-candidate reuse is established in the current four-catalog search; retain current source candidate as a review record, not an accepted runtime node. Pairwise cross-candidate relation(s) added: crossrel.154, crossrel.155. Preserve relation-specific action boundaries; no automatic merge. Pairwise cross-candidate relation(s) added: crossrel.154, crossrel.155. Preserve relation-specific action boundaries; no automatic merge."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/347",
+      "key": "major345.action_candidate.gather_property_listing_information",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Property/listing details are a useful domain-specific refinement of generic data collection, distinct in context from valuation, aggregate market monitoring and transaction advice. The core act of collecting facts is already broadly covered. The source author has added broader existing-action coverage; treat this as an optional findability/context/method refinement, not an uncovered core action."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/348",
+      "key": "major345.action_candidate.industrial_thermal_waste_treatment",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "retain_context_or_general_specific_boundary; No whole-action mapping; any targets are named components only. Thermal processing of sludge/solid waste is a useful method-specific refinement. The existing waste-processing definition broadly covers waste treatment and production.process_material is an additional broad material-processing neighbor; incineration is not an uncovered generic waste-handling action. The source author has added broader existing-action coverage; treat this as an optional findability/context/method refinement, not an uncovered core action."
+    },
+    {
+      "file": "isco_full_projection_v2.json",
+      "pointer": "/candidateDispositions/350",
+      "key": "major345.action_candidate.operate_water_distribution_system",
+      "kind": "source-disposition",
+      "runtimeIds": [],
+      "boundary": "apply_only_explicit_pairwise_case_decisions_no_group_merge; No whole-action mapping; any targets are named components only. No source-qualified whole-candidate reuse is established in the current four-catalog search; retain current source candidate as a review record, not an accepted runtime node. Pairwise cross-candidate relation(s) added: crossrel.158. Preserve relation-specific action boundaries; no automatic merge."
     },
     {
       "file": "sports_additive_catalogue_projection.json",
@@ -73,9 +1511,9 @@
       "skipped": "0",
       "failures": "0",
       "errors": "0",
-      "timestamp": "2026-10-11T17:18:03.099Z",
+      "timestamp": "2026-10-11T17:35:45.975Z",
       "hostname": "442bbd4fc7a7",
-      "time": "35.925"
+      "time": "30.825"
     },
     {
       "backend": "room",
@@ -84,9 +1522,9 @@
       "skipped": "0",
       "failures": "0",
       "errors": "0",
-      "timestamp": "2026-10-11T17:18:42.446Z",
+      "timestamp": "2026-10-11T17:36:18.289Z",
       "hostname": "442bbd4fc7a7",
-      "time": "75.903"
+      "time": "66.795"
     }
   ],
   "deviceTested": false,
@@ -105,5 +1543,207 @@
         "sha256": "6b5e4810622ff4af4af794b2ac8093d7135caad85f1ace51e99ced62a7373955"
       }
     ]
-  }
+  },
+  "v8Comparison": {
+    "commit": "0e9bf78886d4614a07ed6816ca8c95fdbe4ddce7",
+    "remainingTypesExactlyEqual": true,
+    "allAxesExactlyEqual": true,
+    "sportsOutcomesExactlyEqual": true,
+    "unchangedSources": [
+      {
+        "file": "research/catalog.research.json",
+        "sha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19"
+      },
+      {
+        "file": "research/projections/isco_full_projection_v2.json",
+        "sha256": "7dd02e406bb2c34260a73179b2b6a94f19d0141aa1bb06815277eb5e23bc2498"
+      },
+      {
+        "file": "research/projections/sports_additive_catalogue_projection.json",
+        "sha256": "6b5e4810622ff4af4af794b2ac8093d7135caad85f1ace51e99ced62a7373955"
+      }
+    ],
+    "removedImplicitIds": [
+      "isco.research.base.minor_action_proposal.isco08.action.production.slaughter_animal_for_food",
+      "isco.research.base.minor_action_proposal.isco08.minor.421.action.collect_overdue_debt",
+      "isco.research.base.minor_action_proposal.isco08.minor.421.action.operate_gambling_game",
+      "isco.research.base.minor_action_proposal.isco08.minor.516.action.perform_mortuary_body_preparation",
+      "isco.research.base.minor_action_proposal.isco08.minor.524.action.pose_as_model_for_image_or_advertisement",
+      "isco.research.base.minor_action_proposal.isco08.minor.541.action.enforce_law_and_apprehend_person",
+      "isco.research.base.minor_action_proposal.isco08.minor.541.action.supervise_custodial_population",
+      "isco.research.base.unit_action_proposal.isco08.action.healthcare.administer_medication",
+      "isco.research.base.unit_action_proposal.isco08.action.healthcare.compound_medication",
+      "isco.research.base.unit_action_proposal.isco08.action.healthcare.dispense_medication",
+      "isco.research.base.unit_action_proposal.isco08.action.healthcare.perform_autopsy",
+      "isco.research.base.unit_action_proposal.isco08.action.healthcare.perform_surgical_procedure",
+      "isco.research.base.unit_action_proposal.isco08.unit.1113.action.conduct_community_ceremony",
+      "isco.research.base.unit_action_proposal.isco08.unit.1346.action.underwrite_financial_application",
+      "isco.research.base.unit_action_proposal.isco08.unit.1412.action.compose_service_menu",
+      "isco.research.base.unit_action_proposal.isco08.unit.2120.action.actuarial_risk_valuation",
+      "isco.research.base.unit_action_proposal.isco08.unit.2131.action.identify_classify_organisms",
+      "isco.research.base.unit_action_proposal.isco08.unit.2411.action.investigate_financial_irregularity",
+      "isco.research.base.unit_action_proposal.isco08.unit.2412.action.arrange_securities_transaction",
+      "isco.research.base.unit_action_proposal.isco08.unit.2423.action.analyze_jobs",
+      "isco.research.base.unit_action_proposal.isco08.unit.2612.action.adjudicate_case",
+      "isco.research.base.unit_action_proposal.isco08.unit.2612.action.preside_judicial_hearing",
+      "isco.research.base.unit_action_proposal.isco08.unit.2619.action.conduct_legal_inquest",
+      "isco.research.base.unit_action_proposal.isco08.unit.2622.action.circulate_library_material",
+      "isco.research.base.unit_action_proposal.isco08.unit.2635.action.conduct_counselling_session",
+      "isco.research.base.unit_action_proposal.isco08.unit.2659.action.train_animal_for_performance",
+      "isco.research.base.unit_action_proposal.isco08.unit.5161.action.divinatory_reading",
+      "isco.research.major345.action_candidate.actively_supervise_people_during_activities",
+      "isco.research.major345.action_candidate.actuarial_calculation",
+      "isco.research.major345.action_candidate.address_mail_pieces",
+      "isco.research.major345.action_candidate.administer_community_aid_program",
+      "isco.research.major345.action_candidate.agricultural_pest_identification",
+      "isco.research.major345.action_candidate.arrange_and_conduct_funeral_services",
+      "isco.research.major345.action_candidate.arrange_capital_raising_transaction",
+      "isco.research.major345.action_candidate.arrange_customer_order_payment",
+      "isco.research.major345.action_candidate.arrange_staff_training",
+      "isco.research.major345.action_candidate.assess_athlete_performance",
+      "isco.research.major345.action_candidate.assess_client_fitness_and_recommend_activity",
+      "isco.research.major345.action_candidate.assess_passenger_assistance_needs",
+      "isco.research.major345.action_candidate.assess_tax_liability",
+      "isco.research.major345.action_candidate.asset_appraisal",
+      "isco.research.major345.action_candidate.assign_processing_codes_to_records",
+      "isco.research.major345.action_candidate.assist_client_with_official_forms",
+      "isco.research.major345.action_candidate.assist_clinician_during_procedure",
+      "isco.research.major345.action_candidate.assist_dental_or_imaging_procedure",
+      "isco.research.major345.action_candidate.assist_ict_product_development_test",
+      "isco.research.major345.action_candidate.assist_religious_service_or_rite",
+      "isco.research.major345.action_candidate.assist_veterinary_care",
+      "isco.research.major345.action_candidate.assist_with_patient_exercise_practice",
+      "isco.research.major345.action_candidate.assist_with_prescribed_care_tasks",
+      "isco.research.major345.action_candidate.authorized_arrest",
+      "isco.research.major345.action_candidate.authorized_enforcement_detention",
+      "isco.research.major345.action_candidate.calculate_experimental_results",
+      "isco.research.major345.action_candidate.calculate_social_benefit_entitlement",
+      "isco.research.major345.action_candidate.certify_operational_equipment",
+      "isco.research.major345.action_candidate.change_bed_linen",
+      "isco.research.major345.action_candidate.circulate_library_materials",
+      "isco.research.major345.action_candidate.client_requested_business_investigation",
+      "isco.research.major345.action_candidate.collect_lesson_materials",
+      "isco.research.major345.action_candidate.collect_loan_debt_payments",
+      "isco.research.major345.action_candidate.coordinate_interlibrary_loans",
+      "isco.research.major345.action_candidate.copy_fax_work_documents",
+      "isco.research.major345.action_candidate.create_or_edit_web_pages",
+      "isco.research.major345.action_candidate.customs_clearance",
+      "isco.research.major345.action_candidate.customs_tariff_classification",
+      "isco.research.major345.action_candidate.deliver_community_aid",
+      "isco.research.major345.action_candidate.deliver_social_service_program",
+      "isco.research.major345.action_candidate.design_arrange_exhibition",
+      "isco.research.major345.action_candidate.design_retail_window_display",
+      "isco.research.major345.action_candidate.design_sport_fitness_training_program",
+      "isco.research.major345.action_candidate.design_stage_scenery",
+      "isco.research.major345.action_candidate.develop_agricultural_harmful_organism_control_methods",
+      "isco.research.major345.action_candidate.develop_or_revise_work_policy",
+      "isco.research.major345.action_candidate.develop_safety_procedure",
+      "isco.research.major345.action_candidate.digitize_photographic_images",
+      "isco.research.major345.action_candidate.digitize_work_documents",
+      "isco.research.major345.action_candidate.dismantle_temporary_market_stall",
+      "isco.research.major345.action_candidate.distribute_lesson_materials",
+      "isco.research.major345.action_candidate.emergency_shelter_service",
+      "isco.research.major345.action_candidate.enforce_establishment_rules",
+      "isco.research.major345.action_candidate.enforce_public_law_and_apprehend_suspects",
+      "isco.research.major345.action_candidate.enforce_recreation_safety_rules",
+      "isco.research.major345.action_candidate.equipment_calibration",
+      "isco.research.major345.action_candidate.escort_detainees_in_custody",
+      "isco.research.major345.action_candidate.evaluate_social_service_outcomes",
+      "isco.research.major345.action_candidate.event_participant_registration",
+      "isco.research.major345.action_candidate.execute_financial_market_order",
+      "isco.research.major345.action_candidate.facility_layout_planning",
+      "isco.research.major345.action_candidate.financial_information_intake",
+      "isco.research.major345.action_candidate.gather_property_listing_information",
+      "isco.research.major345.action_candidate.general_data_analysis",
+      "isco.research.major345.action_candidate.guide_child_behavior_and_social_development",
+      "isco.research.major345.action_candidate.hand_out_printed_information_materials",
+      "isco.research.major345.action_candidate.implement_safety_controls",
+      "isco.research.major345.action_candidate.industrial_thermal_waste_treatment",
+      "isco.research.major345.action_candidate.issue_event_admission_tickets",
+      "isco.research.major345.action_candidate.issue_protective_service_citations",
+      "isco.research.major345.action_candidate.issue_travel_tickets_vouchers",
+      "isco.research.major345.action_candidate.lead_fitness_recreation_activity",
+      "isco.research.major345.action_candidate.lead_tour_and_interpret_sites",
+      "isco.research.major345.action_candidate.loan_credit_recommendation",
+      "isco.research.major345.action_candidate.loan_creditworthiness_assessment",
+      "isco.research.major345.action_candidate.maintain_childcare_daily_records",
+      "isco.research.major345.action_candidate.maintain_courtroom_order",
+      "isco.research.major345.action_candidate.maintain_library_circulation",
+      "isco.research.major345.action_candidate.manage_tenant_and_visitor_conduct",
+      "isco.research.major345.action_candidate.match_jobseekers_to_vacancies",
+      "isco.research.major345.action_candidate.monitor_institutional_resident_welfare_and_conduct",
+      "isco.research.major345.action_candidate.monitor_recreation_activity_safety",
+      "isco.research.major345.action_candidate.monitor_technical_asset_lifecycle",
+      "isco.research.major345.action_candidate.office_procedure_development",
+      "isco.research.major345.action_candidate.operate_and_control_cooking_equipment",
+      "isco.research.major345.action_candidate.operate_broadcast_transmission_systems",
+      "isco.research.major345.action_candidate.operate_clinical_support_equipment",
+      "isco.research.major345.action_candidate.operate_electronic_system",
+      "isco.research.major345.action_candidate.operate_ict_equipment",
+      "isco.research.major345.action_candidate.operate_maintain_ict_systems",
+      "isco.research.major345.action_candidate.operate_radio_telecom_systems",
+      "isco.research.major345.action_candidate.operate_telephone_switchboard",
+      "isco.research.major345.action_candidate.operate_water_distribution_system",
+      "isco.research.major345.action_candidate.originate_customer_loan",
+      "isco.research.major345.action_candidate.participate_in_sports_promotion",
+      "isco.research.major345.action_candidate.patient_procedure_positioning",
+      "isco.research.major345.action_candidate.perform_diagnostic_imaging",
+      "isco.research.major345.action_candidate.perform_postal_mail_handling",
+      "isco.research.major345.action_candidate.perform_quantitative_calculations",
+      "isco.research.major345.action_candidate.pilot_navigate_vessel",
+      "isco.research.major345.action_candidate.postnatal_care_support",
+      "isco.research.major345.action_candidate.preach_religious_teachings",
+      "isco.research.major345.action_candidate.prepare_collection_objects_for_display",
+      "isco.research.major345.action_candidate.prepare_patient_for_exam_or_treatment",
+      "isco.research.major345.action_candidate.process_bank_counter_transactions",
+      "isco.research.major345.action_candidate.process_prisoner_admission_and_property",
+      "isco.research.major345.action_candidate.provide_postpartum_home_support",
+      "isco.research.major345.action_candidate.provide_spiritual_guidance",
+      "isco.research.major345.action_candidate.read_or_interpret_text_for_client",
+      "isco.research.major345.action_candidate.recommend_collection_enforcement",
+      "isco.research.major345.action_candidate.refer_overdue_accounts_for_legal_action",
+      "isco.research.major345.action_candidate.reproduce_or_digitize_documents",
+      "isco.research.major345.action_candidate.routine_dental_care",
+      "isco.research.major345.action_candidate.serve_court_process",
+      "isco.research.major345.action_candidate.social_crisis_intervention",
+      "isco.research.major345.action_candidate.social_needs_strengths_assessment",
+      "isco.research.major345.action_candidate.social_service_action_planning",
+      "isco.research.major345.action_candidate.sort_and_number_forms",
+      "isco.research.major345.action_candidate.sort_and_route_postal_mail",
+      "isco.research.major345.action_candidate.sterilize_professional_instruments",
+      "isco.research.major345.action_candidate.supervise_housekeeping_staff",
+      "isco.research.major345.action_candidate.supervise_kitchen_helpers",
+      "isco.research.major345.action_candidate.support_community_functioning",
+      "isco.research.major345.action_candidate.support_reentry_transition_planning",
+      "isco.research.major345.action_candidate.technical_drawing_digitization",
+      "isco.research.major345.action_candidate.testify_in_court_as_witness",
+      "isco.research.major345.action_candidate.train_animals_for_behavioural_tasks",
+      "isco.research.major345.action_candidate.transport_and_guard_valuables",
+      "isco.research.major345.action_candidate.wound_care_dressing",
+      "isco.research.major67890.active_action_candidate.ISCO.action.creative.arrange_flowers",
+      "isco.research.major67890.active_action_candidate.ISCO.action.design.garment_patternmaking",
+      "isco.research.major67890.active_action_candidate.ISCO.action.field.collect_animal_products",
+      "isco.research.major67890.active_action_candidate.ISCO.action.field.prepare_soil",
+      "isco.research.major67890.active_action_candidate.ISCO.action.field.process_animal_products",
+      "isco.research.major67890.active_action_candidate.ISCO.action.field.protect_crops",
+      "isco.research.major67890.active_action_candidate.ISCO.action.field.slaughter_and_prepare_animal_products",
+      "isco.research.major67890.active_action_candidate.ISCO.action.production.produce_photographic_media",
+      "isco.research.major67890.active_action_candidate.ISCO.action.service.control_pests_weeds",
+      "isco.research.major67890.active_action_candidate.ISCO.action.service.specialized_surface_cleaning",
+      "isco.research.major67890.active_action_candidate.ISCO.action.service.wash_dishes_cookware",
+      "isco.research.major67890.active_action_candidate.ISCO.action.trade.adjust_measuring_system",
+      "isco.research.major67890.active_action_candidate.ISCO.action.trade.tailor_fit_alter_garment",
+      "isco.research.major67890.active_action_candidate.ISCO.action.transport.operate_work_vessel",
+      "isco.research.major67890.active_action_candidate.ISCO.action.work.appraise_gem_or_valuables",
+      "residual.custom_orthopaedic_footwear_fit_repair",
+      "residual.engrave_etch_surface_marking",
+      "residual.promotional_sample_goods_distribution"
+    ]
+  },
+  "openResiduals": [
+    "residual.engrave_etch_surface_marking",
+    "residual.custom_orthopaedic_footwear_fit_repair",
+    "residual.photosensitive_media_manufacture",
+    "residual.promotional_sample_goods_distribution"
+  ]
 }

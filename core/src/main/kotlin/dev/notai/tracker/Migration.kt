@@ -34,11 +34,12 @@ private fun migrateV1(element: JsonElement): JsonElement = when(element) {
 internal fun decodeBackupVersion(json: String): Backup {
     val root = codec.parseToJsonElement(json).jsonObject
     return when(root["formatVersion"]?.jsonPrimitive?.intOrNull) {
-        3 -> codec.decodeFromJsonElement<Backup>(root)
-        2 -> codec.decodeFromJsonElement<Backup>(root).copy(formatVersion = 3)
+        4 -> codec.decodeFromJsonElement<Backup>(root)
+        3 -> codec.decodeFromJsonElement<Backup>(root).copy(formatVersion = 4)
+        2 -> codec.decodeFromJsonElement<Backup>(root).copy(formatVersion = 4)
         1 -> {
             val migrated = migrateV1(root).jsonObject.toMutableMap()
-            migrated["formatVersion"] = JsonPrimitive(3)
+            migrated["formatVersion"] = JsonPrimitive(4)
             codec.decodeFromJsonElement<Backup>(JsonObject(migrated))
         }
         else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unsupported backup version")

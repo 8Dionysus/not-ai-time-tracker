@@ -33,7 +33,7 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
 @Serializable data class Favorite(@Required val id: String = newId(), val label: String, val selection: Classification)
 @Serializable enum class SessionStatus { RUNNING, PAUSED, STOPPED, RECOVERY }
 @Serializable data class Session(@Required val id: String = newId(), val status: SessionStatus,
-    val selection: Classification = Classification(), val note: String? = null)
+    val selection: Classification = Classification(), val note: String? = null, val importOrigin: ImportOrigin? = null)
 @Serializable data class Anchor(val bootId: String, val elapsedMs: Long)
 @Serializable data class Segment(@Required val id: String = newId(), val sessionId: String,
     val start: Long, val end: Long? = null, @Required val durationMs: Long = 0,
@@ -126,6 +126,11 @@ fun validate(data: Dataset) {
     val bySession = data.segments.groupBy { it.sessionId }
     val segmentIds = data.segments.map { it.id }.toSet()
     data.sessions.forEach { s ->
+        s.importOrigin?.let { origin ->
+            ensure(origin.namespace.isNotBlank() && origin.recordKey.isNotBlank(),"Invalid import origin")
+            ensure(listOf(origin.rowHash,origin.fileHash).all { it.matches(Regex("[0-9a-f]{64}")) },"Invalid import digest")
+            try { ZoneId.of(origin.zone) } catch(e: Exception) { fail(ErrorCode.INVALID_INPUT,"Invalid import zone") }
+        }
         val own = bySession[s.id].orEmpty()
         val open = own.count { it.end == null }
         ensure(open == if (s.status == SessionStatus.RUNNING || s.status == SessionStatus.RECOVERY) 1 else 0, "Inconsistent session state")

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.widget.*
 import dev.notai.tracker.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collectLatest
 import java.time.Instant
 import java.time.ZoneId
 
@@ -22,6 +23,9 @@ class MainActivity: Activity() {
     private lateinit var from: EditText
     private lateinit var until: EditText
     private lateinit var zone: EditText
+    private var visible = false
+    private var observation: Job? = null
+    private var reportText = ""
     private var shown: Snapshot? = null
     private var exportText: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,8 +42,7 @@ class MainActivity: Activity() {
         scope.launch {
             runtime = withContext(Dispatchers.IO) { TrackerRuntime.get(this@MainActivity) }
             buildActions()
-            launch { runtime.tracker.snapshots.collect { render() } }
-            while (isActive) { render(); delay(1000) }
+            observeWhileVisible()
         }
     }
     private fun input(hint: String) = EditText(this).apply { this.hint = hint; contentDescription = hint; body.addView(this) }
@@ -58,11 +61,11 @@ class MainActivity: Activity() {
     }
     private fun buildActions() {
         button("Сохранить новую карточку") {
-            val expected = shown!!.token; val value = name.text.toString(); val activity = details.text.toString()
+            val expected = shown?.token ?: return@button; val value = name.text.toString(); val activity = details.text.toString()
             runAction { runtime.tracker.saveCard(expected,Card(name = value,details = if (activity.isBlank()) emptyMap() else mapOf("activity" to activity))) }
         }
-        button("Добавить первый шаблон каталога") { val token = shown!!.token; runAction { runtime.tracker.saveCard(token,Catalog.card(Catalog.types.first { it.selectable && !it.archived }.id)) } }
-        command("Start",true) { t,e,c,f -> t.start(e,c) }
+        button("Добавить первый шаблон каталога") { val token = shown?.token ?: return@button; runAction { runtime.tracker.saveCard(token,Catalog.card(Catalog.types.first { it.selectable && !it.archived }.id)) } }
+        command("Start",true) { t,e,c,f -> t.start(e,c,f.note.takeIf { it.isNotBlank() }) }
         command("Назначить текущему занятию",true) { t,e,c,f -> t.labelCurrent(e,c,f.note) }
         command("Изменить уточнение с этого момента",true) { t,e,c,f -> t.changeDetails(e,c) }
         command("Pause") { t,e,_,f -> t.pause(e) }
@@ -78,7 +81,7 @@ class MainActivity: Activity() {
         command("Отменить доступную правку") { t,e,_,f -> t.undo(e) }
         command("Подтвердить хвост указанным интервалом") { t,e,_,f -> t.resolveTail(e,time(f.start),time(f.end)) }
         command("Исключить неопределённый хвост") { t,e,_,f -> t.resolveTail(e,null,null) }
-        button("Сохранить зону") { val expected = shown!!.token; val value = zone.text.toString(); runAction { runtime.tracker.settings(expected,Settings(value)) } }
+        button("Сохранить зону") { val expected = shown?.token ?: return@button; val value = zone.text.toString(); runAction { runtime.tracker.settings(expected,Settings(value)) } }
         button("Экспорт полного JSON") { runAction { val json = runtime.backups.export(); withContext(Dispatchers.Main) { createDocument(json,"application/json","not-ai-backup.json") } } }
         button("Экспорт CSV за сегодня") { runAction {
             val t = runtime.tracker; val d = t.data(); val now = t.clock.now()
@@ -89,16 +92,28 @@ class MainActivity: Activity() {
     }
     private fun time(value: String): Long = Instant.parse(value).toEpochMilli()
     private fun runAction(block: suspend ()->Unit) { scope.launch {
-        try { withContext(Dispatchers.IO) { block() }; render() }
+        try { withContext(Dispatchers.IO) { block() } }
         catch (e: Exception) { if (e is CancellationException) throw e; AlertDialog.Builder(this@MainActivity).setMessage("${(e as? CoreError)?.code ?: "Ошибка"}: ${e.message}").setPositiveButton("OK",null).show() }
     } }
-    private suspend fun render() {
-        val text = withContext(Dispatchers.IO) {
-            val t = runtime.tracker; val d = t.data(); val now = t.clock.now(); val s = snapshot(d,now)
-            val report = Reports.day(d,now,Instant.ofEpochMilli(now.wall).atZone(ZoneId.of(d.settings.reportZone)).toLocalDate())
-            s to "Техническая оболочка · схема 1\n${s.safeLabel}\n${s.trustedDurationMs} ms · ревизия ${s.token.revision}\n${s.session?.selection ?: ""}\nСегодня (${report.zone}): ${report.recordedMs} ms; неопределённых: ${report.unresolved.size}\nКарточки: ${d.cards.joinToString { it.name }}\nСессий: ${d.sessions.size}; сегментов: ${d.segments.size}\n${report.rows.joinToString("\n") { "${it.selection.name ?: "Без уточнения"}: ${it.durationMs} ms" }}"
+    override fun onStart() { super.onStart(); visible = true; observeWhileVisible() }
+    override fun onStop() { visible = false; observation?.cancel(); observation = null; super.onStop() }
+    private fun observeWhileVisible() {
+        if(!visible || !::runtime.isInitialized || observation != null) return
+        observation = scope.launch {
+            runtime.tracker.views.collectLatest { revision ->
+                reportText = withContext(Dispatchers.IO) {
+                    val d = revision.data; val now = runtime.tracker.clock.now()
+                    val report = Reports.day(d,now,Instant.ofEpochMilli(now.wall).atZone(ZoneId.of(d.settings.reportZone)).toLocalDate())
+                    "Итоги на ${Instant.ofEpochMilli(report.asOf)} (${report.zone}): ${report.recordedMs} ms; неопределённых: ${report.unresolved.size}\nКарточки: ${d.cards.joinToString { it.name }}\nСессий: ${d.sessions.size}; сегментов: ${d.segments.size}\n${report.rows.joinToString("\n") { "${it.selection.name ?: "Без уточнения"}: ${it.durationMs} ms" }}"
+                }
+                while(isActive) {
+                    val s = revision.snapshot(); shown = s
+                    status.text = "Техническая оболочка · Room 3\n${s.safeLabel}\n${s.trustedDurationMs} ms · ревизия ${s.token.revision}\n${s.session?.selection ?: ""}\n$reportText"
+                    if(s.mode != Mode.RUNNING) break
+                    delay(1000)
+                }
+            }
         }
-        shown = text.first; status.text = text.second
     }
     private fun createDocument(text: String,mime: String,filename: String) {
         exportText = text

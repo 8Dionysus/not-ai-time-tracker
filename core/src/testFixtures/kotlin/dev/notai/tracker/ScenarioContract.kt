@@ -23,7 +23,12 @@ abstract class ScenarioContract {
     open fun reopen(store: StateStore): StateStore = store
     private fun expect(code: ErrorCode,block: ()->Unit) { assertEquals(code,assertFailsWith<CoreError>(block = block).code) }
 
+    open fun storageWorkload() {}
+    open fun assertTransferFailure(transfer: HistoryTransfer,preview: HistoryPreview,tracker: Tracker) {}
+
     @Test fun timerPath() {
+        storageWorkload()
+        historyTransfer()
         val clock = FakeClock(); var tracker = Tracker(createStore(),clock)
         fun token() = tracker.snapshot().token
         val card = Card(name = "Язык",activityTypeId = "language",details = mapOf("language" to "es"),tags = setOf("learning","health"))
@@ -62,6 +67,9 @@ abstract class ScenarioContract {
         assertEquals(tracker.data().classify(detail),tracker.snapshot().session!!.selection) // archived card keeps saved parameters
         assertEquals("Язык",tracker.snapshot().session!!.selection.name)
         clock.advance(10_000)
+        val beforeArchivedSwitch = tracker.data()
+        expect(ErrorCode.INVALID_INPUT) { tracker.switchedEarlier(token(),clock.wall-1000,card.classification()) }
+        assertEquals(beforeArchivedSwitch,tracker.data())
         // Competing commands share a revision: exactly one wins, the second is explicitly stale.
         val shared = token(); val gate = CountDownLatch(1); val pool = Executors.newFixedThreadPool(2)
         try {
@@ -84,6 +92,63 @@ abstract class ScenarioContract {
         expect(ErrorCode.INVALID_INTERVAL) { tracker.snapshot() }
         assertEquals(beforeInvalidClock,tracker.data())
         expect(ErrorCode.INVALID_INTERVAL) { materialize(Segment(sessionId = "range",start = 1,anchor = Anchor("same",0)),Moment(1000,Long.MAX_VALUE,"same")) }
+    }
+
+    private fun historyTransfer() {
+        val clock = FakeClock(); val tracker = Tracker(createStore(),clock); val disk = MemoryRollback()
+        val transfer = HistoryTransfer(tracker,disk)
+        val csv = "Project,Client,Description,Start date,Start time,End date,End time,Duration,Tags\r\n"+
+            "Language,Personal,\"Note, with \"\"quotes\"\"\nand newline\",2026-10-09,10:00:00,2026-10-09,10:20:00,0:20:00,reading\r\n"
+        val file = HistoryTransfer.parseToggl(csv,"toggl:personal-workspace","Europe/Berlin")
+        assertTrue(file.errors.isEmpty()); assertEquals(1,file.rows.size)
+        assertEquals(Instant.parse("2026-10-09T08:00:00Z").toEpochMilli(),file.rows.single().start)
+        assertFalse(transfer.preview(file,emptyMap()).canApply)
+        val mapping = file.activities.associateWith { Classification(name = it.activity,activityTypeId = "language") }
+        val preview = transfer.preview(file,mapping); assertEquals(1,preview.added); assertTrue(preview.canApply)
+        val repeatedRows = HistoryTransfer.parseToggl(csv+csv.substringAfter("\r\n"),"toggl:personal-workspace","Europe/Berlin")
+        val repeatedPreview = transfer.preview(repeatedRows,mapping)
+        assertEquals(1,repeatedPreview.added); assertEquals(1,repeatedPreview.duplicates)
+        val before = tracker.data(); assertTransferFailure(transfer,preview,tracker)
+        val result = transfer.apply(preview)
+        assertEquals(before,Backups.decode(disk.read(result.rollbackReference!!)).data)
+        val imported = tracker.data(); assertEquals("reading",imported.sessions.single().importOrigin!!.fields["Tags"])
+        assertTrue(imported.sessions.single().note!!.contains("\n"))
+        expect(ErrorCode.STALE) { transfer.apply(preview) }
+        val replay = transfer.preview(file,mapping); assertEquals(1,replay.duplicates); assertEquals(0,replay.added)
+        transfer.apply(replay); assertEquals(imported,tracker.data())
+        assertEquals(imported,Backups.decode(Backups(tracker,disk).export()).data)
+        val portable = HistoryTransfer.export(imported)
+        val portableFile = HistoryTransfer.parseCsv(portable.csv,CsvMapping.portable("not-ai:transfer"))
+        assertTrue(portableFile.errors.isEmpty()); assertEquals(file.rows.single().start,portableFile.rows.single().start)
+        assertEquals(file.rows.single().end,portableFile.rows.single().end)
+        val skewed = imported.copy(segments = imported.segments.map { it.copy(durationMs = it.durationMs-250) })
+        val skewRoundTrip = HistoryTransfer.parseCsv(HistoryTransfer.export(skewed).csv,CsvMapping.portable("clock-skew"))
+        assertTrue(skewRoundTrip.errors.isEmpty()); assertEquals(skewed.segments.single().durationMs,skewRoundTrip.rows.single().durationMs)
+        // Same source row with another timezone is a conflict, not a silent replay.
+        val wrongZone = HistoryTransfer.parseToggl(csv,"toggl:personal-workspace","UTC")
+        assertFalse(transfer.preview(wrongZone,mapping).canApply)
+        val overlap = HistoryTransfer.parseToggl(csv,"different-source","Europe/Berlin")
+        val blocked = transfer.preview(overlap,mapping); assertFalse(blocked.canApply)
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { transfer.apply(blocked) }; assertEquals(imported,tracker.data())
+        val dst = csv.replace("2026-10-09","2026-10-25").replace("10:00:00","02:10:00").replace("10:20:00","02:30:00")
+        assertTrue(HistoryTransfer.parseToggl(dst,"dst","Europe/Berlin").errors.isNotEmpty())
+        val wrongDuration = csv.replace(",0:20:00,",",0:21:00,")
+        assertTrue(HistoryTransfer.parseToggl(wrongDuration,"invalid","Europe/Berlin").errors.isNotEmpty())
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { HistoryTransfer.parseCsv("a,b\n\"broken",CsvMapping.portable("broken")) }
+        tracker.undo(tracker.snapshot().token); assertEquals(before.sessions,tracker.data().sessions)
+        val fresh = transfer.preview(file,mapping)
+        tracker.saveCard(tracker.snapshot().token,Card(name = "Changed since preview"))
+        expect(ErrorCode.STALE) { transfer.apply(fresh) }
+        // Retained view ticks never call storage; elapsed time and boot recovery remain core-owned.
+        var reads = 0
+        val counting = object: StateStore by tracker.store { override fun read(): Dataset { reads++; return tracker.store.read() } }
+        val observed = Tracker(counting,clock)
+        observed.start(observed.snapshot().token)
+        val view = observed.view(); val readCount = reads
+        repeat(20) { clock.advance(1000); assertEquals((it+1)*1000L,view.snapshot().trustedDurationMs) }
+        assertEquals(readCount,reads)
+        clock.boot = "after-reboot"; clock.elapsed = 1
+        assertEquals(Mode.RECOVERY,view.snapshot().mode); assertEquals(readCount,reads)
     }
 
     @Test fun smallHistoryAndExport() {
@@ -332,7 +397,7 @@ abstract class ScenarioContract {
         assertTrue(Backups.decode(disk.read(result.rollbackReference)).data.sessions.isEmpty())
         val full = clean.data()
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.dropLast(7)) }; assertEquals(full,clean.data())
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 3","\"formatVersion\": 999")) }; assertEquals(full,clean.data())
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 4","\"formatVersion\": 999")) }; assertEquals(full,clean.data())
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"datasetId\": \"${raw.data.datasetId}\",", "")) }; assertEquals(full,clean.data())
         val broken = raw.copy(data = raw.data.copy(segments = raw.data.segments+raw.data.segments.first()))
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(codec.encodeToString(broken)) }; assertEquals(full,clean.data())
@@ -478,7 +543,7 @@ abstract class ScenarioContract {
         assertEquals(116,quantityReport.measurements.size)
         assertTrue(quantityReport.quantityTotals().isEmpty())
         val backupJson = Backups(t,MemoryRollback()).export()
-        assertEquals(3,Backups.decode(backupJson).formatVersion)
+        assertEquals(4,Backups.decode(backupJson).formatVersion)
         val copy = Backups.decode(backupJson).data
         assertEquals(t.data(),copy)
         val receiver = Tracker(createStore(),clock)

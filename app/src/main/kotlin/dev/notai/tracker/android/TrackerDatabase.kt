@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
 import java.util.concurrent.Callable
 
 @Entity(tableName = "metadata") data class MetaRow(@PrimaryKey val id: Int = 1, val payload: String)
@@ -19,9 +20,15 @@ import java.util.concurrent.Callable
 data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId: String,val openSlot: Int?,val payload: String)
 @Entity(tableName = "favorites") data class FavoriteRow(@PrimaryKey val id: String,val position: Int,val payload: String)
 @Entity(tableName = "measurements") data class MeasurementRow(@PrimaryKey val id: String,val position: Int,val payload: String)
+@Entity(tableName = "store_generation") data class GenerationRow(@PrimaryKey val id: Int = 1,val generation: Long)
+@Entity(tableName = "vocabulary") data class VocabularyRow(@PrimaryKey val id: Int = 1,val payload: String)
 @Dao interface TrackerDao {
+    @Query("SELECT generation FROM store_generation WHERE id=1") fun generation(): Long?
+    @Query("SELECT generation FROM store_generation WHERE id=1") fun generations(): Flow<Long?>
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun generation(row: GenerationRow)
+    @Query("SELECT * FROM vocabulary WHERE id=1") fun vocabulary(): VocabularyRow?
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun vocabulary(row: VocabularyRow)
     @Query("SELECT * FROM metadata WHERE id=1") fun metadata(): MetaRow?
-    @Query("SELECT * FROM metadata WHERE id=1") fun changes(): Flow<MetaRow?>
     @Query("SELECT * FROM activity_types ORDER BY position") fun types(): List<TypeRow>
     @Query("SELECT * FROM cards ORDER BY position") fun cards(): List<CardRow>
     @Query("SELECT * FROM sessions ORDER BY position") fun sessions(): List<SessionRow>
@@ -29,20 +36,26 @@ data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId
     @Query("SELECT * FROM favorites ORDER BY position") fun favorites(): List<FavoriteRow>
     @Query("SELECT * FROM measurements ORDER BY position") fun measurements(): List<MeasurementRow>
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun metadata(row: MetaRow)
-    @Insert fun types(rows: List<TypeRow>)
-    @Insert fun cards(rows: List<CardRow>)
-    @Insert fun sessions(rows: List<SessionRow>)
-    @Insert fun segments(rows: List<SegmentRow>)
-    @Insert fun favorites(rows: List<FavoriteRow>)
-    @Insert fun measurements(rows: List<MeasurementRow>)
-    @Query("DELETE FROM segments") fun clearSegments()
-    @Query("DELETE FROM sessions") fun clearSessions()
-    @Query("DELETE FROM activity_types") fun clearTypes()
-    @Query("DELETE FROM cards") fun clearCards()
-    @Query("DELETE FROM favorites") fun clearFavorites()
-    @Query("DELETE FROM measurements") fun clearMeasurements()
+    @Upsert fun types(rows: List<TypeRow>)
+    @Query("DELETE FROM activity_types WHERE id IN (:ids)") fun deleteTypes(ids: List<String>)
+    @Query("SELECT * FROM activity_types WHERE id IN (:ids)") fun readTypes(ids: List<String>): List<TypeRow>
+    @Upsert fun cards(rows: List<CardRow>)
+    @Query("DELETE FROM cards WHERE id IN (:ids)") fun deleteCards(ids: List<String>)
+    @Query("SELECT * FROM cards WHERE id IN (:ids)") fun readCards(ids: List<String>): List<CardRow>
+    @Upsert fun sessions(rows: List<SessionRow>)
+    @Query("DELETE FROM sessions WHERE id IN (:ids)") fun deleteSessions(ids: List<String>)
+    @Query("SELECT * FROM sessions WHERE id IN (:ids)") fun readSessions(ids: List<String>): List<SessionRow>
+    @Upsert fun segments(rows: List<SegmentRow>)
+    @Query("DELETE FROM segments WHERE id IN (:ids)") fun deleteSegments(ids: List<String>)
+    @Query("SELECT * FROM segments WHERE id IN (:ids)") fun readSegments(ids: List<String>): List<SegmentRow>
+    @Upsert fun favorites(rows: List<FavoriteRow>)
+    @Query("DELETE FROM favorites WHERE id IN (:ids)") fun deleteFavorites(ids: List<String>)
+    @Query("SELECT * FROM favorites WHERE id IN (:ids)") fun readFavorites(ids: List<String>): List<FavoriteRow>
+    @Upsert fun measurements(rows: List<MeasurementRow>)
+    @Query("DELETE FROM measurements WHERE id IN (:ids)") fun deleteMeasurements(ids: List<String>)
+    @Query("SELECT * FROM measurements WHERE id IN (:ids)") fun readMeasurements(ids: List<String>): List<MeasurementRow>
 }
-@Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class],version = 2,exportSchema = true)
+@Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class,GenerationRow::class,VocabularyRow::class],version = 3,exportSchema = true)
 abstract class TrackerDatabase: RoomDatabase() {
     abstract fun dao(): TrackerDao
     companion object {
@@ -68,43 +81,90 @@ abstract class TrackerDatabase: RoomDatabase() {
             }
         }
 
-        fun open(context: Context,name: String = "tracker.db") = Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(MIGRATION_1_2).build()
+        val MIGRATION_2_3 = object: androidx.room.migration.Migration(2,3) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS store_generation (id INTEGER NOT NULL, generation INTEGER NOT NULL, PRIMARY KEY(id))")
+                db.execSQL("CREATE TABLE IF NOT EXISTS vocabulary (id INTEGER NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(id))")
+                db.query("SELECT payload FROM metadata WHERE id=1").use { c -> if(c.moveToFirst()) {
+                    val d = codec.decodeFromString<Dataset>(c.getString(0))
+                    db.execSQL("INSERT INTO vocabulary(id,payload) VALUES(1,?)",arrayOf(codec.encodeToString(VocabularyData(emptyList(),d.axes,d.metrics,d.units))))
+                    db.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(codec.encodeToString(d.copy(axes = emptyList(),metrics = emptyList(),units = emptyList()))))
+                    db.execSQL("INSERT INTO store_generation(id,generation) VALUES(1,0)")
+                } }
+            }
+        }
+
+        fun open(context: Context,name: String = "tracker.db") = Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(MIGRATION_1_2,MIGRATION_2_3).build()
     }
 }
-/** A compact graph store: FK + unique open slot at SQLite level, full validation at the boundary.
- * Writes happen only for user commands, never for display ticks. Transaction readback checks persisted data.
+/** The committed generation invalidates the local graph cache across store instances.
+ * Commands update only changed rows. No REPLACE on sessions (which would cascade-delete segments).
+ * Every changed/deleted row is read back in the transaction; a failed commit discards the cache.
  */
 class RoomStore(private val db: TrackerDatabase): StateStore {
     private val dao = db.dao()
-    init { db.runInTransaction { if (dao.metadata() == null) write(Dataset()) } }
-    override val changes: Flow<Dataset> = dao.changes().map { read() }.flowOn(Dispatchers.IO)
+    private var cached: Pair<Long,Dataset>? = null // accessed only inside Room transactions
+    init { db.runInTransaction { if (dao.metadata() == null) write(null,Dataset()) } }
+    override val changes: Flow<Dataset> = dao.generations().distinctUntilChanged().map { read() }.flowOn(Dispatchers.IO)
     override fun read(): Dataset = db.runInTransaction(Callable { load() })
-    override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T = db.runInTransaction(Callable {
-        val old = load(); val (next,result) = block(old)
-        validate(next)
-        if (old != next) {
-            write(next)
-            check(load() == next) { "Persistence verification failed" }
-        }
-        result
-    })
+    override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T = try {
+        db.runInTransaction(Callable {
+            val old = load(); val (next,result) = block(old)
+            validate(next)
+            if(old != next) write(old,next)
+            result
+        })
+    } catch(e: Exception) { db.runInTransaction { cached = null }; throw e }
     private fun load(): Dataset {
+        val generation = requireNotNull(dao.generation())
+        cached?.takeIf { it.first == generation }?.let { return it.second }
         val base = codec.decodeFromString<Dataset>(dao.metadata()!!.payload)
-        return base.copy(types = dao.types().map { codec.decodeFromString<ActivityType>(it.payload) },cards = dao.cards().map { codec.decodeFromString<Card>(it.payload) },
+        val vocabulary = codec.decodeFromString<VocabularyData>(dao.vocabulary()!!.payload)
+        val data = base.copy(axes = vocabulary.axes,metrics = vocabulary.metrics,units = vocabulary.units,
+            types = dao.types().map { codec.decodeFromString<ActivityType>(it.payload) },cards = dao.cards().map { codec.decodeFromString<Card>(it.payload) },
             sessions = dao.sessions().map { codec.decodeFromString<Session>(it.payload) },
             segments = dao.segments().map { codec.decodeFromString<Segment>(it.payload) },
             favorites = dao.favorites().map { codec.decodeFromString<Favorite>(it.payload) },
             measurements = dao.measurements().map { codec.decodeFromString<Measurement>(it.payload) })
+        validate(data)
+        cached = generation to data
+        return data
     }
-    private fun write(d: Dataset) {
-        validate(d)
-        dao.clearMeasurements(); dao.clearFavorites(); dao.clearSegments(); dao.clearSessions(); dao.clearCards(); dao.clearTypes()
-        dao.types(d.types.mapIndexed { i,t -> TypeRow(t.id,i,codec.encodeToString(t)) })
-        dao.cards(d.cards.mapIndexed { i,c -> CardRow(c.id,i,codec.encodeToString(c)) })
-        dao.sessions(d.sessions.mapIndexed { i,s -> SessionRow(s.id,i,codec.encodeToString(s)) })
-        dao.segments(d.segments.mapIndexed { i,s -> SegmentRow(s.id,i,s.sessionId,if (s.end == null) 1 else null,codec.encodeToString(s)) })
-        dao.favorites(d.favorites.mapIndexed { i,f -> FavoriteRow(f.id,i,codec.encodeToString(f)) })
-        dao.measurements(d.measurements.mapIndexed { i,m -> MeasurementRow(m.id,i,codec.encodeToString(m)) })
-        dao.metadata(MetaRow(payload = codec.encodeToString(d.copy(types = emptyList(),cards = emptyList(),sessions = emptyList(),segments = emptyList(),favorites = emptyList(),measurements = emptyList()))))
+    private fun <T,R> sync(old: List<T>,next: List<T>,id: (T)->String,row: (Int,T)->R,
+        put: (List<R>)->Unit,delete: (List<String>)->Unit,read: (List<String>)->List<R>) {
+        val previous = old.mapIndexed { i,v -> id(v) to (i to v) }.toMap()
+        val ids = next.map(id).toSet()
+        val removed = previous.keys.filter { it !in ids }
+        val changed = next.mapIndexedNotNull { i,v -> if(previous[id(v)] == (i to v)) null else id(v) to row(i,v) }
+        removed.chunked(500).forEach(delete)
+        if(changed.isNotEmpty()) put(changed.map { it.second })
+        // Chunk queries below SQLite's portable bind limit. Verify deletions as well as writes.
+        val expected = changed.toMap()
+        (removed+changed.map { it.first }).chunked(500).forEach { keys ->
+            check(read(keys).toSet() == keys.mapNotNull { expected[it] }.toSet()) { "Persistence verification failed" }
+        }
+    }
+    private fun write(old: Dataset?,d: Dataset) {
+        // Session removals wait until child segments have been removed/reparented.
+        val removeSessions = mutableListOf<String>()
+        sync(old?.sessions.orEmpty(),d.sessions,{ it.id },{ i,s -> SessionRow(s.id,i,codec.encodeToString(s)) },
+            dao::sessions,{ removeSessions.addAll(it) },{ ids -> dao.readSessions(ids).filterNot { it.id in removeSessions } })
+        sync(old?.segments.orEmpty(),d.segments,{ it.id },{ i,s -> SegmentRow(s.id,i,s.sessionId,if(s.end == null) 1 else null,codec.encodeToString(s)) },
+            { rows -> dao.segments(rows.filter { it.openSlot == null }); dao.segments(rows.filter { it.openSlot != null }) },dao::deleteSegments,dao::readSegments)
+        removeSessions.chunked(500).forEach { dao.deleteSessions(it); check(dao.readSessions(it).isEmpty()) }
+        sync(old?.types.orEmpty(),d.types,{ it.id },{ i,t -> TypeRow(t.id,i,codec.encodeToString(t)) },dao::types,dao::deleteTypes,dao::readTypes)
+        sync(old?.cards.orEmpty(),d.cards,{ it.id },{ i,t -> CardRow(t.id,i,codec.encodeToString(t)) },dao::cards,dao::deleteCards,dao::readCards)
+        sync(old?.favorites.orEmpty(),d.favorites,{ it.id },{ i,t -> FavoriteRow(t.id,i,codec.encodeToString(t)) },dao::favorites,dao::deleteFavorites,dao::readFavorites)
+        sync(old?.measurements.orEmpty(),d.measurements,{ it.id },{ i,t -> MeasurementRow(t.id,i,codec.encodeToString(t)) },dao::measurements,dao::deleteMeasurements,dao::readMeasurements)
+        if(old == null || old.axes != d.axes || old.metrics != d.metrics || old.units != d.units) {
+            val row = VocabularyRow(payload = codec.encodeToString(VocabularyData(emptyList(),d.axes,d.metrics,d.units)))
+            dao.vocabulary(row); check(dao.vocabulary() == row) { "Vocabulary verification failed" }
+        }
+        val meta = MetaRow(payload = codec.encodeToString(d.copy(types = emptyList(),cards = emptyList(),sessions = emptyList(),segments = emptyList(),favorites = emptyList(),measurements = emptyList(),axes = emptyList(),metrics = emptyList(),units = emptyList())))
+        dao.metadata(meta); check(dao.metadata() == meta) { "Metadata verification failed" }
+        val generation = Math.addExact(dao.generation() ?: 0,1)
+        dao.generation(GenerationRow(generation = generation))
+        check(dao.generation() == generation) { "Generation verification failed" }
+        cached = generation to d
     }
 }

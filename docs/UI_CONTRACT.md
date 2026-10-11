@@ -91,3 +91,8 @@ ResearchCatalog.read проверяет полный источник и воз�
 
 
 Полный корпус каталога 0.7 устанавливается через FullResearchCatalog / FullResearchPlan.apply; см. [FULL_CATALOG_07.md](FULL_CATALOG_07.md). UI использует тот же Tracker и не пересчитывает whole/component время самостоятельно.
+
+
+## Обновление бэка v10
+
+Актуальные TrackerView, HistoryTransfer, миграция Room 3 и JSON 4 описаны в [BACKEND_V10.md](BACKEND_V10.md). Прежние упоминания Room 2 / JSON 3 относятся к предыдущим поставкам. Команды остаются блокирующими: вызывать с IO dispatcher; UI наблюдает ревизии и отдельно обновляет timer snapshot без базы.

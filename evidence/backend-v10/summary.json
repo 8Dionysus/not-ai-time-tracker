@@ -1,0 +1,61 @@
+{
+  "baselineCommit": "6548204b5b29dbdeb55ee202eb8097cb32ffa924",
+  "appVersion": "0.4.0",
+  "roomSchema": 3,
+  "backupFormat": 4,
+  "backupReaders": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "runtimeTypes": 1918,
+  "runtimeAxes": 337,
+  "testResults": [
+    {
+      "backend": "core",
+      "name": "dev.notai.tracker.CoreScenariosTest",
+      "tests": "3",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-11T20:47:08.332Z",
+      "hostname": "442bbd4fc7a7",
+      "time": "7.136"
+    },
+    {
+      "backend": "room",
+      "name": "dev.notai.tracker.android.RoomScenariosTest",
+      "tests": "3",
+      "skipped": "0",
+      "failures": "0",
+      "errors": "0",
+      "timestamp": "2026-10-11T20:47:17.964Z",
+      "hostname": "442bbd4fc7a7",
+      "time": "15.835"
+    }
+  ],
+  "unchangedCatalog": [
+    {
+      "file": "research/catalog.research.json",
+      "sha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19"
+    },
+    {
+      "file": "research/projections/isco_full_projection_v2.json",
+      "sha256": "7dd02e406bb2c34260a73179b2b6a94f19d0141aa1bb06815277eb5e23bc2498"
+    },
+    {
+      "file": "research/projections/sports_additive_catalogue_projection.json",
+      "sha256": "6b5e4810622ff4af4af794b2ac8093d7135caad85f1ace51e99ced62a7373955"
+    },
+    {
+      "file": "evidence/full-projection/runtime-vocabulary.json",
+      "sha256": "3ed9e362d6c96a1a6fc104dd47cc3782aebb2396eb9c1435cfe0f16449a2adb3"
+    }
+  ],
+  "deviceTested": false,
+  "portableTransfer": true,
+  "togglProfile": "documented time-entry CSV columns with explicit zone/date pattern; synthetic fixture tested",
+  "simpleTimeTrackerAdapter": "not verified; generic CsvMapping available",
+  "workload": "single Start+Pause on 1923 stored types / 337 axes with SQLite audit triggers; JVM Robolectric, not device; no statistical latency or battery claim"
+}

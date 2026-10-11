@@ -1,0 +1,10 @@
+Start + Pause; 1923 stored types (1918 imported + 5 existing seed); axis count was not recorded by this initial probe; Robolectric JVM, not device
+Elapsed ns: 1237521470
+activity_types DELETE 3846
+activity_types INSERT 3846
+metadata DELETE 2
+metadata INSERT 2
+segments DELETE 1
+segments INSERT 2
+sessions DELETE 1
+sessions INSERT 2

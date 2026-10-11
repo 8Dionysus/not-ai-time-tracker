@@ -44,8 +44,9 @@ object DecimalSerializer: KSerializer<Decimal> {
 @Serializable data class UnitDefinition(val id: String,val name: String,val dimension: String,
     val factorToBase: Decimal = Decimal("1"))
 
-fun Dataset.ancestorPath(typeId: String): List<String> {
-    val nodes = types.associateBy { it.id }; val path = mutableListOf<String>(); val seen = mutableSetOf<String>()
+fun Dataset.ancestorPath(typeId: String): List<String> = ancestorPath(types.associateBy { it.id },typeId)
+private fun ancestorPath(nodes: Map<String,ActivityType>,typeId: String): List<String> {
+    val path = mutableListOf<String>(); val seen = mutableSetOf<String>()
     var id: String? = typeId
     while (id != null) {
         ensure(seen.add(id),"Activity tree contains a cycle")
@@ -66,12 +67,14 @@ fun Dataset.cardFromType(typeId: String): Card {
 }
 
 internal fun validateVocabulary(d: Dataset) {
+    val nodes = d.types.associateBy { it.id }
+    val axes = d.axes.map { it.id }.toSet(); val metrics = d.metrics.map { it.id }.toSet()
     d.types.forEach { t ->
         ensure(t.name.isNotBlank() && t.meaningVersion > 0,"Invalid type")
         validateResearchOrigins(t.researchOrigins)
-        d.ancestorPath(t.id)
-        ensure(t.suggestedAxisIds.all { id -> d.axes.any { it.id == id } },"Unknown suggested axis")
-        ensure(t.suggestedMetricIds.all { id -> d.metrics.any { it.id == id } },"Unknown suggested metric")
+        ancestorPath(nodes,t.id)
+        ensure(t.suggestedAxisIds.all { id -> id in axes },"Unknown suggested axis")
+        ensure(t.suggestedMetricIds.all { id -> id in metrics },"Unknown suggested metric")
     }
     ensure(d.axes.map { it.id to it.meaningVersion }.distinct().size == d.axes.size,"Duplicate axis version")
     d.axes.forEach { a ->

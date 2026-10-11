@@ -29,7 +29,9 @@ class PrivateRollbackStore(context: Context): RollbackStore {
 class TrackerRuntime private constructor(context: Context) {
     val database = TrackerDatabase.open(context)
     val tracker = Tracker(RoomStore(database),AndroidClock(context))
-    val backups = Backups(tracker,PrivateRollbackStore(context))
+    private val rollback = PrivateRollbackStore(context)
+    val backups = Backups(tracker,rollback)
+    val historyTransfer = HistoryTransfer(tracker,rollback)
     companion object {
         @Volatile private var instance: TrackerRuntime? = null
         /** Initialize on IO. All future surfaces share this boundary and expected-revision tokens. */

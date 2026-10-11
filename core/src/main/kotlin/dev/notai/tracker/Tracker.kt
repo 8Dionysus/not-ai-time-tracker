@@ -6,6 +6,8 @@ import kotlin.math.abs
 /** All calls are blocking: Android callers use Dispatchers.IO. No timer service or periodic writes. */
 class Tracker(val store: StateStore, val clock: Clock) {
     private var undo: Pair<Token, Dataset>? = null
+    val views get() = store.changes.map { TrackerView(it,clock) }
+    fun view() = TrackerView(data(),clock)
     val snapshots get() = store.changes.map { snapshot(it, clock.now()) }
     fun data(): Dataset = storage { store.read() }
     fun snapshot(): Snapshot = snapshot(data(), clock.now())
@@ -27,17 +29,13 @@ class Tracker(val store: StateStore, val clock: Clock) {
         fun report(start: Long,end: Long,filter: Filter = Filter()) = Reports.report(data,asOf,start,end,filter)
         fun day(date: java.time.LocalDate,filter: Filter = Filter()) = Reports.day(data,asOf,date,filter)
     }
-    private fun mutate(expected: Token, undoable: Boolean = false, edit: (Dataset, Moment) -> Dataset): Change = storage {
+    @Synchronized private fun mutate(expected: Token, undoable: Boolean = false, edit: (Dataset, Moment) -> Dataset): Change = storage {
         store.transaction { old ->
             val now = clock.now()
             checkToken(old, expected, now)
             val next = edit(old, now).copy(revision = Math.addExact(old.revision, 1))
             validate(next)
-            val changed = (old.sessions + next.sessions).map { it.id }.filter { id ->
-                old.sessions.find { it.id == id } != next.sessions.find { it.id == id } ||
-                old.segments.filter { it.sessionId == id } != next.segments.filter { it.sessionId == id } ||
-                measurementsFor(old,id) != measurementsFor(next,id)
-            }.toSet()
+            val changed = changedSessions(old,next)
             val state = snapshot(next, now)
             // Undo is issued only after a successful persistence commit (below).
             next to Triple(Change(state, changed, undoable, next, now), old, next)
@@ -197,6 +195,10 @@ class Tracker(val store: StateStore, val clock: Clock) {
             } ?: segment })
     }
     /** Start/end are explicit; calling this is the form's Save, not its preview. */
+    internal fun importHistory(expected: Token,sessions: List<Session>,segments: List<Segment>) = mutate(expected,true) { d,n ->
+        ensure(segments.all { it.end != null && it.end <= n.wall },"Imported interval is in the future",ErrorCode.INVALID_INTERVAL)
+        d.copy(sessions = d.sessions+sessions,segments = d.segments+segments)
+    }
     fun manual(expected: Token, start: Long, end: Long, selection: Classification, note: String? = null) = mutate(expected, true) { d,n ->
         val selected = d.classify(selection)
         interval(start,end,n)
@@ -213,6 +215,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
     }
     /** Correct a forgotten switch inside the current uninterrupted segment in one transaction. */
     fun switchedEarlier(expected: Token, boundary: Long, selection: Classification) = mutate(expected,true) { d,n ->
+        checkStartable(d,selection)
         val s = running(d,n); val seg = d.segments.single { it.sessionId == s.id && it.end == null }
         val measured = materialize(seg,n)
         ensure(!measured.uncertain && boundary in seg.start..n.wall, "Boundary outside certain active interval", ErrorCode.INVALID_INTERVAL)
@@ -234,14 +237,28 @@ class Tracker(val store: StateStore, val clock: Clock) {
         d.copy(segments = segments, sessions = if (keep) d.sessions.replace(s.copy(status = SessionStatus.STOPPED)) else d.sessions.filterNot { it.id == s.id },
             measurements = d.measurements.filterNot { (it.scope == Scope.SEGMENT && it.targetId == seg.id && start == null) || (!keep && it.scope == Scope.SESSION && it.targetId == s.id) })
     }
-    fun undo(expected: Token): Change {
+    @Synchronized fun canUndo(expected: Token): Boolean = undo?.first == expected
+    @Synchronized fun undo(expected: Token): Change {
         val saved = undo
         if (saved == null || saved.first != expected) throw CoreError(ErrorCode.STALE,"No matching available undo",snapshot())
         return mutate(expected) { _,_ -> saved.second }
     }
-    private fun measurementsFor(d: Dataset,sessionId: String): List<Measurement> {
-        val segmentIds = d.segments.filter { it.sessionId == sessionId }.map { it.id }.toSet()
-        return d.measurements.filter { if (it.scope == Scope.SESSION) it.targetId == sessionId else it.targetId in segmentIds }
+    private fun changedSessions(old: Dataset,next: Dataset): Set<String> {
+        val changed = mutableSetOf<String>()
+        fun <T> compare(a: List<T>,b: List<T>,id: (T)->String,affected: (T,Boolean)->String?) {
+            val before = a.associateBy(id); val after = b.associateBy(id)
+            for(key in before.keys+after.keys) if(before[key] != after[key]) {
+                before[key]?.let { affected(it,false)?.let(changed::add) }
+                after[key]?.let { affected(it,true)?.let(changed::add) }
+            }
+        }
+        compare(old.sessions,next.sessions,{ it.id }) { s,_ -> s.id }
+        compare(old.segments,next.segments,{ it.id }) { s,_ -> s.sessionId }
+        val before = old.segments.associate { it.id to it.sessionId }; val after = next.segments.associate { it.id to it.sessionId }
+        compare(old.measurements,next.measurements,{ it.id }) { m,isAfter ->
+            if(m.scope == Scope.SESSION) m.targetId else (if(isAfter) after else before)[m.targetId]
+        }
+        return changed
     }
     private fun running(d: Dataset,n: Moment): Session {
         val s = current(d) ?: fail(ErrorCode.INVALID_INPUT, "No current session")

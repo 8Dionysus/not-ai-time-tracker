@@ -1,0 +1,19 @@
+> Task :core:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :core:processResources NO-SOURCE
+> Task :core:processTestFixturesResources NO-SOURCE
+> Task :core:processTestResources NO-SOURCE
+> Task :core:compileKotlin
+> Task :core:compileJava NO-SOURCE
+> Task :core:classes UP-TO-DATE
+> Task :core:jar
+> Task :core:compileTestFixturesKotlin
+> Task :core:compileTestFixturesJava NO-SOURCE
+> Task :core:testFixturesClasses UP-TO-DATE
+> Task :core:testFixturesJar
+> Task :core:compileTestKotlin
+> Task :core:compileTestJava NO-SOURCE
+> Task :core:testClasses UP-TO-DATE
+> Task :core:test
+
+BUILD SUCCESSFUL in 4s
+6 actionable tasks: 6 executed

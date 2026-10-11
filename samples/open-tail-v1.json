@@ -1,0 +1,100 @@
+{
+  "formatVersion": 1,
+  "backupId": "example-open-backup-1",
+  "asOf": 1791678000000,
+  "data": {
+    "datasetId": "example-dataset-v1",
+    "revision": 4,
+    "cards": [
+      {
+        "id": "card-language",
+        "name": "Испанский",
+        "templateId": "language-v1",
+        "partOf": "language",
+        "details": {
+          "language": "es",
+          "activity": "listening"
+        },
+        "tags": [
+          "learning"
+        ],
+        "archived": false
+      }
+    ],
+    "favorites": [
+      {
+        "id": "favorite-listening",
+        "label": "Слушать испанский",
+        "selection": {
+          "cardId": "card-language",
+          "name": "Испанский",
+          "partOf": "language",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ]
+        }
+      }
+    ],
+    "sessions": [
+      {
+        "id": "session-1",
+        "status": "RUNNING",
+        "selection": {
+          "cardId": "card-language",
+          "name": "Испанский",
+          "partOf": "language",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ]
+        },
+        "note": "Пример без персональных данных"
+      }
+    ],
+    "segments": [
+      {
+        "id": "segment-1",
+        "sessionId": "session-1",
+        "start": 1791676200000,
+        "end": null,
+        "durationMs": 1800000,
+        "selection": {
+          "cardId": "card-language",
+          "name": "Испанский",
+          "partOf": "language",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ]
+        },
+        "anchor": null,
+        "uncertain": false,
+        "observedUntil": 1791678000000
+      }
+    ],
+    "measurements": [
+      {
+        "id": "measurement-1",
+        "fieldId": "pages",
+        "meaningVersion": 1,
+        "unit": "page",
+        "scope": "SESSION",
+        "targetId": "session-1",
+        "value": 20
+      }
+    ],
+    "settings": {
+      "reportZone": "Europe/Moscow"
+    }
+  }
+}

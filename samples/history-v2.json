@@ -1,0 +1,119 @@
+{
+  "formatVersion": 2,
+  "backupId": "example-backup-1",
+  "asOf": 1791678000000,
+  "data": {
+    "datasetId": "example-dataset-v1",
+    "revision": 4,
+    "cards": [
+      {
+        "id": "card-language",
+        "name": "Испанский",
+        "templateId": "language-v1",
+        "details": {
+          "language": "es",
+          "activity": "listening"
+        },
+        "tags": [
+          "learning"
+        ],
+        "archived": false,
+        "activityTypeId": "language"
+      }
+    ],
+    "favorites": [
+      {
+        "id": "favorite-listening",
+        "label": "Слушать испанский",
+        "selection": {
+          "cardId": "card-language",
+          "name": "Испанский",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "activityTypeId": "language",
+          "ancestorPathAtWrite": [
+            "language"
+          ]
+        }
+      }
+    ],
+    "sessions": [
+      {
+        "id": "session-1",
+        "status": "STOPPED",
+        "selection": {
+          "cardId": "card-language",
+          "name": "Испанский",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "activityTypeId": "language",
+          "ancestorPathAtWrite": [
+            "language"
+          ]
+        },
+        "note": "Пример без персональных данных"
+      }
+    ],
+    "segments": [
+      {
+        "id": "segment-1",
+        "sessionId": "session-1",
+        "start": 1791676200000,
+        "end": 1791677400000,
+        "durationMs": 1200000,
+        "selection": {
+          "cardId": "card-language",
+          "name": "Испанский",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "activityTypeId": "language",
+          "ancestorPathAtWrite": [
+            "language"
+          ]
+        },
+        "anchor": null,
+        "uncertain": false,
+        "observedUntil": null
+      }
+    ],
+    "measurements": [
+      {
+        "id": "measurement-1",
+        "fieldId": "pages",
+        "meaningVersion": 1,
+        "unit": "page",
+        "scope": "SESSION",
+        "targetId": "session-1",
+        "value": "20"
+      }
+    ],
+    "settings": {
+      "reportZone": "Europe/Moscow"
+    },
+    "types": [
+      {
+        "id": "language",
+        "name": "Языковая практика",
+        "archived": false
+      }
+    ],
+    "axes": [],
+    "metrics": [],
+    "units": []
+  }
+}

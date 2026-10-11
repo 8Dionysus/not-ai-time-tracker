@@ -3,6 +3,7 @@ package dev.notai.tracker.android
 import android.content.Context
 import androidx.room.*
 import dev.notai.tracker.*
+import kotlinx.serialization.json.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -41,11 +42,33 @@ data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId
     @Query("DELETE FROM favorites") fun clearFavorites()
     @Query("DELETE FROM measurements") fun clearMeasurements()
 }
-@Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class],version = 1,exportSchema = true)
+@Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class],version = 2,exportSchema = true)
 abstract class TrackerDatabase: RoomDatabase() {
     abstract fun dao(): TrackerDao
     companion object {
-        fun open(context: Context,name: String = "tracker.db") = Room.databaseBuilder(context,TrackerDatabase::class.java,name).build()
+        val MIGRATION_1_2 = object: androidx.room.migration.Migration(1,2) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                // Room wraps the migration in a transaction. No row deletion, no guessed type mapping.
+                val tables = listOf("metadata","activity_types","cards","sessions","segments","favorites","measurements")
+                val migrated = tables.associateWith { table ->
+                    val rows = mutableListOf<Pair<String,String>>()
+                    db.query("SELECT id,payload FROM $table" + if(table == "metadata") "" else " ORDER BY position").use { cursor ->
+                        while (cursor.moveToNext()) rows += cursor.getString(0) to migrateV1Payload(cursor.getString(1))
+                    }
+                    rows
+                }
+                if (migrated.getValue("metadata").isNotEmpty()) {
+                    val graph = codec.parseToJsonElement(migrated.getValue("metadata").single().second).jsonObject.toMutableMap()
+                    for(table in tables.drop(1)) graph[if(table == "activity_types") "types" else table] =
+                        JsonArray(migrated.getValue(table).map { codec.parseToJsonElement(it.second) })
+                    validate(codec.decodeFromJsonElement<Dataset>(JsonObject(graph)))
+                }
+                for ((table,rows) in migrated) for ((id,payload) in rows)
+                    db.execSQL("UPDATE $table SET payload=? WHERE id=?",arrayOf(payload,id))
+            }
+        }
+
+        fun open(context: Context,name: String = "tracker.db") = Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(MIGRATION_1_2).build()
     }
 }
 /** A compact graph store: FK + unique open slot at SQLite level, full validation at the boundary.

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="dev.notai.tracker.CoreScenariosTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-11T05:33:59.926Z" hostname="442bbd4fc7a7" time="0.218">
+<testsuite name="dev.notai.tracker.CoreScenariosTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-11T06:05:08.825Z" hostname="442bbd4fc7a7" time="0.427">
   <properties/>
-  <testcase name="smallHistoryAndExport" classname="dev.notai.tracker.CoreScenariosTest" time="0.126"/>
-  <testcase name="backupReplacementAndFailure" classname="dev.notai.tracker.CoreScenariosTest" time="0.063"/>
-  <testcase name="timerPath" classname="dev.notai.tracker.CoreScenariosTest" time="0.028"/>
+  <testcase name="smallHistoryAndExport" classname="dev.notai.tracker.CoreScenariosTest" time="0.285"/>
+  <testcase name="backupReplacementAndFailure" classname="dev.notai.tracker.CoreScenariosTest" time="0.103"/>
+  <testcase name="timerPath" classname="dev.notai.tracker.CoreScenariosTest" time="0.037"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

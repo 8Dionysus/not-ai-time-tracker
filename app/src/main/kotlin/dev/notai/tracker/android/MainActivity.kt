@@ -61,7 +61,7 @@ class MainActivity: Activity() {
             val expected = shown!!.token; val value = name.text.toString(); val activity = details.text.toString()
             runAction { runtime.tracker.saveCard(expected,Card(name = value,details = if (activity.isBlank()) emptyMap() else mapOf("activity" to activity))) }
         }
-        button("Добавить первый шаблон каталога") { val token = shown!!.token; runAction { runtime.tracker.saveCard(token,Catalog.card("language-v1")) } }
+        button("Добавить первый шаблон каталога") { val token = shown!!.token; runAction { runtime.tracker.saveCard(token,Catalog.card(Catalog.types.first { it.selectable && !it.archived }.id)) } }
         command("Start",true) { t,e,c,f -> t.start(e,c) }
         command("Назначить текущему занятию",true) { t,e,c,f -> t.labelCurrent(e,c,f.note) }
         command("Изменить уточнение с этого момента",true) { t,e,c,f -> t.changeDetails(e,c) }

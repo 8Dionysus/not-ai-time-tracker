@@ -9,8 +9,16 @@ class Tracker(val store: StateStore, val clock: Clock) {
     val snapshots get() = store.changes.map { snapshot(it, clock.now()) }
     fun data(): Dataset = storage { store.read() }
     fun snapshot(): Snapshot = snapshot(data(), clock.now())
-    fun selection(cardId: String): Classification = data().cards.singleOrNull { it.id == cardId && !it.archived }
-        ?.classification() ?: fail(ErrorCode.INVALID_INPUT, "Card missing or archived")
+    fun selection(cardId: String): Classification {
+        val d = data()
+        val card = d.cards.singleOrNull { it.id == cardId && !it.archived } ?: fail(ErrorCode.INVALID_INPUT,"Card missing or archived")
+        ensure(card.activityTypeId == null || d.types.any { it.id == card.activityTypeId && !it.archived && it.selectable },"Type archived or not selectable")
+        return d.classify(card.classification())
+    }
+    fun typeSelection(typeId: String): Classification {
+        val d = data(); val type = d.types.find { it.id == typeId && !it.archived && it.selectable } ?: fail(ErrorCode.INVALID_INPUT,"Type missing or archived")
+        return d.classify(Classification(name = type.name,activityTypeId = type.id))
+    }
 
     data class Change(val state: Snapshot, val changedSessionIds: Set<String>, val undoAvailable: Boolean,
         val data: Dataset, val asOf: Moment) {
@@ -40,6 +48,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
     }
     fun start(expected: Token, selection: Classification = Classification(), note: String? = null) = mutate(expected) { d,n ->
         ensure(current(d) == null, "Already tracking")
+        checkStartable(d,selection)
         append(d, selection, note, n)
     }
     fun pause(expected: Token) = mutate(expected) { d,n ->
@@ -49,8 +58,9 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun resume(expected: Token) = mutate(expected) { d,n ->
         val s = current(d) ?: fail(ErrorCode.INVALID_INPUT, "No current session")
         ensure(s.status == SessionStatus.PAUSED, "Session is not paused")
-        d.copy(sessions = d.sessions.replace(s.copy(status = SessionStatus.RUNNING)),
-            segments = d.segments + open(s.id,s.selection,n))
+        val selected = d.classify(s.selection)
+        d.copy(sessions = d.sessions.replace(s.copy(status = SessionStatus.RUNNING,selection = selected)),
+            segments = d.segments + open(s.id,selected,n))
     }
     fun stop(expected: Token) = mutate(expected) { d,n ->
         val s = current(d) ?: fail(ErrorCode.INVALID_INPUT, "No current session")
@@ -61,22 +71,25 @@ class Tracker(val store: StateStore, val clock: Clock) {
         val s = current(d) ?: fail(ErrorCode.INVALID_INPUT, "No current session")
         val closed = if (s.status == SessionStatus.PAUSED) d.copy(sessions = d.sessions.replace(s.copy(status = SessionStatus.STOPPED)))
         else close(d,running(d,n),n,SessionStatus.STOPPED)
+        checkStartable(d,selection)
         append(closed, selection, null,n)
     }
     /** Explicit late labeling applies to the entire current session, including its earlier segments. */
     fun labelCurrent(expected: Token, selection: Classification, note: String? = null) = mutate(expected, true) { d,_ ->
+        val selected = d.classify(selection)
         val s = current(d) ?: fail(ErrorCode.INVALID_INPUT, "No current session")
-        d.copy(sessions = d.sessions.replace(s.copy(selection = selection, note = note)),
-            segments = d.segments.map { if (it.sessionId == s.id) it.copy(selection = selection) else it })
+        d.copy(sessions = d.sessions.replace(s.copy(selection = selected, note = note)),
+            segments = d.segments.map { if (it.sessionId == s.id) it.copy(selection = selected) else it })
     }
     /** Change details from now; preserves session-scoped measurements without copying them. */
     fun changeDetails(expected: Token, selection: Classification) = mutate(expected, true) { d,n ->
+        val selected = d.classify(selection)
         val s = current(d) ?: fail(ErrorCode.INVALID_INPUT, "No current session")
-        ensure(s.selection.cardId == selection.cardId, "Use switch to change card")
-        if (s.status == SessionStatus.PAUSED) d.copy(sessions = d.sessions.replace(s.copy(selection = selection)))
+        ensure(s.selection.cardId == selection.cardId && (selection.cardId != null || s.selection.activityTypeId == selection.activityTypeId), "Use switch to change card/type")
+        if (s.status == SessionStatus.PAUSED) d.copy(sessions = d.sessions.replace(s.copy(selection = selected)))
         else {
             val closed = close(d,running(d,n),n,SessionStatus.PAUSED)
-            closed.copy(sessions = closed.sessions.replace(s.copy(selection = selection)), segments = closed.segments + open(s.id,selection,n))
+            closed.copy(sessions = closed.sessions.replace(s.copy(selection = selected)), segments = closed.segments + open(s.id,selected,n))
         }
     }
     fun repeat(expected: Token, sessionId: String) = mutate(expected) { d,n ->
@@ -100,6 +113,30 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun saveType(expected: Token, type: ActivityType) = mutate(expected) { d,_ ->
         d.copy(types = d.types.filterNot { it.id == type.id } + type)
     }
+    /** Install absent definitions only; preserve existing local names, moves and settings. */
+    fun addCatalog(expected: Token,catalog: VocabularyData) = mutate(expected) { d,_ ->
+        d.copy(types = d.types + catalog.types.filter { t -> d.types.none { it.id == t.id } },
+            axes = d.axes + catalog.axes.filter { a -> d.axes.none { it.id == a.id && it.meaningVersion == a.meaningVersion } },
+            metrics = d.metrics + catalog.metrics.filter { m -> d.metrics.none { it.id == m.id && it.meaningVersion == m.meaningVersion } },
+            units = d.units + catalog.units.filter { u -> d.units.none { it.id == u.id } })
+    }
+    fun saveAxis(expected: Token,axis: Axis) = mutate(expected) { d,_ ->
+        d.axes.find { it.id == axis.id && it.meaningVersion == axis.meaningVersion }?.let { old ->
+            ensure(old.valueKind == axis.valueKind && old.cardinality == axis.cardinality,"New axis semantics need a new version")
+            ensure(old.values.all { v -> axis.values.any { it.id == v.id && it.meaningVersion == v.meaningVersion } },"Archive values instead of deleting them")
+        }
+        d.copy(axes = d.axes.filterNot { it.id == axis.id && it.meaningVersion == axis.meaningVersion } + axis)
+    }
+    fun saveMetric(expected: Token,metric: Metric) = mutate(expected) { d,_ ->
+        d.metrics.find { it.id == metric.id && it.meaningVersion == metric.meaningVersion }?.let { old ->
+            ensure(old.copy(name = metric.name) == metric,"New metric semantics need a new version")
+        }
+        d.copy(metrics = d.metrics.filterNot { it.id == metric.id && it.meaningVersion == metric.meaningVersion } + metric)
+    }
+    fun saveUnit(expected: Token,unit: UnitDefinition) = mutate(expected) { d,_ ->
+        d.units.find { it.id == unit.id }?.let { old -> ensure(old.copy(name = unit.name) == unit,"New unit semantics need a new ID") }
+        d.copy(units = d.units.filterNot { it.id == unit.id } + unit)
+    }
     fun saveCard(expected: Token, card: Card) = mutate(expected) { d,_ ->
         d.copy(cards = d.cards.filterNot { it.id == card.id } + card)
     }
@@ -117,30 +154,55 @@ class Tracker(val store: StateStore, val clock: Clock) {
     }
     data class SegmentEdit(val id: String,val start: Long,val end: Long,val selection: Classification)
     /** Save a completed session form atomically; retained segment IDs retain their measurements. */
-    fun correctSession(expected: Token,sessionId: String,edits: List<SegmentEdit>,note: String?) = mutate(expected,true) { d,n ->
+    fun correctSession(expected: Token,sessionId: String,edits: List<SegmentEdit>,note: String?,reclassify: Boolean = false) = mutate(expected,true) { d,n ->
+        correctedSession(d,n,sessionId,edits,note,reclassify)
+    }
+    class CorrectionPreview internal constructor(val expected: Token,internal val sessionId: String,
+        internal val edits: List<SegmentEdit>,internal val note: String?,internal val reclassify: Boolean,
+        val before: Dataset,val after: Dataset,val asOf: Moment) {
+        fun reports(start: Long,end: Long,filter: Filter = Filter()): Pair<Report,Report> =
+            Reports.report(before,asOf,start,end,filter) to Reports.report(after,asOf,start,end,filter)
+    }
+    /** Read-only form preview. A later Save retains this token; cancel requires no command. */
+    fun previewCorrection(sessionId: String,edits: List<SegmentEdit>,note: String?,reclassify: Boolean = false): CorrectionPreview = storage {
+        store.transaction { d ->
+            val now = clock.now(); validateMoment(now)
+            val after = correctedSession(d,now,sessionId,edits,note,reclassify)
+            validate(after)
+            d to CorrectionPreview(token(d),sessionId,edits.toList(),note,reclassify,d,after,now)
+        }
+    }
+    fun applyCorrection(preview: CorrectionPreview) = correctSession(preview.expected,preview.sessionId,
+        preview.edits,preview.note,preview.reclassify)
+    private fun correctedSession(d: Dataset,n: Moment,sessionId: String,edits: List<SegmentEdit>,note: String?,reclassify: Boolean): Dataset {
         val session = d.sessions.find { it.id == sessionId } ?: fail(ErrorCode.INVALID_INPUT,"Missing session")
         ensure(session.status == SessionStatus.STOPPED,"Use current-session commands while tracking")
         val own = d.segments.filter { it.sessionId == sessionId }
         ensure(edits.map { it.id }.toSet() == own.map { it.id }.toSet() && edits.size == own.size,"Supply each existing segment once")
         edits.forEach { interval(it.start,it.end,n) }
-        val byId = edits.associateBy { it.id }
-        d.copy(sessions = d.sessions.replace(session.copy(note = note,selection = edits.maxBy { it.start }.selection)),
+        val byId = edits.associate { e ->
+            val old = own.single { it.id == e.id }
+            e.id to e.copy(selection = historicalSelection(d,old.selection,e.selection,reclassify))
+        }
+        return d.copy(sessions = d.sessions.replace(session.copy(note = note,selection = byId.getValue(edits.maxBy { it.start }.id).selection)),
             segments = d.segments.map { segment -> byId[segment.id]?.let { e ->
                 segment.copy(start = e.start,end = e.end,durationMs = e.end-e.start,selection = e.selection,anchor = null,uncertain = false,observedUntil = null)
             } ?: segment })
     }
     /** Start/end are explicit; calling this is the form's Save, not its preview. */
     fun manual(expected: Token, start: Long, end: Long, selection: Classification, note: String? = null) = mutate(expected, true) { d,n ->
+        val selected = d.classify(selection)
         interval(start,end,n)
-        val s = Session(status = SessionStatus.STOPPED, selection = selection, note = note)
-        d.copy(sessions = d.sessions + s, segments = d.segments + Segment(sessionId = s.id,start = start,end = end,durationMs = end-start,selection = selection))
+        val s = Session(status = SessionStatus.STOPPED, selection = selected, note = note)
+        d.copy(sessions = d.sessions + s, segments = d.segments + Segment(sessionId = s.id,start = start,end = end,durationMs = end-start,selection = selected))
     }
-    fun correctSegment(expected: Token, segmentId: String, start: Long, end: Long, selection: Classification) = mutate(expected,true) { d,n ->
+    fun correctSegment(expected: Token, segmentId: String, start: Long, end: Long, selection: Classification,reclassify: Boolean = false) = mutate(expected,true) { d,n ->
         interval(start,end,n)
         val seg = d.segments.find { it.id == segmentId } ?: fail(ErrorCode.INVALID_INPUT, "Missing segment")
         ensure(seg.end != null, "Resolve open tail instead")
+        val selected = historicalSelection(d,seg.selection,selection,reclassify)
         d.copy(segments = d.segments.map { if (it.id == segmentId) it.copy(start = start,end = end,durationMs = end-start,
-            selection = selection,anchor = null,uncertain = false,observedUntil = null) else it })
+            selection = selected,anchor = null,uncertain = false,observedUntil = null) else it })
     }
     /** Correct a forgotten switch inside the current uninterrupted segment in one transaction. */
     fun switchedEarlier(expected: Token, boundary: Long, selection: Classification) = mutate(expected,true) { d,n ->
@@ -184,9 +246,17 @@ class Tracker(val store: StateStore, val clock: Clock) {
         sessions = d.sessions.replace(s.copy(status = status)), segments = d.segments.map {
             if (it.sessionId == s.id && it.end == null) materialize(it,n).copy(end = n.wall, anchor = null) else it
         })
+    private fun historicalSelection(d: Dataset,old: Classification,chosen: Classification,reclassify: Boolean): Classification =
+        if(reclassify || old.activityTypeId != chosen.activityTypeId) d.classify(chosen)
+        else chosen.copy(ancestorPathAtWrite = old.ancestorPathAtWrite)
+    private fun checkStartable(d: Dataset,c: Classification) {
+        ensure(c.cardId == null || d.cards.any { it.id == c.cardId && !it.archived },"Card missing or archived")
+        ensure(c.activityTypeId == null || d.types.any { it.id == c.activityTypeId && !it.archived && it.selectable },"Type missing, archived or not selectable")
+    }
     private fun append(d: Dataset,c: Classification,note: String?,n: Moment): Dataset {
-        val s = Session(status = SessionStatus.RUNNING, selection = c,note = note)
-        return d.copy(sessions = d.sessions+s, segments = d.segments+open(s.id,c,n))
+        val selected = d.classify(c)
+        val s = Session(status = SessionStatus.RUNNING, selection = selected,note = note)
+        return d.copy(sessions = d.sessions+s, segments = d.segments+open(s.id,selected,n))
     }
     private fun open(id: String,c: Classification,n: Moment) = Segment(sessionId = id,start = n.wall,selection = c,anchor = Anchor(n.bootId,n.elapsed))
     private fun interval(start: Long,end: Long,n: Moment) = ensure(start >= 0 && end > start && end <= n.wall && end <= MAX_TIME,"Invalid or future interval",ErrorCode.INVALID_INTERVAL)

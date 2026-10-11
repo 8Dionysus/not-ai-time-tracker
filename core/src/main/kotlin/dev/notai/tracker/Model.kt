@@ -11,19 +11,23 @@ fun newId(): String = UUID.randomUUID().toString()
 val codec = Json { prettyPrint = true; encodeDefaults = true; ignoreUnknownKeys = false }
 const val MAX_TIME = 253402300799999L // last millisecond of year 9999
 
-@Serializable data class ActivityType(@Required val id: String = newId(), val name: String, val archived: Boolean = false)
+@Serializable data class ActivityType(@Required val id: String = newId(), val name: String, val archived: Boolean = false,
+    val parentId: String? = null, val selectable: Boolean = true, val meaningVersion: Int = 1,
+    val aliases: List<String> = emptyList(), val definition: String = "",
+    val suggestedAxisIds: Set<String> = emptySet(), val suggestedMetricIds: Set<String> = emptySet())
 
 @Serializable data class Classification(
     val cardId: String? = null,
     val name: String? = null,
-    val partOf: String? = null,
+    val activityTypeId: String? = null,
     val details: Map<String, String> = emptyMap(),
-    val tags: Set<String> = emptySet()
+    val tags: Set<String> = emptySet(),
+    val ancestorPathAtWrite: List<String> = emptyList(), val facets: List<Facet> = emptyList()
 )
 @Serializable data class Card(@Required val id: String = newId(), val name: String, val templateId: String? = null,
-    val partOf: String? = null, val details: Map<String, String> = emptyMap(),
-    val tags: Set<String> = emptySet(), val archived: Boolean = false) {
-    fun classification() = Classification(id, name, partOf, details, tags)
+    val activityTypeId: String? = null, val details: Map<String, String> = emptyMap(),
+    val tags: Set<String> = emptySet(), val archived: Boolean = false, val facets: List<Facet> = emptyList()) {
+    fun classification() = Classification(id, name, activityTypeId, details, tags, facets = facets)
 }
 @Serializable data class Favorite(@Required val id: String = newId(), val label: String, val selection: Classification)
 @Serializable enum class SessionStatus { RUNNING, PAUSED, STOPPED, RECOVERY }
@@ -36,13 +40,17 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
     val uncertain: Boolean = false, val observedUntil: Long? = null)
 @Serializable enum class Scope { SESSION, SEGMENT }
 @Serializable data class Measurement(@Required val id: String = newId(), val fieldId: String, @Required val meaningVersion: Int = 1,
-    val unit: String, val scope: Scope, val targetId: String, val value: Long)
+    val unit: String, val scope: Scope, val targetId: String, val value: Decimal, val source: String? = null) {
+    constructor(id: String = newId(), fieldId: String, meaningVersion: Int = 1, unit: String, scope: Scope, targetId: String, value: Long):
+        this(id,fieldId,meaningVersion,unit,scope,targetId,Decimal(value.toString()))
+}
 @Serializable data class Settings(val reportZone: String = "UTC")
 @Serializable data class Dataset(@Required val datasetId: String = newId(), @Required val revision: Long = 0,
     @Required val types: List<ActivityType> = Catalog.types,
     @Required val cards: List<Card> = emptyList(), @Required val favorites: List<Favorite> = emptyList(),
     @Required val sessions: List<Session> = emptyList(), @Required val segments: List<Segment> = emptyList(),
-    @Required val measurements: List<Measurement> = emptyList(), @Required val settings: Settings = Settings())
+    @Required val measurements: List<Measurement> = emptyList(), @Required val settings: Settings = Settings(),
+    @Required val axes: List<Axis> = Catalog.vocabulary.axes, @Required val metrics: List<Metric> = Catalog.vocabulary.metrics, @Required val units: List<UnitDefinition> = Catalog.vocabulary.units)
 
 data class Moment(val wall: Long, val elapsed: Long, val bootId: String)
 fun interface Clock { fun now(): Moment }
@@ -86,23 +94,30 @@ fun validate(data: Dataset) {
     ids(data.types.map { it.id }); ids(data.cards.map { it.id }); ids(data.favorites.map { it.id }); ids(data.sessions.map { it.id })
     ids(data.segments.map { it.id }); ids(data.measurements.map { it.id })
     val typeIds = data.types.map { it.id }.toSet()
-    data.types.forEach { ensure(it.name.isNotBlank(), "Type needs a name") }
+    validateVocabulary(data)
     val cards = data.cards.associateBy { it.id }; val sessions = data.sessions.associateBy { it.id }
     fun selection(c: Classification) {
         ensure(c.cardId == null || cards.containsKey(c.cardId), "Missing card")
-        ensure(c.partOf == null || c.partOf in typeIds, "Missing activity type")
-        ensure((c.cardId == null) == (c.name == null), "Unspecified selection must have no card name")
+        ensure(c.activityTypeId == null || c.activityTypeId in typeIds, "Missing activity type")
+        ensure(c.cardId == null || c.name != null, "Card selection needs historical name")
+        ensure(c.activityTypeId != null || c.ancestorPathAtWrite.isEmpty(), "Unmapped selection has a path")
+        ensure(c.ancestorPathAtWrite.isEmpty() || (c.ancestorPathAtWrite.last() == c.activityTypeId && c.ancestorPathAtWrite.distinct().size == c.ancestorPathAtWrite.size && c.ancestorPathAtWrite.all { it in typeIds }), "Invalid historical path")
+        validateFacets(data,c.facets)
         ensure(c.name == null || c.name.isNotBlank(), "Empty historical name")
         ensure(c.details.all { it.key.isNotBlank() && it.value.isNotBlank() } && c.tags.all { it.isNotBlank() }, "Empty detail/tag")
     }
     data.cards.forEach { ensure(it.name.isNotBlank(), "Card needs a name"); selection(it.classification()) }
     data.favorites.forEach { ensure(it.label.isNotBlank(), "Favorite needs a label"); selection(it.selection) }
-    data.sessions.forEach { selection(it.selection) }
+    fun historical(c: Classification) {
+        selection(c)
+        ensure(c.activityTypeId == null || c.ancestorPathAtWrite.isNotEmpty(),"Historical classification requires a path snapshot")
+    }
+    data.sessions.forEach { historical(it.selection) }
     ensure(data.sessions.count { it.status != SessionStatus.STOPPED } <= 1, "Only one current session")
     ensure(data.segments.count { it.end == null } <= 1, "Only one open segment")
     data.segments.forEach { s ->
         val session = sessions[s.sessionId] ?: fail(ErrorCode.INVALID_INPUT, "Missing session")
-        selection(s.selection)
+        historical(s.selection)
         validateSegmentTime(s)
         if (s.end == null) ensure(session.status == SessionStatus.RUNNING || session.status == SessionStatus.RECOVERY, "Open segment without running/recovery session")
     }
@@ -118,25 +133,22 @@ fun validate(data: Dataset) {
     val certain = data.segments.filter { !it.uncertain }.sortedBy { it.start }
     certain.zipWithNext().forEach { (a,b) -> ensure(a.end != null && a.end <= b.start, "Intervals overlap", ErrorCode.OVERLAP) }
     data.measurements.forEach {
-        ensure(it.fieldId.isNotBlank() && it.meaningVersion > 0 && it.unit.isNotBlank() && it.value >= 0, "Invalid measurement")
+        ensure(it.fieldId.isNotBlank() && it.meaningVersion > 0 && it.unit.isNotBlank() && it.value.number.signum() >= 0, "Invalid measurement")
+        validateMeasurement(data,it)
         ensure(if (it.scope == Scope.SESSION) sessions.containsKey(it.targetId) else it.targetId in segmentIds, "Missing measurement target")
     }
     ensure(data.measurements.map { listOf(it.fieldId, it.meaningVersion, it.unit, it.scope, it.targetId) }.distinct().size == data.measurements.size, "Duplicate measurement for target")
 }
 
+/** Temporary technical seed, loaded from data; it is not the completed product catalog. */
 object Catalog {
-    val types = listOf(ActivityType("language","Языковая практика"),ActivityType("fitness","Физическая активность"),
-        ActivityType("reading","Чтение"),ActivityType("work","Работа"),ActivityType("rest","Отдых"))
-    data class Template(val id: String, val name: String, val partOf: String, val options: Map<String,List<String>>, val searchNames: List<String> = listOf(name))
-    val templates = listOf(
-        Template("language-v1", "Языковая практика", "language", mapOf("activity" to listOf("reading", "writing", "listening", "speaking"))),
-        Template("training-v1", "Тренировка", "fitness", mapOf("activity" to listOf("cardio", "strength"))),
-        Template("reading-v1", "Чтение", "reading", emptyMap()),
-        Template("work-v1", "Работа", "work", emptyMap()),
-        Template("rest-v1", "Отдых", "rest", emptyMap())
-    )
-    fun card(templateId: String): Card {
-        val t = templates.singleOrNull { it.id == templateId } ?: fail(ErrorCode.INVALID_INPUT, "Unknown template")
-        return Card(name = t.name, templateId = t.id, partOf = t.partOf)
+    val vocabulary: VocabularyData by lazy {
+        val text = checkNotNull(Catalog::class.java.getResourceAsStream("/catalog-bootstrap.json")).bufferedReader().use { it.readText() }
+        codec.decodeFromString<VocabularyData>(text)
+    }
+    val types get() = vocabulary.types
+    fun card(typeId: String): Card {
+        val t = types.singleOrNull { it.id == typeId && it.selectable && !it.archived } ?: fail(ErrorCode.INVALID_INPUT,"Unknown/selectable type")
+        return Card(name = t.name,templateId = t.id,activityTypeId = t.id)
     }
 }

@@ -5,23 +5,36 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
-data class Filter(val cardId: String? = null, val partOf: String? = null,
-    val details: Map<String,String> = emptyMap(), val tags: Set<String> = emptySet()) {
+enum class FacetMatch { ALL, ANY }
+
+data class Filter(val cardId: String? = null, val activityTypeId: String? = null,
+    val details: Map<String,String> = emptyMap(), val tags: Set<String> = emptySet(), val facets: List<Facet> = emptyList(),
+    val facetMatch: FacetMatch = FacetMatch.ALL) {
     fun matches(c: Classification) = (cardId == null || c.cardId == cardId) &&
-        (partOf == null || c.partOf == partOf) && details.all { c.details[it.key] == it.value } && c.tags.containsAll(tags)
+        (activityTypeId == null || activityTypeId in c.ancestorPathAtWrite) && details.all { c.details[it.key] == it.value } && c.tags.containsAll(tags) &&
+        (facets.isEmpty() || if (facetMatch == FacetMatch.ALL) facets.all { it in c.facets } else facets.any { it in c.facets })
 }
 data class ReportRow(val segmentId: String, val sessionId: String, val start: Long, val end: Long,
     val durationMs: Long, val selection: Classification, val note: String?)
 data class QuantityKey(val fieldId: String,val meaningVersion: Int,val unit: String,val scope: Scope)
 data class Report(val start: Long, val end: Long, val asOf: Long, val zone: String,
     val rows: List<ReportRow>, val unresolved: List<Segment>, val measurements: List<Measurement>,
-    val recordedMs: Long, val calendarDays: Long, val recordedDays: Set<LocalDate>, val incomplete: Boolean) {
+    val recordedMs: Long, val calendarDays: Long, val recordedDays: Set<LocalDate>, val incomplete: Boolean, val metricDefinitions: List<Metric> = emptyList()) {
     /** Whole-target quantities, not apportioned to this report window. Scope stays separate. */
-    fun quantityTotals(): Map<QuantityKey,Long> = measurements.distinctBy { it.id }
+    fun quantityTotals(): Map<QuantityKey,Decimal> = measurements.distinctBy { it.id }.filter { m ->
+        metricDefinitions.find { it.id == m.fieldId && it.meaningVersion == m.meaningVersion }?.aggregation != Aggregation.BY_TARGET
+    }
         .groupBy { QuantityKey(it.fieldId,it.meaningVersion,it.unit,it.scope) }
-        .mapValues { (_,values) -> values.sumExact(ErrorCode.INVALID_INPUT) { it.value } }
+        .mapValues { (_,values) -> values.fold(Decimal.ZERO) { total,m -> total + m.value } }
     val hasRecords get() = rows.isNotEmpty()
     fun byCard(): Map<String?, Long> = rows.groupBy { it.selection.cardId }.mapValues { (_,v) -> v.sumExact { it.durationMs } }
+    /** Parent totals overlap with their children: do not sum this map into an overall total. */
+    fun byType(): Map<String?,Long> = rows.distinctBy { it.segmentId }.flatMap { row ->
+        row.selection.ancestorPathAtWrite.ifEmpty { listOf(null) }.map { it to row }
+    }.groupBy({ it.first },{ it.second }).mapValues { (_,segments) -> segments.sumExact { it.durationMs } }
+    fun byFacet(axisId: String): Map<Facet?,Long> = rows.distinctBy { it.segmentId }.flatMap { row ->
+        row.selection.facets.filter { it.axisId == axisId }.ifEmpty { listOf(null) }.map { it to row }
+    }.groupBy({ it.first },{ it.second }).mapValues { (_,segments) -> segments.sumExact { it.durationMs } }
     fun byDetail(key: String): Map<String?, Long> = rows.groupBy { it.selection.details[key] }.mapValues { (_,v) -> v.sumExact { it.durationMs } }
 }
 data class Comparison(val current: Report, val previous: Report, val absoluteDifferenceMs: Long, val percent: Double?)
@@ -50,7 +63,7 @@ object Reports {
         val first = Instant.ofEpochMilli(start).atZone(zoneId).toLocalDate()
         val last = Instant.ofEpochMilli(end-1).atZone(zoneId).toLocalDate()
         return Report(start,end,now.wall,zone,rows,observed.filter { it.uncertain },measurements,
-            rows.sumExact { it.durationMs },java.time.temporal.ChronoUnit.DAYS.between(first,last)+1,days,end > now.wall)
+            rows.sumExact { it.durationMs },java.time.temporal.ChronoUnit.DAYS.between(first,last)+1,days,end > now.wall,d.metrics)
     }
     fun day(d: Dataset,now: Moment,date: LocalDate,filter: Filter = Filter(),zone: String = d.settings.reportZone): Report {
         val (start,end) = calendarBounds(date,1,zone)
@@ -99,13 +112,13 @@ object Csv {
             if (mode == CsvMode.SPREADSHEET_SAFE && s.trimStart().firstOrNull() in listOf('=','+','-','@')) s = "'"+s
             return "\"" + s.replace("\"","\"\"") + "\""
         }
-        val rows = mutableListOf(listOf("type","id","session_or_target_id","start_ms","end_ms","duration_ms","card_id","name","part_of","details","tags","note","field_id","meaning_version","unit","value","scope","zone"))
+        val rows = mutableListOf(listOf("type","id","session_or_target_id","start_ms","end_ms","duration_ms","card_id","name","activity_type_id","details","tags","note","field_id","meaning_version","unit","value","scope","zone","ancestor_path","facets"))
         report.rows.forEach { r -> rows += listOf("segment",r.segmentId,r.sessionId,r.start.toString(),r.end.toString(),r.durationMs.toString(),
-            r.selection.cardId ?: "",r.selection.name ?: "",r.selection.partOf ?: "",codec.encodeToString(r.selection.details),
-            codec.encodeToString(r.selection.tags),r.note ?: "","","","","","",report.zone) }
-        report.measurements.forEach { m -> rows += listOf("measurement",m.id,m.targetId,"","","","","","","","","",m.fieldId,m.meaningVersion.toString(),m.unit,m.value.toString(),m.scope.name,report.zone) }
+            r.selection.cardId ?: "",r.selection.name ?: "",r.selection.activityTypeId ?: "",codec.encodeToString(r.selection.details),
+            codec.encodeToString(r.selection.tags),r.note ?: "","","","","","",report.zone,codec.encodeToString(r.selection.ancestorPathAtWrite),codec.encodeToString(r.selection.facets)) }
+        report.measurements.forEach { m -> rows += listOf("measurement",m.id,m.targetId,"","","","","","","","","",m.fieldId,m.meaningVersion.toString(),m.unit,m.value.toString(),m.scope.name,report.zone,"","") }
         // Explicitly expose excluded uncertain data without inventing period attribution or adding it to totals.
-        report.unresolved.forEach { s -> rows += listOf("unresolved",s.id,s.sessionId,"","","","",s.selection.name ?: "","","","","","","","","","",report.zone) }
+        report.unresolved.forEach { s -> rows += listOf("unresolved",s.id,s.sessionId,"","","","",s.selection.name ?: "","","","","","","","","","",report.zone,codec.encodeToString(s.selection.ancestorPathAtWrite),codec.encodeToString(s.selection.facets)) }
         return rows.joinToString("\r\n",postfix = "\r\n") { row -> row.joinToString(",") { cell(it) } }
     }
 }

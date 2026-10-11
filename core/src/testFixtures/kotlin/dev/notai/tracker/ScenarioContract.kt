@@ -25,7 +25,7 @@ abstract class ScenarioContract {
     @Test fun timerPath() {
         val clock = FakeClock(); var tracker = Tracker(createStore(),clock)
         fun token() = tracker.snapshot().token
-        val card = Card(name = "Язык",partOf = "language",details = mapOf("language" to "es"),tags = setOf("learning","health"))
+        val card = Card(name = "Язык",activityTypeId = "language",details = mapOf("language" to "es"),tags = setOf("learning","health"))
         tracker.saveCard(token(),card)
         tracker.start(token()); val originalStart = tracker.snapshot().active!!.start
         clock.advance(60_000); tracker.labelCurrent(token(),card.classification())
@@ -45,7 +45,7 @@ abstract class ScenarioContract {
         assertEquals(ErrorCode.STALE,staleUndo.code); assertEquals(c,staleUndo.currentState!!.token); assertEquals(c,token())
         tracker.stop(token()); expect(ErrorCode.STALE) { tracker.stop(c) }
         val stopped = tracker.data().sessions.last()
-        tracker.repeat(token(),stopped.id); assertEquals(card.classification(),tracker.snapshot().session!!.selection)
+        tracker.repeat(token(),stopped.id); assertEquals(tracker.data().classify(card.classification()),tracker.snapshot().session!!.selection)
         assertNotEquals(stopped.id,tracker.snapshot().session!!.id)
         clock.advance(10_000)
         val detail = card.classification().copy(details = mapOf("language" to "es","activity" to "listening"))
@@ -54,10 +54,11 @@ abstract class ScenarioContract {
         tracker.saveFavorite(token(),favorite)
         val repeatId = tracker.data().sessions.last().id
         tracker.saveCard(token(),card.copy(name = "Renamed and archived",archived = true,details = mapOf("activity" to "reading")))
+        expect(ErrorCode.INVALID_INPUT) { tracker.start(token(),card.classification()) }
         tracker.startFavorite(token(),favorite.id)
-        assertEquals(detail,tracker.snapshot().session!!.selection)
+        assertEquals(tracker.data().classify(detail),tracker.snapshot().session!!.selection)
         clock.advance(1000); tracker.stop(token()); tracker.repeat(token(),repeatId)
-        assertEquals(detail,tracker.snapshot().session!!.selection) // archived card keeps saved parameters
+        assertEquals(tracker.data().classify(detail),tracker.snapshot().session!!.selection) // archived card keeps saved parameters
         assertEquals("Язык",tracker.snapshot().session!!.selection.name)
         clock.advance(10_000)
         // Competing commands share a revision: exactly one wins, the second is explicitly stale.
@@ -85,9 +86,10 @@ abstract class ScenarioContract {
     }
 
     @Test fun smallHistoryAndExport() {
+        hierarchyAndDecimals()
         val clock = FakeClock(); val tracker = Tracker(createStore(),clock)
         fun token() = tracker.snapshot().token
-        val card = Card(name = "=Language",partOf = "language",tags = setOf("learning","health"),details = mapOf("language" to "es"))
+        val card = Card(name = "=Language",activityTypeId = "language",tags = setOf("learning","health"),details = mapOf("language" to "es"))
         tracker.saveCard(token(),card); tracker.start(token(),card.classification())
         clock.advance(20*60_000); tracker.pause(token()) // crosses UTC midnight, 10 min on each day
         val sessionId = token().sessionId!!
@@ -97,21 +99,21 @@ abstract class ScenarioContract {
         val d = tracker.data(); val windowStart = Instant.parse("2026-10-10T00:00:00Z").toEpochMilli()
         val all = Reports.report(d,clock.now(),windowStart,clock.wall)
         assertEquals(40*60_000,all.recordedMs); assertEquals(2,all.rows.size) // equal durations are not deduplicated
-        assertEquals(20,all.measurements.single().value)
+        assertEquals(Decimal("20"),all.measurements.single().value)
         val pages = QuantityKey("pages",1,"page",Scope.SESSION)
-        assertEquals(20,all.quantityTotals()[pages])
-        assertEquals(20,Reports.day(d,clock.now(),LocalDate.parse("2026-10-10")).quantityTotals()[pages])
-        assertEquals(20,Reports.day(d,clock.now(),LocalDate.parse("2026-10-11")).quantityTotals()[pages])
+        assertEquals(Decimal("20"),all.quantityTotals()[pages])
+        assertEquals(Decimal("20"),Reports.day(d,clock.now(),LocalDate.parse("2026-10-10")).quantityTotals()[pages])
+        assertEquals(Decimal("20"),Reports.day(d,clock.now(),LocalDate.parse("2026-10-11")).quantityTotals()[pages])
         val quantities = all.copy(measurements = all.measurements + listOf(
             Measurement(id = "reps-a",fieldId = "reps",unit = "rep",scope = Scope.SEGMENT,targetId = d.segments[0].id,value = 8),
             Measurement(id = "reps-b",fieldId = "reps",unit = "rep",scope = Scope.SEGMENT,targetId = d.segments[1].id,value = 12),
             Measurement(id = "pages-zero",fieldId = "pages",meaningVersion = 2,unit = "page",scope = Scope.SESSION,targetId = sessionId,value = 0)))
-        assertEquals(20,quantities.quantityTotals()[QuantityKey("reps",1,"rep",Scope.SEGMENT)])
-        assertEquals(0,quantities.quantityTotals()[QuantityKey("pages",2,"page",Scope.SESSION)])
+        assertEquals(Decimal("20"),quantities.quantityTotals()[QuantityKey("reps",1,"rep",Scope.SEGMENT)])
+        assertEquals(Decimal("0"),quantities.quantityTotals()[QuantityKey("pages",2,"page",Scope.SESSION)])
         assertNull(quantities.quantityTotals()[QuantityKey("missing",1,"page",Scope.SESSION)])
-        val overflowQuantity = all.copy(measurements = listOf(all.measurements.single().copy(value = Long.MAX_VALUE),
-            all.measurements.single().copy(id = "other-target",targetId = "other-session",value = 1)))
-        expect(ErrorCode.INVALID_INPUT) { overflowQuantity.quantityTotals() }
+        val overflowQuantity = all.copy(measurements = listOf(all.measurements.single().copy(value = Decimal(Long.MAX_VALUE.toString())),
+            all.measurements.single().copy(id = "other-target",targetId = "other-session",value = Decimal("1"))))
+        assertEquals(Decimal("9223372036854775808"),overflowQuantity.quantityTotals()[pages])
         val overflowTime = all.copy(rows = listOf(all.rows.first().copy(durationMs = Long.MAX_VALUE),all.rows.last().copy(durationMs = 1)))
         expect(ErrorCode.INVALID_INTERVAL) { overflowTime.byCard() }
         assertEquals(10*60_000,Reports.day(d,clock.now(),LocalDate.parse("2026-10-10")).recordedMs)
@@ -130,11 +132,11 @@ abstract class ScenarioContract {
         tracker.undo(token()); assertEquals(d.segments,tracker.data().segments)
         assertEquals(39*60_000,corrected.report(windowStart,clock.wall).recordedMs) // command result is a fixed snapshot
         tracker.saveType(token(),ActivityType("other","Другая область"))
-        tracker.saveCard(token(),card.copy(name = "Renamed",partOf = "other",archived = true))
+        tracker.saveCard(token(),card.copy(name = "Renamed",activityTypeId = "other",archived = true))
         tracker.saveType(token(),ActivityType("language","Переименованный тип",archived = true))
-        assertEquals(all.recordedMs,Reports.report(tracker.data(),clock.now(),windowStart,clock.wall,Filter(partOf = "language")).recordedMs)
+        assertEquals(all.recordedMs,Reports.report(tracker.data(),clock.now(),windowStart,clock.wall,Filter(activityTypeId = "language")).recordedMs)
         val currentData = tracker.data()
-        expect(ErrorCode.INVALID_INPUT) { tracker.saveCard(token(),Card(name = "Broken link",partOf = "missing-type")) }
+        expect(ErrorCode.INVALID_INPUT) { tracker.saveCard(token(),Card(name = "Broken link",activityTypeId = "missing-type")) }
         assertEquals(currentData,tracker.data())
         assertEquals("=Language",tracker.data().segments.first().selection.name)
         tracker.copyCard(token(),card.id,"Copy")
@@ -142,7 +144,7 @@ abstract class ScenarioContract {
         val quantityId = tracker.data().measurements.single().id
         val removed = tracker.removeMeasurement(token(),quantityId)
         assertEquals(setOf(sessionId),removed.changedSessionIds); assertTrue(removed.data.measurements.isEmpty())
-        tracker.undo(token()); assertEquals(20,tracker.data().measurements.single().value)
+        tracker.undo(token()); assertEquals(Decimal("20"),tracker.data().measurements.single().value)
         val whole = tracker.correctSession(token(),sessionId,tracker.data().segments.map { Tracker.SegmentEdit(it.id,it.start,it.end!!,it.selection) },"Исправленная заметка")
         assertEquals("Исправленная заметка",whole.changedSessions.single().note)
         assertEquals(40*60_000,whole.report(windowStart,clock.wall).recordedMs)
@@ -168,11 +170,84 @@ abstract class ScenarioContract {
         assertEquals(3_600_000,Reports.report(huge,clock.now().copy(wall = MAX_TIME),MAX_TIME-3_600_000,MAX_TIME).recordedMs) // BigInteger intermediate, no multiplication overflow
     }
 
+    private fun hierarchyAndDecimals() {
+        val clock = FakeClock(); val t = Tracker(createStore(),clock)
+        fun token() = t.snapshot().token
+        val parent = ActivityType("area.test","Broad")
+        val other = ActivityType("area.other","Other")
+        val child = ActivityType("activity.test","Specific",parentId = parent.id)
+        val language = Axis("axis.test","Language",valueKind = ValueKind.LOCAL_CHOICE,
+            values = listOf(AxisValue("es","Spanish")))
+        val source = Axis("axis.source","Source",valueKind = ValueKind.FREE_LABEL)
+        val units = listOf(UnitDefinition("unit.m","Metres","length"),UnitDefinition("unit.mi","Miles","length",Decimal("1609.344")))
+        val distance = Metric("measure.distance","Distance",numberKind = NumberKind.DECIMAL,canonicalUnitId = "unit.m",maxScale = 4,aggregation = Aggregation.SUM)
+        t.addCatalog(token(),VocabularyData(listOf(parent,other,child),listOf(language,source),listOf(distance),units))
+        val a = Facet(language.id,valueId = "es",valueMeaningVersion = 1)
+        val b = Facet(source.id,text = "YouTube")
+        val chosen = t.typeSelection(child.id).copy(facets = listOf(a,b))
+        val from = clock.wall
+        t.start(token(),chosen); val first = t.snapshot().session!!.id
+        expect(ErrorCode.INVALID_INPUT) { t.changeDetails(token(),t.typeSelection(other.id)) }
+        clock.advance(1000); t.pause(token()); clock.advance(1000); t.resume(token()); clock.advance(1000); t.stop(token())
+        val converted = t.data().convert(Decimal("0.1"),"unit.mi","unit.m")
+        assertEquals(Decimal("160.9344"),converted)
+        t.measure(token(),Measurement(fieldId = distance.id,unit = "unit.m",scope = Scope.SESSION,targetId = first,value = converted))
+        t.start(token(),t.typeSelection(parent.id)); clock.advance(1000); t.stop(token())
+        val own = Card(name = "Unmapped"); t.saveCard(token(),own)
+        t.start(token(),t.selection(own.id)); clock.advance(1000); t.stop(token())
+        fun report(filter: Filter = Filter()) = Reports.report(t.data(),clock.now(),from,clock.wall,filter)
+        assertEquals(4000,report().recordedMs)
+        assertEquals(3000,report(Filter(activityTypeId = parent.id)).recordedMs)
+        assertEquals(3000,report().byType()[parent.id])
+        assertEquals(2000,report(Filter(facets = listOf(a,b))).recordedMs)
+        assertEquals(2000,report(Filter(facets = listOf(a,b),facetMatch = FacetMatch.ANY)).recordedMs)
+        assertEquals(converted,report().quantityTotals()[QuantityKey(distance.id,1,"unit.m",Scope.SESSION)])
+        val oldSegments = t.data().segments
+        t.saveType(token(),child.copy(parentId = other.id))
+        assertEquals(oldSegments,t.data().segments)
+        assertEquals(3000,report(Filter(activityTypeId = parent.id)).recordedMs)
+        val edits = t.data().segments.filter { it.sessionId == first }.map { Tracker.SegmentEdit(it.id,it.start,it.end!!,it.selection) }
+        t.correctSession(token(),first,edits,"Only a note")
+        assertEquals(3000,report(Filter(activityTypeId = parent.id)).recordedMs)
+        val beforePreview = t.data()
+        val preview = t.previewCorrection(first,edits,"Explicit reclassification",reclassify = true)
+        assertEquals(beforePreview,t.data())
+        val (beforeReport,afterReport) = preview.reports(from,clock.wall,Filter(activityTypeId = parent.id))
+        assertEquals(3000,beforeReport.recordedMs); assertEquals(1000,afterReport.recordedMs)
+        t.applyCorrection(preview)
+        assertEquals(1000,report(Filter(activityTypeId = parent.id)).recordedMs)
+        assertEquals(2000,report(Filter(activityTypeId = other.id)).recordedMs)
+        t.undo(token())
+        assertEquals(3000,report(Filter(activityTypeId = parent.id)).recordedMs)
+        t.repeat(token(),first); clock.advance(1000); t.stop(token())
+        assertEquals(listOf(other.id,child.id),t.data().segments.last().selection.ancestorPathAtWrite)
+        assertEquals(1000,report(Filter(activityTypeId = other.id)).recordedMs)
+        expect(ErrorCode.INVALID_INPUT) { t.saveType(token(),other.copy(parentId = child.id)) }
+        expect(ErrorCode.INVALID_INPUT) { t.start(token(),chosen.copy(facets = listOf(a.copy(text = "bad")))) }
+        expect(ErrorCode.INVALID_INPUT) { t.saveMetric(token(),distance.copy(maxScale = 2)) }
+        val restored = Backups.decode(Backups(t,MemoryRollback()).export()).data
+        assertEquals(t.data(),restored)
+        assertTrue(Csv.export(report()).contains("160.9344"))
+    }
+
     @Test fun backupReplacementAndFailure() {
         val sampleDir = java.io.File(System.getProperty("tracker.samples"))
         val historySample = Backups.decode(java.io.File(sampleDir,"history-v1.json").readText())
         assertEquals(1,historySample.data.sessions.size)
         assertEquals(1_200_000,historySample.data.segments.single().durationMs)
+        assertEquals(historySample.data,Backups.decode(java.io.File(sampleDir,"history-v2.json").readText()).data)
+        val legacyJson = java.io.File(sampleDir,"history-v1.json").readText()
+        val migrated = migrateStoredV1(legacyJson)
+        assertEquals(historySample.data,migrated)
+        assertEquals(listOf("language"),migrated.segments.single().selection.ancestorPathAtWrite)
+        val largest = Backups.decode(legacyJson.replace("\"value\": 20","\"value\": 9223372036854775807"))
+        assertEquals(Decimal("9223372036854775807"),largest.data.measurements.single().value)
+        val unknownLegacy = legacyJson.replace("listening","unknown-custom-detail").replace("\"value\": 20","\"value\": 9223372036854775807")
+        val collisions = unknownLegacy.replace("\"activity\":", "\"partOf\": \"preserve-this-text\", \"value\": \"3\", \"activity\":")
+        val unknownMigrated = migrateStoredV1(collisions)
+        assertEquals("preserve-this-text",unknownMigrated.segments.single().selection.details["partOf"])
+        assertEquals("unknown-custom-detail",unknownMigrated.segments.single().selection.details["activity"])
+        assertEquals(Decimal("9223372036854775807"),unknownMigrated.measurements.single().value)
         val openSample = Backups.decode(java.io.File(sampleDir,"open-tail-v1.json").readText())
         assertNull(openSample.data.segments.single().end)
         val historical = Tracker(createStore(),FakeClock())
@@ -181,7 +256,7 @@ abstract class ScenarioContract {
         assertEquals(historySample.data.copy(revision = 1),historical.data())
         val clock = FakeClock(); val tracker = Tracker(createStore(),clock)
         fun token() = tracker.snapshot().token
-        val card = Card(name = "Своё",partOf = "language")
+        val card = Card(name = "Своё",activityTypeId = "language")
         tracker.saveCard(token(),card); tracker.settings(token(),Settings("Europe/Berlin"))
         tracker.start(token(),card.classification()); clock.advance(42_000)
         tracker.saveType(token(),ActivityType("language","Новый заголовок",archived = true))
@@ -196,11 +271,11 @@ abstract class ScenarioContract {
         assertEquals(Mode.RECOVERY,result.state.mode); assertEquals(42_000,result.state.trustedDurationMs)
         assertEquals(Settings("Europe/Berlin"),clean.data().settings)
         assertEquals(ActivityType("language","Новый заголовок",true),clean.data().types.single { it.id == "language" })
-        assertEquals("language",clean.data().segments.single().selection.partOf)
+        assertEquals("language",clean.data().segments.single().selection.activityTypeId)
         assertTrue(Backups.decode(disk.read(result.rollbackReference)).data.sessions.isEmpty())
         val full = clean.data()
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.dropLast(7)) }; assertEquals(full,clean.data())
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 1","\"formatVersion\": 999")) }; assertEquals(full,clean.data())
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 2","\"formatVersion\": 999")) }; assertEquals(full,clean.data())
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"datasetId\": \"${raw.data.datasetId}\",", "")) }; assertEquals(full,clean.data())
         val broken = raw.copy(data = raw.data.copy(segments = raw.data.segments+raw.data.segments.first()))
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(codec.encodeToString(broken)) }; assertEquals(full,clean.data())
@@ -231,8 +306,10 @@ abstract class ScenarioContract {
         assertTrue(clean.data().cards.any { it.name == "Local data that replacement would delete" })
         val restoredQuantities = Reports.report(historical.data(),clock.now().copy(wall = historySample.asOf),
             historySample.data.segments.single().start,historySample.asOf).quantityTotals()
-        assertEquals(20,restoredQuantities[QuantityKey("pages",1,"page",Scope.SESSION)])
+        assertEquals(Decimal("20"),restoredQuantities[QuantityKey("pages",1,"page",Scope.SESSION)])
     }
+
+    protected open fun migrateStoredV1(json: String): Dataset = Backups.decode(json).data
 
     protected open fun assertImportRollback(tracker: Tracker,json: String,disk: RollbackStore) {
         val failingStore = object: StateStore {

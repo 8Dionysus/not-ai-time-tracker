@@ -13,12 +13,12 @@
 > Task :app:mergeDebugResources UP-TO-DATE
 > Task :app:packageDebugResources UP-TO-DATE
 > Task :app:parseDebugLocalResources UP-TO-DATE
-> Task :app:createDebugCompatibleScreenManifests
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
 > Task :app:extractDeepLinksDebug UP-TO-DATE
-> Task :app:processDebugMainManifest
-> Task :app:processDebugManifest
-> Task :app:processDebugManifestForPackage
-> Task :app:processDebugResources
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
 > Task :app:javaPreCompileDebug UP-TO-DATE
 > Task :app:mergeDebugShaders UP-TO-DATE
 > Task :app:compileDebugShaders NO-SOURCE
@@ -34,8 +34,8 @@
 > Task :app:writeDebugSigningConfigVersions UP-TO-DATE
 > Task :app:preDebugUnitTestBuild UP-TO-DATE
 > Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
-> Task :app:packageDebugUnitTestForUnitTest
-> Task :app:generateDebugUnitTestConfig
+> Task :app:packageDebugUnitTestForUnitTest UP-TO-DATE
+> Task :app:generateDebugUnitTestConfig UP-TO-DATE
 > Task :app:preDebugAndroidTestBuild SKIPPED
 > Task :app:generateDebugAndroidTestResValues UP-TO-DATE
 > Task :app:extractProguardFiles UP-TO-DATE
@@ -44,11 +44,7 @@
 > Task :core:classes UP-TO-DATE
 > Task :core:jar
 > Task :app:kspDebugKotlin
-> Task :core:compileTestFixturesKotlin
 > Task :app:compileDebugKotlin
-> Task :core:compileTestFixturesJava NO-SOURCE
-> Task :core:testFixturesClasses UP-TO-DATE
-> Task :core:testFixturesJar
 > Task :app:compileDebugJavaWithJavac NO-SOURCE
 > Task :app:dexBuilderDebug UP-TO-DATE
 > Task :app:mergeDebugGlobalSynthetics UP-TO-DATE
@@ -58,19 +54,23 @@
 > Task :app:mergeProjectDexDebug UP-TO-DATE
 > Task :app:mergeDebugNativeLibs NO-SOURCE
 > Task :app:stripDebugDebugSymbols NO-SOURCE
+> Task :core:compileTestFixturesKotlin
+> Task :core:compileTestFixturesJava NO-SOURCE
+> Task :core:testFixturesClasses UP-TO-DATE
+> Task :core:testFixturesJar
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDebug
+> Task :app:bundleDebugClassesToRuntimeJar UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
 > Task :core:compileTestKotlin
 > Task :core:compileTestJava NO-SOURCE
 > Task :core:testClasses UP-TO-DATE
+> Task :app:kspDebugUnitTestKotlin
 > Task :core:test
-> Task :app:bundleDebugClassesToRuntimeJar UP-TO-DATE
-> Task :app:bundleDebugClassesToCompileJar UP-TO-DATE
-> Task :app:packageDebug
-> Task :app:createDebugApkListingFileRedirect
-> Task :app:assembleDebug
 > Task :app:generateDebugAndroidTestLintModel
 > Task :app:generateDebugLintReportModel
 > Task :app:generateDebugUnitTestLintModel
-> Task :app:kspDebugUnitTestKotlin
 > Task :app:compileDebugUnitTestKotlin
 > Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
 > Task :app:processDebugUnitTestJavaRes UP-TO-DATE
@@ -78,11 +78,8 @@
 > Task :app:testDebugUnitTest
 > Task :app:lintAnalyzeDebugAndroidTest
 > Task :app:lintAnalyzeDebugUnitTest
-
-> Task :app:lintReportDebug
-Wrote HTML report to file:///workspace/not-ai-time-tracker/app/build/reports/lint-results-debug.html
-
+> Task :app:lintReportDebug UP-TO-DATE
 > Task :app:lintDebug
 
-BUILD SUCCESSFUL in 33s
-60 actionable tasks: 30 executed, 30 up-to-date
+BUILD SUCCESSFUL in 30s
+60 actionable tasks: 21 executed, 39 up-to-date

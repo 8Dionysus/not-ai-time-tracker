@@ -698,6 +698,18 @@ abstract class ScenarioContract {
         val unresolved = t.view().calendar(LocalDate.parse("2026-03-28"),3,zone = "Europe/Berlin")
         assertEquals(1,unresolved.window.unresolved.size)
         assertEquals(after.window.recordedMs,unresolved.days.sumOf { it.recordedMs })
+        // Apia skipped a whole civil date, unlike an ordinary 23/25-hour DST day.
+        val skipped = LocalDate.parse("2011-12-30")
+        expect(ErrorCode.INVALID_INTERVAL) { Reports.day(t.data(),clock.now(),skipped,zone = "Pacific/Apia") }
+        expect(ErrorCode.INVALID_INTERVAL) { t.view().calendar(skipped,1,zone = "Pacific/Apia") }
+        expect(ErrorCode.INVALID_INTERVAL) { t.view().calendar(skipped.minusDays(1),3,zone = "Pacific/Apia") }
+        expect(ErrorCode.INVALID_INTERVAL) { t.view().calendar(skipped,2,zone = "Pacific/Apia") }
+        listOf(skipped.minusDays(1),skipped.plusDays(1)).forEach { date ->
+            val page = t.view().calendar(date,1,zone = "Pacific/Apia")
+            val report = Reports.day(t.data(),clock.now(),date,zone = "Pacific/Apia")
+            assertTrue(page.window.end > page.window.start)
+            assertEquals(1L,page.window.calendarDays); assertEquals(report,page.window)
+        }
         // Calendar boundaries in autumn are 25 hours, without inventing recorded activity.
         assertEquals(25*60*60_000L,t.view().calendar(LocalDate.parse("2026-10-25"),1,zone = "Europe/Berlin").days.single().let { it.end-it.start })
     }

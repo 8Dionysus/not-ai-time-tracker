@@ -76,13 +76,14 @@ object Reports {
         ensure(days in 1..62,"Calendar page must contain 1..62 days",ErrorCode.INVALID_INTERVAL)
         validateMoment(now)
         val (start,end) = calendarBounds(first,days,zone)
-        ensure(start >= 0 && end <= MAX_TIME,"Calendar window out of range",ErrorCode.INVALID_INTERVAL)
+        ensure(start >= 0 && end > start && end <= MAX_TIME,"Calendar window is empty or out of range",ErrorCode.INVALID_INTERVAL)
         val zoneId = ZoneId.of(zone)
         val observed = d.segments.distinctBy { it.id }.filter { filter.matches(it.selection) }.map { materialize(it,now) }
         val whole = observedReport(d,now,start,end,zoneId,observed)
         val notes = d.sessions.associate { it.id to it.note }
         val pages = (0 until days).map { offset ->
             val date = first.plusDays(offset.toLong()); val (a,b) = calendarBounds(date,1,zone)
+            ensure(b > a,"Calendar page contains a skipped local date: $date in $zone",ErrorCode.INVALID_INTERVAL)
             val rows = windowRows(observed,now,a,b,notes)
             // Uncertain attribution and whole-target quantities are exposed once at the window level.
             CalendarDay(date,a,b,frozenList(rows),rows.sumExact { it.durationMs },b > now.wall)

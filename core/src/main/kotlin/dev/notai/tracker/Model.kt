@@ -14,7 +14,8 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
 @Serializable data class ActivityType(@Required val id: String = newId(), val name: String, val archived: Boolean = false,
     val parentId: String? = null, val selectable: Boolean = true, val meaningVersion: Int = 1,
     val aliases: List<String> = emptyList(), val definition: String = "",
-    val suggestedAxisIds: Set<String> = emptySet(), val suggestedMetricIds: Set<String> = emptySet())
+    val suggestedAxisIds: Set<String> = emptySet(), val suggestedMetricIds: Set<String> = emptySet(),
+    val researchOrigins: List<ResearchOrigin> = emptyList())
 
 @Serializable data class Classification(
     val cardId: String? = null,

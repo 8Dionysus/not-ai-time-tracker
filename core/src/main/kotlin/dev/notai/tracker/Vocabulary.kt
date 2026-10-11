@@ -31,7 +31,8 @@ object DecimalSerializer: KSerializer<Decimal> {
 @Serializable enum class Cardinality { SINGLE, MULTIPLE }
 @Serializable data class AxisValue(val id: String,val label: String,val meaningVersion: Int = 1,val archived: Boolean = false)
 @Serializable data class Axis(val id: String,val name: String,val meaningVersion: Int = 1,
-    val valueKind: ValueKind,val cardinality: Cardinality = Cardinality.SINGLE,val values: List<AxisValue> = emptyList(),val archived: Boolean = false)
+    val valueKind: ValueKind,val cardinality: Cardinality = Cardinality.SINGLE,val values: List<AxisValue> = emptyList(),val archived: Boolean = false,
+    val researchOrigins: List<ResearchOrigin> = emptyList())
 @Serializable data class Facet(val axisId: String,val meaningVersion: Int = 1,val valueId: String? = null,
     val valueMeaningVersion: Int? = null,val text: String? = null)
 @Serializable enum class NumberKind { INTEGER, DECIMAL }
@@ -66,12 +67,14 @@ fun Dataset.cardFromType(typeId: String): Card {
 internal fun validateVocabulary(d: Dataset) {
     d.types.forEach { t ->
         ensure(t.name.isNotBlank() && t.meaningVersion > 0,"Invalid type")
+        validateResearchOrigins(t.researchOrigins)
         d.ancestorPath(t.id)
         ensure(t.suggestedAxisIds.all { id -> d.axes.any { it.id == id } },"Unknown suggested axis")
         ensure(t.suggestedMetricIds.all { id -> d.metrics.any { it.id == id } },"Unknown suggested metric")
     }
     ensure(d.axes.map { it.id to it.meaningVersion }.distinct().size == d.axes.size,"Duplicate axis version")
     d.axes.forEach { a ->
+        validateResearchOrigins(a.researchOrigins)
         ensure(a.id.isNotBlank() && a.name.isNotBlank() && a.meaningVersion > 0,"Invalid axis")
         ensure(a.values.map { it.id to it.meaningVersion }.distinct().size == a.values.size,"Duplicate axis value version")
         a.values.forEach { ensure(it.id.isNotBlank() && it.label.isNotBlank() && it.meaningVersion > 0,"Invalid value") }
@@ -169,5 +172,13 @@ fun Dataset.prepareMeasurement(draft: MeasurementDraft): PreparedMeasurement {
         PreparedMeasurement(draft,measurement,null)
     } catch (e: CoreError) {
         PreparedMeasurement(draft,null,"${e.message}. Nothing was saved. Keep this draft; explicitly enter a value in ${metric.canonicalUnitId} within scale ${metric.maxScale}, or cancel")
+    }
+}
+
+internal fun validateResearchOrigins(origins: List<ResearchOrigin>) {
+    ensure(origins.distinct().size == origins.size,"Duplicate research origin")
+    origins.forEach { origin ->
+        ensure(listOf(origin.packageSha256,origin.sourceSha256).all { it.matches(Regex("[0-9a-f]{64}")) } &&
+            origin.sourceFile.isNotBlank() && origin.sourceId.isNotBlank() && origin.pointer.startsWith("/"),"Invalid research provenance")
     }
 }

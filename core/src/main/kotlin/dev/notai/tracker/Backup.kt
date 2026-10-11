@@ -3,7 +3,7 @@ package dev.notai.tracker
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Required
 
-@Serializable data class Backup(@Required val formatVersion: Int = 2,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
+@Serializable data class Backup(@Required val formatVersion: Int = 3,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
 const val MAX_BACKUP_BYTES = 10*1024*1024
 
 interface RollbackStore {
@@ -62,7 +62,7 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore) 
         fun decode(json: String): Backup {
             ensure(json.toByteArray(Charsets.UTF_8).size <= MAX_BACKUP_BYTES,"Backup exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
             val b = try { decodeBackupVersion(json) } catch (_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed or unsupported JSON") }
-            ensure(b.formatVersion == 2,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
+            ensure(b.formatVersion == 3,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
             ensure(b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
             try {
                 validate(b.data)

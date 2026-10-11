@@ -10,6 +10,7 @@ private fun <K,V> frozenMap(values: Map<K,V>): Map<K,V> = Collections.unmodifiab
 internal fun Classification.frozen() = copy(details = frozenMap(details),tags = frozenSet(tags),
     ancestorPathAtWrite = frozenList(ancestorPathAtWrite),facets = frozenList(facets))
 internal fun Dataset.frozen(base: Dataset? = null): Dataset = copy(
+    focus = if(focus === base?.focus) focus else focus?.copy(segmentIds = frozenList(focus.segmentIds)),
     goals = if(goals === base?.goals) goals else frozenList(goals.map { it.copy(filter = it.filter.copy(details = frozenMap(it.filter.details),tags = frozenSet(it.filter.tags),facets = frozenList(it.filter.facets))) }),
     types = if(types === base?.types) types else frozenList(types.map { it.copy(aliases = frozenList(it.aliases),
         suggestedAxisIds = frozenSet(it.suggestedAxisIds),suggestedMetricIds = frozenSet(it.suggestedMetricIds),researchOrigins = frozenList(it.researchOrigins)) }),

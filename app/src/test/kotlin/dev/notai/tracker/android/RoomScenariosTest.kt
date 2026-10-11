@@ -75,6 +75,22 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertEquals(before,tracker.data())
     }
     override fun surfaceActions() {
+        val focusClock = FakeClock(); val focused = Tracker(createStore(),focusClock)
+        focused.startFocus(focused.snapshot().token,plan = FocusPlan(1_000,1_000))
+        org.junit.Assert.assertEquals(TimerCommand.PAUSE,TimerSurfaces.primary(focused.snapshot()))
+        focusClock.advance(1_000); org.junit.Assert.assertNull(TimerSurfaces.primary(focused.snapshot()))
+        focused.focusNext(focused.snapshot().token)
+        org.junit.Assert.assertEquals(TimerCommand.PAUSE,TimerSurfaces.primary(focused.snapshot()))
+        focused.pauseFocus(focused.snapshot().token)
+        org.junit.Assert.assertEquals(TimerCommand.RESUME,TimerSurfaces.primary(focused.snapshot()))
+        focused.resumeFocus(focused.snapshot().token)
+        val beforeRecovery = focused.data(); focusClock.process = "recreated-process"
+        org.junit.Assert.assertNull(TimerSurfaces.primary(focused.snapshot()))
+        val blocked = org.junit.Assert.assertThrows(CoreError::class.java) {
+            TimerSurfaces.execute(focused,SurfaceAction(Surface.SHORTCUT,TimerCommand.PAUSE,focused.snapshot().token))
+        }
+        org.junit.Assert.assertEquals(ErrorCode.RECOVERY_REQUIRED,blocked.code)
+        org.junit.Assert.assertEquals(beforeRecovery,focused.data())
         val context = RuntimeEnvironment.getApplication()
         val tracker = Tracker(createStore(),FakeClock())
         val idle = tracker.snapshot()

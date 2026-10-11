@@ -1,0 +1,484 @@
+{
+    "formatVersion": 7,
+    "backupId": "daea36a7-2035-473f-8252-cca03b43e9f0",
+    "asOf": 1791676264800,
+    "data": {
+        "datasetId": "7a68c9e1-9307-405c-a6df-a92c9835e2fb",
+        "revision": 31,
+        "types": [
+            {
+                "id": "language",
+                "name": "Языковая практика",
+                "archived": false,
+                "parentId": null,
+                "selectable": true,
+                "meaningVersion": 1,
+                "aliases": [],
+                "definition": "",
+                "suggestedAxisIds": [],
+                "suggestedMetricIds": [],
+                "researchOrigins": []
+            },
+            {
+                "id": "fitness",
+                "name": "Физическая активность",
+                "archived": false,
+                "parentId": null,
+                "selectable": true,
+                "meaningVersion": 1,
+                "aliases": [],
+                "definition": "",
+                "suggestedAxisIds": [],
+                "suggestedMetricIds": [],
+                "researchOrigins": []
+            },
+            {
+                "id": "reading",
+                "name": "Чтение",
+                "archived": false,
+                "parentId": null,
+                "selectable": true,
+                "meaningVersion": 1,
+                "aliases": [],
+                "definition": "",
+                "suggestedAxisIds": [],
+                "suggestedMetricIds": [],
+                "researchOrigins": []
+            },
+            {
+                "id": "work",
+                "name": "Работа",
+                "archived": false,
+                "parentId": null,
+                "selectable": true,
+                "meaningVersion": 1,
+                "aliases": [],
+                "definition": "",
+                "suggestedAxisIds": [],
+                "suggestedMetricIds": [],
+                "researchOrigins": []
+            },
+            {
+                "id": "rest",
+                "name": "Отдых",
+                "archived": false,
+                "parentId": null,
+                "selectable": true,
+                "meaningVersion": 1,
+                "aliases": [],
+                "definition": "",
+                "suggestedAxisIds": [],
+                "suggestedMetricIds": [],
+                "researchOrigins": []
+            }
+        ],
+        "cards": [],
+        "favorites": [],
+        "sessions": [
+            {
+                "id": "a9fab207-93d2-4caa-834e-9b8e5786c0e0",
+                "status": "STOPPED",
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": null,
+                    "details": {},
+                    "tags": [],
+                    "ancestorPathAtWrite": [],
+                    "facets": []
+                },
+                "note": null,
+                "importOrigin": null
+            },
+            {
+                "id": "17a07937-17aa-44ef-be3b-63fc73d71aba",
+                "status": "STOPPED",
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {
+                        "mode": "listening"
+                    },
+                    "tags": [],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "note": null,
+                "importOrigin": null
+            },
+            {
+                "id": "5aefc607-c6ca-4f20-8ff1-58e0c79151e2",
+                "status": "STOPPED",
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": null,
+                    "details": {},
+                    "tags": [],
+                    "ancestorPathAtWrite": [],
+                    "facets": []
+                },
+                "note": null,
+                "importOrigin": null
+            },
+            {
+                "id": "89123131-7dc5-4e72-afdb-be7e5d382e06",
+                "status": "STOPPED",
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "note": null,
+                "importOrigin": null
+            },
+            {
+                "id": "7e653db8-0359-4b1d-8b20-4cd9a273a300",
+                "status": "STOPPED",
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "note": null,
+                "importOrigin": null
+            },
+            {
+                "id": "09328db2-c1e1-46ca-9d37-f850f0334d46",
+                "status": "RUNNING",
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "note": null,
+                "importOrigin": null
+            }
+        ],
+        "segments": [
+            {
+                "id": "89fd322e-0c09-4db9-88fe-77058b7c1f99",
+                "sessionId": "a9fab207-93d2-4caa-834e-9b8e5786c0e0",
+                "start": 1791676200000,
+                "end": 1791676201000,
+                "durationMs": 1000,
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": null,
+                    "details": {},
+                    "tags": [],
+                    "ancestorPathAtWrite": [],
+                    "facets": []
+                },
+                "anchor": null,
+                "uncertain": false,
+                "observedUntil": 1791676201000,
+                "limitMs": null
+            },
+            {
+                "id": "51ac9960-fd04-4b49-9f83-15e6b3e9aa3b",
+                "sessionId": "17a07937-17aa-44ef-be3b-63fc73d71aba",
+                "start": 1791676201000,
+                "end": 1791676205000,
+                "durationMs": 4000,
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "anchor": null,
+                "uncertain": false,
+                "observedUntil": 1791676205000,
+                "limitMs": null
+            },
+            {
+                "id": "c722144e-ed1c-483c-84d5-49d25e1439a6",
+                "sessionId": "17a07937-17aa-44ef-be3b-63fc73d71aba",
+                "start": 1791676208000,
+                "end": 1791676210000,
+                "durationMs": 2000,
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "anchor": null,
+                "uncertain": false,
+                "observedUntil": 1791676210000,
+                "limitMs": null
+            },
+            {
+                "id": "c2d184e4-54aa-4468-adb1-3260df6bc77c",
+                "sessionId": "17a07937-17aa-44ef-be3b-63fc73d71aba",
+                "start": 1791676210000,
+                "end": 1791676214000,
+                "durationMs": 4000,
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {
+                        "mode": "listening"
+                    },
+                    "tags": [],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "anchor": null,
+                "uncertain": false,
+                "observedUntil": 1791676214000,
+                "limitMs": null
+            },
+            {
+                "id": "8c894b49-ba26-497f-9f50-4d4c1077ece6",
+                "sessionId": "17a07937-17aa-44ef-be3b-63fc73d71aba",
+                "start": 1791676235000,
+                "end": 1791676236000,
+                "durationMs": 1000,
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {
+                        "mode": "listening"
+                    },
+                    "tags": [],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "anchor": null,
+                "uncertain": false,
+                "observedUntil": 1791676236000,
+                "limitMs": null
+            },
+            {
+                "id": "267a5e81-5984-43ea-8bd7-9d3610426959",
+                "sessionId": "17a07937-17aa-44ef-be3b-63fc73d71aba",
+                "start": 1791676236500,
+                "end": 1791676238000,
+                "durationMs": 1500,
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {
+                        "mode": "listening"
+                    },
+                    "tags": [],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "anchor": null,
+                "uncertain": false,
+                "observedUntil": 1791676238000,
+                "limitMs": null
+            },
+            {
+                "id": "abd18df7-5203-4ce3-8fac-58b6ea4ad79e",
+                "sessionId": "5aefc607-c6ca-4f20-8ff1-58e0c79151e2",
+                "start": 1791676238000,
+                "end": 1791676239000,
+                "durationMs": 1000,
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": null,
+                    "details": {},
+                    "tags": [],
+                    "ancestorPathAtWrite": [],
+                    "facets": []
+                },
+                "anchor": null,
+                "uncertain": false,
+                "observedUntil": 1791676239000,
+                "limitMs": null
+            },
+            {
+                "id": "6408b70f-1e16-4d53-b45e-2b00e420912e",
+                "sessionId": "89123131-7dc5-4e72-afdb-be7e5d382e06",
+                "start": 1791676239000,
+                "end": 1791676240000,
+                "durationMs": 1000,
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "anchor": null,
+                "uncertain": false,
+                "observedUntil": null,
+                "limitMs": null
+            },
+            {
+                "id": "3a730420-b37c-4662-bf2f-48b3217e94b5",
+                "sessionId": "7e653db8-0359-4b1d-8b20-4cd9a273a300",
+                "start": 1791676260000,
+                "end": 1791676262000,
+                "durationMs": 2000,
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "anchor": null,
+                "uncertain": false,
+                "observedUntil": 1791676262000,
+                "limitMs": null
+            },
+            {
+                "id": "721b2a1f-81ae-49a6-883c-d13b14726f67",
+                "sessionId": "09328db2-c1e1-46ca-9d37-f850f0334d46",
+                "start": 1791676262500,
+                "end": 1791676263500,
+                "durationMs": 1000,
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "anchor": null,
+                "uncertain": false,
+                "observedUntil": 1791676263500,
+                "limitMs": null
+            },
+            {
+                "id": "f6a3cf11-ca3f-491b-85d6-990089723ddd",
+                "sessionId": "09328db2-c1e1-46ca-9d37-f850f0334d46",
+                "start": 1791676264500,
+                "end": null,
+                "durationMs": 300,
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "anchor": null,
+                "uncertain": false,
+                "observedUntil": 1791676264800,
+                "limitMs": 1000
+            }
+        ],
+        "goals": [
+            {
+                "id": "focus-goal",
+                "name": "Focus work",
+                "metric": "DURATION_MS",
+                "target": 10000,
+                "direction": "MINIMUM",
+                "period": "DAY",
+                "zone": "UTC",
+                "filter": {
+                    "cardId": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [],
+                    "facets": [],
+                    "facetMatch": "ALL"
+                },
+                "enabled": true,
+                "startDate": null,
+                "endDateExclusive": null
+            }
+        ],
+        "focus": {
+            "id": "575e6475-f1ae-45c7-a717-559a2120dcad",
+            "sessionId": "09328db2-c1e1-46ca-9d37-f850f0334d46",
+            "plan": {
+                "workMs": 2000,
+                "breakMs": 1000
+            },
+            "phase": "WORK",
+            "phaseIndex": 0,
+            "durationMs": 2000,
+            "paused": false,
+            "segmentIds": [
+                "721b2a1f-81ae-49a6-883c-d13b14726f67",
+                "f6a3cf11-ca3f-491b-85d6-990089723ddd"
+            ],
+            "breakElapsedMs": 0,
+            "breakStartedAt": null,
+            "breakAnchor": null,
+            "recovery": true
+        },
+        "measurements": [],
+        "settings": {
+            "reportZone": "UTC",
+            "surfaces": {
+                "widget": false,
+                "notification": false,
+                "overlay": false
+            },
+            "focusPlan": {
+                "workMs": 3000,
+                "breakMs": 2000
+            }
+        },
+        "axes": [],
+        "metrics": [],
+        "units": []
+    }
+}

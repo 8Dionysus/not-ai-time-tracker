@@ -11,7 +11,8 @@ import kotlinx.coroutines.*
 class AndroidClock(context: Context): Clock {
     private val resolver = context.applicationContext.contentResolver
     override fun now() = Moment(System.currentTimeMillis(),SystemClock.elapsedRealtime(),
-        "boot:" + Settings.Global.getInt(resolver,Settings.Global.BOOT_COUNT).toString())
+        "boot:" + Settings.Global.getInt(resolver,Settings.Global.BOOT_COUNT).toString(),PROCESS_ID)
+    companion object { private val PROCESS_ID = newId() }
 }
 class PrivateRollbackStore(context: Context): RollbackStore {
     private val directory = File(context.noBackupFilesDir,"rollback").apply { mkdirs() }

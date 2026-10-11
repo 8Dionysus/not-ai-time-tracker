@@ -30,7 +30,9 @@ object TimerSurfaces {
     fun saveShortcut(c: Context,saved: android.os.Bundle,pending: SurfaceAction?) {
         if(pending != null) saved.putParcelable(PENDING_SHORTCUT,intent(c,pending)) else saved.remove(PENDING_SHORTCUT)
     }
-    fun primary(mode: Mode): TimerCommand? = when(mode) {
+    fun primary(s: Snapshot): TimerCommand? = if(s.focus != null) when(s.focus!!.mode) {
+        FocusMode.RUNNING -> TimerCommand.PAUSE; FocusMode.PAUSED -> TimerCommand.RESUME; FocusMode.DUE, FocusMode.RECOVERY -> null
+    } else when(s.mode) {
         Mode.IDLE -> TimerCommand.START; Mode.RUNNING -> TimerCommand.PAUSE
         Mode.PAUSED -> TimerCommand.RESUME; Mode.RECOVERY -> null
     }
@@ -78,7 +80,7 @@ object TimerSurfaces {
             .setContentText(s?.safeLabel ?: "Открыть приложение").setContentIntent(open(c)).setOnlyAlertOnce(true)
             .setVisibility(Notification.VISIBILITY_PRIVATE).setOngoing(true).setShowWhen(false)
         if(!overlay && s != null) {
-            primary(s.mode)?.let { cmd -> builder.addAction(Notification.Action.Builder(null,cmd.name,pending(c,SurfaceAction(Surface.NOTIFICATION,cmd,s.token))).build()) }
+            primary(s)?.let { cmd -> builder.addAction(Notification.Action.Builder(null,cmd.name,pending(c,SurfaceAction(Surface.NOTIFICATION,cmd,s.token))).build()) }
             if(s.mode == Mode.RUNNING || s.mode == Mode.PAUSED) builder.addAction(Notification.Action.Builder(null,"STOP",pending(c,SurfaceAction(Surface.NOTIFICATION,TimerCommand.STOP,s.token))).build())
         }
         return builder.build()
@@ -86,7 +88,7 @@ object TimerSurfaces {
     fun widget(c: Context,s: Snapshot,enabled: Boolean): RemoteViews = RemoteViews(c.packageName,R.layout.timer_widget).apply {
         setTextViewText(R.id.widget_status,if(enabled) s.safeLabel else "Виджет выключен · открыть настройки")
         setOnClickPendingIntent(R.id.widget_status,open(c))
-        val command = if(enabled) primary(s.mode) else null
+        val command = if(enabled) primary(s) else null
         setTextViewText(R.id.widget_primary,command?.name ?: "Открыть")
         setOnClickPendingIntent(R.id.widget_primary,command?.let { pending(c,SurfaceAction(Surface.WIDGET,it,s.token)) } ?: open(c))
         val canStop = enabled && s.mode in setOf(Mode.RUNNING,Mode.PAUSED)
@@ -96,7 +98,7 @@ object TimerSurfaces {
     /** Launcher may throttle updates. A retained/pinned old shortcut fails STALE, never replays. */
     fun shortcut(c: Context,s: Snapshot) {
         val manager = c.getSystemService(android.content.pm.ShortcutManager::class.java)
-        val command = primary(s.mode)
+        val command = primary(s)
         if(command == null) {
             manager.disableShortcuts(listOf("timer_action"),"Откройте приложение для уточнения времени")
             manager.removeDynamicShortcuts(listOf("timer_action"))

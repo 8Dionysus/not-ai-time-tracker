@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.RoomScenariosTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-11T22:04:33.703Z" hostname="442bbd4fc7a7" time="17.348">
+  <properties/>
+  <testcase name="smallHistoryAndExport" classname="dev.notai.tracker.android.RoomScenariosTest" time="13.167"/>
+  <testcase name="backupReplacementAndFailure" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.342"/>
+  <testcase name="timerPath" classname="dev.notai.tracker.android.RoomScenariosTest" time="3.839"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

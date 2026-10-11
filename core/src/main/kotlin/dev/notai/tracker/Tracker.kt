@@ -47,8 +47,18 @@ class Tracker(val store: StateStore, val clock: Clock) {
     @Synchronized private fun timer(expected: Token,action: TimerAction,selection: Classification = Classification(),note: String? = null): Change = storage {
         store.checkedTransaction { checked ->
             val now = clock.now()
-            checked.timer(expected,action,now,selection,note) { next,changed ->
+            if(checked.data.focus == null) checked.timer(expected,action,now,selection,note) { next,changed ->
                 Change(next.snapshot(now),changed,action == TimerAction.SWITCH,next.data,now) to checked.data
+            } else {
+                val d = checked.data; checkToken(d,expected,now)
+                val edited = when(action) {
+                    TimerAction.START -> fail(ErrorCode.INVALID_INPUT,"Focus is already tracking")
+                    TimerAction.PAUSE -> FocusTransitions.pause(d,now)
+                    TimerAction.RESUME -> FocusTransitions.resume(d,now)
+                    TimerAction.STOP -> FocusTransitions.cancel(d,now)
+                    TimerAction.SWITCH -> { checkStartable(d,selection); append(FocusTransitions.cancel(d,now),selection,note,now) }
+                }.copy(revision = Math.addExact(d.revision,1))
+                checked.replace(edited) { next -> Change(next.snapshot(now),changedSessions(d,next.data),action == TimerAction.SWITCH,next.data,now) to d }
             }
         }.let { (change,old) ->
             undo = if(change.undoAvailable) change.state.token to old else null
@@ -72,7 +82,8 @@ class Tracker(val store: StateStore, val clock: Clock) {
         val selected = d.classify(selection)
         val s = current(d) ?: fail(ErrorCode.INVALID_INPUT, "No current session")
         ensure(s.selection.cardId == selection.cardId && (selection.cardId != null || s.selection.activityTypeId == selection.activityTypeId), "Use switch to change card/type")
-        if (s.status == SessionStatus.PAUSED) d.copy(sessions = d.sessions.replace(s.copy(selection = selected)))
+        if(d.focus != null) FocusTransitions.details(d,n,selected)
+        else if (s.status == SessionStatus.PAUSED) d.copy(sessions = d.sessions.replace(s.copy(selection = selected)))
         else {
             val closed = close(d,running(d,n),n,SessionStatus.PAUSED)
             closed.copy(sessions = closed.sessions.replace(s.copy(selection = selected)), segments = closed.segments + open(s.id,selected,n))
@@ -136,6 +147,28 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun copyCard(expected: Token, cardId: String, name: String) = mutate(expected) { d,_ ->
         val c = d.cards.find { it.id == cardId } ?: fail(ErrorCode.INVALID_INPUT, "Missing card")
         d.copy(cards = d.cards + c.copy(id = newId(), name = name, archived = false))
+    }
+    fun startFocus(expected: Token,selection: Classification = Classification(),plan: FocusPlan? = null) = mutate(expected) { d,n ->
+        FocusTransitions.start(d,n,plan ?: d.settings.focusPlan,selection)
+    }
+    /** Changes defaults and the next phase only; the current phase keeps its explicit duration. */
+    fun configureFocus(expected: Token,plan: FocusPlan) = mutate(expected) { d,_ ->
+        validatePlan(plan); d.copy(settings = d.settings.copy(focusPlan = plan),focus = d.focus?.copy(plan = plan))
+    }
+    fun focusNext(expected: Token) = mutate(expected) { d,n -> FocusTransitions.next(d,n,true) }
+    fun focusSkip(expected: Token) = mutate(expected) { d,n -> FocusTransitions.next(d,n,false) }
+    fun pauseFocus(expected: Token) = mutate(expected) { d,n -> FocusTransitions.pause(d,n) }
+    fun resumeFocus(expected: Token) = mutate(expected) { d,n -> FocusTransitions.resume(d,n) }
+    fun cancelFocus(expected: Token) = mutate(expected) { d,n -> FocusTransitions.cancel(d,n) }
+    /** Recovery ends the Focus run. Work boundaries are explicit; null/null excludes the tail.
+     * An uncertain break has no work tail: null/null ends it without inventing elapsed work. */
+    fun resolveFocus(expected: Token,start: Long?,end: Long?) = mutate(expected,true) { d,n ->
+        val f = d.focus ?: fail(ErrorCode.INVALID_INPUT,"No Focus interval")
+        ensure(Focus.snapshot(d,n)!!.mode == FocusMode.RECOVERY,"Focus does not need recovery")
+        if(f.phase == FocusPhase.WORK) resolveTailData(d,n,start,end) else {
+            ensure(start == null && end == null,"Break recovery has no work interval")
+            d.copy(focus = null,sessions = d.sessions.map { if(it.id == f.sessionId) it.copy(status = SessionStatus.STOPPED) else it })
+        }
     }
     fun saveGoal(expected: Token,goal: Goal) = mutate(expected,true) { d,_ ->
         d.copy(goals = if(d.goals.any { it.id == goal.id }) d.goals.map { if(it.id == goal.id) goal else it } else d.goals+goal)
@@ -228,12 +261,14 @@ class Tracker(val store: StateStore, val clock: Clock) {
         interval(start,end,n)
         val seg = d.segments.find { it.id == segmentId } ?: fail(ErrorCode.INVALID_INPUT, "Missing segment")
         ensure(seg.end != null, "Resolve open tail instead")
+        ensure(d.focus?.segmentIds?.contains(seg.id) != true,"Finish the current Focus phase before correcting its segments")
         val selected = historicalSelection(d,seg.selection,selection,reclassify)
         d.copy(segments = d.segments.map { if (it.id == segmentId) it.copy(start = start,end = end,durationMs = end-start,
             selection = selected,anchor = null,uncertain = false,observedUntil = null) else it })
     }
     /** Correct a forgotten switch inside the current uninterrupted segment in one transaction. */
     fun switchedEarlier(expected: Token, boundary: Long, selection: Classification) = mutate(expected,true) { d,n ->
+        ensure(d.focus == null,"Finish Focus before a retrospective switch")
         checkStartable(d,selection)
         val s = running(d,n); val seg = d.segments.single { it.sessionId == s.id && it.end == null }
         val measured = materialize(seg,n)
@@ -243,17 +278,18 @@ class Tracker(val store: StateStore, val clock: Clock) {
         append(close(d,s,earlier,SessionStatus.STOPPED),selection,null,earlier)
     }
     /** null interval excludes the unresolved tail. An explicit interval confirms/corrects it. */
-    fun resolveTail(expected: Token, start: Long?, end: Long?) = mutate(expected,true) { d,n ->
+    fun resolveTail(expected: Token, start: Long?, end: Long?) = mutate(expected,true) { d,n -> resolveTailData(d,n,start,end) }
+    private fun resolveTailData(d: Dataset,n: Moment,start: Long?,end: Long?): Dataset {
         val s = current(d) ?: fail(ErrorCode.INVALID_INPUT, "No current session")
         val seg = d.segments.singleOrNull { it.sessionId == s.id && it.end == null } ?: fail(ErrorCode.INVALID_INPUT, "No open tail")
         ensure(snapshot(d,n).mode == Mode.RECOVERY, "Tail is not awaiting recovery")
         ensure((start == null) == (end == null), "Supply both boundaries or exclude")
         val segments = if (start == null) d.segments.filterNot { it.id == seg.id } else {
             interval(start,end!!,n)
-            d.segments.map { if (it.id == seg.id) it.copy(start = start,end = end,durationMs = end-start,anchor = null,uncertain = false,observedUntil = null) else it }
+            d.segments.map { if (it.id == seg.id) it.copy(start = start,end = end,durationMs = end-start,anchor = null,uncertain = false,observedUntil = null,limitMs = null) else it }
         }
         val keep = segments.any { it.sessionId == s.id }
-        d.copy(segments = segments, sessions = if (keep) d.sessions.replace(s.copy(status = SessionStatus.STOPPED)) else d.sessions.filterNot { it.id == s.id },
+        return d.copy(focus = null,segments = segments, sessions = if (keep) d.sessions.replace(s.copy(status = SessionStatus.STOPPED)) else d.sessions.filterNot { it.id == s.id },
             measurements = d.measurements.filterNot { (it.scope == Scope.SEGMENT && it.targetId == seg.id && start == null) || (!keep && it.scope == Scope.SESSION && it.targetId == s.id) })
     }
     @Synchronized fun canUndo(expected: Token): Boolean = undo?.first == expected
@@ -288,7 +324,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
     }
     private fun close(d: Dataset,s: Session,n: Moment,status: SessionStatus): Dataset = d.copy(
         sessions = d.sessions.replace(s.copy(status = status)), segments = d.segments.map {
-            if (it.sessionId == s.id && it.end == null) materialize(it,n).copy(end = n.wall, anchor = null) else it
+            if (it.sessionId == s.id && it.end == null) closeMeasured(it,n) else it
         })
     private fun historicalSelection(d: Dataset,old: Classification,chosen: Classification,reclassify: Boolean): Classification =
         if(reclassify || old.activityTypeId != chosen.activityTypeId) d.classify(chosen)
@@ -316,11 +352,18 @@ fun materialize(s: Segment,n: Moment): Segment {
     validateSegmentTime(s)
     if (s.end != null) return s
     val a = s.anchor
-    if (a == null || a.bootId != n.bootId || n.elapsed < a.elapsedMs) return s.copy(anchor = null,uncertain = true)
+    if (a == null || a.bootId != n.bootId || n.elapsed < a.elapsedMs || (a.processId != null && a.processId != n.processId)) return s.copy(anchor = null,uncertain = true)
     val duration = n.elapsed-a.elapsedMs
     ensure(duration in 0..MAX_TIME,"Elapsed duration out of supported range",ErrorCode.INVALID_INTERVAL)
-    return s.copy(durationMs = duration,observedUntil = n.wall,
-        uncertain = s.uncertain || abs((n.wall-s.start)-duration) > 1000)
+    val uncertain = s.uncertain || abs((n.wall-s.start)-duration) > 1000
+    val bounded = minOf(duration,s.limitMs ?: duration)
+    val observed = if(s.limitMs != null && duration >= s.limitMs && !uncertain) Math.addExact(s.start,bounded) else n.wall
+    return s.copy(durationMs = bounded,observedUntil = observed,uncertain = uncertain)
+}
+internal fun closeMeasured(s: Segment,n: Moment): Segment {
+    val measured = materialize(s,n)
+    ensure(!measured.uncertain,"Resolve uncertain time first",ErrorCode.RECOVERY_REQUIRED)
+    return measured.copy(end = measured.observedUntil ?: n.wall,anchor = null,limitMs = null)
 }
 fun snapshot(d: Dataset,n: Moment): Snapshot {
     validateMoment(n)
@@ -328,12 +371,18 @@ fun snapshot(d: Dataset,n: Moment): Snapshot {
     val segs = d.segments.filter { it.sessionId == s?.id }.map { materialize(it,n) }
     val active = segs.singleOrNull { it.end == null }
     val uncertain = segs.any { it.uncertain }
-    val mode = when { s == null -> Mode.IDLE; s.status == SessionStatus.RECOVERY || active?.uncertain == true -> Mode.RECOVERY
+    val focus = Focus.snapshot(d,n)
+    val mode = when { focus?.mode == FocusMode.RECOVERY -> Mode.RECOVERY; s == null -> Mode.IDLE; s.status == SessionStatus.RECOVERY || active?.uncertain == true -> Mode.RECOVERY
         s.status == SessionStatus.PAUSED -> Mode.PAUSED; else -> Mode.RUNNING }
-    val actions = when(mode) { Mode.IDLE -> setOf("start","repeat","favorite","manual")
+    val actions = if(focus != null) when(focus.mode) {
+        FocusMode.RUNNING -> setOf("pause","stop","switch","label","details","focusSkip","configureFocus")
+        FocusMode.PAUSED -> setOf("resume","stop","switch","label","details","focusSkip","configureFocus")
+        FocusMode.DUE -> setOf("stop","switch","label","details","focusNext","focusSkip","configureFocus")
+        FocusMode.RECOVERY -> setOf("resolveFocus","label")
+    } else when(mode) { Mode.IDLE -> setOf("start","repeat","favorite","manual")
         Mode.RUNNING -> setOf("pause","stop","switch","label","details","switchedEarlier")
         Mode.PAUSED -> setOf("resume","stop","switch","label","details")
         Mode.RECOVERY -> setOf("resolveTail","label") }
-    return Snapshot(token(d),mode,s,active,segs.sumExact { it.durationMs },uncertain,
-        when(mode) { Mode.IDLE -> "Таймер остановлен"; Mode.RUNNING -> "Идёт учёт времени"; Mode.PAUSED -> "Таймер на паузе"; Mode.RECOVERY -> "Требуется уточнить время" },actions)
+    return Snapshot(token(d),mode,s,active,segs.sumExact { it.durationMs },uncertain || focus?.mode == FocusMode.RECOVERY,
+        focus?.safeLabel ?: when(mode) { Mode.IDLE -> "Таймер остановлен"; Mode.RUNNING -> "Идёт учёт времени"; Mode.PAUSED -> "Таймер на паузе"; Mode.RECOVERY -> "Требуется уточнить время" },actions,focus)
 }

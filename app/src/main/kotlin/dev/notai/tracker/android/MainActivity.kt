@@ -215,7 +215,7 @@ class MainActivity: Activity() {
             val preview = runtime.backups.prepare(json)
             withContext(Dispatchers.Main) {
                 AlertDialog.Builder(this@MainActivity).setTitle("Подтвердить полную замену")
-                    .setMessage("${preview.consequence}\nКарточек: ${preview.cards}; сессий: ${preview.sessions}; сегментов: ${preview.segments}; целей: ${preview.goals}.\nАктивный хвост: ${preview.unfinishedTail}")
+                    .setMessage("${preview.consequence}\nКарточек: ${preview.cards}; сессий: ${preview.sessions}; сегментов: ${preview.segments}; целей: ${preview.goals}.\nАктивный хвост: ${preview.unfinishedTail}; Focus: ${preview.unfinishedFocus}")
                     .setNegativeButton("Отмена",null).setPositiveButton("Заменить") { _,_ -> runAction { runtime.backups.apply(preview) } }.show()
             }
         }

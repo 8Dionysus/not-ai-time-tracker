@@ -35,11 +35,11 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
 @Serializable enum class SessionStatus { RUNNING, PAUSED, STOPPED, RECOVERY }
 @Serializable data class Session(@Required val id: String = newId(), val status: SessionStatus,
     val selection: Classification = Classification(), val note: String? = null, val importOrigin: ImportOrigin? = null)
-@Serializable data class Anchor(val bootId: String, val elapsedMs: Long)
+@Serializable data class Anchor(val bootId: String, val elapsedMs: Long,val processId: String? = null)
 @Serializable data class Segment(@Required val id: String = newId(), val sessionId: String,
     val start: Long, val end: Long? = null, @Required val durationMs: Long = 0,
     val selection: Classification = Classification(), val anchor: Anchor? = null,
-    val uncertain: Boolean = false, val observedUntil: Long? = null)
+    val uncertain: Boolean = false, val observedUntil: Long? = null,val limitMs: Long? = null)
 @Serializable enum class Scope { SESSION, SEGMENT }
 @Serializable data class Measurement(@Required val id: String = newId(), val fieldId: String, @Required val meaningVersion: Int = 1,
     val unit: String, val scope: Scope, val targetId: String, val value: Decimal, val source: String? = null) {
@@ -47,22 +47,22 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
         this(id,fieldId,meaningVersion,unit,scope,targetId,Decimal(value.toString()))
 }
 @Serializable data class SurfaceSettings(val widget: Boolean = false,val notification: Boolean = false,val overlay: Boolean = false)
-@Serializable data class Settings(val reportZone: String = "UTC",val surfaces: SurfaceSettings = SurfaceSettings())
+@Serializable data class Settings(val reportZone: String = "UTC",val surfaces: SurfaceSettings = SurfaceSettings(),val focusPlan: FocusPlan = FocusPlan())
 @Serializable data class Dataset(@Required val datasetId: String = newId(), @Required val revision: Long = 0,
     @Required val types: List<ActivityType> = Catalog.types,
     @Required val cards: List<Card> = emptyList(), @Required val favorites: List<Favorite> = emptyList(),
     @Required val sessions: List<Session> = emptyList(), @Required val segments: List<Segment> = emptyList(),
-    val goals: List<Goal> = emptyList(),
+    val goals: List<Goal> = emptyList(),val focus: FocusRun? = null,
     @Required val measurements: List<Measurement> = emptyList(), @Required val settings: Settings = Settings(),
     @Required val axes: List<Axis> = Catalog.vocabulary.axes, @Required val metrics: List<Metric> = Catalog.vocabulary.metrics, @Required val units: List<UnitDefinition> = Catalog.vocabulary.units)
 
-data class Moment(val wall: Long, val elapsed: Long, val bootId: String)
+data class Moment(val wall: Long, val elapsed: Long, val bootId: String,val processId: String? = null)
 fun interface Clock { fun now(): Moment }
 data class Token(val datasetId: String, val revision: Long, val sessionId: String?)
 enum class Mode { IDLE, RUNNING, PAUSED, RECOVERY }
 data class Snapshot(val token: Token, val mode: Mode, val session: Session?, val active: Segment?,
     val trustedDurationMs: Long, val calendarUncertain: Boolean, val safeLabel: String,
-    val actions: Set<String>)
+    val actions: Set<String>,val focus: FocusSnapshot? = null)
 enum class ErrorCode { STALE, INVALID_INTERVAL, OVERLAP, INVALID_INPUT, STORAGE, UNSUPPORTED_IMPORT, RECOVERY_REQUIRED }
 class CoreError(val code: ErrorCode, message: String, val currentState: Snapshot? = null) : RuntimeException(message)
 fun fail(code: ErrorCode, message: String): Nothing = throw CoreError(code, message)
@@ -84,9 +84,11 @@ interface StateStore {
 }
 
 internal fun validateMoment(n: Moment) {
-    ensure(n.wall in 0..MAX_TIME && n.elapsed >= 0 && n.bootId.isNotBlank(),"Clock out of supported range",ErrorCode.INVALID_INTERVAL)
+    ensure(n.wall in 0..MAX_TIME && n.elapsed >= 0 && n.bootId.isNotBlank() && (n.processId == null || n.processId.isNotBlank()),"Clock out of supported range",ErrorCode.INVALID_INTERVAL)
 }
 internal fun validateSegmentTime(s: Segment) {
+    ensure(s.limitMs == null || (s.end == null && s.limitMs in 1..MAX_TIME && s.durationMs <= s.limitMs && s.start in 0..MAX_TIME && s.limitMs <= MAX_TIME-s.start),"Invalid bounded interval")
+    ensure(s.anchor?.processId == null || (s.limitMs != null && s.anchor.processId.isNotBlank()),"Process anchor requires bounded Focus interval")
     ensure(s.start in 0..MAX_TIME && s.durationMs in 0..MAX_TIME, "Time out of range", ErrorCode.INVALID_INTERVAL)
     ensure(s.end == null || (s.end in s.start..MAX_TIME), "Invalid interval", ErrorCode.INVALID_INTERVAL)
     ensure(s.observedUntil == null || s.observedUntil in 0..MAX_TIME, "Invalid observation")
@@ -108,6 +110,7 @@ fun validate(data: Dataset) {
     val typeIds = data.types.map { it.id }.toSet()
     validateVocabulary(data)
     validateGoals(data)
+    validateFocus(data)
     val cards = data.cards.associateBy { it.id }; val sessions = data.sessions.associateBy { it.id }
     fun selection(c: Classification) = validateSelection(data,c,typeIds,cards.keys)
     data.cards.forEach { ensure(it.name.isNotBlank(), "Card needs a name"); selection(it.classification()) }

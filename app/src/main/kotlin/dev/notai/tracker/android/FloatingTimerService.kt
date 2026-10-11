@@ -64,7 +64,7 @@ class FloatingTimerService: Service() {
                 }
             })
         }
-        val command = TimerSurfaces.primary(s.mode)
+        val command = TimerSurfaces.primary(s)
         control(command?.name ?: "Уточнить время",command)
         if(s.mode in setOf(Mode.RUNNING,Mode.PAUSED)) control("STOP",TimerCommand.STOP)
         control("Открыть настройки",null)

@@ -1,0 +1,5 @@
+Robolectric JVM; 2000 closed history segments; 1923 types / 337 axes.
+One sample: Start/Pause/Resume/Stop, including snapshot reads. Two warm-up cycles discarded; 7 samples.
+Optimized checked Room path ns: [9436508, 9143173, 9265430, 9118988, 8968057, 9204867, 9241256]; median 9204867
+Safe default full-validation StateStore adapter over the same Room store ns: [117870293, 124206589, 108294306, 160525799, 111013269, 106875249, 104292289]; median 111013269
+Not an old-commit comparison, device measurement, animation test or latency guarantee. No timing assertion.

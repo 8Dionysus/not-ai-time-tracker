@@ -23,6 +23,7 @@ class CheckedState private constructor(val data: Dataset,private val sessionPosi
     }
     internal fun <T> timer(expected: Token,action: TimerAction,now: Moment,selection: Classification,note: String?,
         result: (CheckedState,Set<String>)->T): CheckedCommit<T> {
+        ensure(data.focus == null,"Focus requires a bounded transition")
         val before = snapshot(now)
         if(before.token != expected) throw CoreError(ErrorCode.STALE,"Stale action; refresh snapshot",before)
         val session = sessionPosition?.let { data.sessions[it] }
@@ -42,7 +43,7 @@ class CheckedState private constructor(val data: Dataset,private val sessionPosi
             } else {
                 ensure(before.mode != Mode.RECOVERY,"Resolve uncertain time first",ErrorCode.RECOVERY_REQUIRED)
                 ensure(session.status == SessionStatus.RUNNING && active != null,"Session is not running")
-                val closed = materialize(active!!,now).copy(end = now.wall,anchor = null)
+                val closed = closeMeasured(active!!,now)
                 validateSegmentTime(closed)
                 total = listOf(total-active.durationMs,closed.durationMs).sumExact { it }
                 end = maxOf(end,closed.end!!)

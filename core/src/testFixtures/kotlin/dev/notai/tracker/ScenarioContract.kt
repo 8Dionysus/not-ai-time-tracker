@@ -8,8 +8,8 @@ import java.time.LocalDate
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 
-class FakeClock(var wall: Long = Instant.parse("2026-10-10T23:50:00Z").toEpochMilli(),var elapsed: Long = 100_000,var boot: String = "boot-1"): Clock {
-    override fun now() = Moment(wall,elapsed,boot)
+class FakeClock(var wall: Long = Instant.parse("2026-10-10T23:50:00Z").toEpochMilli(),var elapsed: Long = 100_000,var boot: String = "boot-1",var process: String = "process-1"): Clock {
+    override fun now() = Moment(wall,elapsed,boot,process)
     fun advance(ms: Long) { wall += ms; elapsed += ms }
 }
 class MemoryRollback: RollbackStore {
@@ -28,6 +28,7 @@ abstract class ScenarioContract {
     open fun assertTransferFailure(transfer: HistoryTransfer,preview: HistoryPreview,tracker: Tracker) {}
 
     @Test fun timerPath() {
+        focusLifecycle()
         goalsLifecycle()
         checkedTimerCombinations()
         surfaceActions()
@@ -146,6 +147,111 @@ abstract class ScenarioContract {
         val sample = HistoryFiles.inspect(damaged.toByteArray())
         assertEquals(ImportFormat.DELIMITED_TEXT,sample.format)
         expect(ErrorCode.UNSUPPORTED_IMPORT) { sample.confirmCsv(',',CsvMapping("bad","activity","start",end = "end"),CsvTimeChoice(null,"UTC"),null) }
+    }
+
+    private fun focusLifecycle() {
+        val clock = FakeClock(); var t = Tracker(createStore(),clock)
+        fun token() = t.snapshot().token
+        fun focus() = t.snapshot().focus!!
+        fun total() = t.goalProgress("focus-goal").actual
+        t.saveGoal(token(),Goal(id = "focus-goal",name = "Focus work",metric = GoalMetric.DURATION_MS,target = 10_000,filter = Filter(activityTypeId = "language")))
+        val selection = Classification(activityTypeId = "language")
+        t.start(token()); expect(ErrorCode.INVALID_INPUT) { t.startFocus(token(),selection) }
+        clock.advance(1_000); t.stop(token())
+        t.startFocus(token(),selection,FocusPlan(10_000,5_000)); val originalSession = t.snapshot().session!!.id
+        val stale = token(); clock.advance(4_000)
+        assertEquals(6_000,focus().remainingMs); assertEquals(4_000,total())
+        t.pause(token()); expect(ErrorCode.STALE) { t.focusSkip(stale) }
+        clock.advance(3_000); assertEquals(4_000,total()); assertEquals(FocusMode.PAUSED,focus().mode)
+        t = Tracker(reopen(t.store),clock); assertEquals(FocusMode.PAUSED,focus().mode)
+        t.resumeFocus(token()); clock.advance(2_000)
+        t.changeDetails(token(),selection.copy(details = mapOf("mode" to "listening")))
+        val beforeTicks = t.data(); clock.advance(10_000)
+        assertEquals(FocusMode.DUE,focus().mode); assertEquals(10_000,total())
+        assertEquals(10_000,t.snapshot().trustedDurationMs); assertEquals(beforeTicks,t.data())
+        val cue = focus().signalKey; clock.advance(5_000); assertEquals(cue,focus().signalKey)
+        assertEquals(10_000,total()) // overdue idle is never work
+        t.focusNext(token()); assertEquals(FocusPhase.BREAK,focus().phase); assertEquals(Mode.PAUSED,t.snapshot().mode)
+        val firstWork = t.data().segments.first { it.sessionId == originalSession }
+        t.configureFocus(token(),FocusPlan(3_000,2_000)); assertEquals(5_000,focus().durationMs)
+        clock.advance(1_000); t.pauseFocus(token()); clock.advance(5_000); assertEquals(1_000,focus().elapsedMs)
+        t.resume(token()); clock.advance(4_000); assertEquals(FocusMode.DUE,focus().mode)
+        assertEquals(10_000,total()); t.focusNext(token()); assertEquals(3_000,focus().durationMs)
+        assertEquals(originalSession,t.snapshot().session!!.id)
+        clock.advance(1_000); t.focusSkip(token()); assertEquals(11_000,total()); assertEquals(2_000,focus().durationMs)
+        t.correctSegment(token(),firstWork.id,firstWork.start,firstWork.end!!-1_000,firstWork.selection)
+        assertEquals(10_000,total()); t.undo(token()); assertEquals(11_000,total())
+        clock.advance(500); t.focusSkip(token()); clock.advance(500)
+        t.switch(token(),Classification()); assertNull(t.data().focus)
+        clock.advance(1_000); t.undo(token()); assertNotNull(t.data().focus)
+        t.cancelFocus(token()); assertNull(t.data().focus); assertEquals(12_500,total())
+        t.start(token()); clock.process = "ordinary-reopened"; clock.advance(1_000)
+        assertEquals(Mode.RUNNING,t.snapshot().mode); t.stop(token()) // ordinary timer keeps same-boot recovery semantics
+        t.startFocus(token(),selection,FocusPlan(2_000,1_000)); val tail = t.data().segments.last()
+        clock.advance(1_000); clock.process = "focus-reopened"; clock.advance(20_000)
+        assertEquals(FocusMode.RECOVERY,focus().mode); assertEquals(12_500,total())
+        expect(ErrorCode.RECOVERY_REQUIRED) { t.cancelFocus(token()) }
+        expect(ErrorCode.RECOVERY_REQUIRED) { t.focusNext(token()) }
+        t.resolveFocus(token(),null,null); assertEquals(12_500,total()); t.undo(token())
+        assertEquals(FocusMode.RECOVERY,focus().mode)
+        t.resolveFocus(token(),tail.start,tail.start+1_000); assertEquals(13_500,total())
+        assertNull(t.data().focus)
+        t.startFocus(token(),selection,FocusPlan(2_000,1_000)); clock.advance(2_000); t.focusNext(token())
+        clock.process = "break-reopened"; clock.advance(500)
+        assertEquals(Mode.RECOVERY,t.snapshot().mode); assertEquals(FocusMode.RECOVERY,focus().mode)
+        assertEquals(15_500,total()); t.resolveFocus(token(),null,null); assertEquals(15_500,total())
+        // Paused work is portable; unpaused work/break is explicitly unresolved after replacement.
+        t.startFocus(token(),selection,FocusPlan(2_000,1_000)); clock.advance(1_000); t.pauseFocus(token())
+        val paused = Backups(t,MemoryRollback()).export()
+        var clean = Tracker(createStore(),clock); var backup = Backups(clean,MemoryRollback())
+        backup.apply(backup.prepare(paused)); assertEquals(FocusMode.PAUSED,clean.snapshot().focus!!.mode)
+        clean.resumeFocus(clean.snapshot().token); clock.advance(1_000); clean.cancelFocus(clean.snapshot().token)
+        validate(clean.data())
+        t.resumeFocus(token()); clock.advance(300)
+        val active = Backups(t,MemoryRollback()).export()
+        java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile.resolve("build/focus-example.json").writeText(active)
+        clean = Tracker(createStore(),clock); backup = Backups(clean,MemoryRollback())
+        val preview = backup.prepare(active); assertTrue(preview.unfinishedFocus); assertTrue(preview.unfinishedTail)
+        backup.apply(preview); assertEquals(FocusMode.RECOVERY,clean.snapshot().focus!!.mode)
+        clean.resolveFocus(clean.snapshot().token,null,null); validate(clean.data())
+        clock.advance(1_000); t.focusNext(token()); clock.advance(300)
+        val breakJson = Backups(t,MemoryRollback()).export()
+        val breakPreview = backup.prepare(breakJson); assertTrue(breakPreview.unfinishedFocus); assertFalse(breakPreview.unfinishedTail)
+        backup.apply(breakPreview); assertEquals(FocusMode.RECOVERY,clean.snapshot().focus!!.mode)
+        val known = clean.data().segments.sumOf { it.durationMs }
+        clean.resolveFocus(clean.snapshot().token,null,null)
+        assertEquals(known,clean.data().segments.sumOf { it.durationMs })
+        t.cancelFocus(token()); t.startFocus(token(),selection,FocusPlan(2_000,1_000))
+        clock.wall += 60_000; assertEquals(FocusMode.RECOVERY,focus().mode)
+        t.resolveFocus(token(),null,null)
+        t.startFocus(token(),selection,FocusPlan(2_000,1_000)); clock.advance(2_000); t.focusNext(token())
+        clock.boot = "new-boot"; assertEquals(FocusMode.RECOVERY,focus().mode); t.resolveFocus(token(),null,null)
+        validate(t.data())
+        val invalid = t.data(); expect(ErrorCode.INVALID_INPUT) { t.configureFocus(token(),FocusPlan(0,1)) }; assertEquals(invalid,t.data())
+        val legacy = codec.parseToJsonElement(Backups(t,MemoryRollback()).export()).jsonObject.toMutableMap()
+        legacy["formatVersion"] = JsonPrimitive(6)
+        legacy["data"] = JsonObject(legacy.getValue("data").jsonObject.filterKeys { it != "focus" })
+        assertNull(Backups.decode(JsonObject(legacy).toString()).data.focus)
+        val v14 = java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile.resolve("evidence/goals-v14/goals-example.json").readText()
+        val old = Backups.decode(v14); assertNull(old.data.focus); assertEquals(FocusPlan(),old.data.settings.focusPlan)
+        val broken = codec.parseToJsonElement(active).jsonObject.toMutableMap()
+        val brokenData = broken.getValue("data").jsonObject.toMutableMap()
+        val brokenFocus = brokenData.getValue("focus").jsonObject.toMutableMap()
+        brokenFocus["sessionId"] = JsonPrimitive("missing-session")
+        brokenData["focus"] = JsonObject(brokenFocus); broken["data"] = JsonObject(brokenData)
+        val unchanged = clean.data()
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { backup.prepare(JsonObject(broken).toString()) }
+        assertEquals(unchanged,clean.data())
+        val noProcessClock = Clock { clock.now().copy(processId = null) }
+        val unsupported = Tracker(createStore(),noProcessClock)
+        expect(ErrorCode.INVALID_INPUT) { unsupported.startFocus(unsupported.snapshot().token) }
+        assertTrue(unsupported.data().sessions.isEmpty())
+        t.startFocus(token(),selection,FocusPlan(2_000,1_000)); clock.advance(2_000); t.focusNext(token())
+        val breakState = t.data(); val f = breakState.focus!!
+        val zeroAnchor = breakState.copy(focus = f.copy(breakAnchor = f.breakAnchor!!.copy(elapsedMs = 0)))
+        validate(zeroAnchor)
+        assertEquals(FocusMode.RECOVERY,Focus.snapshot(zeroAnchor,clock.now().copy(wall = f.breakStartedAt!!-1,elapsed = Long.MAX_VALUE))!!.mode)
+        t.cancelFocus(token())
     }
 
     private fun goalsLifecycle() {
@@ -624,7 +730,7 @@ abstract class ScenarioContract {
         assertTrue(Backups.decode(disk.read(result.rollbackReference)).data.sessions.isEmpty())
         val full = clean.data()
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.dropLast(7)) }; assertEquals(full,clean.data())
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 6","\"formatVersion\": 999")) }; assertEquals(full,clean.data())
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 7","\"formatVersion\": 999")) }; assertEquals(full,clean.data())
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"datasetId\": \"${raw.data.datasetId}\",", "")) }; assertEquals(full,clean.data())
         val broken = raw.copy(data = raw.data.copy(segments = raw.data.segments+raw.data.segments.first()))
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(codec.encodeToString(broken)) }; assertEquals(full,clean.data())
@@ -770,7 +876,7 @@ abstract class ScenarioContract {
         assertEquals(116,quantityReport.measurements.size)
         assertTrue(quantityReport.quantityTotals().isEmpty())
         val backupJson = Backups(t,MemoryRollback()).export()
-        assertEquals(6,Backups.decode(backupJson).formatVersion)
+        assertEquals(7,Backups.decode(backupJson).formatVersion)
         val copy = Backups.decode(backupJson).data
         assertEquals(t.data(),copy)
         val receiver = Tracker(createStore(),clock)

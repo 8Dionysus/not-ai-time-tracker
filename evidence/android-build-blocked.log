@@ -1,0 +1,30 @@
+Starting a Gradle Daemon, 1 incompatible Daemon could not be reused, use --status for details
+
+> Configure project :app
+Unable to initialize metrics, ensure /home/agent/.android is writable, details: /home/agent/.android/analytics.settings (No such file or directory)
+Checking the license for package Android SDK Build-Tools 35 in /workspace/toolchains/android-sdk/licenses
+Warning: License for package Android SDK Build-Tools 35 not accepted.
+Checking the license for package Android SDK Platform 35 in /workspace/toolchains/android-sdk/licenses
+Warning: License for package Android SDK Platform 35 not accepted.
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Could not determine the dependencies of task ':app:compileDebugJavaWithJavac'.
+> Failed to install the following Android SDK packages as some licences have not been accepted.
+     build-tools;35.0.0 Android SDK Build-Tools 35
+     platforms;android-35 Android SDK Platform 35
+  To build this project, accept the SDK license agreements and install the missing components using the Android Studio SDK Manager.
+  All licenses can be accepted using the sdkmanager command line tool:
+  sdkmanager.bat --licenses
+  Or, to transfer the license agreements from one workstation to another, see https://developer.android.com/studio/intro/update.html#download-with-gradle
+
+  Using Android SDK: /workspace/toolchains/android-sdk
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 12s

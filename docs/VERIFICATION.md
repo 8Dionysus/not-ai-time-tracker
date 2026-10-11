@@ -4,7 +4,7 @@
 
 ## Среда и воспроизведение
 
-- OpenJDK `21.0.12.1` (Debian); байткод проекта нацелен на Java 17.
+- OpenJDK `21.0.12.1` (Debian); байткод проекта нацелен на Java 17. В системном runtime отсутствовал launcher `javac`, но модули `jdk.compiler`, `jdk.jartool`, `jdk.jlink` уже установлены. Создана отдельная копия `/workspace/toolchains/jdk21` с launcher-скриптами вызова этих существующих модулей; `javac -version` и `jlink --version` успешны. Системная Java не менялась. Попытка получить новый JDK через Adoptium API вернула proxy CONNECT 403; ограничения не обходились, использована независимая локальная возможность.
 - Gradle `8.13`, Kotlin `2.1.20`, AGP `8.11.1`, Room `2.7.2`.
 - Gradle и Android command-line tools получены с официальных источников. SHA-256 Gradle проверен: `20f1b1176237254a6fc204d8434196fa11a4cfb387567519c61556e8710aed78`.
 - Начальная ошибка Java-загрузок устранена обычным использованием уже настроенного прокси и переносом writable Android cache из `/home/agent/.android` в `/workspace/toolchains/android-user`. TLS-проверки и системные trust stores не менялись.
@@ -42,9 +42,12 @@ Android SDK Platform 35
 
 Пакеты: `platforms;android-35`, `build-tools;35.0.0`, `platform-tools`. Разрешение на принятие лицензии запрошено отдельно по уточнению родительского задания. Пока оно ожидается, APK/Room/lint не заявлены успешными. Подготовлен один повторно используемый набор из трёх сценариев для Room/Robolectric; он должен проверить дисковый SQLite и close/reopen базы.
 
-Следующие команды после разрешённой установки SDK:
+Android-команда фактически выполнена с `JAVA_HOME=/workspace/toolchains/jdk21`; она дошла до проверки лицензии и завершилась `BUILD FAILED`: `Failed to install ... as some licences have not been accepted`. [Точный журнал](../evidence/android-build-blocked.log).
+
+Команда повторной проверки после разрешённой установки SDK:
 
 ```sh
+JAVA_HOME=/workspace/toolchains/jdk21 \
 ANDROID_HOME=/workspace/toolchains/android-sdk \
 ANDROID_USER_HOME=/workspace/toolchains/android-user \
 GRADLE_USER_HOME=/workspace/toolchains/gradle-home \

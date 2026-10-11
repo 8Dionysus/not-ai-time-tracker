@@ -59,6 +59,7 @@ private fun ancestorPath(nodes: Map<String,ActivityType>,typeId: String): List<S
 fun Dataset.classify(selection: Classification): Classification = selection.copy(
     ancestorPathAtWrite = selection.activityTypeId?.let { ancestorPath(it) }.orEmpty())
 fun Dataset.children(parentId: String? = null) = types.filter { it.parentId == parentId && !it.archived }
+@Deprecated("Use Tracker.choices().search for indexed, paged discovery; this flat compatibility helper keeps contains semantics")
 fun Dataset.searchTypes(query: String) = types.filter { !it.archived && (listOf(it.name)+it.aliases).any { name -> name.contains(query,ignoreCase = true) } }
 
 fun Dataset.cardFromType(typeId: String): Card {

@@ -4,7 +4,9 @@ package dev.notai.tracker
  * Display ticks materialize only the current session; no storage access or history scan.
  * Reports are explicit operations over this revision, at one captured moment per call.
  */
-class TrackerView internal constructor(private val checked: CheckedState,private val clock: Clock) {
+class TrackerView internal constructor(private val checked: CheckedState,private val clock: Clock,private val choiceCache: ChoiceCache) {
+    private val choiceView by lazy { ChoiceView(data,choiceCache,::snapshot) }
+    fun choices(): ChoiceView = choiceView
     val data get() = checked.data
     fun snapshot(): Snapshot = checked.snapshot(clock.now())
     fun goalProgress(id: String,date: java.time.LocalDate? = null): GoalProgress = Goals.progress(data,clock.now(),id,date)

@@ -28,6 +28,7 @@ abstract class ScenarioContract {
     open fun assertTransferFailure(transfer: HistoryTransfer,preview: HistoryPreview,tracker: Tracker) {}
 
     @Test fun timerPath() {
+        choiceLifecycle()
         focusLifecycle()
         goalsLifecycle()
         checkedTimerCombinations()
@@ -149,6 +150,111 @@ abstract class ScenarioContract {
         expect(ErrorCode.UNSUPPORTED_IMPORT) { sample.confirmCsv(',',CsvMapping("bad","activity","start",end = "end"),CsvTimeChoice(null,"UTC"),null) }
     }
 
+    private fun choiceLifecycle() {
+        val clock = FakeClock(); val t = Tracker(createStore(),clock)
+        val root = java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile!!
+        val full = codec.decodeFromString<VocabularyData>(root.resolve("evidence/full-projection/runtime-vocabulary.json").readText())
+        t.addCatalog(t.snapshot().token,full)
+        val allTypes = ChoiceQuery(kinds = setOf(ChoiceKind.TYPE),includeArchived = true)
+        val view = t.choices()
+        assertEquals(ChoiceIndexStats(0,0,0),view.indexStats())
+        assertEquals(0,view.suggestions().total); assertEquals(ChoiceIndexStats(0,0,0),view.indexStats())
+        val started = System.nanoTime()
+        var page = view.search(allTypes,pageSize = 37); val firstCursor = page.next!!
+        val ids = mutableListOf<String>(); val total = page.total
+        while(true) { ids += page.items.map { it.entry.sourceId }; if(page.next == null) break; page = view.search(allTypes,page.next,37) }
+        val indexingAndPaging = System.nanoTime()-started
+        assertEquals(t.data().types.size,total); assertEquals(total,ids.distinct().size)
+        assertEquals(t.data().types.map { it.id }.toSet(),ids.toSet()) // full 1918 imported types + seed, no top-N loss
+        val stamp = view.indexStats(); val typed = System.nanoTime()
+        repeat(50) { view.search(allTypes.copy(text = listOf("a","work","read","язык","sport")[it%5]),pageSize = 10) }
+        val typingNs = System.nanoTime()-typed; assertEquals(stamp,view.indexStats())
+        expect(ErrorCode.STALE) { view.search(allTypes.copy(text = "different"),firstCursor) }
+        expect(ErrorCode.INVALID_INPUT) { view.search(allTypes,pageSize = 101) }
+        val group = ActivityType("choice-group","Раздел",selectable = false)
+        val child = ActivityType("choice-type","Кофе",parentId = group.id,aliases = listOf("CAFÉ","Coffee"))
+        t.addCatalog(t.snapshot().token,VocabularyData(listOf(group,child,child.copy(id = "choice-sibling",parentId = null))))
+        t.saveAxis(t.snapshot().token,Axis("choice-axis","Контекст",valueKind = ValueKind.FREE_LABEL))
+        val card = Card(id = "choice-card",name = "Мой кофе",activityTypeId = child.id,details = mapOf("method" to "filter"),tags = setOf("study","home"),
+            facets = listOf(Facet("choice-axis",text = "тихо")))
+        t.saveCard(t.snapshot().token,card)
+        val selection = t.selection(card.id)
+        val favorite = Favorite(id = "choice-favorite",label = "Saved coffee",selection = selection)
+        t.saveFavorite(t.snapshot().token,favorite)
+        val index = t.choices()
+        val alias = index.search(allTypes.copy(text = "cafe\u0301"))
+        assertEquals(setOf(child.id,"choice-sibling"),alias.items.map { it.entry.sourceId }.toSet())
+        assertTrue(alias.items.all { it.matches.single().field == MatchField.ALIAS && it.matches.single().strength == MatchStrength.EXACT })
+        assertEquals("CAFÉ",alias.items.first().matches.single().text)
+        val children = index.search(allTypes.copy(scope = CatalogScope.CHILDREN,parentId = group.id))
+        assertEquals(listOf(child.id),children.items.map { it.entry.sourceId })
+        assertEquals(listOf(group.id,child.id),children.items.single().entry.path.map { it.id })
+        val groupRow = index.search(allTypes.copy(text = "Раздел")).items.single { it.entry.sourceId == group.id }.entry
+        assertFalse(groupRow.canStart); assertEquals(ChoiceAvailability.GROUP,groupRow.availability)
+        val a = t.start(t.snapshot().token,selection,"Private note"); clock.advance(100); t.pause(t.snapshot().token)
+        t.resume(t.snapshot().token); clock.advance(100); t.stop(t.snapshot().token)
+        t.repeat(t.snapshot().token,a.state.session!!.id); clock.advance(50); t.stop(t.snapshot().token)
+        val last = t.data().segments.last()
+        val window = HistoryWindow(clock.wall-10_000,clock.wall+1)
+        val frequent = SuggestionQuery(true,SuggestionOrder.FREQUENT_RECORDED,window)
+        var choices = t.choices(); var result = choices.suggestions(frequent)
+        assertEquals(1,result.total); assertEquals(2,result.items.single().suggestion!!.sessionCount) // 3 segments, 2 sessions
+        val stableVariant = result.items.single().entry.id
+        assertEquals(selection,result.items.single().entry.selection); assertEquals("Private note",result.items.single().entry.note)
+        val beforeRename = t.data().segments; val builds = choices.indexStats()
+        t.saveCard(t.snapshot().token,card.copy(name = "Renamed card",details = mapOf("method" to "new")))
+        choices = t.choices()
+        val past = choices.search(ChoiceQuery("Renamed card",setOf(ChoiceKind.HISTORY))).items.single()
+        assertEquals(stableVariant,past.entry.id); assertEquals(selection,past.entry.selection)
+        assertEquals(MatchField.CURRENT_CARD_NAME,past.matches.single().field)
+        assertEquals(builds.historyBuilds,choices.indexStats().historyBuilds)
+        val saved = choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.FAVORITE))).items.single().entry
+        assertEquals(selection,saved.selection)
+        val direct = choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.CARD))).items.single().entry
+        assertEquals("new",direct.selection.details["method"])
+        t.saveType(t.snapshot().token,child.copy(name = "Новый вид",aliases = listOf("fresh-alias")))
+        choices = t.choices()
+        assertTrue(choices.search(ChoiceQuery("fresh-alias",setOf(ChoiceKind.HISTORY))).items.single().matches.any { it.field == MatchField.CURRENT_TYPE_ALIAS })
+        assertEquals(beforeRename,t.data().segments)
+        t.saveType(t.snapshot().token,child.copy(archived = true))
+        choices = t.choices(); assertEquals(0,choices.suggestions(frequent).total)
+        assertFalse(choices.search(ChoiceQuery("Кофе",setOf(ChoiceKind.CARD),includeArchived = true)).items.single().entry.canStart)
+        t.saveType(t.snapshot().token,child.copy(selectable = false))
+        assertEquals(0,t.choices().suggestions(frequent).total)
+        t.saveType(t.snapshot().token,child)
+        t.saveCard(t.snapshot().token,card.copy(archived = true)); assertEquals(0,t.choices().suggestions(frequent).total)
+        t.saveCard(t.snapshot().token,card)
+        t.correctSegment(t.snapshot().token,last.id,beforeRename.first().start-1_000,beforeRename.first().start-900,last.selection)
+        result = t.choices().suggestions(SuggestionQuery(true)); assertEquals(stableVariant,result.items.single().entry.id)
+        assertNotEquals(last.id,result.items.single().entry.sourceSegmentId)
+        t.undo(t.snapshot().token); result = t.choices().suggestions(SuggestionQuery(true)); assertEquals(last.id,result.items.single().entry.sourceSegmentId)
+        val beforeTick = t.data(); val reuse = t.choices(); reuse.search(allTypes); reuse.suggestions(frequent)
+        val same = reuse.indexStats(); clock.advance(500)
+        reuse.search(allTypes.copy(text = "coffee")); reuse.suggestions(frequent); assertEquals(same,reuse.indexStats()); assertEquals(beforeTick,t.data())
+        t.start(t.snapshot().token); t.choices().suggestions(SuggestionQuery(true))
+        assertEquals(same.historyBuilds,t.choices().indexStats().historyBuilds) // active session cannot invalidate completed-history index
+        clock.advance(100); t.pause(t.snapshot().token); t.choices().suggestions(SuggestionQuery(true))
+        assertEquals(same.historyBuilds,t.choices().indexStats().historyBuilds)
+        t.stop(t.snapshot().token)
+        assertEquals(2,t.choices().suggestions(SuggestionQuery(true)).total) // unclassified remains a valid option
+        val json = Backups(t,MemoryRollback()).export(); val keep = t.data()
+        val oldView = t.choices(); val oldCursor = oldView.search(allTypes,pageSize = 10).next!!
+        t.startFavorite(t.snapshot().token,favorite.id); clock.advance(100); t.stop(t.snapshot().token)
+        val backups = Backups(t,MemoryRollback()); backups.apply(backups.prepare(json))
+        val restored = t.choices(); assertEquals(2,restored.suggestions(SuggestionQuery(true)).total)
+        assertEquals(keep.segments,t.data().segments); assertEquals(keep.favorites,t.data().favorites)
+        val error = assertFailsWith<CoreError> { restored.search(allTypes,oldCursor) }
+        assertEquals(ErrorCode.STALE,error.code); assertEquals(restored.token,error.currentState!!.token)
+        assertEquals(10,oldView.search(allTypes,oldCursor,10).items.size) // old immutable view can finish its own pages
+        val row = restored.suggestions(frequent).items.first { it.entry.selection.cardId == card.id }.entry
+        t.start(restored.token,row.selection,row.note)
+        assertEquals(selection,t.snapshot().session!!.selection)
+        assertEquals(selection.tags,t.snapshot().active!!.selection.tags); assertEquals(selection.facets,t.snapshot().active!!.selection.facets)
+        assertEquals("Private note",t.snapshot().session!!.note)
+        t.stop(t.snapshot().token)
+        root.resolve("build/choices-summary.json").writeText("{\"catalogTypesPaged\":$total,\"catalogBuildsAcross50Queries\":${stamp.catalogBuilds},\"coldIndexAndAllPagesNs\":$indexingAndPaging,\"fiftyQueriesNs\":$typingNs,\"deviceTested\":false}")
+    }
+
     private fun focusLifecycle() {
         val clock = FakeClock(); var t = Tracker(createStore(),clock)
         fun token() = t.snapshot().token
@@ -173,7 +279,11 @@ abstract class ScenarioContract {
         assertEquals(10_000,total()) // overdue idle is never work
         t.focusNext(token()); assertEquals(FocusPhase.BREAK,focus().phase); assertEquals(Mode.PAUSED,t.snapshot().mode)
         val firstWork = t.data().segments.first { it.sessionId == originalSession }
+        t.settings(token(),t.data().settings.copy(focusPlan = FocusPlan(9_000,9_000)))
+        assertEquals(FocusPlan(9_000,9_000),t.data().settings.focusPlan)
+        assertEquals(FocusPlan(10_000,5_000),t.data().focus!!.plan) // generic settings changes defaults only
         t.configureFocus(token(),FocusPlan(3_000,2_000)); assertEquals(5_000,focus().durationMs)
+        assertEquals(FocusPlan(3_000,2_000),t.data().focus!!.plan)
         clock.advance(1_000); t.pauseFocus(token()); clock.advance(5_000); assertEquals(1_000,focus().elapsedMs)
         t.resume(token()); clock.advance(4_000); assertEquals(FocusMode.DUE,focus().mode)
         assertEquals(10_000,total()); t.focusNext(token()); assertEquals(3_000,focus().durationMs)

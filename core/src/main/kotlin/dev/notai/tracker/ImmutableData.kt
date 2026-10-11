@@ -5,7 +5,7 @@ import java.util.Collections
 /** Kotlin read-only interfaces alone do not prevent mutation through the original builder/casts.
  * Copy and wrap at trust boundaries. Reuse only collections from the already frozen base proof. */
 internal fun <T> frozenList(values: Collection<T>): List<T> = Collections.unmodifiableList(ArrayList(values))
-private fun <T> frozenSet(values: Collection<T>): Set<T> = Collections.unmodifiableSet(LinkedHashSet(values))
+internal fun <T> frozenSet(values: Collection<T>): Set<T> = Collections.unmodifiableSet(LinkedHashSet(values))
 private fun <K,V> frozenMap(values: Map<K,V>): Map<K,V> = Collections.unmodifiableMap(LinkedHashMap(values))
 internal fun Classification.frozen() = copy(details = frozenMap(details),tags = frozenSet(tags),
     ancestorPathAtWrite = frozenList(ancestorPathAtWrite),facets = frozenList(facets))

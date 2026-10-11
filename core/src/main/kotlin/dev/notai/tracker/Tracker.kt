@@ -5,10 +5,12 @@ import kotlin.math.abs
 
 /** All calls are blocking: Android callers use Dispatchers.IO. No timer service or periodic writes. */
 class Tracker(val store: StateStore, val clock: Clock) {
+    private val choiceCache = ChoiceCache()
     private var undo: Pair<Token, Dataset>? = null
-    val views get() = store.checkedChanges.map { TrackerView(it,clock) }
-    fun view() = TrackerView(store.readChecked(),clock)
+    val views get() = store.checkedChanges.map { TrackerView(it,clock,choiceCache) }
+    fun view() = TrackerView(store.readChecked(),clock,choiceCache)
     val snapshots get() = store.checkedChanges.map { it.snapshot(clock.now()) }
+    fun choices(): ChoiceView = view().choices()
     fun data(): Dataset = storage { store.read() }
     fun snapshot(): Snapshot = storage { store.readChecked().snapshot(clock.now()) }
     fun selection(cardId: String): Classification {

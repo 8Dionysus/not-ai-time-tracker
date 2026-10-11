@@ -1,0 +1,16 @@
+{
+  "appVersion": "0.8.0",
+  "command": "./gradlew --offline :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug",
+  "result": "BUILD SUCCESSFUL in 35s",
+  "coreTests": 3,
+  "roomTests": 3,
+  "failures": 0,
+  "lint": {
+    "Error": 0,
+    "Warning": 12,
+    "Information": 0
+  },
+  "deviceTested": false,
+  "roomSchema": 3,
+  "backupFormat": 7
+}

@@ -1,3 +1,5 @@
+> Актуальное дополнение v16 / app 0.8.0: [CHOICES.md](CHOICES.md). Read API выбора реализован; Room 3 / JSON 7 без изменения. Текущий остаток — [ACCEPTANCE_GAPS.md](ACCEPTANCE_GAPS.md).
+
 > Актуальное дополнение v15 / app 0.7.0: [FOCUS.md](FOCUS.md). JSON 7 (чтение 1–7), backend Focus реализован; устройство не проверялось.
 
 > Актуальное дополнение v14 / app 0.6.0: [GOALS.md](GOALS.md). JSON 6 (чтение 1–6), цели реализованы; устройство не проверялось.

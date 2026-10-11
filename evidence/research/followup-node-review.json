@@ -1,0 +1,109 @@
+[
+  {
+    "original": {
+      "id": "activity.caregiving.event_log",
+      "name": "Отметить событие ухода за младенцем",
+      "definition": "Необязательное моментальное событие, например кормление, сон, смена подгузника, сцеживание, этап развития или лекарство; это журнал события, не длительность дня и не обязательное поле.",
+      "parentId": "area.caregiving",
+      "sourceRecordRefs": [
+        {
+          "sourceFile": "tracker_life_care_inventory.json",
+          "sourceId": "activity.caregiving.event_log"
+        }
+      ],
+      "status": "research_working_projection_not_runtime_published",
+      "originalSourceKinds": [
+        "activity"
+      ],
+      "sourceKindDecision": {
+        "sourceId": "activity.caregiving.event_log",
+        "observedNodeType": "activity",
+        "originalDefinitionRu": "Необязательное моментальное событие, например кормление, сон, смена подгузника, сцеживание, этап развития или лекарство; это журнал события, не длительность дня и не обязательное поле.",
+        "decision": "event_record_schema_not_standalone_duration_activity",
+        "reasonRu": "Сама запись задаёт журнал моментальных событий разных занятий, а не одно человеческое действие с длительностью. Если человек хочет учитывать время ведения журнала, это отдельное действие документирования. Сохранять кормление/подгузник/сцеживание как типы событий и их отдельные действия, без автоматического времени."
+      },
+      "researchPath": [
+        "area.caregiving",
+        "activity.caregiving.event_log"
+      ]
+    },
+    "decision": {
+      "sourceId": "activity.caregiving.event_log",
+      "observedNodeType": "activity",
+      "originalDefinitionRu": "Необязательное моментальное событие, например кормление, сон, смена подгузника, сцеживание, этап развития или лекарство; это журнал события, не длительность дня и не обязательное поле.",
+      "decision": "event_record_schema_not_standalone_duration_activity",
+      "reasonRu": "Сама запись задаёт журнал моментальных событий разных занятий, а не одно человеческое действие с длительностью. Если человек хочет учитывать время ведения журнала, это отдельное действие документирования. Сохранять кормление/подгузник/сцеживание как типы событий и их отдельные действия, без автоматического времени."
+    },
+    "allowedRepresentation": "Instant event log needs event ID/type/timestamp and optional links. Recommend separate event record; time spent documenting may be a separately created personal activity, never duration inferred from the event.",
+    "coreConstraint": "One primary duration stream; facets are classifications, not event records."
+  },
+  {
+    "original": {
+      "id": "activity.caregiving.passive_supervision_concurrent",
+      "name": "Наблюдать за человеком, оставаясь занятым другой задачей",
+      "definition": "Оставаться присутствующим и ответственным за безопасность другого человека, пока выполняется другая основная деятельность. Это реальная ответственность, но не дополнительная аддитивная длительность в текущем ядре.",
+      "parentId": "activity.caregiving.child_supervision",
+      "sourceRecordRefs": [
+        {
+          "sourceFile": "tracker_life_care_inventory.json",
+          "sourceId": "activity.caregiving.passive_supervision_concurrent"
+        }
+      ],
+      "status": "research_working_projection_not_runtime_published",
+      "originalSourceKinds": [
+        "activity"
+      ],
+      "sourceKindDecision": {
+        "sourceId": "activity.caregiving.passive_supervision_concurrent",
+        "decision": "concurrent_responsibility_with_explicit_user_primary_option",
+        "reasonRu": "Ответственность может продолжаться во время другого выбранного основного занятия; её отдельный интервал не суммируется повторно с хронологическим временем. Пользователь может выбрать наблюдение основным действием в соответствующий период."
+      },
+      "researchPath": [
+        "area.caregiving",
+        "activity.caregiving.child_supervision",
+        "activity.caregiving.passive_supervision_concurrent"
+      ]
+    },
+    "decision": {
+      "sourceId": "activity.caregiving.passive_supervision_concurrent",
+      "decision": "concurrent_responsibility_with_explicit_user_primary_option",
+      "reasonRu": "Ответственность может продолжаться во время другого выбранного основного занятия; её отдельный интервал не суммируется повторно с хронологическим временем. Пользователь может выбрать наблюдение основным действием в соответствующий период."
+    },
+    "allowedRepresentation": "primarySupervisionVocabulary creates a separately named explicit primary action. No second timeline; concurrent responsibility still has no interval model.",
+    "coreConstraint": "One primary duration stream; facets are classifications, not event records."
+  },
+  {
+    "original": {
+      "id": "activity.caregiving.kinship_care_context",
+      "name": "Неформальная/родственная забота о ребёнке или близком",
+      "definition": "Добровольный контекст заботы о ребёнке/близком через extended/kinship/chosen family relationship; это не отдельное действие и не обязательное обозначение отношений.",
+      "parentId": "area.caregiving",
+      "sourceRecordRefs": [
+        {
+          "sourceFile": "tracker_life_care_inventory.json",
+          "sourceId": "activity.caregiving.kinship_care_context"
+        }
+      ],
+      "status": "research_working_projection_not_runtime_published",
+      "originalSourceKinds": [
+        "context"
+      ],
+      "sourceKindDecision": {
+        "sourceId": "activity.caregiving.kinship_care_context",
+        "decision": "context_not_activity",
+        "reasonRu": "Тип отношений не определяет совершённую операцию; нельзя выводить семью/родство автоматически."
+      },
+      "researchPath": [
+        "area.caregiving",
+        "activity.caregiving.kinship_care_context"
+      ]
+    },
+    "decision": {
+      "sourceId": "activity.caregiving.kinship_care_context",
+      "decision": "context_not_activity",
+      "reasonRu": "Тип отношений не определяет совершённую операцию; нельзя выводить семью/родство автоматически."
+    },
+    "allowedRepresentation": "Optional life_care relationship_private free-label axis already available. Does not create elapsed activity or infer a relationship.",
+    "coreConstraint": "One primary duration stream; facets are classifications, not event records."
+  }
+]

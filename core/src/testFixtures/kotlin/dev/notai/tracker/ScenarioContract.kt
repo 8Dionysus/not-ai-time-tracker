@@ -369,7 +369,10 @@ abstract class ScenarioContract {
         val path = java.io.File(System.getProperty("tracker.samples")).parentFile.resolve("research/catalog.research.json")
         val bytes = path.readBytes()
         val hash = "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19"
-        val plan = ResearchCatalog.read(bytes,hash)
+        val supporting = path.parentFile.resolve("supporting").listFiles()!!.associate { it.name to it.readBytes() }
+        val plan = ResearchCatalog.read(bytes,hash,supporting)
+        assertEquals(5,plan.supportingHashes.size)
+        assertEquals(357,plan.outcomes.count { it.pointer.startsWith("supporting/tracker_cross_domain_relations_v2_1.json/relations/") })
         assertContentEquals(bytes,plan.sourceBytes())
         assertEquals(1584,plan.sources.size); assertEquals(1587,plan.nodes.size)
         assertEquals(102,plan.outcomes.count { it.kind == "axis" })
@@ -391,10 +394,36 @@ abstract class ScenarioContract {
         val vocabulary = plan.vocabulary(plan.candidateIds,plan.axisCandidateIds)
         assertEquals(vocabulary,plan.vocabulary(plan.candidateIds.reversed().toSet(),plan.axisCandidateIds.reversed().toSet()))
         assertEquals(plan.candidateIds.size,vocabulary.types.size)
-        assertEquals(5,vocabulary.axes.size); assertTrue(vocabulary.axes.all { it.valueKind == ValueKind.FREE_LABEL && it.values.isEmpty() }); assertTrue(vocabulary.metrics.isEmpty())
+        assertEquals(82,vocabulary.axes.size)
+        assertTrue(vocabulary.axes.filter { it.valueKind == ValueKind.FREE_LABEL }.all { it.values.isEmpty() })
+        assertTrue(vocabulary.metrics.isEmpty())
+        assertEquals(Cardinality.MULTIPLE,vocabulary.axes.single { it.id == "research:leisure_sport:axis.game_genre" }.cardinality)
+        val language = vocabulary.axes.single { it.id == "research:seed:axis.language" }
+        assertEquals(listOf("en","es","ru"),language.values.map { it.id })
+        assertFalse("research:life_care:axis.private_display" in plan.axisCandidateIds)
+        assertFalse("research:leisure_sport:axis.observation_record_fields" in plan.axisCandidateIds)
+        val scalar = plan.scalarVocabulary("qneed.work.length_quantity","cable-installed","Installed cable length",Scope.SESSION)
+        assertEquals(Aggregation.BY_TARGET,scalar.metrics.single().aggregation)
+        expect(ErrorCode.INVALID_INPUT) { plan.scalarVocabulary("qneed.writing.word_count","words","Words",Scope.SESSION) }
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { ResearchCatalog.read(bytes,hash,supporting + (supporting.keys.first() to byteArrayOf(0))) }
+        val distance = plan.measureVocabulary("tracker_catalog_proposal.json","measure.distance","walk","Walk distance",Scope.SEGMENT)
+        assertEquals("length",distance.units.single().dimension)
+        val pages = plan.measureVocabulary("tracker_catalog_proposal.json","measure.pages","edition-a","Pages read of edition A (including rereads)",Scope.SESSION)
+        assertEquals(NumberKind.INTEGER,pages.metrics.single().numberKind)
+        expect(ErrorCode.INVALID_INPUT) { plan.measureVocabulary("tracker_leisure_sport_inventory.json","measure.media_progress","p","Progress",Scope.SESSION) }
+        val configured = plan.configureAxis("work_learning","axis.phase","personal",ValueKind.FREE_LABEL,Cardinality.MULTIPLE)
+        val primary = plan.primarySupervisionVocabulary()
+        assertTrue(primary.types.single().id !in plan.candidateIds)
+        expect(ErrorCode.INVALID_INPUT) { plan.configureAxis("seed","axis.topic","x",ValueKind.LOCAL_CHOICE,Cardinality.SINGLE) }
         val clock = FakeClock(); val t = Tracker(createStore(),clock)
+        t.addCatalog(t.snapshot().token,configured)
+        t.addCatalog(t.snapshot().token,primary)
         t.start(t.snapshot().token); clock.advance(1000); t.stop(t.snapshot().token)
         val oldHistory = t.data().segments
+        t.addCatalog(t.snapshot().token,scalar)
+        val metric = scalar.metrics.single()
+        t.measure(t.snapshot().token,Measurement(fieldId = metric.id,unit = metric.canonicalUnitId,
+            scope = Scope.SESSION,targetId = t.data().sessions.single().id,value = Decimal("1.25")))
         val selected = vocabulary.types.first { it.selectable }
         t.saveType(t.snapshot().token,selected.copy(name = "Local definition",definition = "Local meaning",researchOrigins = emptyList()))
         val archive = FileResearchArchive(java.io.File(System.getProperty("tracker.samples")).parentFile.resolve("build/research-source-archives/${newId()}"))
@@ -417,6 +446,16 @@ abstract class ScenarioContract {
         assertEquals(copy.copy(revision = receiver.data().revision),receiver.data())
         receiver.start(receiver.snapshot().token); clock.advance(1000); receiver.stop(receiver.snapshot().token)
         assertNull(receiver.data().sessions.last().selection.activityTypeId)
+        // Chosen source-local meanings survive the actual classification and backup boundary.
+        val facets = listOf(Facet(language.id,valueId = "es",valueMeaningVersion = 1),
+            Facet("research:leisure_sport:axis.game_genre",text = "co-op / puzzle"),
+            Facet("research:leisure_sport:axis.game_genre",text = "local personal genre"),
+            Facet(configured.axes.single().id,text = "publish/release"))
+        receiver.start(receiver.snapshot().token,Classification(activityTypeId = primary.types.single().id,facets = facets))
+        clock.advance(1000); receiver.stop(receiver.snapshot().token)
+        assertEquals(facets,receiver.data().sessions.last().selection.facets)
+        assertEquals(receiver.data(),Backups.decode(Backups(receiver,MemoryRollback()).export()).data)
+        for((_,digest) in plan.supportingHashes) assertEquals(digest,researchHash(archive.read(digest)))
         val badArchive = object: ResearchArchive {
             override fun put(sha256: String,bytes: ByteArray) {}
             override fun read(sha256: String) = byteArrayOf(0)

@@ -36912,6 +36912,446 @@
             ]
         },
         {
+            "id": "research:seed:axis.language",
+            "name": "Язык",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "en",
+                    "label": "Английский",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "es",
+                    "label": "Испанский",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "ru",
+                    "label": "Русский",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_catalog_proposal.json",
+                    "sourceSha256": "d65db2a4cbe011c0d16b35739cdefa8e58f78f8aee1b47a0dbc0d8bfd66bc2c3",
+                    "sourceId": "axis.language",
+                    "pointer": "/axesReview/rows/1"
+                }
+            ]
+        },
+        {
+            "id": "research:seed:axis.mode",
+            "name": "Способ действия",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "read",
+                    "label": "Читать",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "write",
+                    "label": "Писать",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "listen",
+                    "label": "Слушать",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "speak",
+                    "label": "Говорить",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "watch",
+                    "label": "Смотреть",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "practice",
+                    "label": "Практиковать",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "mixed",
+                    "label": "Смешанное",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "unspecified",
+                    "label": "Без уточнения",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_catalog_proposal.json",
+                    "sourceSha256": "d65db2a4cbe011c0d16b35739cdefa8e58f78f8aee1b47a0dbc0d8bfd66bc2c3",
+                    "sourceId": "axis.mode",
+                    "pointer": "/axesReview/rows/2"
+                }
+            ]
+        },
+        {
+            "id": "research:seed:axis.medium",
+            "name": "Формат/носитель",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "book",
+                    "label": "Книга",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "paper",
+                    "label": "Бумага",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "audio",
+                    "label": "Аудио",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "video",
+                    "label": "Видео",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "app",
+                    "label": "Приложение",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "in_person",
+                    "label": "Очно",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_catalog_proposal.json",
+                    "sourceSha256": "d65db2a4cbe011c0d16b35739cdefa8e58f78f8aee1b47a0dbc0d8bfd66bc2c3",
+                    "sourceId": "axis.medium",
+                    "pointer": "/axesReview/rows/3"
+                }
+            ]
+        },
+        {
+            "id": "research:seed:axis.source",
+            "name": "Источник",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "SINGLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_catalog_proposal.json",
+                    "sourceSha256": "d65db2a4cbe011c0d16b35739cdefa8e58f78f8aee1b47a0dbc0d8bfd66bc2c3",
+                    "sourceId": "axis.source",
+                    "pointer": "/axesReview/rows/4"
+                }
+            ]
+        },
+        {
+            "id": "research:seed:axis.project",
+            "name": "Проект или предмет",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "SINGLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_catalog_proposal.json",
+                    "sourceSha256": "d65db2a4cbe011c0d16b35739cdefa8e58f78f8aee1b47a0dbc0d8bfd66bc2c3",
+                    "sourceId": "axis.project",
+                    "pointer": "/axesReview/rows/5"
+                }
+            ]
+        },
+        {
+            "id": "research:seed:axis.context",
+            "name": "Контекст",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "personal",
+                    "label": "Личное",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "work",
+                    "label": "Работа",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "study",
+                    "label": "Учёба",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "practice",
+                    "label": "Практика",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "leisure",
+                    "label": "Отдых",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_catalog_proposal.json",
+                    "sourceSha256": "d65db2a4cbe011c0d16b35739cdefa8e58f78f8aee1b47a0dbc0d8bfd66bc2c3",
+                    "sourceId": "axis.context",
+                    "pointer": "/axesReview/rows/6"
+                }
+            ]
+        },
+        {
+            "id": "research:seed:axis.movement_kind",
+            "name": "Способ перемещения",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "walk",
+                    "label": "Пешком",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "bicycle",
+                    "label": "Велосипед",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "public_transport",
+                    "label": "Общественный транспорт",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "car",
+                    "label": "Автомобиль",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_catalog_proposal.json",
+                    "sourceSha256": "d65db2a4cbe011c0d16b35739cdefa8e58f78f8aee1b47a0dbc0d8bfd66bc2c3",
+                    "sourceId": "axis.movement_kind",
+                    "pointer": "/axesReview/rows/7"
+                }
+            ]
+        },
+        {
+            "id": "research:seed:axis.trip_purpose",
+            "name": "Цель поездки",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "work",
+                    "label": "Работа",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "personal_errand",
+                    "label": "Личное дело",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "leisure",
+                    "label": "Отдых",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "unspecified",
+                    "label": "Без уточнения",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_catalog_proposal.json",
+                    "sourceSha256": "d65db2a4cbe011c0d16b35739cdefa8e58f78f8aee1b47a0dbc0d8bfd66bc2c3",
+                    "sourceId": "axis.trip_purpose",
+                    "pointer": "/axesReview/rows/8"
+                }
+            ]
+        },
+        {
+            "id": "research:seed:axis.activity_variant",
+            "name": "Вариант занятия",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "cardio",
+                    "label": "Кардио",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "strength",
+                    "label": "Силовая",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "cleaning",
+                    "label": "Уборка",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "cooking",
+                    "label": "Готовка",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_catalog_proposal.json",
+                    "sourceSha256": "d65db2a4cbe011c0d16b35739cdefa8e58f78f8aee1b47a0dbc0d8bfd66bc2c3",
+                    "sourceId": "axis.activity_variant",
+                    "pointer": "/axesReview/rows/9"
+                }
+            ]
+        },
+        {
+            "id": "research:seed:axis.accompaniment",
+            "name": "Сопутствующее занятие",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "MULTIPLE",
+            "values": [
+                {
+                    "id": "audio",
+                    "label": "Аудио",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "conversation",
+                    "label": "Беседа",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_catalog_proposal.json",
+                    "sourceSha256": "d65db2a4cbe011c0d16b35739cdefa8e58f78f8aee1b47a0dbc0d8bfd66bc2c3",
+                    "sourceId": "axis.accompaniment",
+                    "pointer": "/axesReview/rows/10"
+                }
+            ]
+        },
+        {
+            "id": "research:seed:axis.companion_private",
+            "name": "С кем (private)",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_catalog_proposal.json",
+                    "sourceSha256": "d65db2a4cbe011c0d16b35739cdefa8e58f78f8aee1b47a0dbc0d8bfd66bc2c3",
+                    "sourceId": "axis.companion_private",
+                    "pointer": "/axesReview/rows/11"
+                }
+            ]
+        },
+        {
+            "id": "research:seed:axis.location_private",
+            "name": "Место (private)",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "SINGLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_catalog_proposal.json",
+                    "sourceSha256": "d65db2a4cbe011c0d16b35739cdefa8e58f78f8aee1b47a0dbc0d8bfd66bc2c3",
+                    "sourceId": "axis.location_private",
+                    "pointer": "/axesReview/rows/12"
+                }
+            ]
+        },
+        {
             "id": "research:work_learning:axis.topic",
             "name": "Какая конкретная тема содержания?",
             "meaningVersion": 1,
@@ -36926,6 +37366,165 @@
                     "sourceSha256": "7c884629d4e286a32bf4fe176a1802cbbdc8d16f809afa295225df381a08b6ef",
                     "sourceId": "axis.topic",
                     "pointer": "/axesReview/rows/13"
+                }
+            ]
+        },
+        {
+            "id": "research:work_learning:axis.language",
+            "name": "На каком/каких языках работали?",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "en",
+                    "label": "Английский",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "es",
+                    "label": "Испанский",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "ru",
+                    "label": "Русский",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_work_learning_inventory.json",
+                    "sourceSha256": "7c884629d4e286a32bf4fe176a1802cbbdc8d16f809afa295225df381a08b6ef",
+                    "sourceId": "axis.language",
+                    "pointer": "/axesReview/rows/14"
+                }
+            ]
+        },
+        {
+            "id": "research:work_learning:axis.mode",
+            "name": "В каком режиме/способе совершалось действие?",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "read",
+                    "label": "Читать",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "write",
+                    "label": "Писать",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "listen",
+                    "label": "Слушать",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "speak",
+                    "label": "Говорить",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "watch",
+                    "label": "Смотреть",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "practice",
+                    "label": "Практиковать",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "mixed",
+                    "label": "Смешанное",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "unspecified",
+                    "label": "Без уточнения",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_work_learning_inventory.json",
+                    "sourceSha256": "7c884629d4e286a32bf4fe176a1802cbbdc8d16f809afa295225df381a08b6ef",
+                    "sourceId": "axis.mode",
+                    "pointer": "/axesReview/rows/15"
+                }
+            ]
+        },
+        {
+            "id": "research:work_learning:axis.medium",
+            "name": "В какой материальной/медийной форме материал?",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "book",
+                    "label": "Книга",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "paper",
+                    "label": "Бумага",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "audio",
+                    "label": "Аудио",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "video",
+                    "label": "Видео",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "app",
+                    "label": "Приложение",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "in_person",
+                    "label": "Очно",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_work_learning_inventory.json",
+                    "sourceSha256": "7c884629d4e286a32bf4fe176a1802cbbdc8d16f809afa295225df381a08b6ef",
+                    "sourceId": "axis.medium",
+                    "pointer": "/axesReview/rows/16"
                 }
             ]
         },
@@ -36948,6 +37547,300 @@
             ]
         },
         {
+            "id": "research:work_learning:axis.context",
+            "name": "В каком институциональном/проектном контексте происходит действие?",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "personal",
+                    "label": "Личное",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "work",
+                    "label": "Работа",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "study",
+                    "label": "Учёба",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "practice",
+                    "label": "Практика",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "leisure",
+                    "label": "Отдых",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_work_learning_inventory.json",
+                    "sourceSha256": "7c884629d4e286a32bf4fe176a1802cbbdc8d16f809afa295225df381a08b6ef",
+                    "sourceId": "axis.context",
+                    "pointer": "/axesReview/rows/19"
+                }
+            ]
+        },
+        {
+            "id": "research:work_learning:axis.movement_kind",
+            "name": "Способ перемещения",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "walk",
+                    "label": "Пешком",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "bicycle",
+                    "label": "Велосипед",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "public_transport",
+                    "label": "Общественный транспорт",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "car",
+                    "label": "Автомобиль",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_work_learning_inventory.json",
+                    "sourceSha256": "7c884629d4e286a32bf4fe176a1802cbbdc8d16f809afa295225df381a08b6ef",
+                    "sourceId": "axis.movement_kind",
+                    "pointer": "/axesReview/rows/20"
+                }
+            ]
+        },
+        {
+            "id": "research:work_learning:axis.trip_purpose",
+            "name": "Цель поездки",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "work",
+                    "label": "Работа",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "personal_errand",
+                    "label": "Личное дело",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "leisure",
+                    "label": "Отдых",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "unspecified",
+                    "label": "Без уточнения",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_work_learning_inventory.json",
+                    "sourceSha256": "7c884629d4e286a32bf4fe176a1802cbbdc8d16f809afa295225df381a08b6ef",
+                    "sourceId": "axis.trip_purpose",
+                    "pointer": "/axesReview/rows/21"
+                }
+            ]
+        },
+        {
+            "id": "research:work_learning:axis.activity_variant",
+            "name": "Вариант занятия",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "cardio",
+                    "label": "Кардио",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "strength",
+                    "label": "Силовая",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "cleaning",
+                    "label": "Уборка",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "cooking",
+                    "label": "Готовка",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_work_learning_inventory.json",
+                    "sourceSha256": "7c884629d4e286a32bf4fe176a1802cbbdc8d16f809afa295225df381a08b6ef",
+                    "sourceId": "axis.activity_variant",
+                    "pointer": "/axesReview/rows/22"
+                }
+            ]
+        },
+        {
+            "id": "research:work_learning:axis.accompaniment",
+            "name": "Сопутствующее занятие",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "MULTIPLE",
+            "values": [
+                {
+                    "id": "audio",
+                    "label": "Аудио",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "conversation",
+                    "label": "Беседа",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_work_learning_inventory.json",
+                    "sourceSha256": "7c884629d4e286a32bf4fe176a1802cbbdc8d16f809afa295225df381a08b6ef",
+                    "sourceId": "axis.accompaniment",
+                    "pointer": "/axesReview/rows/23"
+                }
+            ]
+        },
+        {
+            "id": "research:work_learning:axis.companion_private",
+            "name": "С кем (private)",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_work_learning_inventory.json",
+                    "sourceSha256": "7c884629d4e286a32bf4fe176a1802cbbdc8d16f809afa295225df381a08b6ef",
+                    "sourceId": "axis.companion_private",
+                    "pointer": "/axesReview/rows/24"
+                }
+            ]
+        },
+        {
+            "id": "research:work_learning:axis.location_private",
+            "name": "Место (private)",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "SINGLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_work_learning_inventory.json",
+                    "sourceSha256": "7c884629d4e286a32bf4fe176a1802cbbdc8d16f809afa295225df381a08b6ef",
+                    "sourceId": "axis.location_private",
+                    "pointer": "/axesReview/rows/25"
+                }
+            ]
+        },
+        {
+            "id": "research:work_learning:axis.production_destination",
+            "name": "Куда предназначается произведённый результат?",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "market",
+                    "label": "Рынок / продажа",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "own_household",
+                    "label": "Собственное домохозяйство",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "gift_or_exchange",
+                    "label": "Обмен / дар",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "community_use",
+                    "label": "Общественное использование",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "mixed_or_unknown",
+                    "label": "Смешанное / не указано",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_work_learning_inventory.json",
+                    "sourceSha256": "7c884629d4e286a32bf4fe176a1802cbbdc8d16f809afa295225df381a08b6ef",
+                    "sourceId": "axis.production_destination",
+                    "pointer": "/axesReview/rows/43"
+                }
+            ]
+        },
+        {
             "id": "research:life_care:axis.topic",
             "name": "Тема",
             "meaningVersion": 1,
@@ -36966,6 +37859,165 @@
             ]
         },
         {
+            "id": "research:life_care:axis.language",
+            "name": "Язык",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "en",
+                    "label": "Английский",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "es",
+                    "label": "Испанский",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "ru",
+                    "label": "Русский",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.language",
+                    "pointer": "/axesReview/rows/45"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.mode",
+            "name": "Способ действия",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "read",
+                    "label": "Читать",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "write",
+                    "label": "Писать",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "listen",
+                    "label": "Слушать",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "speak",
+                    "label": "Говорить",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "watch",
+                    "label": "Смотреть",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "practice",
+                    "label": "Практиковать",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "mixed",
+                    "label": "Смешанное",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "unspecified",
+                    "label": "Без уточнения",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.mode",
+                    "pointer": "/axesReview/rows/46"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.medium",
+            "name": "Формат/носитель",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "book",
+                    "label": "Книга",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "paper",
+                    "label": "Бумага",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "audio",
+                    "label": "Аудио",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "video",
+                    "label": "Видео",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "app",
+                    "label": "Приложение",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "in_person",
+                    "label": "Очно",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.medium",
+                    "pointer": "/axesReview/rows/47"
+                }
+            ]
+        },
+        {
             "id": "research:life_care:axis.source",
             "name": "Источник",
             "meaningVersion": 1,
@@ -36980,6 +38032,1043 @@
                     "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
                     "sourceId": "axis.source",
                     "pointer": "/axesReview/rows/48"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.project",
+            "name": "Проект или предмет",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "SINGLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.project",
+                    "pointer": "/axesReview/rows/49"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.context",
+            "name": "Контекст",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "personal",
+                    "label": "Личное",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "work",
+                    "label": "Работа",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "study",
+                    "label": "Учёба",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "practice",
+                    "label": "Практика",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "leisure",
+                    "label": "Отдых",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.context",
+                    "pointer": "/axesReview/rows/50"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.movement_kind",
+            "name": "Способ перемещения",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "walk",
+                    "label": "Пешком",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "bicycle",
+                    "label": "Велосипед",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "public_transport",
+                    "label": "Общественный транспорт",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "car",
+                    "label": "Автомобиль",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.movement_kind",
+                    "pointer": "/axesReview/rows/51"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.trip_purpose",
+            "name": "Цель поездки",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "work",
+                    "label": "Работа",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "personal_errand",
+                    "label": "Личное дело",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "leisure",
+                    "label": "Отдых",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "unspecified",
+                    "label": "Без уточнения",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.trip_purpose",
+                    "pointer": "/axesReview/rows/52"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.activity_variant",
+            "name": "Вариант занятия",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [
+                {
+                    "id": "cardio",
+                    "label": "Кардио",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "strength",
+                    "label": "Силовая",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "cleaning",
+                    "label": "Уборка",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "cooking",
+                    "label": "Готовка",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.activity_variant",
+                    "pointer": "/axesReview/rows/53"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.accompaniment",
+            "name": "Сопутствующее занятие",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "MULTIPLE",
+            "values": [
+                {
+                    "id": "audio",
+                    "label": "Аудио",
+                    "meaningVersion": 1,
+                    "archived": false
+                },
+                {
+                    "id": "conversation",
+                    "label": "Беседа",
+                    "meaningVersion": 1,
+                    "archived": false
+                }
+            ],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.accompaniment",
+                    "pointer": "/axesReview/rows/54"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.companion_private",
+            "name": "С кем (private)",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.companion_private",
+                    "pointer": "/axesReview/rows/55"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.location_private",
+            "name": "Место (private)",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "SINGLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.location_private",
+                    "pointer": "/axesReview/rows/56"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.care_mode",
+            "name": "Режим заботы",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.care_mode",
+                    "pointer": "/axesReview/rows/57"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.relationship_private",
+            "name": "Связь с человеком (частная)",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "SINGLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.relationship_private",
+                    "pointer": "/axesReview/rows/58"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.own_use_purpose",
+            "name": "Для чего производится/создаётся",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.own_use_purpose",
+                    "pointer": "/axesReview/rows/59"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.season",
+            "name": "Сезон/цикл",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.season",
+                    "pointer": "/axesReview/rows/60"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.waiting_context",
+            "name": "Контекст ожидания",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.waiting_context",
+                    "pointer": "/axesReview/rows/61"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.ceremony_role",
+            "name": "Участие в событии/обряде",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.ceremony_role",
+                    "pointer": "/axesReview/rows/62"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.access_support",
+            "name": "Адаптация/поддержка доступа",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.access_support",
+                    "pointer": "/axesReview/rows/63"
+                }
+            ]
+        },
+        {
+            "id": "research:life_care:axis.concurrent_responsibility",
+            "name": "Параллельная ответственность",
+            "meaningVersion": 1,
+            "valueKind": "LOCAL_CHOICE",
+            "cardinality": "SINGLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_life_care_inventory.json",
+                    "sourceSha256": "f2a51af20c0beddd3129ed494a38ccda9e99f359df02f4eb1ea972f100b72699",
+                    "sourceId": "axis.concurrent_responsibility",
+                    "pointer": "/axesReview/rows/64"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.intent",
+            "name": "Намерение / цель",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.intent",
+                    "pointer": "/axesReview/rows/66"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.participation_role",
+            "name": "Роль участия",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.participation_role",
+                    "pointer": "/axesReview/rows/67"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.social_configuration",
+            "name": "Социальная конфигурация",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.social_configuration",
+                    "pointer": "/axesReview/rows/68"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.player_count_mode",
+            "name": "Число игроков / single-multiplayer",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.player_count_mode",
+                    "pointer": "/axesReview/rows/69"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.interaction_style",
+            "name": "Стиль взаимодействия игроков",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.interaction_style",
+                    "pointer": "/axesReview/rows/70"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.connection_mode",
+            "name": "Канал / связь игры",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.connection_mode",
+                    "pointer": "/axesReview/rows/71"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.turn_structure",
+            "name": "Синхронность / очередность",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.turn_structure",
+                    "pointer": "/axesReview/rows/72"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.sport_discipline",
+            "name": "Спортивная дисциплина / практика",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.sport_discipline",
+                    "pointer": "/axesReview/rows/73"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.equipment",
+            "name": "Инвентарь / средство",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.equipment",
+                    "pointer": "/axesReview/rows/74"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.environment",
+            "name": "Пространство / площадка",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.environment",
+                    "pointer": "/axesReview/rows/75"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.route_shape",
+            "name": "Форма маршрута",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.route_shape",
+                    "pointer": "/axesReview/rows/76"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.route_surface",
+            "name": "Поверхность маршрута",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.route_surface",
+                    "pointer": "/axesReview/rows/77"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.route_locality",
+            "name": "Местность маршрута",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.route_locality",
+                    "pointer": "/axesReview/rows/78"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.indoor_outdoor",
+            "name": "Внутри / снаружи",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.indoor_outdoor",
+                    "pointer": "/axesReview/rows/79"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.delivery_medium",
+            "name": "Формат доставки / носитель",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.delivery_medium",
+                    "pointer": "/axesReview/rows/80"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.device_platform",
+            "name": "Устройство / платформа",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.device_platform",
+                    "pointer": "/axesReview/rows/81"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.app_source",
+            "name": "Приложение / сервис / вещатель",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.app_source",
+                    "pointer": "/axesReview/rows/82"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.content_topic",
+            "name": "Тема / объект / предмет",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.content_topic",
+                    "pointer": "/axesReview/rows/83"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.game_genre",
+            "name": "Жанр цифровой игры",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.game_genre",
+                    "pointer": "/axesReview/rows/84"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.tabletop_category",
+            "name": "Категория настольной игры",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.tabletop_category",
+                    "pointer": "/axesReview/rows/85"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.music_genre",
+            "name": "Музыкальный жанр",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.music_genre",
+                    "pointer": "/axesReview/rows/86"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.reading_content_kind",
+            "name": "Тип/жанр читаемого материала",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.reading_content_kind",
+                    "pointer": "/axesReview/rows/87"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.video_content_kind",
+            "name": "Тип/жанр видеоматериала",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.video_content_kind",
+                    "pointer": "/axesReview/rows/88"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.title_identity",
+            "name": "Название произведения / франшизы / события",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.title_identity",
+                    "pointer": "/axesReview/rows/89"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.project_identity",
+            "name": "Творческий проект / изделие",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.project_identity",
+                    "pointer": "/axesReview/rows/90"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.craft_technique",
+            "name": "Техника / метод",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.craft_technique",
+                    "pointer": "/axesReview/rows/91"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.craft_material",
+            "name": "Материал",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.craft_material",
+                    "pointer": "/axesReview/rows/92"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.live_event_kind",
+            "name": "Вид живого события",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.live_event_kind",
+                    "pointer": "/axesReview/rows/93"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.quiet_rest_mode",
+            "name": "Форма спокойного отдыха",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.quiet_rest_mode",
+                    "pointer": "/axesReview/rows/94"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.citizen_science_protocol",
+            "name": "Протокол сбора наблюдений",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.citizen_science_protocol",
+                    "pointer": "/axesReview/rows/95"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.citizen_science_task_role",
+            "name": "Задача в citizen science",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.citizen_science_task_role",
+                    "pointer": "/axesReview/rows/97"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.adaptive_movement_mode",
+            "name": "Способ адаптивного участия",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.adaptive_movement_mode",
+                    "pointer": "/axesReview/rows/98"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.nature_conditions",
+            "name": "Условия наблюдения/природы",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.nature_conditions",
+                    "pointer": "/axesReview/rows/99"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.accessibility_feature",
+            "name": "Доступность места / маршрута",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.accessibility_feature",
+                    "pointer": "/axesReview/rows/100"
+                }
+            ]
+        },
+        {
+            "id": "research:leisure_sport:axis.session_structure",
+            "name": "Структура / фаза сессии",
+            "meaningVersion": 1,
+            "valueKind": "FREE_LABEL",
+            "cardinality": "MULTIPLE",
+            "values": [],
+            "archived": false,
+            "researchOrigins": [
+                {
+                    "packageSha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19",
+                    "sourceFile": "tracker_leisure_sport_inventory.json",
+                    "sourceSha256": "14bf390a87379528e7a3bd77fcd280ab216a0b6c0a1e1ed7f54c02a99202d791",
+                    "sourceId": "axis.session_structure",
+                    "pointer": "/axesReview/rows/101"
                 }
             ]
         }

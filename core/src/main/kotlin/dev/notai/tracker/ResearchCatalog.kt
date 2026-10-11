@@ -26,10 +26,97 @@ data class ResearchImport(val change: Tracker.Change,val sourceSha256: String,va
 
 class ResearchPlan internal constructor(private val original: ByteArray,val sha256: String,val document: JsonObject,
     val sources: List<ResearchSource>,val nodes: List<ResearchNode>,val outcomes: List<ResearchOutcome>,
-    private val candidates: List<ActivityType>,private val candidateAxes: List<Axis>) {
+    private val candidates: List<ActivityType>,private val candidateAxes: List<Axis>,
+    private val supporting: Map<String,ByteArray> = emptyMap()) {
+    val supportingHashes get() = supporting.mapValues { researchHash(it.value) }
     fun sourceBytes(): ByteArray = original.copyOf()
     val axisCandidateIds get() = candidateAxes.map { it.id }.toSet()
     val candidateIds get() = candidates.map { it.id }.toSet()
+    /** For the 17 source proposals with no declared schema, the caller explicitly chooses an
+     * existing core shape. This is a new source-local version, not a migration or inferred default.
+     * Stable value IDs can represent local object/role identities; text is only a descriptive label.
+     */
+    fun configureAxis(inventory: String,sourceId: String,localId: String,kind: ValueKind,cardinality: Cardinality,
+        values: List<AxisValue> = emptyList()): VocabularyData {
+        ensure(localId.matches(Regex("[A-Za-z0-9_.-]+")),"Explicit local axis ID required")
+        val rows = document.getValue("axesReview").jsonObject.getValue("rows").jsonArray
+        val index = rows.indexOfFirst { it.jsonObject["sourceInventory"]?.jsonPrimitive?.content == inventory &&
+            it.jsonObject["sourceAxisId"]?.jsonPrimitive?.content == sourceId }
+        ensure(index >= 0,"Unknown axis source")
+        val row = rows[index].jsonObject; val source = row.getValue("sourceRecord").jsonObject
+        ensure(source["valueKind"] == null && source["cardinality"] == null,"Source already specifies a shape")
+        val descriptor = document.getValue("axisValueMapping").jsonObject.getValue("inputHashesAndCounts").jsonObject
+            .getValue("sourceFiles").jsonObject.getValue(inventory).jsonObject
+        val axis = Axis("research:$inventory:$sourceId:configured:$localId",
+            (source["label"] ?: source["nameRu"] ?: source.getValue("name")).jsonPrimitive.content,
+            valueKind = kind,cardinality = cardinality,values = values,
+            researchOrigins = listOf(ResearchOrigin(sha256,descriptor.getValue("file").jsonPrimitive.content,
+                descriptor.getValue("sha256").jsonPrimitive.content,sourceId,"/axesReview/rows/$index")))
+        validate(Dataset(axes = listOf(axis)))
+        return VocabularyData(emptyList(),listOf(axis))
+    }
+    /** Explicit choice to record supervision as the ONE primary action. Never creates an overlay. */
+    fun primarySupervisionVocabulary(): VocabularyData {
+        val node = nodes.single { it.id == "activity.caregiving.passive_supervision_concurrent" }
+        val type = ActivityType("research:life_care:${node.id}:primary","Присмотр как основное занятие",
+            definition = "Явно выбранное пользователем основное действие присмотра в данном периоде; не параллельный интервал ответственности.",
+            researchOrigins = node.origins)
+        return VocabularyData(listOf(type))
+    }
+    /** Explicitly bounded nonnegative totals. Page count is reading volume, never a page
+     * position or unique coverage; exercise totals are not set/object identities. BY_TARGET only.
+     */
+    fun measureVocabulary(sourceFile: String,sourceId: String,localId: String,meaningLabel: String,scope: Scope): VocabularyData {
+        val rows = document.getValue("quantitiesReview").jsonObject.getValue("rows").jsonArray
+        val index = rows.indexOfFirst { it.jsonObject.getValue("sourceInventory").jsonPrimitive.content == sourceFile &&
+            it.jsonObject.getValue("sourceMeasureId").jsonPrimitive.content == sourceId }
+        ensure(index >= 0,"Unknown measure source")
+        val spec = when(sourceId) {
+            "measure.distance" -> Triple("m","length",NumberKind.DECIMAL)
+            "measure.elevation_gain" -> Triple("m","length",NumberKind.DECIMAL)
+            "measure.sets" -> Triple("set","exercise-set",NumberKind.INTEGER)
+            "measure.repetitions" -> Triple("rep","exercise-repetition",NumberKind.INTEGER)
+            "measure.pages" -> Triple("page","reading-volume",NumberKind.INTEGER)
+            else -> fail(ErrorCode.INVALID_INPUT,"Compound/state quantity requires explicit decomposition")
+        }
+        val digest = document.getValue("manifest").jsonObject.getValue("sourceManifest").jsonArray
+            .single { it.jsonObject.getValue("file").jsonPrimitive.content == sourceFile }.jsonObject.getValue("sha256").jsonPrimitive.content
+        return boundedScalar("research:$sourceFile:$sourceId",localId,meaningLabel,scope,spec,6,
+            ResearchOrigin(sha256,sourceFile,digest,sourceId,"/quantitiesReview/rows/$index"))
+    }
+    /** Bounded manual scalars from the verified work compatibility document. The caller names
+     * one material/operation or response basis; no event/object identity or automatic SUM is claimed.
+     * localId keeps two user definitions separate. Install with Tracker.addCatalog, then measure.
+     */
+    fun scalarVocabulary(sourceId: String,localId: String,meaningLabel: String,scope: Scope,maxScale: Int = 6): VocabularyData {
+        val file = "tracker_work_learning_core_v4_compatibility.json"
+        val bytes = supporting[file] ?: fail(ErrorCode.INVALID_INPUT,"Verified quantity source required")
+        val spec = when(sourceId) {
+            "qneed.work.length_quantity" -> Triple("m","length",NumberKind.DECIMAL)
+            "qneed.work.area_quantity" -> Triple("m2","area",NumberKind.DECIMAL)
+            "qneed.work.volume_quantity" -> Triple("m3","volume",NumberKind.DECIMAL)
+            "qneed.work.mass_quantity" -> Triple("kg","mass",NumberKind.DECIMAL)
+            "qneed.learning.response_attempt_count" -> Triple("response","response-attempt",NumberKind.INTEGER)
+            else -> fail(ErrorCode.INVALID_INPUT,"No lossless bounded scalar projection for this source")
+        }
+        val quantities = codec.parseToJsonElement(bytes.toString(Charsets.UTF_8)).jsonObject.getValue("quantities").jsonArray
+        val index = quantities.indexOfFirst { it.jsonObject.getValue("id").jsonPrimitive.content == sourceId }
+        ensure(index >= 0 && quantities[index].jsonObject.getValue("coreCompatibility").jsonPrimitive.content == "representable","Scalar evidence mismatch")
+        return boundedScalar("research:work_learning:$sourceId",localId,meaningLabel,scope,spec,maxScale,
+            ResearchOrigin(sha256,file,researchHash(bytes),sourceId,"/supporting/$file/quantities/$index"))
+    }
+    private fun boundedScalar(prefix: String,localId: String,meaningLabel: String,scope: Scope,
+        spec: Triple<String,String,NumberKind>,maxScale: Int,origin: ResearchOrigin): VocabularyData {
+        ensure(localId.matches(Regex("[A-Za-z0-9_.-]+")) && meaningLabel.isNotBlank(),"Explicit local meaning required")
+        ensure(maxScale in 0..1000,"Invalid scalar precision")
+        val id = "$prefix:$localId"
+        val unit = UnitDefinition("$id:${spec.first}",spec.first,spec.second)
+        val metric = Metric(id,meaningLabel,numberKind = spec.third,canonicalUnitId = unit.id,
+            maxScale = if(spec.third == NumberKind.INTEGER) 0 else maxScale,scopes = setOf(scope),
+            aggregation = Aggregation.BY_TARGET,researchOrigins = listOf(origin))
+        return VocabularyData(emptyList(),metrics = listOf(metric),units = listOf(unit))
+    }
+
     /** An explicit selection is mandatory; all retained ancestors are included without guessing new parents. */
     fun vocabulary(selectedIds: Set<String>,selectedAxisIds: Set<String> = emptySet()): VocabularyData {
         ensure(selectedAxisIds.all { it in axisCandidateIds },"Selection contains a non-runtime axis")
@@ -49,6 +136,10 @@ class ResearchPlan internal constructor(private val original: ByteArray,val sha2
     /** Evidence is verified before the only database mutation. A stale token cannot replace history. */
     fun apply(tracker: Tracker,expected: Token,selectedIds: Set<String>,archive: ResearchArchive,selectedAxisIds: Set<String> = emptySet()): ResearchImport = storage {
         val vocabulary = vocabulary(selectedIds,selectedAxisIds)
+        for((_,bytes) in supporting) {
+            val digest = researchHash(bytes); archive.put(digest,bytes.copyOf())
+            ensure(researchHash(archive.read(digest)) == digest,"Supporting evidence readback failed",ErrorCode.STORAGE)
+        }
         archive.put(sha256,sourceBytes())
         ensure(researchHash(archive.read(sha256)) == sha256,"Research evidence readback failed",ErrorCode.STORAGE)
         ResearchImport(tracker.addCatalog(expected,vocabulary),sha256,outcomes)
@@ -58,13 +149,13 @@ fun researchHash(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256"
 
 /** Version-specific reader; unhandled research fields remain in the exact original, never silently discarded. */
 object ResearchCatalog {
-    fun read(bytes: ByteArray,expectedSha256: String): ResearchPlan {
+    fun read(bytes: ByteArray,expectedSha256: String,supportingDocuments: Map<String,ByteArray> = emptyMap()): ResearchPlan {
         ensure(researchHash(bytes) == expectedSha256,"Research package hash mismatch",ErrorCode.UNSUPPORTED_IMPORT)
-        return try { parse(bytes.copyOf(),expectedSha256) }
+        return try { parse(bytes.copyOf(),expectedSha256,supportingDocuments.mapValues { it.value.copyOf() }) }
         catch(e: CoreError) { throw e }
         catch(e: Exception) { throw CoreError(ErrorCode.UNSUPPORTED_IMPORT,"Malformed research schema").also { it.initCause(e) } }
     }
-    private fun parse(bytes: ByteArray,hash: String): ResearchPlan {
+    private fun parse(bytes: ByteArray,hash: String,supporting: Map<String,ByteArray>): ResearchPlan {
         val root = codec.parseToJsonElement(bytes.toString(Charsets.UTF_8)).jsonObject
         val manifest = root.obj("manifest")
         ensure(manifest.text("schemaVersion") == "tracker-research-package-0.5","Unsupported research schema",ErrorCode.UNSUPPORTED_IMPORT)
@@ -205,7 +296,8 @@ object ResearchCatalog {
             "Complete raw section retained; nested research evidence is not inferred into runtime rules") }
         sourceManifest.forEachIndexed { i,m -> outcome("/manifest/sourceManifest/$i","source-file",m.text("file"),ResearchDisposition.EXTERNAL_DOCUMENT,
             "Declared source-file digest retained; standalone original bytes are not embedded or independently verified") }
-        val plan = ResearchPlan(bytes,hash,root,sources,nodes,outcomes,candidates,candidateAxes)
+        validateSupportingResearch(root,supporting,sources,nodes,outcomes)
+        val plan = ResearchPlan(bytes,hash,root,sources,nodes,outcomes,candidates,candidateAxes,supporting)
         plan.vocabulary(plan.candidateIds,plan.axisCandidateIds) // validate the complete proposed runtime tree, not a seed sample
         return plan
     }
@@ -228,17 +320,37 @@ object ResearchCatalog {
         axes.forEachIndexed { i,a ->
             ensure(a.obj("sourceRecord").text("id") == a.text("sourceAxisId"),"Axis identity disagrees")
             val source = a.obj("sourceRecord"); val key = axisKey(a)
-            if(a.text("disposition") == "retain_concept" && source.optionalText("valueKind") == "free_label" &&
-                source.optionalText("cardinality") in setOf("single","multiple")) {
+            // Preserve source-local shapes, never the proposed global normalization. A mixed
+            // source label remains exactly that label, not an assertion that components are synonyms.
+            val kind = source.optionalText("valueKind")
+            val card = source.optionalText("cardinality")
+            val leisureText = kind == "user-selected local value or text" &&
+                card == "optional; multiple labels may coexist when true"
+            val blocked = a.text("disposition") in setOf("move_to_preference","move_to_domain_record") ||
+                (a.text("sourceInventory") == "work_learning" && key.id == "axis.project")
+            if(!blocked && ((kind in setOf("free_label","local_choice") && card in setOf("single","multiple","single_optional")) || leisureText)) {
                 val id = "research:${a.text("sourceInventory")}:${key.id}"
+                // Only declared IDs become initial choices; prose/string examples remain evidence.
+                val choices = if(kind == "local_choice") listOf("curatedSuggestedValues","examples","suggestedValues")
+                    .flatMap { (source[it] as? JsonArray).orEmpty() }.mapNotNull { e ->
+                        val v = e as? JsonObject ?: return@mapNotNull null
+                        v.optionalText("valueId")?.let { AxisValue(it,v.optionalText("label") ?: it) }
+                    }.distinctBy { it.id } else emptyList()
                 candidateAxes += Axis(id,source.optionalText("name") ?: source.optionalText("nameRu") ?: source.text("label"),
-                    meaningVersion = source["meaningVersion"]?.jsonPrimitive?.int ?: 1,valueKind = ValueKind.FREE_LABEL,
-                    cardinality = if(source.text("cardinality") == "multiple") Cardinality.MULTIPLE else Cardinality.SINGLE,
+                    meaningVersion = source["meaningVersion"]?.jsonPrimitive?.int ?: 1,
+                    valueKind = if(kind == "local_choice") ValueKind.LOCAL_CHOICE else ValueKind.FREE_LABEL,
+                    cardinality = if(card == "multiple" || leisureText) Cardinality.MULTIPLE else Cardinality.SINGLE,
+                    values = choices,
                     researchOrigins = listOf(ResearchOrigin(hash,key.file,files.getValue(key.file),key.id,"/axesReview/rows/$i")))
                 outcomes += ResearchOutcome("/axesReview/rows/$i","axis",key.toString(),ResearchDisposition.AXIS_CANDIDATE,
-                    "Exact source-local free-label shape; examples remain open-ended evidence, not registered choices",id)
-            } else keep("/axesReview/rows/$i","axis",key.toString(),
-                "Requires explicit source-local schema selection: ${a.text("disposition")}; no concept/name-based merging or mandatory fields")
+                    "Optional exact source-local ${kind}; declared IDs only, custom choices via saveAxis. " +
+                    "No normalized components, identity registry or secondary interval inferred. Review: ${a.text("reasonRu")}",id)
+            } else keep("/axesReview/rows/$i","axis",key.toString(),when {
+                a.text("disposition") == "move_to_preference" -> "Visibility/search/storage preferences are not activity facets; require card preference fields"
+                a.text("disposition") == "move_to_domain_record" -> "Observation fields need a structured observation target; labels cannot preserve record identity and typed values"
+                blocked -> "Definition requires stable projectId; free text preserves spelling but not project identity or project/client separation"
+                else -> "Source declares no valueKind/cardinality. Concrete alternatives: optional MULTIPLE free text or registered local choices; recommend text for descriptive facets, choices for status, with explicit versioned schema"
+            })
         }
         val ledger = valueLayer.array("coverageLedger").map { it.jsonObject }
         ensure(ledger.map(::axisKey).toSet() == axesByKey.keys && ledger.size == axes.size,"Incomplete axis coverage ledger")

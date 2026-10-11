@@ -1,0 +1,1660 @@
+{
+  "research_title": "Android/mobile navigation and search in a large personal time-tracking catalogue",
+  "research_date": "2026-10-11",
+  "language": "ru",
+  "scope": "Mobile catalogue discovery, search, synonym/typo/multilingual retrieval, favorites/recents, folder/tree and facet navigation, user-setting transfer, and Android accessibility. This is research, not an implementation or product-scope approval.",
+  "constraints_observed": [
+    "Read the four requested prior research documents before researching; see read_before.",
+    "Did not install apps or alter code, pages, app settings, or accounts.",
+    "Did not spawn or delegate to other agents.",
+    "Distinguish observed user report, vendor/product claim, research inference, and untested hypothesis.",
+    "Do not convert privacy/security into a restriction on the user's right to record arbitrary personal activities locally.",
+    "Continuation: refreshed official Clockify help/changelog and read the supplied core/UI/catalog contracts. No app/device/user test, code, UI, settings change or new agent was involved."
+  ],
+  "read_before": [
+    {
+      "path": "/workspace/shared/tracker_competitor_progressive_ui.md",
+      "read": "full file",
+      "existing_coverage": "Starter set and one-tap start, optional details, favorites/recent, progressive disclosure, several competitor patterns.",
+      "incremental_scope": "Mobile search-entry point, long-list and recent-order pain, typeahead performance, personal setting export boundary, Unicode and TalkBack details."
+    },
+    {
+      "path": "/workspace/shared/tracker_hierarchy_product_cases.md",
+      "read": "full file",
+      "existing_coverage": "Tree versus tags, mobile large-list gap, safe history reorganization.",
+      "incremental_scope": "Search in current versus global scope, paths in result rows, empirical user reports on mobile search, tag filter patterns, accessible reorder."
+    },
+    {
+      "path": "/workspace/shared/tracker_activity_system_design.md",
+      "read": "full file; relevant selection/search and model sections additionally inspected",
+      "existing_coverage": "Quick actions, search, favorites/recents, locally bundled synonyms, no auto-classification, data model and preliminary accessibility.",
+      "incremental_scope": "Evidence for mobile catalogue navigation; ranking and localization safeguards; access/migration and performance scenarios."
+    },
+    {
+      "path": "/workspace/shared/tracker_data_reliability_cases.md",
+      "read": "full file",
+      "existing_coverage": "Stable identity, aliases, local-first and data-safety issues.",
+      "incremental_scope": "Catalogue-only settings portability distinct from time history, with Android community/product examples."
+    },
+    {
+      "path": "/workspace/shared/tracker_catalog_core_compatibility.md",
+      "read": "full file",
+      "existing_coverage": "Static summary of supported ActivityType, aliases, history path, axes/metrics/units and addCatalog conflicts.",
+      "incremental_scope": "Separate documented support from proposed recent/pins/catalog-only portable contract."
+    },
+    {
+      "path": "/workspace/scratch/518c272c9cd5/core-v4-review/extracted/not-ai-time-tracker/docs/UI_CONTRACT.md",
+      "read": "full file",
+      "existing_coverage": "Current UI/core operations, saveFavorite/startFavorite, history, backup and restore behavior.",
+      "incremental_scope": "Exact boundary between current selection-snapshot favorites and proposed item favorites, Recent, detail pins and start presets."
+    },
+    {
+      "path": "/workspace/scratch/518c272c9cd5/core-v4-review/extracted/not-ai-time-tracker/docs/CATALOG_IMPACT.md",
+      "read": "full file",
+      "existing_coverage": "One-tree catalog semantics, IDs/history, merge statuses, backup/restore boundary.",
+      "incremental_scope": "Stable-ID import contract, user override conflict precedence, no-history-rewrite conditions."
+    }
+  ],
+  "claim_taxonomy": [
+    {
+      "type": "user_report",
+      "meaning": "First-person experience, pain, or request in a thread or review; evidence of a use case, not prevalence."
+    },
+    {
+      "type": "product_claim",
+      "meaning": "Official support page, release note, or vendor statement documents product behavior or intent; it is not an independent usability result."
+    },
+    {
+      "type": "technical_guidance",
+      "meaning": "Official Android/Unicode guidance informs testable implementation requirements."
+    },
+    {
+      "type": "research_inference",
+      "meaning": "Design conclusion reasoned from multiple evidence items and prior project decisions."
+    },
+    {
+      "type": "hypothesis",
+      "meaning": "Plausible design behavior needing user/device evaluation; not established fact."
+    },
+    {
+      "type": "existing_core_contract",
+      "meaning": "Behavior stated in the supplied core/UI/product contract or static compatibility review; documented behavior, not hands-on device verification."
+    },
+    {
+      "type": "proposed_contract",
+      "meaning": "A deterministic, reversible design recommendation authored in this follow-up; not implemented or approved."
+    }
+  ],
+  "sources": [
+    {
+      "id": "S01",
+      "title": "TimeTac Android App Guide, PDF",
+      "url": "https://support.timetac.com/media/downloads/en/timetac-android-app-en.pdf",
+      "kind": "official vendor mobile help document",
+      "date_or_version": "PDF crawled 2026; document is older (search metadata ~5.8 years)",
+      "read_scope": "Opened 22-page/475-line PDF and read the mobile section including Projects & Tasks, hierarchy, search, Recent/Favourites/All, and adjacent app structure. No hands-on app test.",
+      "finding": "The phone picker has search suggestions, tabs To-Dos/Favourites/Recent/All, breadcrumb/superior-level row, folder browsing, and inline start/stop for tasks.",
+      "limitation": "Enterprise app; documentation age and current native screen version were not hands-on verified. Vendor documentation, not independent usability evidence."
+    },
+    {
+      "id": "S02",
+      "title": "aTimeLogger Activities",
+      "url": "https://atimelogger.pro/docs/activities.html",
+      "kind": "official vendor documentation",
+      "date_or_version": "Crawled 2026",
+      "read_scope": "Read relevant full help page covering start/stop, hidden groups, full display path, and multiple activities.",
+      "finding": "Groups may be hidden from the frequent Activities screen while types remain visible; a display-path setting disambiguates duplicate child names.",
+      "limitation": "The docs note most screenshots/menu paths refer to iOS even where behavior also exists on Android; this page is not a hands-on Android verification."
+    },
+    {
+      "id": "S03",
+      "title": "aTimeLogger Types and Groups",
+      "url": "https://atimelogger.pro/docs/types-and-groups.html",
+      "kind": "official vendor documentation",
+      "date_or_version": "Crawled 2026",
+      "read_scope": "Read the full page, including group display/order, archive and destructive conversion/deletion lifecycle.",
+      "finding": "Users can hide groups, order manually or by name, reorder nested items, and inspect their statistics; product distinguishes logged types from grouping nodes.",
+      "limitation": "Evidence of described feature set only; deleting/conversion implications already overlap the prior hierarchy/reliability work."
+    },
+    {
+      "id": "S04",
+      "title": "aTimeLogger History",
+      "url": "https://atimelogger.pro/docs/history.html",
+      "kind": "official vendor documentation",
+      "date_or_version": "Crawled 2026",
+      "read_scope": "Read complete substantive sections for history navigation, filters, search and export.",
+      "finding": "History search covers activity type name, comment, or tags inside the selected date range; type/tag filters are separate.",
+      "limitation": "This is search across recorded history, not proof of search in the start catalogue."
+    },
+    {
+      "id": "S05",
+      "title": "aTimeLogger FAQ",
+      "url": "https://atimelogger.pro/faq.html",
+      "kind": "official vendor FAQ",
+      "date_or_version": "Crawled 2026",
+      "read_scope": "Read full FAQ portions on sync, offline use, data export, account and platform sharing.",
+      "finding": "Vendor says it syncs changes across supported devices with Premium Sync and remains usable offline; it separately distinguishes local-only usage from account-backed sync.",
+      "limitation": "Vendor claim, not verified migration or backup test; no field-by-field setting payload was documented."
+    },
+    {
+      "id": "S06",
+      "title": "ATracker task creation and task/task-entry distinction",
+      "url": "https://support.wonderapps.se/hc/en-us/articles/360022015653-What-is-task-and-how-to-create-a-task",
+      "kind": "official vendor help",
+      "date_or_version": "Updated June 27, 2025",
+      "read_scope": "Read complete substantive help text.",
+      "finding": "Reusable tasks and time-entry records are explicitly separate; tasks can be created from Today/Admin.",
+      "limitation": "Does not document a global activity catalogue search."
+    },
+    {
+      "id": "S07",
+      "title": "ATracker compact Today task list",
+      "url": "https://support.wonderapps.se/hc/en-us/articles/4414229822226-How-to-use-the-new-Compact-view-of-task-list-on-Today-tab",
+      "kind": "official vendor help",
+      "date_or_version": "Current page crawled 2026",
+      "read_scope": "Located and read the compact-view support entry; full app behavior not hands-on tested.",
+      "finding": "Compact task presentation is an explicit option on the Today screen.",
+      "limitation": "The page describes feature setup, not a measured optimum grid density or accessibility performance."
+    },
+    {
+      "id": "S08",
+      "title": "ATracker reorder tasks",
+      "url": "https://support.wonderapps.se/hc/en-us/articles/360022161254-How-to-reorder-tasks",
+      "kind": "official vendor help",
+      "date_or_version": "Updated June 5, 2026",
+      "read_scope": "Read complete procedure.",
+      "finding": "Today tasks support drag-and-drop reordering and alphabetical order.",
+      "limitation": "Does not establish accessibility of drag-and-drop or usability with hundreds of items."
+    },
+    {
+      "id": "S09",
+      "title": "ATracker Feature request - frequently used icons",
+      "url": "https://support.wonderapps.se/hc/en-us/community/posts/360010610259-Feature-request-frequently-used-icons?sort_by=votes",
+      "kind": "vendor-hosted user/feature-request discussion",
+      "date_or_version": "Started 2021; new exchange in 2025; latest visible maintainer response Aug 3, 2025",
+      "read_scope": "Search result rendered the complete seven-comment thread. Direct open returned Cache miss, so do not count it as direct full-page access.",
+      "finding": "Users report repeatedly scrolling to find reused tasks in a long list and painful manual relocation; the team discussed recent/frequency sorting but noted time-window ambiguity, offered tag filter/manual sort, and said request remained to-do in 2025.",
+      "limitation": "Single/limited users and old feature status; does not measure prevalence, and 2026 live app was not installed/retested."
+    },
+    {
+      "id": "S10",
+      "title": "ATracker tag filtering and help index",
+      "url": "https://support.wonderapps.se/hc/en-us/categories/360001698534-ATracker",
+      "kind": "official vendor help index",
+      "date_or_version": "Crawled 2026",
+      "read_scope": "Read listed help topics for Today, task/tag filter, search history, compact view, and ordering.",
+      "finding": "Documentation separates Today tag filtering from History search of task entries.",
+      "limitation": "An index documents page availability, not all screen details; tag filtering is not tree navigation."
+    },
+    {
+      "id": "S11",
+      "title": "ATracker Android backup/restore",
+      "url": "https://support.wonderapps.se/hc/en-us/articles/360022171554-How-to-backup-restore-my-data-Android",
+      "kind": "official vendor help",
+      "date_or_version": "Updated July 17, 2026",
+      "read_scope": "Read full substantive steps for Android-to-Android backup/restore.",
+      "finding": "Android transfer is file based and may require a PC because some vendors restrict direct file access.",
+      "limitation": "Does not state field-by-field whether favorite order, aliases, and all UI preferences are included."
+    },
+    {
+      "id": "S12",
+      "title": "ATracker migration iOS and Android",
+      "url": "https://support.wonderapps.se/hc/en-us/articles/360022171574-How-to-migrate-data-between-iOS-and-Android",
+      "kind": "official vendor help",
+      "date_or_version": "Updated May 23, 2023",
+      "read_scope": "Read complete substantive page.",
+      "finding": "Vendor says direct cross-platform database transfer is unsupported; web sync can convert structure, with subscription requirement stated.",
+      "limitation": "Historic vendor policy and data migration, not only catalogue settings."
+    },
+    {
+      "id": "S13",
+      "title": "ATracker Sharing task list discussion",
+      "url": "https://support.wonderapps.se/hc/en-us/community/posts/5961618937628-Sharing-task-list",
+      "kind": "vendor-hosted user and maintainer discussion",
+      "date_or_version": "Sep 15, 2022",
+      "read_scope": "Complete two-post thread returned in search result.",
+      "finding": "User requests sharing the task list independently. Maintainer describes database export as including all tasks and task entries and says that is not feasible with many time entries; Android/iOS formats differ.",
+      "limitation": "Short historical discussion. A participant's mention of sensitive data is not a policy or a reason to restrict arbitrary private logging."
+    },
+    {
+      "id": "S14",
+      "title": "Clockify Find projects/tasks quickly",
+      "url": "https://clockify.me/help/projects/project-filter",
+      "kind": "official vendor help",
+      "date_or_version": "Official page opened 2026-10-11; crawler reported 4 days earlier",
+      "read_scope": "Re-opened and read full substantive sections (lines 22-54) on 2026-10-11: compact project list, project/task favorites, and task filter.",
+      "finding": "Current help: compact project list for hundreds of clients/projects/tasks; project favorites at the top of finder are user-specific but require workspace activation; Task filter is user-specific web-profile setting and supports task@project/client scope.",
+      "limitation": "Official documentation of web preference/finder behavior; not an Android hands-on test and not proof of usability."
+    },
+    {
+      "id": "S15",
+      "title": "Clockify profile preferences for project collapse and task filter",
+      "url": "https://clockify.me/help/getting-started/manage-your-profile-settings",
+      "kind": "official vendor help",
+      "date_or_version": "Official page opened 2026-10-11; crawler reported 2 days earlier",
+      "read_scope": "Re-opened and read full applicable preference and FAQ text (lines 75-103, 169-171) on 2026-10-11.",
+      "finding": "Collapse preference offers collapse all / none / collapse above project count; task filter is enabled in Profile settings > Preferences; FAQ explains task name in description field followed by @project.",
+      "limitation": "The page describes web profile settings; it does not document the exact Android picker interaction."
+    },
+    {
+      "id": "S16",
+      "title": "Clockify Android feature request: search in Time entries window",
+      "url": "https://forum.clockify.me/t/feature-request-search-in-time-entries-window-android-app/532",
+      "kind": "vendor-hosted user/product discussion",
+      "date_or_version": "Aug 18-20, 2020",
+      "read_scope": "Search result rendered all four posts (original user, vendor questions, explanation, vendor reply).",
+      "finding": "Interrupt-driven user says returning to a past task requires several navigation steps; asks to search prior tasks from the Android time-entry window and preselect the last-used task; vendor says autocomplete is being developed.",
+      "limitation": "Historical request and promise, not current Android app status or outcome."
+    },
+    {
+      "id": "S17",
+      "title": "Clockify Universal Search for Project OR Task",
+      "url": "https://forum.clockify.me/t/feature-request-universal-search-for-project-or-task/620",
+      "kind": "vendor-hosted user/product discussion",
+      "date_or_version": "Oct 28, 2020-Mar 3, 2023",
+      "read_scope": "Search result rendered all ten visible posts (the forum count is original + nine replies), including mobile-specific and ~100-project/~40-task reports.",
+      "finding": "Users report empty results when search assumes the wrong object type, unintuitive @ syntax and long mobile lists; a scaling example had nearly 100 projects with up to 40 tasks each.",
+      "limitation": "Historic enterprise use cases and status; not prevalence or current product state."
+    },
+    {
+      "id": "S18",
+      "title": "Clockify Favorite and/or Recent Descriptions",
+      "url": "https://forum.clockify.me/t/feature-request-favorite-and-or-recent-descriptions/3517",
+      "kind": "vendor-hosted user/product discussion",
+      "date_or_version": "Feb 1-3, 2024",
+      "read_scope": "Opened and read all lines; two total posts.",
+      "finding": "User wants to type/select recently used description scoped to currently selected project; vendor says suggestion passed to product team.",
+      "limitation": "No implementation status in thread."
+    },
+    {
+      "id": "S19",
+      "title": "Toggl Track Favorites product announcement",
+      "url": "https://toggl.com/blog/favorites-feature",
+      "kind": "official vendor announcement",
+      "date_or_version": "Last updated Aug 8, 2024",
+      "read_scope": "Read product feature description and platform availability statement.",
+      "finding": "A favorite can start an entire pre-populated time entry on Android, not just a named category.",
+      "limitation": "Paid-plan feature with platform-gate history; product claim, not measured UX."
+    },
+    {
+      "id": "S20",
+      "title": "Simple Time Tracker releases",
+      "url": "https://github.com/Razeeman/Android-SimpleTimeTracker/releases",
+      "kind": "official open-source release history",
+      "date_or_version": "Through v1.60 (Sep 2026)",
+      "read_scope": "Read current release listing; examined v1.52-v1.59 and recent search/tag/category entries.",
+      "finding": "Main-tab search, tag selection search, categories/tags relations view and per-activity favorite comments arrived incrementally in separate releases.",
+      "limitation": "Changelog documents shipped capabilities, not discoverability or satisfaction; unrelated release items excluded."
+    },
+    {
+      "id": "S21",
+      "title": "Simple Time Tracker issue: lag with Similar comments open",
+      "url": "https://github.com/Razeeman/Android-SimpleTimeTracker/issues/484",
+      "kind": "open-source product issue discussion",
+      "date_or_version": "Jul 12-27, 2026; v1.59 referenced",
+      "read_scope": "Opened the full issue description; search result also displayed maintainer and user follow-up. Full issue activity log could not be retrieved from the page view.",
+      "finding": "One user reports lag and lost second/third typed characters with a very large result set; an almost 10,000-comment crafted backup reproduces a typeahead performance issue in activity-start comment input. The user says v1.59/local dev remained slow in that field after an attempted improvement.",
+      "limitation": "Issue concerns similar comments, not the activity catalogue; reproducer is user supplied and not run by this research. Full comment-log access not confirmed."
+    },
+    {
+      "id": "S22",
+      "title": "Simple Time Tracker: Are template activities translatable?",
+      "url": "https://github.com/Razeeman/Android-SimpleTimeTracker/discussions/431",
+      "kind": "open-source product support discussion",
+      "date_or_version": "Jan 16, 2026",
+      "read_scope": "Opened the complete discussion: original question, answer, and acknowledgment.",
+      "finding": "Seeded template labels (e.g., lunch, dinner, work, sleep) were English-only at time of answer; maintainer planned translation.",
+      "limitation": "Not about user-generated label translation/search. Historical state only."
+    },
+    {
+      "id": "S23",
+      "title": "Simple Time Tracker: Why are strings forced to lower case?",
+      "url": "https://github.com/Razeeman/Android-SimpleTimeTracker/discussions/428",
+      "kind": "open-source product support discussion",
+      "date_or_version": "Jan 9-14, 2026",
+      "read_scope": "Opened all eight thread comments.",
+      "finding": "French volunteer translator questions forced lower-case presentation in a goal hint/notification; maintainer explains design intent for a non-sentence label. This demonstrates locale presentation context, not a catalogue-name search defect.",
+      "limitation": "Only adjacent localization evidence; deliberately not generalized to custom activity names."
+    },
+    {
+      "id": "S24",
+      "title": "Simple Time Tracker: Tool to migrate from Timelog",
+      "url": "https://github.com/Razeeman/Android-SimpleTimeTracker/discussions/459",
+      "kind": "open-source product discussion",
+      "date_or_version": "Mar 23-30, 2026",
+      "read_scope": "Opened complete two-post thread.",
+      "finding": "User built a JSON-to-CSV migration tool, describing conversion as local in-browser; maintainer appreciates it.",
+      "limitation": "Tool was not run; one user's solution, history migration rather than settings-only transfer."
+    },
+    {
+      "id": "S25",
+      "title": "Android per-app language preferences",
+      "url": "https://developer.android.com/guide/topics/resources/app-languages",
+      "kind": "official Android developer documentation",
+      "date_or_version": "Current docs crawled 2026",
+      "read_scope": "Read descriptions of app-language settings on Android 13+, APIs and migration/back-up notes.",
+      "finding": "Android permits a user-selected per-app UI language and supports system/API synchronization; it does not translate application content automatically.",
+      "limitation": "Platform/UI language help does not solve user-label search or synonym handling."
+    },
+    {
+      "id": "S26",
+      "title": "Unicode Collation Algorithm (UTS #10)",
+      "url": "https://www.unicode.org/reports/tr10/tr10-45.html",
+      "kind": "official Unicode specification",
+      "date_or_version": "Version 14.0 / revision 45 (2021); current stable report linked from Unicode",
+      "read_scope": "Read specification summary and sections on linguistic/language variation in collation and loose searching.",
+      "finding": "Sort/search equivalences vary by locale; a single universal accent/character policy is not linguistically correct for every language.",
+      "limitation": "Normative/reference technical guidance, not a user study."
+    },
+    {
+      "id": "S27",
+      "title": "Unicode Normalization Forms (UTR #15)",
+      "url": "https://www.unicode.org/reports/tr15/",
+      "kind": "official Unicode technical report",
+      "date_or_version": "Current revision accessible via latest report link",
+      "read_scope": "Read normalization/equivalence overview and caution on compatibility normalization.",
+      "finding": "Normalization helps compare equivalent encodings, but compatibility transformations may erase visually meaningful distinctions and should not blindly replace arbitrary display text.",
+      "limitation": "Technical guidance, not a product-specific acceptance benchmark."
+    },
+    {
+      "id": "S28",
+      "title": "Unicode LDML Collation",
+      "url": "https://unicode.org/reports/tr35/tr35-collation.html",
+      "kind": "official Unicode technical specification",
+      "date_or_version": "Crawled 2026",
+      "read_scope": "Read relevant matching strengths/ignore accents and punctuation notes.",
+      "finding": "Case, accent and punctuation matching can be configured as separate strengths.",
+      "limitation": "Does not prescribe one right product setting for this user."
+    },
+    {
+      "id": "S29",
+      "title": "2Do Android search help",
+      "url": "https://www.2doapp.com/docs/android/search/",
+      "kind": "official adjacent task-manager documentation",
+      "date_or_version": "Crawled 2026",
+      "read_scope": "Read full search overview, matching modes, search scope and saved-search description.",
+      "finding": "Vendor offers exact/full-text search separately from Soundex matching, explains typo examples, and allows scope/presets.",
+      "limitation": "Adjacent to time tracking, not evidence that Soundex generalizes to Russian/multilingual catalogues."
+    },
+    {
+      "id": "S30",
+      "title": "Jetpack Compose accessibility API defaults",
+      "url": "https://developer.android.com/develop/ui/compose/accessibility/api-defaults",
+      "kind": "official Android developer documentation",
+      "date_or_version": "Crawled 2026",
+      "read_scope": "Read minimum touch target, graphic description, and semantic merge sections.",
+      "finding": "Interactive elements should meet minimum 48dp target; labels and semantics need to reach accessibility services.",
+      "limitation": "API guidance, not an audit of the tracker UI."
+    },
+    {
+      "id": "S31",
+      "title": "Android Text scaling accessibility help",
+      "url": "https://support.google.com/accessibility/android/answer/12159181",
+      "kind": "official Android accessibility help",
+      "date_or_version": "Crawled 2026",
+      "read_scope": "Read design and test guidance for text scaling and responsive layouts.",
+      "finding": "Use scalable text and avoid fixed constraints that crop/obscure large font; test maximum font in portrait/landscape.",
+      "limitation": "General platform guidance, no actual catalogue screenshot test."
+    },
+    {
+      "id": "S32",
+      "title": "TalkBack navigation and container navigation for long lists/grids",
+      "url": "https://support.google.com/accessibility/android/answer/13208602",
+      "kind": "official Android accessibility help",
+      "date_or_version": "TalkBack 13.1 guide, crawled 2026",
+      "read_scope": "Read section for container navigation and list/grid movement.",
+      "finding": "TalkBack has navigation to escape long list/grid containers; the catalogue must be tested with a screen reader in addition to touch.",
+      "limitation": "System capability, not proof of an app-level deficiency."
+    },
+    {
+      "id": "S33",
+      "title": "Compose custom accessibility actions",
+      "url": "https://developer.android.com/develop/ui/compose/accessibility/semantics",
+      "kind": "official Android developer documentation",
+      "date_or_version": "Crawled 2026",
+      "read_scope": "Read custom-action guidance and examples for gestures/list items.",
+      "finding": "Complex gestures such as drag-and-drop/swipe may be difficult for some users; equivalent named custom actions can be exposed through accessibility services.",
+      "limitation": "Guidance does not determine which reorder controls are best for this product."
+    },
+    {
+      "id": "S34",
+      "title": "Compose SearchBar",
+      "url": "https://developer.android.com/develop/ui/compose/components/search-bar",
+      "kind": "official Android developer documentation",
+      "date_or_version": "Crawled 2026",
+      "read_scope": "Read search query state, suggestions and result-selection examples.",
+      "finding": "Provides a standard structure for an input field, suggestions and result list driven by query changes.",
+      "limitation": "UI component example; doesn't supply search ranking, language normalization, performance guarantee or typeahead interaction tests."
+    },
+    {
+      "id": "S35",
+      "title": "Clockify Android app help",
+      "url": "https://clockify.me/help/apps/android-app",
+      "kind": "official vendor Android help",
+      "date_or_version": "Crawled 2026-10-11; official page says 30 min read",
+      "read_scope": "Opened full text (1,108 lines) and read relevant sections: time tracking and edit entry (lines 87-169), Android Track again widget (271-311), manage projects (742-790), profile/settings/default project/offline selection (791-900). No installation or device test.",
+      "finding": "Android help documents project/task as entry details, exact-detail continuation of previous entries, a Track again widget listing four most-recent entries, default fixed/last-used project, and selection of only previously loaded catalogue items offline. It does not document the detailed Android task-search/filter flow.",
+      "limitation": "Vendor documentation, not observed current UI; surrounding features may be workspace/permission dependent."
+    },
+    {
+      "id": "S36",
+      "title": "Clockify official changelog",
+      "url": "https://clockify.me/help/whats-new",
+      "kind": "official product changelog",
+      "date_or_version": "Current page opened 2026-10-11; relevant entries Aug/Oct 2026",
+      "read_scope": "Opened current changelog full page and read current October, September, August, June and historical entries matching task/project picker and search (lines 18-119; 158-170).",
+      "finding": "October 2026 lists a fix for inability to remove a favorite entry on Time tracker. August 2026 lists Android search functionality issues when Task filter is active as a fix; June lists long project-name display issue in expanded picker.",
+      "limitation": "Release notes identify product issue/fix labels, but do not show exact UI, release build, regression tests or independently verified outcome; absence in a later month is not proof."
+    },
+    {
+      "id": "S37",
+      "title": "Каталог и ядро v3: проверка совместимости (project artifact)",
+      "url": "file:///workspace/shared/tracker_catalog_core_compatibility.md",
+      "kind": "supplied internal product/core compatibility document",
+      "date_or_version": "2026-10-11; static review of commit stated in the document",
+      "read_scope": "Read full document, including supported models, addCatalog result semantics, type IDs/aliases, history and remaining integration boundary.",
+      "finding": "Documents ActivityType stable ID/aliases/hierarchy, historical path, supported dictionaries and per-key ADDED/UNCHANGED/CONFLICT import outcome; distinguishes existing core capability from desired catalog/adapter work.",
+      "limitation": "Static compatibility document, not an independent run or live product UX."
+    },
+    {
+      "id": "S38",
+      "title": "UI integration contract v2 (project artifact)",
+      "url": "file:///workspace/scratch/518c272c9cd5/core-v4-review/extracted/not-ai-time-tracker/docs/UI_CONTRACT.md",
+      "kind": "supplied internal UI/core contract",
+      "date_or_version": "v2; read 2026-10-11",
+      "read_scope": "Read complete contract, especially saveFavorite/startFavorite/repeat, classification/history, JSON backup/restore, addCatalog and constraints.",
+      "finding": "Current contract states saveFavorite/startFavorite/removeFavorite saved selection snapshots; Repeat/Favorite preserve selected type/details and archived choices; whole-dataset JSON restore is replacement. No standalone recency, detail-pin or catalog-only transfer semantics are specified.",
+      "limitation": "Contract text does not prove UI/API implementation or user acceptance beyond what the document explicitly says."
+    },
+    {
+      "id": "S39",
+      "title": "Единое дерево и словари · реализованный контракт v2 (project artifact)",
+      "url": "file:///workspace/scratch/518c272c9cd5/core-v4-review/extracted/not-ai-time-tracker/docs/CATALOG_IMPACT.md",
+      "kind": "supplied internal catalog/core contract",
+      "date_or_version": "v2; read 2026-10-11",
+      "read_scope": "Read entire file including tree, aliases, saved historical IDs/path, JSON backup/restore and import-conflict notes.",
+      "finding": "States addCatalog preserves existing local names/links on conflicts and may apply independent definitions; current full backup restore is explicit replacement; type meaning change requires a new ID; no name-based remap is provided.",
+      "limitation": "Implementation boundary document, not tested import or cross-device transfer."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E01",
+      "type": "product_claim",
+      "statement": "An Android time-tracker can combine a global activity/task search, recently/frequently accessible categories, hierarchy breadcrumbs, and inline start/stop in one picker.",
+      "source_ids": [
+        "S01"
+      ],
+      "strength": "Direct vendor documentation of one product pattern.",
+      "caveat": "TimeTac is enterprise-oriented and guide age is non-trivial; do not infer measured usability."
+    },
+    {
+      "id": "E02",
+      "type": "user_report",
+      "statement": "A mobile search restricted to the wrong object type can produce no results; requiring a project choice then a task search and long scrolling can frustrate users, particularly in large lists.",
+      "source_ids": [
+        "S16",
+        "S17"
+      ],
+      "strength": "Two specific first-person vendor-community reports; one explicitly describes Android and another says the effect is particularly frustrating on mobile.",
+      "caveat": "2020 forum threads; historic behavior and a few workflows, not prevalence/current app status."
+    },
+    {
+      "id": "E03",
+      "type": "user_report",
+      "statement": "Manual ordering is not a scalable substitute for fast access as tasks accumulate; users request recently or frequently used tasks and a way to move a selected item straight to the top.",
+      "source_ids": [
+        "S09"
+      ],
+      "strength": "A user raised the request in 2021 and another added a detailed long-list case in 2025; maintainer discusses implementation trade-offs.",
+      "caveat": "Narrow feature-request thread; not a broad usability study."
+    },
+    {
+      "id": "E04",
+      "type": "product_claim",
+      "statement": "Time entries, reusable task definitions, tree/group nodes, filter tags and history search have distinct product roles.",
+      "source_ids": [
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S10"
+      ],
+      "strength": "Supported by several official help pages.",
+      "caveat": "Documentation pages sometimes describe shared iOS/Android behavior but screenshots/menu paths are iOS-based."
+    },
+    {
+      "id": "E05",
+      "type": "user_report",
+      "statement": "A user with frequent interruptions wants to find a previous task from the active Android timer/entry window; last-used default would save project-switching steps.",
+      "source_ids": [
+        "S16"
+      ],
+      "strength": "Specific user-described task-switching journey in a full four-post thread.",
+      "caveat": "One user's use case, historical product discussion."
+    },
+    {
+      "id": "E06",
+      "type": "user_report",
+      "statement": "Search syntax that depends on whether the user means task, project, or client can fail to match the user's mental model; a person reported roughly 100 projects and up to 40 tasks each, with extra frustration on mobile.",
+      "source_ids": [
+        "S17"
+      ],
+      "strength": "Full ten-post thread showed both original request and subsequent user examples.",
+      "caveat": "Enterprise examples should not be assumed to match a personal tracker’s typical scale."
+    },
+    {
+      "id": "E07",
+      "type": "user_report",
+      "statement": "A user values selecting a recent description scoped to an already selected project rather than retyping it.",
+      "source_ids": [
+        "S18"
+      ],
+      "strength": "Full two-post discussion.",
+      "caveat": "It concerns a time-entry description, not a task-definition favorite."
+    },
+    {
+      "id": "E08",
+      "type": "product_claim",
+      "statement": "The label Favorite can mean a stable project favorite or a one-tap fully prepopulated time entry; it is not inherently a synonym for recent activity.",
+      "source_ids": [
+        "S14",
+        "S19",
+        "S01"
+      ],
+      "strength": "Three official product documentation/announcement sources document differing semantics.",
+      "caveat": "Patterns differ by product tier and enterprise settings."
+    },
+    {
+      "id": "E09",
+      "type": "product_claim",
+      "statement": "Searching through activity types, searching history entries, and filtering by tags are separate affordances in mobile tracking products.",
+      "source_ids": [
+        "S02",
+        "S03",
+        "S04",
+        "S06",
+        "S10"
+      ],
+      "strength": "Multiple official docs clearly describe scope separation.",
+      "caveat": "Never infer that history search also covers every start-picker item."
+    },
+    {
+      "id": "E10",
+      "type": "user_report",
+      "statement": "Autocomplete or similar comments can become too slow to type into when a high-cardinality suggestion set is rendered/queried; one user reported keystrokes being dropped with about 9,998 comments.",
+      "source_ids": [
+        "S20",
+        "S21"
+      ],
+      "strength": "Issue contains a detailed reproduction description and later user follow-up; release history separately shows search features added incrementally.",
+      "caveat": "This is a comment-suggestion UI, not catalogue search; reproduction not run and issue activity log was only partially retrieved."
+    },
+    {
+      "id": "E11",
+      "type": "user_report",
+      "statement": "Seed labels which don't localize with the surrounding interface may leave a multilingual user unable to understand first-run presets.",
+      "source_ids": [
+        "S22"
+      ],
+      "strength": "Full user/maintainer discussion identifies English-only default templates as of Jan 2026.",
+      "caveat": "Does not establish a problem for custom labels or search."
+    },
+    {
+      "id": "E12",
+      "type": "technical_guidance",
+      "statement": "UI language, user's label, alias, and search normalization are separate concerns; locale-sensitive comparisons should not silently rewrite displayed personal data.",
+      "source_ids": [
+        "S25",
+        "S26",
+        "S27",
+        "S28"
+      ],
+      "strength": "Derived from platform locale behavior and Unicode guidance.",
+      "caveat": "The actual supported languages and match behavior need localization tests."
+    },
+    {
+      "id": "E13",
+      "type": "product_claim",
+      "statement": "Adjacent Android task software separates exact full-text search from phonetic typo-tolerant matching and saved search presets.",
+      "source_ids": [
+        "S29"
+      ],
+      "strength": "Official product documentation with examples.",
+      "caveat": "2Do is not a time tracker; English Soundex behavior must not be assumed suitable for non-English labels."
+    },
+    {
+      "id": "E14",
+      "type": "product_claim",
+      "statement": "Some Android transfer routes copy a full database/history or require a web conversion subscription; one user's request for a task-list-only share was answered with a full-database export.",
+      "source_ids": [
+        "S11",
+        "S12",
+        "S13",
+        "S05"
+      ],
+      "strength": "Official migration help and complete community exchange; contrasting sync claim also documented.",
+      "caveat": "Source states do not reveal whether all personal UI settings/order/aliases are included."
+    },
+    {
+      "id": "E15",
+      "type": "technical_guidance",
+      "statement": "Android activity grids/search results need tested focus semantics, explicit labels, 48dp touch targets, responsive text, and accessible alternatives to drag-only ordering.",
+      "source_ids": [
+        "S30",
+        "S31",
+        "S32",
+        "S33",
+        "S34"
+      ],
+      "strength": "Multiple current official Android guidance pages.",
+      "caveat": "No app-specific TalkBack user report was retrieved; these are test requirements, not observed defects."
+    },
+    {
+      "id": "E16",
+      "type": "research_inference",
+      "statement": "Combine a short stable quick-start layer, all-catalog search with full-path result labels, optional tree browse, and separate facet filters; do not require taxonomy setup to log.",
+      "source_ids": [
+        "S01",
+        "S16",
+        "S17",
+        "S09",
+        "S30",
+        "S31",
+        "S32",
+        "S33"
+      ],
+      "strength": "Converges documented patterns and user reports with the pre-existing progressive-UI/product-model proposal.",
+      "caveat": "Promising synthesis, not validated in an interaction test.",
+      "derived_from_evidence_ids": [
+        "E01",
+        "E02",
+        "E03",
+        "E04",
+        "E06",
+        "E15"
+      ]
+    },
+    {
+      "id": "E17",
+      "type": "hypothesis",
+      "statement": "Exact name/alias, prefix, normalized case/accent, and finally a clearly marked fuzzy fallback will help multilingual typo searches without unacceptable false matches.",
+      "source_ids": [
+        "S26",
+        "S27",
+        "S28",
+        "S29"
+      ],
+      "strength": "Plausible implementation hypothesis informed by platform/adjacent product docs.",
+      "caveat": "Needs language-specific test corpus and a decision about short query thresholds."
+    },
+    {
+      "id": "E18",
+      "type": "research_inference",
+      "statement": "Use explicit manual Favorite, timestamp-based Recent, and optional frequency ranking as separate concepts.",
+      "source_ids": [
+        "S01",
+        "S08",
+        "S09",
+        "S14",
+        "S19"
+      ],
+      "strength": "Reasoned from official patterns and direct team explanation of frequency-window ambiguity.",
+      "caveat": "Requires user test to decide which of these belongs in the default start screen."
+    },
+    {
+      "id": "E19",
+      "type": "research_inference",
+      "statement": "If catalog portability is added, make selected personal navigation/search settings exportable separately from recorded history; user selects payload explicitly.",
+      "source_ids": [
+        "S11",
+        "S12",
+        "S13",
+        "S05",
+        "S24"
+      ],
+      "strength": "Reasoned from observed migration coupling and existing offline/data-export project direction.",
+      "caveat": "Not a data-security restriction; exact bundle fields, conflicts, and current backups need product decision and testing."
+    },
+    {
+      "id": "E20",
+      "type": "product_claim",
+      "statement": "As of the official help pages opened 2026-10-11, Clockify describes compact project grouping for large catalogs, user-specific project favorites (enabled by workspace), and user-specific task filtering via web profile preferences using task@project/client syntax.",
+      "source_ids": [
+        "S14",
+        "S15"
+      ],
+      "strength": "Direct current vendor documentation read in full on this pass.",
+      "caveat": "Does not show Android hands-on picker; feature presence is not a usability result."
+    },
+    {
+      "id": "E21",
+      "type": "product_claim",
+      "statement": "Clockify Android help documents exact-detail continuation of an old entry and a Track again widget that shows four most recently tracked entries; the Android project/task search UI itself is not specified in the relevant help sections.",
+      "source_ids": [
+        "S35"
+      ],
+      "strength": "Direct official Android guide text.",
+      "caveat": "Documentation may lag the live app; no app installed or exercised."
+    },
+    {
+      "id": "E22",
+      "type": "product_claim",
+      "statement": "Clockify official changelog lists an August 2026 fix item for Android search issues when Task filter is active, June 2026 long-name project-picker display issue, and an October 2026 fix item for removing a favorite entry on Time tracker.",
+      "source_ids": [
+        "S36"
+      ],
+      "strength": "Current first-party release notes.",
+      "caveat": "Release-note labels do not establish exact current behavior, build coverage, or independent fix verification."
+    },
+    {
+      "id": "E23",
+      "type": "existing_core_contract",
+      "statement": "The supplied UI contract documents saveFavorite/startFavorite/removeFavorite and Repeat as saved selection/parameter snapshots; Repeat/Favorite keep selected type/details even after card rename/archive, and a new entry resolves its path at current tree at start.",
+      "source_ids": [
+        "S38",
+        "S39"
+      ],
+      "strength": "Directly stated in current project contract.",
+      "caveat": "The exact stored Favorite field list and actual live UI have not been verified."
+    },
+    {
+      "id": "E24",
+      "type": "existing_core_contract",
+      "statement": "Current core compatibility documents stable type IDs and aliases, saved ancestorPathAtWrite, dictionary axes/metrics/units, addCatalog per-key ADDED/UNCHANGED/CONFLICT outcomes and preservation of local conflicts. JSON v2 restore remains a full dataset replacement, not catalog-only merge.",
+      "source_ids": [
+        "S37",
+        "S38",
+        "S39"
+      ],
+      "strength": "Direct static contract/document analysis.",
+      "caveat": "No catalog-only payload/import adapter or real-device transfer has been run."
+    },
+    {
+      "id": "E25",
+      "type": "proposed_contract",
+      "statement": "Keep four distinct personal access objects: live item Favorite reference; Recent derived only from actual successful segment starts; context-scoped pinned detail value/text; named whole-entry start preset snapshot. Removing any access metadata must not remove the target item or logged history.",
+      "source_ids": [
+        "S35",
+        "S38"
+      ],
+      "strength": "Deterministic reversible recommendation informed by current core boundaries and documented competitor distinctions.",
+      "caveat": "Not approved, implemented, or usability-tested; proposed eight-row Recent summary needs testing."
+    },
+    {
+      "id": "E26",
+      "type": "proposed_contract",
+      "statement": "A separately versioned catalog-only bundle should merge definitions and explicitly selected personal catalog settings by stable IDs, preserve destination overrides by default, report ID/meaning conflicts, and never include or rewrite time-history records. Full JSON restore is not suitable for this merge.",
+      "source_ids": [
+        "S37",
+        "S38",
+        "S39"
+      ],
+      "strength": "Deterministic recommendation aligned to existing ID/history/restore contracts.",
+      "caveat": "Schema, preview statuses and import adapter are new proposals, not current functionality."
+    }
+  ],
+  "needs": [
+    {
+      "id": "N01",
+      "need": "Find a known activity from the screen where the person starts or resumes tracking, without deciding in advance whether it is a project, task, group, or tag.",
+      "evidence_ids": [
+        "E02",
+        "E05",
+        "E06"
+      ],
+      "design_response": "Search all personal activity labels first; put query near Start/Now and let optional filters narrow later.",
+      "status": "evidence supported; first-run path untested"
+    },
+    {
+      "id": "N02",
+      "need": "Return quickly to a deliberately important activity and to a recently used activity.",
+      "evidence_ids": [
+        "E03",
+        "E07",
+        "E08",
+        "E18"
+      ],
+      "design_response": "Stable manual Favorites and chronological Recent; keep frequency ranking optional.",
+      "status": "two different access signals established; exact layout/default not decided"
+    },
+    {
+      "id": "N03",
+      "need": "Re-find an item in hundreds or more records without scroll-only interaction or an obscure search syntax.",
+      "evidence_ids": [
+        "E03",
+        "E06",
+        "E10"
+      ],
+      "design_response": "Global query, indexed/local list, lazy result rendering and predictable ranking; load deeper matches on demand.",
+      "status": "an analogous large enterprise scale and a very large comment case exist; personal-catalog performance to measure"
+    },
+    {
+      "id": "N04",
+      "need": "Recognize the intended item when siblings/groups share a display name.",
+      "evidence_ids": [
+        "E01",
+        "E04"
+      ],
+      "design_response": "Show path/breadcrumb in search rows and accessible labels; optionally hide group nodes from quick-start grid.",
+      "status": "product patterns documented; target hierarchy behavior to test"
+    },
+    {
+      "id": "N05",
+      "need": "Filter by an overlapping property without pretending the property is a folder or replacing the user's own name.",
+      "evidence_ids": [
+        "E04",
+        "E09"
+      ],
+      "design_response": "Keep tree and tags/facets distinct; user-created activity remains loggable if unmatched.",
+      "status": "concept already aligned with prior model; mobile filter details remain to prototype"
+    },
+    {
+      "id": "N06",
+      "need": "Search labels even when the UI locale, script, accent, or user's shorthand differs.",
+      "evidence_ids": [
+        "E11",
+        "E12",
+        "E13",
+        "E17"
+      ],
+      "design_response": "Separate UI translations, original personal label, and personal/local alias list; stage match strength without rewriting.",
+      "status": "requirements technically supported; target user languages and exact match policy are open"
+    },
+    {
+      "id": "N07",
+      "need": "Typeahead/autocomplete must not become slow or swallow characters at high result counts.",
+      "evidence_ids": [
+        "E10"
+      ],
+      "design_response": "Avoid eagerly creating thousands of tappable suggestion buttons; incremental/lazy rendering, measurable responsiveness, scope narrowing.",
+      "status": "analogous issue observed; size/latency envelope not benchmarked"
+    },
+    {
+      "id": "N08",
+      "need": "Move a favorite or change its order without relying exclusively on a drag gesture or visual icon/color.",
+      "evidence_ids": [
+        "E03",
+        "E15"
+      ],
+      "design_response": "Expose explicitly named accessible row actions for pin/move-top/order and semantic Favorite state.",
+      "status": "platform guidance supports alternate actions; no tracker-specific motor/accessibility interview found"
+    },
+    {
+      "id": "N09",
+      "need": "Move one's own useful catalogue/navigation settings between devices without being forced to move all old history.",
+      "evidence_ids": [
+        "E14",
+        "E19"
+      ],
+      "design_response": "Offer explicit settings/catalogue payload distinct from history; preserve local/offline tracking and allow the user to decide what to transfer.",
+      "status": "design inference; user need directly appears in a task-list sharing request, but item-specific transfer not field-tested"
+    },
+    {
+      "id": "N10",
+      "need": "Read/navigate and act on a long catalogue under TalkBack, Switch Access/Voice Access and enlarged text.",
+      "evidence_ids": [
+        "E15"
+      ],
+      "design_response": "Semantic full path/state, screen-reader traversal/escape, responsive text, large touch targets, and alternate reorder action.",
+      "status": "acceptance requirement, not observed user-report evidence"
+    },
+    {
+      "id": "N11",
+      "need": "Start an existing favorite quickly while preserving the intended surrounding fields where the user chose to save a full start.",
+      "evidence_ids": [
+        "E08"
+      ],
+      "design_response": "Keep activity favorite distinct from a whole-entry preset/favorite and show prefilled context before starting.",
+      "status": "vendor examples document the pattern; target need unvalidated"
+    },
+    {
+      "id": "N12",
+      "need": "Tell apart a favorite activity, a recently started activity, a pinned detail value, and a reusable full selection/start preset.",
+      "evidence_ids": [
+        "E20",
+        "E21",
+        "E23",
+        "E25"
+      ],
+      "design_response": "Expose separate nouns and independent lifecycle rules; do not let search/view/favorite mutation create a time record.",
+      "status": "precise reversible contract proposed; terminology and eight-item preview require product/user validation"
+    },
+    {
+      "id": "N13",
+      "need": "Move the user’s catalog labels, aliases, parent/order choices and quick-access shortcuts to another device without losing the destination’s independent history or silently replacing local customizations.",
+      "evidence_ids": [
+        "E24",
+        "E26"
+      ],
+      "design_response": "Add separately versioned catalog-only package and previewed stable-ID merge; keep source definitions and personal overlay distinguishable.",
+      "status": "schema and deterministic conflict policy proposed; implementation and round-trip unverified"
+    },
+    {
+      "id": "N14",
+      "need": "Let seed translations and hierarchy revisions improve search while preserving a person’s own labels/aliases and historical classifications.",
+      "evidence_ids": [
+        "E23",
+        "E24",
+        "E26"
+      ],
+      "design_response": "Use stable IDs and explicit local override/provenance; new semantic identity gets new ID; do not match by label or reclassify history on catalog update.",
+      "status": "existing history rule documented; override provenance and seed-update migration remain unimplemented/unverified"
+    }
+  ],
+  "alternatives": [
+    {
+      "id": "A01",
+      "name": "Flat compact grid/list only",
+      "benefits": [
+        "Simplest first-run mental model",
+        "Fast direct taps for small catalogues"
+      ],
+      "costs": [
+        "Scroll burden as the list grows",
+        "Same names need an additional disambiguator"
+      ],
+      "supported_by": [
+        "S06",
+        "S07",
+        "S09"
+      ],
+      "assessment": "Suitable as quick-start surface, insufficient as the only navigation for an eventual large catalogue."
+    },
+    {
+      "id": "A02",
+      "name": "Nested tree/folder-only picker",
+      "benefits": [
+        "Clear single-parent context",
+        "Breadcrumb makes ancestry visible"
+      ],
+      "costs": [
+        "Adds taps before start",
+        "Can hide a valid item under an unexpected parent",
+        "A full tree may be premature during onboarding"
+      ],
+      "supported_by": [
+        "S01",
+        "S02",
+        "S03"
+      ],
+      "assessment": "Good optional Browse mode; do not require folder construction at first start."
+    },
+    {
+      "id": "A03",
+      "name": "Independent tags only",
+      "benefits": [
+        "Can filter across parents and shared activities",
+        "Useful compact narrowing control"
+      ],
+      "costs": [
+        "Does not supply a parent path or natural tree roll-up",
+        "Too many choice chips may create tag chores"
+      ],
+      "supported_by": [
+        "S03",
+        "S10",
+        "S14"
+      ],
+      "assessment": "Use as optional facets, not a substitute for grouping semantics."
+    },
+    {
+      "id": "A04",
+      "name": "Global all-catalog search with optional current-folder/tag filter",
+      "benefits": [
+        "Avoids category-type ambiguity",
+        "One route from anywhere",
+        "Can expose personal aliases and paths"
+      ],
+      "costs": [
+        "More results require ranking and duplicate-name paths",
+        "Needs performance and accessibility test"
+      ],
+      "supported_by": [
+        "S01",
+        "S16",
+        "S17",
+        "S26",
+        "S34"
+      ],
+      "assessment": "Best search default to prototype; folder/tag filtering should be explicit, never silently scoped."
+    },
+    {
+      "id": "A05",
+      "name": "One-touch recents and manual favorites",
+      "benefits": [
+        "Recency updates itself; favorite order stays under user control",
+        "Does not hide the rest of the catalogue"
+      ],
+      "costs": [
+        "May overlap visually",
+        "Recent window/amount needs device-width testing"
+      ],
+      "supported_by": [
+        "S01",
+        "S09",
+        "S14",
+        "S19"
+      ],
+      "assessment": "Preferred lightweight quick-access pattern; recent and favorite definitions must remain separate."
+    },
+    {
+      "id": "A06",
+      "name": "Automatically sort full list by frequency/recent activity",
+      "benefits": [
+        "Could place reusable actions closer without manual curation"
+      ],
+      "costs": [
+        "Dynamically reorders users' stable list",
+        "Frequency time window and definition of activity are ambiguous",
+        "Could repeatedly surface old one-off actions"
+      ],
+      "supported_by": [
+        "S09"
+      ],
+      "assessment": "Do not default to it; offer only after a user choice and with clear sort label/window."
+    },
+    {
+      "id": "A07",
+      "name": "Fuzzy/phonetic matching as primary retrieval",
+      "benefits": [
+        "Can recover misspelled or partially remembered names"
+      ],
+      "costs": [
+        "False positives, English-language bias, uncertain locale behavior, possibly expensive candidate generation"
+      ],
+      "supported_by": [
+        "S21",
+        "S26",
+        "S27",
+        "S28",
+        "S29"
+      ],
+      "assessment": "Secondary, marked candidate retrieval only; exact name/alias stays ahead, no automatic label mapping."
+    },
+    {
+      "id": "A08",
+      "name": "Combined global search, optional Browse tree, independent facets, personal aliases, stable favorites, timestamped recents",
+      "benefits": [
+        "Supports novices immediately and power users later",
+        "Separates hierarchy, cross-cutting tags and quick access"
+      ],
+      "costs": [
+        "Requires careful filter/path/ranking design and local tests"
+      ],
+      "supported_by": [
+        "E01",
+        "E02",
+        "E03",
+        "E04",
+        "E06",
+        "E15"
+      ],
+      "assessment": "Recommended prototype direction; not approved implementation scope."
+    },
+    {
+      "id": "A09",
+      "name": "Full backup restore versus catalog-only merge",
+      "benefits": [
+        "Full backup preserves whole dataset for device recovery.",
+        "Catalog-only mode can bring search structure and personal quick access without changing target history."
+      ],
+      "costs": [
+        "Full restore is a complete replacement and may remove newer local records.",
+        "Catalog-only merge needs per-ID preview, overlay provenance, conflict/dependency reporting and explicit shortcut merge rules."
+      ],
+      "supported_by": [
+        "S37",
+        "S38",
+        "S39"
+      ],
+      "assessment": "Keep both as named, separate actions. Never implement “catalog only” by invoking full replacement restore; do not imply addCatalog alone is a user-facing portable package."
+    }
+  ],
+  "risks": [
+    {
+      "id": "R01",
+      "risk": "Search field scope is unclear or silently confined to one group/type.",
+      "mechanism": "User enters task label in a project-only field and sees no result; repeated navigation and scrolling.",
+      "mitigation_to_test": "Global all-items scope by default; label any current-folder or facet limit; show full path.",
+      "evidence_ids": [
+        "E02",
+        "E06"
+      ]
+    },
+    {
+      "id": "R02",
+      "risk": "Overly aggressive typo/accent/transliteration matching selects or suggests a semantically different activity.",
+      "mechanism": "String similarity is not intent and language-specific letter equivalence differs.",
+      "mitigation_to_test": "Original label preserved; ranking tiers; approximate label; no auto-start or auto-category mapping from query alone.",
+      "evidence_ids": [
+        "E12",
+        "E13",
+        "E17"
+      ]
+    },
+    {
+      "id": "R03",
+      "risk": "High-cardinality suggestions delay input or drop keystrokes.",
+      "mechanism": "Heavy query/render on each character; excessive rows focusable at once.",
+      "mitigation_to_test": "Indexed/local data, throttle/debounce when needed, incremental render, bounded visible suggestions and full scrollable results; test 10k synthetic input.",
+      "evidence_ids": [
+        "E10"
+      ]
+    },
+    {
+      "id": "R04",
+      "risk": "Manual drag reorder becomes the only route to keep a frequent activity at the top.",
+      "mechanism": "Long-range drag and scrolling are tedious and may be inaccessible.",
+      "mitigation_to_test": "Favorites and recent row; Move to top / reorder accessibility action; manual, alphabetical and explicit recent order choices.",
+      "evidence_ids": [
+        "E03",
+        "E15"
+      ]
+    },
+    {
+      "id": "R05",
+      "risk": "Frequency sorting makes stable catalogue items jump unexpectedly.",
+      "mechanism": "Recency window and count definition are unclear; user activity changes each day.",
+      "mitigation_to_test": "Use explicit Favorite and timestamped Recent separately; frequency sorting only opt-in with period label.",
+      "evidence_ids": [
+        "E18"
+      ]
+    },
+    {
+      "id": "R06",
+      "risk": "A copied full database conflates portable setup with personal time history.",
+      "mechanism": "A user seeking only reusable activity definitions has no narrow payload.",
+      "mitigation_to_test": "Separate export choices and preview imported IDs/duplicates before applying; let the user choose history payload.",
+      "evidence_ids": [
+        "E14",
+        "E19"
+      ]
+    },
+    {
+      "id": "R07",
+      "risk": "Favorites, recents, history entries and full entry templates are collapsed into one feature.",
+      "mechanism": "A named activity favorite is not the same as a complete start with tags/description/default values.",
+      "mitigation_to_test": "Separate labels and interactions; preview all fields of a saved full-entry shortcut.",
+      "evidence_ids": [
+        "E08",
+        "E11"
+      ]
+    },
+    {
+      "id": "R08",
+      "risk": "Accessibility path disappears in a dense grid or gestures-only list.",
+      "mechanism": "Screen-reader users need sequential navigation and long container exit; motor-access users may not drag.",
+      "mitigation_to_test": "Semantics/state/path, 48dp targets, TalkBack, Switch Access/Voice Access alternate custom actions, large-font review.",
+      "evidence_ids": [
+        "E15"
+      ]
+    },
+    {
+      "id": "R09",
+      "risk": "UI localization silently changes user-created names or seed aliases.",
+      "mechanism": "Translated resources and persistent user data are stored/handled as if they were the same field.",
+      "mitigation_to_test": "Keep original labels and aliases separate from UI locale; test language changes and restore without relabeling.",
+      "evidence_ids": [
+        "E11",
+        "E12"
+      ]
+    },
+    {
+      "id": "R10",
+      "risk": "Tags are mistaken for categories or counted as additional time totals.",
+      "mechanism": "Cross-cutting filters are treated as parents or additive buckets.",
+      "mitigation_to_test": "Visualize path only for actual hierarchy; tag is a filter/facet badge; reconcile primary totals according to existing product data model.",
+      "evidence_ids": [
+        "E04",
+        "E09"
+      ]
+    },
+    {
+      "id": "R11",
+      "risk": "Seed translations leave default onboarding labels unreadable or inconsistent.",
+      "mechanism": "UI supports a language while sample activity labels remain English.",
+      "mitigation_to_test": "Translate seed display resources; preserve the user's chosen label; allow no translation/locale to block start.",
+      "evidence_ids": [
+        "E11"
+      ]
+    },
+    {
+      "id": "R12",
+      "risk": "The UI uses “favorite” for an item, selection snapshot and completed time entry interchangeably.",
+      "mechanism": "The user may expect rename-safe live reference but instead get frozen parameters, or remove a convenience and assume history was deleted.",
+      "mitigation_to_test": "Use separate labels and controls for favorite item, saved start preset and historical entry; test each removal independently.",
+      "evidence_ids": [
+        "E21",
+        "E22",
+        "E23",
+        "E25"
+      ]
+    },
+    {
+      "id": "R13",
+      "risk": "Catalog import guesses identity from equal names or silently overwrites a user rename/parent/alias with a translation refresh.",
+      "mechanism": "Different tasks are merged; historical IDs/rollups appear to change meaning; personal search words disappear.",
+      "mitigation_to_test": "Use stable entity IDs plus explicit override/provenance; report conflict by field; default to preserve destination values; no silent history remap.",
+      "evidence_ids": [
+        "E24",
+        "E26"
+      ]
+    },
+    {
+      "id": "R14",
+      "risk": "A whole-backup restore is used as a shortcut to transfer catalog, erasing newer local history.",
+      "mechanism": "Restore replaces existing dataset instead of merging definitions.",
+      "mitigation_to_test": "Distinct export labels/discriminators and a preview stating history counts and replacement versus merge; keep history untouched in catalog-only mode.",
+      "evidence_ids": [
+        "E24",
+        "E26"
+      ]
+    },
+    {
+      "id": "R15",
+      "risk": "Imported shortcut/pin references a conflicting axis, value, parent, or archived type and is attached to the wrong local definition.",
+      "mechanism": "An entry appears valid by text but changes the selected classification/detail.",
+      "mitigation_to_test": "Validate graph before commit; block dependent imports on unresolved identity conflict; show full path and meaning version.",
+      "evidence_ids": [
+        "E24",
+        "E26"
+      ]
+    },
+    {
+      "id": "R16",
+      "risk": "Recent ordering is imported as though it were complete time history or merged by incomparable rank/timestamps.",
+      "mechanism": "New device shows a fabricated last-used time or unpredictable order.",
+      "mitigation_to_test": "Catalog-only bundle may carry only an explicit ID order; do not fabricate timestamp/history; default to destination Recent on merge.",
+      "evidence_ids": [
+        "E25",
+        "E26"
+      ]
+    }
+  ],
+  "acceptance_scenarios": [
+    {
+      "id": "M1",
+      "scenario": "First-use quick start",
+      "expected": "Start a visible seeded action and save its timestamp with no group, tag or alias required; Search/All/Add stay visible.",
+      "status": "not run; proposed acceptance"
+    },
+    {
+      "id": "M2",
+      "scenario": "No result and custom activity",
+      "expected": "Empty results do not block current timer stop or future start; user can add a name or keep it unclassified and relabel later.",
+      "status": "not run; proposed acceptance"
+    },
+    {
+      "id": "M3",
+      "scenario": "Global search from start screen",
+      "expected": "A named task can be found without first choosing its assumed type/folder; any scope filter is explicit.",
+      "status": "not run; proposed acceptance"
+    },
+    {
+      "id": "M4",
+      "scenario": "Duplicate names across parents",
+      "expected": "Each result has visible and spoken full path and stable user label.",
+      "status": "not run; proposed acceptance"
+    },
+    {
+      "id": "M5",
+      "scenario": "Name/alias/tag match reason",
+      "expected": "Search results show whether match was label, alias, path or tag; facets do not modify labels.",
+      "status": "not run; proposed acceptance"
+    },
+    {
+      "id": "M6",
+      "scenario": "Manual favorites survive use",
+      "expected": "Favorite order remains stable while the full list does not silently reorder with each timer use.",
+      "status": "not run; proposed acceptance"
+    },
+    {
+      "id": "M7",
+      "scenario": "Recent list",
+      "expected": "Most recently started action appears first; actions falling off the compact recent view remain in All/history.",
+      "status": "not run; proposed acceptance"
+    },
+    {
+      "id": "M8",
+      "scenario": "Opt-in frequency sort",
+      "expected": "If available, the user chooses sort mode and sees its time window; returning to Manual/A-Z is straightforward.",
+      "status": "not run; hypothesis to validate"
+    },
+    {
+      "id": "M9",
+      "scenario": "Activity vs full-entry shortcut",
+      "expected": "The UI makes it clear if a favorite starts only an activity or restores multiple entry fields; preview fields before start.",
+      "status": "not run; proposed acceptance"
+    },
+    {
+      "id": "M10",
+      "scenario": "Typo candidate",
+      "expected": "Approximate match appears only as a labeled candidate; exact label/alias ranks higher; no auto-start or relabel occurs.",
+      "status": "not run; hypothesis to validate"
+    },
+    {
+      "id": "M11",
+      "scenario": "Russian/English personal alias",
+      "expected": "Switching UI locale does not mutate a stored custom label; a user alias in either script finds the same item and shows the original label.",
+      "status": "not run; proposed acceptance"
+    },
+    {
+      "id": "M12",
+      "scenario": "Unicode/case/accent",
+      "expected": "Canonical/case matching behaves consistently for chosen locale fixtures; distinctions meaningful in the tested language are not silently collapsed.",
+      "status": "not run; locale review needed"
+    },
+    {
+      "id": "M13",
+      "scenario": "Tree vs tag",
+      "expected": "Folder path and cross-cutting tag are visibly distinct; a tag filter does not become a parent roll-up.",
+      "status": "not run; proposed acceptance"
+    },
+    {
+      "id": "M14",
+      "scenario": "Browse path and global search",
+      "expected": "Breadcrumb/back works; global search from within a folder can still find an item outside it or clearly displays a current-folder filter.",
+      "status": "not run; proposed acceptance"
+    },
+    {
+      "id": "M15",
+      "scenario": "Large local catalogue",
+      "expected": "At synthetic sizes 100, 1,000 and 10,000, keyboard input does not block or lose characters; long result list renders incrementally. Define latency thresholds by prototype test.",
+      "status": "not run; benchmark required"
+    },
+    {
+      "id": "M16",
+      "scenario": "Large suggestion corpus",
+      "expected": "High-cardinality comment or alias suggestions do not overlay the keyboard, freeze input, or steal typed characters; user can narrow scope by current activity.",
+      "status": "not run; benchmark required"
+    },
+    {
+      "id": "M17",
+      "scenario": "Platform-specific screen-reader scope",
+      "expected": "For the Android app, TalkBack is the primary screen-reader test with Switch Access/Voice Access as needed. VoiceOver is tested only if an Apple client is in scope, not counted as Android acceptance.",
+      "status": "not run; proposed scope guard"
+    },
+    {
+      "id": "M18",
+      "scenario": "TalkBack grid/list",
+      "expected": "Every action is sequentially reachable; label, path and favorite state are spoken; user can exit long container, focus/clear search and start a result.",
+      "status": "not run; TalkBack device test required"
+    },
+    {
+      "id": "M19",
+      "scenario": "Accessible reorder",
+      "expected": "Switch Access, Voice Access or other accessibility service can pin/move/reorder an item without drag-only interaction.",
+      "status": "not run; accessibility test required"
+    },
+    {
+      "id": "M20",
+      "scenario": "Large text and display size",
+      "expected": "At maximum system font and enlarged display, long Cyrillic/Latin names wrap or reveal full path; controls remain separated and at least 48dp.",
+      "status": "not run; device layout test required"
+    },
+    {
+      "id": "M21",
+      "scenario": "Offline retrieval",
+      "expected": "Local label and alias search continues without a network or cloud taxonomy service.",
+      "status": "not run; implementation test required"
+    },
+    {
+      "id": "M22",
+      "scenario": "Selective settings transfer",
+      "expected": "User can select catalog, aliases/order/favorites/preferences separately from history; shows payload preview and preserves existing destination history by default.",
+      "status": "not run; product/data schema decision required"
+    },
+    {
+      "id": "M23",
+      "scenario": "Import name/ID conflict",
+      "expected": "Duplicate labels/IDs get explicit conflict choices and preview; history is not silently remapped.",
+      "status": "not run; product/data schema decision required"
+    },
+    {
+      "id": "M24",
+      "scenario": "UI locale restore",
+      "expected": "App language selection and personal catalog names remain distinct across Android 13 per-app language change and backup/restore.",
+      "status": "not run; device restore test required"
+    },
+    {
+      "id": "M25",
+      "scenario": "Item Favorite is a live reference",
+      "expected": "Rename/move a favorited ActivityType and edit a personal Card default; Favorite still resolves the current item/card by stable ID. If archived/unselectable, Start is disabled but open/remove/restore remains available. Unstar removes shortcut metadata only; time history, dictionary and Card remain.",
+      "status": "not run; proposed acceptance; item-level favorite API absent"
+    },
+    {
+      "id": "M26",
+      "scenario": "Recent is an actual-start index",
+      "expected": "Search, open, preview, pin, favorite, cancel a form, or edit old history without moving Recent. Successful start/resume/repeat/switch updates relevant item newest-first once; show eight then “All”; edits do not expire old history.",
+      "status": "not run; proposed acceptance; cap 8 is hypothesis"
+    },
+    {
+      "id": "M27",
+      "scenario": "Pinned detail is scoped, optional and non-classifying",
+      "expected": "A LOCAL_CHOICE pin resolves by axis/value ID+meaningVersion and a FREE_LABEL pin preserves exact text; it appears only for the selected applicable activity, requires a deliberate choice and can be removed without changing facet history, tree or defaults.",
+      "status": "not run; no detail-pin model/UI"
+    },
+    {
+      "id": "M28",
+      "scenario": "Start preset versus live Card defaults",
+      "expected": "Save a shortcut with activity and facets, then change Card defaults. Shortcut preserves its saved selection snapshot; direct Card selection uses new defaults. Both show full selection before start, create a new session only on Start and copy neither duration nor measured results.",
+      "status": "not run; existing Favorite snapshot contract partly documented; exact UI fields unverified"
+    },
+    {
+      "id": "M29",
+      "scenario": "Catalog-only payload excludes history and preserves destination",
+      "expected": "Export catalog+selected navigation settings, import to target with different sessions/measurements/notes; history IDs, values, notes, active/recovery state and current times remain bit-for-bit unchanged; historyTouched=0.",
+      "status": "not run; proposed feature; no catalog-only transfer implementation"
+    },
+    {
+      "id": "M30",
+      "scenario": "Malformed bundle and repeated keys are non-mutating",
+      "expected": "Reject unsupported version, invalid graph, duplicate entity key and corrupted facet reference in preflight; no dictionary, preference or history changes.",
+      "status": "not run; proposed schema acceptance"
+    },
+    {
+      "id": "M31",
+      "scenario": "ID collision and local override are transparent",
+      "expected": "Same ID/same semantic definition is unchanged while explicit target-local label/parent/alias/order survives by default; same ID/different meaning is a conflict; user can cancel or choose a separately previewed override.",
+      "status": "not run; current addCatalog statuses only partly cover this"
+    },
+    {
+      "id": "M32",
+      "scenario": "Aliases preserve provenance and ambiguous matches",
+      "expected": "A source translation update adds/removes only source-owned aliases, keeps user-added aliases, preserves exact user spelling and produces multiple path-labeled results if alias maps to distinct IDs; no result auto-starts.",
+      "status": "not run; current model has no declared alias provenance/tombstones"
+    },
+    {
+      "id": "M33",
+      "scenario": "Equal names are not identity",
+      "expected": "Two different stable IDs with the same localized label import separately and remain distinguishable by tree path; no history records are merged or rekeyed.",
+      "status": "not run; proposed import/search acceptance"
+    },
+    {
+      "id": "M34",
+      "scenario": "Shortcut merge is predictable",
+      "expected": "Existing destination favorite order stays; missing favorites append without duplicates; favorites/pins whose target ID conflicts are blocked, never attached to the conflicting local object. Differing same-ID presets/pins report conflicts; Recent defaults to destination list unless user explicitly replaces it.",
+      "status": "not run; proposed merge rules"
+    },
+    {
+      "id": "M35",
+      "scenario": "Seed update preserves historical path",
+      "expected": "Import newer names/aliases/parent placement for same semantic ID; old `ancestorPathAtWrite` and measurement links remain unchanged, while a future start records the current path. A new semantic meaning requires a new type ID.",
+      "status": "not run; history/path rule documented, real seed update untested"
+    },
+    {
+      "id": "M36",
+      "scenario": "Personal catalog round-trip across devices",
+      "expected": "Export/import stable IDs, Unicode names/aliases, cards, manual order, favorites/pins/shortcuts and optional recent order; review per-record counts; cancel leaves target untouched, apply preserves history.",
+      "status": "not run; no schema or cross-device user test"
+    },
+    {
+      "id": "M37",
+      "scenario": "No catalog prerequisite for starting",
+      "expected": "With empty search or no selectable type, user can still start with null type and no details; neither pins nor unresolved import conflicts block local personal logging.",
+      "status": "not run in app; null type already documented as core contract"
+    }
+  ],
+  "concrete_remainder": [
+    {
+      "id": "RMD01",
+      "task": "Test search with a real personal catalogue and record its size instead of assuming target cardinality.",
+      "why_remaining": "Competitor cases include enterprise scales and one 10k-comment issue, not representative personal-activity data.",
+      "ready_when": "Target users' item counts and search journeys are observed without installing competitors or importing private data without permission."
+    },
+    {
+      "id": "RMD02",
+      "task": "Prototype mobile start page with quick action, Favorite, Recent, global Search/All and optional Browse.",
+      "why_remaining": "Feature evidence exists; no user interaction test has compared visual layouts or choice friction.",
+      "ready_when": "First-run and returning-user tasks complete with measured taps/time and no required taxonomy setup."
+    },
+    {
+      "id": "RMD03",
+      "task": "Decide favorite, recent, pinned-detail and whole-entry shortcut semantics and how each is serialized.",
+      "why_remaining": "Competitor vocabulary and existing core snapshot must be reconciled with a named accepted shortcut model; proposed limit/order and actual UX are unvalidated.",
+      "ready_when": "Product spec states object type, persistence, deduplication, ordering, and transfer behavior for each shortcut.",
+      "status": "Analytical contract is now specified as recommendation; still open for product acceptance and UI/API mapping. Item Favorite, Recent and Detail Pin are not documented core features; preset field-level behavior needs verification."
+    },
+    {
+      "id": "RMD04",
+      "task": "Benchmark local search on low-end Android hardware using long names and 100/1k/10k synthetic catalogues.",
+      "why_remaining": "No app was installed and no benchmark was run.",
+      "ready_when": "Measured p50/p95 query latency, keystroke loss, and result-render behavior meet thresholds selected by the product team."
+    },
+    {
+      "id": "RMD05",
+      "task": "Select supported UI locales and ask speakers to review case, accents, Unicode normalization and aliases.",
+      "why_remaining": "General Unicode/platform guidance cannot decide user-visible equivalence in each language.",
+      "ready_when": "Fixtures and false-positive cases are approved per supported language before fuzzy/diacritic matching ships."
+    },
+    {
+      "id": "RMD06",
+      "task": "Prototype accessible search/reorder and run TalkBack, Switch Access/Voice Access and keyboard tests.",
+      "why_remaining": "No tracker-specific a11y user report or live app audit was available.",
+      "ready_when": "Every action works without drag-only interaction; focus, result paths, 48dp targets and state are verified."
+    },
+    {
+      "id": "RMD07",
+      "task": "Specify and test catalogue-only export/import separate from activity history.",
+      "why_remaining": "The current JSON v2 restore replaces the dataset; no catalog-only bundle or previewed per-ID adapter has been implemented or tested on another device.",
+      "ready_when": "A previewed portable schema handles new device, duplicate names, edits and undo without silently remapping existing history.",
+      "status": "Catalog-only schema and deterministic merge policy proposed; feature/round-trip remains open."
+    },
+    {
+      "id": "RMD08",
+      "task": "Review the current state of 2020 Clockify picker feature requests before using them as competitor status claims.",
+      "why_remaining": "Official docs now give present-day feature/fix context, but do not document exact Android project/task search picker flow; historic community reports remain historical evidence only.",
+      "ready_when": "Only current official documentation or hands-on result is used for present-day competitor functionality; historic pain remains clearly dated.",
+      "status": "Documentary current-state check completed on 2026-10-11 using complete relevant sections of current official help pages and relevant changelog entries; hands-on Android verification remains separate and explicitly not claimed."
+    },
+    {
+      "id": "RMD09",
+      "task": "Check that a seed translation update does not overwrite custom user labels and synonyms.",
+      "why_remaining": "Current core supports some effective-field preservation but has no verified provenance/overlay adapter or actual catalog update migration test.",
+      "ready_when": "A seeded catalog update preserves stable IDs, user labels, aliases, favorites, history mappings, and allows rollback/undo.",
+      "status": "Source-vs-user alias/override policy proposed; seed translation refresh remains untested."
+    },
+    {
+      "id": "RMD10",
+      "task": "Decide whether recents have a visible cap, whether frequent-use ranking is offered, and its period if so.",
+      "why_remaining": "Spec now offers a reversible starting point, but the optimum count/window and rank remain hypotheses.",
+      "ready_when": "A prototype test records discovery and start speed across a small/medium/large library with recent and favorites separated.",
+      "status": "Provisional cap/order specified for test (eight recent unique launch items plus All); keep open until user/device evidence supports or changes it."
+    }
+  ],
+  "access_limitations": [
+    "ATracker frequently-used-icons thread: all seven comments were visible in the search response; direct open failed with Cache miss.",
+    "Simple Time Tracker issue #484: issue body opened and later user/maintainer updates appeared in search output, but the complete Activity log was not retrievable; status remains partial.",
+    "No cited result snippet is used as if an un-opened full article had been read. Search-result complete thread render is explicitly distinguished from direct open in source records.",
+    "No application was installed or manually exercised; public docs/listings are vendor claims, not observed interface behavior.",
+    "Clockify current Android/Project finder behavior is documented but no live Android app was installed or exercised. August/June changelog entries identify fixes but not exact screens or independently verifiable outcomes.",
+    "No catalog-only file existed in the supplied contract to round-trip; all payload and merge rules in this continuation are proposals, not observed import results."
+  ],
+  "recommendation_status": "Research/design recommendation only. Original prototype proposal remains; RMD03/RMD07/RMD09 semantics are specified for review but not approved or implemented. RMD08 is closed for documentary current-state context only; all device/user acceptance scenarios remain unrun.",
+  "follow_up_2026_10_11": {
+    "purpose": "Continue RMD03/RMD07/RMD08/RMD09: refresh Clockify official status and define a deterministic quick-access/catalog-only contract from supplied core documents.",
+    "clockify_status": "Complete relevant sections of current official help pages and relevant changelog months read 2026-10-11; page text was opened in full where available. Recent Android help documents exact-entry continue/4-entry Track again widget and project/task selection but not exact task search interaction. Clockify help documents project/task finder favorites and web-profile task filter; Aug 2026 release notes list an Android Task-filter search fix. Historical forum threads remain dated user evidence, not current feature-status proof.",
+    "core_contract_status": "Current contract documents selection-snapshot Favorite and Repeat APIs, stable IDs/aliases/history paths, addCatalog per-key outcomes, and full-replacement backup restore. Separate item favorites, Recent, detail pins, portable catalog-only bundle, override provenance and per-key UI preview are not specified as shipped.",
+    "recommendation_status": "Proposed exact semantics for item favorites, timestamp-derived Recent, context-scoped detail pins and saved start presets; proposed separate catalog-only envelope and local-wins conflict policy. Requires product approval and implementation mapping.",
+    "device_user_tests": "Open: no app installation, phone benchmark, TalkBack/large-text test, user task study, seed translation refresh or cross-device round-trip was run. These remain open because this pass was research/contract-only and the relevant UX/import path is not established.",
+    "id_map": {
+      "sources": [
+        "S14",
+        "S15",
+        "S35",
+        "S36",
+        "S37",
+        "S38",
+        "S39"
+      ],
+      "evidence": [
+        "E20",
+        "E21",
+        "E22",
+        "E23",
+        "E24",
+        "E25",
+        "E26"
+      ],
+      "needs": [
+        "N12",
+        "N13",
+        "N14"
+      ],
+      "alternatives": [
+        "A09"
+      ],
+      "risks": [
+        "R12",
+        "R13",
+        "R14",
+        "R15",
+        "R16"
+      ],
+      "acceptance_scenarios": [
+        "M25",
+        "M26",
+        "M27",
+        "M28",
+        "M29",
+        "M30",
+        "M31",
+        "M32",
+        "M33",
+        "M34",
+        "M35",
+        "M36",
+        "M37"
+      ],
+      "remainder": [
+        "RMD03",
+        "RMD07",
+        "RMD08",
+        "RMD09",
+        "RMD10"
+      ]
+    }
+  },
+  "root_contract_review": {
+    "date": "2026-10-11",
+    "coreCommit": "17d86e9eb7e48983930b064c4e4d31505eed2f9e",
+    "status": "research_recommendations_not_implemented",
+    "codeFiles": [
+      "core/src/main/kotlin/dev/notai/tracker/Model.kt",
+      "core/src/main/kotlin/dev/notai/tracker/Vocabulary.kt",
+      "core/src/main/kotlin/dev/notai/tracker/Tracker.kt"
+    ],
+    "corrections": [
+      "Recent proposed ordering uses new successful-launch sequence, not editable Segment.start; current core has no launch ledger.",
+      "Unclassified sessions remain repeatable; absence of item ID does not block tracking.",
+      "Favorite exact fields id/label/Classification; no session note or measurements. startFavorite note=null; repeat copies source session note.",
+      "LOCAL_CHOICE and units verified present; portable activityTypes/cards are new container fields, not VocabularyData fields."
+    ],
+    "remaining": [
+      "No implementation or device/user testing",
+      "Historical edited segments cannot reconstruct original launch order",
+      "Prototype validation and full portable schema remain open"
+    ]
+  }
+}

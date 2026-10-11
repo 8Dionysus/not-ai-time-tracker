@@ -46,3 +46,5 @@ adb shell am start -n dev.notai.tracker/dev.notai.tracker.android.MainActivity
 Расширение каталога и его незакрытый вход: [docs/CATALOG_IMPACT.md](docs/CATALOG_IMPACT.md). Пять технических узлов не являются полным перечнем занятий человека.
 
 Адаптер полного полученного корпуса 0.5, API, фактическое покрытие и остаток: [docs/RESEARCH_ADAPTER.md](docs/RESEARCH_ADAPTER.md).
+
+Текущий разбор оставшихся осей, составных значений, количеств и пяти проверенных оригиналов: [RESEARCH_FOLLOWUP.md](docs/RESEARCH_FOLLOWUP.md). Подготовлены 82 необязательные оси; 17 схем выбираются явно через configureAxis. Реальные 357 междоменных связей проверены как доказательства, без изменения дерева и времени.

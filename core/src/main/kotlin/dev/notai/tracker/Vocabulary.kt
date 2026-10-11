@@ -39,7 +39,8 @@ object DecimalSerializer: KSerializer<Decimal> {
 @Serializable enum class Aggregation { SUM, BY_TARGET }
 @Serializable data class Metric(val id: String,val name: String,val meaningVersion: Int = 1,
     val numberKind: NumberKind,val canonicalUnitId: String,val maxScale: Int = 0,
-    val scopes: Set<Scope> = setOf(Scope.SESSION,Scope.SEGMENT),val aggregation: Aggregation = Aggregation.BY_TARGET)
+    val scopes: Set<Scope> = setOf(Scope.SESSION,Scope.SEGMENT),val aggregation: Aggregation = Aggregation.BY_TARGET,
+    val researchOrigins: List<ResearchOrigin> = emptyList())
 @Serializable data class UnitDefinition(val id: String,val name: String,val dimension: String,
     val factorToBase: Decimal = Decimal("1"))
 
@@ -84,6 +85,7 @@ internal fun validateVocabulary(d: Dataset) {
     d.units.forEach { ensure(it.id.isNotBlank() && it.name.isNotBlank() && it.dimension.isNotBlank() && it.factorToBase.number.signum() > 0,"Invalid unit") }
     ensure(d.metrics.map { it.id to it.meaningVersion }.distinct().size == d.metrics.size,"Duplicate metric version")
     d.metrics.forEach { m ->
+        validateResearchOrigins(m.researchOrigins)
         ensure(m.id.isNotBlank() && m.name.isNotBlank() && m.meaningVersion > 0 && m.maxScale in 0..1000 && m.scopes.isNotEmpty(),"Invalid metric")
         ensure(d.units.any { it.id == m.canonicalUnitId },"Missing canonical unit")
         ensure(m.numberKind != NumberKind.INTEGER || m.maxScale == 0,"Integer metric cannot have fractional precision")

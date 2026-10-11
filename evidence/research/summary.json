@@ -13,8 +13,8 @@
   "workingNodes": 1587,
   "runtimeCandidateTypes": 1584,
   "selectableTypes": 1496,
-  "runtimeCandidateAxes": 5,
-  "outcomes": 17170,
+  "runtimeCandidateAxes": 82,
+  "outcomes": 17561,
   "outcomeKinds": {
     "resolution": 1584,
     "source": 1584,
@@ -34,7 +34,8 @@
     "declared-count": 18,
     "proposal": 30,
     "section": 11,
-    "source-file": 31
+    "source-file": 31,
+    "supporting-evidence": 391
   },
   "nonRuntimeNodes": [
     {
@@ -53,5 +54,9 @@
   "diagnosedReferences": 10956,
   "unresolvedDiagnosedReferences": 0,
   "researchComplete": false,
-  "automaticRuntimePublication": false
+  "automaticRuntimePublication": false,
+  "verifiedSupportingDocuments": 5,
+  "verifiedCrossDomainRelations": 357,
+  "configuredAxes": 17,
+  "boundedScalarFactories": 10
 }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.map
 import java.util.concurrent.Callable
 
 @Entity(tableName = "metadata") data class MetaRow(@PrimaryKey val id: Int = 1, val payload: String)
+@Entity(tableName = "activity_types") data class TypeRow(@PrimaryKey val id: String,val position: Int,val payload: String)
 @Entity(tableName = "cards") data class CardRow(@PrimaryKey val id: String,val position: Int,val payload: String)
 @Entity(tableName = "sessions") data class SessionRow(@PrimaryKey val id: String,val position: Int,val payload: String)
 @Entity(tableName = "segments", foreignKeys = [ForeignKey(entity = SessionRow::class,parentColumns = ["id"],childColumns = ["sessionId"],onDelete = ForeignKey.CASCADE)],
@@ -20,12 +21,14 @@ data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId
 @Dao interface TrackerDao {
     @Query("SELECT * FROM metadata WHERE id=1") fun metadata(): MetaRow?
     @Query("SELECT * FROM metadata WHERE id=1") fun changes(): Flow<MetaRow?>
+    @Query("SELECT * FROM activity_types ORDER BY position") fun types(): List<TypeRow>
     @Query("SELECT * FROM cards ORDER BY position") fun cards(): List<CardRow>
     @Query("SELECT * FROM sessions ORDER BY position") fun sessions(): List<SessionRow>
     @Query("SELECT * FROM segments ORDER BY position") fun segments(): List<SegmentRow>
     @Query("SELECT * FROM favorites ORDER BY position") fun favorites(): List<FavoriteRow>
     @Query("SELECT * FROM measurements ORDER BY position") fun measurements(): List<MeasurementRow>
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun metadata(row: MetaRow)
+    @Insert fun types(rows: List<TypeRow>)
     @Insert fun cards(rows: List<CardRow>)
     @Insert fun sessions(rows: List<SessionRow>)
     @Insert fun segments(rows: List<SegmentRow>)
@@ -33,11 +36,12 @@ data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId
     @Insert fun measurements(rows: List<MeasurementRow>)
     @Query("DELETE FROM segments") fun clearSegments()
     @Query("DELETE FROM sessions") fun clearSessions()
+    @Query("DELETE FROM activity_types") fun clearTypes()
     @Query("DELETE FROM cards") fun clearCards()
     @Query("DELETE FROM favorites") fun clearFavorites()
     @Query("DELETE FROM measurements") fun clearMeasurements()
 }
-@Database(entities = [MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class],version = 1,exportSchema = true)
+@Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class],version = 1,exportSchema = true)
 abstract class TrackerDatabase: RoomDatabase() {
     abstract fun dao(): TrackerDao
     companion object {
@@ -63,7 +67,7 @@ class RoomStore(private val db: TrackerDatabase): StateStore {
     })
     private fun load(): Dataset {
         val base = codec.decodeFromString<Dataset>(dao.metadata()!!.payload)
-        return base.copy(cards = dao.cards().map { codec.decodeFromString<Card>(it.payload) },
+        return base.copy(types = dao.types().map { codec.decodeFromString<ActivityType>(it.payload) },cards = dao.cards().map { codec.decodeFromString<Card>(it.payload) },
             sessions = dao.sessions().map { codec.decodeFromString<Session>(it.payload) },
             segments = dao.segments().map { codec.decodeFromString<Segment>(it.payload) },
             favorites = dao.favorites().map { codec.decodeFromString<Favorite>(it.payload) },
@@ -71,12 +75,13 @@ class RoomStore(private val db: TrackerDatabase): StateStore {
     }
     private fun write(d: Dataset) {
         validate(d)
-        dao.clearMeasurements(); dao.clearFavorites(); dao.clearSegments(); dao.clearSessions(); dao.clearCards()
+        dao.clearMeasurements(); dao.clearFavorites(); dao.clearSegments(); dao.clearSessions(); dao.clearCards(); dao.clearTypes()
+        dao.types(d.types.mapIndexed { i,t -> TypeRow(t.id,i,codec.encodeToString(t)) })
         dao.cards(d.cards.mapIndexed { i,c -> CardRow(c.id,i,codec.encodeToString(c)) })
         dao.sessions(d.sessions.mapIndexed { i,s -> SessionRow(s.id,i,codec.encodeToString(s)) })
         dao.segments(d.segments.mapIndexed { i,s -> SegmentRow(s.id,i,s.sessionId,if (s.end == null) 1 else null,codec.encodeToString(s)) })
         dao.favorites(d.favorites.mapIndexed { i,f -> FavoriteRow(f.id,i,codec.encodeToString(f)) })
         dao.measurements(d.measurements.mapIndexed { i,m -> MeasurementRow(m.id,i,codec.encodeToString(m)) })
-        dao.metadata(MetaRow(payload = codec.encodeToString(d.copy(cards = emptyList(),sessions = emptyList(),segments = emptyList(),favorites = emptyList(),measurements = emptyList()))))
+        dao.metadata(MetaRow(payload = codec.encodeToString(d.copy(types = emptyList(),cards = emptyList(),sessions = emptyList(),segments = emptyList(),favorites = emptyList(),measurements = emptyList()))))
     }
 }

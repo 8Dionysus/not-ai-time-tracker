@@ -12,7 +12,13 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun selection(cardId: String): Classification = data().cards.singleOrNull { it.id == cardId && !it.archived }
         ?.classification() ?: fail(ErrorCode.INVALID_INPUT, "Card missing or archived")
 
-    data class Change(val state: Snapshot, val changedSessionIds: Set<String>, val undoAvailable: Boolean)
+    data class Change(val state: Snapshot, val changedSessionIds: Set<String>, val undoAvailable: Boolean,
+        val data: Dataset, val asOf: Moment) {
+        val changedSessions get() = data.sessions.filter { it.id in changedSessionIds }
+        val changedSegments get() = data.segments.filter { it.sessionId in changedSessionIds }
+        fun report(start: Long,end: Long,filter: Filter = Filter()) = Reports.report(data,asOf,start,end,filter)
+        fun day(date: java.time.LocalDate,filter: Filter = Filter()) = Reports.day(data,asOf,date,filter)
+    }
     private fun mutate(expected: Token, undoable: Boolean = false, edit: (Dataset, Moment) -> Dataset): Change = storage {
         store.transaction { old ->
             val now = clock.now()
@@ -21,11 +27,12 @@ class Tracker(val store: StateStore, val clock: Clock) {
             validate(next)
             val changed = (old.sessions + next.sessions).map { it.id }.filter { id ->
                 old.sessions.find { it.id == id } != next.sessions.find { it.id == id } ||
-                old.segments.filter { it.sessionId == id } != next.segments.filter { it.sessionId == id }
+                old.segments.filter { it.sessionId == id } != next.segments.filter { it.sessionId == id } ||
+                measurementsFor(old,id) != measurementsFor(next,id)
             }.toSet()
             val state = snapshot(next, now)
             // Undo is issued only after a successful persistence commit (below).
-            next to Triple(Change(state, changed, undoable), old, next)
+            next to Triple(Change(state, changed, undoable, next, now), old, next)
         }.let { (change, previous, _) ->
             undo = if (undoable) change.state.token to previous else null
             change
@@ -83,8 +90,15 @@ class Tracker(val store: StateStore, val clock: Clock) {
         val f = d.favorites.find { it.id == favoriteId } ?: fail(ErrorCode.INVALID_INPUT, "Missing favorite")
         append(d,f.selection,null,n)
     }
+    fun removeFavorite(expected: Token, favoriteId: String) = mutate(expected) { d,_ ->
+        ensure(d.favorites.any { it.id == favoriteId }, "Missing favorite")
+        d.copy(favorites = d.favorites.filterNot { it.id == favoriteId })
+    }
     fun saveFavorite(expected: Token, favorite: Favorite) = mutate(expected) { d,_ ->
         d.copy(favorites = d.favorites.filterNot { it.id == favorite.id } + favorite)
+    }
+    fun saveType(expected: Token, type: ActivityType) = mutate(expected) { d,_ ->
+        d.copy(types = d.types.filterNot { it.id == type.id } + type)
     }
     fun saveCard(expected: Token, card: Card) = mutate(expected) { d,_ ->
         d.copy(cards = d.cards.filterNot { it.id == card.id } + card)
@@ -96,6 +110,24 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun settings(expected: Token, settings: Settings) = mutate(expected) { d,_ -> d.copy(settings = settings) }
     fun measure(expected: Token, measurement: Measurement) = mutate(expected, true) { d,_ ->
         d.copy(measurements = d.measurements.filterNot { it.id == measurement.id } + measurement)
+    }
+    fun removeMeasurement(expected: Token, measurementId: String) = mutate(expected,true) { d,_ ->
+        ensure(d.measurements.any { it.id == measurementId }, "Missing measurement")
+        d.copy(measurements = d.measurements.filterNot { it.id == measurementId })
+    }
+    data class SegmentEdit(val id: String,val start: Long,val end: Long,val selection: Classification)
+    /** Save a completed session form atomically; retained segment IDs retain their measurements. */
+    fun correctSession(expected: Token,sessionId: String,edits: List<SegmentEdit>,note: String?) = mutate(expected,true) { d,n ->
+        val session = d.sessions.find { it.id == sessionId } ?: fail(ErrorCode.INVALID_INPUT,"Missing session")
+        ensure(session.status == SessionStatus.STOPPED,"Use current-session commands while tracking")
+        val own = d.segments.filter { it.sessionId == sessionId }
+        ensure(edits.map { it.id }.toSet() == own.map { it.id }.toSet() && edits.size == own.size,"Supply each existing segment once")
+        edits.forEach { interval(it.start,it.end,n) }
+        val byId = edits.associateBy { it.id }
+        d.copy(sessions = d.sessions.replace(session.copy(note = note,selection = edits.maxBy { it.start }.selection)),
+            segments = d.segments.map { segment -> byId[segment.id]?.let { e ->
+                segment.copy(start = e.start,end = e.end,durationMs = e.end-e.start,selection = e.selection,anchor = null,uncertain = false,observedUntil = null)
+            } ?: segment })
     }
     /** Start/end are explicit; calling this is the form's Save, not its preview. */
     fun manual(expected: Token, start: Long, end: Long, selection: Classification, note: String? = null) = mutate(expected, true) { d,n ->
@@ -134,9 +166,13 @@ class Tracker(val store: StateStore, val clock: Clock) {
             measurements = d.measurements.filterNot { (it.scope == Scope.SEGMENT && it.targetId == seg.id && start == null) || (!keep && it.scope == Scope.SESSION && it.targetId == s.id) })
     }
     fun undo(expected: Token): Change {
-        val saved = undo ?: fail(ErrorCode.STALE, "No available undo")
-        ensure(saved.first == expected, "Undo is stale", ErrorCode.STALE)
+        val saved = undo
+        if (saved == null || saved.first != expected) throw CoreError(ErrorCode.STALE,"No matching available undo",snapshot())
         return mutate(expected) { _,_ -> saved.second }
+    }
+    private fun measurementsFor(d: Dataset,sessionId: String): List<Measurement> {
+        val segmentIds = d.segments.filter { it.sessionId == sessionId }.map { it.id }.toSet()
+        return d.measurements.filter { if (it.scope == Scope.SESSION) it.targetId == sessionId else it.targetId in segmentIds }
     }
     private fun running(d: Dataset,n: Moment): Session {
         val s = current(d) ?: fail(ErrorCode.INVALID_INPUT, "No current session")

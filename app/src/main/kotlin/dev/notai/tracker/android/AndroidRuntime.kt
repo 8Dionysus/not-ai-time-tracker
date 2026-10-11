@@ -17,7 +17,7 @@ class PrivateRollbackStore(context: Context): RollbackStore {
     override fun save(json: String): String {
         val file = File(directory,"rollback-${newId()}.json")
         FileOutputStream(file).use { it.write(json.toByteArray(Charsets.UTF_8)); it.fd.sync() }
-        val dirFd = android.system.Os.open(directory.absolutePath,android.system.OsConstants.O_RDONLY or android.system.OsConstants.O_DIRECTORY,0)
+        val dirFd = android.system.Os.open(directory.absolutePath,android.system.OsConstants.O_RDONLY,0)
         try { android.system.Os.fsync(dirFd) } finally { android.system.Os.close(dirFd) }
         return file.name
     }

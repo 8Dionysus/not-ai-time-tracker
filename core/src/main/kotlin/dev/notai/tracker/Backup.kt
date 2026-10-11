@@ -13,6 +13,7 @@ class RestorePreview internal constructor(internal val backup: Backup,internal v
     val datasetId get() = backup.data.datasetId
     val backupId get() = backup.backupId
     val asOf get() = backup.asOf
+    val types get() = backup.data.types.size
     val cards get() = backup.data.cards.size
     val sessions get() = backup.data.sessions.size
     val segments get() = backup.data.segments.size

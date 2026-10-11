@@ -11,6 +11,8 @@ fun newId(): String = UUID.randomUUID().toString()
 val codec = Json { prettyPrint = true; encodeDefaults = true; ignoreUnknownKeys = false }
 const val MAX_TIME = 253402300799999L // last millisecond of year 9999
 
+@Serializable data class ActivityType(@Required val id: String = newId(), val name: String, val archived: Boolean = false)
+
 @Serializable data class Classification(
     val cardId: String? = null,
     val name: String? = null,
@@ -37,6 +39,7 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
     val unit: String, val scope: Scope, val targetId: String, val value: Long)
 @Serializable data class Settings(val reportZone: String = "UTC")
 @Serializable data class Dataset(@Required val datasetId: String = newId(), @Required val revision: Long = 0,
+    @Required val types: List<ActivityType> = Catalog.types,
     @Required val cards: List<Card> = emptyList(), @Required val favorites: List<Favorite> = emptyList(),
     @Required val sessions: List<Session> = emptyList(), @Required val segments: List<Segment> = emptyList(),
     @Required val measurements: List<Measurement> = emptyList(), @Required val settings: Settings = Settings())
@@ -64,11 +67,14 @@ fun validate(data: Dataset) {
     fun ids(values: List<String>) { ensure(values.all { it.isNotBlank() } && values.distinct().size == values.size, "Empty or duplicate ID") }
     ensure(data.datasetId.isNotBlank() && data.revision >= 0, "Invalid dataset metadata")
     try { ZoneId.of(data.settings.reportZone) } catch (_: Exception) { fail(ErrorCode.INVALID_INPUT, "Invalid report zone") }
-    ids(data.cards.map { it.id }); ids(data.favorites.map { it.id }); ids(data.sessions.map { it.id })
+    ids(data.types.map { it.id }); ids(data.cards.map { it.id }); ids(data.favorites.map { it.id }); ids(data.sessions.map { it.id })
     ids(data.segments.map { it.id }); ids(data.measurements.map { it.id })
+    val typeIds = data.types.map { it.id }.toSet()
+    data.types.forEach { ensure(it.name.isNotBlank(), "Type needs a name") }
     val cards = data.cards.associateBy { it.id }; val sessions = data.sessions.associateBy { it.id }
     fun selection(c: Classification) {
         ensure(c.cardId == null || cards.containsKey(c.cardId), "Missing card")
+        ensure(c.partOf == null || c.partOf in typeIds, "Missing activity type")
         ensure((c.cardId == null) == (c.name == null), "Unspecified selection must have no card name")
         ensure(c.name == null || c.name.isNotBlank(), "Empty historical name")
         ensure(c.details.all { it.key.isNotBlank() && it.value.isNotBlank() } && c.tags.all { it.isNotBlank() }, "Empty detail/tag")
@@ -106,7 +112,9 @@ fun validate(data: Dataset) {
 }
 
 object Catalog {
-    data class Template(val id: String, val name: String, val partOf: String, val options: Map<String,List<String>>)
+    val types = listOf(ActivityType("language","Языковая практика"),ActivityType("fitness","Физическая активность"),
+        ActivityType("reading","Чтение"),ActivityType("work","Работа"),ActivityType("rest","Отдых"))
+    data class Template(val id: String, val name: String, val partOf: String, val options: Map<String,List<String>>, val searchNames: List<String> = listOf(name))
     val templates = listOf(
         Template("language-v1", "Языковая практика", "language", mapOf("activity" to listOf("reading", "writing", "listening", "speaking"))),
         Template("training-v1", "Тренировка", "fitness", mapOf("activity" to listOf("cardio", "strength"))),

@@ -95,6 +95,13 @@
     ],
     "settings": {
       "reportZone": "Europe/Moscow"
-    }
+    },
+    "types": [
+      {
+        "id": "language",
+        "name": "Языковая практика",
+        "archived": false
+      }
+    ]
   }
 }

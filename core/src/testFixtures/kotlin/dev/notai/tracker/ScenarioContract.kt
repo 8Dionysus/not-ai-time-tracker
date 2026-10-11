@@ -41,7 +41,8 @@ abstract class ScenarioContract {
         assertEquals(ErrorCode.STALE,staleStop.code); assertEquals(b,staleStop.currentState!!.token); assertEquals(b,token())
         clock.advance(60_000); tracker.switchedEarlier(token(),clock.wall-30_000,card.classification())
         assertEquals(30_000,tracker.snapshot().trustedDurationMs)
-        val c = token(); expect(ErrorCode.STALE) { tracker.undo(b) }; assertEquals(c,token())
+        val c = token(); val staleUndo = assertFailsWith<CoreError> { tracker.undo(b) }
+        assertEquals(ErrorCode.STALE,staleUndo.code); assertEquals(c,staleUndo.currentState!!.token); assertEquals(c,token())
         tracker.stop(token()); expect(ErrorCode.STALE) { tracker.stop(c) }
         val stopped = tracker.data().sessions.last()
         tracker.repeat(token(),stopped.id); assertEquals(card.classification(),tracker.snapshot().session!!.selection)
@@ -79,7 +80,8 @@ abstract class ScenarioContract {
         tracker.saveCard(token(),card); tracker.start(token(),card.classification())
         clock.advance(20*60_000); tracker.pause(token()) // crosses UTC midnight, 10 min on each day
         val sessionId = token().sessionId!!
-        tracker.measure(token(),Measurement(fieldId = "pages",unit = "page",scope = Scope.SESSION,targetId = sessionId,value = 20))
+        val measuredChange = tracker.measure(token(),Measurement(fieldId = "pages",unit = "page",scope = Scope.SESSION,targetId = sessionId,value = 20))
+        assertEquals(setOf(sessionId),measuredChange.changedSessionIds)
         clock.advance(5*60_000); tracker.resume(token()); clock.advance(20*60_000); tracker.stop(token())
         val d = tracker.data(); val windowStart = Instant.parse("2026-10-10T00:00:00Z").toEpochMilli()
         val all = Reports.report(d,clock.now(),windowStart,clock.wall)
@@ -93,13 +95,29 @@ abstract class ScenarioContract {
         assertEquals(1,csv.lineSequence().count { it.startsWith("\"measurement\"") })
         assertEquals(all.recordedMs,csv.lineSequence().filter { it.startsWith("\"segment\"") }.sumOf { it.split(',')[5].trim('"').toLong() })
         val first = d.segments.first()
-        tracker.correctSegment(token(),first.id,first.start+60_000,first.end!!,first.selection)
+        val corrected = tracker.correctSegment(token(),first.id,first.start+60_000,first.end!!,first.selection)
+        assertEquals(39*60_000,corrected.report(windowStart,clock.wall).recordedMs)
+        assertEquals(setOf(sessionId),corrected.changedSessions.map { it.id }.toSet())
         assertEquals(39*60_000,Reports.report(tracker.data(),clock.now(),windowStart,clock.wall).recordedMs)
         tracker.undo(token()); assertEquals(d.segments,tracker.data().segments)
+        assertEquals(39*60_000,corrected.report(windowStart,clock.wall).recordedMs) // command result is a fixed snapshot
+        tracker.saveType(token(),ActivityType("other","Другая область"))
         tracker.saveCard(token(),card.copy(name = "Renamed",partOf = "other",archived = true))
+        tracker.saveType(token(),ActivityType("language","Переименованный тип",archived = true))
+        assertEquals(all.recordedMs,Reports.report(tracker.data(),clock.now(),windowStart,clock.wall,Filter(partOf = "language")).recordedMs)
+        val currentData = tracker.data()
+        expect(ErrorCode.INVALID_INPUT) { tracker.saveCard(token(),Card(name = "Broken link",partOf = "missing-type")) }
+        assertEquals(currentData,tracker.data())
         assertEquals("=Language",tracker.data().segments.first().selection.name)
         tracker.copyCard(token(),card.id,"Copy")
         assertEquals(1,tracker.data().sessions.size); assertEquals(1,tracker.data().measurements.size)
+        val quantityId = tracker.data().measurements.single().id
+        val removed = tracker.removeMeasurement(token(),quantityId)
+        assertEquals(setOf(sessionId),removed.changedSessionIds); assertTrue(removed.data.measurements.isEmpty())
+        tracker.undo(token()); assertEquals(20,tracker.data().measurements.single().value)
+        val whole = tracker.correctSession(token(),sessionId,tracker.data().segments.map { Tracker.SegmentEdit(it.id,it.start,it.end!!,it.selection) },"Исправленная заметка")
+        assertEquals("Исправленная заметка",whole.changedSessions.single().note)
+        assertEquals(40*60_000,whole.report(windowStart,clock.wall).recordedMs)
         val before = tracker.data()
         expect(ErrorCode.OVERLAP) { tracker.manual(token(),first.start,first.end,first.selection) }; assertEquals(before,tracker.data())
         // Calendar days use zone rules: Berlin spring DST day has 23 hours.
@@ -122,9 +140,10 @@ abstract class ScenarioContract {
         assertEquals(historySample.data.copy(revision = 1),historical.data())
         val clock = FakeClock(); val tracker = Tracker(createStore(),clock)
         fun token() = tracker.snapshot().token
-        val card = Card(name = "Своё")
+        val card = Card(name = "Своё",partOf = "language")
         tracker.saveCard(token(),card); tracker.settings(token(),Settings("Europe/Berlin"))
         tracker.start(token(),card.classification()); clock.advance(42_000)
+        tracker.saveType(token(),ActivityType("language","Новый заголовок",archived = true))
         val disk = MemoryRollback(); val backups = Backups(tracker,disk); val json = backups.export()
         val raw = Backups.decode(json)
         assertEquals(42_000,raw.data.segments.single().durationMs)
@@ -135,6 +154,8 @@ abstract class ScenarioContract {
         val result = restore.apply(preview)
         assertEquals(Mode.RECOVERY,result.state.mode); assertEquals(42_000,result.state.trustedDurationMs)
         assertEquals(Settings("Europe/Berlin"),clean.data().settings)
+        assertEquals(ActivityType("language","Новый заголовок",true),clean.data().types.single { it.id == "language" })
+        assertEquals("language",clean.data().segments.single().selection.partOf)
         assertTrue(Backups.decode(disk.read(result.rollbackReference)).data.sessions.isEmpty())
         val full = clean.data()
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.dropLast(7)) }; assertEquals(full,clean.data())

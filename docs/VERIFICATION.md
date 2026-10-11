@@ -1,71 +1,51 @@
 # Фактическая проверка · 11 октября 2026
 
-Рабочий каталог: `/workspace/not-ai-time-tracker`, отдельный Git-репозиторий; соседние проекты не изменялись. Доступные `.agents`/локальные skills проверены: дополнительных инструкций для нового каталога не было. Создан собственный AGENTS.md с границей ядра и ограничениями объёма.
+Проект: `/workspace/not-ai-time-tracker`, отдельный Git-репозиторий. Соседние репозитории не изменялись. Дополнительные агенты не запускались; фактические модель/effort runtime не раскрыл, исполнитель их не менял.
 
-## Среда и воспроизведение
+## Среда и разрешение
 
-- OpenJDK `21.0.12.1` (Debian); байткод проекта нацелен на Java 17. В системном runtime отсутствовал launcher `javac`, но модули `jdk.compiler`, `jdk.jartool`, `jdk.jlink` уже установлены. Создана отдельная копия `/workspace/toolchains/jdk21` с launcher-скриптами вызова этих существующих модулей; `javac -version` и `jlink --version` успешны. Системная Java не менялась. Попытка получить новый JDK через Adoptium API вернула proxy CONNECT 403; ограничения не обходились, использована независимая локальная возможность.
-- Gradle `8.13`, Kotlin `2.1.20`, AGP `8.11.1`, Room `2.7.2`.
-- Gradle и Android command-line tools получены с официальных источников. SHA-256 Gradle проверен: `20f1b1176237254a6fc204d8434196fa11a4cfb387567519c61556e8710aed78`.
-- Начальная ошибка Java-загрузок устранена обычным использованием уже настроенного прокси и переносом writable Android cache из `/home/agent/.android` в `/workspace/toolchains/android-user`. TLS-проверки и системные trust stores не менялись.
-- Кэши и инструменты лежат вне репозитория: `/workspace/toolchains`. Настройки прокси не включены в Git.
+- OpenJDK 21.0.12.1; target bytecode Java 17. В системном runtime отсутствовал launcher javac, но модули компилятора уже были. В `/workspace/toolchains/jdk21` создана отдельная копия с launcher-скриптами существующих jdk.compiler/jdk.jartool/jdk.jlink. javac и jlink проверены; системная Java не менялась. Adoptium API ответил proxy CONNECT 403, ограничения не обходились.
+- Gradle 8.13 (Wrapper включён), Kotlin 2.1.20, AGP 8.11.1, KSP 2.1.20-2.0.1, Room 2.7.2.
+- SHA-256 Gradle: `20f1b1176237254a6fc204d8434196fa11a4cfb387567519c61556e8710aed78` — проверен и закреплён в wrapper properties.
+- Дионис разрешил Android SDK License 11 октября 2026, 05:13:16 UTC. Принята только `android-sdk-license` для согласованных пакетов. sdkmanager завершился с кодом 0: Platform 35 revision 2, Build-tools 35.0.0, Platform-tools 37.0.1 установлены в `/workspace/toolchains/android-sdk`.
+- Загрузки Java используют уже настроенный прокси; Android-кэш перенесён в writable workspace. TLS/trust stores не менялись. Robolectric использует тестовый user.home внутри `.gradle/robolectric`, потому что системный home read-only. Credentials не менялись.
 
-Фактически исполненная команда:
+## Команда и результат
 
 ```sh
 cd /workspace/not-ai-time-tracker
-ANDROID_USER_HOME=/workspace/toolchains/android-user \
-GRADLE_USER_HOME=/workspace/toolchains/gradle-home \
-./gradlew :core:test
-```
-
-Результат: `BUILD SUCCESSFUL`, три теста, 0 failures / 0 errors / 0 skipped. [Лог](../evidence/core-test.log), [JUnit XML](../evidence/core-tests.xml).
-
-## Что проверено тремя сценариями
-
-1. **timerPath**: старт без карточки; поздняя классификация без сброса времени; pause/resume; сериализация состояния и создание нового Tracker/хранилища в памяти; устаревший Stop; switch и забытое переключение; защита Undo; repeat/favorite; изменение деталей; два конкурирующих переключения (одно принято, другое STALE с актуальным состоянием); скачок часов; другая загрузка; явное исключение/исправление хвоста.
-2. **smallHistoryAndExport**: пауза; пересечение полуночи; два разных сегмента равной длительности; пересекающиеся tags; дневные итоги и общий итог; CSV из тех же строк; одна запись session quantity на два сегмента; правка и Undo; архив/переименование без изменения прошлого; копия карточки без истории/количеств; запрет пересечения; 23-часовой день Europe/Berlin при DST.
-3. **backupReplacementAndFailure**: разбор обоих поставляемых JSON-примеров; полная замена чистого состояния; сохранение настроек, карточек, избранного, измерений и истории; незавершённый импортированный хвост в RECOVERY без end; отказ повреждённого файла, неизвестной версии, отсутствующего dataset ID, дубликата ID; stale preview; повреждённая откатная копия; моделируемая ошибка транзакции без изменения старых данных; явное подтверждение границы.
-
-Это доменные JVM-проверки; сериализация/новый объект не выдаются за kill/restart Android-процесса.
-
-## Незавершённая Android-проверка
-
-На текущем шаге установка SDK остановлена до принятия Android SDK License. Команда sdkmanager с закрытым stdin вернула:
-
-```
-Accept? (y/N): Skipping following packages as the license is not accepted:
-Android SDK Build-Tools 35
-Android SDK Platform-Tools
-Android SDK Platform 35
-```
-
-Пакеты: `platforms;android-35`, `build-tools;35.0.0`, `platform-tools`. Разрешение на принятие лицензии запрошено отдельно по уточнению родительского задания. Пока оно ожидается, APK/Room/lint не заявлены успешными. Подготовлен один повторно используемый набор из трёх сценариев для Room/Robolectric; он должен проверить дисковый SQLite и close/reopen базы.
-
-Android-команда фактически выполнена с `JAVA_HOME=/workspace/toolchains/jdk21`; она дошла до проверки лицензии и завершилась `BUILD FAILED`: `Failed to install ... as some licences have not been accepted`. [Точный журнал](../evidence/android-build-blocked.log).
-
-Команда повторной проверки после разрешённой установки SDK:
-
-```sh
 JAVA_HOME=/workspace/toolchains/jdk21 \
 ANDROID_HOME=/workspace/toolchains/android-sdk \
 ANDROID_USER_HOME=/workspace/toolchains/android-user \
 GRADLE_USER_HOME=/workspace/toolchains/gradle-home \
-./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
+./gradlew :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-Исходный manifest статически разобран: allowBackup=false, fullBackupContent=false, нет uses-permission. [Свидетельство](../evidence/source-manifest-check.txt). Проверка merged manifest и APK ещё не выполнена. Политика системного backup задана, но её работа на телефоне не проверена.
+Последний запуск: **BUILD SUCCESSFUL in 18s**. [Полный журнал](../evidence/android-build.log).
 
-`adb`/эмулятор изначально отсутствовали. На этапе первой сборки навык android-emulator-qa по переданному package дал `skill package is not available`; тогда его не было в cloud/executor-каталоге. При последующей приёмке навык появился в обновлённом каталоге; это не установило SDK или adb-target. Подключение плагина в родительском чате не доказало наличие Android-target в этой среде. Никаких замеров физического телефона, батареи или performance не проводилось.
+- Core: 3 tests, 0 failures, 0 errors, 0 skipped — [XML](../evidence/core-tests.xml).
+- Room/Robolectric API 35: те же 3 сценария на дисковой SQLite, 0 failures, 0 errors, 0 skipped — [XML](../evidence/room-tests.xml). Это не тест на Android-устройстве.
+- APK: `app/build/outputs/apk/debug/app-debug.apk`, debug-сборка приложения `dev.notai.tracker`, minSdk 26 / targetSdk 35.
+- `apksigner verify --verbose`: Verifies, v2=true, один подписант — [вывод](../evidence/apk-signature.txt).
+- Room KSP: сгенерированы implementation и [schema 1](../app/schemas/dev.notai.tracker.android.TrackerDatabase/1.json). Destructive migration fallback не включён.
+- Lint: **0 errors, 7 warnings** — [отчёт](../evidence/lint-results-debug.txt). Предупреждения: старшие доступные SDK/версии зависимостей, отсутствие продуктовой иконки и строковый литерал UTC в технической оболочке. Они не скрывались; обновление targetSdk и продуктовые ресурсы требуют отдельной проверки UI.
+- В APK через aapt2 проверены allowBackup=false, fullBackupContent=false, ссылка на dataExtractionRules, отсутствие uses-permission — [manifest](../evidence/apk-manifest.txt). Manifest содержит служебный неэкспортируемый Room MultiInstanceInvalidationService; постоянный сервис отсчёта не запускается.
 
-## GitHub
+## Три сценария
 
-В доступном GitHub-коннекторе нет операции создания репозитория. Уже настроенный CLI `gh auth status` сообщает недействительный GH_TOKEN; значение токена не читалось/не выводилось, credentials не менялись. Новый удалённый репозиторий не создан; публичная публикация не выполнялась. Для завершения удалённого шага нужен отдельно авторизованный способ создать именно **private** `not-ai-time-tracker` и отправить локальный commit.
+1. **timerPath**: старт без карточки; поздняя разметка; pause/resume; повторное открытие состояния; stale Stop/Undo с актуальным Snapshot; switch и забытое переключение; repeat/favorite; изменение деталей; два конкурентных switch (один принят, другой STALE); скачок часов; другая загрузка; подтверждение/исключение хвоста. Core восстанавливает сериализованный объект, Room закрывает и заново открывает дисковую базу.
+2. **smallHistoryAndExport**: полночь; пауза; разные сегменты равной длительности; пересекающиеся tags; одинаковые суммы отчёта и CSV; session quantity не удваивается; исправление/Undo; зафиксированный результат правки с отчётом; удаление измерения с affected ID; атомарная правка сессии/заметки; копия карточки без истории/количеств; переименование/архивирование карточки и типа без смены прошлой связи; отказ отсутствующей ссылки и пересечения; 23-часовой день Europe/Berlin.
+3. **backupReplacementAndFailure**: оба JSON-примера; полная замена чистого состояния; история/настройки/типы/избранное/измерения; сохранение переименованного архивного типа и ссылки; активный хвост в RECOVERY без выдуманного end; повреждённый файл, неизвестная версия, пропущенный datasetId, дубликат ID; stale preview; повреждённая rollback-копия; моделируемая ошибка внутри транзакции без изменения старых данных; явное подтверждение границы.
 
-Модель/effort runtime не раскрыты; исполнитель их не менял. Дополнительные агенты не запускались.
+Расширения добавлены внутрь этих трёх сценариев, отдельной большой тестовой системы нет. Исправлены обнаруженные дефекты Android-компиляции (O_DIRECTORY), тестовой среды (Robolectric lock), STALE/Undo, affected IDs измерений и отсутствующего реестра типов.
 
-## Технические источники версий
+## Не выполнено
 
-- [Совместимость AGP 8.11](https://developer.android.com/build/releases/agp-8-11-0-release-notes): Gradle 8.13, JDK >=17, build tools 35.
-- [Room release notes](https://developer.android.com/jetpack/androidx/releases/room): Kotlin 2.x/KSP и закреплённая ветка Room 2.7.
-- [Android SDK License](https://developer.android.com/studio/terms): внешнее условие установки SDK.
+- Нет проверки Activity/SAF/sleep/reboot/kill-process на устройстве или эмуляторе; нет screenshots/logcat сценария. Android QA-навык теперь доступен и прочитан. Установленный adb 37.0.1 при `devices -l` остановился на `Cannot mkdir '/home/agent/.android': Read-only file system`; его env-параметры Android home не изменили поведение. Эмулятор/qemu-процесс и `/dev/kvm` не обнаружены. Новые filesystem-разрешения не запрашивались. Доступный adb-target не подтверждён.
+- Политика Android backup проверена в собранном APK, но не проверялась на OEM-устройствах. Производительность и батарея не измерялись.
+- Private GitHub-репозиторий не создан: create-repository нет в доступном коннекторе, существующая CLI-авторизация невалидна. Токен не читался/не выводился; remote не настроен, публичной публикации не было.
+- Остальные продуктовые ограничения и этапы перечислены в [ACCEPTANCE_GAPS.md](ACCEPTANCE_GAPS.md).
+
+## Источники
+
+[Совместимость AGP 8.11](https://developer.android.com/build/releases/agp-8-11-0-release-notes), [Room](https://developer.android.com/jetpack/androidx/releases/room), [Android SDK License](https://developer.android.com/studio/terms).

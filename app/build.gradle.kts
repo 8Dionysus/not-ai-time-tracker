@@ -7,7 +7,16 @@ android {
     kotlinOptions { jvmTarget = "17" }
     testOptions {
         unitTests.isIncludeAndroidResources = true
-        unitTests.all { it.systemProperty("tracker.samples", rootProject.file("samples").absolutePath) }
+        unitTests.all { test ->
+            test.systemProperty("tracker.samples", rootProject.file("samples").absolutePath)
+            // Robolectric writes a lock and Maven cache under user.home. Keep test-only state in the project.
+            val testHome = rootProject.file(".gradle/robolectric")
+            test.systemProperty("user.home", testHome.absolutePath)
+            test.doFirst { testHome.mkdirs() }
+            listOf("https.proxyHost", "https.proxyPort", "http.proxyHost", "http.proxyPort").forEach { key ->
+                System.getProperty(key)?.let { value -> test.systemProperty(key, value) }
+            }
+        }
     }
 }
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }

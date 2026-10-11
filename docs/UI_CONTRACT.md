@@ -72,3 +72,12 @@ saveAxis/saveMetric/saveUnit/addCatalog работают через тот же 
 Пример: Facet("axis.language", valueId="es", valueMeaningVersion=1); свободная ось: Facet("axis.source", text="YouTube"). Определения предварительно устанавливаются через addCatalog/saveAxis; примеры ID иллюстрируют API и не заявляют наличие полного каталога. Filter(facets=listOf(a,b), facetMatch=FacetMatch.ANY) — объединение по сегментам; ALL — пересечение. Остальные условия фильтра сохраняют AND.
 
 При правке заметки/времени с прежним activityTypeId сохраняется прежний исторический путь. Для явного пересчёта по текущему дереву передать reclassify=true. UI сначала вызывает previewCorrection(sessionId, edits, note, reclassify): он не пишет в базу и через preview.reports возвращает старые/новые суммы на одном asOf. После подтверждения — applyCorrection(preview), с сохранённым Token и одношаговой Undo. Отмена формы не требует команды. Прямая correctSession остаётся командой Save; массовой переклассификации нескольких сессий нет.
+
+
+### Уточнение API после предметной приёмки
+
+Для нового смысла ActivityType создайте новый ID: saveType не разрешает изменять meaningVersion/definition прежнего ID. Переименование/перенос/архив остаются разрешены. Архив/невыбираемость родителя не каскадируют на потомков. Обычный start/switch проверяет выбранный тип даже для прямой Classification; явный Repeat/Favorite разрешает исторический выбор.
+
+После addCatalog проверяйте change.catalogImport!!.entries (ADDED/UNCHANGED/CONFLICT); успех команды не означает применение конфликтующих определений. Повторный ключ во входе — INVALID_INPUT без изменения базы. Неизвестные suggestedAxisIds/suggestedMetricIds также отклоняются.
+
+Для ввода количества используйте data.prepareMeasurement(MeasurementDraft(metricId, meaningVersion, value, unitId, scope, targetId)). Сохраняйте returned draft в форме. Если measurement=null, покажите error и оставьте ввод для явного исправления/отмены. При наличии measurement вызовите tracker.measure с токеном показанного состояния. Метод не округляет и не сохраняет черновик в базу; оригинальная единица не подменяет каноническую при неудаче преобразования.

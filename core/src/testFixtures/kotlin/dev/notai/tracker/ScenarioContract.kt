@@ -225,6 +225,60 @@ abstract class ScenarioContract {
         expect(ErrorCode.INVALID_INPUT) { t.saveType(token(),other.copy(parentId = child.id)) }
         expect(ErrorCode.INVALID_INPUT) { t.start(token(),chosen.copy(facets = listOf(a.copy(text = "bad")))) }
         expect(ErrorCode.INVALID_INPUT) { t.saveMetric(token(),distance.copy(maxScale = 2)) }
+        // Semantic identity is immutable; ordinary presentation/navigation edits stay legal.
+        val stable = t.data()
+        expect(ErrorCode.INVALID_INPUT) { t.saveType(token(),child.copy(meaningVersion = 2)) }
+        expect(ErrorCode.INVALID_INPUT) { t.saveType(token(),child.copy(definition = "A different meaning")) }
+        expect(ErrorCode.INVALID_INPUT) { t.saveType(token(),parent.copy(suggestedAxisIds = setOf("missing.axis"))) }
+        expect(ErrorCode.INVALID_INPUT) { t.saveType(token(),parent.copy(suggestedMetricIds = setOf("missing.metric"))) }
+        assertEquals(stable,t.data())
+        t.saveType(token(),parent.copy(name = "Renamed",suggestedAxisIds = setOf(language.id),suggestedMetricIds = setOf(distance.id)))
+        // Raw classifications cannot bypass the selected node's flags. Flags are node-local, not recursive.
+        t.saveType(token(),parent.copy(archived = true))
+        val rawParent = Classification(activityTypeId = parent.id)
+        expect(ErrorCode.INVALID_INPUT) { t.start(token(),rawParent) }
+        t.saveType(token(),child.copy(parentId = parent.id))
+        t.start(token(),Classification(activityTypeId = child.id))
+        val beforeSwitch = t.data()
+        expect(ErrorCode.INVALID_INPUT) { t.switch(token(),rawParent) }
+        assertEquals(beforeSwitch,t.data()); t.stop(token())
+        val broadSession = t.data().sessions.first { it.selection.activityTypeId == parent.id }
+        t.repeat(token(),broadSession.id); t.stop(token()) // explicit Repeat still permits archived history
+        t.saveType(token(),parent.copy(selectable = false))
+        expect(ErrorCode.INVALID_INPUT) { t.start(token(),rawParent) }
+        t.start(token(),Classification(activityTypeId = child.id)); t.stop(token())
+
+        val existingChild = t.data().types.single { it.id == child.id }
+        val collision = t.addCatalog(token(),VocabularyData(listOf(existingChild.copy(name = "Incoming rename"),other)))
+            .catalogImport!!
+        assertEquals(listOf(child.id),collision.conflicts.map { it.id })
+        assertEquals(listOf(other.id),collision.unchanged.map { it.id })
+        assertTrue(collision.added.isEmpty())
+        assertEquals(existingChild,t.data().types.single { it.id == child.id })
+        val newNode = ActivityType("activity.new","New",parentId = other.id)
+        assertEquals(listOf(newNode.id),t.addCatalog(token(),VocabularyData(listOf(newNode))).catalogImport!!.added.map { it.id })
+        val beforeDuplicates = t.data()
+        expect(ErrorCode.INVALID_INPUT) { t.addCatalog(token(),VocabularyData(listOf(existingChild,existingChild.copy(name = "Duplicate")))) }
+        expect(ErrorCode.INVALID_INPUT) { t.addCatalog(token(),VocabularyData(emptyList(),axes = listOf(language,language))) }
+        expect(ErrorCode.INVALID_INPUT) { t.addCatalog(token(),VocabularyData(emptyList(),metrics = listOf(distance,distance))) }
+        expect(ErrorCode.INVALID_INPUT) { t.addCatalog(token(),VocabularyData(emptyList(),units = listOf(units[0],units[0]))) }
+        expect(ErrorCode.INVALID_INPUT) { t.addCatalog(token(),VocabularyData(listOf(existingChild.copy(suggestedAxisIds = setOf("unknown"))))) }
+        assertEquals(beforeDuplicates,t.data())
+
+        // A failed registered-metric conversion retains the form input; saving in the wrong unit is rejected.
+        t.saveUnit(token(),UnitDefinition("unit.three_m","Three metres","length",Decimal("3")))
+        val thirds = distance.copy(id = "measure.thirds",canonicalUnitId = "unit.three_m")
+        t.saveMetric(token(),thirds)
+        val draft = MeasurementDraft(thirds.id,1,Decimal("1"),"unit.m",Scope.SESSION,first)
+        val beforeConversion = t.data(); val prepared = t.data().prepareMeasurement(draft)
+        assertEquals(draft,prepared.draft); assertNull(prepared.measurement)
+        assertTrue(prepared.error!!.contains("unit.three_m"))
+        expect(ErrorCode.INVALID_INPUT) { t.measure(token(),Measurement(fieldId = thirds.id,unit = draft.unitId,scope = draft.scope,targetId = first,value = draft.value)) }
+        assertEquals(beforeConversion,t.data())
+        val explicitCanonical = t.data().prepareMeasurement(draft.copy(value = Decimal("2"),unitId = "unit.three_m"))
+        assertNull(explicitCanonical.error)
+        t.measure(token(),explicitCanonical.measurement!!)
+        assertEquals(Decimal("2"),t.data().measurements.last().value)
         val restored = Backups.decode(Backups(t,MemoryRollback()).export()).data
         assertEquals(t.data(),restored)
         assertTrue(Csv.export(report()).contains("160.9344"))

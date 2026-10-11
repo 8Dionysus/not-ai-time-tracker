@@ -21,7 +21,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
     }
 
     data class Change(val state: Snapshot, val changedSessionIds: Set<String>, val undoAvailable: Boolean,
-        val data: Dataset, val asOf: Moment) {
+        val data: Dataset, val asOf: Moment, val catalogImport: CatalogImportReport? = null) {
         val changedSessions get() = data.sessions.filter { it.id in changedSessionIds }
         val changedSegments get() = data.segments.filter { it.sessionId in changedSessionIds }
         fun report(start: Long,end: Long,filter: Filter = Filter()) = Reports.report(data,asOf,start,end,filter)
@@ -111,14 +111,21 @@ class Tracker(val store: StateStore, val clock: Clock) {
         d.copy(favorites = d.favorites.filterNot { it.id == favorite.id } + favorite)
     }
     fun saveType(expected: Token, type: ActivityType) = mutate(expected) { d,_ ->
+        d.types.find { it.id == type.id }?.let { old ->
+            ensure(old.meaningVersion == type.meaningVersion && old.definition == type.definition,
+                "A new type meaning/version/definition requires a new ID; existing history retains the old ID")
+        }
         d.copy(types = d.types.filterNot { it.id == type.id } + type)
     }
-    /** Install absent definitions only; preserve existing local names, moves and settings. */
-    fun addCatalog(expected: Token,catalog: VocabularyData) = mutate(expected) { d,_ ->
-        d.copy(types = d.types + catalog.types.filter { t -> d.types.none { it.id == t.id } },
-            axes = d.axes + catalog.axes.filter { a -> d.axes.none { it.id == a.id && it.meaningVersion == a.meaningVersion } },
-            metrics = d.metrics + catalog.metrics.filter { m -> d.metrics.none { it.id == m.id && it.meaningVersion == m.meaningVersion } },
-            units = d.units + catalog.units.filter { u -> d.units.none { it.id == u.id } })
+    /** Install absent definitions only; report every added, identical and conflicting key. */
+    fun addCatalog(expected: Token,catalog: VocabularyData): Change {
+        lateinit var report: CatalogImportReport
+        val change = mutate(expected) { d,_ ->
+            val merged = d.mergeCatalog(catalog)
+            report = merged.second
+            merged.first
+        }
+        return change.copy(catalogImport = report)
     }
     fun saveAxis(expected: Token,axis: Axis) = mutate(expected) { d,_ ->
         d.axes.find { it.id == axis.id && it.meaningVersion == axis.meaningVersion }?.let { old ->

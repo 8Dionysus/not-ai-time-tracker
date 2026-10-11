@@ -67,6 +67,8 @@ internal fun validateVocabulary(d: Dataset) {
     d.types.forEach { t ->
         ensure(t.name.isNotBlank() && t.meaningVersion > 0,"Invalid type")
         d.ancestorPath(t.id)
+        ensure(t.suggestedAxisIds.all { id -> d.axes.any { it.id == id } },"Unknown suggested axis")
+        ensure(t.suggestedMetricIds.all { id -> d.metrics.any { it.id == id } },"Unknown suggested metric")
     }
     ensure(d.axes.map { it.id to it.meaningVersion }.distinct().size == d.axes.size,"Duplicate axis version")
     d.axes.forEach { a ->
@@ -107,9 +109,65 @@ fun Dataset.convert(value: Decimal,fromUnitId: String,toUnitId: String): Decimal
     val to = units.find { it.id == toUnitId } ?: fail(ErrorCode.INVALID_INPUT,"Unknown target unit")
     ensure(from.dimension == to.dimension,"Incompatible units")
     return try { Decimal(value.number.multiply(from.factorToBase.number).divide(to.factorToBase.number).toPlainString()) }
-    catch (_: ArithmeticException) { fail(ErrorCode.INVALID_INPUT,"Conversion requires rounding; retain the original unit") }
+    catch (_: ArithmeticException) { fail(ErrorCode.INVALID_INPUT,"Exact conversion is nonterminating. Nothing was saved; keep the input draft and enter an explicitly chosen value in the target unit") }
 }
 
 /** Versioned dictionaries are data, independent of tree size, depth and UI layout. */
 @Serializable data class VocabularyData(val types: List<ActivityType>,val axes: List<Axis> = emptyList(),
     val metrics: List<Metric> = emptyList(),val units: List<UnitDefinition> = emptyList())
+
+
+enum class CatalogEntryStatus { ADDED, UNCHANGED, CONFLICT }
+data class CatalogEntryOutcome(val kind: String,val id: String,val meaningVersion: Int?,val status: CatalogEntryStatus)
+data class CatalogImportReport(val entries: List<CatalogEntryOutcome>) {
+    val added get() = entries.filter { it.status == CatalogEntryStatus.ADDED }
+    val unchanged get() = entries.filter { it.status == CatalogEntryStatus.UNCHANGED }
+    val conflicts get() = entries.filter { it.status == CatalogEntryStatus.CONFLICT }
+}
+internal fun Dataset.mergeCatalog(incoming: VocabularyData): Pair<Dataset,CatalogImportReport> {
+    val outcomes = mutableListOf<CatalogEntryOutcome>()
+    fun <T> merge(kind: String,old: List<T>,fresh: List<T>,key: (T)->Pair<String,Int?>): List<T> {
+        val keys = fresh.map(key)
+        ensure(keys.distinct().size == keys.size,"Duplicate $kind key in incoming catalog")
+        val existing = old.associateBy(key)
+        fresh.forEach { entry ->
+            val (id,version) = key(entry); val previous = existing[id to version]
+            outcomes += CatalogEntryOutcome(kind,id,version,when {
+                previous == null -> CatalogEntryStatus.ADDED
+                previous == entry -> CatalogEntryStatus.UNCHANGED
+                else -> CatalogEntryStatus.CONFLICT
+            })
+        }
+        return old + fresh.filter { key(it) !in existing }
+    }
+    val result = copy(types = merge("type",types,incoming.types) { it.id to null },
+        axes = merge("axis",axes,incoming.axes) { it.id to it.meaningVersion },
+        metrics = merge("metric",metrics,incoming.metrics) { it.id to it.meaningVersion },
+        units = merge("unit",units,incoming.units) { it.id to null })
+    // Validate incoming definitions even when an existing local key will win a conflict.
+    val candidate = copy(types = types.filterNot { old -> incoming.types.any { it.id == old.id } } + incoming.types,
+        axes = axes.filterNot { old -> incoming.axes.any { it.id == old.id && it.meaningVersion == old.meaningVersion } } + incoming.axes,
+        metrics = metrics.filterNot { old -> incoming.metrics.any { it.id == old.id && it.meaningVersion == old.meaningVersion } } + incoming.metrics,
+        units = units.filterNot { old -> incoming.units.any { it.id == old.id } } + incoming.units)
+    validateVocabulary(candidate)
+    validate(result)
+    return result to CatalogImportReport(outcomes)
+}
+
+/** A form value is returned intact on conversion/precision failure. No write, fallback unit or rounding. */
+data class MeasurementDraft(val metricId: String,val meaningVersion: Int,val value: Decimal,val unitId: String,
+    val scope: Scope,val targetId: String)
+data class PreparedMeasurement(val draft: MeasurementDraft,val measurement: Measurement?,val error: String?)
+fun Dataset.prepareMeasurement(draft: MeasurementDraft): PreparedMeasurement {
+    val metric = metrics.find { it.id == draft.metricId && it.meaningVersion == draft.meaningVersion }
+        ?: return PreparedMeasurement(draft,null,"Unknown metric/version; keep the draft and choose a defined metric")
+    return try {
+        val converted = convert(draft.value,draft.unitId,metric.canonicalUnitId)
+        val measurement = Measurement(fieldId = metric.id,meaningVersion = metric.meaningVersion,
+            unit = metric.canonicalUnitId,scope = draft.scope,targetId = draft.targetId,value = converted)
+        validateMeasurement(this,measurement)
+        PreparedMeasurement(draft,measurement,null)
+    } catch (e: CoreError) {
+        PreparedMeasurement(draft,null,"${e.message}. Nothing was saved. Keep this draft; explicitly enter a value in ${metric.canonicalUnitId} within scale ${metric.maxScale}, or cancel")
+    }
+}

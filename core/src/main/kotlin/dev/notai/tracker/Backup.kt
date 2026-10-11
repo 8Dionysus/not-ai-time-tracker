@@ -4,6 +4,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Required
 
 @Serializable data class Backup(@Required val formatVersion: Int = 2,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
+const val MAX_BACKUP_BYTES = 10*1024*1024
+
 interface RollbackStore {
     /** Persist durably and return a reference. Do not overwrite the user's existing copies. */
     fun save(json: String): String
@@ -47,11 +49,18 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore) 
     }
     companion object {
         fun encode(d: Dataset,n: Moment): String {
+            validateMoment(n)
+            validate(d)
             val frozen = d.copy(segments = d.segments.map { materialize(it,n).copy(anchor = null) })
-            return codec.encodeToString(Backup(asOf = n.wall,data = frozen))
+            val json = codec.encodeToString(Backup(asOf = n.wall,data = frozen))
+            ensure(json.toByteArray(Charsets.UTF_8).size <= MAX_BACKUP_BYTES,
+                "Backup exceeds supported 10 MiB restore limit; no usable backup was produced",ErrorCode.INVALID_INPUT)
+            // An export must pass the same temporal/reference checks as a future restore.
+            decode(json)
+            return json
         }
         fun decode(json: String): Backup {
-            ensure(json.toByteArray(Charsets.UTF_8).size <= 10*1024*1024,"Backup exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
+            ensure(json.toByteArray(Charsets.UTF_8).size <= MAX_BACKUP_BYTES,"Backup exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
             val b = try { decodeBackupVersion(json) } catch (_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed or unsupported JSON") }
             ensure(b.formatVersion == 2,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
             ensure(b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)

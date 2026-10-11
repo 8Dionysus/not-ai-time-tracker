@@ -290,6 +290,7 @@ abstract class ScenarioContract {
         assertEquals(1,historySample.data.sessions.size)
         assertEquals(1_200_000,historySample.data.segments.single().durationMs)
         assertEquals(historySample.data,Backups.decode(java.io.File(sampleDir,"history-v2.json").readText()).data)
+        repeatedRestoreAndReferences(java.io.File(sampleDir,"history-v2.json").readText())
         val legacyJson = java.io.File(sampleDir,"history-v1.json").readText()
         val migrated = migrateStoredV1(legacyJson)
         assertEquals(historySample.data,migrated)
@@ -361,6 +362,62 @@ abstract class ScenarioContract {
         val restoredQuantities = Reports.report(historical.data(),clock.now().copy(wall = historySample.asOf),
             historySample.data.segments.single().start,historySample.asOf).quantityTotals()
         assertEquals(Decimal("20"),restoredQuantities[QuantityKey("pages",1,"page",Scope.SESSION)])
+    }
+
+    private fun repeatedRestoreAndReferences(sampleJson: String) {
+        val fixture = Backups.decode(sampleJson)
+        val clock = FakeClock(wall = fixture.asOf+60_000)
+        val t = Tracker(createStore(),clock); val disk = MemoryRollback(); val b = Backups(t,disk)
+        b.apply(b.prepare(sampleJson))
+        val originalSegments = t.data().segments
+        val originalType = t.data().types.single()
+        val parent = ActivityType("local.parent","Local parent")
+        t.saveType(t.snapshot().token,parent)
+        t.saveType(t.snapshot().token,originalType.copy(name = "Renamed",parentId = parent.id))
+        assertEquals(originalSegments,t.data().segments)
+        val incoming = VocabularyData(listOf(originalType.copy(meaningVersion = 2,definition = "Different semantic meaning")))
+        val conflict = t.addCatalog(t.snapshot().token,incoming)
+        assertEquals(listOf(originalType.id),conflict.catalogImport!!.conflicts.map { it.id })
+        val replay = t.addCatalog(t.snapshot().token,incoming)
+        assertEquals(conflict.catalogImport,replay.catalogImport)
+        assertEquals(originalSegments,t.data().segments)
+        assertEquals(1,t.data().types.single { it.id == originalType.id }.meaningVersion)
+        val exported = b.export(); val saved = Backups.decode(exported).data
+        val clean = Tracker(createStore(),clock); val restore = Backups(clean,disk)
+        restore.apply(restore.prepare(exported))
+        assertEquals(saved.copy(revision = clean.data().revision),clean.data())
+        val once = clean.data()
+        restore.apply(restore.prepare(exported))
+        assertEquals(once.copy(revision = once.revision+1),clean.data())
+        val marker = Card(name = "New local record since backup")
+        clean.saveCard(clean.snapshot().token,marker)
+        val beforeReplacement = clean.data()
+        val result = restore.apply(restore.prepare(exported))
+        assertFalse(clean.data().cards.any { it.id == marker.id }) // full replacement is not merge
+        val rollbackJson = disk.read(result.rollbackReference)
+        assertEquals(beforeReplacement,Backups.decode(rollbackJson).data)
+        restore.apply(restore.prepare(rollbackJson))
+        assertEquals(beforeReplacement.copy(revision = clean.data().revision),clean.data())
+        val unchanged = clean.data(); val diskCount = disk.saved.size
+        val source = Backups.decode(exported)
+        val invalidGraphs = listOf(
+            saved.copy(types = saved.types.map { if(it.id == parent.id) it.copy(parentId = originalType.id) else it }),
+            saved.copy(types = saved.types.filterNot { it.id == parent.id }),
+            saved.copy(cards = emptyList()),
+            saved.copy(measurements = saved.measurements.map { it.copy(targetId = "missing") }),
+            saved.copy(types = saved.types.map { it.copy(suggestedAxisIds = setOf("missing")) }),
+            saved.copy(segments = saved.segments.map { it.copy(selection = it.selection.copy(ancestorPathAtWrite = listOf("missing",originalType.id))) })
+        )
+        invalidGraphs.forEach { graph ->
+            expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(codec.encodeToString(source.copy(data = graph))) }
+            assertEquals(unchanged,clean.data()); assertEquals(diskCount,disk.saved.size)
+        }
+        expect(ErrorCode.INVALID_INTERVAL) { Backups.encode(Dataset(),clock.now().copy(wall = -1)) }
+        val oversized = Dataset(cards = listOf(Card(name = "я".repeat(MAX_BACKUP_BYTES/2))))
+        expect(ErrorCode.INVALID_INPUT) { Backups.encode(oversized,clock.now()) }
+        // A backwards wall clock must not create a successfully exported but unrestorable backup.
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { Backups.encode(saved,clock.now().copy(wall = 0)) }
+        assertEquals(unchanged,clean.data())
     }
 
     protected open fun migrateStoredV1(json: String): Dataset = Backups.decode(json).data

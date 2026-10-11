@@ -6,11 +6,11 @@ import kotlin.math.abs
 /** All calls are blocking: Android callers use Dispatchers.IO. No timer service or periodic writes. */
 class Tracker(val store: StateStore, val clock: Clock) {
     private var undo: Pair<Token, Dataset>? = null
-    val views get() = store.changes.map { TrackerView(it,clock) }
-    fun view() = TrackerView(data(),clock)
-    val snapshots get() = store.changes.map { snapshot(it, clock.now()) }
+    val views get() = store.checkedChanges.map { TrackerView(it,clock) }
+    fun view() = TrackerView(store.readChecked(),clock)
+    val snapshots get() = store.checkedChanges.map { it.snapshot(clock.now()) }
     fun data(): Dataset = storage { store.read() }
-    fun snapshot(): Snapshot = snapshot(data(), clock.now())
+    fun snapshot(): Snapshot = storage { store.readChecked().snapshot(clock.now()) }
     fun selection(cardId: String): Classification {
         val d = data()
         val card = d.cards.singleOrNull { it.id == cardId && !it.archived } ?: fail(ErrorCode.INVALID_INPUT,"Card missing or archived")
@@ -30,48 +30,36 @@ class Tracker(val store: StateStore, val clock: Clock) {
         fun day(date: java.time.LocalDate,filter: Filter = Filter()) = Reports.day(data,asOf,date,filter)
     }
     @Synchronized private fun mutate(expected: Token, undoable: Boolean = false, edit: (Dataset, Moment) -> Dataset): Change = storage {
-        store.transaction { old ->
+        store.checkedTransaction { checked ->
+            val old = checked.data
             val now = clock.now()
             checkToken(old, expected, now)
             val next = edit(old, now).copy(revision = Math.addExact(old.revision, 1))
-            validate(next)
-            val changed = changedSessions(old,next)
-            val state = snapshot(next, now)
-            // Undo is issued only after a successful persistence commit (below).
-            next to Triple(Change(state, changed, undoable, next, now), old, next)
+            checked.replace(next) { validated ->
+                val changed = changedSessions(old,next)
+                Triple(Change(validated.snapshot(now), changed, undoable, validated.data, now), old, next)
+            }
         }.let { (change, previous, _) ->
             undo = if (undoable) change.state.token to previous else null
             change
         }
     }
-    fun start(expected: Token, selection: Classification = Classification(), note: String? = null) = mutate(expected) { d,n ->
-        ensure(current(d) == null, "Already tracking")
-        checkStartable(d,selection)
-        append(d, selection, note, n)
+    @Synchronized private fun timer(expected: Token,action: TimerAction,selection: Classification = Classification(),note: String? = null): Change = storage {
+        store.checkedTransaction { checked ->
+            val now = clock.now()
+            checked.timer(expected,action,now,selection,note) { next,changed ->
+                Change(next.snapshot(now),changed,action == TimerAction.SWITCH,next.data,now) to checked.data
+            }
+        }.let { (change,old) ->
+            undo = if(change.undoAvailable) change.state.token to old else null
+            change
+        }
     }
-    fun pause(expected: Token) = mutate(expected) { d,n ->
-        val s = running(d,n)
-        close(d,s,n,SessionStatus.PAUSED)
-    }
-    fun resume(expected: Token) = mutate(expected) { d,n ->
-        val s = current(d) ?: fail(ErrorCode.INVALID_INPUT, "No current session")
-        ensure(s.status == SessionStatus.PAUSED, "Session is not paused")
-        val selected = d.classify(s.selection)
-        d.copy(sessions = d.sessions.replace(s.copy(status = SessionStatus.RUNNING,selection = selected)),
-            segments = d.segments + open(s.id,selected,n))
-    }
-    fun stop(expected: Token) = mutate(expected) { d,n ->
-        val s = current(d) ?: fail(ErrorCode.INVALID_INPUT, "No current session")
-        if (s.status == SessionStatus.PAUSED) d.copy(sessions = d.sessions.replace(s.copy(status = SessionStatus.STOPPED)))
-        else close(d,running(d,n),n,SessionStatus.STOPPED)
-    }
-    fun switch(expected: Token, selection: Classification) = mutate(expected, true) { d,n ->
-        val s = current(d) ?: fail(ErrorCode.INVALID_INPUT, "No current session")
-        val closed = if (s.status == SessionStatus.PAUSED) d.copy(sessions = d.sessions.replace(s.copy(status = SessionStatus.STOPPED)))
-        else close(d,running(d,n),n,SessionStatus.STOPPED)
-        checkStartable(d,selection)
-        append(closed, selection, null,n)
-    }
+    fun start(expected: Token,selection: Classification = Classification(),note: String? = null) = timer(expected,TimerAction.START,selection,note)
+    fun pause(expected: Token) = timer(expected,TimerAction.PAUSE)
+    fun resume(expected: Token) = timer(expected,TimerAction.RESUME)
+    fun stop(expected: Token) = timer(expected,TimerAction.STOP)
+    fun switch(expected: Token,selection: Classification) = timer(expected,TimerAction.SWITCH,selection)
     /** Explicit late labeling applies to the entire current session, including its earlier segments. */
     fun labelCurrent(expected: Token, selection: Classification, note: String? = null) = mutate(expected, true) { d,_ ->
         val selected = d.classify(selection)
@@ -205,6 +193,30 @@ class Tracker(val store: StateStore, val clock: Clock) {
         val s = Session(status = SessionStatus.STOPPED, selection = selected, note = note)
         d.copy(sessions = d.sessions + s, segments = d.segments + Segment(sessionId = s.id,start = start,end = end,durationMs = end-start,selection = selected))
     }
+    class BoundaryPreview internal constructor(val expected: Token,val left: Segment,val right: Segment,val boundary: Long)
+    /** Read-only preview. Only an explicit apply changes the two stopped sessions. */
+    fun previewBoundary(expected: Token,leftId: String,rightId: String,boundary: Long): BoundaryPreview {
+        val d = data(); checkToken(d,expected,clock.now())
+        val pair = boundarySegments(d,leftId,rightId,boundary)
+        return BoundaryPreview(expected,pair.first,pair.second,boundary)
+    }
+    fun correctBoundary(preview: BoundaryPreview) = mutate(preview.expected,true) { d,_ ->
+        val (left,right) = boundarySegments(d,preview.left.id,preview.right.id,preview.boundary)
+        d.copy(segments = d.segments.map { when(it.id) {
+            left.id -> it.copy(end = preview.boundary,durationMs = preview.boundary-it.start,observedUntil = null,anchor = null)
+            right.id -> it.copy(start = preview.boundary,durationMs = it.end!!-preview.boundary,observedUntil = null,anchor = null)
+            else -> it
+        } })
+    }
+    private fun boundarySegments(d: Dataset,leftId: String,rightId: String,boundary: Long): Pair<Segment,Segment> {
+        val left = d.segments.singleOrNull { it.id == leftId } ?: fail(ErrorCode.INVALID_INPUT,"Missing left segment")
+        val right = d.segments.singleOrNull { it.id == rightId } ?: fail(ErrorCode.INVALID_INPUT,"Missing right segment")
+        ensure(left.sessionId != right.sessionId && listOf(left,right).all { segment ->
+            !segment.uncertain && segment.end != null && d.sessions.any { it.id == segment.sessionId && it.status == SessionStatus.STOPPED }
+        },"Boundary correction requires two certain stopped sessions")
+        ensure(left.end == right.start && boundary > left.start && boundary < right.end!!,"Invalid common boundary",ErrorCode.INVALID_INTERVAL)
+        return left to right
+    }
     fun correctSegment(expected: Token, segmentId: String, start: Long, end: Long, selection: Classification,reclassify: Boolean = false) = mutate(expected,true) { d,n ->
         interval(start,end,n)
         val seg = d.segments.find { it.id == segmentId } ?: fail(ErrorCode.INVALID_INPUT, "Missing segment")
@@ -246,6 +258,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
     private fun changedSessions(old: Dataset,next: Dataset): Set<String> {
         val changed = mutableSetOf<String>()
         fun <T> compare(a: List<T>,b: List<T>,id: (T)->String,affected: (T,Boolean)->String?) {
+            if(a === b) return
             val before = a.associateBy(id); val after = b.associateBy(id)
             for(key in before.keys+after.keys) if(before[key] != after[key]) {
                 before[key]?.let { affected(it,false)?.let(changed::add) }
@@ -273,10 +286,6 @@ class Tracker(val store: StateStore, val clock: Clock) {
     private fun historicalSelection(d: Dataset,old: Classification,chosen: Classification,reclassify: Boolean): Classification =
         if(reclassify || old.activityTypeId != chosen.activityTypeId) d.classify(chosen)
         else chosen.copy(ancestorPathAtWrite = old.ancestorPathAtWrite)
-    private fun checkStartable(d: Dataset,c: Classification) {
-        ensure(c.cardId == null || d.cards.any { it.id == c.cardId && !it.archived },"Card missing or archived")
-        ensure(c.activityTypeId == null || d.types.any { it.id == c.activityTypeId && !it.archived && it.selectable },"Type missing, archived or not selectable")
-    }
     private fun append(d: Dataset,c: Classification,note: String?,n: Moment): Dataset {
         val selected = d.classify(c)
         val s = Session(status = SessionStatus.RUNNING, selection = selected,note = note)

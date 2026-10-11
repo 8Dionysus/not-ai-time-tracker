@@ -103,19 +103,24 @@ abstract class TrackerDatabase: RoomDatabase() {
  */
 class RoomStore(private val db: TrackerDatabase): StateStore {
     private val dao = db.dao()
-    private var cached: Pair<Long,Dataset>? = null // accessed only inside Room transactions
-    init { db.runInTransaction { if (dao.metadata() == null) write(null,Dataset()) } }
-    override val changes: Flow<Dataset> = dao.generations().distinctUntilChanged().map { read() }.flowOn(Dispatchers.IO)
-    override fun read(): Dataset = db.runInTransaction(Callable { load() })
-    override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T = try {
+    private var cached: Pair<Long,CheckedState>? = null // accessed only inside Room transactions
+    init { db.runInTransaction { if (dao.metadata() == null) write(null,CheckedState.validate(Dataset())) } }
+    override val checkedChanges: Flow<CheckedState> = dao.generations().distinctUntilChanged().map { readChecked() }.flowOn(Dispatchers.IO)
+    override val changes: Flow<Dataset> = checkedChanges.map { it.data }
+    override fun readChecked(): CheckedState = db.runInTransaction(Callable { load() })
+    override fun read(): Dataset = readChecked().data
+    override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T = checkedTransaction { before ->
+        val (next,result) = block(before.data)
+        before.replace(next) { result }
+    }
+    override fun <T> checkedTransaction(block: (CheckedState)->CheckedCommit<T>): T = try {
         db.runInTransaction(Callable {
-            val old = load(); val (next,result) = block(old)
-            validate(next)
-            if(old != next) write(old,next)
-            result
+            val before = load(); val commit = block(before); commit.requireBase(before)
+            if(before !== commit.state) write(before.data,commit.state,commit.timerRows)
+            commit.result
         })
     } catch(e: Exception) { db.runInTransaction { cached = null }; throw e }
-    private fun load(): Dataset {
+    private fun load(): CheckedState {
         val generation = requireNotNull(dao.generation())
         cached?.takeIf { it.first == generation }?.let { return it.second }
         val base = codec.decodeFromString<Dataset>(dao.metadata()!!.payload)
@@ -126,12 +131,13 @@ class RoomStore(private val db: TrackerDatabase): StateStore {
             segments = dao.segments().map { codec.decodeFromString<Segment>(it.payload) },
             favorites = dao.favorites().map { codec.decodeFromString<Favorite>(it.payload) },
             measurements = dao.measurements().map { codec.decodeFromString<Measurement>(it.payload) })
-        validate(data)
-        cached = generation to data
-        return data
+        val checked = CheckedState.validate(data)
+        cached = generation to checked
+        return checked
     }
     private fun <T,R> sync(old: List<T>,next: List<T>,id: (T)->String,row: (Int,T)->R,
         put: (List<R>)->Unit,delete: (List<String>)->Unit,read: (List<String>)->List<R>) {
+        if(old === next) return
         val previous = old.mapIndexed { i,v -> id(v) to (i to v) }.toMap()
         val ids = next.map(id).toSet()
         val removed = previous.keys.filter { it !in ids }
@@ -144,7 +150,16 @@ class RoomStore(private val db: TrackerDatabase): StateStore {
             check(read(keys).toSet() == keys.mapNotNull { expected[it] }.toSet()) { "Persistence verification failed" }
         }
     }
-    private fun write(old: Dataset?,d: Dataset) {
+    private fun write(old: Dataset?,state: CheckedState,timer: TimerRows? = null) {
+        val d = state.data
+        if(timer != null) {
+            val sessions = timer.sessions.map { SessionRow(it.value.id,it.position,codec.encodeToString(it.value)) }
+            val segments = timer.segments.map { SegmentRow(it.value.id,it.position,it.value.sessionId,if(it.value.end == null) 1 else null,codec.encodeToString(it.value)) }
+            dao.sessions(sessions)
+            dao.segments(segments.filter { it.openSlot == null }); dao.segments(segments.filter { it.openSlot != null })
+            check(dao.readSessions(sessions.map { it.id }).toSet() == sessions.toSet()) { "Timer session verification failed" }
+            check(dao.readSegments(segments.map { it.id }).toSet() == segments.toSet()) { "Timer segment verification failed" }
+        } else {
         // Session removals wait until child segments have been removed/reparented.
         val removeSessions = mutableListOf<String>()
         sync(old?.sessions.orEmpty(),d.sessions,{ it.id },{ i,s -> SessionRow(s.id,i,codec.encodeToString(s)) },
@@ -160,11 +175,12 @@ class RoomStore(private val db: TrackerDatabase): StateStore {
             val row = VocabularyRow(payload = codec.encodeToString(VocabularyData(emptyList(),d.axes,d.metrics,d.units)))
             dao.vocabulary(row); check(dao.vocabulary() == row) { "Vocabulary verification failed" }
         }
+        }
         val meta = MetaRow(payload = codec.encodeToString(d.copy(types = emptyList(),cards = emptyList(),sessions = emptyList(),segments = emptyList(),favorites = emptyList(),measurements = emptyList(),axes = emptyList(),metrics = emptyList(),units = emptyList())))
         dao.metadata(meta); check(dao.metadata() == meta) { "Metadata verification failed" }
         val generation = Math.addExact(dao.generation() ?: 0,1)
         dao.generation(GenerationRow(generation = generation))
         check(dao.generation() == generation) { "Generation verification failed" }
-        cached = generation to d
+        cached = generation to state
     }
 }

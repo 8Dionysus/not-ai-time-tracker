@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Required
 import kotlinx.serialization.json.Json
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.time.ZoneId
 import java.util.UUID
 
@@ -45,7 +46,8 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
     constructor(id: String = newId(), fieldId: String, meaningVersion: Int = 1, unit: String, scope: Scope, targetId: String, value: Long):
         this(id,fieldId,meaningVersion,unit,scope,targetId,Decimal(value.toString()))
 }
-@Serializable data class Settings(val reportZone: String = "UTC")
+@Serializable data class SurfaceSettings(val widget: Boolean = false,val notification: Boolean = false,val overlay: Boolean = false)
+@Serializable data class Settings(val reportZone: String = "UTC",val surfaces: SurfaceSettings = SurfaceSettings())
 @Serializable data class Dataset(@Required val datasetId: String = newId(), @Required val revision: Long = 0,
     @Required val types: List<ActivityType> = Catalog.types,
     @Required val cards: List<Card> = emptyList(), @Required val favorites: List<Favorite> = emptyList(),
@@ -70,6 +72,14 @@ interface StateStore {
     fun read(): Dataset
     fun <T> transaction(block: (Dataset) -> Pair<Dataset, T>): T
     val changes: Flow<Dataset>
+    fun readChecked(): CheckedState = CheckedState.validate(read())
+    val checkedChanges: Flow<CheckedState> get() = changes.map { CheckedState.validate(it) }
+    /** Safe fallback for stores without the optimized checked-state path. */
+    fun <T> checkedTransaction(block: (CheckedState) -> CheckedCommit<T>): T = transaction { old ->
+        val before = CheckedState.validate(old)
+        val commit = block(before); commit.requireBase(before)
+        commit.state.data to commit.result
+    }
 }
 
 internal fun validateMoment(n: Moment) {
@@ -97,16 +107,7 @@ fun validate(data: Dataset) {
     val typeIds = data.types.map { it.id }.toSet()
     validateVocabulary(data)
     val cards = data.cards.associateBy { it.id }; val sessions = data.sessions.associateBy { it.id }
-    fun selection(c: Classification) {
-        ensure(c.cardId == null || cards.containsKey(c.cardId), "Missing card")
-        ensure(c.activityTypeId == null || c.activityTypeId in typeIds, "Missing activity type")
-        ensure(c.cardId == null || c.name != null, "Card selection needs historical name")
-        ensure(c.activityTypeId != null || c.ancestorPathAtWrite.isEmpty(), "Unmapped selection has a path")
-        ensure(c.ancestorPathAtWrite.isEmpty() || (c.ancestorPathAtWrite.last() == c.activityTypeId && c.ancestorPathAtWrite.distinct().size == c.ancestorPathAtWrite.size && c.ancestorPathAtWrite.all { it in typeIds }), "Invalid historical path")
-        validateFacets(data,c.facets)
-        ensure(c.name == null || c.name.isNotBlank(), "Empty historical name")
-        ensure(c.details.all { it.key.isNotBlank() && it.value.isNotBlank() } && c.tags.all { it.isNotBlank() }, "Empty detail/tag")
-    }
+    fun selection(c: Classification) = validateSelection(data,c,typeIds,cards.keys)
     data.cards.forEach { ensure(it.name.isNotBlank(), "Card needs a name"); selection(it.classification()) }
     data.favorites.forEach { ensure(it.label.isNotBlank(), "Favorite needs a label"); selection(it.selection) }
     fun historical(c: Classification) {
@@ -144,6 +145,17 @@ fun validate(data: Dataset) {
         ensure(if (it.scope == Scope.SESSION) sessions.containsKey(it.targetId) else it.targetId in segmentIds, "Missing measurement target")
     }
     ensure(data.measurements.map { listOf(it.fieldId, it.meaningVersion, it.unit, it.scope, it.targetId) }.distinct().size == data.measurements.size, "Duplicate measurement for target")
+}
+
+internal fun validateSelection(data: Dataset,c: Classification,typeIds: Set<String>,cardIds: Set<String>) {
+        ensure(c.cardId == null || c.cardId in cardIds, "Missing card")
+        ensure(c.activityTypeId == null || c.activityTypeId in typeIds, "Missing activity type")
+        ensure(c.cardId == null || c.name != null, "Card selection needs historical name")
+        ensure(c.activityTypeId != null || c.ancestorPathAtWrite.isEmpty(), "Unmapped selection has a path")
+        ensure(c.ancestorPathAtWrite.isEmpty() || (c.ancestorPathAtWrite.last() == c.activityTypeId && c.ancestorPathAtWrite.distinct().size == c.ancestorPathAtWrite.size && c.ancestorPathAtWrite.all { it in typeIds }), "Invalid historical path")
+        validateFacets(data,c.facets)
+        ensure(c.name == null || c.name.isNotBlank(), "Empty historical name")
+        ensure(c.details.all { it.key.isNotBlank() && it.value.isNotBlank() } && c.tags.all { it.isNotBlank() }, "Empty detail/tag")
 }
 
 /** Temporary technical seed, loaded from data; it is not the completed product catalog. */

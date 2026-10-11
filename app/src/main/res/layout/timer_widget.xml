@@ -1,0 +1,5 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="8dp" android:background="#FFFFFF">
+    <TextView android:id="@+id/widget_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#000000" android:text="@string/app_name" />
+    <Button android:id="@+id/widget_primary" android:layout_width="match_parent" android:layout_height="48dp" android:text="@string/open_timer" />
+    <Button android:id="@+id/widget_stop" android:layout_width="match_parent" android:layout_height="48dp" android:text="@string/stop_timer" android:visibility="gone" />
+</LinearLayout>

@@ -24,9 +24,12 @@ abstract class ScenarioContract {
     private fun expect(code: ErrorCode,block: ()->Unit) { assertEquals(code,assertFailsWith<CoreError>(block = block).code) }
 
     open fun storageWorkload() {}
+    open fun surfaceActions() {}
     open fun assertTransferFailure(transfer: HistoryTransfer,preview: HistoryPreview,tracker: Tracker) {}
 
     @Test fun timerPath() {
+        checkedTimerCombinations()
+        surfaceActions()
         storageWorkload()
         historyTransfer()
         formatInspection()
@@ -142,6 +145,72 @@ abstract class ScenarioContract {
         val sample = HistoryFiles.inspect(damaged.toByteArray())
         assertEquals(ImportFormat.DELIMITED_TEXT,sample.format)
         expect(ErrorCode.UNSUPPORTED_IMPORT) { sample.confirmCsv(',',CsvMapping("bad","activity","start",end = "end"),CsvTimeChoice(null,"UTC"),null) }
+    }
+
+    private fun checkedTimerCombinations() {
+        val clock = FakeClock(); val store = createStore(); val tracker = Tracker(store,clock)
+        val disk = MemoryRollback(); val transfer = HistoryTransfer(tracker,disk)
+        val start = clock.wall-10_000
+        val file = HistoryTransfer.parseCsv("activity,start,end,id\nImported,${Instant.ofEpochMilli(start)},${Instant.ofEpochMilli(clock.wall)},one\n",
+            CsvMapping("combination","activity","start",end = "end",id = "id"))
+        transfer.apply(transfer.preview(file,file.activities.associateWith { Classification(name = it.activity,activityTypeId = "language") }))
+        val card = Card(name = "Private activity",activityTypeId = "language")
+        tracker.saveCard(tracker.snapshot().token,card)
+        tracker.start(tracker.snapshot().token,tracker.selection(card.id))
+        fun checked() { validate(tracker.data()); assertEquals(snapshot(tracker.data(),clock.now()),tracker.snapshot()) }
+        checked(); clock.advance(10_000); tracker.pause(tracker.snapshot().token); checked()
+        tracker.saveCard(tracker.snapshot().token,card.copy(archived = true))
+        val oldPath = tracker.data().segments.last().selection.ancestorPathAtWrite
+        tracker.saveType(tracker.snapshot().token,ActivityType("parent-combination","Parent"))
+        tracker.saveType(tracker.snapshot().token,tracker.data().types.single { it.id == "language" }.copy(parentId = "parent-combination"))
+        assertEquals(oldPath,tracker.data().segments.last().selection.ancestorPathAtWrite)
+        tracker.resume(tracker.snapshot().token); checked(); clock.advance(10_000)
+        tracker.switch(tracker.snapshot().token,Classification()); checked(); clock.advance(1_000)
+        tracker.undo(tracker.snapshot().token); checked(); tracker.stop(tracker.snapshot().token); checked()
+        val before = tracker.data(); val first = before.segments[0]; val second = before.segments[1]
+        val preview = tracker.previewBoundary(tracker.snapshot().token,first.id,second.id,first.end!!-1_000)
+        assertEquals(before,tracker.data())
+        val correction = tracker.correctBoundary(preview); checked()
+        assertEquals(setOf(first.sessionId,second.sessionId),correction.changedSessionIds)
+        assertEquals(before.segments.sumOf { it.durationMs },tracker.data().segments.sumOf { it.durationMs })
+        assertEquals(before.sessions.map { it.importOrigin },tracker.data().sessions.map { it.importOrigin })
+        tracker.undo(tracker.snapshot().token); checked(); assertEquals(before.segments,tracker.data().segments)
+        expect(ErrorCode.STALE) { tracker.correctBoundary(preview) }
+        tracker.settings(tracker.snapshot().token,Settings("Europe/Berlin",SurfaceSettings(true,true,true)))
+        expect(ErrorCode.INVALID_INPUT) { tracker.start(tracker.snapshot().token,tracker.selection(card.id)) }
+        val saved = tracker.data()
+        assertFailsWith<CoreError> { store.transaction { it.copy(sessions = it.sessions+it.sessions.first()) to Unit } }
+        assertEquals(saved,tracker.data())
+        val wrongProof = CheckedState.validate(saved).replace(saved) { Unit }
+        expect(ErrorCode.STALE) { store.checkedTransaction { wrongProof } }
+        assertEquals(saved,tracker.data())
+        // A cast or later edit of an input builder cannot invalidate a reused proof.
+        assertFailsWith<UnsupportedOperationException> { (tracker.data().sessions as MutableList).clear() }
+        assertFailsWith<UnsupportedOperationException> { (tracker.data().types.first().aliases as MutableList).add("changed") }
+        val tags = mutableSetOf("original")
+        tracker.start(tracker.snapshot().token,Classification(tags = tags)); tags.add("late mutation")
+        assertEquals(setOf("original"),tracker.snapshot().session!!.selection.tags)
+        assertFailsWith<UnsupportedOperationException> { (tracker.snapshot().session!!.selection.tags as MutableSet).add("cast mutation") }
+        tracker.stop(tracker.snapshot().token)
+        val frozenSaved = tracker.data()
+        val json = Backups(tracker,disk).export()
+        val clean = Tracker(createStore(),clock); val backups = Backups(clean,MemoryRollback())
+        backups.apply(backups.prepare(json)); validate(clean.data())
+        assertEquals(frozenSaved.settings,clean.data().settings); assertEquals(frozenSaved.segments,clean.data().segments)
+        clean.start(clean.snapshot().token); clock.advance(1_000); clean.stop(clean.snapshot().token); validate(clean.data())
+        // Full validation is still mandatory on an arbitrary store's default checked path.
+        val fallback = object: StateStore {
+            var data = saved
+            override fun read() = data
+            override val changes = kotlinx.coroutines.flow.flowOf(data)
+            override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T { val (next,result) = block(data); data = next; return result }
+        }
+        val fallbackTracker = Tracker(fallback,clock)
+        fallbackTracker.start(fallbackTracker.snapshot().token); validate(fallback.read())
+        val bad = saved.copy(segments = saved.segments+saved.segments.first())
+        fallback.data = bad
+        expect(ErrorCode.INVALID_INPUT) { fallbackTracker.stop(Token(bad.datasetId,bad.revision,null)) }
+        assertEquals(bad,fallback.data)
     }
 
     private fun historyTransfer() {
@@ -453,7 +522,7 @@ abstract class ScenarioContract {
         assertTrue(Backups.decode(disk.read(result.rollbackReference)).data.sessions.isEmpty())
         val full = clean.data()
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.dropLast(7)) }; assertEquals(full,clean.data())
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 4","\"formatVersion\": 999")) }; assertEquals(full,clean.data())
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 5","\"formatVersion\": 999")) }; assertEquals(full,clean.data())
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"datasetId\": \"${raw.data.datasetId}\",", "")) }; assertEquals(full,clean.data())
         val broken = raw.copy(data = raw.data.copy(segments = raw.data.segments+raw.data.segments.first()))
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(codec.encodeToString(broken)) }; assertEquals(full,clean.data())
@@ -599,7 +668,7 @@ abstract class ScenarioContract {
         assertEquals(116,quantityReport.measurements.size)
         assertTrue(quantityReport.quantityTotals().isEmpty())
         val backupJson = Backups(t,MemoryRollback()).export()
-        assertEquals(4,Backups.decode(backupJson).formatVersion)
+        assertEquals(5,Backups.decode(backupJson).formatVersion)
         val copy = Backups.decode(backupJson).data
         assertEquals(t.data(),copy)
         val receiver = Tracker(createStore(),clock)

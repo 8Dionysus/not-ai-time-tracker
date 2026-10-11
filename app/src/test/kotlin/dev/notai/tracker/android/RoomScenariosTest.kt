@@ -73,12 +73,66 @@ class RoomScenariosTest: ScenarioContract() {
         } finally { db.execSQL("DROP TRIGGER fail_transfer") }
         org.junit.Assert.assertEquals(before,tracker.data())
     }
+    override fun surfaceActions() {
+        val context = RuntimeEnvironment.getApplication()
+        val tracker = Tracker(createStore(),FakeClock())
+        val idle = tracker.snapshot()
+        val action = SurfaceAction(Surface.WIDGET,TimerCommand.START,idle.token)
+        org.junit.Assert.assertEquals(action,TimerSurfaces.parse(TimerSurfaces.intent(context,action)))
+        org.junit.Assert.assertNull(TimerSurfaces.parse(android.content.Intent()))
+        val before = tracker.data()
+        org.junit.Assert.assertThrows(CoreError::class.java) { TimerSurfaces.execute(tracker,action) }
+        org.junit.Assert.assertEquals(before,tracker.data())
+        tracker.settings(idle.token,Settings(surfaces = SurfaceSettings(true,true,true)))
+        val fresh = action.copy(token = tracker.snapshot().token)
+        val widgetPending = TimerSurfaces.pending(context,fresh)
+        TimerSurfaces.execute(tracker,fresh)
+        val started = tracker.data()
+        val stale = org.junit.Assert.assertThrows(CoreError::class.java) { TimerSurfaces.execute(tracker,fresh.copy(source = Surface.NOTIFICATION)) }
+        org.junit.Assert.assertEquals(ErrorCode.STALE,stale.code)
+        org.junit.Assert.assertEquals(started,tracker.data())
+        val pausedAction = SurfaceAction(Surface.OVERLAY,TimerCommand.PAUSE,tracker.snapshot().token)
+        org.junit.Assert.assertThrows(CoreError::class.java) { TimerSurfaces.execute(tracker,pausedAction,permission = false) }
+        org.junit.Assert.assertEquals(started,tracker.data())
+        TimerSurfaces.execute(tracker,pausedAction)
+        val latest = tracker.snapshot()
+        org.junit.Assert.assertNotEquals(widgetPending,TimerSurfaces.pending(context,fresh.copy(token = latest.token)))
+        val rendered = TimerSurfaces.widget(context,latest,true).apply(context,null)
+        org.junit.Assert.assertEquals("RESUME",rendered.findViewById<android.widget.Button>(R.id.widget_primary).text.toString())
+        val disabled = TimerSurfaces.widget(context,latest,false).apply(context,null)
+        org.junit.Assert.assertEquals("Открыть",disabled.findViewById<android.widget.Button>(R.id.widget_primary).text.toString())
+        val notification = TimerSurfaces.notification(context,latest)
+        org.junit.Assert.assertEquals(latest.safeLabel,notification.extras.getCharSequence(android.app.Notification.EXTRA_TEXT))
+        org.junit.Assert.assertEquals(2,notification.actions.size)
+        org.junit.Assert.assertEquals(android.app.Notification.VISIBILITY_PRIVATE,notification.visibility)
+        TimerSurfaces.shortcut(context,latest)
+        val launcher = context.getSystemService(android.content.pm.ShortcutManager::class.java).dynamicShortcuts.single()
+        val launcherAction = requireNotNull(TimerSurfaces.parse(launcher.intent!!))
+        org.junit.Assert.assertEquals(Surface.SHORTCUT,launcherAction.source)
+        org.junit.Assert.assertEquals(latest.token,launcherAction.token)
+        org.robolectric.Shadows.shadowOf(context).denyPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+        org.junit.Assert.assertFalse(TimerSurfaces.notificationsAllowed(context))
+        org.robolectric.shadows.ShadowSettings.setCanDrawOverlays(false)
+        org.junit.Assert.assertFalse(TimerSurfaces.overlayAllowed(context))
+        val activity = org.robolectric.Robolectric.buildActivity(android.app.Activity::class.java).setup()
+        try {
+            org.junit.Assert.assertTrue(FloatingTimerService.fromVisibleActivity(activity.get(),SurfaceSettings(overlay = true)).contains("не предоставлено"))
+            org.junit.Assert.assertNull(org.robolectric.Shadows.shadowOf(context).nextStartedService)
+        } finally { activity.pause().stop().destroy() }
+        // Turning surfaces off preserves the paused session. Old intents are gated after reopen.
+        tracker.settings(latest.token,tracker.data().settings.copy(surfaces = SurfaceSettings()))
+        val saved = tracker.data(); val reopened = Tracker(reopen(tracker.store),tracker.clock)
+        org.junit.Assert.assertThrows(CoreError::class.java) { TimerSurfaces.execute(reopened,pausedAction.copy(command = TimerCommand.RESUME,token = reopened.snapshot().token)) }
+        org.junit.Assert.assertEquals(saved,reopened.data())
+        org.junit.Assert.assertEquals(Mode.PAUSED,reopened.snapshot().mode)
+    }
     override fun storageWorkload() {
         val store = createStore(); val db = databases.getValue(store).second
         val clock = FakeClock(); val tracker = Tracker(store,clock)
         val root = java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile!!
         val vocabulary = codec.decodeFromString<VocabularyData>(root.resolve("evidence/full-projection/runtime-vocabulary.json").readText())
         tracker.addCatalog(tracker.snapshot().token,vocabulary)
+        benchmarkCheckedPath(tracker.data())
         val sql = db.openHelper.writableDatabase
         sql.execSQL("CREATE TABLE io_audit(table_name TEXT, operation TEXT)")
         for(table in listOf("activity_types","cards","sessions","segments","metadata","favorites","measurements","vocabulary","store_generation")) {
@@ -96,7 +150,8 @@ class RoomScenariosTest: ScenarioContract() {
             for(op in listOf("INSERT","UPDATE","DELETE")) sql.execSQL("DROP TRIGGER audit_${table}_${op}")
         org.junit.Assert.assertFalse(rows.any { it.startsWith("activity_types ") || it.startsWith("vocabulary ") })
         sql.execSQL("DROP TABLE io_audit")
-        val another = Tracker(RoomStore(db),clock)
+        val anotherStore = open(databases.getValue(store).first) // independent RoomDatabase / SQLite handle
+        val another = Tracker(anotherStore,clock)
         another.saveCard(another.snapshot().token,Card(name = "Other store instance"))
         org.junit.Assert.assertEquals(another.data(),tracker.data()) // generation invalidates first cache
         val beforeFailure = tracker.data()
@@ -115,6 +170,38 @@ class RoomScenariosTest: ScenarioContract() {
         assertV2Migration(tracker.data())
         val saved = tracker.data(); val reopened = reopen(store)
         org.junit.Assert.assertEquals(saved,reopened.read())
+    }
+    private fun benchmarkCheckedPath(catalog: Dataset) {
+        val baseClock = FakeClock()
+        val sessions = (0 until 2_000).map { Session(status = SessionStatus.STOPPED,selection = Classification()) }
+        val segments = sessions.mapIndexed { i,s -> Segment(sessionId = s.id,start = baseClock.wall-4_000_000+i*2_000L,
+            end = baseClock.wall-4_000_000+i*2_000L+1_000,durationMs = 1_000,selection = Classification()) }
+        val input = catalog.copy(sessions = sessions,segments = segments)
+        fun sample(fullFallback: Boolean): List<Long> {
+            val store = createStore(); store.transaction { input to Unit }
+            val use = if(!fullFallback) store else object: StateStore {
+                override fun read() = store.read()
+                override val changes get() = store.changes
+                override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T = store.transaction(block)
+            }
+            val clock = FakeClock(); val tracker = Tracker(use,clock)
+            return (0 until 9).map { iteration ->
+                val start = System.nanoTime()
+                tracker.start(tracker.snapshot().token); clock.advance(1_000); tracker.pause(tracker.snapshot().token)
+                tracker.resume(tracker.snapshot().token); clock.advance(1_000); tracker.stop(tracker.snapshot().token)
+                val elapsed = System.nanoTime()-start
+                validate(tracker.data()) // independent full oracle, outside timed interval
+                elapsed
+            }.drop(2)
+        }
+        val fast = sample(false); val full = sample(true)
+        val root = java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile!!
+        root.resolve("build/checked-path-benchmark.txt").writeText(
+            "Robolectric JVM; 2000 closed history segments; ${catalog.types.size} types / ${catalog.axes.size} axes.\n"+
+            "One sample: Start/Pause/Resume/Stop, including snapshot reads. Two warm-up cycles discarded; 7 samples.\n"+
+            "Optimized checked Room path ns: $fast; median ${fast.sorted()[3]}\n"+
+            "Safe default full-validation StateStore adapter over the same Room store ns: $full; median ${full.sorted()[3]}\n"+
+            "Not an old-commit comparison, device measurement, animation test or latency guarantee. No timing assertion.\n")
     }
     private fun assertV2Migration(data: Dataset) {
         val context = RuntimeEnvironment.getApplication(); val name = "migration-v2-${newId()}.db"

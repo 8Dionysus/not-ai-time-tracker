@@ -24,12 +24,19 @@ class MainActivity: Activity() {
     private lateinit var until: EditText
     private lateinit var zone: EditText
     private var visible = false
+    private var resumed = false
+    private lateinit var surfaceStatus: TextView
+    private val surfaceToggles = mutableMapOf<Surface,CheckBox>()
+    private var renderingSurfaceSettings = false
+    private var shortcutPending: SurfaceAction? = null
     private var observation: Job? = null
     private var reportText = ""
     private var shown: Snapshot? = null
     private var exportText: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        shortcutPending = if(savedInstanceState == null) TimerSurfaces.parse(intent)?.takeIf { it.source == Surface.SHORTCUT } else null
+        intent.action = Intent.ACTION_MAIN
         body = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(24,48,24,24) }
         setContentView(ScrollView(this).apply { addView(body) })
         status = TextView(this); body.addView(status)
@@ -42,6 +49,9 @@ class MainActivity: Activity() {
         scope.launch {
             runtime = withContext(Dispatchers.IO) { TrackerRuntime.get(this@MainActivity) }
             buildActions()
+            buildSurfaceControls()
+            consumeShortcut()
+            refreshSurfacePermissions()
             observeWhileVisible()
         }
     }
@@ -81,7 +91,7 @@ class MainActivity: Activity() {
         command("Отменить доступную правку") { t,e,_,f -> t.undo(e) }
         command("Подтвердить хвост указанным интервалом") { t,e,_,f -> t.resolveTail(e,time(f.start),time(f.end)) }
         command("Исключить неопределённый хвост") { t,e,_,f -> t.resolveTail(e,null,null) }
-        button("Сохранить зону") { val expected = shown?.token ?: return@button; val value = zone.text.toString(); runAction { runtime.tracker.settings(expected,Settings(value)) } }
+        button("Сохранить зону") { val expected = shown?.token ?: return@button; val value = zone.text.toString(); runAction { runtime.tracker.settings(expected,runtime.tracker.data().settings.copy(reportZone = value)) } }
         button("Экспорт полного JSON") { runAction { val json = runtime.backups.export(); withContext(Dispatchers.Main) { createDocument(json,"application/json","not-ai-backup.json") } } }
         button("Экспорт CSV за сегодня") { runAction {
             val t = runtime.tracker; val d = t.data(); val now = t.clock.now()
@@ -89,6 +99,62 @@ class MainActivity: Activity() {
             withContext(Dispatchers.Main) { createDocument(Csv.export(report),"text/csv","not-ai-today.csv") }
         } }
         button("Восстановить JSON…") { startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply { type = "application/json"; addCategory(Intent.CATEGORY_OPENABLE) },2) }
+    }
+    private suspend fun buildSurfaceControls() {
+        val preferences = withContext(Dispatchers.IO) { runtime.tracker.data().settings.surfaces }
+        surfaceStatus = TextView(this).also { body.addView(it) }
+        fun toggle(source: Surface,label: String,initial: Boolean,change: (SurfaceSettings,Boolean)->SurfaceSettings,permission: ()->Unit = {}) {
+            body.addView(CheckBox(this).apply {
+                text = label; isChecked = initial; surfaceToggles[source] = this
+                setOnCheckedChangeListener { _,enabled -> if(!renderingSurfaceSettings) runAction {
+                    val t = runtime.tracker; val view = t.view()
+                    t.settings(view.snapshot().token,view.data.settings.copy(surfaces = change(view.data.settings.surfaces,enabled)))
+                    withContext(Dispatchers.Main) { if(enabled) permission(); refreshSurfacePermissions() }
+                } }
+            })
+        }
+        toggle(Surface.WIDGET,"Виджет (добавить через launcher)",preferences.widget,{ s,b -> s.copy(widget = b) })
+        toggle(Surface.NOTIFICATION,"Управляющее уведомление",preferences.notification,{ s,b -> s.copy(notification = b) }) {
+            if(android.os.Build.VERSION.SDK_INT >= 33 && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED)
+                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),20)
+        }
+        toggle(Surface.OVERLAY,"Плавающая кнопка + обязательный индикатор сервиса",preferences.overlay,{ s,b -> s.copy(overlay = b) }) {
+            if(!TimerSurfaces.overlayAllowed(this)) try {
+                startActivity(Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,android.net.Uri.parse("package:$packageName")))
+            } catch(_: android.content.ActivityNotFoundException) { surfaceStatus.text = "Настройки разрешения недоступны на этом устройстве" }
+        }
+        button("Проверить разрешения поверхностей") { refreshSurfacePermissions() }
+    }
+    private fun renderSurfaceSettings(settings: SurfaceSettings) {
+        renderingSurfaceSettings = true
+        try { surfaceToggles.forEach { (source,box) -> box.isChecked = TimerSurfaces.enabled(settings,source) } }
+        finally { renderingSurfaceSettings = false }
+    }
+    private fun refreshSurfacePermissions() {
+        if(!::runtime.isInitialized || !::surfaceStatus.isInitialized) return
+        scope.launch {
+            val view = withContext(Dispatchers.IO) { runtime.tracker.view().also { TimerSurfaces.refresh(this@MainActivity,it,forceWidget = true) } }
+            val settings = view.data.settings.surfaces
+            renderSurfaceSettings(settings)
+            val overlay = if(resumed) FloatingTimerService.fromVisibleActivity(this@MainActivity,settings) else "Overlay запускается только из видимого приложения"
+            surfaceStatus.text = "Уведомление: ${if(!settings.notification) "выключено" else if(TimerSurfaces.notificationsAllowed(this@MainActivity)) "разрешено" else "запрошено, но запрещено ОС/каналом"}\n$overlay"
+        }
+    }
+    override fun onResume() { super.onResume(); resumed = true; refreshSurfacePermissions() }
+    override fun onPause() { resumed = false; super.onPause() }
+    override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<out String>,grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode,permissions,grantResults); if(requestCode == 20) refreshSurfacePermissions()
+    }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        shortcutPending = TimerSurfaces.parse(intent)?.takeIf { it.source == Surface.SHORTCUT }
+        intent.action = Intent.ACTION_MAIN; setIntent(intent); consumeShortcut()
+    }
+    private fun consumeShortcut() {
+        if(!::runtime.isInitialized) return
+        val action = shortcutPending ?: return
+        shortcutPending = null // consume before scheduling; rotation does not replay it
+        runAction { TimerSurfaces.execute(runtime.tracker,action) }
     }
     private fun time(value: String): Long = Instant.parse(value).toEpochMilli()
     private fun runAction(block: suspend ()->Unit) { scope.launch {
@@ -101,6 +167,7 @@ class MainActivity: Activity() {
         if(!visible || !::runtime.isInitialized || observation != null) return
         observation = scope.launch {
             runtime.tracker.views.collectLatest { revision ->
+                renderSurfaceSettings(revision.data.settings.surfaces)
                 reportText = withContext(Dispatchers.IO) {
                     val d = revision.data; val now = runtime.tracker.clock.now()
                     val report = Reports.day(d,now,Instant.ofEpochMilli(now.wall).atZone(ZoneId.of(d.settings.reportZone)).toLocalDate())

@@ -52,6 +52,7 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
     @Required val types: List<ActivityType> = Catalog.types,
     @Required val cards: List<Card> = emptyList(), @Required val favorites: List<Favorite> = emptyList(),
     @Required val sessions: List<Session> = emptyList(), @Required val segments: List<Segment> = emptyList(),
+    val goals: List<Goal> = emptyList(),
     @Required val measurements: List<Measurement> = emptyList(), @Required val settings: Settings = Settings(),
     @Required val axes: List<Axis> = Catalog.vocabulary.axes, @Required val metrics: List<Metric> = Catalog.vocabulary.metrics, @Required val units: List<UnitDefinition> = Catalog.vocabulary.units)
 
@@ -106,6 +107,7 @@ fun validate(data: Dataset) {
     ids(data.segments.map { it.id }); ids(data.measurements.map { it.id })
     val typeIds = data.types.map { it.id }.toSet()
     validateVocabulary(data)
+    validateGoals(data)
     val cards = data.cards.associateBy { it.id }; val sessions = data.sessions.associateBy { it.id }
     fun selection(c: Classification) = validateSelection(data,c,typeIds,cards.keys)
     data.cards.forEach { ensure(it.name.isNotBlank(), "Card needs a name"); selection(it.classification()) }

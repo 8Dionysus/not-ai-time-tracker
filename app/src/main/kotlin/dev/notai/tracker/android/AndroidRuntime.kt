@@ -34,6 +34,7 @@ class TrackerRuntime private constructor(context: Context) {
     val backups = Backups(tracker,rollback)
     val historyTransfer = HistoryTransfer(tracker,rollback)
     private val surfaceScope = CoroutineScope(SupervisorJob()+Dispatchers.IO)
+    internal val shortcuts = ShortcutCommands(tracker,surfaceScope)
     init {
         surfaceScope.launch {
             var previous: SurfaceSettings? = null

@@ -7,6 +7,7 @@ package dev.notai.tracker
 class TrackerView internal constructor(private val checked: CheckedState,private val clock: Clock) {
     val data get() = checked.data
     fun snapshot(): Snapshot = checked.snapshot(clock.now())
+    fun goalProgress(id: String,date: java.time.LocalDate? = null): GoalProgress = Goals.progress(data,clock.now(),id,date)
     fun report(start: Long,end: Long,filter: Filter = Filter()): Report = Reports.report(data,clock.now(),start,end,filter)
     fun day(date: java.time.LocalDate,filter: Filter = Filter()): Report = Reports.day(data,clock.now(),date,filter)
 }

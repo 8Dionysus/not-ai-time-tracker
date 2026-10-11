@@ -21,6 +21,15 @@ object TimerSurfaces {
     const val OVERLAY_CHANNEL = "floating_controls"
     const val CONTROL_ID = 41
     const val OVERLAY_ID = 42
+    private const val PENDING_SHORTCUT = "pendingShortcut"
+    @Suppress("DEPRECATION")
+    fun restoredShortcut(saved: android.os.Bundle?,launch: Intent): SurfaceAction? {
+        val pending = if(saved == null) launch else saved.getParcelable<Intent>(PENDING_SHORTCUT)
+        return pending?.let(::parse)?.takeIf { it.source == Surface.SHORTCUT }
+    }
+    fun saveShortcut(c: Context,saved: android.os.Bundle,pending: SurfaceAction?) {
+        if(pending != null) saved.putParcelable(PENDING_SHORTCUT,intent(c,pending)) else saved.remove(PENDING_SHORTCUT)
+    }
     fun primary(mode: Mode): TimerCommand? = when(mode) {
         Mode.IDLE -> TimerCommand.START; Mode.RUNNING -> TimerCommand.PAUSE
         Mode.PAUSED -> TimerCommand.RESUME; Mode.RECOVERY -> null
@@ -114,6 +123,17 @@ object TimerSurfaces {
             try { notifications.notify(CONTROL_ID,notification(c,view.snapshot())) } catch(_: SecurityException) { notifications.cancel(CONTROL_ID) }
         } else if(previous == null || previous.notification) notifications.cancel(CONTROL_ID)
         if(previous?.overlay == true && !settings.overlay) c.stopService(Intent(c,FloatingTimerService::class.java))
+    }
+}
+
+/** Submitted work belongs to the process runtime, never to an Activity awaiting its result.
+ * The original revision still makes recreation/repeated delivery safe without a command queue. */
+internal class ShortcutCommands(private val tracker: Tracker,private val scope: CoroutineScope) {
+    fun submit(action: SurfaceAction): Deferred<Result<Tracker.Change>> = scope.async {
+        runCatching {
+            require(action.source == Surface.SHORTCUT)
+            TimerSurfaces.execute(tracker,action)
+        }
     }
 }
 

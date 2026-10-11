@@ -1,6 +1,7 @@
 package dev.notai.tracker.android
 
 import dev.notai.tracker.*
+import kotlinx.coroutines.*
 import kotlinx.serialization.json.*
 import org.junit.After
 import org.junit.runner.RunWith
@@ -110,6 +111,15 @@ class RoomScenariosTest: ScenarioContract() {
         val launcherAction = requireNotNull(TimerSurfaces.parse(launcher.intent!!))
         org.junit.Assert.assertEquals(Surface.SHORTCUT,launcherAction.source)
         org.junit.Assert.assertEquals(latest.token,launcherAction.token)
+        val savedLaunch = android.os.Bundle()
+        TimerSurfaces.saveShortcut(context,savedLaunch,launcherAction) // no runtime yet
+        val parcel = android.os.Parcel.obtain()
+        try {
+            savedLaunch.writeToParcel(parcel,0); parcel.setDataPosition(0)
+            val recreated = android.os.Bundle.CREATOR.createFromParcel(parcel)
+            org.junit.Assert.assertEquals(launcherAction,TimerSurfaces.restoredShortcut(recreated,android.content.Intent()))
+            org.junit.Assert.assertNull(TimerSurfaces.restoredShortcut(android.os.Bundle(),launcher.intent!!)) // already submitted, do not replay launch intent
+        } finally { parcel.recycle() }
         org.robolectric.Shadows.shadowOf(context).denyPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
         org.junit.Assert.assertFalse(TimerSurfaces.notificationsAllowed(context))
         org.robolectric.shadows.ShadowSettings.setCanDrawOverlays(false)
@@ -125,6 +135,34 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertThrows(CoreError::class.java) { TimerSurfaces.execute(reopened,pausedAction.copy(command = TimerCommand.RESUME,token = reopened.snapshot().token)) }
         org.junit.Assert.assertEquals(saved,reopened.data())
         org.junit.Assert.assertEquals(Mode.PAUSED,reopened.snapshot().mode)
+        // Reproduce recreation while the launcher command is waiting immediately before its transaction.
+        val entered = java.util.concurrent.CountDownLatch(1); val release = java.util.concurrent.CountDownLatch(1)
+        val blocking = object: StateStore by reopened.store {
+            override fun <T> checkedTransaction(block: (CheckedState)->CheckedCommit<T>): T {
+                entered.countDown(); check(release.await(5,java.util.concurrent.TimeUnit.SECONDS))
+                return reopened.store.checkedTransaction(block)
+            }
+        }
+        val dispatcher = java.util.concurrent.Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+        val applicationScope = CoroutineScope(SupervisorJob()+dispatcher)
+        val activityScope = CoroutineScope(SupervisorJob()+Dispatchers.Default)
+        try {
+            val actions = ShortcutCommands(Tracker(blocking,reopened.clock),applicationScope)
+            val resume = SurfaceAction(Surface.SHORTCUT,TimerCommand.RESUME,reopened.snapshot().token)
+            val submitted = actions.submit(resume)
+            val observer = activityScope.launch(start = CoroutineStart.UNDISPATCHED) { submitted.await() }
+            org.junit.Assert.assertTrue(entered.await(5,java.util.concurrent.TimeUnit.SECONDS))
+            activityScope.cancel() // onDestroy before persistence
+            org.junit.Assert.assertTrue(observer.isCancelled)
+            org.junit.Assert.assertEquals(Mode.PAUSED,reopened.snapshot().mode)
+            release.countDown()
+            runBlocking {
+                org.junit.Assert.assertTrue(submitted.await().isSuccess)
+                org.junit.Assert.assertEquals(Mode.RUNNING,reopened.snapshot().mode)
+                val duplicate = actions.submit(resume).await().exceptionOrNull() as CoreError
+                org.junit.Assert.assertEquals(ErrorCode.STALE,duplicate.code)
+            }
+        } finally { release.countDown(); activityScope.cancel(); applicationScope.cancel(); dispatcher.close() }
     }
     override fun storageWorkload() {
         val store = createStore(); val db = databases.getValue(store).second

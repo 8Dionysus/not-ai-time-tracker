@@ -1,0 +1,10 @@
+Start + Pause; 1923 stored types / 337 axes (1918 imported types plus existing seed); Robolectric JVM, not device
+Elapsed ns: 4276398
+metadata DELETE 2
+metadata INSERT 2
+segments INSERT 1
+segments UPDATE 1
+sessions INSERT 1
+sessions UPDATE 1
+store_generation DELETE 2
+store_generation INSERT 2

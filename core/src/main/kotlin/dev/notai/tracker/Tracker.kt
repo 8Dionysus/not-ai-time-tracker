@@ -137,6 +137,13 @@ class Tracker(val store: StateStore, val clock: Clock) {
         val c = d.cards.find { it.id == cardId } ?: fail(ErrorCode.INVALID_INPUT, "Missing card")
         d.copy(cards = d.cards + c.copy(id = newId(), name = name, archived = false))
     }
+    fun saveGoal(expected: Token,goal: Goal) = mutate(expected,true) { d,_ ->
+        d.copy(goals = if(d.goals.any { it.id == goal.id }) d.goals.map { if(it.id == goal.id) goal else it } else d.goals+goal)
+    }
+    fun deleteGoal(expected: Token,id: String) = mutate(expected,true) { d,_ ->
+        ensure(d.goals.any { it.id == id },"Missing goal"); d.copy(goals = d.goals.filterNot { it.id == id })
+    }
+    fun goalProgress(id: String,date: java.time.LocalDate? = null): GoalProgress = view().goalProgress(id,date)
     fun settings(expected: Token, settings: Settings) = mutate(expected) { d,_ -> d.copy(settings = settings) }
     fun measure(expected: Token, measurement: Measurement) = mutate(expected, true) { d,_ ->
         d.copy(measurements = d.measurements.filterNot { it.id == measurement.id } + measurement)

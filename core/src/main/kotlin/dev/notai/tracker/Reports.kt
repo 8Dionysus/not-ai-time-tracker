@@ -5,9 +5,9 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
-enum class FacetMatch { ALL, ANY }
+@kotlinx.serialization.Serializable enum class FacetMatch { ALL, ANY }
 
-data class Filter(val cardId: String? = null, val activityTypeId: String? = null,
+@kotlinx.serialization.Serializable data class Filter(val cardId: String? = null, val activityTypeId: String? = null,
     val details: Map<String,String> = emptyMap(), val tags: Set<String> = emptySet(), val facets: List<Facet> = emptyList(),
     val facetMatch: FacetMatch = FacetMatch.ALL) {
     fun matches(c: Classification) = (cardId == null || c.cardId == cardId) &&

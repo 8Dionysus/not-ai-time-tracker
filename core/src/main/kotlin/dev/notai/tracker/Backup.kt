@@ -3,7 +3,7 @@ package dev.notai.tracker
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Required
 
-@Serializable data class Backup(@Required val formatVersion: Int = 5,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
+@Serializable data class Backup(@Required val formatVersion: Int = 6,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
 const val MAX_BACKUP_BYTES = 10*1024*1024
 
 interface RollbackStore {
@@ -19,9 +19,10 @@ class RestorePreview internal constructor(internal val backup: Backup,internal v
     val cards get() = backup.data.cards.size
     val sessions get() = backup.data.sessions.size
     val segments get() = backup.data.segments.size
+    val goals get() = backup.data.goals.size
     val measurements get() = backup.data.measurements.size
     val unfinishedTail get() = backup.data.segments.any { it.end == null }
-    val consequence = "Полная замена локальных записей, карточек, избранного и настроек. Новые локальные данные будут удалены."
+    val consequence = "Полная замена локальных записей, карточек, избранного, целей и настроек. Новые локальные данные будут удалены."
 }
 data class RestoreResult(val state: Snapshot,val rollbackReference: String)
 class Backups(private val tracker: Tracker,private val rollback: RollbackStore) {
@@ -65,7 +66,7 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore) 
         fun decode(json: String): Backup {
             ensure(json.toByteArray(Charsets.UTF_8).size <= MAX_BACKUP_BYTES,"Backup exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
             val b = try { decodeBackupVersion(json) } catch (_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed or unsupported JSON") }
-            ensure(b.formatVersion == 5,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
+            ensure(b.formatVersion == 6,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
             ensure(b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
             try {
                 validate(b.data)

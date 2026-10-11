@@ -28,6 +28,7 @@ abstract class ScenarioContract {
     open fun assertTransferFailure(transfer: HistoryTransfer,preview: HistoryPreview,tracker: Tracker) {}
 
     @Test fun timerPath() {
+        goalsLifecycle()
         checkedTimerCombinations()
         surfaceActions()
         storageWorkload()
@@ -145,6 +146,107 @@ abstract class ScenarioContract {
         val sample = HistoryFiles.inspect(damaged.toByteArray())
         assertEquals(ImportFormat.DELIMITED_TEXT,sample.format)
         expect(ErrorCode.UNSUPPORTED_IMPORT) { sample.confirmCsv(',',CsvMapping("bad","activity","start",end = "end"),CsvTimeChoice(null,"UTC"),null) }
+    }
+
+    private fun goalsLifecycle() {
+        val clock = FakeClock(wall = Instant.parse("2026-03-28T22:59:00Z").toEpochMilli())
+        var tracker = Tracker(createStore(),clock)
+        val duration = Goal(name = "Recorded language",metric = GoalMetric.DURATION_MS,target = 120_000,
+            zone = "Europe/Berlin",filter = Filter(activityTypeId = "language",tags = setOf("practice")))
+        val count = duration.copy(id = newId(),name = "Sessions limit",metric = GoalMetric.SESSION_COUNT,target = 1,direction = GoalDirection.LIMIT)
+        tracker.saveGoal(tracker.snapshot().token,duration); tracker.saveGoal(tracker.snapshot().token,count)
+        val day = LocalDate.parse("2026-03-29")
+        val initial = tracker.goalProgress(duration.id,day)
+        assertEquals(23*3_600_000L,initial.window.end-initial.window.start) // spring DST, not 24 h
+        assertEquals(0,initial.actual); assertFalse(initial.hasRecords); assertTrue(initial.incompletePeriod)
+        tracker.start(tracker.snapshot().token,Classification(activityTypeId = "language",tags = setOf("practice","other")))
+        val persistedBeforeTick = tracker.data()
+        clock.advance(120_000) // one minute on each side of midnight
+        val active = tracker.goalProgress(duration.id,day)
+        assertEquals(60_000,active.actual); assertEquals(GoalPosition.BELOW,active.position)
+        assertEquals(1,tracker.goalProgress(count.id,day).actual)
+        assertEquals(1,active.unfinishedSessionIds.size); assertTrue(active.completedSessionIds.isEmpty())
+        assertEquals(persistedBeforeTick,tracker.data())
+        val previous = tracker.goalProgress(count.id,day.minusDays(1))
+        assertEquals(1,previous.actual) // explicit participation-in-period policy
+        tracker.pause(tracker.snapshot().token); clock.advance(60_000)
+        tracker.resume(tracker.snapshot().token); clock.advance(60_000); tracker.stop(tracker.snapshot().token)
+        val stopped = tracker.goalProgress(duration.id,day)
+        assertEquals(120_000,stopped.actual); assertEquals(GoalPosition.AT,stopped.position)
+        assertEquals(GoalStatus.MINIMUM_REACHED,stopped.recordedStatus)
+        assertEquals(1,stopped.completedSessionIds.size); assertTrue(stopped.unfinishedSessionIds.isEmpty())
+        assertEquals(1,tracker.goalProgress(count.id,day).actual) // two segments, one session
+        val segment = tracker.data().segments.last()
+        tracker.correctSegment(tracker.snapshot().token,segment.id,segment.start,segment.end!!-30_000,segment.selection)
+        assertEquals(90_000,tracker.goalProgress(duration.id,day).actual)
+        tracker.undo(tracker.snapshot().token); assertEquals(120_000,tracker.goalProgress(duration.id,day).actual)
+        tracker.start(tracker.snapshot().token,Classification(activityTypeId = "language",tags = setOf("practice")))
+        clock.advance(1_000)
+        assertEquals(2,tracker.goalProgress(count.id,day).actual)
+        assertEquals(GoalPosition.ABOVE,tracker.goalProgress(count.id,day).position)
+        assertEquals(GoalStatus.LIMIT_EXCEEDED,tracker.goalProgress(count.id,day).recordedStatus)
+        assertEquals(1,tracker.goalProgress(count.id,day).excess)
+        val saved = tracker.data(); tracker = Tracker(reopen(tracker.store),clock)
+        assertEquals(saved,tracker.data()); assertEquals(121_000,tracker.goalProgress(duration.id,day).actual)
+        val backup = Backups(tracker,MemoryRollback()).export()
+        val clean = Tracker(createStore(),clock); val backups = Backups(clean,MemoryRollback())
+        val preview = backups.prepare(backup); assertEquals(2,preview.goals); backups.apply(preview)
+        assertEquals(tracker.data().goals,clean.data().goals)
+        val imported = clean.goalProgress(duration.id,day)
+        assertEquals(120_000,imported.actual); assertTrue(imported.uncertain) // active imported tail is unresolved, not a fabricated finish
+        clean.resolveTail(clean.snapshot().token,tracker.data().segments.last().start,clock.wall)
+        assertEquals(121_000,clean.goalProgress(duration.id,day).actual)
+        val last = clean.data().segments.last(); val earlier = clean.data().segments.first().start-2_000
+        clean.correctSegment(clean.snapshot().token,last.id,earlier,earlier+1_000,last.selection)
+        assertEquals(1,clean.goalProgress(count.id,day).actual) // moving a whole session out of the period recomputes count
+        clean.undo(clean.snapshot().token); assertEquals(2,clean.goalProgress(count.id,day).actual)
+        val closedBackup = Backups(clean,MemoryRollback()).export()
+        java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile.resolve("build/goals-example.json").writeText(closedBackup)
+        val legacy = codec.parseToJsonElement(closedBackup).jsonObject.toMutableMap()
+        legacy["formatVersion"] = JsonPrimitive(5)
+        legacy["data"] = JsonObject(legacy.getValue("data").jsonObject.filterKeys { it != "goals" })
+        assertTrue(Backups.decode(JsonObject(legacy).toString()).data.goals.isEmpty())
+        val malformed = closedBackup.replace("\"target\": 120000","\"target\": 0")
+        val beforeBad = clean.data()
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { backups.prepare(malformed) }; assertEquals(beforeBad,clean.data())
+        val disabled = duration.copy(enabled = false)
+        clean.saveGoal(clean.snapshot().token,disabled)
+        assertFalse(clean.goalProgress(duration.id,day).goal.enabled); assertEquals(121_000,clean.goalProgress(duration.id,day).actual)
+        clean.deleteGoal(clean.snapshot().token,duration.id); clean.undo(clean.snapshot().token)
+        assertEquals(disabled,clean.data().goals.single { it.id == duration.id })
+        val week = Goals.window(duration.copy(period = GoalPeriod.WEEK),day)
+        assertEquals(LocalDate.parse("2026-03-23").atStartOfDay(java.time.ZoneId.of("Europe/Berlin")).toInstant().toEpochMilli(),week.start)
+        val month = Goals.window(duration.copy(period = GoalPeriod.MONTH),day)
+        assertEquals(LocalDate.parse("2026-04-01").atStartOfDay(java.time.ZoneId.of("Europe/Berlin")).toInstant().toEpochMilli(),month.end)
+        val autumn = Goals.window(duration,LocalDate.parse("2026-10-25"))
+        assertEquals(25*3_600_000L,autumn.end-autumn.start)
+        val fixed = duration.copy(period = GoalPeriod.FIXED,startDate = "2026-03-29",endDateExclusive = "2026-03-30")
+        assertEquals(initial.window,Goals.window(fixed,day.plusYears(1)))
+        expect(ErrorCode.INVALID_INTERVAL) { clean.saveGoal(clean.snapshot().token,fixed.copy(endDateExclusive = fixed.startDate)) }
+        assertEquals(beforeBad.segments,clean.data().segments)
+        // Adjacent end is excluded; period totals come directly from the same report filter.
+        val report = Reports.report(clean.data(),clock.now(),initial.window.start,initial.window.end,duration.filter,duration.zone)
+        assertEquals(report.recordedMs,clean.goalProgress(duration.id,day).actual)
+        assertEquals(0,clean.goalProgress(duration.id,day.plusDays(1)).actual)
+        val beforeInvalid = clean.data()
+        expect(ErrorCode.INVALID_INPUT) { clean.saveGoal(clean.snapshot().token,duration.copy(target = 0)) }
+        expect(ErrorCode.INVALID_INPUT) { clean.saveGoal(clean.snapshot().token,duration.copy(zone = "Not/AZone")) }
+        expect(ErrorCode.INVALID_INPUT) { clean.saveGoal(clean.snapshot().token,duration.copy(filter = Filter(cardId = "missing"))) }
+        assertEquals(beforeInvalid,clean.data())
+        val unmatched = duration.copy(id = newId(),filter = Filter(details = mapOf("never" to "recorded")))
+        clean.saveGoal(clean.snapshot().token,unmatched)
+        assertEquals(0,clean.goalProgress(unmatched.id,day).actual)
+        clean.deleteGoal(clean.snapshot().token,unmatched.id)
+        assertFailsWith<UnsupportedOperationException> { (clean.data().goals as MutableList).clear() }
+        assertFailsWith<UnsupportedOperationException> { (clean.data().goals.first().filter.tags as MutableSet).clear() }
+        val jsonWithoutGoals = codec.parseToJsonElement(closedBackup).jsonObject.toMutableMap()
+        jsonWithoutGoals["data"] = JsonObject(jsonWithoutGoals.getValue("data").jsonObject.filterKeys { it != "goals" })
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { backups.prepare(JsonObject(jsonWithoutGoals).toString()) }
+        assertEquals(beforeInvalid.goals,clean.data().goals)
+        assertEquals(beforeInvalid.segments,clean.data().segments)
+        val beforeZoneChange = clean.goalProgress(duration.id,day)
+        clean.settings(clean.snapshot().token,clean.data().settings.copy(reportZone = "America/New_York"))
+        assertEquals(beforeZoneChange,clean.goalProgress(duration.id,day)) // goal zone is explicit and independent
     }
 
     private fun checkedTimerCombinations() {
@@ -522,7 +624,7 @@ abstract class ScenarioContract {
         assertTrue(Backups.decode(disk.read(result.rollbackReference)).data.sessions.isEmpty())
         val full = clean.data()
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.dropLast(7)) }; assertEquals(full,clean.data())
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 5","\"formatVersion\": 999")) }; assertEquals(full,clean.data())
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 6","\"formatVersion\": 999")) }; assertEquals(full,clean.data())
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"datasetId\": \"${raw.data.datasetId}\",", "")) }; assertEquals(full,clean.data())
         val broken = raw.copy(data = raw.data.copy(segments = raw.data.segments+raw.data.segments.first()))
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(codec.encodeToString(broken)) }; assertEquals(full,clean.data())
@@ -668,7 +770,7 @@ abstract class ScenarioContract {
         assertEquals(116,quantityReport.measurements.size)
         assertTrue(quantityReport.quantityTotals().isEmpty())
         val backupJson = Backups(t,MemoryRollback()).export()
-        assertEquals(5,Backups.decode(backupJson).formatVersion)
+        assertEquals(6,Backups.decode(backupJson).formatVersion)
         val copy = Backups.decode(backupJson).data
         assertEquals(t.data(),copy)
         val receiver = Tracker(createStore(),clock)

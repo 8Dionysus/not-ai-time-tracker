@@ -35,7 +35,7 @@ class MainActivity: Activity() {
     private var exportText: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        shortcutPending = if(savedInstanceState == null) TimerSurfaces.parse(intent)?.takeIf { it.source == Surface.SHORTCUT } else null
+        shortcutPending = TimerSurfaces.restoredShortcut(savedInstanceState,intent)
         intent.action = Intent.ACTION_MAIN
         body = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(24,48,24,24) }
         setContentView(ScrollView(this).apply { addView(body) })
@@ -145,16 +145,21 @@ class MainActivity: Activity() {
     override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<out String>,grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode,permissions,grantResults); if(requestCode == 20) refreshSurfacePermissions()
     }
+    override fun onSaveInstanceState(outState: Bundle) {
+        TimerSurfaces.saveShortcut(this,outState,shortcutPending) // also covers recreation before runtime initialization
+        super.onSaveInstanceState(outState)
+    }
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        shortcutPending = TimerSurfaces.parse(intent)?.takeIf { it.source == Surface.SHORTCUT }
+        TimerSurfaces.parse(intent)?.takeIf { it.source == Surface.SHORTCUT }?.let { shortcutPending = it }
         intent.action = Intent.ACTION_MAIN; setIntent(intent); consumeShortcut()
     }
     private fun consumeShortcut() {
         if(!::runtime.isInitialized) return
         val action = shortcutPending ?: return
-        shortcutPending = null // consume before scheduling; rotation does not replay it
-        runAction { TimerSurfaces.execute(runtime.tracker,action) }
+        val result = runtime.shortcuts.submit(action) // process-owned execution survives Activity cancellation
+        shortcutPending = null
+        runAction { result.await().getOrThrow() }
     }
     private fun time(value: String): Long = Instant.parse(value).toEpochMilli()
     private fun runAction(block: suspend ()->Unit) { scope.launch {
@@ -210,7 +215,7 @@ class MainActivity: Activity() {
             val preview = runtime.backups.prepare(json)
             withContext(Dispatchers.Main) {
                 AlertDialog.Builder(this@MainActivity).setTitle("Подтвердить полную замену")
-                    .setMessage("${preview.consequence}\nКарточек: ${preview.cards}; сессий: ${preview.sessions}; сегментов: ${preview.segments}.\nАктивный хвост: ${preview.unfinishedTail}")
+                    .setMessage("${preview.consequence}\nКарточек: ${preview.cards}; сессий: ${preview.sessions}; сегментов: ${preview.segments}; целей: ${preview.goals}.\nАктивный хвост: ${preview.unfinishedTail}")
                     .setNegativeButton("Отмена",null).setPositiveButton("Заменить") { _,_ -> runAction { runtime.backups.apply(preview) } }.show()
             }
         }

@@ -1,0 +1,250 @@
+{
+    "formatVersion": 6,
+    "backupId": "c647b112-b21d-447f-94bc-6bb994142cf1",
+    "asOf": 1774738981000,
+    "data": {
+        "datasetId": "7965818f-145c-43fe-a690-24b99b04bf0e",
+        "revision": 4,
+        "types": [
+            {
+                "id": "language",
+                "name": "Языковая практика",
+                "archived": false,
+                "parentId": null,
+                "selectable": true,
+                "meaningVersion": 1,
+                "aliases": [],
+                "definition": "",
+                "suggestedAxisIds": [],
+                "suggestedMetricIds": [],
+                "researchOrigins": []
+            },
+            {
+                "id": "fitness",
+                "name": "Физическая активность",
+                "archived": false,
+                "parentId": null,
+                "selectable": true,
+                "meaningVersion": 1,
+                "aliases": [],
+                "definition": "",
+                "suggestedAxisIds": [],
+                "suggestedMetricIds": [],
+                "researchOrigins": []
+            },
+            {
+                "id": "reading",
+                "name": "Чтение",
+                "archived": false,
+                "parentId": null,
+                "selectable": true,
+                "meaningVersion": 1,
+                "aliases": [],
+                "definition": "",
+                "suggestedAxisIds": [],
+                "suggestedMetricIds": [],
+                "researchOrigins": []
+            },
+            {
+                "id": "work",
+                "name": "Работа",
+                "archived": false,
+                "parentId": null,
+                "selectable": true,
+                "meaningVersion": 1,
+                "aliases": [],
+                "definition": "",
+                "suggestedAxisIds": [],
+                "suggestedMetricIds": [],
+                "researchOrigins": []
+            },
+            {
+                "id": "rest",
+                "name": "Отдых",
+                "archived": false,
+                "parentId": null,
+                "selectable": true,
+                "meaningVersion": 1,
+                "aliases": [],
+                "definition": "",
+                "suggestedAxisIds": [],
+                "suggestedMetricIds": [],
+                "researchOrigins": []
+            }
+        ],
+        "cards": [],
+        "favorites": [],
+        "sessions": [
+            {
+                "id": "c8ae1d39-0531-4610-8a35-ad1e05886167",
+                "status": "STOPPED",
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [
+                        "practice",
+                        "other"
+                    ],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "note": null,
+                "importOrigin": null
+            },
+            {
+                "id": "1c0f4b0e-3c38-4b83-bdfd-02845c310cd2",
+                "status": "STOPPED",
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [
+                        "practice"
+                    ],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "note": null,
+                "importOrigin": null
+            }
+        ],
+        "segments": [
+            {
+                "id": "c8c12322-a583-4ec6-910a-ceba1a4563f5",
+                "sessionId": "c8ae1d39-0531-4610-8a35-ad1e05886167",
+                "start": 1774738740000,
+                "end": 1774738860000,
+                "durationMs": 120000,
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [
+                        "practice",
+                        "other"
+                    ],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "anchor": null,
+                "uncertain": false,
+                "observedUntil": 1774738860000
+            },
+            {
+                "id": "41f830fd-bf3c-48b7-8863-51a03fb0f20d",
+                "sessionId": "c8ae1d39-0531-4610-8a35-ad1e05886167",
+                "start": 1774738920000,
+                "end": 1774738980000,
+                "durationMs": 60000,
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [
+                        "practice",
+                        "other"
+                    ],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "anchor": null,
+                "uncertain": false,
+                "observedUntil": 1774738980000
+            },
+            {
+                "id": "21b02377-79a3-4348-ac78-b26a3d94205a",
+                "sessionId": "1c0f4b0e-3c38-4b83-bdfd-02845c310cd2",
+                "start": 1774738980000,
+                "end": 1774738981000,
+                "durationMs": 1000,
+                "selection": {
+                    "cardId": null,
+                    "name": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [
+                        "practice"
+                    ],
+                    "ancestorPathAtWrite": [
+                        "language"
+                    ],
+                    "facets": []
+                },
+                "anchor": null,
+                "uncertain": false,
+                "observedUntil": null
+            }
+        ],
+        "goals": [
+            {
+                "id": "29ef94d8-ade9-40c5-8724-29a5e7b3da08",
+                "name": "Recorded language",
+                "metric": "DURATION_MS",
+                "target": 120000,
+                "direction": "MINIMUM",
+                "period": "DAY",
+                "zone": "Europe/Berlin",
+                "filter": {
+                    "cardId": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [
+                        "practice"
+                    ],
+                    "facets": [],
+                    "facetMatch": "ALL"
+                },
+                "enabled": true,
+                "startDate": null,
+                "endDateExclusive": null
+            },
+            {
+                "id": "b1c3aed8-5dc7-41d5-9f41-0191f856cbc5",
+                "name": "Sessions limit",
+                "metric": "SESSION_COUNT",
+                "target": 1,
+                "direction": "LIMIT",
+                "period": "DAY",
+                "zone": "Europe/Berlin",
+                "filter": {
+                    "cardId": null,
+                    "activityTypeId": "language",
+                    "details": {},
+                    "tags": [
+                        "practice"
+                    ],
+                    "facets": [],
+                    "facetMatch": "ALL"
+                },
+                "enabled": true,
+                "startDate": null,
+                "endDateExclusive": null
+            }
+        ],
+        "measurements": [],
+        "settings": {
+            "reportZone": "UTC",
+            "surfaces": {
+                "widget": false,
+                "notification": false,
+                "overlay": false
+            }
+        },
+        "axes": [],
+        "metrics": [],
+        "units": []
+    }
+}

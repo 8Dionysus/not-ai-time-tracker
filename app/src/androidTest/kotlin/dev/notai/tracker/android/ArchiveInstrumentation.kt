@@ -12,10 +12,22 @@ import kotlinx.serialization.json.*
  * Reuses one owned reference directory, so five samples do not leave five DB copies.
  * Never opens/modifies/deletes the live store or existing archives. */
 class ArchiveInstrumentation: Instrumentation() {
-    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments);start() }
+    private var mode = "archive"
+    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments);mode = arguments?.getString("mode") ?: "archive";start() }
     override fun onStart() {
         try {
             val context = targetContext
+            if(mode == "focus-plan") {
+                // Only an explicitly invoked test runner on the isolated AVD uses
+                // this fixture setup. Product APK has no such entry point.
+                val tracker = TrackerRuntime.get(context).tracker;val before = tracker.data()
+                tracker.settings(tracker.snapshot().token,before.settings.copy(focusPlan = FocusPlan(10_000,10_000)))
+                val after = tracker.data();check(before.sessions == after.sessions && before.segments == after.segments)
+                val report = buildJsonObject { put("mode",mode);put("workMs",after.settings.focusPlan.workMs);put("breakMs",after.settings.focusPlan.breakMs)
+                    put("historyUnchanged",true);put("sessions",after.sessions.size);put("segments",after.segments.size) }
+                finish(Activity.RESULT_OK,Bundle().apply { putString("report",report.toString()) });return
+            }
+            check(mode == "archive")
             val sources = DatabaseFiles.paths(context).filter { it.exists() }
             check(sources.isNotEmpty())
             val baseline = sources.associate { it.name to (it.length() to fileHash(it)) }

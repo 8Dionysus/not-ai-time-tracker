@@ -8,6 +8,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable data class PreservedDatabaseFile(val name: String,val bytes: Long,val sha256: String)
 @Serializable data class DatabaseArchive(val id: String,val database: String,val files: List<PreservedDatabaseFile>)
+/** Main file and sidecars form one store, including when the main file is missing. */
+internal object DatabaseFiles {
+    fun paths(context: Context,name: String = "tracker.db"): List<File> =
+        listOf("","-wal","-shm","-journal").map { context.getDatabasePath(name+it) }
+    fun exists(context: Context,name: String = "tracker.db") = paths(context,name).any { it.exists() }
+}
 /** Preserve raw originals without opening SQLite, including sidecars, before any explicit rescue.
  * SQLite's default corruption handler must never delete this application's files.
  */
@@ -15,8 +21,9 @@ object DatabaseArchives {
     fun capture(context: Context,name: String = "tracker.db"): File {
         val root = File(context.noBackupFilesDir,"database-archives").apply { mkdirs() }
         val id = newId();val directory = File(root,id).apply { mkdirs() }
-        val files = listOf(name,"$name-wal","$name-shm","$name-journal").mapNotNull { filename ->
-            val source = context.getDatabasePath(filename);if(!source.exists()) return@mapNotNull null
+        val files = DatabaseFiles.paths(context,name).mapNotNull { source ->
+            if(!source.exists()) return@mapNotNull null
+            val filename = source.name
             val target = File(directory,filename)
             source.inputStream().use { input -> FileOutputStream(target).use { input.copyTo(it,64*1024);it.fd.sync() } }
             val sourceHash = fileHash(source);ensure(source.length() == target.length() && sourceHash == fileHash(target),"Original database changed during preservation",ErrorCode.STORAGE)

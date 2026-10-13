@@ -22,6 +22,146 @@ class RoomScenariosTest: ScenarioContract() {
     }
     @org.junit.After fun restoreDirectoryDurability() { DirectoryDurability.sync = originalDirectorySync;DirectoryDurability.rename = originalRename }
     private val databases = mutableMapOf<StateStore,Pair<String,TrackerDatabase>>()
+    @org.junit.Test fun orphanSidecarsNeverInitialize() {
+        val context = RuntimeEnvironment.getApplication()
+        val suffixes = listOf("-wal","-shm","-journal")
+        fun check(name: String,selected: List<String>,open: ()->Unit) {
+            val main = context.getDatabasePath(name)
+            org.junit.Assert.assertFalse(main.exists())
+            org.junit.Assert.assertFalse(DatabaseFiles.exists(context,name))
+            val originals = selected.associate { suffix -> name+suffix to ("Orphan fixture $name$suffix").toByteArray() }
+            originals.forEach { (filename,bytes) -> context.getDatabasePath(filename).apply { parentFile!!.mkdirs();writeBytes(bytes) } }
+            org.junit.Assert.assertTrue(DatabaseFiles.exists(context,name))
+            val root = java.io.File(context.noBackupFilesDir,"database-archives")
+            val before = root.listFiles().orEmpty().map { it.name }.toSet()
+            val error = org.junit.Assert.assertThrows(CoreError::class.java,open)
+            org.junit.Assert.assertEquals(ErrorCode.STORAGE,error.code)
+            org.junit.Assert.assertTrue(error.message!!.contains("explicit recovery"))
+            org.junit.Assert.assertFalse("SQLite must not create a main file",main.exists())
+            originals.forEach { (filename,bytes) -> org.junit.Assert.assertArrayEquals(bytes,context.getDatabasePath(filename).readBytes()) }
+            val archive = root.listFiles().orEmpty().single { it.name !in before }
+            val manifest = codec.decodeFromString<DatabaseArchive>(java.io.File(archive,"manifest.json").readText())
+            org.junit.Assert.assertEquals(name,manifest.database)
+            org.junit.Assert.assertEquals(originals.keys,manifest.files.map { it.name }.toSet())
+            manifest.files.forEach { entry ->
+                val preserved = java.io.File(archive,entry.name)
+                org.junit.Assert.assertArrayEquals(originals.getValue(entry.name),preserved.readBytes())
+                org.junit.Assert.assertEquals(entry.bytes,preserved.length())
+                org.junit.Assert.assertEquals(entry.sha256,fileHash(preserved))
+            }
+        }
+        for(mask in 1..7) {
+            val name = "orphan-$mask-${newId()}.db"
+            check(name,suffixes.filterIndexed { i,_ -> mask and (1 shl i) != 0 }) { TrackerDatabase.open(context,name) }
+        }
+        // Exercise the real runtime's newStore decision as well as the named open boundary.
+        check("tracker.db",suffixes) { runBlocking { withContext(Dispatchers.IO) { TrackerRuntime.get(context) } } }
+        val freshName = "genuinely-new-${newId()}.db"
+        org.junit.Assert.assertFalse(DatabaseFiles.exists(context,freshName))
+        val fresh = TrackerDatabase.open(context,freshName)
+        try { runBlocking { withContext(Dispatchers.IO) { org.junit.Assert.assertTrue(RoomStore(fresh).read().sessions.isEmpty()) } } }
+        finally { fresh.close() }
+    }
+
+    @org.junit.Test fun sessionCommandsIgnoreStaleSelectedCard() {
+        val context = RuntimeEnvironment.getApplication()
+        val runtime = runBlocking { withContext(Dispatchers.IO) { TrackerRuntime.get(context) } }
+        val tracker = runtime.tracker;val clock = FakeClock()
+        // Inject the deterministic clock at the test boundary; buttons execute the real runtime/Room.
+        val clockField = Tracker::class.java.getDeclaredField("clock").apply { isAccessible = true }
+        val originalClock = clockField.get(tracker);clockField.set(tracker,clock)
+        val controller = org.robolectric.Robolectric.buildActivity(MainActivity::class.java).create()
+        val activity = controller.get()
+        fun <T> io(block: ()->T): T = runBlocking { withContext(Dispatchers.IO) { block() } }
+        fun field(name: String) = MainActivity::class.java.getDeclaredField(name).apply { isAccessible = true }
+        fun input(name: String) = field(name).get(activity) as android.widget.EditText
+        fun button(label: String): android.widget.Button? {
+            val body = field("body").get(activity) as android.widget.LinearLayout
+            return (0 until body.childCount).map { body.getChildAt(it) }.filterIsInstance<android.widget.Button>().firstOrNull { it.text.toString() == label }
+        }
+        fun await(condition: ()->Boolean) {
+            val limit = System.nanoTime()+5_000_000_000L
+            while(!condition() && System.nanoTime() < limit) { org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();Thread.sleep(5) }
+            org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
+            org.junit.Assert.assertTrue("UI command did not complete",condition())
+        }
+        fun form(): Map<String,String?> = listOf("name","details","note","from","until","zone").associateWith { input(it).text.toString() } +
+            ("selectedCardId" to (field("selectedCardId").get(activity) as String?))
+        fun show() { field("shown").set(activity,io { tracker.snapshot() }) }
+        fun success(label: String) {
+            val before = form();val revision = io { tracker.data().revision };show()
+            val previous = org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog()
+            org.junit.Assert.assertTrue(button(label)!!.performClick())
+            await { io { tracker.data().revision } > revision || org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog()?.let { it !== previous && it.isShowing } == true }
+            val dialog = org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog()
+            org.junit.Assert.assertTrue("$label was refused: ${dialog?.let { org.robolectric.Shadows.shadowOf(it).message }}",io { tracker.data().revision } > revision)
+            org.junit.Assert.assertEquals(revision+1,io { tracker.data().revision })
+            org.junit.Assert.assertEquals("Command must retain the entire unrelated form",before,form())
+        }
+        fun selectionRefused(label: String) {
+            val before = form();val data = io { tracker.data() };show()
+            val previous = org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog()
+            button(label)!!.performClick()
+            await { org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog()?.let { it !== previous && it.isShowing } == true }
+            val dialog = org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog()
+            org.junit.Assert.assertTrue(org.robolectric.Shadows.shadowOf(dialog).message.toString().contains("Selected card is missing or archived"))
+            org.junit.Assert.assertEquals(data,io { tracker.data() });org.junit.Assert.assertEquals(before,form());dialog.dismiss()
+        }
+        try {
+            await { button("Отменить доступную правку") != null && button("Начать Focus") != null }
+            for(archived in listOf(false,true)) {
+                val baseline = io { tracker.data() }
+                val staleCard = io { Card(name = "Unrelated form card").also { tracker.saveCard(tracker.snapshot().token,it) } }
+                val staleId = staleCard.id
+                field("selectedCardId").set(activity,staleId)
+                mapOf("name" to "Retained name","details" to "retained activity","note" to "Retained note","from" to "unused start","until" to "unused end","zone" to "America/Los_Angeles")
+                    .forEach { (key,value) -> input(key).setText(value) }
+                val beforeExternalChange = form()
+                io {
+                    if(archived) tracker.saveCard(tracker.snapshot().token,staleCard.copy(archived = true))
+                    else {
+                        val backups = Backups(tracker,MemoryRollback())
+                        backups.apply(backups.prepare(Backups.encode(baseline,clock.now())))
+                    }
+                }
+                org.junit.Assert.assertEquals(beforeExternalChange,form())
+                org.junit.Assert.assertTrue(io { if(archived) tracker.data().cards.single { it.id == staleId }.archived else tracker.data().cards.none { it.id == staleId } })
+                selectionRefused("Start");selectionRefused("Начать Focus")
+                io { tracker.start(tracker.snapshot().token,Classification(name = "Saved history"));clock.advance(1000);tracker.stop(tracker.snapshot().token) }
+                success("Повторить последнее записанное (сохранённые, включая архивные параметры)")
+                org.junit.Assert.assertEquals("Saved history",io { tracker.snapshot().session!!.selection.name })
+                org.junit.Assert.assertTrue(io { tracker.snapshot().session!!.selection.details.isEmpty() })
+                success("PAUSE");success("RESUME");clock.advance(1000);success("STOP")
+                val marker = io { tracker.manual(tracker.snapshot().token,clock.wall-3*86_400_000L,clock.wall-3*86_400_000L+1000,
+                    Classification(name = "Undo marker")).changedSessionIds.single() }
+                success("Отменить доступную правку")
+                org.junit.Assert.assertTrue(io { tracker.data().sessions.none { it.id == marker } })
+                io { tracker.start(tracker.snapshot().token);clock.advance(1000);clock.boot = newId() }
+                org.junit.Assert.assertEquals(Mode.RECOVERY,io { tracker.snapshot().mode })
+                input("from").setText(java.time.Instant.ofEpochMilli(io { tracker.snapshot().active!!.start }).toString())
+                input("until").setText(java.time.Instant.ofEpochMilli(clock.wall).toString())
+                success("Подтвердить хвост указанным интервалом")
+                io { tracker.start(tracker.snapshot().token);clock.advance(1000);clock.boot = newId() }
+                success("Исключить неопределённый хвост")
+                val live = io { Card(name = "Focus selected card").also { tracker.saveCard(tracker.snapshot().token,it) } }
+                field("selectedCardId").set(activity,live.id);success("Начать Focus")
+                org.junit.Assert.assertEquals(live.id,io { tracker.snapshot().session!!.selection.cardId })
+                org.junit.Assert.assertEquals("retained activity",io { tracker.snapshot().session!!.selection.details["activity"] })
+                field("selectedCardId").set(activity,staleId)
+                clock.advance(io { tracker.data().focus!!.durationMs });success("Следующий этап Focus")
+                success("Пропустить этап Focus");clock.advance(1000);success("Завершить Focus")
+                org.junit.Assert.assertNull(io { tracker.data().focus })
+                // Persist the still-stale ID and all fields just as a recreation would.
+                val state = android.os.Bundle();val beforeSave = form();controller.saveInstanceState(state)
+                val saved = FormFiles(context).read(state.getString("formReference")!!)
+                org.junit.Assert.assertEquals(staleId,saved.selectedCardId)
+                org.junit.Assert.assertEquals(beforeSave,listOf("name","details","note","from","until","zone").zip(listOf(saved.name,saved.details,saved.note,saved.start,saved.end,saved.zone)).toMap() + ("selectedCardId" to saved.selectedCardId))
+            }
+        } finally {
+            controller.destroy();clockField.set(tracker,originalClock)
+            TrackerRuntime.beginRecovery();TrackerRuntime.endRecovery()
+        }
+    }
     override fun createStore(): StateStore = open("test-${newId()}.db")
     private fun open(name: String): StateStore {
         val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3).allowMainThreadQueries().build()

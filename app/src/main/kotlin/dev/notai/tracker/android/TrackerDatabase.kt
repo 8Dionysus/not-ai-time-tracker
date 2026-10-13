@@ -96,6 +96,11 @@ abstract class TrackerDatabase: RoomDatabase() {
 
         fun open(context: Context,name: String = "tracker.db"): TrackerDatabase {
             val file = context.getDatabasePath(name)
+            val existing = DatabaseFiles.paths(context,name).filter { it.exists() }
+            if(!file.exists() && existing.isNotEmpty()) {
+                DatabaseArchives.capture(context,name)
+                throw CoreError(ErrorCode.STORAGE,"Database main file is missing; sidecars preserved. Use explicit recovery")
+            }
             if(file.exists()) {
                 val expected = "SQLite format 3\u0000".toByteArray(Charsets.US_ASCII)
                 val header = ByteArray(expected.size)
@@ -105,7 +110,7 @@ abstract class TrackerDatabase: RoomDatabase() {
                 }
                 // SQLite may discard invalid sidecars before its corruption callback. Preserve
                 // them before opening. Clean closed stores without sidecars avoid this copy.
-                if(!validHeader || listOf("-wal","-shm","-journal").any { context.getDatabasePath(name+it).exists() })
+                if(!validHeader || existing.any { it != file })
                     DatabaseArchives.capture(context,name)
                 ensure(validHeader,"Database header is damaged; originals preserved. Use explicit recovery",ErrorCode.STORAGE)
             }

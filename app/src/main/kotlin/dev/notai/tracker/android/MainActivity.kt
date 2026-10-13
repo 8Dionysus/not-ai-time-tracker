@@ -89,8 +89,8 @@ class MainActivity: Activity() {
         val form = Form(note.text.toString(),from.text.toString(),until.text.toString(),inputDraft)
         runAction {
             val t = runtime.tracker
-            val selected = CardInputs.selection(t.data(),chosenId)
-            block(t,expected,if (activity.isEmpty()) selected else selected.copy(details = selected.details + ("activity" to activity)),form)
+            val selected = if(needsSelection) CardInputs.selection(t.data(),chosenId) else Classification()
+            block(t,expected,if (!needsSelection || activity.isEmpty()) selected else selected.copy(details = selected.details + ("activity" to activity)),form)
         }
     }
     private fun buildActions() {
@@ -279,7 +279,7 @@ class MainActivity: Activity() {
         dialog.show()
     }
     private fun buildFocusControls() {
-        command("Начать Focus") { t,e,c,f -> t.startFocus(e,c) }
+        command("Начать Focus",true) { t,e,c,f -> t.startFocus(e,c) }
         command("Следующий этап Focus") { t,e,_,_ -> t.focusNext(e) }
         command("Пропустить этап Focus") { t,e,_,_ -> t.focusSkip(e) }
         command("Завершить Focus") { t,e,_,_ -> t.cancelFocus(e) }

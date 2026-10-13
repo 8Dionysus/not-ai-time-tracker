@@ -42,3 +42,13 @@ JDK 17/21, Android SDK Platform 35 / Build Tools 35.0.0, Gradle Wrapper 8.13 с 
 Физический Android/emulator не подключён (`adb devices -l`: пусто). Не подтверждены устройство, OEM idle delivery, реальный OS chooser/CalendarProvider, убийство процесса/потеря питания, память и задержки телефона. Полный визуальный UI остаётся отдельной работой. GitHub checks проверяются отдельно для публикуемого commit; отсутствие checks не означает CI pass.
 
 Новый локальный debug APK подписан другим сертификатом, чем APK исходной поставки. Установка поверх того APK требует исходного signing key. Ключ не восстановлен из сертификата и не включён в Git; удаление приложения/данных не выполнялось. Исходный APK сохранён. Это ограничение установки бинарной сборки, отдельное от проверяемой совместимости Room/JSON и словаря.
+
+## Дополнительная приёмка: orphan sidecars и выбор карточки
+
+После `dfd627a` исправлены только два найденных пути и добавлены связанные регрессии. Полный aggregate: **BUILD SUCCESSFUL in 46s**; 3 Core + 5 Room, failures/errors/skips=0; lint 0 errors, 34 warnings, 1 hint. Core и каталог не менялись; соответствующий Core run повторно использован Gradle по неизменным входам.
+
+[Отчёт follow-up](../evidence/acceptance-followup/verification.json) содержит точный implementation fingerprint и hashes отчётов. `orphanSidecarsNeverInitialize` проверяет каждый sidecar и все семь непустых комбинаций, сохранение исходных/архивных bytes и SHA-256, отсутствие созданного DB, отказ runtime и работающий действительно новый store. `sessionCommandsIgnoreStaleSelectedCard` нажимает реальные кнопки Activity с карточкой, исчезнувшей после полного restore, и с архивированной выбранной карточкой: Undo, Repeat, resolveTail, Focus transitions, Pause/Resume/Stop сохраняют форму. Start/Start Focus требуют действительного выбора; положительный Start Focus сохраняет выбранный ID и details.
+
+Подпись вновь собранного APK совпадает с предыдущей локальной debug-сборкой; ключи не менялись. Старый APK в Library относится к предыдущему implementation commit, не к этому follow-up.
+
+Проверка emulator проведена отдельно от adb: executable не найден в PATH, рабочем SDK, стандартных SDK-путях и machine runtimes; system-images в рабочем SDK отсутствуют; штатные AVD-каталоги и конфигурации Android Studio отсутствуют. Готового пути для emulator QA нет. Ничего не установлено, эмулятор не запускался, пользовательская установка и данные не затронуты. Физическая/эмуляторная QA остаётся открытой.

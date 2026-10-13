@@ -73,7 +73,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
         fun get(context: Context): TrackerRuntime = instance ?: synchronized(this) {
             if(recovering || DatabaseRecovery.needsAttention(context)) throw CoreError(ErrorCode.STORAGE,"A recovery operation needs completion; open recovery controls")
             instance ?: run {
-                val newStore = !context.getDatabasePath("tracker.db").exists()
+                val newStore = !DatabaseFiles.exists(context)
                 val database = TrackerDatabase.open(context)
                 try { TrackerRuntime(context.applicationContext,database,newStore).also { instance = it } }
                 catch(e: Exception) { database.close();throw e }

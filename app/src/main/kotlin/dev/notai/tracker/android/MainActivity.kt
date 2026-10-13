@@ -24,14 +24,18 @@ class MainActivity : ComponentActivity() {
     private val vm: TrackerViewModel by viewModels()
     private var shortcutPending: SurfaceAction? = null
     private var tracedReady = false
+    private var launchedDocumentExport: String? = null
     private val saveExport = registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
         vm.documentExportId()?.let { vm.writeExport(it,uri) }
+        launchedDocumentExport = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         StartupTrace.mark(this, "activity-create")
+        launchedDocumentExport = savedInstanceState?.getString("launchedDocumentExport")
+        vm.recoverDocumentExport(launchedDocumentExport)
         shortcutPending = TimerSurfaces.restoredShortcut(savedInstanceState, intent)
         if (savedInstanceState == null) receiveSelectedText(intent)
         intent.action = Intent.ACTION_MAIN
@@ -40,7 +44,16 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 vm.documentExport.collect { id ->
-                    if(id != null && vm.claimDocumentExport(id)) saveExport.launch(vm.exportTitle(id))
+                    val owner = dev.notai.tracker.newId()
+                    if(id != null) try {
+                        if(vm.claimDocumentExport(id,owner)) {
+                            saveExport.launch(vm.exportTitle(id))
+                            launchedDocumentExport = id
+                        }
+                    } catch(e: Exception) {
+                        vm.releaseDocumentExport(id,owner,e)
+                        if(e is kotlinx.coroutines.CancellationException) throw e
+                    }
                 }
             }
         }
@@ -66,6 +79,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         TimerSurfaces.saveShortcut(this, outState, shortcutPending)
+        launchedDocumentExport?.let { outState.putString("launchedDocumentExport",it) }
         super.onSaveInstanceState(outState)
     }
 

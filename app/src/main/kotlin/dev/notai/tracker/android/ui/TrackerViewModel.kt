@@ -52,6 +52,11 @@ data class CorrectionState(val preview: Tracker.CorrectionPreview?, val beforeMs
                            val freeFrom: Long?, val freeUntil: Long?)
 
 data class BackupInfo(val at: Long, val bytes: Long, val verified: Boolean)
+internal object DocumentExportCoordination {
+    val lock = Any()
+    // Test-only suspension boundary after a durable commit; never set by product code.
+    var afterClaimCommit: (() -> Unit)? = null
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
@@ -383,13 +388,33 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
     val exportPreparing = MutableStateFlow(false)
     private val _documentExport = MutableStateFlow<String?>(null)
     val documentExport: StateFlow<String?> = _documentExport
-    init {
-        val id = prefs.getString("documentExportId",null)
-        if(id != null && !prefs.getBoolean("documentExportLaunched",false)) _documentExport.value = id
+    /** Activity saved state is the witness that a chooser was actually launched.
+     * A disk claim by itself cannot suppress recovery after a process death. */
+    fun recoverDocumentExport(registeredId: String?) {
+        viewModelScope.launch(Dispatchers.IO) { synchronized(DocumentExportCoordination.lock) {
+            val id = documentExportId() ?: return@synchronized
+            if(registeredId != id) {
+                check(prefs.edit().putBoolean("documentExportLaunched",false).remove("documentExportOwner").commit())
+                _documentExport.value = id
+            }
+        } }
+    }
+    fun releaseDocumentExport(id: String,owner: String,error: Exception) {
+        synchronized(DocumentExportCoordination.lock) {
+        if(documentExportId() == id && prefs.getString("documentExportOwner",null) == owner) {
+            prefs.edit().putBoolean("documentExportLaunched",false).apply()
+            _documentExport.value = null // retry by the original action, no launch loop
+        }
+        }
+        notice(Format.error(error))
     }
     /** Operation lifetime is the Activity, not a disposable tab. No new retry UI. */
     @Synchronized fun requestExport(csv: Boolean = false) {
-        if(exportPreparing.value || documentExportId() != null) return
+        if(exportPreparing.value) return
+        documentExportId()?.let { id ->
+            if(!prefs.getBoolean("documentExportLaunched",false)) _documentExport.value = id
+            return
+        }
         exportPreparing.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -398,15 +423,20 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
                     check(prefs.edit().putString("documentExportId",id).putBoolean("documentExportLaunched",false).commit())
                     _documentExport.value = id
                 }
-            } finally { exportPreparing.value = false }
+            } catch(e: Exception) { notice(Format.error(e)) }
+            finally { exportPreparing.value = false }
         }
     }
     fun documentExportId(): String? = prefs.getString("documentExportId",null)
-    suspend fun claimDocumentExport(id: String): Boolean = withContext(Dispatchers.IO) {
-        if(_documentExport.value != id || prefs.getBoolean("documentExportLaunched",false)) false else {
-            check(prefs.edit().putBoolean("documentExportLaunched",true).commit())
-            _documentExport.value = null;true
+    suspend fun claimDocumentExport(id: String,owner: String): Boolean = withContext(Dispatchers.IO) {
+        val claimed = synchronized(DocumentExportCoordination.lock) {
+            if(_documentExport.value != id || documentExportId() != id || prefs.getBoolean("documentExportLaunched",false)) false else {
+                check(prefs.edit().putBoolean("documentExportLaunched",true).putString("documentExportOwner",owner).commit())
+                _documentExport.value = null;true
+            }
         }
+        if(claimed) DocumentExportCoordination.afterClaimCommit?.invoke()
+        claimed
     }
     val lastBackup = MutableStateFlow(prefs.getLong("backupAt", 0L).takeIf { it > 0 }?.let {
         BackupInfo(it, prefs.getLong("backupBytes", 0), prefs.getBoolean("backupVerified", false))
@@ -447,7 +477,7 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
                 notice(if (result.verified) "Файл сохранён и проверен" else "Файл сохранён. Проверить его чтением нельзя")
             } catch (e: Exception) { notice(Format.error(e)) }
             finally {
-                if(documentExportId() == id) prefs.edit().remove("documentExportId").remove("documentExportLaunched").apply()
+                if(documentExportId() == id) prefs.edit().remove("documentExportId").remove("documentExportLaunched").remove("documentExportOwner").apply()
             }
         }
     }

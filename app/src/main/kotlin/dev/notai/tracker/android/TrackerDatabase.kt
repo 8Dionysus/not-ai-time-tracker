@@ -14,15 +14,23 @@ import java.util.concurrent.Callable
 @Entity(tableName = "metadata") data class MetaRow(@PrimaryKey val id: Int = 1, val payload: String)
 @Entity(tableName = "activity_types") data class TypeRow(@PrimaryKey val id: String,val position: Int,val payload: String)
 @Entity(tableName = "cards") data class CardRow(@PrimaryKey val id: String,val position: Int,val payload: String)
-@Entity(tableName = "sessions",indices = [Index(value = ["position","id"])]) data class SessionRow(@PrimaryKey val id: String,val position: Int,val payload: String)
-@Entity(tableName = "segments", foreignKeys = [ForeignKey(entity = SessionRow::class,parentColumns = ["id"],childColumns = ["sessionId"],onDelete = ForeignKey.CASCADE)],
-    indices = [Index("sessionId"),Index(value = ["openSlot"],unique = true),Index(value = ["position","id"])])
-data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId: String,val openSlot: Int?,val payload: String)
+@Entity(tableName = "history_classifications") data class ClassificationRow(@PrimaryKey val id: String,val payload: String)
+@Entity(tableName = "sessions",foreignKeys = [ForeignKey(entity = ClassificationRow::class,parentColumns = ["id"],childColumns = ["selectionId"])],
+    indices = [Index(value = ["position","id"]),Index("selectionId")])
+data class SessionRow(@PrimaryKey val id: String,val position: Int,val status: String,val selectionId: String,val note: String?,val importOrigin: String?)
+@Entity(tableName = "segments", foreignKeys = [ForeignKey(entity = SessionRow::class,parentColumns = ["id"],childColumns = ["sessionId"],onDelete = ForeignKey.CASCADE),
+    ForeignKey(entity = ClassificationRow::class,parentColumns = ["id"],childColumns = ["selectionId"])],
+    indices = [Index("sessionId"),Index(value = ["openSlot"],unique = true),Index(value = ["position","id"]),Index("selectionId")])
+data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId: String,val openSlot: Int?,val start: Long,val end: Long?,val durationMs: Long,
+    val selectionId: String,val anchor: String?,val uncertain: Boolean,val observedUntil: Long?,val limitMs: Long?)
 @Entity(tableName = "favorites") data class FavoriteRow(@PrimaryKey val id: String,val position: Int,val payload: String)
 @Entity(tableName = "measurements") data class MeasurementRow(@PrimaryKey val id: String,val position: Int,val payload: String)
 @Entity(tableName = "store_generation") data class GenerationRow(@PrimaryKey val id: Int = 1,val generation: Long)
 @Entity(tableName = "vocabulary") data class VocabularyRow(@PrimaryKey val id: Int = 1,val payload: String)
 @Dao interface TrackerDao {
+    @Query("SELECT * FROM history_classifications") fun classifications(): List<ClassificationRow>
+    @Query("SELECT * FROM history_classifications WHERE id=:id") fun classification(id: String): ClassificationRow?
+    @Insert fun classification(row: ClassificationRow)
     @Query("SELECT generation FROM store_generation WHERE id=1") fun generation(): Long?
     @Query("SELECT generation FROM store_generation WHERE id=1") fun generations(): Flow<Long?>
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun generation(row: GenerationRow)
@@ -55,7 +63,7 @@ data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId
     @Query("DELETE FROM measurements WHERE id IN (:ids)") fun deleteMeasurements(ids: List<String>)
     @Query("SELECT * FROM measurements WHERE id IN (:ids)") fun readMeasurements(ids: List<String>): List<MeasurementRow>
 }
-@Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class,GenerationRow::class,VocabularyRow::class],version = 4,exportSchema = true)
+@Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class,GenerationRow::class,VocabularyRow::class,ClassificationRow::class],version = 5,exportSchema = true)
 abstract class TrackerDatabase: RoomDatabase() {
     abstract fun dao(): TrackerDao
     companion object {
@@ -100,6 +108,9 @@ abstract class TrackerDatabase: RoomDatabase() {
                 db.execSQL("CREATE INDEX IF NOT EXISTS index_segments_position_id ON segments(position,id)")
             }
         }
+        val MIGRATION_4_5 = object: androidx.room.migration.Migration(4,5) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) = migrateNormalizedHistory(db)
+        }
 
         fun open(context: Context,name: String = "tracker.db"): TrackerDatabase {
             val file = context.getDatabasePath(name)
@@ -110,19 +121,20 @@ abstract class TrackerDatabase: RoomDatabase() {
             }
             if(file.exists()) {
                 val expected = "SQLite format 3\u0000".toByteArray(Charsets.US_ASCII)
-                val header = ByteArray(expected.size)
+                val header = ByteArray(100)
                 val validHeader = file.inputStream().use { input -> var n = 0
                     while(n < header.size) { val count = input.read(header,n,header.size-n);if(count < 0) break;n += count }
-                    n == header.size && header.contentEquals(expected)
+                    n == header.size && header.copyOfRange(0,expected.size).contentEquals(expected)
                 }
                 // SQLite may discard invalid sidecars before its corruption callback. Preserve
                 // them before opening. Clean closed stores without sidecars avoid this copy.
-                if(!validHeader || existing.any { it != file })
+                val storedVersion = if(validHeader) java.nio.ByteBuffer.wrap(header,60,4).int else null
+                if(!validHeader || storedVersion != 5 || existing.any { it != file })
                     DatabaseArchives.capture(context,name)
                 ensure(validHeader,"Database header is damaged; originals preserved. Use explicit recovery",ErrorCode.STORAGE)
             }
             return Room.databaseBuilder(context,TrackerDatabase::class.java,name)
-            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4).openHelperFactory { configuration ->
+            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5).openHelperFactory { configuration ->
                 val original = configuration.callback
                 val guarded = object: androidx.sqlite.db.SupportSQLiteOpenHelper.Callback(original.version) {
                     override fun onConfigure(db: androidx.sqlite.db.SupportSQLiteDatabase) = original.onConfigure(db)
@@ -156,7 +168,7 @@ class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset
     @Volatile private var cached: Pair<Long,CheckedState>? = null // accessed only inside Room transactions
     init { db.runInTransaction {
         if(dao.metadata() == null) {
-            val tables = listOf("metadata","activity_types","cards","sessions","segments","favorites","measurements","vocabulary","store_generation")
+            val tables = listOf("metadata","activity_types","cards","sessions","segments","favorites","measurements","vocabulary","store_generation","history_classifications")
             val remnants = tables.any { table -> db.openHelper.readableDatabase.query("SELECT 1 FROM $table LIMIT 1").use { it.moveToFirst() } }
             if(remnants || !allowInitialize) throw CoreError(ErrorCode.STORAGE,"Metadata is missing from an existing store; use explicit recovery. Nothing was initialized.")
             write(null,CheckedState.validate(initial()))
@@ -194,10 +206,12 @@ class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset
         val base = loadPhase("decode-metadata") { codec.decodeFromString<Dataset>(meta) }
         val rawVocabulary = loadPhase("sql-vocabulary") { dao.vocabulary()!!.payload }
         val vocabulary = loadPhase("decode-vocabulary") { codec.decodeFromString<VocabularyData>(rawVocabulary) }
+        val rawSelections = loadPhase("sql-history-classifications") { dao.classifications() }
+        val selections = loadPhase("decode-history-classifications") { rawSelections.associate { it.id to codec.decodeFromString<Classification>(it.payload) } }
         val data = base.copy(axes = vocabulary.axes,metrics = vocabulary.metrics,units = vocabulary.units,
             types = payloads("activity_types") { codec.decodeFromString<ActivityType>(it) },cards = payloads("cards") { codec.decodeFromString<Card>(it) },
-            sessions = payloads("sessions") { codec.decodeFromString<Session>(it) },
-            segments = payloads("segments") { codec.decodeFromString<Segment>(it) },
+            sessions = historyRows("sessions",HistoryColumns.SESSION_COLUMNS) { HistoryColumns.session(it,selections) },
+            segments = historyRows("segments",HistoryColumns.SEGMENT_COLUMNS) { HistoryColumns.segment(it,selections) },
             favorites = payloads("favorites") { codec.decodeFromString<Favorite>(it) },
             measurements = payloads("measurements") { codec.decodeFromString<Measurement>(it) })
         val checked = CheckedState.validate(data,onLoadPhase)
@@ -211,8 +225,7 @@ class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset
     }
     /** One cursor window / one payload at a time; never retain a second full list of JSON rows. */
     private fun <T> payloads(table: String,decode: (String)->T): List<T> {
-        check(table in setOf("activity_types","cards","sessions","segments","favorites","measurements"))
-        if(loadPageSize != null && table in setOf("sessions","segments")) return pagedPayloads(table,decode,loadPageSize)
+        check(table in setOf("activity_types","cards","favorites","measurements"))
         val result = ArrayList<T>()
         val start = if(onLoadPhase != null) System.nanoTime() else 0
         db.openHelper.readableDatabase.query("SELECT payload FROM $table ORDER BY position").use { cursor ->
@@ -231,30 +244,31 @@ class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset
         }
         return result
     }
-    private fun <T> pagedPayloads(table: String,decode: (String)->T,size: Int): List<T> {
-        require(size in 1..1024)
+    private fun <T> historyRows(table: String,columns: String,decode: (android.database.Cursor)->T): List<T> {
+        check(table in setOf("sessions","segments"))
+        val size = loadPageSize;require(size == null || size in 1..1024)
         val result = ArrayList<T>();var position: Long? = null;var id: String? = null
         var sqlNs = 0L;var decodeNs = 0L
         do {
             val tick = if(onLoadPhase != null) System.nanoTime() else 0L
-            val query = if(position == null) "SELECT payload,position,id FROM $table ORDER BY position,id LIMIT $size" else
-                "SELECT payload,position,id FROM $table WHERE position>=? AND (position>? OR id>?) ORDER BY position,id LIMIT $size"
+            val query = if(position == null) "SELECT $columns FROM $table ORDER BY position,id"+(size?.let { " LIMIT $it" } ?: "") else
+                "SELECT $columns FROM $table WHERE position>=? AND (position>? OR id>?) ORDER BY position,id LIMIT $size"
             val args = if(position == null) emptyArray() else arrayOf<Any>(position!!,position!!,id!!)
             var count = 0
             db.openHelper.readableDatabase.query(query,args).use { cursor ->
                 var previous = if(onLoadPhase != null) System.nanoTime() else 0L
                 if(onLoadPhase != null) sqlNs += previous-tick
                 while(cursor.moveToNext()) {
-                    val payload = cursor.getString(0);position = cursor.getLong(1);id = cursor.getString(2);count++
+                    position = cursor.getLong(1);id = cursor.getString(0);count++
                     val beforeDecode = if(onLoadPhase != null) System.nanoTime() else 0L
                     if(onLoadPhase != null) sqlNs += beforeDecode-previous
-                    result += decode(payload)
+                    result += decode(cursor)
                     previous = if(onLoadPhase != null) System.nanoTime() else 0L
                     if(onLoadPhase != null) decodeNs += previous-beforeDecode
                 }
                 if(onLoadPhase != null) sqlNs += System.nanoTime()-previous
             }
-        } while(count == size)
+        } while(size != null && count == size)
         onLoadPhase?.invoke("sql-$table",sqlNs);onLoadPhase?.invoke("decode-$table",decodeNs)
         return result
     }
@@ -275,9 +289,17 @@ class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset
     }
     private fun write(old: Dataset?,state: CheckedState,timer: TimerRows? = null) {
         val d = state.data
+        val definitions = mutableMapOf<Classification,String>()
+        fun selection(c: Classification): String = definitions.getOrPut(c) {
+            val row = codec.encodeToString(c).let { ClassificationRow(HistoryColumns.key(it),it) }
+            val existing = dao.classification(row.id)
+            if(existing == null) dao.classification(row)
+            check(dao.classification(row.id) == row) { "Historical classification verification failed" }
+            row.id
+        }
         if(timer != null) {
-            val sessions = timer.sessions.map { SessionRow(it.value.id,it.position,codec.encodeToString(it.value)) }
-            val segments = timer.segments.map { SegmentRow(it.value.id,it.position,it.value.sessionId,if(it.value.end == null) 1 else null,codec.encodeToString(it.value)) }
+            val sessions = timer.sessions.map { HistoryColumns.session(it.value,it.position,selection(it.value.selection)) }
+            val segments = timer.segments.map { HistoryColumns.segment(it.value,it.position,selection(it.value.selection)) }
             dao.sessions(sessions)
             dao.segments(segments.filter { it.openSlot == null }); dao.segments(segments.filter { it.openSlot != null })
             check(dao.readSessions(sessions.map { it.id }).toSet() == sessions.toSet()) { "Timer session verification failed" }
@@ -285,9 +307,9 @@ class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset
         } else {
         // Session removals wait until child segments have been removed/reparented.
         val removeSessions = mutableListOf<String>()
-        sync(old?.sessions.orEmpty(),d.sessions,{ it.id },{ i,s -> SessionRow(s.id,i,codec.encodeToString(s)) },
+        sync(old?.sessions.orEmpty(),d.sessions,{ it.id },{ i,s -> HistoryColumns.session(s,i,selection(s.selection)) },
             dao::sessions,{ removeSessions.addAll(it) },{ ids -> dao.readSessions(ids).filterNot { it.id in removeSessions } })
-        sync(old?.segments.orEmpty(),d.segments,{ it.id },{ i,s -> SegmentRow(s.id,i,s.sessionId,if(s.end == null) 1 else null,codec.encodeToString(s)) },
+        sync(old?.segments.orEmpty(),d.segments,{ it.id },{ i,s -> HistoryColumns.segment(s,i,selection(s.selection)) },
             { rows -> dao.segments(rows.filter { it.openSlot == null }); dao.segments(rows.filter { it.openSlot != null }) },dao::deleteSegments,dao::readSegments)
         removeSessions.chunked(500).forEach { dao.deleteSessions(it); check(dao.readSessions(it).isEmpty()) }
         sync(old?.types.orEmpty(),d.types,{ it.id },{ i,t -> TypeRow(t.id,i,codec.encodeToString(t)) },dao::types,dao::deleteTypes,dao::readTypes)

@@ -18,19 +18,43 @@ internal object DatabaseFiles {
  * SQLite's default corruption handler must never delete this application's files.
  */
 object DatabaseArchives {
-    fun capture(context: Context,name: String = "tracker.db"): File {
+    fun capture(context: Context,name: String = "tracker.db",forceSeparate: Boolean = false): File {
+        val start = System.nanoTime();StartupTrace.mark(context,"archive-start")
         val root = File(context.noBackupFilesDir,"database-archives").apply { mkdirs() }
+        // Only sealed, immutable archival copies can be shared. Never link a live
+        // SQLite file: subsequent writes would then alter the preserved original.
+        val previous = root.listFiles().orEmpty().filter { it.isDirectory }.mapNotNull { folder ->
+            runCatching { folder to codec.decodeFromString<DatabaseArchive>(File(folder,"manifest.json").readText()) }.getOrNull()
+        }.filter { it.second.database == name }
+        val sources = DatabaseFiles.paths(context,name).filter { it.exists() }
+        val snapshot = sources.associate { it.name to PreservedDatabaseFile(it.name,it.length(),fileHash(it)) }
+        if(!forceSeparate) previous.firstOrNull { (folder,archive) ->
+            archive.files.associateBy { it.name } == snapshot && archive.files.all { entry ->
+                val file = File(folder,entry.name)
+                file.isFile && file.length() == entry.bytes && fileHash(file) == entry.sha256
+            } && sources.all { source -> val entry = snapshot.getValue(source.name);source.length() == entry.bytes && fileHash(source) == entry.sha256 }
+        }?.let { StartupTrace.mark(context,"archive-reused",System.nanoTime()-start);return it.first }
         val id = newId();val directory = File(root,id).apply { mkdirs() }
-        val files = DatabaseFiles.paths(context,name).mapNotNull { source ->
-            if(!source.exists()) return@mapNotNull null
+        val files = sources.map { source ->
             val filename = source.name
             val target = File(directory,filename)
-            source.inputStream().use { input -> FileOutputStream(target).use { input.copyTo(it,64*1024);it.fd.sync() } }
-            val sourceHash = fileHash(source);ensure(source.length() == target.length() && sourceHash == fileHash(target),"Original database changed during preservation",ErrorCode.STORAGE)
+            val sourceBytes = snapshot.getValue(filename).bytes;val sourceHash = snapshot.getValue(filename).sha256
+            val reusable = previous.firstNotNullOfOrNull { (folder,archive) ->
+                archive.files.singleOrNull { it.name == filename && it.bytes == sourceBytes && it.sha256 == sourceHash }?.let {
+                    File(folder,filename).takeIf { it.isFile && it.length() == sourceBytes && fileHash(it) == sourceHash }
+                }
+            }
+            if(reusable != null) try { DirectoryDurability.link(reusable,target) } catch(_: Exception) { /* Filesystems without hard links copy below. */ }
+            if(!target.exists()) source.inputStream().use { input -> FileOutputStream(target).use { input.copyTo(it,64*1024);it.fd.sync() } }
+            // Do not truncate an existing target after a partial link failure. It may
+            // already share an inode with a previous, still-needed archive.
+            ensure(source.length() == sourceBytes && target.length() == sourceBytes && sourceHash == fileHash(target) && sourceHash == fileHash(source),
+                "Original database changed during preservation",ErrorCode.STORAGE)
             PreservedDatabaseFile(filename,target.length(),sourceHash)
         }
         atomicText(File(directory,"manifest.json"),codec.encodeToString(DatabaseArchive(id,name,files)))
-        syncDirectory(directory);syncDirectory(root);syncDirectory(context.noBackupFilesDir);return directory
+        syncDirectory(directory);syncDirectory(root);syncDirectory(context.noBackupFilesDir)
+        StartupTrace.mark(context,"archive-created",System.nanoTime()-start);return directory
     }
 }
 @Serializable private data class RecoveryJob(val id: String,val source: String,val archive: String,val candidate: String,val sourceSha256: String)
@@ -56,7 +80,7 @@ object DatabaseRecovery {
         ensure(liveSource == preview.backup,"Recovery source changed after preview",ErrorCode.STALE)
         TrackerRuntime.beginRecovery()
         try {
-            val archive = DatabaseArchives.capture(context)
+            val archive = DatabaseArchives.capture(context,forceSeparate = true)
             val candidateName = "rescue-${newId()}.db"
             val restored = Backups.restoredData(liveSource,Math.addExact(liveSource.data.revision,1))
             val candidate = TrackerDatabase.open(context,candidateName)

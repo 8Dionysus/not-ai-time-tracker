@@ -1,0 +1,9 @@
+{
+  "stage": "owned AVD experiment only, current schema4 APK unchanged",
+  "durationNs": 1073426785,
+  "canonicalValuesAndRowCountsIdentical": true,
+  "beforePayloadBytes": 106711378,
+  "afterPayloadBytes": 76913211,
+  "historySessions": 73001,
+  "historySegments": 73002
+}

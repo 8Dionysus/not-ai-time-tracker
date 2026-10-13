@@ -20,7 +20,7 @@ UnitDefinition задаёт размерность и точный положи�
 
 ## Хранение и импорт
 
-Room schema 4 мигрирует 1→2→3 без destructive fallback. Схемы [1](../app/schemas/dev.notai.tracker.android.TrackerDatabase/1.json), [2](../app/schemas/dev.notai.tracker.android.TrackerDatabase/2.json) и [3](../app/schemas/dev.notai.tracker.android.TrackerDatabase/3.json) сохранены. Миграции валидируют данные и сохраняют предметные ID/историю.
+Room schema 5 мигрирует 1→2→3→4→5 без destructive fallback. Схемы [1](../app/schemas/dev.notai.tracker.android.TrackerDatabase/1.json), [2](../app/schemas/dev.notai.tracker.android.TrackerDatabase/2.json) и [3](../app/schemas/dev.notai.tracker.android.TrackerDatabase/3.json) сохранены. Миграции валидируют данные и сохраняют предметные ID/историю.
 
 Экспорт JSON использует формат 7, reader принимает 1–7. В старой версии 1 partOf мигрирует в activityTypeId с одноэлементным историческим путём; Long превращается в точный Decimal, неизвестные details сохраняются буквально. Исторические переходы форматов описаны в [истории](history/ACCEPTANCE_GAPS_through_v15.md).
 
@@ -37,3 +37,5 @@ Room schema 4 мигрирует 1→2→3 без destructive fallback. Схем
 - addCatalog возвращает обычный Change с непустым catalogImport. entries перечисляет каждый ключ с kind/id/meaningVersion/status: ADDED, UNCHANGED или CONFLICT. added/unchanged/conflicts — готовые списки. Конфликтующий локальный объект сохраняется целиком, включая пользовательские имя и parentId; CONFLICT показывает, что конфликтующие определения сохранены локально; остальные корректные новые определения низкоуровневый addCatalog может добавить. Полный package importer блокирует применение до решения любого конфликта. Дубликат ключа внутри входа отклоняет всю команду, включая повторы уже существующего ID. Ключ типа/единицы — ID, оси/метрики — ID + meaningVersion. Разные смысловые версии оси/метрики допустимы. Входные определения валидируются также при конфликте; некорректные ссылки/циклы не скрываются под статусом пропуска. Report формируется в той же транзакции, что результат команды.
 
 Проверки этих правил входят в общие сценарии Memory/Room. Точные результаты — [VERIFICATION](VERIFICATION.md).
+
+Текущие экспортированные схемы: [Room 4](../app/schemas/dev.notai.tracker.android.TrackerDatabase/4.json), [Room 5](../app/schemas/dev.notai.tracker.android.TrackerDatabase/5.json). Миграция 4→5 переносит Sessions/Segments в типизированные колонки и таблицу повторно используемых исторических классификаций; vocabulary и предметные значения сохраняются. JSON backup остаётся 7 с чтением 1–7.

@@ -1,0 +1,275 @@
+{
+  "schema": "tracker_normalized_history_verification_v1",
+  "baselineCommit": "bd18a6ed5a5d89cc434bf01d60ea4a82330185a5",
+  "stage": "normalized storage and preservation verified; Android feature QA continues",
+  "createdAtUtc": "2026-10-13T17:33:26.750200+00:00",
+  "roomSchema": 5,
+  "jsonExport": 7,
+  "jsonReadVersions": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "aggregate": "BUILD SUCCESSFUL in 1m 5s",
+  "checks": {
+    "core": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "room": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "additionalCases": [
+        "repeatedArchivesShareOnlyVerifiedImmutableCopies",
+        "indexedPagingAndV3MigrationPreserveEveryRow",
+        "normalizedMigrationRejectsContradictionsWithoutChangingLegacyRows",
+        "normalizedMigrationRollsBackAfterReplacementFailure",
+        "healthyMainWithDamagedSidecarsPreservesEveryOriginalBeforeSQLite"
+      ]
+    }
+  },
+  "aggregateLogSha256": "8850c13db90d86091a0b93ddf91316e16996b45d7efa59f50cbd683d47371386",
+  "subsequentBuild": "24s; technical shell Room label only",
+  "jvmProfile": "BUILD SUCCESSFUL in 58s; timerPath only",
+  "implementationFiles": [
+    {
+      "path": "app/build.gradle.kts",
+      "sha256": "86d4aabc5f47d15f6923fd752b5cd2a4bd05452a8216b738217ebdd86082308a"
+    },
+    {
+      "path": "app/schemas/dev.notai.tracker.android.TrackerDatabase/1.json",
+      "sha256": "d2ce971d7d97e594862fc9370eeb1c01c8f0e343f52038325af26655cf18b1fb"
+    },
+    {
+      "path": "app/schemas/dev.notai.tracker.android.TrackerDatabase/2.json",
+      "sha256": "f8b482f96bc97821ac08d49682b58d496a1b889a6b5aa7813def76b6d364415b"
+    },
+    {
+      "path": "app/schemas/dev.notai.tracker.android.TrackerDatabase/3.json",
+      "sha256": "aacce33a2aa0f5877979100afef2eb0157541312dbd1d35d7d49adf10d3051bf"
+    },
+    {
+      "path": "app/schemas/dev.notai.tracker.android.TrackerDatabase/4.json",
+      "sha256": "227eaa27771307f19d36534fa30aa8f86f5250bbe569334abe963df221125702"
+    },
+    {
+      "path": "app/schemas/dev.notai.tracker.android.TrackerDatabase/5.json",
+      "sha256": "b3bd6649eaf17ef1028e9079d78ee56f4fdc3d0892ecff512969ae59bee4849c"
+    },
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "sha256": "cc90b356f155ac3f663dff8e42e50170923a7e7fcefc241774dde8d3c7efa8b2"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/AndroidRuntime.kt",
+      "sha256": "a7b568553b9d3ea275fdd2dff328db37d9b0b8941327f0562a5b0e7de7a06fab"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/BackupDocuments.kt",
+      "sha256": "b901af0305ffd6b366091c7086bca774e5f0ad2286ad132e183465803819a7c1"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/DatabaseRecovery.kt",
+      "sha256": "365130038cacfb02d6693ec36ca0f7b693bda1778ce2d642fdf50579dbbd60d8"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/EntryInputs.kt",
+      "sha256": "e9cf05dbe12f2f4894f610dde4cd5bef6bf3e8ed39fb80fc01df1e2f6f316c9b"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/FloatingTimerService.kt",
+      "sha256": "0037d620b53f3de84bc558babde8ddedb7119138afcf365e91eb52c1aa5b110d"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/FocusDueSignals.kt",
+      "sha256": "41c4bf89597b702d858f3536bb085d73cfca82f0de37707051e6f031792fcc6f"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/FocusSignals.kt",
+      "sha256": "4357815d58316930edf6016bd1f51901faf4fc05b2ae438177324a89710d5bca"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/MainActivity.kt",
+      "sha256": "429bf5722626cb39d13333c255ce9ddd7d3bd2e9e15939c6f8a60e33f873db1d"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/NormalizedHistory.kt",
+      "sha256": "09e375a5d80f910eec7eeeac4fb7eac751c69220fca71b230f964d95fdee1be7"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/PrivateFiles.kt",
+      "sha256": "da562650f2ffde8f5a4727266953176c4edb974bb0af8abb0247c94f52f5c6b3"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/StartupTrace.kt",
+      "sha256": "dd83cc28c721a3ce323f22c1439b0436d1766951d3c10a0804b5d272bcd9a104"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/TimerSurfaces.kt",
+      "sha256": "7d59a1acf36527c09c25921dbde4b39c1c197651e5af24004a8cd1305bd83b17"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/TrackerDatabase.kt",
+      "sha256": "976dfff11149d293cee26a1f323a8f771744dcfc47cf265e163c3e86797ce44f"
+    },
+    {
+      "path": "app/src/main/res/layout/timer_widget.xml",
+      "sha256": "26fe15c1f6900e153e2ea2fb49150ffa377af2bb3667dbcee91776e953495ec2"
+    },
+    {
+      "path": "app/src/main/res/values/ids.xml",
+      "sha256": "773a1a3bff330b5279d7579034b9d3fc532ed094b94f33667ae1af573ab74731"
+    },
+    {
+      "path": "app/src/main/res/values/strings.xml",
+      "sha256": "928989d0f30ddd30135c53fbb355f5248224d94202ad3eb7100d6684f1725668"
+    },
+    {
+      "path": "app/src/main/res/xml/data_extraction_rules.xml",
+      "sha256": "a0d81ccff94f23b8dfb475cbf11e99f16e1fea062d64c7d0a4537b117ef1d259"
+    },
+    {
+      "path": "app/src/main/res/xml/shortcuts.xml",
+      "sha256": "2172f4b79a77dfac4b197e9bfd04038fb8a0a4f08cd01e57c175c6e6e04b0c0b"
+    },
+    {
+      "path": "app/src/main/res/xml/timer_widget_info.xml",
+      "sha256": "9ac1dd397eddcf354723d5eb3fed745b9f151ba945a229e935f6e5860ec48c5e"
+    },
+    {
+      "path": "app/src/test/kotlin/dev/notai/tracker/android/RoomScenariosTest.kt",
+      "sha256": "b367b044913eb7d8cf239ad1f3fa7e808780949be12fa495696a85ac275cc783"
+    },
+    {
+      "path": "core/build.gradle.kts",
+      "sha256": "ccfde10a2668653c9501f30e7d418daa123e79a2d6a7ca2e3379ab7defe847e9"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Backup.kt",
+      "sha256": "9f6d9f3bd36c77f9e6eb8713d3ee5cc0f38ca9df4f20b423d8344adf7c98429d"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/CheckedState.kt",
+      "sha256": "87cec59d36dab0dcac7d8a16a0ed4073372724cc5b74564532ff4ba6f72144e8"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Choices.kt",
+      "sha256": "654036e62475aad1af92e3e795280223eb0ccccaa047a3472ddd0682f47ad837"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Focus.kt",
+      "sha256": "d8750580267731fa6ecbf371857b7be8ca8000ddae68bb865f85eea735f7906e"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Goals.kt",
+      "sha256": "042ab78a6ee394b9380e2de0f40877b42e98256266dcc57cc4e9ca35e926d8d4"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/HistoryTransfer.kt",
+      "sha256": "dfbfddf5d8852f62576997940764d30db91b59f610cdfc35e8dbc00c746bc7bd"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ImmutableData.kt",
+      "sha256": "75c357a1aaffd333ecdfb6a79ad53898e833fafbaadf2f2f94537a12d53c70bb"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ImportInspection.kt",
+      "sha256": "bd76397d33b532a7d87b3715c918bd4df45dd298c10a584822ad6c9e9f468e38"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/LocalEntries.kt",
+      "sha256": "7e7cb8888c3287b17daa450e280422d88e409cfa29b691740c60dd71842675ab"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Migration.kt",
+      "sha256": "41082c3229d0c2f43015914162b9af4579646f9ffefe09919b81d4008abdb6e7"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Model.kt",
+      "sha256": "f2e4f02020473e976563f109c9969001bdc241bf5096cec68f1e13b19442eec0"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ReadyCatalog.kt",
+      "sha256": "f5a88bb9fbaa111e855126b524b62c4a7a8923226c4661e9fa3f017489db2442"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Reports.kt",
+      "sha256": "b2ff9a2b509ce215d0a872f04f970e2d7c08a4d8a5dc965131e33c91c4e92408"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/StreamingBackup.kt",
+      "sha256": "eeab6837f2e69837bf87d6dc0ce32aed62a07be46695f86c6c585b12957c9e02"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Tracker.kt",
+      "sha256": "1f013c0a8a1d1e5abc16d0d331f9f6e1366082b50ace5cf5a517d84ca8a05406"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/TrackerView.kt",
+      "sha256": "015673b6d781e8d0e4421997b672ab8f6583a07de0323b01f3efdd450bb6fb63"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Vocabulary.kt",
+      "sha256": "c59eefef94876b9d2765ba156e708e3d8b9d26e342e81cba594eaa031d1f1fc5"
+    },
+    {
+      "path": "core/src/main/resources/catalog-bootstrap.json",
+      "sha256": "16a9ad1415182a7c392285d117e1ad5b98d1bfcadb1086def4cf832bb823923b"
+    },
+    {
+      "path": "core/src/test/kotlin/dev/notai/tracker/CoreScenariosTest.kt",
+      "sha256": "8704e5952ec1e33973be46cf666f5048703efa0b21e0151fdc86419f0ce2b9b2"
+    },
+    {
+      "path": "core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt",
+      "sha256": "f889245e3f3f948f6f4421401ec47232c590a5aa899c8b33c901325cf4096c2e"
+    },
+    {
+      "path": "core/src/testFixtures/resources/previous-runtime-catalog.json.gz",
+      "sha256": "d8212d4a404117bd3427890bff08bd1ca4b7bc8eff2f2b0006b1e4925fa635c5"
+    }
+  ],
+  "apk": {
+    "bytes": 3285745,
+    "sha256": "3cb14b41c47262276d981c13126a77fc941101516392332791828fd9cac4d229"
+  },
+  "nativeValueVerification": {
+    "sessions": 73001,
+    "segments": 73002,
+    "allNineCanonicalTableValueHashesAndCountsMatchBeforeCompactAndAfterNormalization": true,
+    "metaVocabularyTypesAlsoPreserved": true,
+    "migrationMeasuredSeparately": true
+  },
+  "preservation": {
+    "source": "production Android DatabaseArchives; not only test harness",
+    "existingArchivesDeleted": false,
+    "liveDatabaseHardLinks": false,
+    "unchangedWholeArchiveReuseChecksFreshSourceAndArchiveHashes": true,
+    "partialReuseOnlyVerifiedSealedArchivalCopies": true,
+    "explicitRecoveryUsesSeparateRetiredDirectory": true,
+    "damagedSidecarsCapturedBeforeSQLite": true
+  },
+  "saf": {
+    "actualProcessKilledWhileChooserOpen": true,
+    "completedBytes": 106803806,
+    "privateAndProviderSha256": "1170964f57f4d031250431a4dbeb129574f0c3224c3fbdbd2e1bff7d518d1ae2",
+    "operationState": "COMPLETE",
+    "providerReadbackVerified": true,
+    "allTableFingerprintsUnchanged": true
+  },
+  "limits": [
+    "Same synthetic data across compact/normalized series; original SQL baseline had 73000/73000 before the additional real timer scenario",
+    "No discarded warmups or OS page-cache eviction; sequential host runs",
+    "x86_64 API35 AOSP emulator, KVM, swangle software graphics; not a physical-phone guarantee",
+    "Full graph still loaded/frozen/validated before actions; no partial/trusted shortcut",
+    "Migration changes physical representation, not domain values; old JSON payload byte layout is not retained inside the new tables"
+  ]
+}

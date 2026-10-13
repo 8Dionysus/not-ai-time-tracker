@@ -14,58 +14,172 @@ import org.robolectric.annotation.Config
 class RoomScenariosTest: ScenarioContract() {
     private val originalDirectorySync = DirectoryDurability.sync
     private val originalRename = DirectoryDurability.rename
+    private val originalLink = DirectoryDurability.link
     @org.junit.Before fun directoryDurability() {
         DirectoryDurability.rename = { source,target -> java.nio.file.Files.move(source.toPath(),target.toPath(),java.nio.file.StandardCopyOption.ATOMIC_MOVE,java.nio.file.StandardCopyOption.REPLACE_EXISTING);Unit }
+        DirectoryDurability.link = { source,target -> java.nio.file.Files.createLink(target.toPath(),source.toPath());Unit }
         DirectoryDurability.sync = { directory ->
             java.nio.channels.FileChannel.open(directory.toPath(),java.nio.file.StandardOpenOption.READ).use { it.force(true) }
         }
     }
-    @org.junit.After fun restoreDirectoryDurability() { DirectoryDurability.sync = originalDirectorySync;DirectoryDurability.rename = originalRename }
+    @org.junit.After fun restoreDirectoryDurability() { DirectoryDurability.sync = originalDirectorySync;DirectoryDurability.rename = originalRename;DirectoryDurability.link = originalLink }
     private val databases = mutableMapOf<StateStore,Pair<String,TrackerDatabase>>()
+    @org.junit.Test fun repeatedArchivesShareOnlyVerifiedImmutableCopies() {
+        val context = RuntimeEnvironment.getApplication();val name = "archive-share-${newId()}.db"
+        val originals = DatabaseFiles.paths(context,name).associateWith { file -> ("synthetic preserved original "+file.name).toByteArray() }
+        originals.forEach { (file,bytes) -> file.parentFile!!.mkdirs();file.writeBytes(bytes) }
+        val first = DatabaseArchives.capture(context,name);val second = DatabaseArchives.capture(context,name)
+        org.junit.Assert.assertEquals(first,second)
+        val separate = DatabaseArchives.capture(context,name,forceSeparate = true)
+        org.junit.Assert.assertNotEquals(first,separate)
+        for((file,bytes) in originals) {
+            val a = java.io.File(first,file.name);val b = java.io.File(second,file.name)
+            org.junit.Assert.assertTrue(java.nio.file.Files.isSameFile(a.toPath(),b.toPath()))
+            org.junit.Assert.assertTrue(java.nio.file.Files.isSameFile(a.toPath(),java.io.File(separate,file.name).toPath()))
+            org.junit.Assert.assertFalse(java.nio.file.Files.isSameFile(file.toPath(),a.toPath()))
+            file.appendText(" live mutation")
+            org.junit.Assert.assertArrayEquals(bytes,a.readBytes());org.junit.Assert.assertArrayEquals(bytes,b.readBytes())
+        }
+        val changed = DatabaseArchives.capture(context,name)
+        for(file in originals.keys) org.junit.Assert.assertArrayEquals(file.readBytes(),java.io.File(changed,file.name).readBytes())
+        // A damaged candidate cannot be admitted on its manifest hash alone.
+        val victim = originals.keys.first();java.io.File(changed,victim.name).appendText(" archive damage")
+        DirectoryDurability.link = { _,_ -> throw java.io.IOException("hard links unavailable") }
+        val fallback = DatabaseArchives.capture(context,name)
+        for(file in originals.keys) {
+            val preserved = java.io.File(fallback,file.name)
+            org.junit.Assert.assertArrayEquals(file.readBytes(),preserved.readBytes())
+            org.junit.Assert.assertFalse(java.nio.file.Files.isSameFile(file.toPath(),preserved.toPath()))
+        }
+        // A backend reporting failure after creating a link must never truncate it.
+        DirectoryDurability.link = { source,target -> java.nio.file.Files.createLink(target.toPath(),source.toPath());throw java.io.IOException("late failure") }
+        val lateFailure = DatabaseArchives.capture(context,name,forceSeparate = true)
+        for(file in originals.keys) org.junit.Assert.assertArrayEquals(file.readBytes(),java.io.File(lateFailure,file.name).readBytes())
+    }
+    private fun legacyStore(name: String,input: Dataset,version: Int = 4) {
+        val context = RuntimeEnvironment.getApplication();val path = context.getDatabasePath(name);path.parentFile!!.mkdirs()
+        val schemaFile = java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile!!
+            .resolve("app/schemas/dev.notai.tracker.android.TrackerDatabase/$version.json")
+        val schema = codec.parseToJsonElement(schemaFile.readText()).jsonObject.getValue("database").jsonObject
+        android.database.sqlite.SQLiteDatabase.openOrCreateDatabase(path,null).use { sql ->
+            for(entity in schema.getValue("entities").jsonArray) {
+                val e = entity.jsonObject;val table = e.getValue("tableName").jsonPrimitive.content
+                sql.execSQL(e.getValue("createSql").jsonPrimitive.content.replace("\${TABLE_NAME}",table))
+                for(index in e["indices"]?.jsonArray.orEmpty()) sql.execSQL(index.jsonObject.getValue("createSql").jsonPrimitive.content.replace("\${TABLE_NAME}",table))
+            }
+            val tables = linkedMapOf("activity_types" to input.types.map { it.id to codec.encodeToString(it) },"cards" to input.cards.map { it.id to codec.encodeToString(it) },
+                "sessions" to input.sessions.map { it.id to codec.encodeToString(it) },"segments" to input.segments.map { it.id to codec.encodeToString(it) },
+                "favorites" to input.favorites.map { it.id to codec.encodeToString(it) },"measurements" to input.measurements.map { it.id to codec.encodeToString(it) })
+            for((table,rows) in tables) rows.forEachIndexed { i,(id,payload) ->
+                val v = android.content.ContentValues();v.put("id",id);v.put("position",i);v.put("payload",payload)
+                if(table == "segments") { val seg = input.segments[i];v.put("sessionId",seg.sessionId);if(seg.end == null) v.put("openSlot",1) else v.putNull("openSlot") }
+                sql.insertOrThrow(table,null,v)
+            }
+            val meta = input.copy(types = emptyList(),cards = emptyList(),sessions = emptyList(),segments = emptyList(),favorites = emptyList(),measurements = emptyList(),axes = emptyList(),metrics = emptyList(),units = emptyList())
+            sql.execSQL("INSERT INTO metadata(id,payload) VALUES(1,?)",arrayOf(codec.encodeToString(meta)))
+            sql.execSQL("INSERT INTO vocabulary(id,payload) VALUES(1,?)",arrayOf(codec.encodeToString(VocabularyData(emptyList(),input.axes,input.metrics,input.units))))
+            sql.execSQL("INSERT INTO store_generation(id,generation) VALUES(1,7)");sql.version = version
+        }
+    }
     @org.junit.Test fun indexedPagingAndV3MigrationPreserveEveryRow() {
         val context = RuntimeEnvironment.getApplication()
         for(count in listOf(0,1,511,512,513,1024,1025)) {
-            var store = createStore()
             val sessions = (0 until count).map { i -> Session(id = listOf("a","é","😀")[i%3]+"-$i",status = SessionStatus.STOPPED,note = "page boundary $i") }
             val segments = sessions.mapIndexed { i,s -> Segment(id = "segment-${s.id}",sessionId = s.id,start = 1_000L+i*2_000L,end = 2_000L+i*2_000L,durationMs = 1_000) }
-            val input = Dataset(sessions = sessions,segments = segments)
-            store.transaction { input to Unit }
-            val sql = databases.getValue(store).second.openHelper.writableDatabase
-            for((table,ids) in listOf("sessions" to sessions.map { it.id },"segments" to segments.map { it.id })) {
-                ids.forEachIndexed { i,id -> sql.execSQL("UPDATE $table SET position=? WHERE id=?",arrayOf(i/3-2,id)) }
+            val input = Dataset(sessions = sessions,segments = segments);val name = "legacy-page-${newId()}.db"
+            legacyStore(name,input,if(count%2 == 0) 3 else 4)
+            val positions = mutableMapOf<String,List<Pair<String,Int>>>()
+            val expected = android.database.sqlite.SQLiteDatabase.openDatabase(context.getDatabasePath(name).path,null,0).use { sql ->
+                for((table,ids) in listOf("sessions" to sessions.map { it.id },"segments" to segments.map { it.id })) {
+                    ids.forEachIndexed { i,id -> sql.execSQL("UPDATE $table SET position=? WHERE id=?",arrayOf<Any>(i/3-2,id)) }
+                    positions[table] = sql.rawQuery("SELECT id,position FROM $table ORDER BY position,id",null).use { c -> buildList { while(c.moveToNext()) add(c.getString(0) to c.getInt(1)) } }
+                }
+                input.copy(sessions = positions.getValue("sessions").map { sessions.associateBy { it.id }.getValue(it.first) },
+                    segments = positions.getValue("segments").map { segments.associateBy { it.id }.getValue(it.first) })
             }
-            // Expected ordering comes from SQLite's binary collation, including Unicode IDs
-            // and duplicate positions that straddle page boundaries.
-            fun ordered(table: String): List<String> = sql.query("SELECT id FROM $table ORDER BY position,id").use { c -> buildList { while(c.moveToNext()) add(c.getString(0)) } }
-            val expected = input.copy(sessions = ordered("sessions").map(sessions.associateBy { it.id }::getValue),
-                segments = ordered("segments").map(segments.associateBy { it.id }::getValue))
-            val tables = listOf("metadata","activity_types","cards","sessions","segments","favorites","measurements","store_generation","vocabulary")
-            fun rows(db: androidx.sqlite.db.SupportSQLiteDatabase) = tables.associateWith { table -> db.query("SELECT * FROM $table ORDER BY id").use { c ->
-                buildList { while(c.moveToNext()) add((0 until c.columnCount).map { if(c.isNull(it)) null else c.getString(it) }) }
-            } }
-            val before = rows(sql)
-            val (name,old) = databases.remove(store)!!;old.close()
-            // Turn this owned fixture into the exact exported v3 schema/identity.
-            val schemaPath = java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile!!
-                .resolve("app/schemas/dev.notai.tracker.android.TrackerDatabase/3.json")
-            val identity = codec.parseToJsonElement(schemaPath.readText()).jsonObject.getValue("database").jsonObject.getValue("identityHash").jsonPrimitive.content
-            android.database.sqlite.SQLiteDatabase.openDatabase(context.getDatabasePath(name).path,null,0).use { legacy ->
-                legacy.execSQL("DROP INDEX index_sessions_position_id");legacy.execSQL("DROP INDEX index_segments_position_id")
-                legacy.execSQL("UPDATE room_master_table SET identity_hash=? WHERE id=42",arrayOf(identity));legacy.version = 3
-            }
-            store = open(name)
+            var store = open(name)
             org.junit.Assert.assertEquals(expected,store.read())
             org.junit.Assert.assertEquals(count,store.read().sessions.map { it.id }.toSet().size)
             val migrated = databases.getValue(store).second.openHelper.readableDatabase
-            org.junit.Assert.assertEquals(4,migrated.version)
-            org.junit.Assert.assertEquals(before,rows(migrated))
-            for(table in listOf("sessions","segments")) migrated.query("EXPLAIN QUERY PLAN SELECT payload,position,id FROM $table ORDER BY position,id LIMIT 512").use { c ->
-                org.junit.Assert.assertTrue(c.moveToFirst());org.junit.Assert.assertTrue(c.getString(3).contains("index_${table}_position_id"))
+            org.junit.Assert.assertEquals(5,migrated.version)
+            for(table in listOf("sessions","segments")) {
+                val after = migrated.query("SELECT id,position FROM $table ORDER BY position,id").use { c -> buildList { while(c.moveToNext()) add(c.getString(0) to c.getInt(1)) } }
+                org.junit.Assert.assertEquals(positions[table],after)
+                migrated.query("EXPLAIN QUERY PLAN SELECT id,position FROM $table ORDER BY position,id LIMIT 512").use { c ->
+                    org.junit.Assert.assertTrue(c.moveToFirst());org.junit.Assert.assertTrue(c.getString(3).contains("index_${table}_position_id"))
+                }
             }
             store = reopen(store);org.junit.Assert.assertEquals(expected,store.read())
             val tracker = Tracker(store,FakeClock());tracker.start(tracker.snapshot().token)
             org.junit.Assert.assertEquals(1,tracker.data().segments.count { it.end == null })
             org.junit.Assert.assertThrows(CoreError::class.java) { tracker.start(tracker.snapshot().token) }
+        }
+    }
+    @org.junit.Test fun normalizedMigrationRejectsContradictionsWithoutChangingLegacyRows() {
+        val context = RuntimeEnvironment.getApplication()
+        val session = Session(id = "legacy-one",status = SessionStatus.STOPPED,note = "retain note")
+        val input = Dataset(sessions = listOf(session),segments = listOf(Segment(id = "legacy-segment",sessionId = session.id,start = 1000,end = 2000,durationMs = 1000)))
+        for(case in listOf("id","sessionId","openSlot","payload")) {
+            val name = "invalid-normalized-$case-${newId()}.db";legacyStore(name,input)
+            val path = context.getDatabasePath(name)
+            fun rows(sql: android.database.sqlite.SQLiteDatabase) = listOf("metadata","sessions","segments","vocabulary","store_generation").associateWith { table ->
+                sql.rawQuery("SELECT * FROM $table ORDER BY id",null).use { c -> buildList { while(c.moveToNext()) add((0 until c.columnCount).map { if(c.isNull(it)) null else c.getString(it) }) } }
+            }
+            val before = android.database.sqlite.SQLiteDatabase.openDatabase(path.path,null,0).use { sql ->
+                when(case) { "id" -> sql.execSQL("UPDATE sessions SET id='contradictory-id'");"sessionId" -> sql.execSQL("UPDATE segments SET sessionId='missing'");"openSlot" -> sql.execSQL("UPDATE segments SET openSlot=1");
+                    else -> sql.execSQL("UPDATE segments SET payload=?",arrayOf(codec.encodeToString(input.segments.single().copy(durationMs = 999999)))) }
+                rows(sql)
+            }
+            org.junit.Assert.assertThrows(Exception::class.java) { open(name) }
+            android.database.sqlite.SQLiteDatabase.openDatabase(path.path,null,0).use { sql -> org.junit.Assert.assertEquals(4,sql.version);org.junit.Assert.assertEquals(before,rows(sql)) }
+        }
+    }
+    @org.junit.Test fun normalizedMigrationRollsBackAfterReplacementFailure() {
+        val context = RuntimeEnvironment.getApplication();val name = "late-migration-${newId()}.db"
+        val session = Session(id = "retain-session",status = SessionStatus.STOPPED,note = "retain exactly")
+        val input = Dataset(sessions = listOf(session),segments = listOf(Segment(id = "retain-segment",sessionId = session.id,start = 1000,end = 2000,durationMs = 1000)))
+        legacyStore(name,input)
+        fun snapshot() = android.database.sqlite.SQLiteDatabase.openDatabase(context.getDatabasePath(name).path,null,0).use { sql ->
+            listOf("sessions","segments","metadata","vocabulary","store_generation").associateWith { table -> sql.rawQuery("SELECT * FROM $table ORDER BY id",null).use { c ->
+                buildList { while(c.moveToNext()) add((0 until c.columnCount).map { if(c.isNull(it)) null else c.getString(it) }) }
+            } }
+        }
+        val before = snapshot()
+        val fault = object: androidx.room.migration.Migration(4,5) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                migrateNormalizedHistory(object: androidx.sqlite.db.SupportSQLiteDatabase by db {
+                    override fun execSQL(sql: String) {
+                        if(sql == "CREATE INDEX index_sessions_position_id ON sessions(position,id)") throw android.database.sqlite.SQLiteException("injected after rebuild/readback")
+                        db.execSQL(sql)
+                    }
+                })
+            }
+        }
+        val db = androidx.room.Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(fault).allowMainThreadQueries().build()
+        try { org.junit.Assert.assertThrows(Exception::class.java) { RoomStore(db) } } finally { db.close() }
+        org.junit.Assert.assertEquals(before,snapshot())
+        org.junit.Assert.assertEquals(input,open(name).read())
+    }
+    @org.junit.Test fun healthyMainWithDamagedSidecarsPreservesEveryOriginalBeforeSQLite() {
+        val context = RuntimeEnvironment.getApplication();val root = java.io.File(context.noBackupFilesDir,"database-archives")
+        for(suffixes in listOf(emptyList(),listOf("-wal"),listOf("-shm"),listOf("-wal","-shm"),listOf("-journal"))) {
+            val name = "valid-main-sidecars-${newId()}.db";val store = open(name);val expected = store.read()
+            databases.remove(store)!!.second.close()
+            for(suffix in suffixes) context.getDatabasePath(name+suffix).writeText("damaged sidecar $suffix")
+            val originals = DatabaseFiles.paths(context,name).filter { it.exists() }.associate { it.name to it.readBytes() }
+            val before = root.listFiles().orEmpty().map { it.name }.toSet()
+            val db = TrackerDatabase.open(context,name)
+            val archives = root.listFiles().orEmpty().filter { it.name !in before }
+            if(suffixes.isEmpty()) org.junit.Assert.assertTrue(archives.isEmpty())
+            else {
+                val preserved = archives.single();val manifest = codec.decodeFromString<DatabaseArchive>(java.io.File(preserved,"manifest.json").readText())
+                org.junit.Assert.assertEquals(originals.keys,manifest.files.map { it.name }.toSet())
+                for((filename,bytes) in originals) org.junit.Assert.assertArrayEquals(bytes,java.io.File(preserved,filename).readBytes())
+            }
+            // Opening behavior may differ by SQLite version; preservation is checked
+            // before opening, even when SQLite later discards the damaged WAL.
+            try { org.junit.Assert.assertEquals(expected,RoomStore(db).read()) } catch(_: Exception) { /* explicit recovery is allowed */ }
+            finally { db.close() }
         }
     }
     @org.junit.Test fun orphanSidecarsNeverInitialize() {
@@ -210,8 +324,8 @@ class RoomScenariosTest: ScenarioContract() {
     }
     override fun createStore(): StateStore = open("test-${newId()}.db")
     private fun open(name: String): StateStore {
-        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4).allowMainThreadQueries().build()
-        return RoomStore(db).also { databases[it] = name to db }
+        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5).allowMainThreadQueries().build()
+        return try { RoomStore(db).also { databases[it] = name to db } } catch(e: Exception) { db.close();throw e }
     }
     override fun reopen(store: StateStore): StateStore {
         val (name,db) = databases.remove(store)!!; db.close(); return open(name)
@@ -246,7 +360,7 @@ class RoomScenariosTest: ScenarioContract() {
             db.version = 1
         }
         val store = open(name)
-        org.junit.Assert.assertEquals(4,databases.getValue(store).second.openHelper.readableDatabase.version)
+        org.junit.Assert.assertEquals(5,databases.getValue(store).second.openHelper.readableDatabase.version)
         return store.read().also { validate(it) }
     }
     override fun backupDocumentInput() {
@@ -756,10 +870,10 @@ class RoomScenariosTest: ScenarioContract() {
     private fun coldLoadHypotheses() {
         val clock = FakeClock();val input = realisticHistoryInput(clock)
         var store = createStore();store.transaction { input to Unit }
-        val variant = System.getProperty("tracker.cold.variant","baseline")
+        val variant = System.getProperty("tracker.cold.variant","normalized")!!
+        require(variant in setOf("normalized","normalized-unpaged"))
         val initialDb = databases.getValue(store).second
-        if(variant == "baseline") for(table in listOf("sessions","segments")) initialDb.openHelper.writableDatabase.execSQL("DROP INDEX index_${table}_position_id")
-        val plans = listOf("sessions","segments").associateWith { table -> initialDb.openHelper.readableDatabase.query("EXPLAIN QUERY PLAN SELECT payload FROM $table ORDER BY position").use { c -> buildList { while(c.moveToNext()) add(c.getString(3)) } } }
+        val plans = listOf("sessions","segments").associateWith { table -> initialDb.openHelper.readableDatabase.query("EXPLAIN QUERY PLAN SELECT id,position FROM $table ORDER BY position,id").use { c -> buildList { while(c.moveToNext()) add(c.getString(3)) } } }
         val samples = mutableListOf<JsonObject>()
         for(iteration in 0 until 5) {
             val (name,old) = databases.remove(store)!!;old.close()
@@ -771,8 +885,8 @@ class RoomScenariosTest: ScenarioContract() {
             val phases = linkedMapOf<String,Long>()
             val start = System.nanoTime()
             val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name)
-                .addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4).allowMainThreadQueries().build()
-            val reopened = RoomStore(db,onLoadPhase = { key,ns -> phases[key] = (phases[key] ?: 0)+ns },loadPageSize = if(variant == "keyset-index") 512 else null)
+                .addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5).allowMainThreadQueries().build()
+            val reopened = RoomStore(db,onLoadPhase = { key,ns -> phases[key] = (phases[key] ?: 0)+ns },loadPageSize = if(variant == "normalized") 512 else null)
             databases[reopened] = name to db;store = reopened
             val initDone = System.nanoTime()-start
             val tracker = Tracker(store,clock)

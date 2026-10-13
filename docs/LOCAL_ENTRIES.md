@@ -58,4 +58,4 @@ tracker.recordDraft(expectedToken, fromEvent) // только после под�
 
 Общий `localEntryLifecycle` входит в существующий smallHistoryAndExport и исполняется на Memory и Room. Проверяет отсутствие записи при черновике/отказе, точное сохранение текста и параметров, future/overlap/stale, Start-now, pause/resume, 23/25-часовые дни, единство строк/сумм с Reports и CSV, отдельные IDs одноимённых карточек, количество сессий без удвоения, 20 страниц один раз, correction/Undo, реальное JSON replacement на чистой базе и неприписываемый дню хвост после reboot.
 
-Room 4 / JSON 7. Сохранённые результаты: [LocalEntries](../evidence/local-entries-v17/verification.json) и [валидация drafts/пропущенных дат](../evidence/draft-validation-v18/verification.json). Текущие результаты — [VERIFICATION](VERIFICATION.md). Физическое устройство не проверено.
+Room 5 / JSON 7. Сохранённые результаты: [LocalEntries](../evidence/local-entries-v17/verification.json) и [валидация drafts/пропущенных дат](../evidence/draft-validation-v18/verification.json). Текущие результаты — [VERIFICATION](VERIFICATION.md). Физическое устройство не проверено.

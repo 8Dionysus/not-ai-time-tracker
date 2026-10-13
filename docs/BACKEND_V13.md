@@ -1,6 +1,6 @@
 # Android-адаптеры и проверенный путь таймера
 
-Текущая Room schema — 4, JSON backup — 7 с чтением 1–7. Настройки поверхностей хранятся в metadata payload. Принципы хранения описаны в [BACKEND_V10](BACKEND_V10.md).
+Текущая Room schema — 5, JSON backup — 7 с чтением 1–7. Настройки поверхностей хранятся в metadata payload. Принципы хранения описаны в [BACKEND_V10](BACKEND_V10.md).
 
 ## Горячий путь и безопасность
 

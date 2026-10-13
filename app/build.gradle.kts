@@ -20,7 +20,7 @@ android {
             test.systemProperty("tracker.artifacts", layout.buildDirectory.dir("test-artifacts").get().asFile.absolutePath)
             test.systemProperty("tracker.scale", providers.gradleProperty("trackerScale").getOrElse("false"))
             test.systemProperty("tracker.cold.profile", providers.gradleProperty("trackerColdProfile").getOrElse("false"))
-            test.systemProperty("tracker.cold.variant", providers.gradleProperty("trackerColdVariant").getOrElse("baseline"))
+            test.systemProperty("tracker.cold.variant", providers.gradleProperty("trackerColdVariant").getOrElse("normalized"))
             providers.gradleProperty("trackerAndroidFixture").orNull?.let { test.systemProperty("tracker.android.fixture",it) }
             // Robolectric writes a lock and Maven cache under user.home. Keep test-only state in the project.
             val testHome = rootProject.file(".gradle/robolectric")

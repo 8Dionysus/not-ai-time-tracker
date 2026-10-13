@@ -121,7 +121,9 @@ fun validate(data: Dataset) {
     fun selection(c: Classification) = validateSelection(data,c,typeIds,cards.keys)
     data.cards.forEach { ensure(it.name.isNotBlank(), "Card needs a name"); selection(it.classification()) }
     data.favorites.forEach { ensure(it.label.isNotBlank(), "Favorite needs a label"); selection(it.selection) }
+    val checkedHistorical = java.util.IdentityHashMap<Classification,Boolean>()
     fun historical(c: Classification) {
+        if(checkedHistorical.put(c,true) != null) return
         selection(c)
         ensure(c.activityTypeId == null || c.ancestorPathAtWrite.isNotEmpty(),"Historical classification requires a path snapshot")
     }

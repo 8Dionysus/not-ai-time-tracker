@@ -59,7 +59,7 @@ tracker.resolveFocus(token, null, null) // явно исключить неиз�
 
 ## Хранение, перенос и совместимость
 
-SQL Room schema 4. `Dataset.focus`, `Settings.focusPlan`, процессная опора и ограничение открытого сегмента — дополнительные сериализованные поля существующих metadata/segment payload. При старом payload Focus отсутствует и используются defaults. Downgrade APK не поддерживается.
+SQL Room schema 5. `Dataset.focus`, `Settings.focusPlan`, процессная опора и ограничение открытого сегмента — дополнительные сериализованные поля существующих metadata/segment payload. При старом payload Focus отсутствует и используются defaults. Downgrade APK не поддерживается.
 
 Полный JSON **7**, чтение **1–7**. Для v7 обязательны поля goals и focus (null допустим). Сохраняются параметры, состояние фаз, связи и измеренное время, но не рабочие monotonic/process anchors. Активная work/break фаза после переноса требует RECOVERY. Paused Focus может быть явно продолжен. Preview показывает unfinishedFocus отдельно от unfinishedTail: у перерыва нет открытого рабочего хвоста. Восстановление остаётся полной атомарной заменой с проверенной откатной копией, не merge.
 

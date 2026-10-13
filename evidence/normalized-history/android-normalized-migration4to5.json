@@ -1,0 +1,213 @@
+{
+  "schema": "tracker_android_startup_samples_v1",
+  "label": "normalized-migration4to5",
+  "serial": "emulator-5580",
+  "avd": "not_ai_qa_api35",
+  "countPerMode": 1,
+  "noDiscardedWarmups": true,
+  "noOSPageCacheEviction": true,
+  "warmProcessStartMetricIsProcessAge": true,
+  "samples": [
+    {
+      "mode": "cold-process",
+      "iteration": 0,
+      "phases": {
+        "activity-create": {
+          "elapsedNs": 3198095042221,
+          "processStartMs": 3197987,
+          "pid": 7095
+        },
+        "store-open-start": {
+          "elapsedNs": 3198149904523,
+          "processStartMs": 3197987,
+          "pid": 7095
+        },
+        "archive-start": {
+          "elapsedNs": 3198152968269,
+          "processStartMs": 3197987,
+          "pid": 7095
+        },
+        "archive-reused": {
+          "elapsedNs": 3200274386961,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 2121298745
+        },
+        "store-initialized": {
+          "elapsedNs": 3219063811749,
+          "processStartMs": 3197987,
+          "pid": 7095
+        },
+        "load-sql-metadata": {
+          "elapsedNs": 3219064948744,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 170735
+        },
+        "load-decode-metadata": {
+          "elapsedNs": 3219065148843,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 132143
+        },
+        "load-sql-vocabulary": {
+          "elapsedNs": 3219066073499,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 882890
+        },
+        "load-decode-vocabulary": {
+          "elapsedNs": 3219075026452,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 8889548
+        },
+        "load-sql-history-classifications": {
+          "elapsedNs": 3219075491150,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 390266
+        },
+        "load-decode-history-classifications": {
+          "elapsedNs": 3219075658571,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 121095
+        },
+        "load-sql-activity_types": {
+          "elapsedNs": 3219144102469,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 15747112
+        },
+        "load-decode-activity_types": {
+          "elapsedNs": 3219144193305,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 52023851
+        },
+        "load-sql-cards": {
+          "elapsedNs": 3219144727012,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 237397
+        },
+        "load-decode-cards": {
+          "elapsedNs": 3219144752085,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 0
+        },
+        "load-sql-sessions": {
+          "elapsedNs": 3219446895406,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 99045786
+        },
+        "load-decode-sessions": {
+          "elapsedNs": 3219446998250,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 196482921
+        },
+        "load-sql-segments": {
+          "elapsedNs": 3219688608154,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 76648168
+        },
+        "load-decode-segments": {
+          "elapsedNs": 3219688689745,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 159859162
+        },
+        "load-sql-favorites": {
+          "elapsedNs": 3219688923175,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 102627
+        },
+        "load-decode-favorites": {
+          "elapsedNs": 3219688966169,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 0
+        },
+        "load-sql-measurements": {
+          "elapsedNs": 3219689059661,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 42966
+        },
+        "load-decode-measurements": {
+          "elapsedNs": 3219689081441,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 0
+        },
+        "load-freeze": {
+          "elapsedNs": 3219762633096,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 73349670
+        },
+        "load-validate": {
+          "elapsedNs": 3219959665557,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 196740624
+        },
+        "load-checked-index": {
+          "elapsedNs": 3219968469887,
+          "processStartMs": 3197987,
+          "pid": 7095,
+          "durationNs": 8586134
+        },
+        "history-graph-ready": {
+          "elapsedNs": 3219968907539,
+          "processStartMs": 3197987,
+          "pid": 7095
+        },
+        "action-ready": {
+          "elapsedNs": 3220113550873,
+          "processStartMs": 3197987,
+          "pid": 7095
+        },
+        "action-first-frame": {
+          "elapsedNs": 3220121927071,
+          "processStartMs": 3197987,
+          "pid": 7095
+        }
+      },
+      "processStartToActionFrameNs": 22134927071,
+      "activityCreateToActionFrameNs": 22026884850,
+      "actionReadyToFrameNs": 8376198,
+      "processStartToHistoryGraphNs": 21981907539
+    },
+    {
+      "mode": "warm-process-new-activity",
+      "iteration": 0,
+      "phases": {
+        "activity-create": {
+          "elapsedNs": 3220457977632,
+          "processStartMs": 3197987,
+          "pid": 7095
+        },
+        "action-ready": {
+          "elapsedNs": 3220570501088,
+          "processStartMs": 3197987,
+          "pid": 7095
+        },
+        "action-first-frame": {
+          "elapsedNs": 3220573938702,
+          "processStartMs": 3197987,
+          "pid": 7095
+        }
+      },
+      "processStartToActionFrameNs": 22586938702,
+      "activityCreateToActionFrameNs": 115961070,
+      "actionReadyToFrameNs": 3437614
+    }
+  ]
+}

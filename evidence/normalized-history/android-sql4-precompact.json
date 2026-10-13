@@ -1,0 +1,902 @@
+{
+  "schema": "tracker_android_startup_samples_v1",
+  "label": "sql4-precompact",
+  "serial": "emulator-5580",
+  "avd": "not_ai_qa_api35",
+  "countPerMode": 5,
+  "noDiscardedWarmups": true,
+  "noOSPageCacheEviction": true,
+  "warmProcessStartMetricIsProcessAge": true,
+  "samples": [
+    {
+      "mode": "cold-process",
+      "iteration": 0,
+      "phases": {
+        "activity-create": {
+          "elapsedNs": 1488160403686,
+          "processStartMs": 1488041,
+          "pid": 5329
+        },
+        "store-open-start": {
+          "elapsedNs": 1488261742905,
+          "processStartMs": 1488041,
+          "pid": 5329
+        },
+        "store-initialized": {
+          "elapsedNs": 1489555497527,
+          "processStartMs": 1488041,
+          "pid": 5329
+        },
+        "load-sql-metadata": {
+          "elapsedNs": 1489557139711,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 312415
+        },
+        "load-decode-metadata": {
+          "elapsedNs": 1489562261934,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 5054710
+        },
+        "load-sql-vocabulary": {
+          "elapsedNs": 1489564200146,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 1882476
+        },
+        "load-decode-vocabulary": {
+          "elapsedNs": 1489614250561,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 49805588
+        },
+        "load-sql-activity_types": {
+          "elapsedNs": 1489726172673,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 29504510
+        },
+        "load-decode-activity_types": {
+          "elapsedNs": 1489726308833,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 81183915
+        },
+        "load-sql-cards": {
+          "elapsedNs": 1489726987392,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 302158
+        },
+        "load-decode-cards": {
+          "elapsedNs": 1489727229372,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 0
+        },
+        "load-sql-sessions": {
+          "elapsedNs": 1491773637987,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 415693704
+        },
+        "load-decode-sessions": {
+          "elapsedNs": 1491773735241,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 1616509593
+        },
+        "load-sql-segments": {
+          "elapsedNs": 1493551813124,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 353237247
+        },
+        "load-decode-segments": {
+          "elapsedNs": 1493551935392,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 1412522010
+        },
+        "load-sql-favorites": {
+          "elapsedNs": 1493552544043,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 199937
+        },
+        "load-decode-favorites": {
+          "elapsedNs": 1493552601931,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 0
+        },
+        "load-sql-measurements": {
+          "elapsedNs": 1493552701821,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 52432
+        },
+        "load-decode-measurements": {
+          "elapsedNs": 1493552733415,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 0
+        },
+        "load-freeze": {
+          "elapsedNs": 1494395074681,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 840822252
+        },
+        "load-validate": {
+          "elapsedNs": 1495961860972,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 1566482457
+        },
+        "load-checked-index": {
+          "elapsedNs": 1495990732267,
+          "processStartMs": 1488041,
+          "pid": 5329,
+          "durationNs": 28676489
+        },
+        "history-graph-ready": {
+          "elapsedNs": 1495991306417,
+          "processStartMs": 1488041,
+          "pid": 5329
+        },
+        "action-ready": {
+          "elapsedNs": 1496221939508,
+          "processStartMs": 1488041,
+          "pid": 5329
+        },
+        "action-first-frame": {
+          "elapsedNs": 1496238746157,
+          "processStartMs": 1488041,
+          "pid": 5329
+        }
+      },
+      "processStartToActionFrameNs": 8197746157,
+      "activityCreateToActionFrameNs": 8078342471,
+      "actionReadyToFrameNs": 16806649,
+      "processStartToHistoryGraphNs": 7950306417
+    },
+    {
+      "mode": "cold-process",
+      "iteration": 1,
+      "phases": {
+        "activity-create": {
+          "elapsedNs": 1496863490013,
+          "processStartMs": 1496733,
+          "pid": 5471
+        },
+        "store-open-start": {
+          "elapsedNs": 1496926455037,
+          "processStartMs": 1496733,
+          "pid": 5471
+        },
+        "store-initialized": {
+          "elapsedNs": 1498229659124,
+          "processStartMs": 1496733,
+          "pid": 5471
+        },
+        "load-sql-metadata": {
+          "elapsedNs": 1498233043456,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 375196
+        },
+        "load-decode-metadata": {
+          "elapsedNs": 1498241138268,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 7844424
+        },
+        "load-sql-vocabulary": {
+          "elapsedNs": 1498243991355,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 2522555
+        },
+        "load-decode-vocabulary": {
+          "elapsedNs": 1498291796206,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 47397288
+        },
+        "load-sql-activity_types": {
+          "elapsedNs": 1498391435436,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 19380779
+        },
+        "load-decode-activity_types": {
+          "elapsedNs": 1498391770283,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 79293572
+        },
+        "load-sql-cards": {
+          "elapsedNs": 1498392269373,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 182943
+        },
+        "load-decode-cards": {
+          "elapsedNs": 1498392304982,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 0
+        },
+        "load-sql-sessions": {
+          "elapsedNs": 1500244938552,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 388192564
+        },
+        "load-decode-sessions": {
+          "elapsedNs": 1500245355377,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 1451435701
+        },
+        "load-sql-segments": {
+          "elapsedNs": 1501899896803,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 346373472
+        },
+        "load-decode-segments": {
+          "elapsedNs": 1501900246894,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 1296494676
+        },
+        "load-sql-favorites": {
+          "elapsedNs": 1501900667536,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 189698
+        },
+        "load-decode-favorites": {
+          "elapsedNs": 1501900728374,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 0
+        },
+        "load-sql-measurements": {
+          "elapsedNs": 1501900857517,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 56766
+        },
+        "load-decode-measurements": {
+          "elapsedNs": 1501900912872,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 0
+        },
+        "load-freeze": {
+          "elapsedNs": 1502605794861,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 703915321
+        },
+        "load-validate": {
+          "elapsedNs": 1504085109869,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 1479050460
+        },
+        "load-checked-index": {
+          "elapsedNs": 1504116074502,
+          "processStartMs": 1496733,
+          "pid": 5471,
+          "durationNs": 30734154
+        },
+        "history-graph-ready": {
+          "elapsedNs": 1504116742242,
+          "processStartMs": 1496733,
+          "pid": 5471
+        },
+        "action-ready": {
+          "elapsedNs": 1504338086979,
+          "processStartMs": 1496733,
+          "pid": 5471
+        },
+        "action-first-frame": {
+          "elapsedNs": 1504355673102,
+          "processStartMs": 1496733,
+          "pid": 5471
+        }
+      },
+      "processStartToActionFrameNs": 7622673102,
+      "activityCreateToActionFrameNs": 7492183089,
+      "actionReadyToFrameNs": 17586123,
+      "processStartToHistoryGraphNs": 7383742242
+    },
+    {
+      "mode": "cold-process",
+      "iteration": 2,
+      "phases": {
+        "activity-create": {
+          "elapsedNs": 1505117655465,
+          "processStartMs": 1504997,
+          "pid": 5603
+        },
+        "store-open-start": {
+          "elapsedNs": 1505185647868,
+          "processStartMs": 1504997,
+          "pid": 5603
+        },
+        "store-initialized": {
+          "elapsedNs": 1506469919266,
+          "processStartMs": 1504997,
+          "pid": 5603
+        },
+        "load-sql-metadata": {
+          "elapsedNs": 1506471191756,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 158371
+        },
+        "load-decode-metadata": {
+          "elapsedNs": 1506474768577,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 3441916
+        },
+        "load-sql-vocabulary": {
+          "elapsedNs": 1506476257469,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 1383119
+        },
+        "load-decode-vocabulary": {
+          "elapsedNs": 1506516531222,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 40150822
+        },
+        "load-sql-activity_types": {
+          "elapsedNs": 1506616158358,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 19299133
+        },
+        "load-decode-activity_types": {
+          "elapsedNs": 1506616334195,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 79407907
+        },
+        "load-sql-cards": {
+          "elapsedNs": 1506616869049,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 207194
+        },
+        "load-decode-cards": {
+          "elapsedNs": 1506616902820,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 0
+        },
+        "load-sql-sessions": {
+          "elapsedNs": 1508360541332,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 357158066
+        },
+        "load-decode-sessions": {
+          "elapsedNs": 1508360736469,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 1374440720
+        },
+        "load-sql-segments": {
+          "elapsedNs": 1510063006965,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 338526710
+        },
+        "load-decode-segments": {
+          "elapsedNs": 1510063077266,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 1352208652
+        },
+        "load-sql-favorites": {
+          "elapsedNs": 1510063283076,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 110415
+        },
+        "load-decode-favorites": {
+          "elapsedNs": 1510063299696,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 0
+        },
+        "load-sql-measurements": {
+          "elapsedNs": 1510063361204,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 35546
+        },
+        "load-decode-measurements": {
+          "elapsedNs": 1510063375502,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 0
+        },
+        "load-freeze": {
+          "elapsedNs": 1510832317695,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 766992254
+        },
+        "load-validate": {
+          "elapsedNs": 1512479727222,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 1647134126
+        },
+        "load-checked-index": {
+          "elapsedNs": 1512512826907,
+          "processStartMs": 1504997,
+          "pid": 5603,
+          "durationNs": 32919921
+        },
+        "history-graph-ready": {
+          "elapsedNs": 1512513509691,
+          "processStartMs": 1504997,
+          "pid": 5603
+        },
+        "action-ready": {
+          "elapsedNs": 1512752913705,
+          "processStartMs": 1504997,
+          "pid": 5603
+        },
+        "action-first-frame": {
+          "elapsedNs": 1512772511433,
+          "processStartMs": 1504997,
+          "pid": 5603
+        }
+      },
+      "processStartToActionFrameNs": 7775511433,
+      "activityCreateToActionFrameNs": 7654855968,
+      "actionReadyToFrameNs": 19597728,
+      "processStartToHistoryGraphNs": 7516509691
+    },
+    {
+      "mode": "cold-process",
+      "iteration": 3,
+      "phases": {
+        "activity-create": {
+          "elapsedNs": 1513329657884,
+          "processStartMs": 1513206,
+          "pid": 5736
+        },
+        "store-open-start": {
+          "elapsedNs": 1513384907622,
+          "processStartMs": 1513206,
+          "pid": 5736
+        },
+        "store-initialized": {
+          "elapsedNs": 1514774385292,
+          "processStartMs": 1513206,
+          "pid": 5736
+        },
+        "load-sql-metadata": {
+          "elapsedNs": 1514775265894,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 136877
+        },
+        "load-decode-metadata": {
+          "elapsedNs": 1514779052957,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 3736673
+        },
+        "load-sql-vocabulary": {
+          "elapsedNs": 1514780741685,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 1643619
+        },
+        "load-decode-vocabulary": {
+          "elapsedNs": 1514829799120,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 48971313
+        },
+        "load-sql-activity_types": {
+          "elapsedNs": 1514947323615,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 21409705
+        },
+        "load-decode-activity_types": {
+          "elapsedNs": 1514947441617,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 95169506
+        },
+        "load-sql-cards": {
+          "elapsedNs": 1514948055676,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 247993
+        },
+        "load-decode-cards": {
+          "elapsedNs": 1514948076957,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 0
+        },
+        "load-sql-sessions": {
+          "elapsedNs": 1517221240419,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 406946583
+        },
+        "load-decode-sessions": {
+          "elapsedNs": 1517221562387,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 1853553362
+        },
+        "load-sql-segments": {
+          "elapsedNs": 1519231995741,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 320701418
+        },
+        "load-decode-segments": {
+          "elapsedNs": 1519232101890,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 1678457920
+        },
+        "load-sql-favorites": {
+          "elapsedNs": 1519232392216,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 144517
+        },
+        "load-decode-favorites": {
+          "elapsedNs": 1519232436180,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 0
+        },
+        "load-sql-measurements": {
+          "elapsedNs": 1519232534802,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 57407
+        },
+        "load-decode-measurements": {
+          "elapsedNs": 1519232557333,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 0
+        },
+        "load-freeze": {
+          "elapsedNs": 1520051861557,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 818541370
+        },
+        "load-validate": {
+          "elapsedNs": 1521570066133,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 1517938844
+        },
+        "load-checked-index": {
+          "elapsedNs": 1521603330911,
+          "processStartMs": 1513206,
+          "pid": 5736,
+          "durationNs": 33018238
+        },
+        "history-graph-ready": {
+          "elapsedNs": 1521607087841,
+          "processStartMs": 1513206,
+          "pid": 5736
+        },
+        "action-ready": {
+          "elapsedNs": 1521907601141,
+          "processStartMs": 1513206,
+          "pid": 5736
+        },
+        "action-first-frame": {
+          "elapsedNs": 1521922483073,
+          "processStartMs": 1513206,
+          "pid": 5736
+        }
+      },
+      "processStartToActionFrameNs": 8716483073,
+      "activityCreateToActionFrameNs": 8592825189,
+      "actionReadyToFrameNs": 14881932,
+      "processStartToHistoryGraphNs": 8401087841
+    },
+    {
+      "mode": "cold-process",
+      "iteration": 4,
+      "phases": {
+        "activity-create": {
+          "elapsedNs": 1522397849560,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "store-open-start": {
+          "elapsedNs": 1522461468808,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "store-initialized": {
+          "elapsedNs": 1523778905209,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "load-sql-metadata": {
+          "elapsedNs": 1523779892227,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 160891
+        },
+        "load-decode-metadata": {
+          "elapsedNs": 1523784481083,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 4529167
+        },
+        "load-sql-vocabulary": {
+          "elapsedNs": 1523788446002,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 3852900
+        },
+        "load-decode-vocabulary": {
+          "elapsedNs": 1523847012355,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 58419237
+        },
+        "load-sql-activity_types": {
+          "elapsedNs": 1523967573743,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 25179282
+        },
+        "load-decode-activity_types": {
+          "elapsedNs": 1523967668797,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 94407912
+        },
+        "load-sql-cards": {
+          "elapsedNs": 1523968167291,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 223103
+        },
+        "load-decode-cards": {
+          "elapsedNs": 1523968189470,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 0
+        },
+        "load-sql-sessions": {
+          "elapsedNs": 1525894892033,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 414770164
+        },
+        "load-decode-sessions": {
+          "elapsedNs": 1525894988046,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 1497119831
+        },
+        "load-sql-segments": {
+          "elapsedNs": 1527535154069,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 329319911
+        },
+        "load-decode-segments": {
+          "elapsedNs": 1527535225879,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 1299435154
+        },
+        "load-sql-favorites": {
+          "elapsedNs": 1527535501997,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 144303
+        },
+        "load-decode-favorites": {
+          "elapsedNs": 1527535554033,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 0
+        },
+        "load-sql-measurements": {
+          "elapsedNs": 1527535646185,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 45352
+        },
+        "load-decode-measurements": {
+          "elapsedNs": 1527535672039,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 0
+        },
+        "load-freeze": {
+          "elapsedNs": 1528365372282,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 828937662
+        },
+        "load-validate": {
+          "elapsedNs": 1529855312219,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 1489765403
+        },
+        "load-checked-index": {
+          "elapsedNs": 1529882144847,
+          "processStartMs": 1522300,
+          "pid": 5879,
+          "durationNs": 26616281
+        },
+        "history-graph-ready": {
+          "elapsedNs": 1529882916415,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "action-ready": {
+          "elapsedNs": 1530175576355,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "action-first-frame": {
+          "elapsedNs": 1530188614706,
+          "processStartMs": 1522300,
+          "pid": 5879
+        }
+      },
+      "processStartToActionFrameNs": 7888614706,
+      "activityCreateToActionFrameNs": 7790765146,
+      "actionReadyToFrameNs": 13038351,
+      "processStartToHistoryGraphNs": 7582916415
+    },
+    {
+      "mode": "warm-process-new-activity",
+      "iteration": 0,
+      "phases": {
+        "activity-create": {
+          "elapsedNs": 1530735636451,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "action-ready": {
+          "elapsedNs": 1530919176403,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "action-first-frame": {
+          "elapsedNs": 1530922465154,
+          "processStartMs": 1522300,
+          "pid": 5879
+        }
+      },
+      "processStartToActionFrameNs": 8622465154,
+      "activityCreateToActionFrameNs": 186828703,
+      "actionReadyToFrameNs": 3288751
+    },
+    {
+      "mode": "warm-process-new-activity",
+      "iteration": 1,
+      "phases": {
+        "activity-create": {
+          "elapsedNs": 1531432820372,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "action-ready": {
+          "elapsedNs": 1531550584286,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "action-first-frame": {
+          "elapsedNs": 1531561350601,
+          "processStartMs": 1522300,
+          "pid": 5879
+        }
+      },
+      "processStartToActionFrameNs": 9261350601,
+      "activityCreateToActionFrameNs": 128530229,
+      "actionReadyToFrameNs": 10766315
+    },
+    {
+      "mode": "warm-process-new-activity",
+      "iteration": 2,
+      "phases": {
+        "activity-create": {
+          "elapsedNs": 1532026192870,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "action-ready": {
+          "elapsedNs": 1532137413031,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "action-first-frame": {
+          "elapsedNs": 1532141594112,
+          "processStartMs": 1522300,
+          "pid": 5879
+        }
+      },
+      "processStartToActionFrameNs": 9841594112,
+      "activityCreateToActionFrameNs": 115401242,
+      "actionReadyToFrameNs": 4181081
+    },
+    {
+      "mode": "warm-process-new-activity",
+      "iteration": 3,
+      "phases": {
+        "activity-create": {
+          "elapsedNs": 1532614006988,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "action-ready": {
+          "elapsedNs": 1532715065874,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "action-first-frame": {
+          "elapsedNs": 1532722085694,
+          "processStartMs": 1522300,
+          "pid": 5879
+        }
+      },
+      "processStartToActionFrameNs": 10422085694,
+      "activityCreateToActionFrameNs": 108078706,
+      "actionReadyToFrameNs": 7019820
+    },
+    {
+      "mode": "warm-process-new-activity",
+      "iteration": 4,
+      "phases": {
+        "activity-create": {
+          "elapsedNs": 1533233521611,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "action-ready": {
+          "elapsedNs": 1533319715260,
+          "processStartMs": 1522300,
+          "pid": 5879
+        },
+        "action-first-frame": {
+          "elapsedNs": 1533326758372,
+          "processStartMs": 1522300,
+          "pid": 5879
+        }
+      },
+      "processStartToActionFrameNs": 11026758372,
+      "activityCreateToActionFrameNs": 93236761,
+      "actionReadyToFrameNs": 7043112
+    }
+  ]
+}

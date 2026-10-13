@@ -19,6 +19,7 @@ private fun streamHash(input: InputStream): String {
 internal object DirectoryDurability {
     // Injectable platform boundary: Robolectric does not implement opening a directory fd.
     var rename: (File,File)->Unit = { source,target -> android.system.Os.rename(source.absolutePath,target.absolutePath) }
+    var link: (File,File)->Unit = { source,target -> android.system.Os.link(source.absolutePath,target.absolutePath) }
     var sync: (File)->Unit = { directory ->
     val fd = android.system.Os.open(directory.absolutePath,android.system.OsConstants.O_RDONLY,0)
     try { android.system.Os.fsync(fd) } finally { android.system.Os.close(fd) }

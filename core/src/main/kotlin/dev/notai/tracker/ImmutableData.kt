@@ -19,8 +19,11 @@ internal fun ImportOrigin.frozen() = copy(fields = frozenMap(fields))
 internal fun Dataset.frozen(base: Dataset? = null): Dataset {
     val selections = HashMap<Classification,Classification>()
     fun capture(value: Classification): Classification {
+        // Stored keys are immutable snapshots; looking up an equivalent input
+        // cannot retain its mutable maps/lists or change an existing snapshot.
+        selections[value]?.let { return it }
         val frozen = value.frozen()
-        return selections.getOrPut(frozen) { frozen }
+        selections[frozen] = frozen;return frozen
     }
     return copy(
     focus = if(focus === base?.focus) focus else focus?.copy(segmentIds = frozenList(focus.segmentIds)),

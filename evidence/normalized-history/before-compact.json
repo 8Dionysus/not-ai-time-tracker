@@ -1,0 +1,50 @@
+{
+  "schema": "tracker_android_store_fingerprint_v1",
+  "tables": {
+    "metadata": {
+      "rows": 1,
+      "canonicalValuesSha256": "1f93680315695fdc5b7908f109a22f2ca94c01a3f87d5186c8be7fb556f0fee2",
+      "payloadBytes": 668
+    },
+    "activity_types": {
+      "rows": 1918,
+      "canonicalValuesSha256": "029cc4d20959b4ac18af38f6201534bcae89e33ff593b07a0ed0df1be87160dc",
+      "payloadBytes": 2147754
+    },
+    "cards": {
+      "rows": 0,
+      "canonicalValuesSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payloadBytes": 0
+    },
+    "sessions": {
+      "rows": 73001,
+      "canonicalValuesSha256": "4f9abaea9611b4fada3f4547e553002241d5e7c2e78b13d7df6bfd2a77af0e36",
+      "payloadBytes": 52270429
+    },
+    "segments": {
+      "rows": 73002,
+      "canonicalValuesSha256": "2ca45407bc0011497eff7a4ff765fbed316a76053c897ea15f29bc1f72d93700",
+      "payloadBytes": 51979089
+    },
+    "favorites": {
+      "rows": 0,
+      "canonicalValuesSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payloadBytes": 0
+    },
+    "measurements": {
+      "rows": 0,
+      "canonicalValuesSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "payloadBytes": 0
+    },
+    "vocabulary": {
+      "rows": 1,
+      "canonicalValuesSha256": "a5607b0302ba1602e9b8b3f4cb18f0cac50d1c7316c9706bc5e673d69a397857",
+      "payloadBytes": 313438
+    },
+    "store_generation": {
+      "rows": 1,
+      "canonicalValuesSha256": "7fa58316f09d16f1929f73302bbdd22204732b918d35b9c888e1eb6431a4afe5",
+      "payloadBytes": 0
+    }
+  }
+}

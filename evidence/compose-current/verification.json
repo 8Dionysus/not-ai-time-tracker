@@ -1,0 +1,515 @@
+{
+  "schema": "tracker_compose_current_verification_v1",
+  "createdAtUtc": "2026-10-13T22:52:46.992872+00:00",
+  "codeCommit": "d5ade78d173c091b00a20aba99247e6f671e7d2d",
+  "currentStatus": "partial_native_review",
+  "historicalReports": [
+    "evidence/audit-updates/verification.json",
+    "evidence/acceptance-followup/verification.json"
+  ],
+  "implementationFiles": [
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "sha256": "c931b2b95dd86350c090d04d42019489e03dbe165fb0def404cb6c21e57382db"
+    },
+    {
+      "path": "app/src/main/assets/licenses/onest-OFL.txt",
+      "sha256": "1b10b77bbd5198a6d6dd4ec8ccb0410624b8c994b0bd880161cc46959e9f6374"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/AndroidRuntime.kt",
+      "sha256": "a7b568553b9d3ea275fdd2dff328db37d9b0b8941327f0562a5b0e7de7a06fab"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/BackupDocuments.kt",
+      "sha256": "b901af0305ffd6b366091c7086bca774e5f0ad2286ad132e183465803819a7c1"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/DatabaseRecovery.kt",
+      "sha256": "365130038cacfb02d6693ec36ca0f7b693bda1778ce2d642fdf50579dbbd60d8"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/EntryInputs.kt",
+      "sha256": "e9cf05dbe12f2f4894f610dde4cd5bef6bf3e8ed39fb80fc01df1e2f6f316c9b"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/FloatingTimerService.kt",
+      "sha256": "0037d620b53f3de84bc558babde8ddedb7119138afcf365e91eb52c1aa5b110d"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/FocusDueSignals.kt",
+      "sha256": "41c4bf89597b702d858f3536bb085d73cfca82f0de37707051e6f031792fcc6f"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/FocusSignals.kt",
+      "sha256": "4357815d58316930edf6016bd1f51901faf4fc05b2ae438177324a89710d5bca"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/MainActivity.kt",
+      "sha256": "9b90c4697c2b38b188fd2e506d3b68c30a97e50b14c80fe8db8934f55248e902"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/NormalizedHistory.kt",
+      "sha256": "09e375a5d80f910eec7eeeac4fb7eac751c69220fca71b230f964d95fdee1be7"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/PrivateFiles.kt",
+      "sha256": "1eb2b0d74d2a6d61487200831bed2c211ea7b557f7fe397bca920d6a004ae1e6"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/StartupTrace.kt",
+      "sha256": "dd83cc28c721a3ce323f22c1439b0436d1766951d3c10a0804b5d272bcd9a104"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/TechnicalActivity.kt",
+      "sha256": "04488d3fca3be9aaba80ec23be5dc05e5048252be79cf2d3582a33f1ee173f4a"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/TimerSurfaces.kt",
+      "sha256": "e2313678a7035d685e971141583f7b4fe3aa11bf6007ed95443cc532f0de16f9"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/TrackerDatabase.kt",
+      "sha256": "64198661867baea29ea0d38f6a31a62749fc71044987bfb4ff14c18e7c670e88"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/App.kt",
+      "sha256": "17a1157156370d6df273ef93df75f757294903ffad494f3001ff897bdaf88d43"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/Backend.kt",
+      "sha256": "4cd526a642a4c4ead66a3e0134bf9cd6e13aa1509331bb40fefdfc7c03359a9f"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/Components.kt",
+      "sha256": "d3d14ab7378e19809ab44af0e40ca67eb379244de184f15e1b5f88a2293f21f8"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/DataScreen.kt",
+      "sha256": "9393361677544ca2d98bc436f789c9523be63545a28a73e491b7a9787be9ec84"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "sha256": "cd29eccb5e36d5365ae9912850724877cab3484ce8b95379812fd2164934f723"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/Icons.kt",
+      "sha256": "b6ef267dc274c2a8daa495a81cec91aa5b30ec202d4fd93c41ef627284caa7f8"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/Interval.kt",
+      "sha256": "c7444bfdfd245d213eafd926ca19878498037c8781737438e79686401e025fdd"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "sha256": "b3286b88a04f12a96d3e5c69146cf1735ddba33d5487ead0148a274a8e81423f"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "sha256": "bcd9f769d8e6d5b497aeb47e4fb4c139de10d5ab83e0c7a5c0b50a90bb4fd041"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "sha256": "b0b64054bedfda7e13f260cb251e359e53e519a086b1ece7afd3e58a5d0a4a68"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/Theme.kt",
+      "sha256": "c95f93a55d10cfed2b7c0d7c62487966455d152955708c16e5b4e7e34e5efa72"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "sha256": "e2bbedf9f33d62559df57fd7b85ba4c67ec3faacdebb5b0e1f3497760f101572"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "sha256": "d34a7d0176c96268c386d1ca99f17c2aa22ef50163fa68e1c399e0bfd8fcadbf"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher_foreground.xml",
+      "sha256": "e3a1a8f94c87ed73d102c2e58314afdab4d1ae6daa7bc2494d59ffdcfb67910f"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher_monochrome.xml",
+      "sha256": "89e171d97755ed82532cf128999903342ae9f85e028dae1725e4774c5271cbb3"
+    },
+    {
+      "path": "app/src/main/res/drawable/widget_background.xml",
+      "sha256": "71d7f8e1093ff292443aec7c44a0a21a23bff540eff0a0df6cb8125992e562bc"
+    },
+    {
+      "path": "app/src/main/res/drawable/widget_button_primary.xml",
+      "sha256": "4b5f727135fbfabcdce550a6ddff49ef8c141c302314dde2ec76671f8f1300c7"
+    },
+    {
+      "path": "app/src/main/res/drawable/widget_button_tonal.xml",
+      "sha256": "149ef55c19f0970c3021e2fae7726956f93a699ffb3c9c27f83c4dde65790e18"
+    },
+    {
+      "path": "app/src/main/res/font/onest_200.ttf",
+      "sha256": "7b7124f6823e00437042f2fe37568a06ff80398805c85a3b4052859cf504e3aa"
+    },
+    {
+      "path": "app/src/main/res/font/onest_300.ttf",
+      "sha256": "3ccb4ee42d342f3d11e2ae0d853f6b0962201d8964c1b9668aad13fc063d59cb"
+    },
+    {
+      "path": "app/src/main/res/font/onest_400.ttf",
+      "sha256": "5d27bd7fe4b79e94bbe64e7eed75a2ab9921dd603b2cf02ceb9a19150de48f2c"
+    },
+    {
+      "path": "app/src/main/res/font/onest_500.ttf",
+      "sha256": "24744bba5ddd417b44ab201a5eae234ba3f1bacfc56d552e51799e5e3eec26c4"
+    },
+    {
+      "path": "app/src/main/res/font/onest_600.ttf",
+      "sha256": "030d1bae9b38f45a1d821bf9d76006450982b41c3ab96cd0c72960e01e674436"
+    },
+    {
+      "path": "app/src/main/res/layout/timer_widget.xml",
+      "sha256": "1cbd11f9a69597db706e49e3d823e33a202428259de0c4deb973dc74e95688bd"
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi/ic_launcher.xml",
+      "sha256": "ae92c429e7ef5c0be5e06b652315e43fb7f0fa6034c6ab005b19bc950a8ccf4c"
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi/ic_launcher_round.xml",
+      "sha256": "ae92c429e7ef5c0be5e06b652315e43fb7f0fa6034c6ab005b19bc950a8ccf4c"
+    },
+    {
+      "path": "app/src/main/res/values/colors.xml",
+      "sha256": "5e73f78131232311380f8c30e53d36204be4938a9701575cacc0f60ef8cf299e"
+    },
+    {
+      "path": "app/src/main/res/values/ids.xml",
+      "sha256": "773a1a3bff330b5279d7579034b9d3fc532ed094b94f33667ae1af573ab74731"
+    },
+    {
+      "path": "app/src/main/res/values/strings.xml",
+      "sha256": "7a1afda9ffc3727941c6ab07a93c192af94a35155cabfce9f4c9123c4bffaf0d"
+    },
+    {
+      "path": "app/src/main/res/values/themes.xml",
+      "sha256": "753f2d6667d04327820407736812fc46913ad3da85de54f5ccfb4ca9db944339"
+    },
+    {
+      "path": "app/src/main/res/values-night/colors.xml",
+      "sha256": "33a2390ff93c994b80ad35b0dc9dc8a5b2d502745bf63481943e864bfe25cab9"
+    },
+    {
+      "path": "app/src/main/res/values-night/themes.xml",
+      "sha256": "eee73f8257ecf7eb85aef6de1de8acd83057d70998f93fe1a09435c1c931f6f6"
+    },
+    {
+      "path": "app/src/main/res/xml/data_extraction_rules.xml",
+      "sha256": "a0d81ccff94f23b8dfb475cbf11e99f16e1fea062d64c7d0a4537b117ef1d259"
+    },
+    {
+      "path": "app/src/main/res/xml/shortcuts.xml",
+      "sha256": "2172f4b79a77dfac4b197e9bfd04038fb8a0a4f08cd01e57c175c6e6e04b0c0b"
+    },
+    {
+      "path": "app/src/main/res/xml/timer_widget_info.xml",
+      "sha256": "a806a5b9ff52a08cf8cf48951de864bc668196df4604b803bf87598d8105cd5c"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Backup.kt",
+      "sha256": "9f6d9f3bd36c77f9e6eb8713d3ee5cc0f38ca9df4f20b423d8344adf7c98429d"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/CheckedState.kt",
+      "sha256": "87cec59d36dab0dcac7d8a16a0ed4073372724cc5b74564532ff4ba6f72144e8"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Choices.kt",
+      "sha256": "654036e62475aad1af92e3e795280223eb0ccccaa047a3472ddd0682f47ad837"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Focus.kt",
+      "sha256": "d8750580267731fa6ecbf371857b7be8ca8000ddae68bb865f85eea735f7906e"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Goals.kt",
+      "sha256": "042ab78a6ee394b9380e2de0f40877b42e98256266dcc57cc4e9ca35e926d8d4"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/HistoryTransfer.kt",
+      "sha256": "dfbfddf5d8852f62576997940764d30db91b59f610cdfc35e8dbc00c746bc7bd"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ImmutableData.kt",
+      "sha256": "6e337b83bf01cd5a50bf3efd61205e7a803d7c681a6685ebf1bfd2f8c5c1b470"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ImportInspection.kt",
+      "sha256": "bd76397d33b532a7d87b3715c918bd4df45dd298c10a584822ad6c9e9f468e38"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/LocalEntries.kt",
+      "sha256": "7e7cb8888c3287b17daa450e280422d88e409cfa29b691740c60dd71842675ab"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Migration.kt",
+      "sha256": "41082c3229d0c2f43015914162b9af4579646f9ffefe09919b81d4008abdb6e7"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Model.kt",
+      "sha256": "f2e4f02020473e976563f109c9969001bdc241bf5096cec68f1e13b19442eec0"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ReadyCatalog.kt",
+      "sha256": "f5a88bb9fbaa111e855126b524b62c4a7a8923226c4661e9fa3f017489db2442"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Reports.kt",
+      "sha256": "9189072eb4f2eadca18a6be8241399cd3cc9c9a275b4d74913e190b9de7442d9"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/StreamingBackup.kt",
+      "sha256": "f739cd0a04a4ef582c3a0cc10da8b632d26ec4ccb1b05f120c4ec3083dae817d"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Tracker.kt",
+      "sha256": "1f013c0a8a1d1e5abc16d0d331f9f6e1366082b50ace5cf5a517d84ca8a05406"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/TrackerView.kt",
+      "sha256": "015673b6d781e8d0e4421997b672ab8f6583a07de0323b01f3efdd450bb6fb63"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Vocabulary.kt",
+      "sha256": "c59eefef94876b9d2765ba156e708e3d8b9d26e342e81cba594eaa031d1f1fc5"
+    },
+    {
+      "path": "core/src/main/resources/catalog-bootstrap.json",
+      "sha256": "16a9ad1415182a7c392285d117e1ad5b98d1bfcadb1086def4cf832bb823923b"
+    },
+    {
+      "path": "app/src/test/kotlin/dev/notai/tracker/android/RoomScenariosTest.kt",
+      "sha256": "582af53566571061eb7a5c5937539a8a56820230bbfd22e7268a64becb545012"
+    },
+    {
+      "path": "app/src/test/kotlin/dev/notai/tracker/android/ui/UiExportLifecycleTest.kt",
+      "sha256": "e21efe41edf0571908c7c0741f9c424eab21109bd2fd551c377ddf97727ac767"
+    },
+    {
+      "path": "app/src/test/kotlin/dev/notai/tracker/android/ui/UiScreensTest.kt",
+      "sha256": "57ea8bef5b39c60b6fb12d950d6a030b30a67118f09c2c5d45f14479be272c86"
+    },
+    {
+      "path": "core/src/test/kotlin/dev/notai/tracker/CoreScenariosTest.kt",
+      "sha256": "8704e5952ec1e33973be46cf666f5048703efa0b21e0151fdc86419f0ce2b9b2"
+    },
+    {
+      "path": "app/src/androidTest/kotlin/dev/notai/tracker/android/ArchiveInstrumentation.kt",
+      "sha256": "f0e2643d476a8f8d5c266b5fefba6f916ecbffadce685d95539c96dbb691f6dd"
+    },
+    {
+      "path": "catalog/compatibility.json",
+      "sha256": "40f9a284bea80a588f52cc58c331699ff69046a69a1045f793f87b43b8634a38"
+    },
+    {
+      "path": "catalog/manifest.json",
+      "sha256": "136b030c63707f5e3a6dcd150d790fb4e6d669c1d032ecc8aa1051f2e01180d1"
+    },
+    {
+      "path": "catalog/runtime-catalog.json",
+      "sha256": "9efaea5313b40ed2ae762437450f1a69759bfdd1e5fe1bb28e7ca2f8f5dc36b3"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "sha256": "a0dc244c27d9a8263d41a07aa790db1ba30dc06b7605e3ec3a5f63f67d27fe12"
+    },
+    {
+      "path": "core/build.gradle.kts",
+      "sha256": "ccfde10a2668653c9501f30e7d418daa123e79a2d6a7ca2e3379ab7defe847e9"
+    },
+    {
+      "path": "build.gradle.kts",
+      "sha256": "69bae8fb385bd8af0c3fab2783cf923626e9b62980d379fd1356d50a05f456ce"
+    },
+    {
+      "path": "settings.gradle.kts",
+      "sha256": "95ab85802c94b2e5ca751a37b8af46fbbb0c01850affcbbb89d5b37f3cb7b319"
+    },
+    {
+      "path": "gradle.properties",
+      "sha256": "66eb28b6c7a2125fb66df726193b029c86133ecf3ae80d12c04da84ef5ff5785"
+    }
+  ],
+  "tests": {
+    "total": 26,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "execution": "Core JVM3 freshly rerun32s; app Robolectric/API35 23 executed in88s aggregate; native QA separate",
+    "rawXml": [
+      {
+        "file": "TEST-dev.notai.tracker.CoreScenariosTest.xml",
+        "sha256": "9bb017017bc31d482a7f44cb9ded77f14cde608dd8be254cdb308ba879acf408",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "timestampUtc": "2026-10-13T22:35:55.908Z",
+        "cases": [
+          "smallHistoryAndExport",
+          "backupReplacementAndFailure",
+          "timerPath"
+        ]
+      },
+      {
+        "file": "TEST-dev.notai.tracker.android.RoomScenariosTest.xml",
+        "sha256": "a95b8824e2112e39cad7081992444bb75cbdec2676041db6fd18723a6380eb88",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "timestampUtc": "2026-10-13T22:33:57.190Z",
+        "cases": [
+          "orphanSidecarsNeverInitialize",
+          "validClassificationPayloadCannotChangeUnderItsOldContentId",
+          "healthyMainWithDamagedSidecarsPreservesEveryOriginalBeforeSQLite",
+          "sessionCommandsIgnoreStaleSelectedCard",
+          "indexedPagingAndV3MigrationPreserveEveryRow",
+          "normalizedMigrationRollsBackAfterReplacementFailure",
+          "normalizedMigrationRejectsContradictionsWithoutChangingLegacyRows",
+          "repeatedArchivesShareOnlyVerifiedImmutableCopies",
+          "smallHistoryAndExport",
+          "backupReplacementAndFailure",
+          "timerPath"
+        ]
+      },
+      {
+        "file": "TEST-dev.notai.tracker.android.ui.UiExportLifecycleTest.xml",
+        "sha256": "831276c9a2457d578e7af9b433d2755e2c0efed5b32a7c7f7cf4de13d8d3f062",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "timestampUtc": "2026-10-13T22:34:20.106Z",
+        "cases": [
+          "exportClaimsAndConsumedActivityResultsSurviveInterruption"
+        ]
+      },
+      {
+        "file": "TEST-dev.notai.tracker.android.ui.UiScreensTest.xml",
+        "sha256": "56c06a0a74e45f4a6a9a2a65d1aa8ab6d0f9f6487e070f9ec73ce56ba1d6095c",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "timestampUtc": "2026-10-13T22:33:20.516Z",
+        "cases": [
+          "picker",
+          "recovery",
+          "data",
+          "focus",
+          "finishedFocusKeepsItsSnapshotDuringOutgoingAnimation",
+          "overview",
+          "headerThemeToggleUsesCurrentAppearanceOnEveryClick",
+          "runningTimer",
+          "crossMidnightSegmentHasDistinctKeysForEachCalendarDay",
+          "correction",
+          "idleTimer"
+        ]
+      }
+    ],
+    "rawXmlPublished": false
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 56,
+    "hints": 1
+  },
+  "apk": {
+    "name": "not-ai-time-tracker-0.10.0-d5ade78-debug.apk",
+    "bytes": 12461614,
+    "sha256": "a9103b9fb725d899bc23c17ee3b715b9fd9c7f39f0014f4ec71b157953c43026",
+    "versionName": "0.10.0",
+    "versionCode": 11,
+    "minSdk": 26,
+    "targetSdk": 35,
+    "signatureCryptographicallyVerified": true,
+    "signerSha256": "86e221956fd1ed4dab261a10c1baeac3537816d271601037b309f2ddf186c3cc",
+    "priorLocalDebugSignerEqual": true,
+    "originalUserSignerSha256": "c4335948a9dbedb8bc1b557d23d0ea37013fb53c79a8ce57f19a7f24fb7f20b7",
+    "originalUserSigningKeyRecovered": false,
+    "libraryVersion": 5,
+    "libraryPinnedReadbackExact": true,
+    "catalogAssetsExact": true,
+    "androidTestFixturesAbsent": true,
+    "nativeInstalledExact": false,
+    "nativeInstallBlocker": "QA storage; verified old QA archive transfer pending permission; no uninstall/data clearing"
+  },
+  "native": {
+    "platform": "AOSP API35 x86_64; owned QA AVD; synthetic history",
+    "matrix": "android-action-matrix.json",
+    "counts": {
+      "passed": 21,
+      "failed-awaiting-ui-permission": 2,
+      "not-run": 1,
+      "blocked-storage-awaiting-archive-transfer-permission": 1,
+      "native-blocked-storage": 1
+    },
+    "physicalPhone": false,
+    "talkBack": "unavailable/not installed",
+    "recordingVariedCodeStates": "Per-action receipts retained; v4 installation/Calendar/Focus/restore precede day-key fix; v5 native installation and scroll repeat still blocked",
+    "composeRestore": {
+      "schema": "tracker_native_compose_restore_proof_v1",
+      "testedCodeCommit": "979481ac113215f8fb98dbbfd8fb1260136a47c2",
+      "backupBytes": 106822991,
+      "backupSha256": "c569f792951c006c7444e36ea4bd0900ea934a1214668bc779cce83a5857f8d9",
+      "sourceProviderAndPrivateExact": true,
+      "sessions": 73016,
+      "segments": 73022,
+      "unchangedCanonicalTables": [
+        "activity_types",
+        "cards",
+        "sessions",
+        "segments",
+        "favorites",
+        "measurements",
+        "vocabulary"
+      ],
+      "segmentsEqualPortableSource": true,
+      "clockAnchorsIntentionallyRemovedByPortableFormat": true,
+      "metadataChangedFields": [
+        "revision",
+        "controlBarrier"
+      ],
+      "goalsAndSettingsUnchanged": true,
+      "revisionBefore": 58,
+      "revisionAfter": 59,
+      "cancelBeforeApplyRevisionUnchanged": true,
+      "rollbackPreserved": true,
+      "rollbackDecodedDataEqualOriginalBackup": true,
+      "rollbackSha256": "e21dff86c94fcfb9cda459b3267f00b410c0c1a851d2b07fc4f3cf497cdb7923"
+    },
+    "focusBackground": {
+      "testedCodeCommit": "979481ac113215f8fb98dbbfd8fb1260136a47c2",
+      "killedPid": "21257",
+      "recreatedPid": "21670",
+      "receiver": "FocusAlarmReceiver",
+      "newPhaseKeyDelivered": true,
+      "notificationId": 43,
+      "observationSeconds": 18.97,
+      "foregroundReopened": false,
+      "forcedAlarmOrBroadcast": false,
+      "OEMIdleClaim": false
+    }
+  },
+  "github": {
+    "codeCommitStatusCount": 0,
+    "codeCommitCheckRunCount": 0,
+    "codeCommitActionsRunCount": 0,
+    "CIpassClaim": false
+  },
+  "limits": [
+    "font150 search placeholder clipped; visual repair awaiting permission",
+    "three-button bottom navbar icons/labels cropped; visual repair awaiting permission",
+    "TalkBack absent; physical phone/OEM idle/power loss not tested",
+    "v5 install/launch/native scrolling blocked by QA storage pending verified archive offload permission"
+  ],
+  "license": "No project licence selected"
+}

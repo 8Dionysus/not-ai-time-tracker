@@ -1,0 +1,144 @@
+{
+  "schema": "tracker_android_action_matrix_v1",
+  "scope": "Native AOSP API35 synthetic QA, per-action receipts/limits; JVM callbacks distinguished",
+  "items": [
+    {
+      "action": "timer-start-pause-resume-stop-label",
+      "status": "passed",
+      "evidence": "native merged UI XML ui-merged-*; actual persisted sessions/segments"
+    },
+    {
+      "action": "favorite-start",
+      "status": "passed",
+      "evidence": "ui-final-favorite-*"
+    },
+    {
+      "action": "picker-search-create-custom-activity",
+      "status": "passed",
+      "evidence": "ui-final-search-*, ui-final-create-* and stopped QA-native-card record"
+    },
+    {
+      "action": "manual-overlap-refusal-and-valid-save",
+      "status": "passed",
+      "evidence": "ui-manual-overlap-result-0.xml, ui-manual-valid-before/after;73005 sessions"
+    },
+    {
+      "action": "correction-preview-apply",
+      "status": "passed",
+      "evidence": "ui-correction-*; no changed fields in this native application"
+    },
+    {
+      "action": "overview-day-week",
+      "status": "passed",
+      "evidence": "ui-overview-day-0.xml, ui-merged-overview-state-0.xml"
+    },
+    {
+      "action": "overview-30days-goals",
+      "status": "passed",
+      "evidence": "native30-day overview; realTrackerGoalFixture preserveshistory; ui-goals-progress-native-0.xml MINIMUM_PENDING/LIMIT_EXCEEDED correct; creation/edit UI absent in accepted design, no controls added"
+    },
+    {
+      "action": "backup-navigation-away-chooser-processdeath-save",
+      "status": "passed",
+      "evidence": "106803842B exact private/provider SHA21dc20aa...f9a"
+    },
+    {
+      "action": "large-restore-preserves-values",
+      "status": "passed",
+      "evidence": "currentCompose normal SAF preview/cancel/explicitReplace106822991B; 73016sessions/73022segments;7canonicaltables exactly equal, goals/settings equal;rev58to59/newbarrier+gen; separate decoded rollback equal source; compose-current-restore-proof.json"
+    },
+    {
+      "action": "csv-large-export-chooser-processdeath-readback",
+      "status": "passed",
+      "evidence": "csv-current-operation.json;37880167B,73007 unique rows"
+    },
+    {
+      "action": "csv-import-through-technical-ui",
+      "status": "passed",
+      "evidence": "actualSAF218Bfixture, delimiter/columns/namespace/zoneconfirmation,preview2,apply2STOPPEDsourceorigins,aftercommit replay0added2duplicates0errors; oldearlyprecommitpreviewcancelled"
+    },
+    {
+      "action": "export-claim-and-callback-interruption",
+      "status": "passed",
+      "evidence": "registered real MainActivity ActivityResult Robolectric callbacks plus native chooser processdeath; not equivalent evidence"
+    },
+    {
+      "action": "calendar-deny-grant-second-occurrence-allday-draft",
+      "status": "passed",
+      "evidence": "currentCompose: actual permission denial/user-fixed reask refusal, normalAndroidSettings grant, selected 15Oct recurrence exactreference, all-day emptyboundaries/CALENDAR_EVENT; all9canonicaltables unchanged; calendar-current-{second,allday}-form.json,after-calendar-current.json"
+    },
+    {
+      "action": "notification-deny-grant-feedback",
+      "status": "passed",
+      "evidence": "ui-native-notification-*"
+    },
+    {
+      "action": "notification-resume-recreated-process",
+      "status": "passed",
+      "evidence": "Focus pausedfalse/second segment after actual shade Resume"
+    },
+    {
+      "action": "focus-work-break-due-no-auto-next-data-finish",
+      "status": "passed",
+      "evidence": "focus-native-checkpoint.json;2work segments sum10000ms, break0work"
+    },
+    {
+      "action": "focus-finish-outgoing-animation",
+      "status": "passed",
+      "evidence": "before native+JVM NPE reproduced; fixed animated regression pass, ui-focus-fixed-full-finished-0.xml and process13322alive"
+    },
+    {
+      "action": "background-inexact-focus-alarm-delivery",
+      "status": "passed",
+      "evidence": "exact979481a APK; cachedpid21257 killed1.57s aftertap; pid absent; actualFOCUS_DUE receiver recreated21670, notification43 and new durablephasekey observed18.97s withoutforeground/forcedevents; bg-focus-current-observation/events/notifications"
+    },
+    {
+      "action": "widget-placement-and-actions",
+      "status": "passed",
+      "evidence": "actual launcher picker placement, disabledOpen app route, opt-in switch enabled after overlayoff, ui-widget-{running,paused,resumed,stopped}-real-0.xml"
+    },
+    {
+      "action": "launcher-shortcut-actions",
+      "status": "passed",
+      "evidence": "actual launcher longpress menu Start/Pause/Resume; ui-shortcut-*-real-state XML; stopped throughMain; sourcebindfresh state verified"
+    },
+    {
+      "action": "theme-report-zone-overlay-settings",
+      "status": "passed",
+      "evidence": "Data selector3states; repairedheader2directions native+25tests; zonecancel+save with7unchanged tables; overlayOSpermission+foreground42+real4actionWindowObserver/freshprocess, featureoff stopsoverlay"
+    },
+    {
+      "action": "large-font",
+      "status": "failed-awaiting-ui-permission",
+      "evidence": "Native1.5 font actualTimer/Picker; font150-picker-real.png shows cropped two-line search placeholder. Manual/Overview/Data font150 remainder not completed; restored original1.0 verified. No visual repair applied."
+    },
+    {
+      "action": "talkback",
+      "status": "not-run",
+      "evidence": "not installed in AOSP image"
+    },
+    {
+      "action": "three-button-navigation-insets",
+      "status": "failed-awaiting-ui-permission",
+      "evidence": "labels/icons cropped; original UI preserved, gesture nav used only on QA emulator"
+    },
+    {
+      "action": "final-APK-install-launch",
+      "status": "blocked-storage-awaiting-archive-transfer-permission",
+      "evidence": "v4 exactinstalled and Focus receiver recreation passed; v5 d5ade78 updateinstall refused insufficient internalstorage;10oldQAarchives1324906622B copied40files/hashverified; removal requires permission, no removals yet"
+    },
+    {
+      "action": "cross-midnight-history-scroll",
+      "status": "native-blocked-storage",
+      "evidence": "Actual font150 native crash duplicate scale-segment-72989; JVM same IllegalArgumentException reproduced; day+segment key fix and new regressionpassed,11UiScreens/26total; exactv5 native rerun requires installation"
+    }
+  ],
+  "codeCommit": "d5ade78d173c091b00a20aba99247e6f671e7d2d",
+  "counts": {
+    "passed": 21,
+    "failed-awaiting-ui-permission": 2,
+    "not-run": 1,
+    "blocked-storage-awaiting-archive-transfer-permission": 1,
+    "native-blocked-storage": 1
+  }
+}

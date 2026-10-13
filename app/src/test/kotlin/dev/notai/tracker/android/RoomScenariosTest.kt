@@ -87,6 +87,28 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertEquals(ErrorCode.STALE,error.code)
         org.junit.Assert.assertEquals(changed,receiver.data())
     }
+    private fun bundledCatalogInput() {
+        val context = RuntimeEnvironment.getApplication()
+        val tracker = Tracker(createStore(),FakeClock())
+        val directory = java.io.File(context.noBackupFilesDir,"bundled-${newId()}")
+        val importer = FullCatalogImports(tracker,FileResearchArchive(directory))
+        val before = tracker.data()
+        val preview = importer.prepare { context.assets.open("research/$it") }
+        org.junit.Assert.assertEquals(1918,preview.types)
+        org.junit.Assert.assertEquals(337,preview.axes)
+        org.junit.Assert.assertTrue(preview.canApply)
+        org.junit.Assert.assertEquals(before,tracker.data())
+        org.junit.Assert.assertFalse(directory.exists()) // cancelling a bundled preview writes nothing
+        importer.apply(preview)
+        val installed = tracker.data()
+        org.junit.Assert.assertEquals(before.types.size+1918,installed.types.size)
+        val replay = importer.prepare { context.assets.open("research/$it") }
+        importer.apply(replay)
+        org.junit.Assert.assertEquals(installed.types,tracker.data().types)
+        org.junit.Assert.assertEquals(installed.axes,tracker.data().axes)
+        org.junit.Assert.assertEquals(8,preview.sourceHashes.size)
+        org.junit.Assert.assertEquals(tracker.data(),reopen(tracker.store).read())
+    }
     override fun assertImportRollback(tracker: Tracker,json: String,disk: RollbackStore) {
         val db = databases.getValue(tracker.store).second
         // Metadata is written last, after child tables were replaced: force a real SQLite write failure.
@@ -108,6 +130,7 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertEquals(before,tracker.data())
     }
     override fun surfaceActions() {
+        bundledCatalogInput()
         externalInputAdapters()
         val focusClock = FakeClock(); val focused = Tracker(createStore(),focusClock)
         focused.startFocus(focused.snapshot().token,plan = FocusPlan(1_000,1_000))

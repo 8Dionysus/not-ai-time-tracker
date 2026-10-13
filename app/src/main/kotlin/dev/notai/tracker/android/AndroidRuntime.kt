@@ -35,6 +35,12 @@ class TrackerRuntime private constructor(context: Context) {
     val backups = Backups(tracker,rollback)
     val historyTransfer = HistoryTransfer(tracker,rollback)
     val catalogImports = FullCatalogImports(tracker,FileResearchArchive(File(context.noBackupFilesDir,"research")))
+    private val catalogAssets = context.applicationContext.assets
+    /** Explicit IO preparation; construction/first launch never imports the bundled catalog.
+     * Present the preview and call catalogImports.apply only after the user's confirmation.
+     */
+    fun prepareBundledCatalog(): FullCatalogPreview =
+        catalogImports.prepare { path -> catalogAssets.open("research/$path") }
     val calendarOccurrences = CalendarOccurrences(context.applicationContext)
     val focusDueSignals = FocusDueSignals()
     private val surfaceScope = CoroutineScope(SupervisorJob()+Dispatchers.IO)

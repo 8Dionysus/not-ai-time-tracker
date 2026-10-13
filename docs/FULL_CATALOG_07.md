@@ -4,16 +4,18 @@
 
 ## Явный app-facing импорт
 
-`runtime.catalogImports` использует [full-catalog-manifest.json](../core/src/main/resources/full-catalog-manifest.json), включённый в core resource: восемь заранее известных файлов, их размеры и SHA‑256. Вызывающая сторона передаёт opener для выбранных локальных файлов; manifest и ожидаемые digests не берутся из недоверенного пакета. Reader закрывает streams, ограничивает каждый ввод объявленным размером плюс один контрольный байт и проверяет все восемь источников до подготовки плана.
+`runtime.catalogImports` использует [full-catalog-manifest.json](../core/src/main/resources/full-catalog-manifest.json), включённый в core resource: восемь заранее известных файлов, их размеры и SHA‑256. APK включает эти восемь исходников как `assets/research/…`; Gradle `bundleCatalogAssets` копирует только принятые файлы из Git без изменения байтов. `runtime.prepareBundledCatalog()` открывает комплект из APK. Для внешнего локального комплекта вызывающая сторона может передать opener; manifest и ожидаемые digests не берутся из недоверенного пакета. Reader закрывает streams, ограничивает каждый ввод объявленным размером плюс один контрольный байт и проверяет все восемь источников до подготовки плана.
 
 ```kotlin
 val importer = runtime.catalogImports
-val preview = importer.prepare { path -> selectedFiles.getValue(path).inputStream() }
+val preview = runtime.prepareBundledCatalog() // на IO, не в main/ticker
+// Альтернатива для локального комплекта из checkout:
+// val preview = importer.prepare { path -> File(researchDirectory, path).inputStream() }
 // Показать preview.types, preview.axes и preview.report.entries; отмена ничего не пишет.
 if (preview.canApply) importer.apply(preview) // только после явного подтверждения
 ```
 
-`FullCatalogImports.sources` сообщает канонические относительные имена, размеры и хеши для формы выбора файлов. Это загрузка существующего принятого корпуса, без автоматического обновления, сетевого downloader или нового переносимого формата. Имена map не заменяют проверку bytes/hash. Исходники распространяются в [research/](../research/README.md).
+`FullCatalogImports.sources` сообщает канонические относительные имена, размеры и хеши для формы выбора файлов. Это загрузка существующего принятого корпуса, без автоматического обновления, сетевого downloader или нового переносимого формата. Имена map не заменяют проверку bytes/hash. Исходники распространяются в [research/](../research/README.md) и включаются обычной сборкой `:app:assembleDebug` в APK. Для JVM/внешнего импорта получите checkout репозитория (`git clone https://github.com/8Dionysus/not-ai-time-tracker.git`) и передайте его каталог `research/` в opener выше; все восемь путей перечислены в manifest. После checkout файлы доступны локально; runtime не запрашивает сетевой или постоянный доступ. Условия повторного распространения проекта пока не выбраны. Создание runtime, первый запуск и подготовка preview ничего не импортируют; экран должен отдельно вызвать Apply после подтверждения.
 
 Проверенная неизменяемая проекция может переиспользоваться между живыми previews через одну weak-reference; все входные файлы всё равно сверяются при каждом prepare. После освобождения previews source graph может быть собран GC. Импорт полного 28 MiB корпуса — отдельная IO-операция, а не часть Start/ticker; память/скорость на телефоне не измерены.
 

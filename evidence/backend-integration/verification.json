@@ -1,7 +1,7 @@
 {
   "schema": "tracker_backend_verification_v1",
-  "sourceCommit": "3fb7439c2255ea1f7b4536ceed63d4402db9b85b",
-  "recordedAt": "2026-10-13T05:08:47.263165+00:00",
+  "sourceCommit": "7881df5e795fe006b270787556640dd699011478",
+  "recordedAt": "2026-10-13T05:25:27.507895+00:00",
   "appVersion": "0.9.1",
   "roomSchema": 3,
   "backupFormat": 7,
@@ -15,7 +15,7 @@
     7
   ],
   "command": "./gradlew --offline --no-daemon :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug",
-  "result": "BUILD SUCCESSFUL in 1m 33s",
+  "result": "BUILD SUCCESSFUL in 59s",
   "toolchain": {
     "jdk": "Microsoft OpenJDK 21.0.12.1",
     "gradle": "8.13",
@@ -47,13 +47,13 @@
       "failures": 0,
       "errors": 0,
       "skipped": 0,
-      "seconds": 34.255,
+      "seconds": 21.807,
       "cases": [
         "smallHistoryAndExport",
         "backupReplacementAndFailure",
         "timerPath"
       ],
-      "originalXmlSha256": "6bbf271407c77652d5c7e9094363a8a2f036e7b9352ce847a534567bf1c3fff8"
+      "originalXmlSha256": "ff0a2aaf709b7de49d95425619a3f385f2511fe0a5b146a7a047376d55035b02"
     }
   ],
   "lint": {
@@ -70,17 +70,20 @@
       "ReportShortcutUsage": 1,
       "SetTextI18n": 5
     },
-    "originalXmlSha256": "7406fee8628af53c8ba6d32d20231d0e8fc57d253662056539e6b62ecf09e9bb"
+    "originalXmlSha256": "b32e4c61179848c6b167abc452fa16b396b211023aee079fe8a6136575c017cb"
   },
-  "originalBuildLogSha256": "79ef4ba233a0bb9c6717abc034094bb9200bcb0ebf4819c61933fe924927c994",
+  "originalBuildLogSha256": "2117471f7e3ae78d16013869d44a97e804176a86af966941c21d97e0aa628111",
   "apk": {
     "file": "app-debug.apk",
-    "bytes": 3051814,
-    "sha256": "996044afe21c5ccc162237cc56592d7a472d4336fc1a34f2aec371819ed4bac8",
+    "bytes": 5935630,
+    "sha256": "45b21c527aba8d8516cfb872d4b1a8f776bd8e9c61a3f8f318f491446eb17cf4",
     "signatureVerified": true,
     "v2Signature": true,
     "trustedCatalogManifestPackaged": true,
-    "debugBuild": true
+    "debugBuild": true,
+    "catalogInputsPackaged": 8,
+    "catalogInputsBytes": 28167396,
+    "catalogInputHashesVerified": true
   },
   "coverage": [
     "single timer, late classification, transitions, correction/Undo, reports and recovery",
@@ -92,7 +95,8 @@
     "trusted full-catalog sources, wrong hash/missing companion/conflict/stale, replay and retained history/provenance",
     "Calendar explicit enable/permission guard, revocation/missing provider/invalid occurrence/all-day",
     "PROCESS_TEXT draft-only, edited note, existing-form protection and Activity recreation",
-    "Focus DUE callback deduplication, re-entry, failure retry and no phase/timer mutation"
+    "Focus DUE callback deduplication, re-entry, failure retry and no phase/timer mutation",
+    "actual bundled APK assets → preview/cancel → Room apply/replay → reopen, with eight exact source hashes"
   ],
   "evidenceHandling": "Public summary derived from this run. Original XML/build/manifest/signature reports retained locally without rewriting; historical evidence directories unchanged.",
   "documentationReview": {
@@ -100,7 +104,7 @@
     "authoredFilesRevised": 19,
     "rawHashedMarkdownPreserved": 1,
     "newNavigationFiles": 1,
-    "localMarkdownLinksChecked": 135,
+    "localMarkdownLinksChecked": 138,
     "missingTargets": 0,
     "unbalancedFences": 0,
     "privatePagesOrParticipantReferencesInAuthoredDocs": 0,

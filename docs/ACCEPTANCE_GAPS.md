@@ -42,7 +42,24 @@ Focus предоставляет countdown, DUE/RECOVERY и `signalKey`; Android
 | Focus | Один таймер, work/break, pause/skip/recovery | Дедупликация DUE callback, видимый статус | Полные controls и device QA открыты; background sound/alarms отдельно |
 | Calendar/grouping/drafts | Локальный календарь истории, точные группы, валидация EntryDraft | Выбранный CalendarProvider occurrence; all-day без рабочего интервала | UI выбора/opt-in/OS grant и device QA открыты |
 | PROCESS_TEXT | Draft и явные Start-now/manual-save | Явный intent, редактирование, защита текущей формы | Реальный OS chooser и внешние приложения не проверены |
-| Полный каталог | Доверенные восемь источников, preview, атомарный package Apply | runtime.catalogImports и приватный ResearchArchive | Форма выбора файлов/подтверждения открыта; установка остаётся явной |
+| Полный каталог | Доверенные восемь источников, preview, атомарный package Apply | Восемь inputs в APK, runtime.prepareBundledCatalog(), catalogImports и приватный ResearchArchive | Форма preview/подтверждения открыта; установка остаётся явной |
 | Файлы | JSON 1–7, CSV mapping/preview/apply, rollback | SAF JSON с строгим UTF‑8/BOM/лимитом | Удобная CSV-форма и device SAF QA открыты |
 | Быстрые поверхности | Исходные токены и единый таймер | widget/notification/overlay/launcher | OS permissions/OEM/батарея/доступность не проверены физически |
 | Исследовательские ограничения | Source-only residuals и точные quantity annotations | Новая модель не добавляется адаптерами | Object/event IDs, snapshots/version, signed deltas, plans/schedules отложены до выбора |
+
+## Сквозная готовность бэкенда
+
+Производственный runtime использует дисковый RoomStore. MemoryStore — второй исполнитель общего контракта в тестах; он не подменяет Android-хранилище.
+
+| Путь | Реализация и сохраняемые данные | Проверяемый сквозной результат |
+|---|---|---|
+| Учёт времени | Tracker → StateStore; Session/Segment, classification, monotonic anchors | Start без карточки → поздняя разметка → pause/resume → switch → stop; закрытие/открытие Room сохраняет состояние; stale и recovery не меняют данные |
+| Исправление и отчёты | correction preview → atomic mutation → Reports/CSV из того же Dataset | Коррекция границ → Undo → совпадающий итог, зоны/DST, без двойного времени по классификациям |
+| Перенос | Backups/HistoryTransfer, PrivateRollbackStore, Room transaction | Экспорт → preview → чистое хранилище → Apply/readback; JSON 1–7 и CSV mapping; отмена/повреждение/stale и SQL failure не оставляют частичной истории |
+| Поиск, цели и Focus | ChoiceView/Goals/Focus над сохраняемыми catalog/history/goals/focus | Полный обход каталога; поиск после редактирования; прогресс цели из истории; Focus pause/recovery/DUE без второго таймера или автоперехода |
+| История и входы | LocalEntries, EntryDraft; CalendarOccurrences/PROCESS_TEXT | Календарь/DST/grouping → валидируемый черновик → явная запись; запрет календаря/отзыв/нет provider; входной текст лишь заполняет форму |
+| Полный каталог | APK assets → trusted manifest → FullCatalogImports → ResearchArchive + Room | 1918 типов/337 осей; preview/cancel без записи; Apply сохраняет provenance и историю; повтор без дубликатов; конфликт/hash/missing/stale отклоняются |
+
+Undo, preview, draft, search cursor, derived caches и DUE callback dedup живут в процессе намеренно. История, классификация, определения, настройки, цели и состояние Focus сохраняются в Room. Rollback и исходники исследовательского импорта сохраняются отдельно в app-private noBackup storage. Полный граф на холодной загрузке и память полного импорта остаются ограничениями архитектуры, а не проверкой скорости/ёмкости физического телефона.
+
+Эта готовность позволяет строить полноценный UI на реализованных API. Технический экран всё ещё ограничен; продуктовая приёмка и физическое устройство остаются отдельными работами.

@@ -26,13 +26,15 @@ Gradle Wrapper 8.13 проверяет закреплённый SHA‑256 дис
 
 Room-проверки используют дисковую SQLite, миграции 1→2→3, независимые подключения и принудительные ошибки записи после изменения дочерних таблиц. Android-адаптеры используют контролируемые intent/cursor/permission inputs. Они не обращаются к личному календарю и не заменяют физическую проверку CalendarProvider/chooser.
 
+Дополнительно проверены восемь assets в APK по точным sizes/SHA‑256, preview без записи, явный импорт в Room, replay и повторное открытие базы. APK — 5 935 630 байт, SHA‑256 `45b21c527aba8d8516cfb872d4b1a8f776bd8e9c61a3f8f318f491446eb17cf4`.
+
 Новые границы включают malformed UTF‑8 внутри JSON, BOM, повреждение/oversize, отказ без записи; trusted catalog manifest и все supporting inputs, conflict/stale/replay/provenance; PROCESS_TEXT draft-only, opt-in и отказ/отзыв Calendar permission, all-day без выдуманного рабочего интервала; дедупликацию Focus DUE callback без переключения фазы.
 
 ## Записанные результаты
 
 Результат предыдущего состояния app 0.9.1 сохранён в [draft-validation-v18/verification.json](../evidence/draft-validation-v18/verification.json): 3 Core + 3 Room, 0 failures, lint 0 errors / 12 warnings, APK собран, deviceTested=false. Эти файлы сохранены как историческое доказательство и не пересчитываются под новые изменения.
 
-Текущий код проверен полным aggregate: **BUILD SUCCESSFUL in 1m 33s**, 3 Core + 3 Room/Robolectric, 0 failures/errors/skips; lint **0 errors, 15 warnings и 1 hint**, APK собран и v2-подпись проверена. Code commit: `3fb7439c2255ea1f7b4536ceed63d4402db9b85b`. Публичная сводка с case names, coverage, SHA‑256 исходных отчётов и APK: [backend-integration/verification.json](../evidence/backend-integration/verification.json).
+Текущий код проверен полным aggregate: **BUILD SUCCESSFUL in 59s**, 3 Core + 3 Room/Robolectric, 0 failures/errors/skips; lint **0 errors, 15 warnings и 1 hint**, APK собран и v2-подпись проверена. Code commit: `7881df5e795fe006b270787556640dd699011478`. Публичная сводка с case names, coverage, SHA‑256 исходных отчётов и APK: [backend-integration/verification.json](../evidence/backend-integration/verification.json).
 
 Сводка получена из нового запуска. Неизменённые оригиналы XML/build/lint/manifest/signature сохранены локально; исторические evidence не заменены. Предупреждения относятся к target/dependency suggestions, техническим строкам/иконке, overdraw и shortcut usage; они не скрывались. Ни этот run, ни APK не являются проверкой физического телефона.
 

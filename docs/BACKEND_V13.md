@@ -65,3 +65,5 @@ tracker.undo(change.state.token)
 Сохранённый JVM-замер [backend-v13](../evidence/backend-v13/verification.json) использовал 2000 закрытых сегментов, 1923 типа (1918 импортированных и пять seed), 337 осей, два прогрева и семь измерений. Он сравнивал оптимизированный путь с безопасным StateStore fallback поверх того же Room, а не с прошлым commit. Замер не доказывает скорость телефона или плавность интерфейса.
 
 Установка/запуск на физическом устройстве не проверены. Реальные launcher/виджет, OS prompts, overlay-окно, FGS/OEM, отзыв разрешений, CalendarProvider и доставка внешнего текста требуют device QA.
+
+Восемь принятых inputs включены в APK через generated assets. Явный `runtime.prepareBundledCatalog()` и последующий `catalogImports.apply(preview)` дают исполнимый путь установки; создание runtime не импортирует каталог. Внешний комплект и командный путь описаны в [FULL_CATALOG_07](FULL_CATALOG_07.md).

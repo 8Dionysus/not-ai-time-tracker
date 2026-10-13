@@ -25,9 +25,11 @@ class MainActivity : ComponentActivity() {
     private var shortcutPending: SurfaceAction? = null
     private var tracedReady = false
     private var launchedDocumentExport: String? = null
+    private var launchedDocumentExportOwner: String? = null
     private val saveExport = registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
-        vm.documentExportId()?.let { vm.writeExport(it,uri) }
         launchedDocumentExport = null
+        launchedDocumentExportOwner = null
+        vm.documentExportId()?.let { vm.writeExport(it,uri) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +37,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         StartupTrace.mark(this, "activity-create")
         launchedDocumentExport = savedInstanceState?.getString("launchedDocumentExport")
-        vm.recoverDocumentExport(launchedDocumentExport)
+        launchedDocumentExportOwner = savedInstanceState?.getString("launchedDocumentExportOwner")
+        vm.recoverDocumentExport(launchedDocumentExport,launchedDocumentExportOwner)
         shortcutPending = TimerSurfaces.restoredShortcut(savedInstanceState, intent)
         if (savedInstanceState == null) receiveSelectedText(intent)
         intent.action = Intent.ACTION_MAIN
@@ -49,6 +52,7 @@ class MainActivity : ComponentActivity() {
                         if(vm.claimDocumentExport(id,owner)) {
                             saveExport.launch(vm.exportTitle(id))
                             launchedDocumentExport = id
+                            launchedDocumentExportOwner = owner
                         }
                     } catch(e: Exception) {
                         vm.releaseDocumentExport(id,owner,e)
@@ -80,6 +84,7 @@ class MainActivity : ComponentActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         TimerSurfaces.saveShortcut(this, outState, shortcutPending)
         launchedDocumentExport?.let { outState.putString("launchedDocumentExport",it) }
+        launchedDocumentExportOwner?.let { outState.putString("launchedDocumentExportOwner",it) }
         super.onSaveInstanceState(outState)
     }
 

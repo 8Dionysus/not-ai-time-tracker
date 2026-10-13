@@ -33,7 +33,7 @@ internal fun atomicText(file: File,text: String) {
 }
 
 @Serializable data class ExportOperation(val id: String,val mime: String,val title: String,val state: String = "PREPARING",
-    val bytes: Long = 0,val sha256: String? = null,val error: String? = null)
+    val bytes: Long = 0,val sha256: String? = null,val error: String? = null,val resultReceived: Boolean = false)
 data class ExportWriteResult(val bytes: Long,val verified: Boolean)
 /** File-backed jobs survive Activity recreation. The Bundle only carries the operation ID. */
 class ExportOperations(private val context: Context) {
@@ -57,6 +57,13 @@ class ExportOperations(private val context: Context) {
         } catch(e: Exception) { save(op.copy(state = "FAILED",error = e.javaClass.simpleName));throw e }
     }
     fun cancel(id: String) { val op = read(id);save(op.copy(state = "CANCELLED")) } // retain staged bytes for explicit retry
+    /** Persist consumption of the chooser result before scheduling any destination I/O.
+     * No destination URI or grant is retained: an interrupted write needs a fresh chooser. */
+    fun receiveResult(id: String,cancelled: Boolean) {
+        val op = read(id)
+        save(op.copy(resultReceived = true,state = if(cancelled) "CANCELLED" else op.state))
+    }
+    fun awaitResult(id: String) { val op = read(id);save(op.copy(resultReceived = false)) }
     fun write(id: String,uri: Uri): ExportWriteResult {
         val op = read(id);val data = File(dir(id),"data")
         ensure(op.state in setOf("READY","CANCELLED") && data.exists() && data.length() == op.bytes && fileHash(data) == op.sha256,

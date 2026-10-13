@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class UiExportLifecycleTest {
-    @Test fun exportBelongsToViewModelAndDocumentIdSurvivesRecreation() {
+    @Test fun exportClaimsAndConsumedActivityResultsSurviveInterruption() {
         val app = RuntimeEnvironment.getApplication()
         val previousOpen = UiBackends.open
         val previousSync = DirectoryDurability.sync;val previousRename = DirectoryDurability.rename
@@ -79,7 +79,7 @@ class UiExportLifecycleTest {
             assertTrue(runBlocking { restored.claimDocumentExport(id,"owner-restored") })
             val normal = TrackerViewModel(app);models.put("normal",normal)
             waitFor { normal.boot.value is TrackerViewModel.Boot.Ready }
-            normal.recoverDocumentExport(id) // normal recreation while chooser exists
+            runBlocking { normal.recoverDocumentExport(id,"owner-restored").join() } // normal recreation while chooser exists
             assertNull(normal.documentExport.value)
             assertEquals(id,restored.documentExportId())
             assertNull(restored.documentExport.value) // registered Activity result, no second chooser
@@ -109,8 +109,80 @@ class UiExportLifecycleTest {
             successor.requestExport();waitFor { !successor.exportPreparing.value && successor.documentExportId() != null }
             assertNotEquals(id,successor.documentExportId())
             assertEquals(before+2,java.io.File(app.noBackupFilesDir,"exports").listFiles().orEmpty().size)
+
+            // Exercise the registered MainActivity ActivityResult callback, not a
+            // model claim standing in for the system's result delivery.
+            fun controller(operationId: String,owner: String): org.robolectric.android.controller.ActivityController<MainActivity> =
+                org.robolectric.Robolectric.buildActivity(MainActivity::class.java)
+                    .create(android.os.Bundle().apply {
+                        putString("launchedDocumentExport",operationId);putString("launchedDocumentExportOwner",owner)
+                    }).start().resume()
+                    .also { control ->
+                        @Suppress("UNCHECKED_CAST")
+                        val launcher = MainActivity::class.java.getDeclaredField("saveExport").apply { isAccessible = true }
+                            .get(control.get()) as androidx.activity.result.ActivityResultLauncher<String>
+                        launcher.launch(ExportOperations(app).read(operationId).title)
+                    }
+            fun deliver(activity: MainActivity,uri: android.net.Uri?) {
+                val registry = activity.activityResultRegistry
+                val saved = android.os.Bundle();registry.onSaveInstanceState(saved)
+                val requestCode = saved.getIntegerArrayList("KEY_COMPONENT_ACTIVITY_REGISTERED_RCS")!!.first()
+                assertTrue(registry.dispatchResult(requestCode,if(uri == null) android.app.Activity.RESULT_CANCELED else android.app.Activity.RESULT_OK,
+                    uri?.let { android.content.Intent().setData(it) }))
+            }
+            class CallbackInterruption: RuntimeException()
+            val cancelledId = successor.documentExportId()!!
+            assertTrue(runBlocking { successor.claimDocumentExport(cancelledId,"cancel-result") })
+            val cancelActivity = controller(cancelledId,"cancel-result")
+            DocumentExportCoordination.afterResultCommit = { throw CallbackInterruption() }
+            assertThrows(CallbackInterruption::class.java) { deliver(cancelActivity.get(),null) }
+            val cancelledOp = ExportOperations(app).read(cancelledId)
+            assertTrue(cancelledOp.resultReceived);assertEquals("CANCELLED",cancelledOp.state)
+            assertEquals(cancelledId,successor.documentExportId()) // interrupted before cleanup
+            cancelActivity.pause().stop().destroy()
+            synchronized(DocumentExportCoordination.lock) { DocumentExportCoordination.writing.clear() } // new-process boundary
+            DocumentExportCoordination.afterResultCommit = null
+            val afterCancel = TrackerViewModel(app);models.put("after-cancel-result",afterCancel)
+            afterCancel.recoverDocumentExport(cancelledId) // deliberately stale saved Activity state
+            waitFor { afterCancel.documentExportId() == null };assertNull(afterCancel.documentExport.value)
+            afterCancel.requestExport();waitFor { !afterCancel.exportPreparing.value && afterCancel.documentExportId() != null }
+            val writeId = afterCancel.documentExportId()!!;val prepared = ExportOperations(app).read(writeId)
+            assertTrue(runBlocking { afterCancel.claimDocumentExport(writeId,"write-result") })
+            val writeActivity = controller(writeId,"write-result")
+            val destination = java.io.File(app.noBackupFilesDir,"callback-result.json")
+            val uri = android.net.Uri.fromFile(destination)
+            DocumentExportCoordination.afterResultCommit = { throw CallbackInterruption() }
+            assertThrows(CallbackInterruption::class.java) { deliver(writeActivity.get(),uri) }
+            assertTrue(ExportOperations(app).read(writeId).resultReceived)
+            writeActivity.pause().stop().destroy()
+            synchronized(DocumentExportCoordination.lock) { DocumentExportCoordination.writing.clear() }
+            DocumentExportCoordination.afterResultCommit = null
+            val afterWriteResult = TrackerViewModel(app);models.put("after-write-result",afterWriteResult)
+            afterWriteResult.recoverDocumentExport(writeId)
+            waitFor { afterWriteResult.documentExport.value == writeId }
+            assertEquals(prepared.sha256,ExportOperations(app).read(writeId).sha256)
+            assertEquals(prepared.bytes,ExportOperations(app).read(writeId).bytes)
+            assertTrue(runBlocking { afterWriteResult.claimDocumentExport(writeId,"retry-result") })
+            val retryRecreation = TrackerViewModel(app);models.put("retry-recreation",retryRecreation)
+            runBlocking { retryRecreation.recoverDocumentExport(writeId,"retry-result").join() }
+            assertNull(retryRecreation.documentExport.value) // fresh chooser after consumed old result
+            val complete = CountDownLatch(1);val finishWrite = CountDownLatch(1)
+            DocumentExportCoordination.afterWriteComplete = { complete.countDown();check(finishWrite.await(10,TimeUnit.SECONDS)) }
+            afterWriteResult.writeExport(writeId,uri)
+            assertTrue(complete.await(10,TimeUnit.SECONDS))
+            assertEquals("COMPLETE",ExportOperations(app).read(writeId).state)
+            assertEquals(writeId,afterWriteResult.documentExportId()) // completed file, interrupted before finally
+            assertEquals(prepared.sha256,fileHash(destination));assertEquals(prepared.bytes,destination.length())
+            val afterComplete = TrackerViewModel(app);models.put("after-complete",afterComplete)
+            afterComplete.recoverDocumentExport(writeId)
+            waitFor { afterComplete.documentExportId() == null && afterComplete.lastBackup.value != null }
+            assertNull(afterComplete.documentExport.value);assertTrue(afterComplete.lastBackup.value!!.verified)
+            finishWrite.countDown();DocumentExportCoordination.afterWriteComplete = null
+            waitFor { synchronized(DocumentExportCoordination.lock) { DocumentExportCoordination.writing.isEmpty() } }
         } finally {
-            release.countDown();DocumentExportCoordination.afterClaimCommit = null;models.clear();UiBackends.open = previousOpen
+            release.countDown();DocumentExportCoordination.afterClaimCommit = null
+            DocumentExportCoordination.afterResultCommit = null;DocumentExportCoordination.afterWriteComplete = null
+            models.clear();UiBackends.open = previousOpen
             DirectoryDurability.sync = previousSync;DirectoryDurability.rename = previousRename
         }
     }

@@ -815,6 +815,11 @@ abstract class ScenarioContract {
         assertEquals(30*60_000,Reports.day(d,clock.now(),LocalDate.parse("2026-10-11")).recordedMs)
         for (tag in listOf("learning","health")) assertEquals(all.recordedMs,Reports.report(d,clock.now(),windowStart,clock.wall,Filter(tags = setOf(tag))).recordedMs)
         val csv = Csv.export(all)
+        for(mode in CsvMode.entries) {
+            val streamed = StringBuilder();Csv.write(all,streamed,mode)
+            assertEquals(MaterializedCsvReference.export(all,mode),streamed.toString())
+            assertEquals(streamed.toString(),Csv.export(all,mode))
+        }
         assertTrue(csv.contains("' =Language").not()); assertTrue(csv.contains("'=Language"))
         assertEquals(20,csv.lineSequence().filter { it.startsWith("\"measurement\"") }.sumOf { it.split(',')[15].trim('"').toLong() })
         assertEquals(1,csv.lineSequence().count { it.startsWith("\"measurement\"") })
@@ -1352,5 +1357,25 @@ abstract class ScenarioContract {
         }
         val failing = Backups(Tracker(failingStore,tracker.clock),disk)
         expect(ErrorCode.STORAGE) { failing.apply(failing.prepare(json)) }
+    }
+}
+
+// Prior materializing algorithm, kept only as a byte-for-byte streaming regression oracle.
+private object MaterializedCsvReference {
+    /** Segment rows use exactly Report's totals. Quantities get separate rows, once per target, never per day/minute. */
+    fun export(report: Report,mode: CsvMode = CsvMode.SPREADSHEET_SAFE): String {
+        fun cell(value: Any?): String {
+            var s = value?.toString() ?: ""
+            if (mode == CsvMode.SPREADSHEET_SAFE && s.trimStart().firstOrNull() in listOf('=','+','-','@')) s = "'"+s
+            return "\"" + s.replace("\"","\"\"") + "\""
+        }
+        val rows = mutableListOf(listOf("type","id","session_or_target_id","start_ms","end_ms","duration_ms","card_id","name","activity_type_id","details","tags","note","field_id","meaning_version","unit","value","scope","zone","ancestor_path","facets"))
+        report.rows.forEach { r -> rows += listOf("segment",r.segmentId,r.sessionId,r.start.toString(),r.end.toString(),r.durationMs.toString(),
+            r.selection.cardId ?: "",r.selection.name ?: "",r.selection.activityTypeId ?: "",codec.encodeToString(r.selection.details),
+            codec.encodeToString(r.selection.tags),r.note ?: "","","","","","",report.zone,codec.encodeToString(r.selection.ancestorPathAtWrite),codec.encodeToString(r.selection.facets)) }
+        report.measurements.forEach { m -> rows += listOf("measurement",m.id,m.targetId,"","","","","","","","","",m.fieldId,m.meaningVersion.toString(),m.unit,m.value.toString(),m.scope.name,report.zone,"","") }
+        // Explicitly expose excluded uncertain data without inventing period attribution or adding it to totals.
+        report.unresolved.forEach { s -> rows += listOf("unresolved",s.id,s.sessionId,"","","","",s.selection.name ?: "","","","","","","","","","",report.zone,codec.encodeToString(s.selection.ancestorPathAtWrite),codec.encodeToString(s.selection.facets)) }
+        return rows.joinToString("\r\n",postfix = "\r\n") { row -> row.joinToString(",") { cell(it) } }
     }
 }

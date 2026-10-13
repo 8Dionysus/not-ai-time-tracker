@@ -171,19 +171,24 @@ internal fun <T> Iterable<T>.sumExact(errorCode: ErrorCode = ErrorCode.INVALID_I
 enum class CsvMode { EXACT, SPREADSHEET_SAFE }
 object Csv {
     /** Segment rows use exactly Report's totals. Quantities get separate rows, once per target, never per day/minute. */
-    fun export(report: Report,mode: CsvMode = CsvMode.SPREADSHEET_SAFE): String {
+    fun export(report: Report,mode: CsvMode = CsvMode.SPREADSHEET_SAFE): String = buildString { write(report,this,mode) }
+    /** Emit each row directly so file exports never retain the whole CSV plus encoded row copies. */
+    fun write(report: Report,out: Appendable,mode: CsvMode = CsvMode.SPREADSHEET_SAFE) {
         fun cell(value: Any?): String {
             var s = value?.toString() ?: ""
             if (mode == CsvMode.SPREADSHEET_SAFE && s.trimStart().firstOrNull() in listOf('=','+','-','@')) s = "'"+s
             return "\"" + s.replace("\"","\"\"") + "\""
         }
-        val rows = mutableListOf(listOf("type","id","session_or_target_id","start_ms","end_ms","duration_ms","card_id","name","activity_type_id","details","tags","note","field_id","meaning_version","unit","value","scope","zone","ancestor_path","facets"))
-        report.rows.forEach { r -> rows += listOf("segment",r.segmentId,r.sessionId,r.start.toString(),r.end.toString(),r.durationMs.toString(),
+        fun row(values: List<String>) {
+            values.forEachIndexed { index,value -> if(index > 0) out.append(',');out.append(cell(value)) }
+            out.append("\r\n")
+        }
+        row(listOf("type","id","session_or_target_id","start_ms","end_ms","duration_ms","card_id","name","activity_type_id","details","tags","note","field_id","meaning_version","unit","value","scope","zone","ancestor_path","facets"))
+        report.rows.forEach { r -> row(listOf("segment",r.segmentId,r.sessionId,r.start.toString(),r.end.toString(),r.durationMs.toString(),
             r.selection.cardId ?: "",r.selection.name ?: "",r.selection.activityTypeId ?: "",codec.encodeToString(r.selection.details),
-            codec.encodeToString(r.selection.tags),r.note ?: "","","","","","",report.zone,codec.encodeToString(r.selection.ancestorPathAtWrite),codec.encodeToString(r.selection.facets)) }
-        report.measurements.forEach { m -> rows += listOf("measurement",m.id,m.targetId,"","","","","","","","","",m.fieldId,m.meaningVersion.toString(),m.unit,m.value.toString(),m.scope.name,report.zone,"","") }
+            codec.encodeToString(r.selection.tags),r.note ?: "","","","","","",report.zone,codec.encodeToString(r.selection.ancestorPathAtWrite),codec.encodeToString(r.selection.facets))) }
+        report.measurements.forEach { m -> row(listOf("measurement",m.id,m.targetId,"","","","","","","","","",m.fieldId,m.meaningVersion.toString(),m.unit,m.value.toString(),m.scope.name,report.zone,"","")) }
         // Explicitly expose excluded uncertain data without inventing period attribution or adding it to totals.
-        report.unresolved.forEach { s -> rows += listOf("unresolved",s.id,s.sessionId,"","","","",s.selection.name ?: "","","","","","","","","","",report.zone,codec.encodeToString(s.selection.ancestorPathAtWrite),codec.encodeToString(s.selection.facets)) }
-        return rows.joinToString("\r\n",postfix = "\r\n") { row -> row.joinToString(",") { cell(it) } }
+        report.unresolved.forEach { s -> row(listOf("unresolved",s.id,s.sessionId,"","","","",s.selection.name ?: "","","","","","","","","","",report.zone,codec.encodeToString(s.selection.ancestorPathAtWrite),codec.encodeToString(s.selection.facets))) }
     }
 }

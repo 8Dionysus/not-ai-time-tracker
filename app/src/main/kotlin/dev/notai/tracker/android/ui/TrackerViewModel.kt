@@ -54,8 +54,11 @@ data class CorrectionState(val preview: Tracker.CorrectionPreview?, val beforeMs
 data class BackupInfo(val at: Long, val bytes: Long, val verified: Boolean)
 internal object DocumentExportCoordination {
     val lock = Any()
+    val writing = mutableSetOf<String>()
     // Test-only suspension boundary after a durable commit; never set by product code.
     var afterClaimCommit: (() -> Unit)? = null
+    var afterResultCommit: (() -> Unit)? = null
+    var afterWriteComplete: (() -> Unit)? = null
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -390,15 +393,20 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
     val documentExport: StateFlow<String?> = _documentExport
     /** Activity saved state is the witness that a chooser was actually launched.
      * A disk claim by itself cannot suppress recovery after a process death. */
-    fun recoverDocumentExport(registeredId: String?) {
-        viewModelScope.launch(Dispatchers.IO) { synchronized(DocumentExportCoordination.lock) {
+    fun recoverDocumentExport(registeredId: String?,registeredOwner: String? = null) =
+        viewModelScope.launch(Dispatchers.IO) { try { synchronized(DocumentExportCoordination.lock) {
             val id = documentExportId() ?: return@synchronized
-            if(registeredId != id) {
+            val operation = exports.read(id)
+            if(operation.state in setOf("COMPLETE","CANCELLED")) {
+                clearDocumentExport(id)
+                if(operation.state == "COMPLETE" && operation.mime == "application/json") recordBackup(operation.bytes,operation.error == null)
+            } else if(id !in DocumentExportCoordination.writing &&
+                (registeredId != id || registeredOwner != prefs.getString("documentExportOwner",null) ||
+                    operation.resultReceived || !prefs.getBoolean("documentExportLaunched",false))) {
                 check(prefs.edit().putBoolean("documentExportLaunched",false).remove("documentExportOwner").commit())
                 _documentExport.value = id
             }
-        } }
-    }
+        } } catch(e: Exception) { notice(Format.error(e)) } }
     fun releaseDocumentExport(id: String,owner: String,error: Exception) {
         synchronized(DocumentExportCoordination.lock) {
         if(documentExportId() == id && prefs.getString("documentExportOwner",null) == owner) {
@@ -428,10 +436,22 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
     fun documentExportId(): String? = prefs.getString("documentExportId",null)
+    private fun clearDocumentExport(id: String) {
+        if(documentExportId() == id) {
+            check(prefs.edit().remove("documentExportId").remove("documentExportLaunched").remove("documentExportOwner").commit())
+            _documentExport.value = null
+        }
+    }
+    private fun recordBackup(bytes: Long,verified: Boolean) {
+        val at = now()
+        prefs.edit().putLong("backupAt",at).putLong("backupBytes",bytes).putBoolean("backupVerified",verified).apply()
+        lastBackup.value = BackupInfo(at,bytes,verified)
+    }
     suspend fun claimDocumentExport(id: String,owner: String): Boolean = withContext(Dispatchers.IO) {
         val claimed = synchronized(DocumentExportCoordination.lock) {
             if(_documentExport.value != id || documentExportId() != id || prefs.getBoolean("documentExportLaunched",false)) false else {
                 check(prefs.edit().putBoolean("documentExportLaunched",true).putString("documentExportOwner",owner).commit())
+                exports.awaitResult(id)
                 _documentExport.value = null;true
             }
         }
@@ -456,28 +476,54 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
         val rt = runtime ?: return@withContext null
         try {
             val v = rt.tracker.view()
-            val text = Csv.export(v.report(0, rt.tracker.clock.now().wall + 1))
+            val report = v.report(0, rt.tracker.clock.now().wall + 1)
             val op = exports.begin("text/csv", "not-ai-history-${Instant.ofEpochMilli(now()).atZone(ZoneId.systemDefault()).toLocalDate()}.csv")
-            val prepared = exports.prepare(op.id) { it.write(text.toByteArray(Charsets.UTF_8)) }
+            val prepared = exports.prepare(op.id) { out ->
+                val writer = out.bufferedWriter(Charsets.UTF_8)
+                Csv.write(report,writer);writer.flush() // ExportOperations owns close/fsync.
+            }
             if (prepared.state == "READY") op.id else null
         } catch (e: Exception) { notice(Format.error(e)); null }
     }
     fun exportTitle(id: String) = exports.read(id).title
     fun exportMime(id: String) = exports.read(id).mime
     fun writeExport(id: String, uri: Uri?) {
-        viewModelScope.launch(Dispatchers.IO) {
+        synchronized(DocumentExportCoordination.lock) {
+            if(!DocumentExportCoordination.writing.add(id)) return
+            try { exports.receiveResult(id,uri == null) }
+            catch(e: Exception) {
+                DocumentExportCoordination.writing.remove(id)
+                prefs.edit().putBoolean("documentExportLaunched",false).commit()
+                notice(Format.error(e));return
+            }
+        }
+        DocumentExportCoordination.afterResultCommit?.invoke()
+        if(uri == null) {
+            synchronized(DocumentExportCoordination.lock) { clearDocumentExport(id);DocumentExportCoordination.writing.remove(id) }
+            notice("Сохранение отменено");return
+        }
+        val job = viewModelScope.launch(Dispatchers.IO) {
+            var completed = false
             try {
-                if (uri == null) { exports.cancel(id); notice("Сохранение отменено"); return@launch }
                 val result = exports.write(id, uri)
-                if (exports.read(id).mime == "application/json") {
-                    val now = now()
-                    prefs.edit().putLong("backupAt", now).putLong("backupBytes", result.bytes).putBoolean("backupVerified", result.verified).apply()
-                    lastBackup.value = BackupInfo(now, result.bytes, result.verified)
-                }
+                completed = true
+                DocumentExportCoordination.afterWriteComplete?.invoke()
+                if (exports.read(id).mime == "application/json") recordBackup(result.bytes,result.verified)
                 notice(if (result.verified) "Файл сохранён и проверен" else "Файл сохранён. Проверить его чтением нельзя")
             } catch (e: Exception) { notice(Format.error(e)) }
             finally {
-                if(documentExportId() == id) prefs.edit().remove("documentExportId").remove("documentExportLaunched").remove("documentExportOwner").apply()
+                synchronized(DocumentExportCoordination.lock) {
+                    DocumentExportCoordination.writing.remove(id)
+                    if(completed) clearDocumentExport(id)
+                    else if(documentExportId() == id) prefs.edit().putBoolean("documentExportLaunched",false).remove("documentExportOwner").commit()
+                }
+            }
+        }
+        job.invokeOnCompletion {
+            // Also runs if the ViewModel was cleared before the IO coroutine started.
+            synchronized(DocumentExportCoordination.lock) {
+                if(DocumentExportCoordination.writing.remove(id) && documentExportId() == id)
+                    prefs.edit().putBoolean("documentExportLaunched",false).remove("documentExportOwner").commit()
             }
         }
     }

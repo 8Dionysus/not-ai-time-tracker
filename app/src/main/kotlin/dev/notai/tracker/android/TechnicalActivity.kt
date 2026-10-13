@@ -160,8 +160,9 @@ class TechnicalActivity: Activity() {
         button("CSV отчёт за сегодня (не полная копия)") { runAction {
             val t = runtime.tracker; val d = t.data(); val now = t.clock.now()
             val report = t.view().day(Instant.ofEpochMilli(now.wall).atZone(ZoneId.of(d.settings.reportZone)).toLocalDate())
-            val text = Csv.export(report)
-            withContext(Dispatchers.Main) { beginExport("text/csv","not-ai-today.csv") { it.write(text.toByteArray(Charsets.UTF_8)) } }
+            withContext(Dispatchers.Main) { beginExport("text/csv","not-ai-today.csv") { out ->
+                val writer = out.bufferedWriter(Charsets.UTF_8);Csv.write(report,writer);writer.flush()
+            } }
         } }
     }
     private fun chooseCard() = runAction {

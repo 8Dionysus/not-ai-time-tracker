@@ -1,0 +1,7 @@
+<resources>
+    <color name="paper">#11161E</color>
+    <color name="widget_surface">#1D2531</color>
+    <color name="widget_tonal">#232C38</color>
+    <color name="widget_ink">#ECEAE4</color>
+    <color name="widget_on_ink">#11161E</color>
+</resources>

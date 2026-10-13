@@ -116,10 +116,10 @@ class RoomScenariosTest: ScenarioContract() {
         // Inject the deterministic clock at the test boundary; buttons execute the real runtime/Room.
         val clockField = Tracker::class.java.getDeclaredField("clock").apply { isAccessible = true }
         val originalClock = clockField.get(tracker);clockField.set(tracker,clock)
-        val controller = org.robolectric.Robolectric.buildActivity(MainActivity::class.java).create()
+        val controller = org.robolectric.Robolectric.buildActivity(TechnicalActivity::class.java).create()
         val activity = controller.get()
         fun <T> io(block: ()->T): T = runBlocking { withContext(Dispatchers.IO) { block() } }
-        fun field(name: String) = MainActivity::class.java.getDeclaredField(name).apply { isAccessible = true }
+        fun field(name: String) = TechnicalActivity::class.java.getDeclaredField(name).apply { isAccessible = true }
         fun input(name: String) = field(name).get(activity) as android.widget.EditText
         fun button(label: String): android.widget.Button? {
             val body = field("body").get(activity) as android.widget.LinearLayout
@@ -375,7 +375,7 @@ class RoomScenariosTest: ScenarioContract() {
         val latest = tracker.snapshot()
         org.junit.Assert.assertNotEquals(widgetPending,TimerSurfaces.pending(context,fresh.copy(token = latest.token)))
         val rendered = TimerSurfaces.widget(context,latest,true).apply(context,null)
-        org.junit.Assert.assertEquals("RESUME",rendered.findViewById<android.widget.Button>(R.id.widget_primary).text.toString())
+        org.junit.Assert.assertEquals("Продолжить",rendered.findViewById<android.widget.Button>(R.id.widget_primary).text.toString())
         val disabled = TimerSurfaces.widget(context,latest,false).apply(context,null)
         org.junit.Assert.assertEquals("Открыть",disabled.findViewById<android.widget.Button>(R.id.widget_primary).text.toString())
         val notification = TimerSurfaces.notification(context,latest)
@@ -512,30 +512,30 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertFalse(signals.consume(work) { cues++ })
         org.junit.Assert.assertEquals(2,cues)
         org.junit.Assert.assertEquals(1000L,tracker.snapshot().trustedDurationMs) // signal consumption never starts another phase/timer
-        val controller = org.robolectric.Robolectric.buildActivity(MainActivity::class.java,android.content.Intent(shared)).create()
+        val controller = org.robolectric.Robolectric.buildActivity(TechnicalActivity::class.java,android.content.Intent(shared)).create()
         val activity = controller.get()
-        val noteField = MainActivity::class.java.getDeclaredField("note").apply { isAccessible = true }
+        val noteField = TechnicalActivity::class.java.getDeclaredField("note").apply { isAccessible = true }
         val note = noteField.get(activity) as android.widget.EditText
         org.junit.Assert.assertEquals(text,note.text.toString())
         org.junit.Assert.assertEquals(android.content.Intent.ACTION_MAIN,activity.intent.action)
         org.junit.Assert.assertFalse(activity.intent.hasExtra(android.content.Intent.EXTRA_PROCESS_TEXT))
         note.setText("Edited draft")
         val fieldValues = mapOf("name" to "Draft name","details" to "listening","from" to "2026-10-01T00:00:00Z","until" to "2026-10-01T00:01:00Z","zone" to "America/Los_Angeles")
-        fieldValues.forEach { (key,value) -> (MainActivity::class.java.getDeclaredField(key).apply { isAccessible = true }.get(activity) as android.widget.EditText).setText(value) }
-        val cardField = MainActivity::class.java.getDeclaredField("selectedCardId").apply { isAccessible = true };cardField.set(activity,"two")
+        fieldValues.forEach { (key,value) -> (TechnicalActivity::class.java.getDeclaredField(key).apply { isAccessible = true }.get(activity) as android.widget.EditText).setText(value) }
+        val cardField = TechnicalActivity::class.java.getDeclaredField("selectedCardId").apply { isAccessible = true };cardField.set(activity,"two")
         controller.newIntent(android.content.Intent(shared).putExtra(android.content.Intent.EXTRA_PROCESS_TEXT,"Other text"))
         org.junit.Assert.assertEquals("Edited draft",note.text.toString()) // explicit text input never silently destroys an existing form
         org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog()
             .getButton(android.content.DialogInterface.BUTTON_NEGATIVE).performClick()
         val state = android.os.Bundle()
         controller.saveInstanceState(state)
-        val stateStatus = MainActivity::class.java.getDeclaredField("status").apply { isAccessible = true }.get(activity) as android.widget.TextView
+        val stateStatus = TechnicalActivity::class.java.getDeclaredField("status").apply { isAccessible = true }.get(activity) as android.widget.TextView
         org.junit.Assert.assertNotNull("Form save failed: ${stateStatus.text}",state.getString("formReference"))
         controller.destroy()
-        val recreated = org.robolectric.Robolectric.buildActivity(MainActivity::class.java,android.content.Intent(shared)).create(state)
+        val recreated = org.robolectric.Robolectric.buildActivity(TechnicalActivity::class.java,android.content.Intent(shared)).create(state)
         try {
             org.junit.Assert.assertEquals("Edited draft",(noteField.get(recreated.get()) as android.widget.EditText).text.toString())
-            fieldValues.forEach { (key,value) -> org.junit.Assert.assertEquals(value,(MainActivity::class.java.getDeclaredField(key).apply { isAccessible = true }.get(recreated.get()) as android.widget.EditText).text.toString()) }
+            fieldValues.forEach { (key,value) -> org.junit.Assert.assertEquals(value,(TechnicalActivity::class.java.getDeclaredField(key).apply { isAccessible = true }.get(recreated.get()) as android.widget.EditText).text.toString()) }
             org.junit.Assert.assertEquals("two",cardField.get(recreated.get()))
         }
         finally { recreated.destroy() }

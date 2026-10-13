@@ -1,0 +1,8 @@
+<resources>
+    <color name="paper">#F2F3EF</color>
+    <color name="icon_background">#1D2024</color>
+    <color name="widget_surface">#FBFBF8</color>
+    <color name="widget_tonal">#E3E6DF</color>
+    <color name="widget_ink">#1D2024</color>
+    <color name="widget_on_ink">#F2F3EF</color>
+</resources>

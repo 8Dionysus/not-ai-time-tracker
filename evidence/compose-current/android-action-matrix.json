@@ -109,8 +109,8 @@
     },
     {
       "action": "large-font",
-      "status": "failed-awaiting-ui-permission",
-      "evidence": "Native1.5 font actualTimer/Picker; font150-picker-real.png shows cropped two-line search placeholder. Manual/Overview/Data font150 remainder not completed; restored original1.0 verified. No visual repair applied."
+      "status": "failed-additional-capacity-awaiting-ui-permission",
+      "evidence": "Authorized search-height fix passed JVM and nativefont150/current-font150-picker.png; fullTimer/Picker/Manual/Overview/Data reached,original1.0restored. AdditionalManualTimeFieldHH:mm wraps/crops andPillButton labels crop at320dp/150%; not covered by prior2UIpermissions; request for scoped extra capacity fix pending; current-font150-{manual,data}.png"
     },
     {
       "action": "talkback",
@@ -119,26 +119,24 @@
     },
     {
       "action": "three-button-navigation-insets",
-      "status": "failed-awaiting-ui-permission",
-      "evidence": "labels/icons cropped; original UI preserved, gesture nav used only on QA emulator"
+      "status": "passed",
+      "evidence": "a589f56 minimalmodifierorderfix authorized23:03; actualthreebutton all3tabs navigation; fullicons/labels screenshotcurrent-threebutton-data.png,labels bottom764<systemnavbar782"
     },
     {
       "action": "final-APK-install-launch",
-      "status": "blocked-storage-awaiting-archive-transfer-permission",
-      "evidence": "v4 exactinstalled and Focus receiver recreation passed; v5 d5ade78 updateinstall refused insufficient internalstorage;10oldQAarchives1324906622B copied40files/hashverified; removal requires permission, no removals yet"
+      "status": "passed",
+      "evidence": "a589f56 exactAPK updateinstallSuccess,12462001B SHA f1b30b3dc506df4161eccdb6144f87bca1a0e69eae4c5cb51551973f840ac968; installedbytesexact; no uninstall/data clear; user-approved only10oldQA archive copies removed after40SHAs rechecked, all9tables unchanged"
     },
     {
       "action": "cross-midnight-history-scroll",
-      "status": "native-blocked-storage",
-      "evidence": "Actual font150 native crash duplicate scale-segment-72989; JVM same IllegalArgumentException reproduced; day+segment key fix and new regressionpassed,11UiScreens/26total; exactv5 native rerun requires installation"
+      "status": "passed",
+      "evidence": "a589f56 font150 native bothSynthetic72989 parts00:00to00:20 and23:50to00:00 displayed across10/9Oct,process3543alive; ui-current-crossday-both-pieces.xml; previousnative/JVMduplicatekeyexception reproduced,day+segmentregressionpasses"
     }
   ],
-  "codeCommit": "d5ade78d173c091b00a20aba99247e6f671e7d2d",
+  "codeCommit": "a589f56779163aef07952f1696a97593d0e09b6b",
   "counts": {
-    "passed": 21,
-    "failed-awaiting-ui-permission": 2,
-    "not-run": 1,
-    "blocked-storage-awaiting-archive-transfer-permission": 1,
-    "native-blocked-storage": 1
+    "passed": 24,
+    "failed-additional-capacity-awaiting-ui-permission": 1,
+    "not-run": 1
   }
 }

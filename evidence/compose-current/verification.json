@@ -1,8 +1,8 @@
 {
   "schema": "tracker_compose_current_verification_v1",
-  "createdAtUtc": "2026-10-13T22:52:46.992872+00:00",
-  "codeCommit": "d5ade78d173c091b00a20aba99247e6f671e7d2d",
-  "currentStatus": "partial_native_review",
+  "createdAtUtc": "2026-10-13T23:22:33.741829+00:00",
+  "codeCommit": "a589f56779163aef07952f1696a97593d0e09b6b",
+  "currentStatus": "approved_ui_fixes_delivered; additional_font_capacity_review_pending",
   "historicalReports": [
     "evidence/audit-updates/verification.json",
     "evidence/acceptance-followup/verification.json"
@@ -74,7 +74,7 @@
     },
     {
       "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/App.kt",
-      "sha256": "17a1157156370d6df273ef93df75f757294903ffad494f3001ff897bdaf88d43"
+      "sha256": "464a00e3a322d1d2e9dace0f2f58de513c76330468efaab949b63897d65cc9ef"
     },
     {
       "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/Backend.kt",
@@ -106,7 +106,7 @@
     },
     {
       "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
-      "sha256": "bcd9f769d8e6d5b497aeb47e4fb4c139de10d5ab83e0c7a5c0b50a90bb4fd041"
+      "sha256": "69cb5a3b59924497fca973d4151c5764a295e251f0ba1dd1f785aabfa2667baf"
     },
     {
       "path": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
@@ -294,7 +294,7 @@
     },
     {
       "path": "app/src/test/kotlin/dev/notai/tracker/android/ui/UiScreensTest.kt",
-      "sha256": "57ea8bef5b39c60b6fb12d950d6a030b30a67118f09c2c5d45f14479be272c86"
+      "sha256": "5f2c6d2fbe0ec05c4e3bf3d93d63aa85063fb7fb748aef73101ad638c2f4c2b8"
     },
     {
       "path": "core/src/test/kotlin/dev/notai/tracker/CoreScenariosTest.kt",
@@ -338,20 +338,20 @@
     }
   ],
   "tests": {
-    "total": 26,
+    "total": 27,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "execution": "Core JVM3 freshly rerun32s; app Robolectric/API35 23 executed in88s aggregate; native QA separate",
+    "execution": "Core JVM3 freshly rerun43s; app Robolectric/API35 24 executed in100s aggregate; native QA separate",
     "rawXml": [
       {
         "file": "TEST-dev.notai.tracker.CoreScenariosTest.xml",
-        "sha256": "9bb017017bc31d482a7f44cb9ded77f14cde608dd8be254cdb308ba879acf408",
+        "sha256": "64d6498f783526a70a102657c030f725c06ef330735f96c7666c1af805584282",
         "tests": 3,
         "failures": 0,
         "errors": 0,
         "skipped": 0,
-        "timestampUtc": "2026-10-13T22:35:55.908Z",
+        "timestampUtc": "2026-10-13T23:10:08.856Z",
         "cases": [
           "smallHistoryAndExport",
           "backupReplacementAndFailure",
@@ -360,12 +360,12 @@
       },
       {
         "file": "TEST-dev.notai.tracker.android.RoomScenariosTest.xml",
-        "sha256": "a95b8824e2112e39cad7081992444bb75cbdec2676041db6fd18723a6380eb88",
+        "sha256": "f3ba47c4e9a36e999cb3368bf02e7fb8f6dc8ed9cba9bf3ad9fae2a9bdb2174e",
         "tests": 11,
         "failures": 0,
         "errors": 0,
         "skipped": 0,
-        "timestampUtc": "2026-10-13T22:33:57.190Z",
+        "timestampUtc": "2026-10-13T23:06:31.747Z",
         "cases": [
           "orphanSidecarsNeverInitialize",
           "validClassificationPayloadCannotChangeUnderItsOldContentId",
@@ -382,25 +382,26 @@
       },
       {
         "file": "TEST-dev.notai.tracker.android.ui.UiExportLifecycleTest.xml",
-        "sha256": "831276c9a2457d578e7af9b433d2755e2c0efed5b32a7c7f7cf4de13d8d3f062",
+        "sha256": "d1a973792de6c89438643728502c0dedc16163d399f06293ad0888c12b1ae718",
         "tests": 1,
         "failures": 0,
         "errors": 0,
         "skipped": 0,
-        "timestampUtc": "2026-10-13T22:34:20.106Z",
+        "timestampUtc": "2026-10-13T23:07:04.212Z",
         "cases": [
           "exportClaimsAndConsumedActivityResultsSurviveInterruption"
         ]
       },
       {
         "file": "TEST-dev.notai.tracker.android.ui.UiScreensTest.xml",
-        "sha256": "56c06a0a74e45f4a6a9a2a65d1aa8ab6d0f9f6487e070f9ec73ce56ba1d6095c",
-        "tests": 11,
+        "sha256": "2ec086006a1f925f08a541c047fd4931301b6d6b8054f53cfa662c23ac41137d",
+        "tests": 12,
         "failures": 0,
         "errors": 0,
         "skipped": 0,
-        "timestampUtc": "2026-10-13T22:33:20.516Z",
+        "timestampUtc": "2026-10-13T23:07:04.721Z",
         "cases": [
+          "largeFontSearchPlaceholderFitsItsContainer",
           "picker",
           "recovery",
           "data",
@@ -423,9 +424,9 @@
     "hints": 1
   },
   "apk": {
-    "name": "not-ai-time-tracker-0.10.0-d5ade78-debug.apk",
-    "bytes": 12461614,
-    "sha256": "a9103b9fb725d899bc23c17ee3b715b9fd9c7f39f0014f4ec71b157953c43026",
+    "name": "not-ai-time-tracker-0.10.0-a589f56-debug.apk",
+    "bytes": 12462001,
+    "sha256": "f1b30b3dc506df4161eccdb6144f87bca1a0e69eae4c5cb51551973f840ac968",
     "versionName": "0.10.0",
     "versionCode": 11,
     "minSdk": 26,
@@ -435,26 +436,24 @@
     "priorLocalDebugSignerEqual": true,
     "originalUserSignerSha256": "c4335948a9dbedb8bc1b557d23d0ea37013fb53c79a8ce57f19a7f24fb7f20b7",
     "originalUserSigningKeyRecovered": false,
-    "libraryVersion": 5,
+    "libraryVersion": 6,
     "libraryPinnedReadbackExact": true,
     "catalogAssetsExact": true,
     "androidTestFixturesAbsent": true,
-    "nativeInstalledExact": false,
-    "nativeInstallBlocker": "QA storage; verified old QA archive transfer pending permission; no uninstall/data clearing"
+    "nativeInstalledExact": true,
+    "updateInstall": "Success over prior local QA without uninstall or data clear"
   },
   "native": {
     "platform": "AOSP API35 x86_64; owned QA AVD; synthetic history",
     "matrix": "android-action-matrix.json",
     "counts": {
-      "passed": 21,
-      "failed-awaiting-ui-permission": 2,
-      "not-run": 1,
-      "blocked-storage-awaiting-archive-transfer-permission": 1,
-      "native-blocked-storage": 1
+      "passed": 24,
+      "failed-additional-capacity-awaiting-ui-permission": 1,
+      "not-run": 1
     },
     "physicalPhone": false,
     "talkBack": "unavailable/not installed",
-    "recordingVariedCodeStates": "Per-action receipts retained; v4 installation/Calendar/Focus/restore precede day-key fix; v5 native installation and scroll repeat still blocked",
+    "recordingVariedCodeStates": "Per-action receipts retained; v4 Calendar/Focus/restore precede scoped visual changes; v6 exact updateinstall, threebutton, searchfont150 and cross-day scroll verified",
     "composeRestore": {
       "schema": "tracker_native_compose_restore_proof_v1",
       "testedCodeCommit": "979481ac113215f8fb98dbbfd8fb1260136a47c2",
@@ -497,6 +496,13 @@
       "foregroundReopened": false,
       "forcedAlarmOrBroadcast": false,
       "OEMIdleClaim": false
+    },
+    "qaArchiveOffload": {
+      "userApproved": true,
+      "exactArchivesRemoved": 10,
+      "hostFilesPreservedAndHashesRechecked": 40,
+      "bytes": 1324906622,
+      "all9DatabaseTablesUnchanged": true
     }
   },
   "github": {
@@ -506,10 +512,8 @@
     "CIpassClaim": false
   },
   "limits": [
-    "font150 search placeholder clipped; visual repair awaiting permission",
-    "three-button bottom navbar icons/labels cropped; visual repair awaiting permission",
-    "TalkBack absent; physical phone/OEM idle/power loss not tested",
-    "v5 install/launch/native scrolling blocked by QA storage pending verified archive offload permission"
+    "At320dp/font150 Manual TimeFieldHH:mm wraps/crops and some PillButton labels crop; outside two approved visual fixes, separate scoped request pending",
+    "TalkBack absent; physical phone/OEM idle/power loss not tested"
   ],
   "license": "No project licence selected"
 }

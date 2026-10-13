@@ -1,0 +1,195 @@
+{
+  "schema": "tracker_backend_verification_v1",
+  "sourceCommit": "3fb7439c2255ea1f7b4536ceed63d4402db9b85b",
+  "recordedAt": "2026-10-13T05:08:47.263165+00:00",
+  "appVersion": "0.9.1",
+  "roomSchema": 3,
+  "backupFormat": 7,
+  "readBackupVersions": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "command": "./gradlew --offline --no-daemon :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug",
+  "result": "BUILD SUCCESSFUL in 1m 33s",
+  "toolchain": {
+    "jdk": "Microsoft OpenJDK 21.0.12.1",
+    "gradle": "8.13",
+    "compileSdk": 35,
+    "buildTools": "35.0.0",
+    "roomTestMaxHeap": "1g",
+    "cacheRouting": "External local Gradle/Robolectric/build caches; same project tasks and inputs"
+  },
+  "deviceTested": false,
+  "androidExecution": "Robolectric API 35; controlled adapter inputs; no actual calendar access or OS permission grant",
+  "suites": [
+    {
+      "module": "core",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 12.4,
+      "cases": [
+        "smallHistoryAndExport",
+        "backupReplacementAndFailure",
+        "timerPath"
+      ],
+      "originalXmlSha256": "552aa01d361cc58a8758b53df5e06be1114c6e74f7b74370f250fd0d29e75779"
+    },
+    {
+      "module": "room",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 34.255,
+      "cases": [
+        "smallHistoryAndExport",
+        "backupReplacementAndFailure",
+        "timerPath"
+      ],
+      "originalXmlSha256": "6bbf271407c77652d5c7e9094363a8a2f036e7b9352ce847a534567bf1c3fff8"
+    }
+  ],
+  "lint": {
+    "errors": 0,
+    "fatal": 0,
+    "warnings": 15,
+    "hints": 1,
+    "issueIds": {
+      "OldTargetApi": 1,
+      "GradleDependency": 4,
+      "NewerVersionAvailable": 3,
+      "Overdraw": 1,
+      "MissingApplicationIcon": 1,
+      "ReportShortcutUsage": 1,
+      "SetTextI18n": 5
+    },
+    "originalXmlSha256": "7406fee8628af53c8ba6d32d20231d0e8fc57d253662056539e6b62ecf09e9bb"
+  },
+  "originalBuildLogSha256": "79ef4ba233a0bb9c6717abc034094bb9200bcb0ebf4819c61933fe924927c994",
+  "apk": {
+    "file": "app-debug.apk",
+    "bytes": 3051814,
+    "sha256": "996044afe21c5ccc162237cc56592d7a472d4336fc1a34f2aec371819ed4bac8",
+    "signatureVerified": true,
+    "v2Signature": true,
+    "trustedCatalogManifestPackaged": true,
+    "debugBuild": true
+  },
+  "coverage": [
+    "single timer, late classification, transitions, correction/Undo, reports and recovery",
+    "Room migration/readback, SQL rollback, independent-store invalidation and stale tokens",
+    "JSON 1–7, preview/cancel, clean replacement and verified rollback",
+    "CSV inspect/mapping/preview/apply, replay/provenance and bad inputs",
+    "Choices complete pagination, Groups/availability, Goals, Focus recovery, LocalEntries/calendar/grouping/draft validation",
+    "SAF strict UTF-8 including corrupt bytes inside JSON, BOM, truncation, oversize, no mutation on refusal",
+    "trusted full-catalog sources, wrong hash/missing companion/conflict/stale, replay and retained history/provenance",
+    "Calendar explicit enable/permission guard, revocation/missing provider/invalid occurrence/all-day",
+    "PROCESS_TEXT draft-only, edited note, existing-form protection and Activity recreation",
+    "Focus DUE callback deduplication, re-entry, failure retry and no phase/timer mutation"
+  ],
+  "evidenceHandling": "Public summary derived from this run. Original XML/build/manifest/signature reports retained locally without rewriting; historical evidence directories unchanged.",
+  "documentationReview": {
+    "originalMarkdownFiles": 20,
+    "authoredFilesRevised": 19,
+    "rawHashedMarkdownPreserved": 1,
+    "newNavigationFiles": 1,
+    "localMarkdownLinksChecked": 135,
+    "missingTargets": 0,
+    "unbalancedFences": 0,
+    "privatePagesOrParticipantReferencesInAuthoredDocs": 0,
+    "originalRawResearchAndEvidenceChanged": false,
+    "files": [
+      {
+        "file": "AGENTS.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "README.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/ACCEPTANCE_GAPS.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/BACKEND_V10.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/BACKEND_V13.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/CATALOG_IMPACT.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/CHOICES.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/FILE_IMPORT.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/FOCUS.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/FULL_CATALOG_07.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/GOALS.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/LOCAL_ENTRIES.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/QUANTITY_REVIEW.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/RESEARCH_ADAPTER.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/RESEARCH_FOLLOWUP.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/UI_CONTRACT.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/VERIFICATION.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "docs/history/ACCEPTANCE_GAPS_through_v15.md",
+        "review": "authored documentation revised"
+      },
+      {
+        "file": "research/README.md",
+        "review": "new navigation"
+      },
+      {
+        "file": "research/supporting/tracker_catalog_core_compatibility.md",
+        "review": "raw research input preserved"
+      },
+      {
+        "file": "samples/transfer/README.md",
+        "review": "authored documentation revised"
+      }
+    ]
+  }
+}

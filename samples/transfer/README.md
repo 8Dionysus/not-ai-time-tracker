@@ -1,6 +1,11 @@
-Synthetic compatibility example, not a user's export. Uses columns documented by Toggl (links in docs/BACKEND_V10.md).
+# Synthetic CSV examples
 
-Parse with HistoryTransfer.parseToggl(text, "toggl:my-workspace", "Europe/Berlin").
-The interval is 2026-10-09T08:00:00Z..08:20:00Z, 1,200,000 ms.
-Choose an explicit Classification for SourceActivity("Language", "Personal") before preview/apply.
-No claim that all versions/localizations of Toggl exports, or Simple Time Tracker exports, match this fixture.
+These files contain synthetic data and exercise documented input schemas; they are not personal exports.
+
+- [schema-a.csv](schema-a.csv): comma delimiter and ISO timestamps with offsets.
+- [schema-b.csv](schema-b.csv): semicolon delimiter, explicit local timestamp pattern and duration in seconds.
+- [toggl-supported.csv](toggl-supported.csv): columns supported by the compatibility preset described in [HistoryTransfer](../../docs/BACKEND_V10.md).
+
+For the Toggl fixture call `HistoryTransfer.parseToggl(text, "example:workspace", "Europe/Berlin")`. The interval is `2026-10-09T08:00:00Z..08:20:00Z`, 1,200,000 ms. Choose an explicit Classification for `SourceActivity("Language", "Personal")` before preview/apply.
+
+The general [inspect → mapping → preview → apply](../../docs/FILE_IMPORT.md) path does not require a vendor name. A synthetic fixture does not establish compatibility with every localization/export version of an external tracker.

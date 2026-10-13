@@ -1,151 +1,61 @@
-> Исправление приёмки v18 / app 0.9.1: [валидация редактируемого EntryDraft](LOCAL_ENTRIES.md) на обеих командах. Room 3 / JSON 7 без изменения; прежние поставки сохранены.
+# Проверки и пределы результатов
 
-> Текущий срез v17 / app 0.9.0: [LOCAL_ENTRIES.md](LOCAL_ENTRIES.md) — локальный календарь, группы истории, черновики из события/текста. Room 3 / JSON 7 без изменения. Поиск v16 сохранён. Устройство не проверялось.
+Проверки относятся к конкретному исходному состоянию и окружению. Успешный JVM-набор или сборка APK не подтверждают запуск приложения, доступность UI, поведение OS-разрешений и OEM на физическом Android.
 
-> Актуальное дополнение v16 / app 0.8.0: [CHOICES.md](CHOICES.md). Read API выбора реализован; Room 3 / JSON 7 без изменения. Текущий остаток — [ACCEPTANCE_GAPS.md](ACCEPTANCE_GAPS.md).
+## Воспроизводимая команда
 
-> Актуальное дополнение v15 / app 0.7.0: [FOCUS.md](FOCUS.md). JSON 7 (чтение 1–7), backend Focus реализован; устройство не проверялось.
-
-> Актуальное дополнение v14 / app 0.6.0: [GOALS.md](GOALS.md). JSON 6 (чтение 1–6), цели реализованы; устройство не проверялось.
-
-> Актуальное дополнение v13 / app 0.5.0: [BACKEND_V13.md](BACKEND_V13.md). Ниже сохранена история прежнего среза; JSON теперь 5 (чтение 1–5), Android-поверхности реализованы, устройство не проверялось.
-
-# Проверка версии 0.2.0 / схемы 2 · 11 октября 2026
-
-В этой среде выполнена команда:
+Требуются JDK 17 или 21, Android Platform 35 и Build Tools 35.0.0. SDK и кэш задаются локально через environment/local.properties, без персональных путей в репозитории.
 
 ```sh
-JAVA_HOME=/workspace/toolchains/jdk21 \
-ANDROID_HOME=/workspace/toolchains/android-sdk \
-ANDROID_USER_HOME=/workspace/toolchains/android-user \
-GRADLE_USER_HOME=/workspace/toolchains/gradle-home \
 ./gradlew :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-Повторный предметный проход по четырём рискам: BUILD SUCCESSFUL. Три Core-сценария и те же три Room/Robolectric-сценария прошли без пропусков и ошибок. Lint: 0 errors, 7 warnings (зафиксированные версии SDK/зависимостей, техническая иконка/строка). APK собран; схемы 1 и 2 сохранены. Свидетельства: evidence/android-build.log, core-tests.xml, room-tests.xml, lint-results-debug.txt.
+Gradle Wrapper 8.13 проверяет закреплённый SHA‑256 дистрибутива. `--offline` работает только при заранее заполненном кэше. Версии Kotlin/AGP/Room зафиксированы в Gradle-файлах.
 
-Внутри прежних трёх сценариев добавлены: прямой выбор широкой группы, null type, исторический roll-up после перемещения, отказ цикла, AND/OR фасетов без повторного времени, повтор с новым путём и прежними параметрами, точная дробь/конверсия 0.1 mi → 160.9344 m, одно измерение на два сегмента, словари в полном JSON. Проверены JSON v1 и настоящая SQLite-база по сохранённой Room-схеме 1 с миграцией в 2, Long.MAX_VALUE без потерь и неизвестные details, включая ключ partOf. Preview исправления не пишет в базу, показывает старые/новые суммы; сохранение заметки не переклассифицирует старый путь, явный пересчёт отменяется Undo. Миграция не угадывает новый каталог и валидирует граф до записи.
+## Общий набор
 
-Дополнительно в те же сценарии включены: запрет смены версии/definition существующего типа; неизвестные suggestedAxisIds/suggestedMetricIds; raw Classification архивного/невыбираемого узла и доступного потомка; атомарный отказ switch; явный Repeat архива; отчёт ADDED/UNCHANGED/CONFLICT; дубликаты типов, осей, метрик, единиц и конфликт с пользовательским ID; периодическая дробь для зарегистрированной метрики с сохранением draft и успешным последующим явным вводом в canonicalUnitId. Схема Room/JSON остаётся 2, данных для новой миграции не добавлено.
+Одни и те же три сценария выполняются на Memory и Room/Robolectric API 35:
 
-Device QA не выполнен: прежний успешный adb devices -l вернул пустой список, новых образов/эмуляторов не устанавливали. GitHub remote не создан по прежнему препятствию авторизации. Входной каталог Library v1 не получен после ограниченных попыток передачи; точные ID/hash и остаток — CATALOG_IMPACT.md. Полный каталог не заявляется готовым.
+| Сценарий | Охват |
+|---|---|
+| `timerPath` | Start без карточки, последующая разметка, pause/resume/switch/stop, повтор/Favorite, токены и конкурентные команды, monotonic/boot recovery; Choices, Goals, Focus; storage/cache, CSV inspect/mapping/preview/apply; Android-поверхности и optional adapters |
+| `smallHistoryAndExport` | История, correction/Undo и общая граница, Reports/CSV и DST, дерево/фасеты/Decimal, calendar/grouping/EntryDraft, полный исследовательский корпус и явный package import |
+| `backupReplacementAndFailure` | JSON 1–7, чистое хранилище, preview/cancel, полная замена и rollback, повреждения/размер/ссылки, stale и конкурентная правка; Room SQL-failure rollback и SAF byte boundary |
 
----
+Тестовый JVM Room/Robolectric имеет heap 1 GiB для полного исследовательского корпуса и Android sandbox. Это параметр тестов, а не largeHeap приложения и не проверка памяти телефона.
 
-## Историческое свидетельство предыдущего прохода v1
+Room-проверки используют дисковую SQLite, миграции 1→2→3, независимые подключения и принудительные ошибки записи после изменения дочерних таблиц. Android-адаптеры используют контролируемые intent/cursor/permission inputs. Они не обращаются к личному календарю и не заменяют физическую проверку CalendarProvider/chooser.
 
-# Фактическая проверка · 11 октября 2026
+Новые границы включают malformed UTF‑8 внутри JSON, BOM, повреждение/oversize, отказ без записи; trusted catalog manifest и все supporting inputs, conflict/stale/replay/provenance; PROCESS_TEXT draft-only, opt-in и отказ/отзыв Calendar permission, all-day без выдуманного рабочего интервала; дедупликацию Focus DUE callback без переключения фазы.
 
-Проект: `/workspace/not-ai-time-tracker`, отдельный Git-репозиторий. Соседние репозитории не изменялись. Дополнительные агенты не запускались; фактические модель/effort runtime не раскрыл, исполнитель их не менял.
+## Записанные результаты
 
-## Среда и разрешение
+Результат предыдущего состояния app 0.9.1 сохранён в [draft-validation-v18/verification.json](../evidence/draft-validation-v18/verification.json): 3 Core + 3 Room, 0 failures, lint 0 errors / 12 warnings, APK собран, deviceTested=false. Эти файлы сохранены как историческое доказательство и не пересчитываются под новые изменения.
 
-- OpenJDK 21.0.12.1; target bytecode Java 17. В системном runtime отсутствовал launcher javac, но модули компилятора уже были. В `/workspace/toolchains/jdk21` создана отдельная копия с launcher-скриптами существующих jdk.compiler/jdk.jartool/jdk.jlink. javac и jlink проверены; системная Java не менялась. Adoptium API ответил proxy CONNECT 403, ограничения не обходились.
-- Gradle 8.13 (Wrapper включён), Kotlin 2.1.20, AGP 8.11.1, KSP 2.1.20-2.0.1, Room 2.7.2.
-- SHA-256 Gradle: `20f1b1176237254a6fc204d8434196fa11a4cfb387567519c61556e8710aed78` — проверен и закреплён в wrapper properties.
-- Дионис разрешил Android SDK License 11 октября 2026, 05:13:16 UTC. Принята только `android-sdk-license` для согласованных пакетов. sdkmanager завершился с кодом 0: Platform 35 revision 2, Build-tools 35.0.0, Platform-tools 37.0.1 установлены в `/workspace/toolchains/android-sdk`.
-- Загрузки Java используют уже настроенный прокси; Android-кэш перенесён в writable workspace. TLS/trust stores не менялись. Robolectric использует тестовый user.home внутри `.gradle/robolectric`, потому что системный home read-only. Credentials не менялись.
+Текущий код проверен полным aggregate: **BUILD SUCCESSFUL in 1m 33s**, 3 Core + 3 Room/Robolectric, 0 failures/errors/skips; lint **0 errors, 15 warnings и 1 hint**, APK собран и v2-подпись проверена. Code commit: `3fb7439c2255ea1f7b4536ceed63d4402db9b85b`. Публичная сводка с case names, coverage, SHA‑256 исходных отчётов и APK: [backend-integration/verification.json](../evidence/backend-integration/verification.json).
 
-## Команда и результат
+Сводка получена из нового запуска. Неизменённые оригиналы XML/build/lint/manifest/signature сохранены локально; исторические evidence не заменены. Предупреждения относятся к target/dependency suggestions, техническим строкам/иконке, overdraw и shortcut usage; они не скрывались. Ни этот run, ни APK не являются проверкой физического телефона.
 
-```sh
-cd /workspace/not-ai-time-tracker
-JAVA_HOME=/workspace/toolchains/jdk21 \
-ANDROID_HOME=/workspace/toolchains/android-sdk \
-ANDROID_USER_HOME=/workspace/toolchains/android-user \
-GRADLE_USER_HOME=/workspace/toolchains/gradle-home \
-./gradlew :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
-```
+| Историческая область | Материалы |
+|---|---|
+| Начальные сценарии / migration / backup | [Core XML](../evidence/core-tests.xml), [Room XML](../evidence/room-tests.xml), [manifest](../evidence/apk-manifest.txt) |
+| Research baseline и семантический анализ | [summary](../evidence/research/summary.json), [followup](../evidence/research/followup-summary.json) |
+| Полная исправленная проекция | [summary](../evidence/full-projection/summary.json), [outcomes](../evidence/full-projection/outcomes.json) |
+| Delta writes и внешняя история | [backend-v10](../evidence/backend-v10/summary.json) |
+| Лимит перед CSV parser | [acceptance-v11](../evidence/acceptance-v11/summary.json) |
+| Форматная инспекция | [format-import-v12](../evidence/format-import-v12/summary.json) |
+| CheckedState / Android-поверхности | [backend-v13](../evidence/backend-v13/verification.json) |
+| Goals / Focus | [goals-v14](../evidence/goals-v14/verification.json), [focus-v15](../evidence/focus-v15/verification.json) |
+| Choices / LocalEntries | [choices-v16](../evidence/choices-v16/verification.json), [local-entries-v17](../evidence/local-entries-v17/verification.json) |
 
-Последний запуск: **BUILD SUCCESSFUL in 15s**. [Полный журнал](../evidence/android-build.log).
+Сырые файлы evidence сохраняются без редакторской подгонки результатов. Старые версии Room/JSON в них относятся к моменту запуска; действующие версии — Room 3 и JSON 7. Ранние документы и изменения доступны в истории Git.
 
-- Core: 3 tests, 0 failures, 0 errors, 0 skipped — [XML](../evidence/core-tests.xml).
-- Room/Robolectric API 35: те же 3 сценария на дисковой SQLite, 0 failures, 0 errors, 0 skipped — [XML](../evidence/room-tests.xml). Это не тест на Android-устройстве.
-- APK: `app/build/outputs/apk/debug/app-debug.apk`, debug-сборка приложения `dev.notai.tracker`, minSdk 26 / targetSdk 35.
-- `apksigner verify --verbose`: Verifies, v2=true, один подписант — [вывод](../evidence/apk-signature.txt).
-- Room KSP: сгенерированы implementation и [schema 1](../app/schemas/dev.notai.tracker.android.TrackerDatabase/1.json). Destructive migration fallback не включён.
-- Lint: **0 errors, 7 warnings** — [отчёт](../evidence/lint-results-debug.txt). Предупреждения: старшие доступные SDK/версии зависимостей, отсутствие продуктовой иконки и строковый литерал UTC в технической оболочке. Они не скрывались; обновление targetSdk и продуктовые ресурсы требуют отдельной проверки UI.
-- В APK через aapt2 проверены allowBackup=false, fullBackupContent=false, ссылка на dataExtractionRules, отсутствие uses-permission — [manifest](../evidence/apk-manifest.txt). Manifest содержит служебный неэкспортируемый Room MultiInstanceInvalidationService; постоянный сервис отсчёта не запускается.
+## Проверка документации
 
-## Три сценария
+Проверены все 20 исходных Markdown/README/AGENTS-файлов: 19 авторских документов переработаны, один checksum-bound исследовательский Markdown сохранён как сырой исторический источник. Добавлен research/README для навигации и объяснения его роли. Проверены 135 локальных Markdown-ссылок и парность code fences; отсутствующих целей нет. Частные Pages, упоминания участников/исполнителей и пути окружения удалены из авторской документации. Все исходные research/evidence сохранены; полный перечень файлов находится в новой verification.json.
 
-1. **timerPath**: старт без карточки; поздняя разметка; pause/resume; повторное открытие состояния; stale Stop/Undo с актуальным Snapshot; switch и забытое переключение; repeat/favorite, в том числе после переименования и архивирования карточки; изменение деталей; два конкурентных switch (один принят, другой STALE); скачок часов; другая загрузка; подтверждение/исключение хвоста; отказ недопустимых крайних значений часов и elapsed duration. Core восстанавливает сериализованный объект, Room закрывает и заново открывает дисковую базу.
-2. **smallHistoryAndExport**: полночь; пауза; разные сегменты равной длительности; пересекающиеся tags; одинаковые суммы отчёта и CSV; session quantity не удваивается; исправление/Undo; зафиксированный результат правки с отчётом; удаление измерения с affected ID; атомарная правка сессии/заметки; копия карточки без истории/количеств; переименование/архивирование карточки и типа без смены прошлой связи; отказ отсутствующей ссылки и пересечения; календарные сравнения 23/24 и 25/24 часов Europe/Berlin; метка неполного периода; quantityTotals по field/version/unit/scope без удвоения и с различением нуля/отсутствия; отказы переполнения сумм и безопасное целочисленное пересечение больших длительностей.
-3. **backupReplacementAndFailure**: оба JSON-примера; полная замена чистого состояния; история/настройки/типы/избранное/измерения; сохранение переименованного архивного типа и ссылки; активный хвост в RECOVERY без выдуманного end; повреждённый файл, неизвестная версия, пропущенный datasetId, дубликат ID; stale preview; повреждённая rollback-копия; ошибка SQLite trigger на последней записи metadata после фактической замены дочерних таблиц (в Room) с полным rollback; в Core — моделируемый отказ StateStore; конкурентное изменение настройки во время внешней записи rollback-файла с отказом устаревшего импорта; отказ неподтверждённой длительности активного хвоста; quantity-суммы после JSON-восстановления; явное подтверждение границы.
+## Непроверенные области
 
-Расширения добавлены внутрь этих трёх сценариев, отдельной большой тестовой системы нет. Исправлены обнаруженные дефекты Android-компиляции (O_DIRECTORY), тестовой среды (Robolectric lock), STALE/Undo, affected IDs измерений и отсутствующего реестра типов. Дополнительная приёмка закрыла календарное сравнение через DST, безопасные quantity-суммы, диапазоны часов/длительностей и усилила доказательство атомарности импорта.
+Физический Android: Activity/SAF, sleep/reboot/kill/restart, widgets/launcher/overlay, OS prompts и отзыв разрешений, CalendarProvider, PROCESS_TEXT chooser, OEM-поведение, TalkBack и увеличенный текст. Производительность и батарея на многолетней истории телефона не измерены. Малые JVM-замеры являются локальными измерениями, без гарантии p95, плавности или фоновой доставки сигнала.
 
-## Не выполнено
-
-- Нет проверки Activity/SAF/sleep/reboot/kill-process на устройстве или эмуляторе; нет screenshots/logcat сценария. Android QA-навык теперь доступен и прочитан. Первоначальный запуск adb 37.0.1 упирался в read-only home. После явного указания родителя отдельному дочернему процессу adb передан HOME=/workspace/toolchains/adb-home; родительское окружение не менялось. `adb devices -l` завершился с кодом 0 и пустым списком — [вывод](../evidence/adb-devices.txt). Эмулятор/qemu-процесс и `/dev/kvm` не обнаружены. Новые образы не устанавливались, filesystem-разрешения не расширялись. Доступного adb-target нет.
-- Политика Android backup проверена в собранном APK, но не проверялась на OEM-устройствах. Производительность и батарея не измерялись.
-- Private GitHub-репозиторий не создан: create-repository нет в доступном коннекторе, существующая CLI-авторизация невалидна. Токен не читался/не выводился; remote не настроен, публичной публикации не было.
-- Остальные продуктовые ограничения и этапы перечислены в [ACCEPTANCE_GAPS.md](ACCEPTANCE_GAPS.md).
-
-## Источники
-
-[Совместимость AGP 8.11](https://developer.android.com/build/releases/agp-8-11-0-release-notes), [Room](https://developer.android.com/jetpack/androidx/releases/room), [Android SDK License](https://developer.android.com/studio/terms).
-
-## Независимая проверка сохранности после доставки Library v3
-
-11 октября 2026: по фактическому коду и локальному samples/history-v2.json расширен существующий backupReplacementAndFailure. Выполнена та же команда сборки выше: BUILD SUCCESSFUL (27s), 3 Core + 3 Room/Robolectric, 0 failures/errors/skips; lint 0 errors / 7 warnings. Это новые проверки согласованных механизмов, не повторный запуск ради статуса.
-
-Проверено: rename/reparent без изменения сегментов; повторный addCatalog с тем же ID и иным meaningVersion/definition возвращает тот же CONFLICT и сохраняет старую семантику; экспорт/восстановление сохраняет старые пути; повторный полный restore не дублирует записи (только новая ревизия), удаляет записи после снимка как явная полная замена; реальное восстановление его rollback-файла возвращает эти локальные записи. Шесть повреждений графа — цикл, отсутствующий parent, карточка, measurement target, suggested axis и ID исторического пути — отклоняются до записи и создания rollback-файла. Прежний тест SQLite-триггера продолжает проверять откат после промежуточной записи дочерних таблиц.
-
-Исправленный дефект: encode мог выдавать JSON больше лимита собственного decode, а для пустой базы не проверял часы. Теперь валидирует часы/граф, проверяет UTF-8 размер через общий MAX_BACKUP_BYTES и проверяет полученный JSON тем же decoder до возврата. Регрессии: недопустимые часы; >10 MiB с многобайтным текстом; откат календарных часов, при котором старые определённые записи оказались позже asOf. В последнем случае экспорт явно отклоняется, а исходные данные сохраняются: непригодная копия не объявляется успешной. Лимит не расширялся, форматы Room/JSON остались 2.
-
-ZIP исследовательского пакета 0.4 не читался и не загружался повторно. Данные пакета, его manifest, source-kind/axis-value решения, шесть конфликтов исследовательских ID и source-qualified provenance не проверены. Ещё нужен доступ к фактическим байтам/исходникам, затем типизированный reader/адаптер, покрывающий каждый входной элемент преобразованием или обоснованным остатком, проверка ссылок/путей полного runtime-представления и повторного пакетного импорта. Локальные фикстуры не заменяют эту приёмку. UI и устройство не проверялись и не менялись.
-
-
-## Полный полученный корпус 0.5 · APK 0.3.0
-
-После снятия блокера через Library read API добавлен типизированный ResearchCatalog и FileResearchArchive. Фактический SHA-256 входа подтверждён; полный файл и результаты включены в research/ и evidence/research/. Новые проверки полного корпуса входят в прежние три сценария. Команда :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug прошла: BUILD SUCCESSFUL, 3 Core + 3 Room, 0 failures/errors/skips; lint 0 errors / 7 warnings. Это не device QA. JSON теперь 3 с чтением 1/2, SQL Room остаётся 2. Подробный контракт и непреобразованный остаток — RESEARCH_ADAPTER.md; предыдущие разделы о недоступности JSON/отсутствии адаптера являются историей прежних проходов.
-
-
-## Полный baseline + ISCO v2 + спорт 0.7
-
-11 октября 2026: `JAVA_HOME=/workspace/toolchains/jdk21 ANDROID_HOME=/workspace/toolchains/android-sdk ANDROID_USER_HOME=/workspace/toolchains/android-user GRADLE_USER_HOME=/workspace/toolchains/gradle-home ./gradlew :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` — **BUILD SUCCESSFUL in 2m 1s**, 60 tasks (19 executed). Три Core и три Room/Robolectric сценария: 0 failures/errors/skips. Lint: 0 errors, 7 прежних warnings. APK собран; устройство не запускалось. Логи, XML, summary и полные runtime/outcomes: `evidence/full-projection/`.
-
-Полный каталог: 2092 типа, 337 осей; baseline не изменён. Проверены все 353 ISCO и 223 спортивных строки, 37 целых занятий без деталей и Repeat (38 сегментов, ровно 38 секунд), полная установка, replay/conflict/stale, сохранность истории, JSON export/restore на чистой базе, отказ при повреждённом JSON/parent/hash/evidence. Прежние количественные и rollback проверки сохранены в трёх сценариях; schema Room 2 и JSON 3 не менялись. Контракт и неисполняемые связи описаны в FULL_CATALOG_07.md. Remote по-прежнему не настроен; репозиторий локальный, без публичной публикации.
-
-
-## Исправление приёмки v9
-
-11 октября 2026: итоговая команда `JAVA_HOME=/workspace/toolchains/jdk21 ANDROID_HOME=/workspace/toolchains/android-sdk ANDROID_USER_HOME=/workspace/toolchains/android-user GRADLE_USER_HOME=/workspace/toolchains/gradle-home ./gradlew --offline :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` — **BUILD SUCCESSFUL in 1m 45s**, 60 tasks (21 executed). 3 Core + 3 Room/Robolectric, 0 failures/errors/skips; lint 0 errors / 7 прежних warnings. APK собран. Устройство и производительность телефона не проверялись.
-
-Удалены 171 неявный fallback-тип и три типа, ошибочно созданные из residualId. Осталось 1918 типов и 337 осей. Регрессии проверяют точное равенство новых ISCO ID набору 137 явных proposedActions + 18 components, отсутствие fallback у frozen-строк и всех residualId в runtime, четыре открытых residual без принятого отображения. Новые отрицательные проверки: валидный ResearchPlan с другим SHA и валидный ResearchPlan с четырьмя из пяти companions отклоняются до подготовки полного плана. Существующие проверки Repeat/семейств/истории/конфликтов/backup сохранены.
-
-Сравнение с commit 0e9bf78886d4614a07ed6816ca8c95fdbe4ddce7: baseline и два оригинала побайтно равны; все оставшиеся типы, все оси и все спортивные outcomes равны точно. Машиночитаемый summary содержит хеши, полный список 174 исключённых ID и 353 + 223 исходных решения. При первом запуске новой регрессии обнаружена зависимость photosensitive_media_manufacture от удалённого fallback: ожидание трёх открытых residual уточнено до четырёх, без создания замены по догадке.
-
-Загрузка в приложение/новые экраны/модель данных не менялись. Статический остаток секундного цикла MainActivity зафиксирован в ACCEPTANCE_GAPS.md; измерений фонового расхода нет. Исправленный импорт не удаляет автоматически данные, ранее импортированные пользователем из v8.
-
-
-## Бэк v10 / приложение 0.4.0
-
-11 октября 2026: `JAVA_HOME=/workspace/toolchains/jdk21 ANDROID_HOME=/workspace/toolchains/android-sdk ANDROID_USER_HOME=/workspace/toolchains/android-user GRADLE_USER_HOME=/workspace/toolchains/gradle-home ./gradlew --offline :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` — **BUILD SUCCESSFUL in 32s**, 60 tasks (24 executed). 3 Core + 3 Room/Robolectric сценария, 0 failures/errors/skips. Lint: 0 errors / 10 warnings (SDK/dependency suggestions, icon и локализация технических строк; три дополнительных SetTextI18n относятся к обновляемому статусу). APK 0.4.0 собран; устройство, батарея и product UI не проверялись.
-
-Те же сценарии расширены проверками: Room 1→2→3 и 2→3 с полным каталогом/активным таймером; сохранение/повторное открытие; cache invalidation между двумя RoomStore; ошибки SQL после изменения дочерних строк в timer/import/backup; Undo открытого переключения без утраты сегментов; запрет ретроспективного запуска архивной карточки; 20 display ticks без чтения StateStore; восстановление boot в retained view. Старые stale/concurrent commands, коррекции, интервалы, CSV, restore, каталог 1918/337 и все предыдущие проверки сохранены.
-
-Новый перенос: документированные колонки Toggl на синтетическом CSV с кавычками/переносом строки; явная зона, duration/end cross-check; DST fold отказ; выбор классификации; exact replay и дубликат внутри файла; stale preview; overlap отказ; изменение source zone как конфликт; JSON v4 round-trip provenance; portable CSV round-trip, включая 250 ms сохранённого расхождения часов; Undo и rollback-копия. Полная трансформация связанных сущностей внешних трекеров не заявляется, все исходные поля сохранены. Отдельный Simple Time Tracker adapter остаётся неподтверждённым.
-
-До и после выполнен одинаковый Start + Pause с 1918 импортированными типами плюс пять существовавших seed-типов (1923 строки), аудитом SQLite-триггеров, в Robolectric. До: 3846 DELETE + 3846 INSERT activity_types; после: 0 операций activity_types и vocabulary. После: по одному INSERT/UPDATE session и segment, служебные metadata/generation. Реальные одиночные elapsed samples — evidence/backend-v10/storage-before.txt и storage-after.txt; это не статистический benchmark, не измерение телефона и не обещание батареи. Исходная проба ошибочно подписывала только число импортированных типов; подпись уточнена по точному аудиту, численные результаты не менялись.
-
-Все исходные research-файлы и runtime-словарь v9 побайтно сохранены; fresh projection равна принятому словарю. Новые логи/SQL-аудит/XML/summary в evidence/backend-v10/; прежние доказательства не заменены. Room теперь 3, JSON 4 читает 1/2/3/4. Полный контракт/ограничения — BACKEND_V10.md.
-
-
-## Исправление приёмки v11
-
-Лимит 10 MiB UTF-8 проверяется до первого разбора и в parseToggl, и в parseCsv. Toggl передаёт уже разобранную таблицу общей обработке; второго полного разбора и повторного UTF-8 кодирования для хеша нет. README теперь описывает фактические delta writes/UPSERT и прежнее ограничение полного холодного чтения.
-
-Целевая регрессия в прежнем сценарии: строка с числом символов меньше лимита, но UTF-8 размером больше 10 MiB, содержит повреждённые кавычки; результат обязан быть UNSUPPORTED_IMPORT / CSV exceeds 10 MiB, до CSV parser. Это проверяет порядок проверок, а не только код ошибки.
-
-Команда `JAVA_HOME=/workspace/toolchains/jdk21 ANDROID_HOME=/workspace/toolchains/android-sdk ANDROID_USER_HOME=/workspace/toolchains/android-user GRADLE_USER_HOME=/workspace/toolchains/gradle-home ./gradlew --offline :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` — BUILD SUCCESSFUL in 29s, 60 tasks (21 executed). 3 Core + 3 Room/Robolectric сценария, 0 failures/errors/skips. Lint 0 errors / 10 warnings. APK пересобран; Room 3, JSON 4 и версия приложения 0.4.0 не менялись. Логи и XML: evidence/acceptance-v11/. Simple Time Tracker, UI и устройство не исследовались повторно, ограничение доступа не обходилось.
-
-
-## Форматный импорт v12
-
-Основной вход HistoryFiles.inspect: UTF-8 и лимит до декодирования, предложения разделителя/колонок/примеров без записи. confirmCsv требует явного разделителя, схемы времени/зоны и формата длительности; затем прежний mapping→preview→apply. Свой JSON проходит прежний preview полного восстановления, произвольный JSON/XLSX не поддержаны. Брендовые адаптеры не являются обязательным остатком; исторические упоминания ограничения доступа выше не меняют эту границу.
-
-В тех же сценариях проверены две разные схемы CSV без бренда: comma + offset timestamps и semicolon + локальная дата/секунды. Apply добавил 2 интервала / 1800000 ms, replay — 0. Проверены пустая строка, неоднозначные разделители/колонки, явные dd/MM и MM/dd с разными результатами, отказ без timezone/duration choice, неизвестный JSON/не-UTF-8, JSON restore, повреждённая строка за пределами sample. Прежние stale/atomicity/dedup/provenance и oversized проверки сохранены.
-
-Команда `JAVA_HOME=/workspace/toolchains/jdk21 ANDROID_HOME=/workspace/toolchains/android-sdk ANDROID_USER_HOME=/workspace/toolchains/android-user GRADLE_USER_HOME=/workspace/toolchains/gradle-home ./gradlew --offline :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug` — BUILD SUCCESSFUL in 27s, 60 tasks (21 executed). 3 Core + 3 Room, 0 failures/errors/skips. Lint 0 errors / 10 warnings. APK пересобран; каталог 1918/337, Room 3, JSON 4 сохранены. Логи в evidence/format-import-v12/. Устройства/UI/новых сервисов нет; доступ к внешним исходникам не повторялся.
+Репозиторий не содержит GitHub Actions workflow; отсутствие check runs не означает успешное CI. Remote commit проверяется отдельно от локального результата команд. Текущие функциональные ограничения — [состояние проекта](ACCEPTANCE_GAPS.md).

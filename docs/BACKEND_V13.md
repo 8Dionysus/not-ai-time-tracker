@@ -1,6 +1,6 @@
-# Backend 0.5.0 · поставка v13
+# Android-адаптеры и проверенный путь таймера
 
-Room schema 3; JSON format 5, чтение 1–5. Новые настройки сериализуются в существующем payload metadata, поэтому миграция SQL не требуется. Каталоги и архив исследовательских материалов сохранены без изменений. Обычные функции остаются бесплатными; ни подписка ИИ, ни лицензия, ни публикация не добавлялись.
+Текущая Room schema — 3, JSON backup — 7 с чтением 1–7. Настройки поверхностей хранятся в metadata payload. Принципы хранения описаны в [BACKEND_V10](BACKEND_V10.md).
 
 ## Горячий путь и безопасность
 
@@ -38,14 +38,30 @@ tracker.undo(change.state.token)
 
 Плавающее окно имеет отдельный обязательный notification ID/channel `floating_controls`. Выключение обычного управляющего уведомления не скрывает индикатор сервиса. При отказе POST_NOTIFICATIONS Android всё равно показывает FGS в Task Manager, хотя шторка может его не показывать. Отказ/ошибка разрешения оставляет доступным обычный таймер. Нет dataSync FGS, точных alarms, wakelock, ежесекундных записей или циклов фонового отсчёта.
 
-Техническая оболочка дополнена только функциональными переключателями и состоянием разрешений. Существующая задержка основного статуса до расчёта отчёта и перезапись `status.text` на тиках не переработаны. Визуальный дизайн остаётся работой Диониса с Opus. Поверхности сейчас показывают состояние/кнопки, без отдельной анимации счётчика.
+Технический экран предоставляет переключатели и состояние разрешений. Основной статус обновляется после расчёта отчёта, затем перерисовывается на тиках. Поверхности показывают состояние и кнопки; удобный основной интерфейс и отдельная анимация счётчика ещё не проверены.
 
-Официальные основания: [типы FGS и specialUse](https://developer.android.com/develop/background-work/services/fgs/service-types), [ограничения фонового старта](https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start), [notification permission](https://developer.android.com/develop/ui/compose/notifications/notification-permission), [AppWidget](https://developer.android.com/develop/ui/views/appwidgets), [создание shortcuts](https://developer.android.com/develop/ui/compose/system/shortcuts/creating-shortcuts), [управление pinned shortcuts](https://developer.android.com/develop/ui/compose/system/shortcuts/managing-shortcuts). Возможная магазинная проверка specialUse этим проходом не проводилась; приложение не публиковалось.
+Официальные основания: [типы FGS и specialUse](https://developer.android.com/develop/background-work/services/fgs/service-types), [ограничения фонового старта](https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start), [notification permission](https://developer.android.com/develop/ui/compose/notifications/notification-permission), [AppWidget](https://developer.android.com/develop/ui/views/appwidgets), [создание shortcuts](https://developer.android.com/develop/ui/compose/system/shortcuts/creating-shortcuts), [управление pinned shortcuts](https://developer.android.com/develop/ui/compose/system/shortcuts/managing-shortcuts). Проверка соответствия specialUse требованиям магазина приложений не проводилась. Публикация исходного кода не означает одобрения магазином.
 
-## Проверка и пределы
+## Файловые и внешние входы
 
-Те же три интегрированных сценария запускаются на Memory и Room/Robolectric API 35: всего 6 tests. Добавлены комбинация CSV import → timer → archive card → Resume → Switch/Undo → исправление границы/Undo → зона/настройки → JSON restore → timer; сравнение с полной проверкой после переходов; недоверенная transaction; чужое доказательство; попытки изменения коллекций. Room проверяет два независимых подключения, откат при SQL-ошибке и миграции. Android JVM проверяет token/URI, разные источники, disabled/permission denied, RemoteViews, notification safe text, dynamic shortcut и сохранение паузы при отключении/переоткрытии.
+`BackupDocuments.prepare(input, backups)` читает не больше 10 MiB + один контрольный байт и передаёт ввод в `HistoryFiles.inspect`. SAF использует общий строгий UTF‑8 decoder и BOM handling; до подтверждения restore база не меняется. Ошибки ввода не создают rollback-файл. [Контракт файлов](FILE_IMPORT.md).
 
-`evidence/backend-v13` содержит лог сборки, XML результатов, lint, SQL-аудит и небольшой JVM-замер: 2000 закрытых сегментов, 1923 сохранённых типа (1918 полных + 5 seed), 337 осей, 7 измерений после 2 прогревов. Сравнение с безопасным полным StateStore fallback поверх того же Room, а не с предыдущим commit. Замер не доказывает скорость на телефоне или плавность UI.
+`runtime.catalogImports` — явный импорт восьми известных файлов полного исследовательского корпуса с доверенным manifest, preview и приватным архивом. Ошибки хеша, отсутствующий companion, конфликт и stale token не изменяют базу. [Полная проекция](FULL_CATALOG_07.md).
 
-APK не устанавливался и не запускался на устройстве. Реальные launcher/виджет, разрешения, overlay-окно, FGS/OEM ограничения, отзыв доступа и поведение после убийства процесса требуют отдельной device QA. Следующий разрешённый backend-срез — необязательные цели по времени/числу занятий, минимум/лимит, период/зона/фильтр, нейтральный прогресс. Параллельный учёт не вводился; Focus/календарь/выделенный текст/подсказки и продуктовый UI остаются дальше.
+`runtime.calendarOccurrences.readSelected(reference, enabled=true)` читает только конкретное вхождение события: eventId, begin и end задаются явно и проверяются в query и результате. По умолчанию функция выключена. После явного включения требуется фактически выданный READ_CALENDAR; адаптер не вызывает prompt и не выдаёт себе доступ. Denial/revocation, отсутствующий provider и неверное вхождение возвращают отдельный результат. `occurrence.draft()` предлагает title и интервал, для all-day — interval=null. Preview не пишет историю; запись проходит только через явные команды EntryDraft.
+
+`ProcessTextDrafts.read(intent)` принимает только ACTION_PROCESS_TEXT/text/plain и EXTRA_PROCESS_TEXT. Полная строка сохраняется в редактируемой заметке; неизвестное/пустое/слишком длинное содержимое отклоняется. Технический экран спрашивает перед заменой уже заполненной заметки. Никакого чтения clipboard, автоматического Start/Save или сети нет. OS chooser и поведение конкретных приложений остаются непроверенными на устройстве.
+
+`runtime.focusDueSignals.consume(snapshot.focus, callback)` обрабатывает DUE по signalKey в рамках runtime. Повторный сигнал и возврат к нему через одношаговую Undo не вызывают callback снова; ошибка callback остаётся retryable. Технический экран показывает безопасную подпись. Consumer не пишет историю и не переключает фазу. Дедупликация хранится в памяти процесса; это не гарантированная фоновая доставка, звук или alarm. [Focus](FOCUS.md).
+
+## Lifecycle launcher-команды
+
+`ShortcutCommands.submit` сразу передаёт команду в scope общего runtime. Activity ожидает Deferred; отмена ожидания не отменяет уже переданное действие. Непереданное действие сохраняется в instance-state Bundle. После передачи pending очищается, старый launch intent не повторяется с новым token. Гибель всего процесса до транзакции может оставить действие невыполненным; автоматического replay нет.
+
+## Проверки и пределы
+
+Три общих интеграционных сценария исполняются на Memory и Room/Robolectric API 35. Android-часть проверяет token/URI, stale и двойное нажатие, disabled/permission denied, RemoteViews, безопасный текст уведомления, launcher и отмену ожидания Activity, а также файловый ввод, CalendarProvider через контролируемый cursor, PROCESS_TEXT и Focus cue consumer. Точные результаты текущего кода — [VERIFICATION](VERIFICATION.md).
+
+Сохранённый JVM-замер [backend-v13](../evidence/backend-v13/verification.json) использовал 2000 закрытых сегментов, 1923 типа (1918 импортированных и пять seed), 337 осей, два прогрева и семь измерений. Он сравнивал оптимизированный путь с безопасным StateStore fallback поверх того же Room, а не с прошлым commit. Замер не доказывает скорость телефона или плавность интерфейса.
+
+Установка/запуск на физическом устройстве не проверены. Реальные launcher/виджет, OS prompts, overlay-окно, FGS/OEM, отзыв разрешений, CalendarProvider и доставка внешнего текста требуют device QA.

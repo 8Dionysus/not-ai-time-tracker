@@ -1,0 +1,32 @@
+{
+  "schema": "tracker_publication_verification_v1",
+  "implementationCommit": "be0dd8ffa5d16293429d820fc0b535af15a5a5a4",
+  "publicHttpsUrl": "https://github.com/8Dionysus/not-ai-time-tracker",
+  "public": true,
+  "remoteImplementationCommitMatches": true,
+  "anonymousCloneSucceeded": true,
+  "publicObjectsChecked": 1132,
+  "privateEmailMatches": 0,
+  "originalCommitsVerified": 23,
+  "originalCommitTreesMessagesTopologyPreserved": true,
+  "originalBundleUntouched": true,
+  "bundlesPublished": 0,
+  "normalAppendOnlyPush": true,
+  "github": {
+    "status": {
+      "state": "pending",
+      "count": 0
+    },
+    "checkRuns": 0,
+    "actionsRuns": 0,
+    "verdict": "No CI results"
+  },
+  "postCommitAggregate": "BUILD SUCCESSFUL in 8s;1 executed/61 up-to-date; unchanged implementation",
+  "apkSigning": {
+    "originalCertificateSha256": "c4335948a9dbedb8bc1b557d23d0ea37013fb53c79a8ce57f19a7f24fb7f20b7",
+    "newCertificateSha256": "86e221956fd1ed4dab261a10c1baeac3537816d271601037b309f2ddf186c3cc",
+    "sameSigner": false,
+    "installationConstraint": "Updating the supplied original APK requires its original signing key. No app/data removal performed."
+  },
+  "runtimeModelAndEffort": "Exact runtime metadata not exposed by available tools; requested model/effort is not treated as verification."
+}

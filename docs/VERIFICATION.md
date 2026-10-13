@@ -33,8 +33,12 @@ JDK 17/21, Android SDK Platform 35 / Build Tools 35.0.0, Gradle Wrapper 8.13 с 
 
 Финальный aggregate: BUILD SUCCESSFUL in 53s; 3 Core + 3 Room, failures/errors/skips=0; lint 0 errors, 34 warnings, 1 hint. APK 3 285 313 байт, SHA-256 `cc68a1b358584c49bebad5114519c60c70a4226d9c870d8465533e93c091903b`, v2 signature verified. Три assets byte-identical подготовленному каталогу; source readers отсутствуют в DEX.
 
-[Машинный отчёт](../evidence/audit-updates/verification.json) включает case names, implementation fingerprint и SHA-256 исходных XML/lint/build reports. [Замеры](../evidence/audit-updates/scale-comparison.json) содержат полные before/after samples. Сырые текущие отчёты сохранены отдельно без публикации локальных путей. Старые evidence относятся к указанным в них состояниям; их нельзя выдавать за проверки текущего кода. Исследовательские материалы вынесены из текущего дерева после проверки внешних архивов; прошлые commits сохранены.
+[Машинный отчёт](../evidence/audit-updates/verification.json) включает case names, implementation fingerprint и SHA-256 исходных XML/lint/build reports. [Замеры](../evidence/audit-updates/scale-comparison.json) содержат полные before/after samples. Сырые текущие отчёты сохранены отдельно без публикации локальных путей. Повтор aggregate после code commit завершился BUILD SUCCESSFUL in 8s (1 executed, 61 up-to-date), исходное состояние не менялось.
+
+[Публикация](../evidence/audit-updates/publication.json): code commit проверен анонимным клонированием, 1132 публичных объектов без исходного приватного email, оригинальные 23 commit trees/messages/topology сохранены. GitHub statuses/check-runs/Actions для него отсутствуют; это не CI pass. Старые evidence относятся к указанным в них состояниям; их нельзя выдавать за проверки текущего кода. Исследовательские материалы вынесены из текущего дерева после проверки внешних архивов; прошлые commits сохранены.
 
 ## Открытый остаток
 
 Физический Android/emulator не подключён (`adb devices -l`: пусто). Не подтверждены устройство, OEM idle delivery, реальный OS chooser/CalendarProvider, убийство процесса/потеря питания, память и задержки телефона. Полный визуальный UI остаётся отдельной работой. GitHub checks проверяются отдельно для публикуемого commit; отсутствие checks не означает CI pass.
+
+Новый локальный debug APK подписан другим сертификатом, чем APK исходной поставки. Установка поверх того APK требует исходного signing key. Ключ не восстановлен из сертификата и не включён в Git; удаление приложения/данных не выполнялось. Исходный APK сохранён. Это ограничение установки бинарной сборки, отдельное от проверяемой совместимости Room/JSON и словаря.

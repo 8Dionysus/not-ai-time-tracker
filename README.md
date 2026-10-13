@@ -38,7 +38,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n dev.notai.tracker/dev.notai.tracker.android.MainActivity
 ```
 
-Эти команды не означают, что проверка устройства уже выполнена. `--offline` допустим только при заранее заполненном кэше зависимостей. SDK, кэши, credentials и `local.properties` в Git не добавляются.
+Эти команды не означают, что проверка устройства уже выполнена. Для установки поверх ранее подписанного APK нужен тот же signing key; новая локальная debug-подпись отличается от APK исходной поставки. Исходный ключ не включён в репозиторий. `--offline` допустим только при заранее заполненном кэше зависимостей. SDK, кэши, credentials и `local.properties` в Git не добавляются.
 
 ## Документация
 

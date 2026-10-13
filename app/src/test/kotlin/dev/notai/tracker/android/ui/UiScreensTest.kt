@@ -123,10 +123,10 @@ class UiScreensTest {
 
     private var actionReady = 0
 
-    private fun render(seed: Seed): TrackerViewModel {
+    private fun render(seed: Seed,reducedMotion: Boolean = true): TrackerViewModel {
         UiBackends.open = { TestBackend(seed.tracker, seed.catalog) }
         val vm = TrackerViewModel(ApplicationProvider.getApplicationContext())
-        compose.setContent { TrackerApp(vm, openTechnical = {}, reducedMotion = true, onActionReady = { actionReady++ }) }
+        compose.setContent { TrackerApp(vm, openTechnical = {}, reducedMotion = reducedMotion, onActionReady = { actionReady++ }) }
         waitText("Сегодня")
         assertTrue("startup trace hook fires once controls are live", actionReady > 0)
         return vm
@@ -202,6 +202,21 @@ class UiScreensTest {
         val vm = render(seed)
         waitText("осталось из")
         shot("04-focus", vm)
+    }
+
+    @Test fun finishedFocusKeepsItsSnapshotDuringOutgoingAnimation() {
+        val seed = seed(running = false)
+        seed.tracker.startFocus(seed.tracker.snapshot().token)
+        val vm = render(seed,reducedMotion = false)
+        waitText("осталось из")
+        compose.mainClock.autoAdvance = false
+        vm.stop()
+        compose.waitUntil(5_000) { seed.tracker.data().focus == null }
+        repeat(5) { compose.mainClock.advanceTimeBy(16);compose.waitForIdle() }
+        compose.mainClock.advanceTimeBy(400)
+        compose.mainClock.autoAdvance = true
+        waitText("Время пойдёт сразу.")
+        assertTrue(seed.tracker.data().focus == null)
     }
 
     @Test fun overview() {

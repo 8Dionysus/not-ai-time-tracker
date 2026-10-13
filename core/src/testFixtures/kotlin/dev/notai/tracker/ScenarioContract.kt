@@ -815,10 +815,13 @@ abstract class ScenarioContract {
         assertEquals(30*60_000,Reports.day(d,clock.now(),LocalDate.parse("2026-10-11")).recordedMs)
         for (tag in listOf("learning","health")) assertEquals(all.recordedMs,Reports.report(d,clock.now(),windowStart,clock.wall,Filter(tags = setOf(tag))).recordedMs)
         val csv = Csv.export(all)
+        val csvRows = all.copy(unresolved = all.unresolved + d.segments.first().copy(
+            id = "csv-unresolved",end = null,durationMs = 0,anchor = null,uncertain = true,observedUntil = clock.wall))
         for(mode in CsvMode.entries) {
-            val streamed = StringBuilder();Csv.write(all,streamed,mode)
-            assertEquals(MaterializedCsvReference.export(all,mode),streamed.toString())
-            assertEquals(streamed.toString(),Csv.export(all,mode))
+            val streamed = StringBuilder();Csv.write(csvRows,streamed,mode)
+            assertEquals(MaterializedCsvReference.export(csvRows,mode),streamed.toString())
+            assertEquals(streamed.toString(),Csv.export(csvRows,mode))
+            assertTrue(streamed.contains("\"unresolved\",\"csv-unresolved\""))
         }
         assertTrue(csv.contains("' =Language").not()); assertTrue(csv.contains("'=Language"))
         assertEquals(20,csv.lineSequence().filter { it.startsWith("\"measurement\"") }.sumOf { it.split(',')[15].trim('"').toLong() })

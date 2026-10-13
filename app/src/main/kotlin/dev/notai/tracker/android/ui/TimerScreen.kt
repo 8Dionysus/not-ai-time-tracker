@@ -49,6 +49,7 @@ class TimerActions(
 )
 
 private enum class HeroKind { LOADING, IDLE, ACTIVE, RECOVERY, FOCUS }
+private data class HeroState(val kind: HeroKind,val snapshot: Snapshot?)
 
 @Composable
 fun TimerScreen(snapshot: Snapshot?, home: HomeData?, vm: TrackerViewModel, actions: TimerActions, dark: Boolean, modifier: Modifier = Modifier) {
@@ -71,17 +72,19 @@ fun TimerScreen(snapshot: Snapshot?, home: HomeData?, vm: TrackerViewModel, acti
                 else -> HeroKind.ACTIVE
             }
             val reduced = NotAi.reducedMotion
-            AnimatedContent(kind, Modifier.fillMaxWidth(), transitionSpec = {
+            // Outgoing content keeps the snapshot that belongs to its own kind.
+            // A completed Focus must not render against the new idle snapshot.
+            AnimatedContent(HeroState(kind,snapshot), Modifier.fillMaxWidth(), contentKey = { it.kind }, transitionSpec = {
                 if (reduced) fadeIn(tween(0)) togetherWith fadeOut(tween(0))
                 else (fadeIn(tween(260, 90)) + slideInVertically(tween(320)) { it / 12 }) togetherWith fadeOut(tween(120))
-            }, label = "hero") { k ->
+            }, label = "hero") { state ->
                 Box(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 12.dp, bottom = 8.dp), contentAlignment = Alignment.TopCenter) {
-                    when (k) {
+                    when (state.kind) {
                         HeroKind.LOADING -> Spacer(Modifier.height(300.dp))
                         HeroKind.IDLE -> IdleHero(home, vm, actions)
-                        HeroKind.ACTIVE -> ActiveHero(snapshot!!, home, vm, actions, zone)
-                        HeroKind.RECOVERY -> RecoveryHero(snapshot!!, home, vm, actions, zone)
-                        HeroKind.FOCUS -> FocusHero(snapshot!!, home, vm, actions, zone)
+                        HeroKind.ACTIVE -> ActiveHero(state.snapshot!!, home, vm, actions, zone)
+                        HeroKind.RECOVERY -> RecoveryHero(state.snapshot!!, home, vm, actions, zone)
+                        HeroKind.FOCUS -> FocusHero(state.snapshot!!, home, vm, actions, zone)
                     }
                 }
             }

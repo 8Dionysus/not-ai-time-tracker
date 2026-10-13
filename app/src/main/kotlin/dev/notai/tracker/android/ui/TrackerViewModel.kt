@@ -391,6 +391,8 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
     val exportPreparing = MutableStateFlow(false)
     private val _documentExport = MutableStateFlow<String?>(null)
     val documentExport: StateFlow<String?> = _documentExport
+    internal var documentExportRecovery: kotlinx.coroutines.Job? = null
+        private set
     /** Activity saved state is the witness that a chooser was actually launched.
      * A disk claim by itself cannot suppress recovery after a process death. */
     fun recoverDocumentExport(registeredId: String?,registeredOwner: String? = null) =
@@ -406,7 +408,7 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
                 check(prefs.edit().putBoolean("documentExportLaunched",false).remove("documentExportOwner").commit())
                 _documentExport.value = id
             }
-        } } catch(e: Exception) { notice(Format.error(e)) } }
+        } } catch(e: Exception) { notice(Format.error(e)) } }.also { documentExportRecovery = it }
     fun releaseDocumentExport(id: String,owner: String,error: Exception) {
         synchronized(DocumentExportCoordination.lock) {
         if(documentExportId() == id && prefs.getString("documentExportOwner",null) == owner) {

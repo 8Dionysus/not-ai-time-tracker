@@ -118,6 +118,8 @@ class UiExportLifecycleTest {
                         putString("launchedDocumentExport",operationId);putString("launchedDocumentExportOwner",owner)
                     }).start().resume()
                     .also { control ->
+                        val activityModel = androidx.lifecycle.ViewModelProvider(control.get())[TrackerViewModel::class.java]
+                        runBlocking { activityModel.documentExportRecovery!!.join() }
                         @Suppress("UNCHECKED_CAST")
                         val launcher = MainActivity::class.java.getDeclaredField("saveExport").apply { isAccessible = true }
                             .get(control.get()) as androidx.activity.result.ActivityResultLauncher<String>

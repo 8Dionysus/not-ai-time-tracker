@@ -270,7 +270,7 @@ private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: Track
                 DayRibbon(day.start, day.end, pieces)
             }
         }
-        items(day.entries, key = { it.segmentId }) { e ->
+        items(day.entries, key = { "${day.date}:${it.segmentId}" }) { e ->
             EntryRow(e, home.zone, onOpen = { actions.edit(e, day) }, onRepeat = { vm.repeat(e) },
                 modifier = Modifier.padding(horizontal = 20.dp).animateItem())
         }

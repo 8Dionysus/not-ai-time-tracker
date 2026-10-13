@@ -11,6 +11,8 @@ import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.hasScrollAction
+import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
 import dev.notai.tracker.*
@@ -219,6 +221,16 @@ class UiScreensTest {
         compose.mainClock.autoAdvance = true
         waitText("Время пойдёт сразу.")
         assertTrue(seed.tracker.data().focus == null)
+    }
+
+    @Test fun crossMidnightSegmentHasDistinctKeysForEachCalendarDay() {
+        val seed = seed(running = false)
+        seed.tracker.manual(seed.tracker.snapshot().token,at(today.minusDays(1),23,55),at(today,0,5),
+            Classification(),"cross-midnight")
+        render(seed)
+        compose.onNode(hasScrollAction()).performScrollToIndex(7)
+        compose.waitForIdle()
+        assertTrue("both clipped day rows compose",compose.onAllNodesWithText("cross-midnight",substring = true).fetchSemanticsNodes().size == 2)
     }
 
     @Test fun headerThemeToggleUsesCurrentAppearanceOnEveryClick() {

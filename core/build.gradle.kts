@@ -9,4 +9,7 @@ dependencies {
     testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 }
 
-tasks.test { systemProperty("tracker.samples", rootProject.file("samples").absolutePath) }
+tasks.test {
+    systemProperty("tracker.samples", rootProject.file("samples").absolutePath)
+    systemProperty("tracker.artifacts", layout.buildDirectory.dir("test-artifacts").get().asFile.absolutePath)
+}

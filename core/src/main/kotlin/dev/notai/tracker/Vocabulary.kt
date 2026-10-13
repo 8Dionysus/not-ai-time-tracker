@@ -126,47 +126,72 @@ fun Dataset.convert(value: Decimal,fromUnitId: String,toUnitId: String): Decimal
     val metrics: List<Metric> = emptyList(),val units: List<UnitDefinition> = emptyList())
 
 
-enum class CatalogEntryStatus { ADDED, UNCHANGED, CONFLICT }
+enum class CatalogEntryStatus { ADDED, UNCHANGED, UPDATED, CONFLICT }
 data class CatalogEntryOutcome(val kind: String,val id: String,val meaningVersion: Int?,val status: CatalogEntryStatus)
 data class CatalogImportReport(val entries: List<CatalogEntryOutcome>) {
-    val added get() = entries.filter { it.status == CatalogEntryStatus.ADDED }
-    val unchanged get() = entries.filter { it.status == CatalogEntryStatus.UNCHANGED }
-    val conflicts get() = entries.filter { it.status == CatalogEntryStatus.CONFLICT }
+    val added get() = frozenList(entries.filter { it.status == CatalogEntryStatus.ADDED })
+    val unchanged get() = frozenList(entries.filter { it.status == CatalogEntryStatus.UNCHANGED })
+    val updated get() = frozenList(entries.filter { it.status == CatalogEntryStatus.UPDATED })
+    val conflicts get() = frozenList(entries.filter { it.status == CatalogEntryStatus.CONFLICT })
 }
-/** Only the reviewed descriptive cleanup may be treated as the same definition. Keep the
- * installed origin unchanged: it truthfully identifies the source originally imported.
- * Every other field, origin locator, source and version must still compare exactly.
+enum class CatalogInstallPolicy { STRICT, PRESERVE_LOCAL_PRESENTATION }
+/** Technical origin revisions and local presentation do not change an activity's meaning.
+ * Keep the installed entry intact; definitions, versions and references still compare exactly.
  */
-internal fun reviewedSourceRevisionEquivalent(previous: Any,entry: Any): Boolean {
-    val oldHash = "7dd02e406bb2c34260a73179b2b6a94f19d0141aa1bb06815277eb5e23bc2498"
-    val currentHash = "e7a9f50cda7b40714b7da7ddedb9de4f77b36d71a9c78ffdd85d780ebd9378b3"
-    if(FullCatalogImports.sources.single { it.path == "projections/${FullResearchCatalog.ISCO}" }.sha256 != currentHash) return false
-    fun advanced(origins: List<ResearchOrigin>) = origins.map { origin ->
-        if(origin.sourceFile == FullResearchCatalog.ISCO && origin.packageSha256 == oldHash && origin.sourceSha256 == oldHash)
-            origin.copy(packageSha256 = currentHash,sourceSha256 = currentHash) else origin
+fun catalogMeaningEquivalent(previous: Any,entry: Any): Boolean = when {
+    previous is ActivityType && entry is ActivityType -> previous.copy(name = entry.name,archived = entry.archived,
+        aliases = entry.aliases,researchOrigins = entry.researchOrigins) == entry
+    previous is Axis && entry is Axis -> {
+        val oldValues = previous.values.associateBy { it.id to it.meaningVersion }
+        previous.values.size == entry.values.size && oldValues.keys == entry.values.map { it.id to it.meaningVersion }.toSet() &&
+            previous.copy(name = entry.name,archived = entry.archived,researchOrigins = entry.researchOrigins,
+                values = entry.values.map { fresh -> oldValues.getValue(fresh.id to fresh.meaningVersion).copy(label = fresh.label,archived = fresh.archived) }) == entry
     }
-    return when {
-        previous is ActivityType && entry is ActivityType -> previous.copy(researchOrigins = advanced(previous.researchOrigins)) == entry
-        previous is Axis && entry is Axis -> previous.copy(researchOrigins = advanced(previous.researchOrigins)) == entry
-        else -> false
-    }
+    previous is Metric && entry is Metric -> previous.copy(name = entry.name,researchOrigins = entry.researchOrigins) == entry
+    previous is UnitDefinition && entry is UnitDefinition -> previous.copy(name = entry.name) == entry
+    else -> false
 }
-internal fun Dataset.mergeCatalog(incoming: VocabularyData,allowReviewedSourceRevision: Boolean = false): Pair<Dataset,CatalogImportReport> {
+private fun editorialReplacement(previous: Any,entry: Any,revisions: List<CatalogEditorialRevision>): Any? {
+    if(previous is Axis && entry is Axis) {
+        val revision = revisions.singleOrNull { it.kind == "axis" && it.id == entry.id } ?: return null
+        val current = catalogMeaningFingerprint(entry)
+        if(current != revision.toMeaningSha256 || catalogMeaningFingerprint(previous) != revision.fromMeaningSha256 ||
+            !catalogMeaningEquivalent(previous,entry)) return null
+        return previous.copy(name = if(revision.previousDefaultNameSha256 != null &&
+            sha256(previous.name.toByteArray(Charsets.UTF_8)) == revision.previousDefaultNameSha256) entry.name else previous.name).takeUnless { it == previous }
+    }
+    if(previous !is ActivityType || entry !is ActivityType) return null
+    val revision = revisions.singleOrNull { it.kind == "type" && it.id == entry.id } ?: return null
+    val current = catalogMeaningFingerprint(entry);val before = catalogMeaningFingerprint(previous)
+    if(current != revision.toMeaningSha256 || (before != revision.fromMeaningSha256 && before != current) ||
+        !catalogMeaningEquivalent(previous.copy(definition = entry.definition),entry)) return null
+    val updated = previous.copy(definition = entry.definition,name = if(revision.previousDefaultNameSha256 != null &&
+        sha256(previous.name.toByteArray(Charsets.UTF_8)) == revision.previousDefaultNameSha256) entry.name else previous.name)
+    return updated.takeUnless { it == previous }
+}
+internal fun Dataset.mergeCatalog(incoming: VocabularyData,policy: CatalogInstallPolicy = CatalogInstallPolicy.STRICT,
+    revisions: List<CatalogEditorialRevision> = emptyList()): Pair<Dataset,CatalogImportReport> {
     val outcomes = mutableListOf<CatalogEntryOutcome>()
     fun <T> merge(kind: String,old: List<T>,fresh: List<T>,key: (T)->Pair<String,Int?>): List<T> {
         val keys = fresh.map(key)
         ensure(keys.distinct().size == keys.size,"Duplicate $kind key in incoming catalog")
         val existing = old.associateBy(key)
+        val replacements = mutableMapOf<Pair<String,Int?>,T>()
         fresh.forEach { entry ->
             val (id,version) = key(entry); val previous = existing[id to version]
+            val replacement = if(previous != null && policy == CatalogInstallPolicy.PRESERVE_LOCAL_PRESENTATION)
+                editorialReplacement(previous as Any,entry as Any,revisions) else null
+            @Suppress("UNCHECKED_CAST")
+            if(replacement != null) replacements[id to version] = replacement as T
             outcomes += CatalogEntryOutcome(kind,id,version,when {
                 previous == null -> CatalogEntryStatus.ADDED
                 previous == entry -> CatalogEntryStatus.UNCHANGED
-                allowReviewedSourceRevision && reviewedSourceRevisionEquivalent(previous as Any,entry as Any) -> CatalogEntryStatus.UNCHANGED
+                replacement != null -> CatalogEntryStatus.UPDATED
+                policy == CatalogInstallPolicy.PRESERVE_LOCAL_PRESENTATION && catalogMeaningEquivalent(previous as Any,entry as Any) -> CatalogEntryStatus.UNCHANGED
                 else -> CatalogEntryStatus.CONFLICT
             })
         }
-        return old + fresh.filter { key(it) !in existing }
+        return (if(replacements.isEmpty()) old else old.map { replacements[key(it)] ?: it }) + fresh.filter { key(it) !in existing }
     }
     val result = copy(types = merge("type",types,incoming.types) { it.id to null },
         axes = merge("axis",axes,incoming.axes) { it.id to it.meaningVersion },
@@ -179,7 +204,7 @@ internal fun Dataset.mergeCatalog(incoming: VocabularyData,allowReviewedSourceRe
         units = units.filterNot { old -> incoming.units.any { it.id == old.id } } + incoming.units)
     validateVocabulary(candidate)
     validate(result)
-    return result to CatalogImportReport(outcomes)
+    return result to CatalogImportReport(frozenList(outcomes))
 }
 
 /** A form value is returned intact on conversion/precision failure. No write, fallback unit or rounding. */

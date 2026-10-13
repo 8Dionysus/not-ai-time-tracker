@@ -58,7 +58,7 @@ class FloatingTimerService: Service() {
                     if(cmd == null) {
                         try { TimerSurfaces.open(this@FloatingTimerService).send() } catch(_: PendingIntent.CanceledException) { }
                     } else scope.launch {
-                        try { withContext(Dispatchers.IO) { TimerSurfaces.execute(tracker,SurfaceAction(Surface.OVERLAY,cmd,s.token),TimerSurfaces.overlayAllowed(this@FloatingTimerService)) } }
+                        try { withContext(Dispatchers.IO) { TimerSurfaces.execute(tracker,SurfaceAction(Surface.OVERLAY,cmd,s.token,s.timerTarget),TimerSurfaces.overlayAllowed(this@FloatingTimerService)) } }
                         catch(e: Exception) { if(e is CancellationException) throw e; Toast.makeText(this@FloatingTimerService,"Обновите состояние в приложении",Toast.LENGTH_SHORT).show() }
                     }
                 }

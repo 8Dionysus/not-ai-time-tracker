@@ -2,14 +2,24 @@ package dev.notai.tracker
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Required
+import java.io.InputStream
+import java.io.OutputStream
+import java.io.ByteArrayOutputStream
 
 @Serializable data class Backup(@Required val formatVersion: Int = 7,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
+/** Bounded whole-String convenience API only; streaming full backups have no total-file cap. */
 const val MAX_BACKUP_BYTES = 10*1024*1024
 
 interface RollbackStore {
     /** Persist durably and return a reference. Do not overwrite the user's existing copies. */
     fun save(json: String): String
     fun read(reference: String): String
+    /** Compatibility fallback for small/custom stores; persistent adapters override with file streams. */
+    fun saveSnapshot(backup: Backup): String {
+        val bytes = ByteArrayOutputStream();StreamingBackup.write(backup,bytes)
+        return save(bytes.toString("UTF-8"))
+    }
+    fun readSnapshot(reference: String): Backup = StreamingBackup.read { read(reference).byteInputStream(Charsets.UTF_8) }
 }
 class RestorePreview internal constructor(internal val backup: Backup,internal val expected: Token) {
     val datasetId get() = backup.data.datasetId
@@ -32,27 +42,37 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore) 
         val captured = tracker.store.transaction { d -> d to (d to tracker.clock.now()) }
         encode(captured.first,captured.second) // serialization/validation never holds the DB transaction
     }
+    /** Full-size portable export: no whole-file text or byte buffer. Caller owns the stream. */
+    fun write(output: OutputStream) = storage {
+        val captured = tracker.store.transaction { d -> d to (d to tracker.clock.now()) }
+        StreamingBackup.write(StreamingBackup.portable(captured.first,captured.second),output)
+    }
     fun prepare(json: String): RestorePreview = RestorePreview(decode(json),tracker.snapshot().token)
+    fun prepare(open: ()->InputStream): RestorePreview = RestorePreview(StreamingBackup.read(open),tracker.snapshot().token)
     /** Calling apply is explicit confirmation of a preview. Abandoning the preview has no effects. */
     fun apply(preview: RestorePreview): RestoreResult = storage {
         val old = tracker.data(); checkToken(old,preview.expected,tracker.clock.now())
-        val rollbackJson = encode(old,tracker.clock.now())
-        val reference = rollback.save(rollbackJson)
-        val readBack = rollback.read(reference)
-        ensure(readBack == rollbackJson, "Rollback verification failed",ErrorCode.STORAGE)
-        decode(readBack)
+        val rollbackBackup = StreamingBackup.portable(old,tracker.clock.now())
+        val reference = rollback.saveSnapshot(rollbackBackup)
+        val readBack = try { rollback.readSnapshot(reference) } catch(_: Exception) { fail(ErrorCode.STORAGE,"Rollback verification failed") }
+        ensure(readBack == rollbackBackup, "Rollback verification failed",ErrorCode.STORAGE)
         val state = tracker.store.transaction { live ->
             checkToken(live,preview.expected,tracker.clock.now())
-            val source = preview.backup.data
-            val imported = source.copy(revision = Math.addExact(live.revision,1),
-                sessions = source.sessions.map { if (it.status == SessionStatus.RUNNING || it.status == SessionStatus.RECOVERY) it.copy(status = SessionStatus.RECOVERY) else it },
-                segments = source.segments.map { it.copy(anchor = null,uncertain = it.uncertain || it.end == null) })
-            validate(imported)
+            val imported = restoredData(preview.backup,Math.addExact(live.revision,1))
             imported to snapshot(imported,tracker.clock.now())
         }
         RestoreResult(state,reference)
     }
     companion object {
+        fun restoredData(backup: Backup,revision: Long): Dataset {
+            StreamingBackup.validateBackup(backup)
+            val source = backup.data
+            val imported = source.copy(revision = revision,
+                controlBarrier = newId(),
+                sessions = source.sessions.map { if(it.status in setOf(SessionStatus.RUNNING,SessionStatus.RECOVERY)) it.copy(status = SessionStatus.RECOVERY) else it },
+                segments = source.segments.map { it.copy(anchor = null,uncertain = it.uncertain || it.end == null) }).frozen()
+            validate(imported);return imported
+        }
         fun encode(d: Dataset,n: Moment): String {
             validateMoment(n)
             validate(d)

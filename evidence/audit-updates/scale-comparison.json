@@ -1,0 +1,71 @@
+{
+  "schema": "tracker_scale_comparison_v1",
+  "baseline": {
+    "schema": "tracker_scale_benchmark_v1",
+    "execution": "Room/SQLite in Robolectric JVM API35; synthetic, not phone",
+    "sessions": 73000,
+    "segments": 73000,
+    "years": 10,
+    "entriesPerDay": 20,
+    "fullValidationNs": 342275658,
+    "initialRoomWriteNs": 5189196276,
+    "coldReopenReadNs": 11813746224,
+    "timerCycleNs": [
+      84589686,
+      60179432,
+      67242219,
+      56448823,
+      45553143,
+      49077511,
+      38357747
+    ],
+    "dailyReportNs": [
+      173502492,
+      78761289,
+      116703553,
+      72487654,
+      64535029,
+      69677049,
+      72630213
+    ],
+    "calendar30DaysNs": 399457871,
+    "maxHeapBytes": 1073741824
+  },
+  "after": {
+    "schema": "tracker_scale_benchmark_v1",
+    "execution": "Room/SQLite in Robolectric JVM API35; synthetic, not phone",
+    "sessions": 73000,
+    "segments": 73000,
+    "years": 10,
+    "entriesPerDay": 20,
+    "fullValidationNs": 113125206,
+    "initialRoomWriteNs": 2006000590,
+    "coldReopenReadNs": 4933351203,
+    "timerCycleNs": [
+      30845389,
+      20140728,
+      20501683,
+      26398381,
+      19827861,
+      20872587,
+      20986455
+    ],
+    "dailyReportNs": [
+      47952599,
+      83361,
+      45950,
+      43304,
+      44216,
+      42776,
+      43795
+    ],
+    "calendar30DaysNs": 2830893,
+    "maxHeapBytes": 1073741824
+  },
+  "limitations": [
+    "Synthetic JVM/API35/Room fixture, not phone.",
+    "Single cold sample and seven timer/day samples, no controlled statistical claim.",
+    "First report builds an index; warm median is reported separately.",
+    "Public report snapshot freezing was added after this measurement; final aggregate checks final code."
+  ]
+}

@@ -1,14 +1,7 @@
-plugins { id("com.android.application"); kotlin("android"); id("com.google.devtools.ksp") }
-// Bundle only the eight reviewed inputs; the trusted manifest remains a core resource.
-// Copy into generated assets, so the repository keeps one original of each source.
+plugins { id("com.android.application"); kotlin("android"); kotlin("plugin.serialization"); id("com.google.devtools.ksp") }
+// Package the prepared vocabulary, never source research or preparation readers.
 val bundledCatalogAssets = tasks.register<Sync>("bundleCatalogAssets") {
-    from(rootProject.file("research")) {
-        include("catalog.research.json", "supporting/tracker_catalog_core_compatibility.md",
-            "supporting/tracker_catalog_identity_resolution.json", "supporting/tracker_cross_domain_relations_v2_1.json",
-            "supporting/tracker_mobile_catalog_navigation_research.json", "supporting/tracker_work_learning_core_v4_compatibility.json",
-            "projections/isco_full_projection_v2.json", "projections/sports_additive_catalogue_projection.json")
-        into("research")
-    }
+    from(rootProject.file("catalog")) { include("manifest.json", "runtime-catalog.json", "compatibility.json"); into("catalog") }
     into(layout.buildDirectory.dir("generated/catalogAssets"))
 }
 android {
@@ -21,9 +14,11 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
         unitTests.all { test ->
-            // Full research-source scenarios plus Robolectric need more than Gradle's 512 MiB default.
+            // Full catalog/history scenarios plus Robolectric need more than Gradle's 512 MiB default.
             test.maxHeapSize = "1g"
             test.systemProperty("tracker.samples", rootProject.file("samples").absolutePath)
+            test.systemProperty("tracker.artifacts", layout.buildDirectory.dir("test-artifacts").get().asFile.absolutePath)
+            test.systemProperty("tracker.scale", providers.gradleProperty("trackerScale").getOrElse("false"))
             // Robolectric writes a lock and Maven cache under user.home. Keep test-only state in the project.
             val testHome = rootProject.file(".gradle/robolectric")
             test.systemProperty("user.home", testHome.absolutePath)

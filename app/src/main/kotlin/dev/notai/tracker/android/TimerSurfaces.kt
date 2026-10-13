@@ -15,7 +15,7 @@ import kotlinx.coroutines.*
 /** An action carries the revision that the user actually saw. No retries with a newer token. */
 enum class Surface { WIDGET, NOTIFICATION, OVERLAY, SHORTCUT }
 enum class TimerCommand { START, PAUSE, RESUME, STOP }
-data class SurfaceAction(val source: Surface,val command: TimerCommand,val token: Token)
+data class SurfaceAction(val source: Surface,val command: TimerCommand,val token: Token,val target: TimerTarget? = null)
 object TimerSurfaces {
     const val CONTROL_CHANNEL = "timer_controls"
     const val OVERLAY_CHANNEL = "floating_controls"
@@ -44,6 +44,9 @@ object TimerSurfaces {
     }
     /** Policy is checked again after process recreation, before the core revision check/write. */
     fun execute(tracker: Tracker,action: SurfaceAction,permission: Boolean = true): Tracker.Change {
+        if(action.target != null) return tracker.timerCommand(action.target,TimerDirective.valueOf(action.command.name)) { data ->
+            permission && enabled(data.settings.surfaces,action.source)
+        }
         if(!permission || !enabled(tracker.data().settings.surfaces,action.source)) throw CoreError(ErrorCode.INVALID_INPUT,"Surface disabled or permission denied")
         return when(action.command) {
             TimerCommand.START -> tracker.start(action.token)
@@ -56,14 +59,17 @@ object TimerSurfaces {
         action = "dev.notai.tracker.TIMER_ACTION"
         // PendingIntent identity includes the immutable token; newer rendering cannot rewrite old actions.
         data = Uri.Builder().scheme("notai").authority("timer").appendPath(a.source.name).appendPath(a.command.name)
-            .appendPath(a.token.datasetId).appendPath(a.token.revision.toString()).appendPath(a.token.sessionId ?: "").build()
+            .appendPath(a.token.datasetId).appendPath(a.token.revision.toString()).appendPath(a.token.sessionId ?: "").appendPath(a.target?.epoch?.toString() ?: "").appendPath(a.target?.barrier ?: "").build()
         putExtra("source",a.source.name); putExtra("command",a.command.name)
         putExtra("dataset",a.token.datasetId); putExtra("revision",a.token.revision); putExtra("session",a.token.sessionId)
+        a.target?.let { target -> putExtra("timerEpoch",target.epoch);putExtra("controlBarrier",target.barrier) }
     }
     fun parse(i: Intent): SurfaceAction? = try {
         if(i.action != "dev.notai.tracker.TIMER_ACTION" || !i.hasExtra("revision")) null else
             SurfaceAction(Surface.valueOf(requireNotNull(i.getStringExtra("source"))),TimerCommand.valueOf(requireNotNull(i.getStringExtra("command"))),
-                Token(requireNotNull(i.getStringExtra("dataset")),i.getLongExtra("revision",-1),i.getStringExtra("session")))
+                Token(requireNotNull(i.getStringExtra("dataset")),i.getLongExtra("revision",-1),i.getStringExtra("session")),
+                if(i.hasExtra("timerEpoch")) TimerTarget(requireNotNull(i.getStringExtra("dataset")),i.getStringExtra("session"),
+                    i.getLongExtra("timerEpoch",-1),i.getStringExtra("controlBarrier").orEmpty()) else null)
     } catch(_: IllegalArgumentException) { null }
     fun pending(c: Context,a: SurfaceAction): PendingIntent = PendingIntent.getBroadcast(c,0,intent(c,a),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
     fun open(c: Context): PendingIntent = PendingIntent.getActivity(c,0,Intent(c,MainActivity::class.java),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
@@ -80,8 +86,8 @@ object TimerSurfaces {
             .setContentText(s?.safeLabel ?: "Открыть приложение").setContentIntent(open(c)).setOnlyAlertOnce(true)
             .setVisibility(Notification.VISIBILITY_PRIVATE).setOngoing(true).setShowWhen(false)
         if(!overlay && s != null) {
-            primary(s)?.let { cmd -> builder.addAction(Notification.Action.Builder(null,cmd.name,pending(c,SurfaceAction(Surface.NOTIFICATION,cmd,s.token))).build()) }
-            if(s.mode == Mode.RUNNING || s.mode == Mode.PAUSED) builder.addAction(Notification.Action.Builder(null,"STOP",pending(c,SurfaceAction(Surface.NOTIFICATION,TimerCommand.STOP,s.token))).build())
+            primary(s)?.let { cmd -> builder.addAction(Notification.Action.Builder(null,cmd.name,pending(c,SurfaceAction(Surface.NOTIFICATION,cmd,s.token,s.timerTarget))).build()) }
+            if(s.mode == Mode.RUNNING || s.mode == Mode.PAUSED) builder.addAction(Notification.Action.Builder(null,"STOP",pending(c,SurfaceAction(Surface.NOTIFICATION,TimerCommand.STOP,s.token,s.timerTarget))).build())
         }
         return builder.build()
     }
@@ -90,10 +96,10 @@ object TimerSurfaces {
         setOnClickPendingIntent(R.id.widget_status,open(c))
         val command = if(enabled) primary(s) else null
         setTextViewText(R.id.widget_primary,command?.name ?: "Открыть")
-        setOnClickPendingIntent(R.id.widget_primary,command?.let { pending(c,SurfaceAction(Surface.WIDGET,it,s.token)) } ?: open(c))
+        setOnClickPendingIntent(R.id.widget_primary,command?.let { pending(c,SurfaceAction(Surface.WIDGET,it,s.token,s.timerTarget)) } ?: open(c))
         val canStop = enabled && s.mode in setOf(Mode.RUNNING,Mode.PAUSED)
         setViewVisibility(R.id.widget_stop,if(canStop) android.view.View.VISIBLE else android.view.View.GONE)
-        setOnClickPendingIntent(R.id.widget_stop,if(canStop) pending(c,SurfaceAction(Surface.WIDGET,TimerCommand.STOP,s.token)) else open(c))
+        setOnClickPendingIntent(R.id.widget_stop,if(canStop) pending(c,SurfaceAction(Surface.WIDGET,TimerCommand.STOP,s.token,s.timerTarget)) else open(c))
     }
     /** Launcher may throttle updates. A retained/pinned old shortcut fails STALE, never replays. */
     fun shortcut(c: Context,s: Snapshot) {
@@ -104,7 +110,7 @@ object TimerSurfaces {
             manager.removeDynamicShortcuts(listOf("timer_action"))
             return
         }
-        val action = intent(c,SurfaceAction(Surface.SHORTCUT,command,s.token)).setClass(c,MainActivity::class.java)
+        val action = intent(c,SurfaceAction(Surface.SHORTCUT,command,s.token,s.timerTarget)).setClass(c,MainActivity::class.java)
         manager.enableShortcuts(listOf("timer_action"))
         manager.setDynamicShortcuts(listOf(android.content.pm.ShortcutInfo.Builder(c,"timer_action")
             .setShortLabel("Таймер: ${command.name}").setLongLabel("Таймер: ${command.name}")
@@ -151,7 +157,12 @@ class TimerActionReceiver: BroadcastReceiver() {
                     Surface.OVERLAY -> TimerSurfaces.overlayAllowed(context)
                     Surface.WIDGET, Surface.SHORTCUT -> true
                 }
-                try { TimerSurfaces.execute(runtime.tracker,action,permitted) } catch(_: CoreError) { /* stale/denied: show current state, never replay */ }
+                try { TimerSurfaces.execute(runtime.tracker,action,permitted) }
+                catch(e: CoreError) {
+                    val message = "${e.code}: ${e.message}. Откройте приложение; история не изменена."
+                    context.getSharedPreferences("surface-results",Context.MODE_PRIVATE).edit().putString("last",message).apply()
+                    android.os.Handler(android.os.Looper.getMainLooper()).post { android.widget.Toast.makeText(context,message,android.widget.Toast.LENGTH_LONG).show() }
+                }
                 TimerSurfaces.refresh(context,runtime.tracker.view(),forceWidget = action.source == Surface.WIDGET)
             } catch(_: Exception) { android.util.Log.w("TimerSurfaces","Action unavailable; local state retained") }
             finally { pending.finish() }

@@ -1,73 +1,40 @@
 # Проверки и пределы результатов
 
-Проверки относятся к конкретному исходному состоянию и окружению. Успешный JVM-набор или сборка APK не подтверждают запуск приложения, доступность UI, поведение OS-разрешений и OEM на физическом Android.
-
 ## Воспроизводимая команда
 
-Требуются JDK 17 или 21, Android Platform 35 и Build Tools 35.0.0. SDK и кэш задаются локально через environment/local.properties, без персональных путей в репозитории.
+JDK 17/21, Android SDK Platform 35 / Build Tools 35.0.0, Gradle Wrapper 8.13 с закреплённым distribution SHA-256. SDK/cache задаются локально и не включаются в Git.
 
 ```sh
 ./gradlew :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
+./gradlew -PtrackerScale=true :app:testDebugUnitTest --tests '*RoomScenariosTest.timerPath'
 ```
 
-Gradle Wrapper 8.13 проверяет закреплённый SHA‑256 дистрибутива. `--offline` работает только при заранее заполненном кэше. Версии Kotlin/AGP/Room зафиксированы в Gradle-файлах.
+Один контракт из трёх интеграционных сценариев выполняется на Memory и дисковом Room/Robolectric API35. Проверки включают timer domain freshness, старые JSON 1–7, large streaming restore/rollback, SQL failure, неподвижный correction/CSV preview, полный старый→новый каталог и личные изменения, same-boot Focus, Calendar paging/recurring/all-day/denial, SAF failure/cancel/retry, все поля Activity recreation, нечитаемый DB/WAL/SHM и прерванный recovery. При потере metadata/vocabulary/generation число и хеш содержимого таблиц не меняются; уже загруженный кэш не скрывает повреждение.
 
-## Общий набор
+Тесты Android permissions и provider используют управляемые входы Robolectric. Они не обращаются к личному календарю и не выдают приложению реальные разрешения. Платформенные directory fsync/rename выполняются настоящей JVM filesystem через test seam: стандартные Robolectric shadows не реализуют эти операции. Наличие вызовов Android fsync не является проверкой отключения питания телефона.
 
-Одни и те же три сценария выполняются на Memory и Room/Robolectric API 35:
+## Измерение большой истории
 
-| Сценарий | Охват |
-|---|---|
-| `timerPath` | Start без карточки, последующая разметка, pause/resume/switch/stop, повтор/Favorite, токены и конкурентные команды, monotonic/boot recovery; Choices, Goals, Focus; storage/cache, CSV inspect/mapping/preview/apply; Android-поверхности и optional adapters |
-| `smallHistoryAndExport` | История, correction/Undo и общая граница, Reports/CSV и DST, дерево/фасеты/Decimal, calendar/grouping/EntryDraft, полный исследовательский корпус и явный package import |
-| `backupReplacementAndFailure` | JSON 1–7, чистое хранилище, preview/cancel, полная замена и rollback, повреждения/размер/ссылки, stale и конкурентная правка; Room SQL-failure rollback и SAF byte boundary |
+73 000 sessions/segments: десять лет ×20 записей в день, 30 минут каждая, 128 символов заметки, три классификации. Полный готовый каталог; JVM heap 1 GiB. Одно cold measurement и семь timer/day samples; этот разовый замер не является статистической или device-гарантией.
 
-Тестовый JVM Room/Robolectric имеет heap 1 GiB для полного исследовательского корпуса и Android sandbox. Это параметр тестов, а не largeHeap приложения и не проверка памяти телефона.
+| Операция | До | После |
+|---|---:|---:|
+| Холодное RoomStore open/read | 11,814 с | 4,933 с |
+| Таймерный Start/Pause/Resume/Stop, медиана | 56,449 мс | 20,873 мс |
+| Дневной отчёт, медиана | 72,630 мс | 0,044 мс |
+| Первый дневной запрос | 173,502 мс | 47,953 мс |
+| Календарь 30 дней | 399,458 мс | 2,831 мс |
 
-Room-проверки используют дисковую SQLite, миграции 1→2→3, независимые подключения и принудительные ошибки записи после изменения дочерних таблиц. Android-адаптеры используют контролируемые intent/cursor/permission inputs. Они не обращаются к личному календарю и не заменяют физическую проверку CalendarProvider/chooser.
+После измерения изменены cursor loading (без полного списка JSON DTO), переиспользование пустых immutable collections и одинаковых frozen classifications, индекс выбранной неизменяемой ревизии для Reports/Calendar. Индекс строится лениво при первом запросе. Его результаты сравниваются с прежним полным oracle для фильтров, границ, зон и unresolved данных. Замораживание публичных report rows и предварительное сохранение sidecars добавлены после этого performance run; окончательный aggregate проверяет итоговый код. Замер закрывает RoomStore, не всю инициализацию Activity/runtime. Crash-open с WAL/SHM дополнительно копирует оригиналы до SQLite и требует I/O/места; это не включено в холодный чистый RoomStore sample.
 
-Дополнительно проверены восемь assets в APK по точным sizes/SHA‑256, preview без записи, явный импорт в Room, replay и повторное открытие базы. APK — 5 935 630 байт, SHA‑256 `45b21c527aba8d8516cfb872d4b1a8f776bd8e9c61a3f8f318f491446eb17cf4`.
+Большой restore использует 10 000 records с длинными заметками и фактический файл больше 10 MiB: export→preview/cancel→replace→verified rollback→повтор→reopen→точный report на Memory и Room. Полный graph остаётся в памяти; дополнительный encoded файл не удерживается. Максимум одного JSON record —16 MiB characters, nesting128. CSV отдельно ограничен 10 MiB /50 000 строк /128 колонок.
 
-Новые границы включают malformed UTF‑8 внутри JSON, BOM, повреждение/oversize, отказ без записи; trusted catalog manifest и все supporting inputs, conflict/stale/replay/provenance; PROCESS_TEXT draft-only, opt-in и отказ/отзыв Calendar permission, all-day без выдуманного рабочего интервала; дедупликацию Focus DUE callback без переключения фазы.
+## Сохранённые доказательства
 
-## Записанные результаты
+Финальный aggregate: BUILD SUCCESSFUL in 53s; 3 Core + 3 Room, failures/errors/skips=0; lint 0 errors, 34 warnings, 1 hint. APK 3 285 313 байт, SHA-256 `cc68a1b358584c49bebad5114519c60c70a4226d9c870d8465533e93c091903b`, v2 signature verified. Три assets byte-identical подготовленному каталогу; source readers отсутствуют в DEX.
 
-Результат предыдущего состояния app 0.9.1 сохранён в [draft-validation-v18/verification.json](../evidence/draft-validation-v18/verification.json): 3 Core + 3 Room, 0 failures, lint 0 errors / 12 warnings, APK собран, deviceTested=false. Эти файлы сохранены как историческое доказательство и не пересчитываются под новые изменения.
+[Машинный отчёт](../evidence/audit-updates/verification.json) включает case names, implementation fingerprint и SHA-256 исходных XML/lint/build reports. [Замеры](../evidence/audit-updates/scale-comparison.json) содержат полные before/after samples. Сырые текущие отчёты сохранены отдельно без публикации локальных путей. Старые evidence относятся к указанным в них состояниям; их нельзя выдавать за проверки текущего кода. Исследовательские материалы вынесены из текущего дерева после проверки внешних архивов; прошлые commits сохранены.
 
-Состояние до очистки ISCO проверено полным aggregate: **BUILD SUCCESSFUL in 59s**, 3 Core + 3 Room/Robolectric, 0 failures/errors/skips; lint **0 errors, 15 warnings и 1 hint**, APK собран и v2-подпись проверена. Code commit: `7881df5e795fe006b270787556640dd699011478`. Публичная сводка с case names, coverage, SHA‑256 исходных отчётов и APK: [backend-integration/verification.json](../evidence/backend-integration/verification.json).
+## Открытый остаток
 
-Сводка получена из нового запуска. Неизменённые оригиналы XML/build/lint/manifest/signature сохранены локально; исторические evidence не заменены. Предупреждения относятся к target/dependency suggestions, техническим строкам/иконке, overdraw и shortcut usage; они не скрывались. Ни этот run, ни APK не являются проверкой физического телефона.
-
-| Историческая область | Материалы |
-|---|---|
-| Начальные сценарии / migration / backup | [Core XML](../evidence/core-tests.xml), [Room XML](../evidence/room-tests.xml), [manifest](../evidence/apk-manifest.txt) |
-| Research baseline и семантический анализ | [summary](../evidence/research/summary.json), [followup](../evidence/research/followup-summary.json) |
-| Полная исправленная проекция | [summary](../evidence/full-projection/summary.json), [outcomes](../evidence/full-projection/outcomes.json) |
-| Delta writes и внешняя история | [backend-v10](../evidence/backend-v10/summary.json) |
-| Лимит перед CSV parser | [acceptance-v11](../evidence/acceptance-v11/summary.json) |
-| Форматная инспекция | [format-import-v12](../evidence/format-import-v12/summary.json) |
-| CheckedState / Android-поверхности | [backend-v13](../evidence/backend-v13/verification.json) |
-| Goals / Focus | [goals-v14](../evidence/goals-v14/verification.json), [focus-v15](../evidence/focus-v15/verification.json) |
-| Choices / LocalEntries | [choices-v16](../evidence/choices-v16/verification.json), [local-entries-v17](../evidence/local-entries-v17/verification.json) |
-
-Сырые файлы evidence сохраняются без редакторской подгонки результатов. Старые версии Room/JSON в них относятся к моменту запуска; действующие версии — Room 3 и JSON 7. Ранние документы и изменения доступны в истории Git.
-
-## Проверка документации
-
-Проверены все 20 исходных Markdown/README/AGENTS-файлов: 19 авторских документов переработаны, один checksum-bound исследовательский Markdown сохранён как сырой исторический источник. Добавлен research/README для навигации и объяснения его роли. Проверены 135 локальных Markdown-ссылок и парность code fences; отсутствующих целей нет. Частные Pages, упоминания участников/исполнителей и пути окружения удалены из авторской документации. Все исходные research/evidence сохранены; полный перечень файлов находится в новой verification.json.
-
-## Непроверенные области
-
-Физический Android: Activity/SAF, sleep/reboot/kill/restart, widgets/launcher/overlay, OS prompts и отзыв разрешений, CalendarProvider, PROCESS_TEXT chooser, OEM-поведение, TalkBack и увеличенный текст. Производительность и батарея на многолетней истории телефона не измерены. Малые JVM-замеры являются локальными измерениями, без гарантии p95, плавности или фоновой доставки сигнала.
-
-Репозиторий не содержит GitHub Actions workflow; отсутствие check runs не означает успешное CI. Remote commit проверяется отдельно от локального результата команд. Действующие функциональные ограничения — [состояние проекта](ACCEPTANCE_GAPS.md).
-
-## Проверка авторских описаний ISCO
-
-Актуальный прогон и content audit: [isco-description-review/verification.json](../evidence/isco-description-review/verification.json) и [source-check.json](../evidence/isco-description-review/source-check.json). Предыдущие evidence сохранены как исторические результаты.
-
-Сценарий общего Memory/Room-контракта сравнивает полную runtime VocabularyData с принятой до исправления проекцией, разрешая только обновление ISCO source hashes в provenance. Он также устанавливает предыдущий каталог, записывает сессию, проверяет строгие конфликты обычного импорта, затем выполняет package preview/cancel/Apply/replay/reopen. Установленные определения, старый provenance и история остаются прежними. Пользовательское имя, иная definition, неизвестный hash или изменённый pointer не получают metadata-only исключение; stale Apply отклоняется.
-
-Рекурсивная проверка описаний, всех восьми manifests/inputs и действительного APK выполняется командой `python3 scripts/check_catalog_descriptions.py --apk app/build/outputs/apk/debug/app-debug.apk`. Исправление описаний не является юридическим заключением о полном clearance. Лицензия не добавлялась.
-
-Итоговый aggregate: **BUILD SUCCESSFUL in 1m 2s**; 3 Core + 3 Room, failures/errors/skips=0. Lint: 0 errors, 15 warnings, 1 hint. APK: 7259905 байт, SHA‑256 `0200eaa306e26717d4648c557bd5953b6cfbbbe38818a15cccd92a697f53a794`, v2 signature verified. Все восемь assets совпали с manifest. Физическое устройство не проверялось.
+Физический Android/emulator не подключён (`adb devices -l`: пусто). Не подтверждены устройство, OEM idle delivery, реальный OS chooser/CalendarProvider, убийство процесса/потеря питания, память и задержки телефона. Полный визуальный UI остаётся отдельной работой. GitHub checks проверяются отдельно для публикуемого commit; отсутствие checks не означает CI pass.

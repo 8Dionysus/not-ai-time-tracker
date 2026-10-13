@@ -9,6 +9,10 @@ import java.io.InputStream
 
 /** The SAF restore boundary shares the core byte limit, strict UTF-8 and BOM handling. */
 internal object BackupDocuments {
+    fun prepare(context: android.content.Context,input: InputStream,backups: Backups): RestorePreview {
+        val file = stageRestore(context,input)
+        return backups.prepare { file.inputStream() }
+    }
     fun prepare(input: InputStream, backups: Backups): RestorePreview {
         val output = ByteArrayOutputStream()
         val chunk = ByteArray(8192)

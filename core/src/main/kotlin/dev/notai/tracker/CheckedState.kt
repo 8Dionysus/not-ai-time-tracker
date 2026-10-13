@@ -16,6 +16,9 @@ internal enum class TimerAction { START, PAUSE, RESUME, STOP, SWITCH }
 class CheckedState private constructor(val data: Dataset,private val sessionPosition: Int?,private val segmentPosition: Int?,
     private val ownSegments: List<Segment>,private val lastCertainEnd: Long,private val totalDuration: Long,
     private val typeIds: Set<String>,private val cardIds: Set<String>) {
+    private val reportIndex by lazy { ReportIndex(data) }
+    internal fun calendar(now: Moment,first: java.time.LocalDate,days: Int,filter: Filter,zone: String) = Reports.indexedCalendar(data,reportIndex,now,first,days,filter,zone)
+    internal fun report(now: Moment,start: Long,end: Long,filter: Filter,zone: String) = Reports.indexed(data,reportIndex,now,start,end,filter,zone)
     fun snapshot(now: Moment): Snapshot = snapshot(data.copy(sessions = listOfNotNull(sessionPosition?.let { data.sessions[it] }),segments = ownSegments),now)
     fun <T> replace(next: Dataset,result: (CheckedState)->T): CheckedCommit<T> {
         val checked = if(next === data) this else validated(next.frozen(data))
@@ -77,7 +80,7 @@ class CheckedState private constructor(val data: Dataset,private val sessionPosi
         fun <E> edited(old: List<E>,rows: List<Positioned<E>>): List<E> = if(rows.isEmpty()) old else frozenList(old.toMutableList().apply {
             for(row in rows) if(row.position == size) add(row.value) else set(row.position,row.value)
         })
-        val next = data.copy(revision = Math.addExact(data.revision,1),sessions = edited(data.sessions,sessionRows),segments = edited(data.segments,segmentRows))
+        val next = data.copy(revision = Math.addExact(data.revision,1),timerEpoch = Math.addExact(data.timerEpoch,1),sessions = edited(data.sessions,sessionRows),segments = edited(data.segments,segmentRows))
         val checked = CheckedState(next,nextSession,nextSegment,own,end,total,typeIds,cardIds)
         val changed = sessionRows.map { it.value.id }.toSet()
         return CheckedCommit(this,checked,result(checked,changed),TimerRows(frozenList(sessionRows),frozenList(segmentRows)))

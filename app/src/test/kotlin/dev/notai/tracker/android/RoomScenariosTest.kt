@@ -12,6 +12,15 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class RoomScenariosTest: ScenarioContract() {
+    private val originalDirectorySync = DirectoryDurability.sync
+    private val originalRename = DirectoryDurability.rename
+    @org.junit.Before fun directoryDurability() {
+        DirectoryDurability.rename = { source,target -> java.nio.file.Files.move(source.toPath(),target.toPath(),java.nio.file.StandardCopyOption.ATOMIC_MOVE,java.nio.file.StandardCopyOption.REPLACE_EXISTING);Unit }
+        DirectoryDurability.sync = { directory ->
+            java.nio.channels.FileChannel.open(directory.toPath(),java.nio.file.StandardOpenOption.READ).use { it.force(true) }
+        }
+    }
+    @org.junit.After fun restoreDirectoryDurability() { DirectoryDurability.sync = originalDirectorySync;DirectoryDurability.rename = originalRename }
     private val databases = mutableMapOf<StateStore,Pair<String,TrackerDatabase>>()
     override fun createStore(): StateStore = open("test-${newId()}.db")
     private fun open(name: String): StateStore {
@@ -78,7 +87,7 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertEquals(plain.backupId,bom.backupId)
         org.junit.Assert.assertEquals(before,receiver.data()) // preview and cancellation do not replace data
         val result = backups.apply(bom)
-        org.junit.Assert.assertEquals(source.data().copy(revision = before.revision+1),receiver.data())
+        org.junit.Assert.assertEquals(source.data().copy(revision = before.revision+1,controlBarrier = receiver.data().controlBarrier),receiver.data())
         org.junit.Assert.assertEquals(before,Backups.decode(rollback.read(result.rollbackReference)).data)
         val stale = prepare(json.toByteArray(Charsets.UTF_8))
         receiver.settings(receiver.snapshot().token,Settings("Europe/Berlin"))
@@ -89,24 +98,28 @@ class RoomScenariosTest: ScenarioContract() {
     }
     private fun bundledCatalogInput() {
         val context = RuntimeEnvironment.getApplication()
+        val ready = ReadyCatalog.read { context.assets.open("catalog/$it") }
+        val fresh = newInstallData(ready,"America/Los_Angeles")
+        org.junit.Assert.assertEquals("America/Los_Angeles",fresh.settings.reportZone)
+        org.junit.Assert.assertEquals(ready.vocabulary.types,fresh.types)
+        org.junit.Assert.assertEquals(ready.vocabulary.axes,fresh.axes)
+        org.junit.Assert.assertEquals(ready.manifest.catalogVersion,fresh.catalogVersion)
+        org.junit.Assert.assertEquals(java.time.ZoneId.systemDefault().id,newInstallData(ready).settings.reportZone)
+        val installDb = TrackerDatabase.open(context,"fresh-${newId()}.db")
+        try { runBlocking { withContext(Dispatchers.IO) {
+            val installed = RoomStore(installDb,{ fresh }).read()
+            org.junit.Assert.assertEquals(fresh,installed)
+            org.junit.Assert.assertEquals(fresh,RoomStore(installDb,{ throw AssertionError("Existing install must not initialize again") }).read())
+        } } } finally { installDb.close() }
+
         val tracker = Tracker(createStore(),FakeClock())
-        val directory = java.io.File(context.noBackupFilesDir,"bundled-${newId()}")
-        val importer = FullCatalogImports(tracker,FileResearchArchive(directory))
-        val before = tracker.data()
-        val preview = importer.prepare { context.assets.open("research/$it") }
-        org.junit.Assert.assertEquals(1918,preview.types)
-        org.junit.Assert.assertEquals(337,preview.axes)
-        org.junit.Assert.assertTrue(preview.canApply)
-        org.junit.Assert.assertEquals(before,tracker.data())
-        org.junit.Assert.assertFalse(directory.exists()) // cancelling a bundled preview writes nothing
-        importer.apply(preview)
-        val installed = tracker.data()
-        org.junit.Assert.assertEquals(before.types.size+1918,installed.types.size)
-        val replay = importer.prepare { context.assets.open("research/$it") }
-        importer.apply(replay)
+        val importer = CatalogImports(tracker) { ready }
+        val before = tracker.data();val preview = importer.prepare()
+        org.junit.Assert.assertTrue(preview.canApply);org.junit.Assert.assertEquals(before,tracker.data())
+        importer.apply(preview);val installed = tracker.data()
+        importer.apply(importer.prepare())
         org.junit.Assert.assertEquals(installed.types,tracker.data().types)
         org.junit.Assert.assertEquals(installed.axes,tracker.data().axes)
-        org.junit.Assert.assertEquals(8,preview.sourceHashes.size)
         org.junit.Assert.assertEquals(tracker.data(),reopen(tracker.store).read())
     }
     override fun assertImportRollback(tracker: Tracker,json: String,disk: RollbackStore) {
@@ -131,6 +144,10 @@ class RoomScenariosTest: ScenarioContract() {
     }
     override fun surfaceActions() {
         bundledCatalogInput()
+        calendarDiscovery()
+        focusBackgroundSignals()
+        privateFilesAndMetadata()
+        corruptDatabaseRescue()
         externalInputAdapters()
         val focusClock = FakeClock(); val focused = Tracker(createStore(),focusClock)
         focused.startFocus(focused.snapshot().token,plan = FocusPlan(1_000,1_000))
@@ -141,7 +158,7 @@ class RoomScenariosTest: ScenarioContract() {
         focused.pauseFocus(focused.snapshot().token)
         org.junit.Assert.assertEquals(TimerCommand.RESUME,TimerSurfaces.primary(focused.snapshot()))
         focused.resumeFocus(focused.snapshot().token)
-        val beforeRecovery = focused.data(); focusClock.process = "recreated-process"
+        val beforeRecovery = focused.data(); focusClock.process = "recreated-process";focusClock.boot = "recreated-boot"
         org.junit.Assert.assertNull(TimerSurfaces.primary(focused.snapshot()))
         val blocked = org.junit.Assert.assertThrows(CoreError::class.java) {
             TimerSurfaces.execute(focused,SurfaceAction(Surface.SHORTCUT,TimerCommand.PAUSE,focused.snapshot().token))
@@ -317,21 +334,184 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertEquals(android.content.Intent.ACTION_MAIN,activity.intent.action)
         org.junit.Assert.assertFalse(activity.intent.hasExtra(android.content.Intent.EXTRA_PROCESS_TEXT))
         note.setText("Edited draft")
+        val fieldValues = mapOf("name" to "Draft name","details" to "listening","from" to "2026-10-01T00:00:00Z","until" to "2026-10-01T00:01:00Z","zone" to "America/Los_Angeles")
+        fieldValues.forEach { (key,value) -> (MainActivity::class.java.getDeclaredField(key).apply { isAccessible = true }.get(activity) as android.widget.EditText).setText(value) }
+        val cardField = MainActivity::class.java.getDeclaredField("selectedCardId").apply { isAccessible = true };cardField.set(activity,"two")
         controller.newIntent(android.content.Intent(shared).putExtra(android.content.Intent.EXTRA_PROCESS_TEXT,"Other text"))
         org.junit.Assert.assertEquals("Edited draft",note.text.toString()) // explicit text input never silently destroys an existing form
         org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog()
             .getButton(android.content.DialogInterface.BUTTON_NEGATIVE).performClick()
         val state = android.os.Bundle()
-        controller.saveInstanceState(state).destroy()
+        controller.saveInstanceState(state)
+        val stateStatus = MainActivity::class.java.getDeclaredField("status").apply { isAccessible = true }.get(activity) as android.widget.TextView
+        org.junit.Assert.assertNotNull("Form save failed: ${stateStatus.text}",state.getString("formReference"))
+        controller.destroy()
         val recreated = org.robolectric.Robolectric.buildActivity(MainActivity::class.java,android.content.Intent(shared)).create(state)
-        try { org.junit.Assert.assertEquals("Edited draft",(noteField.get(recreated.get()) as android.widget.EditText).text.toString()) }
+        try {
+            org.junit.Assert.assertEquals("Edited draft",(noteField.get(recreated.get()) as android.widget.EditText).text.toString())
+            fieldValues.forEach { (key,value) -> org.junit.Assert.assertEquals(value,(MainActivity::class.java.getDeclaredField(key).apply { isAccessible = true }.get(recreated.get()) as android.widget.EditText).text.toString()) }
+            org.junit.Assert.assertEquals("two",cardField.get(recreated.get()))
+        }
         finally { recreated.destroy() }
     }
+    private fun focusBackgroundSignals() {
+        val context = RuntimeEnvironment.getApplication();val clock = FakeClock();val t = Tracker(createStore(),clock)
+        t.startFocus(t.snapshot().token,plan = FocusPlan(1000,1000));clock.advance(1000)
+        val due = t.snapshot().focus!!;val before = t.data()
+        org.robolectric.Shadows.shadowOf(context).denyPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+        org.junit.Assert.assertFalse(FocusSignals.deliver(context,due))
+        org.robolectric.Shadows.shadowOf(context).grantPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+        org.junit.Assert.assertTrue(FocusSignals.deliver(context,due))
+        org.junit.Assert.assertFalse(FocusSignals.deliver(context,due))
+        org.junit.Assert.assertTrue(context.getSharedPreferences("focus-signals",0).getStringSet("delivered",emptySet())!!.contains(due.signalKey))
+        org.junit.Assert.assertEquals(before,t.data())
+        t.focusNext(t.snapshot().token);clock.advance(1000)
+        org.junit.Assert.assertTrue(FocusSignals.deliver(context,t.snapshot().focus!!))
+        org.junit.Assert.assertEquals(1000L,t.snapshot().trustedDurationMs)
+        org.robolectric.Shadows.shadowOf(context).denyPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+        FocusSignals.refresh(context,t.view()) // opt-in remains false; no alarm or history transition
+        org.junit.Assert.assertEquals(FocusMode.DUE,t.snapshot().focus!!.mode)
+    }
+    private fun privateFilesAndMetadata() {
+        val context = RuntimeEnvironment.getApplication()
+        val cards = listOf(Card(id = "one",name = "Same",details = mapOf("variant" to "one")),Card(id = "two",name = "Same",details = mapOf("variant" to "two")))
+        val data = Dataset(cards = cards)
+        org.junit.Assert.assertEquals("two",CardInputs.selection(data,"two").details["variant"])
+        org.junit.Assert.assertEquals("two",CardInputs.selection(data,"two").cardId)
+        val subjectClock = FakeClock();val subjectTracker = Tracker(createStore(),subjectClock)
+        subjectTracker.settings(subjectTracker.snapshot().token,Settings(surfaces = SurfaceSettings(widget = true)))
+        subjectTracker.start(subjectTracker.snapshot().token);subjectClock.advance(1000)
+        val shown = subjectTracker.snapshot();val stop = SurfaceAction(Surface.WIDGET,TimerCommand.STOP,shown.token,shown.timerTarget)
+        org.junit.Assert.assertEquals(stop,TimerSurfaces.parse(TimerSurfaces.intent(context,stop)))
+        subjectTracker.settings(shown.token,subjectTracker.data().settings.copy(reportZone = "Europe/Berlin"))
+        TimerSurfaces.execute(subjectTracker,stop)
+        subjectTracker.start(subjectTracker.snapshot().token)
+        val active = subjectTracker.data()
+        org.junit.Assert.assertEquals(ErrorCode.STALE,org.junit.Assert.assertThrows(CoreError::class.java) { TimerSurfaces.execute(subjectTracker,stop) }.code)
+        org.junit.Assert.assertEquals(active,subjectTracker.data())
+        val exports = ExportOperations(context);val op = exports.begin("application/json","test.json")
+        val bytes = "{\"complete\":true}".toByteArray()
+        exports.prepare(op.id) { it.write(bytes) };exports.cancel(op.id)
+        val reopened = ExportOperations(context);org.junit.Assert.assertEquals("CANCELLED",reopened.read(op.id).state)
+        val destination = java.io.File(context.noBackupFilesDir,"export-test-${newId()}.json")
+        org.junit.Assert.assertThrows(Exception::class.java) { reopened.write(op.id,android.net.Uri.fromFile(java.io.File(context.noBackupFilesDir,"missing-parent/out.json"))) }
+        org.junit.Assert.assertEquals("READY",reopened.read(op.id).state)
+        val result = reopened.write(op.id,android.net.Uri.fromFile(destination))
+        org.junit.Assert.assertArrayEquals(bytes,destination.readBytes());org.junit.Assert.assertTrue(result.verified)
+        for(table in listOf("metadata","vocabulary","store_generation")) {
+            val store = createStore();val db = databases.getValue(store).second;val tracker = Tracker(store,FakeClock())
+            tracker.saveType(tracker.snapshot().token,ActivityType("personal","Personal"))
+            tracker.start(tracker.snapshot().token,Classification(activityTypeId = "personal"));tracker.stop(tracker.snapshot().token)
+            tracker.saveFavorite(tracker.snapshot().token,Favorite(label = "Personal",selection = tracker.data().sessions.single().selection))
+            db.openHelper.writableDatabase.execSQL("DELETE FROM $table")
+            fun counts(): List<Long> = listOf("activity_types","sessions","segments","favorites","metadata","vocabulary","store_generation").map { name ->
+                db.openHelper.readableDatabase.query("SELECT COUNT(*) FROM $name").use { it.moveToFirst();it.getLong(0) }
+            }
+            fun payloadHashes(): List<String> = listOf("activity_types","sessions","segments","favorites","metadata","vocabulary","store_generation").map { name ->
+                db.openHelper.readableDatabase.query("SELECT * FROM $name ORDER BY id").use { c ->
+                    val digest = java.security.MessageDigest.getInstance("SHA-256")
+                    while(c.moveToNext()) for(i in 0 until c.columnCount) digest.update((c.getString(i) ?: "<NULL>").toByteArray())
+                    digest.digest().joinToString("") { "%02x".format(it) }
+                }
+            }
+            val hashes = payloadHashes();val before = counts()
+            org.junit.Assert.assertThrows(CoreError::class.java) { RoomStore(db) }
+            org.junit.Assert.assertThrows(CoreError::class.java) { store.read() }
+            org.junit.Assert.assertThrows(CoreError::class.java) { tracker.start(tracker.snapshot().token) }
+            org.junit.Assert.assertEquals(before,counts());org.junit.Assert.assertEquals(hashes,payloadHashes())
+            val name = databases.getValue(store).first;val archive = DatabaseArchives.capture(context,name)
+            val manifest = codec.decodeFromString<DatabaseArchive>(java.io.File(archive,"manifest.json").readText())
+            org.junit.Assert.assertTrue(manifest.files.isNotEmpty())
+            for(file in manifest.files) org.junit.Assert.assertEquals(file.sha256,fileHash(java.io.File(archive,file.name)))
+        }
+    }
+    private fun corruptDatabaseRescue() {
+        val context = RuntimeEnvironment.getApplication()
+        TrackerRuntime.beginRecovery();TrackerRuntime.endRecovery() // retire only this test application's singleton
+        val dbFile = context.getDatabasePath("tracker.db").apply { parentFile!!.mkdirs() }
+        val originals = listOf("tracker.db","tracker.db-wal","tracker.db-shm").associateWith { ("corrupt fixture: "+it).toByteArray() }
+        originals.forEach { (name,bytes) -> context.getDatabasePath(name).writeBytes(bytes) }
+        org.junit.Assert.assertThrows(Exception::class.java) { runBlocking { withContext(Dispatchers.IO) { TrackerRuntime.get(context) } } }
+        originals.forEach { (name,bytes) -> org.junit.Assert.assertArrayEquals(bytes,context.getDatabasePath(name).readBytes()) }
+
+        val clock = FakeClock();val tracker = Tracker(createStore(),clock)
+        tracker.saveCard(tracker.snapshot().token,Card(name = "Rescued card"))
+        tracker.start(tracker.snapshot().token);clock.advance(1000);tracker.stop(tracker.snapshot().token)
+        val backup = StreamingBackup.portable(tracker.data(),clock.now())
+        val source = java.io.File(context.noBackupFilesDir,"rescue-source.json")
+        source.outputStream().use { StreamingBackup.write(backup,it) }
+        val preview = DatabaseRecovery.prepare(source)
+        source.appendText("invalid")
+        org.junit.Assert.assertThrows(CoreError::class.java) { DatabaseRecovery.apply(context,preview) }
+        originals.forEach { (name,bytes) -> org.junit.Assert.assertArrayEquals(bytes,context.getDatabasePath(name).readBytes()) }
+        source.outputStream().use { StreamingBackup.write(backup,it) }
+        val rename = DirectoryDurability.rename
+        DirectoryDurability.rename = { old,new ->
+            if(old.name.startsWith("rescue-") && new.name == "tracker.db") throw java.io.IOException("Injected interrupted installation")
+            rename(old,new)
+        }
+        try { org.junit.Assert.assertThrows(java.io.IOException::class.java) {
+            runBlocking { withContext(Dispatchers.IO) { DatabaseRecovery.apply(context,DatabaseRecovery.prepare(source)) } }
+        } } finally { DirectoryDurability.rename = rename }
+        org.junit.Assert.assertTrue(DatabaseRecovery.needsAttention(context))
+        org.junit.Assert.assertThrows(CoreError::class.java) { TrackerRuntime.get(context) }
+        val archives = java.io.File(context.noBackupFilesDir,"database-archives").listFiles().orEmpty()
+        val preserved = archives.first { java.io.File(it,"tracker.db").exists() && java.io.File(it,"tracker.db-wal").exists() && java.io.File(it,"tracker.db-shm").exists() }
+        originals.forEach { (name,bytes) -> org.junit.Assert.assertArrayEquals(bytes,java.io.File(preserved,name).readBytes()) }
+        source.appendText("changed")
+        org.junit.Assert.assertThrows(CoreError::class.java) { DatabaseRecovery.resume(context) }
+        org.junit.Assert.assertTrue(DatabaseRecovery.needsAttention(context))
+        source.outputStream().use { StreamingBackup.write(backup,it) }
+        val result = runBlocking { withContext(Dispatchers.IO) { DatabaseRecovery.resume(context) } }
+        val archive = java.io.File(context.noBackupFilesDir,"database-archives/${result.archive}")
+        org.junit.Assert.assertTrue(java.io.File(archive,"manifest.json").exists())
+        org.junit.Assert.assertFalse(DatabaseRecovery.needsAttention(context))
+        val db = TrackerDatabase.open(context)
+        try {
+            val data = runBlocking { withContext(Dispatchers.IO) { RoomStore(db).read() } }
+            org.junit.Assert.assertEquals(backup.data.sessions,data.sessions)
+            org.junit.Assert.assertEquals(backup.data.segments,data.segments)
+            org.junit.Assert.assertEquals(backup.data.cards,data.cards)
+        } finally { db.close() }
+        org.junit.Assert.assertTrue(source.exists());org.junit.Assert.assertTrue(dbFile.exists())
+    }
+    private fun calendarDiscovery() {
+        var permission = false;var queries = 0
+        val refs = listOf(CalendarOccurrenceRef(2,0,6000),CalendarOccurrenceRef(1,1000,1800),CalendarOccurrenceRef(1,2000,3000))
+        val calendar = CalendarOccurrences({ permission },{ _: android.net.Uri,columns: Array<String>,where: String,args: Array<String>,order: String? ->
+            queries++
+            org.junit.Assert.assertEquals("begin ASC, event_id ASC, end ASC",order)
+            val cursor = android.database.MatrixCursor(columns)
+            val from = args[0].toLong();val until = args[1].toLong()
+            val after = if(args.size > 2) CalendarOccurrenceRef(args[4].toLong(),args[2].toLong(),args[7].toLong()) else null
+            val comparison = compareBy<CalendarOccurrenceRef> { it.begin }.thenBy { it.eventId }.thenBy { it.end }
+            refs.filter { it.end > from && it.begin < until && (after == null || comparison.compare(it,after)>0) }
+                .forEach { cursor.addRow(arrayOf<Any>(it.eventId,it.begin,it.end,"Occurrence",if(it.eventId==2L) 1 else 0)) }
+            org.junit.Assert.assertTrue(where.contains("end > ?"));cursor
+        })
+        org.junit.Assert.assertEquals(CalendarReadIssue.DISABLED,calendar.list(0,6000).issue)
+        org.junit.Assert.assertEquals(CalendarReadIssue.PERMISSION_REQUIRED,calendar.list(0,6000,true).issue)
+        org.junit.Assert.assertEquals(0,queries);permission = true
+        val first = calendar.list(0,6000,true,limit = 2)
+        org.junit.Assert.assertEquals(refs.take(2),first.occurrences.map { it.reference })
+        org.junit.Assert.assertNull(first.occurrences.first().draft().interval)
+        val second = calendar.list(0,6000,true,limit = 2,cursor = first.next)
+        org.junit.Assert.assertEquals(listOf(refs.last()),second.occurrences.map { it.reference })
+        org.junit.Assert.assertNull(second.next)
+        org.junit.Assert.assertEquals(refs.first(),calendar.nearest(1500,true).occurrence!!.reference)
+        org.junit.Assert.assertThrows(CoreError::class.java) { calendar.list(0,7000,true,cursor = first.next) }
+        permission = false;org.junit.Assert.assertEquals(CalendarReadIssue.PERMISSION_REQUIRED,calendar.nearest(1500,true).issue)
+        val revoked = CalendarOccurrences({ true },{ _: android.net.Uri,_: Array<String>,_: String,_: Array<String>,_: String? -> throw SecurityException() })
+        org.junit.Assert.assertEquals(CalendarReadIssue.PERMISSION_REQUIRED,revoked.list(0,6000,true).issue)
+        val missing = CalendarOccurrences({ true },{ _: android.net.Uri,_: Array<String>,_: String,_: Array<String>,_: String? -> null })
+        org.junit.Assert.assertEquals(CalendarReadIssue.PROVIDER_UNAVAILABLE,missing.list(0,6000,true).issue)
+    }
     override fun storageWorkload() {
+        if(System.getProperty("tracker.scale") == "true") realisticHistoryBenchmark()
         val store = createStore(); val db = databases.getValue(store).second
         val clock = FakeClock(); val tracker = Tracker(store,clock)
         val root = java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile!!
-        val vocabulary = codec.decodeFromString<VocabularyData>(root.resolve("evidence/full-projection/runtime-vocabulary.json").readText())
+        val vocabulary = codec.decodeFromString<VocabularyData>(root.resolve("catalog/runtime-catalog.json").readText())
         tracker.addCatalog(tracker.snapshot().token,vocabulary)
         benchmarkCheckedPath(tracker.data())
         val sql = db.openHelper.writableDatabase
@@ -371,6 +551,42 @@ class RoomScenariosTest: ScenarioContract() {
         assertV2Migration(tracker.data())
         val saved = tracker.data(); val reopened = reopen(store)
         org.junit.Assert.assertEquals(saved,reopened.read())
+    }
+    private fun realisticHistoryBenchmark() {
+        val clock = FakeClock();val root = java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile!!
+        val vocabulary = codec.decodeFromString<VocabularyData>(root.resolve("catalog/runtime-catalog.json").readText())
+        val base = Dataset(types = vocabulary.types,axes = vocabulary.axes,metrics = vocabulary.metrics,units = vocabulary.units)
+        val selected = vocabulary.types.filter { it.selectable }.take(3).map { base.classify(Classification(name = it.name,activityTypeId = it.id,
+            tags = setOf("synthetic-benchmark"),details = mapOf("fixture" to "ten-years"))) }
+        val count = 73_000;val first = clock.wall-3650L*86_400_000
+        val sessions = (0 until count).map { Session(id = "scale-session-$it",status = SessionStatus.STOPPED,selection = selected[it%selected.size],
+            note = "Synthetic entry $it "+"x".repeat(128)) }
+        val segments = sessions.mapIndexed { i,s -> val start = first+(i/20)*86_400_000L+(i%20)*40*60_000L
+            Segment(id = "scale-segment-$i",sessionId = s.id,start = start,end = start+30*60_000,durationMs = 30*60_000,
+                selection = s.selection) }
+        val input = base.copy(sessions = sessions,segments = segments)
+        fun time(block: ()->Unit): Long { val start = System.nanoTime();block();return System.nanoTime()-start }
+        val validation = time { validate(input) };var store = createStore()
+        val persisted = time { store.transaction { input to Unit } }
+        val cold = time { store = reopen(store);store.readChecked() }
+        val tracker = Tracker(store,clock)
+        val timers = (0 until 7).map {
+            time { tracker.start(tracker.snapshot().token);clock.advance(1000);tracker.pause(tracker.snapshot().token)
+                tracker.resume(tracker.snapshot().token);clock.advance(1000);tracker.stop(tracker.snapshot().token) }
+        }
+        val date = java.time.Instant.ofEpochMilli(clock.wall-86_400_000).atZone(java.time.ZoneId.of("UTC")).toLocalDate()
+        val view = tracker.view()
+        val daily = (0 until 7).map { time { val report = view.day(date);org.junit.Assert.assertEquals(20*30*60_000L,report.recordedMs) } }
+        val calendar = time { view.calendar(date.minusDays(29),30) }
+        val directory = java.io.File(requireNotNull(System.getProperty("tracker.artifacts"))).apply { mkdirs() }
+        val result = buildJsonObject {
+            put("schema","tracker_scale_benchmark_v1");put("execution","Room/SQLite in Robolectric JVM API35; synthetic, not phone")
+            put("sessions",count);put("segments",count);put("years",10);put("entriesPerDay",20)
+            put("fullValidationNs",validation);put("initialRoomWriteNs",persisted);put("coldReopenReadNs",cold)
+            put("timerCycleNs",JsonArray(timers.map(::JsonPrimitive)));put("dailyReportNs",JsonArray(daily.map(::JsonPrimitive)))
+            put("calendar30DaysNs",calendar);put("maxHeapBytes",Runtime.getRuntime().maxMemory())
+        }
+        java.io.File(directory,"scale-benchmark.json").writeText(result.toString())
     }
     private fun benchmarkCheckedPath(catalog: Dataset) {
         val baseClock = FakeClock()

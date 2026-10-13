@@ -6,6 +6,8 @@ import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.ResolverStyle
 
+const val MAX_CSV_BYTES = 10*1024*1024
+
 @Serializable data class ImportOrigin(val namespace: String,val recordKey: String,val rowHash: String,
     val fileHash: String,val zone: String,val fields: Map<String,String>)
 data class SourceActivity(val activity: String,val category: String)
@@ -28,15 +30,21 @@ data class CsvMapping(val namespace: String,val activity: String,val start: Stri
 }
 data class TransferRow(val number: Int,val activity: SourceActivity,val start: Long,val end: Long,
     val note: String?,val origin: ImportOrigin,val durationMs: Long)
-class TransferFile internal constructor(val rows: List<TransferRow>,val errors: List<String>,val warnings: List<String>) {
-    val activities get() = rows.map { it.activity }.distinct()
+class TransferFile internal constructor(rows: List<TransferRow>,errors: List<String>,warnings: List<String>) {
+    val rows = frozenList(rows.map { it.copy(origin = it.origin.frozen()) })
+    val errors = frozenList(errors)
+    val warnings = frozenList(warnings)
+    val activities get() = frozenList(rows.map { it.activity }.distinct())
 }
 class HistoryPreview internal constructor(val expected: Token,val file: TransferFile,
-    internal val sessions: List<Session>,internal val segments: List<Segment>,val duplicates: Int,val errors: List<String>) {
+    sessions: List<Session>,segments: List<Segment>,val duplicates: Int,errors: List<String>) {
+    internal val sessions = frozenList(sessions.map { it.copy(selection = it.selection.frozen(),importOrigin = it.importOrigin?.frozen()) })
+    internal val segments = frozenList(segments.map { it.copy(selection = it.selection.frozen()) })
+    val errors = frozenList(errors)
     val added get() = sessions.size
     val canApply get() = errors.isEmpty()
     val warnings get() = file.warnings
-    val intervals get() = segments.toList()
+    val intervals get() = segments
 }
 data class HistoryImportResult(val state: Snapshot,val added: Int,val duplicates: Int,val rollbackReference: String?)
 data class HistoryExport(val csv: String,val warnings: List<String>)
@@ -48,7 +56,7 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
         val errors = file.errors.toMutableList(); val sessions = mutableListOf<Session>(); val segments = mutableListOf<Segment>()
         val known = d.sessions.associateBy { it.id }.toMutableMap(); var duplicates = 0
         for(row in file.rows) {
-            val id = "import:"+researchHash(codec.encodeToString(listOf(row.origin.namespace,row.origin.recordKey)).toByteArray())
+            val id = "import:"+sha256(codec.encodeToString(listOf(row.origin.namespace,row.origin.recordKey)).toByteArray())
             val previous = known[id]
             if(previous != null) {
                 if(previous.importOrigin?.rowHash == row.origin.rowHash) duplicates++
@@ -63,7 +71,7 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
                 sessions += session; segments += segment; known[id] = session
             } catch(e: CoreError) { errors += "Row ${row.number}: ${e.message}" }
         }
-        if(errors.isEmpty()) try { Backups.encode(d.copy(sessions = d.sessions+sessions,segments = d.segments+segments),now) }
+        if(errors.isEmpty()) try { StreamingBackup.portable(d.copy(sessions = d.sessions+sessions,segments = d.segments+segments),now) }
         catch(e: CoreError) { errors += "${e.code}: ${e.message}; no rows will be applied" }
         return HistoryPreview(token(d),file,sessions.toList(),segments.toList(),duplicates,errors.toList())
     }
@@ -71,10 +79,9 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
         ensure(preview.canApply,"Resolve preview errors before applying",ErrorCode.UNSUPPORTED_IMPORT)
         val before = tracker.data(); checkToken(before,preview.expected,tracker.clock.now())
         if(preview.added == 0) return@storage HistoryImportResult(tracker.snapshot(),0,preview.duplicates,null)
-        val backup = Backups.encode(before,tracker.clock.now())
-        val reference = rollback.save(backup)
-        ensure(rollback.read(reference) == backup,"Transfer rollback verification failed",ErrorCode.STORAGE)
-        Backups.decode(backup)
+        val backup = StreamingBackup.portable(before,tracker.clock.now())
+        val reference = rollback.saveSnapshot(backup)
+        ensure(rollback.readSnapshot(reference) == backup,"Transfer rollback verification failed",ErrorCode.STORAGE)
         val change = tracker.importHistory(preview.expected,preview.sessions,preview.segments)
         HistoryImportResult(change.state,preview.added,preview.duplicates,reference)
     }
@@ -87,17 +94,17 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
             val mapping = CsvMapping.toggl(namespace,zone,datePattern).let {
                 if(hasEnd) it.copy(end = "End date",endTime = "End time") else it
             }
-            return parseTable(table,mapping,researchHash(bytes))
+            return parseTable(table,mapping,sha256(bytes))
         }
         fun parseCsv(text: String,mapping: CsvMapping): TransferFile {
             val bytes = checkedCsvBytes(text)
-            return parseTable(CsvTable.parse(text,mapping.delimiter),mapping,researchHash(bytes))
+            return parseTable(CsvTable.parse(text,mapping.delimiter),mapping,sha256(bytes))
         }
         private fun checkedCsvBytes(text: String): ByteArray {
             // UTF-8 needs at least as many bytes as UTF-16 code units. Bound encoding too.
-            ensure(text.length <= MAX_BACKUP_BYTES,"CSV exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
+            ensure(text.length <= MAX_CSV_BYTES,"CSV exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
             return text.toByteArray(Charsets.UTF_8).also {
-                ensure(it.size <= MAX_BACKUP_BYTES,"CSV exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
+                ensure(it.size <= MAX_CSV_BYTES,"CSV exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
             }
         }
         private fun parseTable(table: List<List<String>>,mapping: CsvMapping,fileHash: String): TransferFile {
@@ -134,8 +141,8 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
                         ?: Math.addExact(start,requireNotNull(duration))
                     ensure(start >= 0 && end > start && end <= MAX_TIME,"Invalid interval",ErrorCode.INVALID_INTERVAL)
                     ensure(duration == null || kotlin.math.abs((end-start)-duration) <= mapping.clockToleranceMs,"Duration disagrees with endpoints; no rounding inferred")
-                    val rawHash = researchHash(codec.encodeToString(fields.toSortedMap().toMap()).toByteArray())
-                    val hash = researchHash(codec.encodeToString(listOf(rawHash,start.toString(),end.toString(),mapping.zone)).toByteArray())
+                    val rawHash = sha256(codec.encodeToString(fields.toSortedMap().toMap()).toByteArray())
+                    val hash = sha256(codec.encodeToString(listOf(rawHash,start.toString(),end.toString(),mapping.zone)).toByteArray())
                     val key = mapping.id?.let { get(it).also { value -> ensure(value.isNotBlank(),"Missing source ID") } } ?: rawHash
                     rows += TransferRow(index+2,SourceActivity(get(mapping.activity),get(mapping.category)),start,end,
                         get(mapping.note).takeIf { it.isNotEmpty() },ImportOrigin(mapping.namespace,key,hash,fileHash,mapping.zone,fields),duration ?: (end-start))

@@ -94,46 +94,109 @@ abstract class TrackerDatabase: RoomDatabase() {
             }
         }
 
-        fun open(context: Context,name: String = "tracker.db") = Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(MIGRATION_1_2,MIGRATION_2_3).build()
+        fun open(context: Context,name: String = "tracker.db"): TrackerDatabase {
+            val file = context.getDatabasePath(name)
+            if(file.exists()) {
+                val expected = "SQLite format 3\u0000".toByteArray(Charsets.US_ASCII)
+                val header = ByteArray(expected.size)
+                val validHeader = file.inputStream().use { input -> var n = 0
+                    while(n < header.size) { val count = input.read(header,n,header.size-n);if(count < 0) break;n += count }
+                    n == header.size && header.contentEquals(expected)
+                }
+                // SQLite may discard invalid sidecars before its corruption callback. Preserve
+                // them before opening. Clean closed stores without sidecars avoid this copy.
+                if(!validHeader || listOf("-wal","-shm","-journal").any { context.getDatabasePath(name+it).exists() })
+                    DatabaseArchives.capture(context,name)
+                ensure(validHeader,"Database header is damaged; originals preserved. Use explicit recovery",ErrorCode.STORAGE)
+            }
+            return Room.databaseBuilder(context,TrackerDatabase::class.java,name)
+            .addMigrations(MIGRATION_1_2,MIGRATION_2_3).openHelperFactory { configuration ->
+                val original = configuration.callback
+                val guarded = object: androidx.sqlite.db.SupportSQLiteOpenHelper.Callback(original.version) {
+                    override fun onConfigure(db: androidx.sqlite.db.SupportSQLiteDatabase) = original.onConfigure(db)
+                    override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) = original.onCreate(db)
+                    override fun onUpgrade(db: androidx.sqlite.db.SupportSQLiteDatabase,old: Int,new: Int) = original.onUpgrade(db,old,new)
+                    override fun onDowngrade(db: androidx.sqlite.db.SupportSQLiteDatabase,old: Int,new: Int) = original.onDowngrade(db,old,new)
+                    override fun onOpen(db: androidx.sqlite.db.SupportSQLiteDatabase) = original.onOpen(db)
+                    override fun onCorruption(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                        try { DatabaseArchives.capture(context,name) }
+                        catch(_: Exception) { android.util.Log.e("Recovery","Original database remains in place; archival copy failed") }
+                        // Do not call the default callback: it deletes corrupted database files.
+                    }
+                }
+                androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory().create(
+                    androidx.sqlite.db.SupportSQLiteOpenHelper.Configuration.builder(configuration.context).name(configuration.name)
+                        .callback(guarded).noBackupDirectory(configuration.useNoBackupDirectory).allowDataLossOnRecovery(false).build())
+            }.build()
+        }
     }
 }
 /** The committed generation invalidates the local graph cache across store instances.
  * Commands update only changed rows. No REPLACE on sessions (which would cascade-delete segments).
  * Every changed/deleted row is read back in the transaction; a failed commit discards the cache.
  */
-class RoomStore(private val db: TrackerDatabase): StateStore {
+class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset = { Dataset() },private val allowInitialize: Boolean = true): StateStore {
+    @Volatile private var retired = false
+    internal fun retire() { retired = true }
+    private fun active() { if(retired) throw CoreError(ErrorCode.STORAGE,"Store was closed for explicit recovery") }
     private val dao = db.dao()
-    private var cached: Pair<Long,CheckedState>? = null // accessed only inside Room transactions
-    init { db.runInTransaction { if (dao.metadata() == null) write(null,CheckedState.validate(Dataset())) } }
+    @Volatile private var cached: Pair<Long,CheckedState>? = null // accessed only inside Room transactions
+    init { db.runInTransaction {
+        if(dao.metadata() == null) {
+            val tables = listOf("metadata","activity_types","cards","sessions","segments","favorites","measurements","vocabulary","store_generation")
+            val remnants = tables.any { table -> db.openHelper.readableDatabase.query("SELECT 1 FROM $table LIMIT 1").use { it.moveToFirst() } }
+            if(remnants || !allowInitialize) throw CoreError(ErrorCode.STORAGE,"Metadata is missing from an existing store; use explicit recovery. Nothing was initialized.")
+            write(null,CheckedState.validate(initial()))
+        } else if(dao.vocabulary() == null || dao.generation() == null) {
+            throw CoreError(ErrorCode.STORAGE,"Store metadata is incomplete; use explicit recovery. Nothing was changed.")
+        }
+    } }
     override val checkedChanges: Flow<CheckedState> = dao.generations().distinctUntilChanged().map { readChecked() }.flowOn(Dispatchers.IO)
     override val changes: Flow<Dataset> = checkedChanges.map { it.data }
-    override fun readChecked(): CheckedState = db.runInTransaction(Callable { load() })
+    override fun readChecked(): CheckedState { active();return db.runInTransaction(Callable { active();load() }) }
     override fun read(): Dataset = readChecked().data
     override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T = checkedTransaction { before ->
         val (next,result) = block(before.data)
         before.replace(next) { result }
     }
     override fun <T> checkedTransaction(block: (CheckedState)->CheckedCommit<T>): T = try {
+        active()
         db.runInTransaction(Callable {
-            val before = load(); val commit = block(before); commit.requireBase(before)
+            active();val before = load(); val commit = block(before); commit.requireBase(before);active()
             if(before !== commit.state) write(before.data,commit.state,commit.timerRows)
             commit.result
         })
-    } catch(e: Exception) { db.runInTransaction { cached = null }; throw e }
+    } catch(e: Exception) { cached = null;throw e }
     private fun load(): CheckedState {
-        val generation = requireNotNull(dao.generation())
+        for(table in listOf("metadata","vocabulary","store_generation")) {
+            db.openHelper.readableDatabase.query("SELECT COUNT(*),MIN(id),MAX(id) FROM $table").use { c ->
+                ensure(c.moveToFirst() && c.getLong(0) == 1L && c.getInt(1) == 1 && c.getInt(2) == 1,
+                    "Store metadata is incomplete; use explicit recovery",ErrorCode.STORAGE)
+            }
+        }
+        val generation = dao.generation() ?: throw CoreError(ErrorCode.STORAGE,"Missing store generation")
+        ensure(generation >= 0,"Invalid store generation",ErrorCode.STORAGE)
         cached?.takeIf { it.first == generation }?.let { return it.second }
         val base = codec.decodeFromString<Dataset>(dao.metadata()!!.payload)
         val vocabulary = codec.decodeFromString<VocabularyData>(dao.vocabulary()!!.payload)
         val data = base.copy(axes = vocabulary.axes,metrics = vocabulary.metrics,units = vocabulary.units,
-            types = dao.types().map { codec.decodeFromString<ActivityType>(it.payload) },cards = dao.cards().map { codec.decodeFromString<Card>(it.payload) },
-            sessions = dao.sessions().map { codec.decodeFromString<Session>(it.payload) },
-            segments = dao.segments().map { codec.decodeFromString<Segment>(it.payload) },
-            favorites = dao.favorites().map { codec.decodeFromString<Favorite>(it.payload) },
-            measurements = dao.measurements().map { codec.decodeFromString<Measurement>(it.payload) })
+            types = payloads("activity_types") { codec.decodeFromString<ActivityType>(it) },cards = payloads("cards") { codec.decodeFromString<Card>(it) },
+            sessions = payloads("sessions") { codec.decodeFromString<Session>(it) },
+            segments = payloads("segments") { codec.decodeFromString<Segment>(it) },
+            favorites = payloads("favorites") { codec.decodeFromString<Favorite>(it) },
+            measurements = payloads("measurements") { codec.decodeFromString<Measurement>(it) })
         val checked = CheckedState.validate(data)
         cached = generation to checked
         return checked
+    }
+    /** One cursor window / one payload at a time; never retain a second full list of JSON rows. */
+    private fun <T> payloads(table: String,decode: (String)->T): List<T> {
+        check(table in setOf("activity_types","cards","sessions","segments","favorites","measurements"))
+        val result = ArrayList<T>()
+        db.openHelper.readableDatabase.query("SELECT payload FROM $table ORDER BY position").use { cursor ->
+            while(cursor.moveToNext()) result += decode(cursor.getString(0))
+        }
+        return result
     }
     private fun <T,R> sync(old: List<T>,next: List<T>,id: (T)->String,row: (Int,T)->R,
         put: (List<R>)->Unit,delete: (List<String>)->Unit,read: (List<String>)->List<R>) {

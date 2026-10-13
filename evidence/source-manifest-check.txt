@@ -1,5 +1,0 @@
-Static XML check only (not merged/built APK):
-allowBackup=false
-fullBackupContent=false
-No uses-permission declarations
-data-extraction-rules XML parses

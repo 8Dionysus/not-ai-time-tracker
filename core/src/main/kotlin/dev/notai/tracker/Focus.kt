@@ -26,7 +26,7 @@ object Focus {
             segments.sumExact { it.durationMs }
         } else if(f.paused) f.breakElapsedMs else {
             val a = f.breakAnchor
-            if(a == null || a.bootId != n.bootId || a.processId != n.processId || n.elapsed < a.elapsedMs || n.elapsed-a.elapsedMs > MAX_TIME ||
+            if(a == null || a.bootId != n.bootId || n.elapsed < a.elapsedMs || n.elapsed-a.elapsedMs > MAX_TIME ||
                 kotlin.math.abs((n.wall-f.breakStartedAt!!)-(n.elapsed-a.elapsedMs)) > 1000) {
                 uncertain = true; f.breakElapsedMs
             } else f.breakElapsedMs + minOf(f.durationMs-f.breakElapsedMs,n.elapsed-a.elapsedMs)

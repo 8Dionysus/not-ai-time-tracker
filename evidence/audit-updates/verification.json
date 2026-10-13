@@ -1,0 +1,311 @@
+{
+  "schema": "tracker_audit_updates_verification_v1",
+  "createdAtUtc": "2026-10-13T08:57:09.259397+00:00",
+  "aggregate": "BUILD SUCCESSFUL in 53s",
+  "command": "./gradlew :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug",
+  "execution": "JDK21; Android SDK35 / Build Tools35.0.0; offline; Room/Robolectric API35 JVM heap1GiB",
+  "checks": {
+    "core": {
+      "name": "dev.notai.tracker.CoreScenariosTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "timestamp": "2026-10-13T08:49:17.988Z",
+      "time": "7.471",
+      "cases": [
+        "smallHistoryAndExport",
+        "backupReplacementAndFailure",
+        "timerPath"
+      ],
+      "reportSha256": "c0d474af5434f5f2842724f0c2f1497d79e16b2aec6119dbab6275b79b2511c0"
+    },
+    "room": {
+      "name": "dev.notai.tracker.android.RoomScenariosTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "timestamp": "2026-10-13T08:51:47.941Z",
+      "time": "23.446",
+      "cases": [
+        "smallHistoryAndExport",
+        "backupReplacementAndFailure",
+        "timerPath"
+      ],
+      "reportSha256": "4cd8b57951e1c7c9846f34c94763ea03b077b07a42d69ec14880f161aee0fe46"
+    }
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 34,
+    "hints": 1,
+    "reportSha256": "45aa06e3921873c498ea5a3408fda8f4fecc1a15f7e42984b7caaf1e3abbafa7"
+  },
+  "logSha256": "e69ad3dc46ae11b19675e4e78b87141bc37086bae17920822fd65ad270a576a8",
+  "implementationSha256": "a18501bd9ecf99bbe5420b08d4770ff23d9ed85fad523ee90d570a09b2d5455b",
+  "implementationFiles": [
+    {
+      "path": "app/build.gradle.kts",
+      "sha256": "008538256b8f602b8126ca9d8512fa1c3c0bfa8a154773c01e12af3b63106cbf"
+    },
+    {
+      "path": "app/schemas/dev.notai.tracker.android.TrackerDatabase/1.json",
+      "sha256": "d2ce971d7d97e594862fc9370eeb1c01c8f0e343f52038325af26655cf18b1fb"
+    },
+    {
+      "path": "app/schemas/dev.notai.tracker.android.TrackerDatabase/2.json",
+      "sha256": "f8b482f96bc97821ac08d49682b58d496a1b889a6b5aa7813def76b6d364415b"
+    },
+    {
+      "path": "app/schemas/dev.notai.tracker.android.TrackerDatabase/3.json",
+      "sha256": "aacce33a2aa0f5877979100afef2eb0157541312dbd1d35d7d49adf10d3051bf"
+    },
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "sha256": "cc90b356f155ac3f663dff8e42e50170923a7e7fcefc241774dde8d3c7efa8b2"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/AndroidRuntime.kt",
+      "sha256": "f3b6052168ac21fe0a0f6c43604c2e2e3bee6a295bdd8a7c8b94935d4547705c"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/BackupDocuments.kt",
+      "sha256": "b901af0305ffd6b366091c7086bca774e5f0ad2286ad132e183465803819a7c1"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/DatabaseRecovery.kt",
+      "sha256": "f5ad5cd40b0f136ad2718293a995a059e3e1c412e9170beef4b88c7f68e843a5"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/EntryInputs.kt",
+      "sha256": "e9cf05dbe12f2f4894f610dde4cd5bef6bf3e8ed39fb80fc01df1e2f6f316c9b"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/FloatingTimerService.kt",
+      "sha256": "0037d620b53f3de84bc558babde8ddedb7119138afcf365e91eb52c1aa5b110d"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/FocusDueSignals.kt",
+      "sha256": "41c4bf89597b702d858f3536bb085d73cfca82f0de37707051e6f031792fcc6f"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/FocusSignals.kt",
+      "sha256": "4357815d58316930edf6016bd1f51901faf4fc05b2ae438177324a89710d5bca"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/MainActivity.kt",
+      "sha256": "75f64f0dcb985d077dd0538e92bd1ab07605f117ab24ed9bb15e3587c41a191c"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/PrivateFiles.kt",
+      "sha256": "b10688a92adec0018c0b5c1ee789d3f33325e243941a4306d6bc8cebdc637c6c"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/TimerSurfaces.kt",
+      "sha256": "7d59a1acf36527c09c25921dbde4b39c1c197651e5af24004a8cd1305bd83b17"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/TrackerDatabase.kt",
+      "sha256": "92d11a2f8641e2ffa70dafa97f296fea5809a64c2b711dc1a906c8a692d98f7a"
+    },
+    {
+      "path": "app/src/main/res/layout/timer_widget.xml",
+      "sha256": "26fe15c1f6900e153e2ea2fb49150ffa377af2bb3667dbcee91776e953495ec2"
+    },
+    {
+      "path": "app/src/main/res/values/ids.xml",
+      "sha256": "773a1a3bff330b5279d7579034b9d3fc532ed094b94f33667ae1af573ab74731"
+    },
+    {
+      "path": "app/src/main/res/values/strings.xml",
+      "sha256": "928989d0f30ddd30135c53fbb355f5248224d94202ad3eb7100d6684f1725668"
+    },
+    {
+      "path": "app/src/main/res/xml/data_extraction_rules.xml",
+      "sha256": "a0d81ccff94f23b8dfb475cbf11e99f16e1fea062d64c7d0a4537b117ef1d259"
+    },
+    {
+      "path": "app/src/main/res/xml/shortcuts.xml",
+      "sha256": "2172f4b79a77dfac4b197e9bfd04038fb8a0a4f08cd01e57c175c6e6e04b0c0b"
+    },
+    {
+      "path": "app/src/main/res/xml/timer_widget_info.xml",
+      "sha256": "9ac1dd397eddcf354723d5eb3fed745b9f151ba945a229e935f6e5860ec48c5e"
+    },
+    {
+      "path": "app/src/test/kotlin/dev/notai/tracker/android/RoomScenariosTest.kt",
+      "sha256": "f99fb2085c9df64f9499314fa3324cb62f69fe4880c0d3c3fd8fe8c6c7e12d94"
+    },
+    {
+      "path": "build.gradle.kts",
+      "sha256": "adbaee020198aab53108e9f21e677303fdfb12c517b54737caef6a0cbf261018"
+    },
+    {
+      "path": "catalog/compatibility.json",
+      "sha256": "40f9a284bea80a588f52cc58c331699ff69046a69a1045f793f87b43b8634a38"
+    },
+    {
+      "path": "catalog/manifest.json",
+      "sha256": "136b030c63707f5e3a6dcd150d790fb4e6d669c1d032ecc8aa1051f2e01180d1"
+    },
+    {
+      "path": "catalog/runtime-catalog.json",
+      "sha256": "9efaea5313b40ed2ae762437450f1a69759bfdd1e5fe1bb28e7ca2f8f5dc36b3"
+    },
+    {
+      "path": "core/build.gradle.kts",
+      "sha256": "ccfde10a2668653c9501f30e7d418daa123e79a2d6a7ca2e3379ab7defe847e9"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Backup.kt",
+      "sha256": "9f6d9f3bd36c77f9e6eb8713d3ee5cc0f38ca9df4f20b423d8344adf7c98429d"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/CheckedState.kt",
+      "sha256": "4c477d9eff99e912abefc88f5e9e84bc89c70b71ca06f6b083a81b3b599764cf"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Choices.kt",
+      "sha256": "654036e62475aad1af92e3e795280223eb0ccccaa047a3472ddd0682f47ad837"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Focus.kt",
+      "sha256": "d8750580267731fa6ecbf371857b7be8ca8000ddae68bb865f85eea735f7906e"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Goals.kt",
+      "sha256": "042ab78a6ee394b9380e2de0f40877b42e98256266dcc57cc4e9ca35e926d8d4"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/HistoryTransfer.kt",
+      "sha256": "dfbfddf5d8852f62576997940764d30db91b59f610cdfc35e8dbc00c746bc7bd"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ImmutableData.kt",
+      "sha256": "42c68ffe9dcaa98c4652c5ffa69e1768011135ba67d1c3fabc8e20158ef97980"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ImportInspection.kt",
+      "sha256": "bd76397d33b532a7d87b3715c918bd4df45dd298c10a584822ad6c9e9f468e38"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/LocalEntries.kt",
+      "sha256": "7e7cb8888c3287b17daa450e280422d88e409cfa29b691740c60dd71842675ab"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Migration.kt",
+      "sha256": "41082c3229d0c2f43015914162b9af4579646f9ffefe09919b81d4008abdb6e7"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Model.kt",
+      "sha256": "5bbe0722ab3f6b780f17ebb0b76ec5301a94ea67e2faa699974b8b14423f413e"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ReadyCatalog.kt",
+      "sha256": "f5a88bb9fbaa111e855126b524b62c4a7a8923226c4661e9fa3f017489db2442"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Reports.kt",
+      "sha256": "b2ff9a2b509ce215d0a872f04f970e2d7c08a4d8a5dc965131e33c91c4e92408"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/StreamingBackup.kt",
+      "sha256": "eeab6837f2e69837bf87d6dc0ce32aed62a07be46695f86c6c585b12957c9e02"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Tracker.kt",
+      "sha256": "1f013c0a8a1d1e5abc16d0d331f9f6e1366082b50ace5cf5a517d84ca8a05406"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/TrackerView.kt",
+      "sha256": "015673b6d781e8d0e4421997b672ab8f6583a07de0323b01f3efdd450bb6fb63"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Vocabulary.kt",
+      "sha256": "c59eefef94876b9d2765ba156e708e3d8b9d26e342e81cba594eaa031d1f1fc5"
+    },
+    {
+      "path": "core/src/main/resources/catalog-bootstrap.json",
+      "sha256": "16a9ad1415182a7c392285d117e1ad5b98d1bfcadb1086def4cf832bb823923b"
+    },
+    {
+      "path": "core/src/test/kotlin/dev/notai/tracker/CoreScenariosTest.kt",
+      "sha256": "8704e5952ec1e33973be46cf666f5048703efa0b21e0151fdc86419f0ce2b9b2"
+    },
+    {
+      "path": "core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt",
+      "sha256": "f889245e3f3f948f6f4421401ec47232c590a5aa899c8b33c901325cf4096c2e"
+    },
+    {
+      "path": "core/src/testFixtures/resources/previous-runtime-catalog.json.gz",
+      "sha256": "d8212d4a404117bd3427890bff08bd1ca4b7bc8eff2f2b0006b1e4925fa635c5"
+    },
+    {
+      "path": "gradle.properties",
+      "sha256": "66eb28b6c7a2125fb66df726193b029c86133ecf3ae80d12c04da84ef5ff5785"
+    },
+    {
+      "path": "settings.gradle.kts",
+      "sha256": "95ab85802c94b2e5ca751a37b8af46fbbb0c01850affcbbb89d5b37f3cb7b319"
+    }
+  ],
+  "apk": {
+    "bytes": 3285313,
+    "sha256": "cc68a1b358584c49bebad5114519c60c70a4226d9c870d8465533e93c091903b",
+    "v2SignatureVerified": true,
+    "debugBuild": true,
+    "assets": [
+      "assets/catalog/compatibility.json",
+      "assets/catalog/manifest.json",
+      "assets/catalog/runtime-catalog.json"
+    ],
+    "researchReadersAbsent": true
+  },
+  "catalog": {
+    "version": "0.9.1.3",
+    "types": 1918,
+    "axes": 337,
+    "manifest": {
+      "formatVersion": 1,
+      "catalogVersion": "0.9.1.3",
+      "file": "runtime-catalog.json",
+      "bytes": 2011561,
+      "sha256": "9efaea5313b40ed2ae762437450f1a69759bfdd1e5fe1bb28e7ca2f8f5dc36b3",
+      "compatibility": {
+        "file": "compatibility.json",
+        "bytes": 49144,
+        "sha256": "40f9a284bea80a588f52cc58c331699ff69046a69a1045f793f87b43b8634a38"
+      }
+    },
+    "editorialRecords": 179,
+    "changedDefinitions": 178,
+    "changedNames": 3,
+    "otherFieldsPreserved": true
+  },
+  "regressions": [
+    "readyCatalogLifecycle: old prepared catalogue, custom name/archive/aliases, favourites/history, editorial guards, semantic refusal/replay/hash",
+    "largeStreamingBackup: 10000 long-note records, file >10MiB, preview/cancel/restore/verified rollback/reopen/report",
+    "streamingBackupFormats: JSON1-7, strict UTF8/BOM/trailing/digest/nested duplicate-key refusal",
+    "subjectCommands and Android roundtrip: unrelated settings survive, old Stop refused on new session, restore barrier, permission inside transaction",
+    "focusProcessContinuation and focusBackgroundSignals: same-boot new-process work/break cap, no auto phase, permission denial, durable dedup",
+    "calendarDiscovery: recurring occurrence IDs, ordered pages, nearest, all-day, denial/revocation",
+    "privateFilesAndMetadata: failed/cancelled/reopened export retry/readback, duplicate card names by ID, metadata/vocabulary/generation missing with counts+payload hashes unchanged, loaded-cache refusal",
+    "corruptDatabaseRescue: actual corrupt open preserves DB/WAL/SHM; failed installation journal/runtime gate; changed retained source refused; explicit resume/readback",
+    "externalInputAdapters: all main form fields, selected card ID and text draft survive Activity recreation",
+    "previewSnapshots and formatInspection: nested form mutation and public collection mutation cannot alter confirmed correction/CSV data",
+    "chronologicalHistory: older manual/CSV appended after newer history; corrected bounds determine latest",
+    "indexedReportOracle: raw/indexed Reports and Calendar equal across zones, filters, windows and uncertainty",
+    "newInstallData/bundledCatalogInput: full prepared dictionary and local zone; existing store never reinitialized",
+    "empty nonselectable group hidden from normal choices but preserved by technical full-ID search"
+  ],
+  "deviceTested": false,
+  "deviceBlocker": "No Android device or emulator connected (adb devices -l empty).",
+  "limits": [
+    "Full domain graph remains in memory. Streaming avoids a whole encoded file; one record <=16MiB characters; nesting128.",
+    "CSV separate cap10MiB/50000rows/128columns.",
+    "Benchmark is synthetic JVM RoomStore, not phone or complete runtime/Activity startup; crash-open with sidecars adds preservation IO.",
+    "Real SAF/Calendar/OEM notification/process-kill/power-loss testing and full visual UI remain open.",
+    "No licence chosen."
+  ]
+}

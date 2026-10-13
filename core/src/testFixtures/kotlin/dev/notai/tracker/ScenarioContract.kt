@@ -29,6 +29,8 @@ abstract class ScenarioContract {
     open fun backupDocumentInput() {}
 
     @Test fun timerPath() {
+        indexedReportOracle()
+        subjectCommands()
         choiceLifecycle()
         focusLifecycle()
         goalsLifecycle()
@@ -102,6 +104,27 @@ abstract class ScenarioContract {
         expect(ErrorCode.INVALID_INTERVAL) { materialize(Segment(sessionId = "range",start = 1,anchor = Anchor("same",0)),Moment(1000,Long.MAX_VALUE,"same")) }
     }
 
+    private fun subjectCommands() {
+        val clock = FakeClock();val tracker = Tracker(createStore(),clock)
+        val idle = tracker.snapshot().timerTarget!!
+        tracker.settings(tracker.snapshot().token,Settings("Europe/Berlin"))
+        tracker.timerCommand(idle,TimerDirective.START)
+        val stop = tracker.snapshot().timerTarget!!;val oldGlobal = tracker.snapshot().token
+        tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(reportZone = "Asia/Tokyo"))
+        expect(ErrorCode.STALE) { tracker.stop(oldGlobal) } // explicit form contract remains strict
+        clock.advance(1000);tracker.timerCommand(stop,TimerDirective.STOP)
+        tracker.start(tracker.snapshot().token);val newSession = tracker.snapshot().session!!.id
+        expect(ErrorCode.STALE) { tracker.timerCommand(stop,TimerDirective.STOP) }
+        assertEquals(newSession,tracker.snapshot().session!!.id)
+        val pause = tracker.snapshot().timerTarget!!;tracker.timerCommand(pause,TimerDirective.PAUSE)
+        val resume = tracker.snapshot().timerTarget!!;val backups = Backups(tracker,MemoryRollback());val snapshot = backups.export()
+        backups.apply(backups.prepare(snapshot))
+        expect(ErrorCode.STALE) { tracker.timerCommand(resume,TimerDirective.RESUME) }
+        assertEquals(Mode.PAUSED,tracker.snapshot().mode)
+        val unchanged = tracker.data()
+        expect(ErrorCode.INVALID_INPUT) { tracker.timerCommand(tracker.snapshot().timerTarget!!,TimerDirective.RESUME) { false } }
+        assertEquals(unchanged,tracker.data())
+    }
     private fun formatInspection() {
         val clock = FakeClock(); val tracker = Tracker(createStore(),clock)
         val transfer = HistoryTransfer(tracker,MemoryRollback())
@@ -111,6 +134,12 @@ abstract class ScenarioContract {
         assertEquals(ImportFormat.DELIMITED_TEXT,a.format); assertEquals(',',a.candidates.single().delimiter)
         assertEquals(listOf("activity"),a.candidates.single().suggestions[ImportField.ACTIVITY])
         assertEquals("Read",a.candidates.single().examples.single()[1])
+        assertFailsWith<UnsupportedOperationException> { (a.candidates as MutableList).clear() }
+        assertFailsWith<UnsupportedOperationException> { (a.candidates.single().columns as MutableList)[0] = "changed" }
+        assertFailsWith<UnsupportedOperationException> { (a.candidates.single().examples.single() as MutableList)[0] = "changed" }
+        assertFailsWith<UnsupportedOperationException> { (a.candidates.single().suggestions as MutableMap).clear() }
+        assertFailsWith<UnsupportedOperationException> { (a.warnings as MutableList).clear() }
+
         val fa = a.confirmCsv(',',CsvMapping("source-a","activity","start",end = "end",note = "note",id = "id"),CsvTimeChoice(null,"UTC"),null)
         val pa = transfer.preview(fa,fa.activities.associateWith { Classification(name = it.activity) })
         assertTrue(pa.canApply); transfer.apply(pa)
@@ -154,7 +183,7 @@ abstract class ScenarioContract {
     private fun choiceLifecycle() {
         val clock = FakeClock(); val t = Tracker(createStore(),clock)
         val root = java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile!!
-        val full = codec.decodeFromString<VocabularyData>(root.resolve("evidence/full-projection/runtime-vocabulary.json").readText())
+        val full = codec.decodeFromString<VocabularyData>(root.resolve("catalog/runtime-catalog.json").readText())
         t.addCatalog(t.snapshot().token,full)
         val allTypes = ChoiceQuery(kinds = setOf(ChoiceKind.TYPE),includeArchived = true)
         val view = t.choices()
@@ -257,6 +286,7 @@ abstract class ScenarioContract {
     }
 
     private fun focusLifecycle() {
+        focusProcessContinuation()
         val clock = FakeClock(); var t = Tracker(createStore(),clock)
         fun token() = t.snapshot().token
         fun focus() = t.snapshot().focus!!
@@ -299,7 +329,7 @@ abstract class ScenarioContract {
         t.start(token()); clock.process = "ordinary-reopened"; clock.advance(1_000)
         assertEquals(Mode.RUNNING,t.snapshot().mode); t.stop(token()) // ordinary timer keeps same-boot recovery semantics
         t.startFocus(token(),selection,FocusPlan(2_000,1_000)); val tail = t.data().segments.last()
-        clock.advance(1_000); clock.process = "focus-reopened"; clock.advance(20_000)
+        clock.advance(1_000); clock.process = "focus-reopened"; clock.boot = "focus-new-boot"; clock.advance(20_000)
         assertEquals(FocusMode.RECOVERY,focus().mode); assertEquals(12_500,total())
         expect(ErrorCode.RECOVERY_REQUIRED) { t.cancelFocus(token()) }
         expect(ErrorCode.RECOVERY_REQUIRED) { t.focusNext(token()) }
@@ -308,7 +338,7 @@ abstract class ScenarioContract {
         t.resolveFocus(token(),tail.start,tail.start+1_000); assertEquals(13_500,total())
         assertNull(t.data().focus)
         t.startFocus(token(),selection,FocusPlan(2_000,1_000)); clock.advance(2_000); t.focusNext(token())
-        clock.process = "break-reopened"; clock.advance(500)
+        clock.process = "break-reopened"; clock.boot = "break-new-boot"; clock.advance(500)
         assertEquals(Mode.RECOVERY,t.snapshot().mode); assertEquals(FocusMode.RECOVERY,focus().mode)
         assertEquals(15_500,total()); t.resolveFocus(token(),null,null); assertEquals(15_500,total())
         // Paused work is portable; unpaused work/break is explicitly unresolved after replacement.
@@ -365,6 +395,27 @@ abstract class ScenarioContract {
         t.cancelFocus(token())
     }
 
+    private fun focusProcessContinuation() {
+        val clock = FakeClock();var tracker = Tracker(createStore(),clock)
+        tracker.startFocus(tracker.snapshot().token,plan = FocusPlan(2_000,1_000))
+        clock.advance(1000);clock.process = "new-work-process"
+        tracker = Tracker(reopen(tracker.store),clock)
+        assertEquals(FocusMode.RUNNING,tracker.snapshot().focus!!.mode)
+        assertEquals(1000,tracker.snapshot().focus!!.remainingMs)
+        val before = tracker.data();clock.advance(20_000)
+        assertEquals(FocusMode.DUE,tracker.snapshot().focus!!.mode)
+        assertEquals(2000,tracker.snapshot().trustedDurationMs)
+        assertEquals(before,tracker.data());assertEquals(1,tracker.data().sessions.size);assertEquals(1,tracker.data().segments.size)
+        tracker.focusNext(tracker.snapshot().token)
+        clock.process = "new-break-process";clock.advance(500)
+        tracker = Tracker(reopen(tracker.store),clock)
+        assertEquals(FocusMode.RUNNING,tracker.snapshot().focus!!.mode)
+        assertEquals(500,tracker.snapshot().focus!!.remainingMs)
+        clock.advance(20_000);assertEquals(FocusMode.DUE,tracker.snapshot().focus!!.mode)
+        assertEquals(1,tracker.data().segments.size)
+        tracker.cancelFocus(tracker.snapshot().token)
+        assertEquals(2000,tracker.data().segments.single().durationMs)
+    }
     private fun goalsLifecycle() {
         val clock = FakeClock(wall = Instant.parse("2026-03-28T22:59:00Z").toEpochMilli())
         var tracker = Tracker(createStore(),clock)
@@ -716,8 +767,10 @@ abstract class ScenarioContract {
     }
 
     @Test fun smallHistoryAndExport() {
+        chronologicalHistory()
+        previewSnapshots()
         localEntryLifecycle()
-        researchPackageAdapter()
+        readyCatalogLifecycle()
         hierarchyAndDecimals()
         val clock = FakeClock(); val tracker = Tracker(createStore(),clock)
         fun token() = tracker.snapshot().token
@@ -810,6 +863,25 @@ abstract class ScenarioContract {
         expect(ErrorCode.INVALID_INTERVAL) { Reports.day(dstData,clock.now(),LocalDate.MAX) }
         val huge = dstData.copy(segments = listOf(dstData.segments.single().copy(start = 0,end = MAX_TIME,durationMs = MAX_TIME)))
         assertEquals(3_600_000,Reports.report(huge,clock.now().copy(wall = MAX_TIME),MAX_TIME-3_600_000,MAX_TIME).recordedMs) // BigInteger intermediate, no multiplication overflow
+    }
+
+    private fun indexedReportOracle() {
+        val clock = FakeClock();val t = Tracker(createStore(),clock);val now = clock.wall
+        t.manual(t.snapshot().token,now-86_400_000,now-86_399_000,Classification(tags = setOf("match")))
+        t.manual(t.snapshot().token,now-2000,now-1000,Classification())
+        t.start(t.snapshot().token,Classification(tags = setOf("match")));clock.advance(500)
+        fun compare() {
+            val d = t.data();val view = t.view();val moment = clock.now()
+            for(f in listOf(Filter(),Filter(tags = setOf("match")),Filter(tags = setOf("missing")))) {
+                for((a,b) in listOf(now-86_400_000 to now-86_399_500,now-3000 to now-1500,now-1000 to now+1000))
+                    assertEquals(Reports.report(d,moment,a,b,f),view.report(a,b,f))
+                for(zone in listOf("UTC","Europe/Berlin","America/Los_Angeles")) {
+                    val day = Instant.ofEpochMilli(now).atZone(java.time.ZoneId.of(zone)).toLocalDate()
+                    assertEquals(Reports.calendar(d,moment,day.minusDays(2),4,f,zone),view.calendar(day.minusDays(2),4,f,zone))
+                }
+            }
+        }
+        compare();clock.boot = "another-boot";compare() // unresolved segments remain global, not guessed into a date
     }
 
     private fun hierarchyAndDecimals() {
@@ -927,6 +999,7 @@ abstract class ScenarioContract {
     }
 
     @Test fun backupReplacementAndFailure() {
+        streamingBackupFormats()
         backupDocumentInput()
         val sampleDir = java.io.File(System.getProperty("tracker.samples"))
         val historySample = Backups.decode(java.io.File(sampleDir,"history-v1.json").readText())
@@ -961,7 +1034,7 @@ abstract class ScenarioContract {
         val historical = Tracker(createStore(),FakeClock())
         val historicalBackup = Backups(historical,MemoryRollback())
         historicalBackup.apply(historicalBackup.prepare(java.io.File(sampleDir,"history-v1.json").readText()))
-        assertEquals(historySample.data.copy(revision = 1),historical.data())
+        assertEquals(historySample.data.copy(revision = 1,controlBarrier = historical.data().controlBarrier),historical.data())
         val clock = FakeClock(); val tracker = Tracker(createStore(),clock)
         fun token() = tracker.snapshot().token
         val card = Card(name = "Своё",activityTypeId = "language")
@@ -1017,368 +1090,198 @@ abstract class ScenarioContract {
         assertEquals(Decimal("20"),restoredQuantities[QuantityKey("pages",1,"page",Scope.SESSION)])
     }
 
-    private fun researchPackageAdapter() {
-        val path = java.io.File(System.getProperty("tracker.samples")).parentFile.resolve("research/catalog.research.json")
-        val bytes = path.readBytes()
-        val hash = "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19"
-        val supporting = path.parentFile.resolve("supporting").listFiles()!!.associate { it.name to it.readBytes() }
-        val plan = ResearchCatalog.read(bytes,hash,supporting)
-        assertEquals(5,plan.supportingHashes.size)
-        assertEquals(357,plan.outcomes.count { it.pointer.startsWith("supporting/tracker_cross_domain_relations_v2_1.json/relations/") })
-        assertContentEquals(bytes,plan.sourceBytes())
-        assertEquals(1584,plan.sources.size); assertEquals(1587,plan.nodes.size)
-        assertEquals(102,plan.outcomes.count { it.kind == "axis" })
-        assertEquals(760,plan.outcomes.count { it.kind == "axis-value" })
-        assertEquals(6,plan.outcomes.count { it.kind == "identity-conflict" })
-        assertFalse("activity.caregiving.event_log" in plan.candidateIds)
-        assertFalse("activity.caregiving.kinship_care_context" in plan.candidateIds)
-        assertFalse("activity.caregiving.passive_supervision_concurrent" in plan.candidateIds)
-        val split = plan.sources.single { it.key == SourceKey("tracker_work_learning_inventory.json","activity.writing.draft") }
-        assertEquals("activity.writing.compose_draft",split.workingId)
-        assertEquals("activity.writing.draft",plan.sources.single { it.key == SourceKey("tracker_catalog_proposal.json","activity.writing.draft") }.workingId)
-        val explicitSix = plan.sources.filter { "seedDefinition" in it.original }.associate { it.key.id to it.workingId }
-        assertEquals(mapOf("activity.work.job_search" to "activity.work.job_search",
-            "activity.writing.draft" to "activity.writing.compose_draft",
-            "activity.writing.correspondence" to "activity.writing.compose_correspondence",
-            "activity.writing.journal" to "activity.writing.journal",
-            "activity.language.lesson" to "activity.language.lesson",
-            "activity.language.conversation" to "activity.language.conversation_exchange"),explicitSix)
-        val vocabulary = plan.vocabulary(plan.candidateIds,plan.axisCandidateIds)
-        assertEquals(vocabulary,plan.vocabulary(plan.candidateIds.reversed().toSet(),plan.axisCandidateIds.reversed().toSet()))
-        assertEquals(plan.candidateIds.size,vocabulary.types.size)
-        assertEquals(82,vocabulary.axes.size)
-        assertTrue(vocabulary.axes.filter { it.valueKind == ValueKind.FREE_LABEL }.all { it.values.isEmpty() })
-        assertTrue(vocabulary.metrics.isEmpty())
-        assertEquals(Cardinality.MULTIPLE,vocabulary.axes.single { it.id == "research:leisure_sport:axis.game_genre" }.cardinality)
-        val language = vocabulary.axes.single { it.id == "research:seed:axis.language" }
-        assertEquals(listOf("en","es","ru"),language.values.map { it.id })
-        assertFalse("research:life_care:axis.private_display" in plan.axisCandidateIds)
-        assertFalse("research:leisure_sport:axis.observation_record_fields" in plan.axisCandidateIds)
-        val scalar = plan.scalarVocabulary("qneed.work.length_quantity","cable-installed","Installed cable length",Scope.SESSION)
-        assertEquals(Aggregation.BY_TARGET,scalar.metrics.single().aggregation)
-        expect(ErrorCode.INVALID_INPUT) { plan.scalarVocabulary("qneed.writing.word_count","words","Words",Scope.SESSION) }
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { ResearchCatalog.read(bytes,hash,supporting + (supporting.keys.first() to byteArrayOf(0))) }
-        val distance = plan.measureVocabulary("tracker_catalog_proposal.json","measure.distance","walk","Walk distance",Scope.SEGMENT)
-        assertEquals("length",distance.units.single().dimension)
-        val pages = plan.measureVocabulary("tracker_catalog_proposal.json","measure.pages","edition-a","Pages read of edition A (including rereads)",Scope.SESSION)
-        assertEquals(NumberKind.INTEGER,pages.metrics.single().numberKind)
-        expect(ErrorCode.INVALID_INPUT) { plan.measureVocabulary("tracker_leisure_sport_inventory.json","measure.media_progress","p","Progress",Scope.SESSION) }
-        val projections = plan.quantityProjections()
-        assertEquals(71,projections.size)
-        val numeric = projections.flatMap { row -> row.variants.filter { it.kind == QuantityRepresentation.NUMBER }.map { row to it } }
-        assertEquals(115,numeric.size)
-        val projected = numeric.mapIndexed { i,(row,basis) ->
-            val dimension = if(basis.dimension == "currency") "currency:USD" else basis.dimension
-            val unit = UnitDefinition("review-unit-$i",basis.id,dimension)
-            plan.quantityVocabulary(row.pointer,basis.id,"personal",basis.meaning,Scope.SESSION,unit)
-        }
-        val projectedCatalog = VocabularyData(emptyList(),metrics = projected.flatMap { it.metrics },units = projected.flatMap { it.units })
-        assertEquals(115,projectedCatalog.metrics.map { it.id }.toSet().size)
-        assertTrue(projectedCatalog.metrics.all { it.aggregation == Aggregation.BY_TARGET && it.researchOrigins.size == 1 })
-        val planting = projections.single { it.sourceId == "qneed.garden.planting_and_growing_quantity" }
-        assertFalse(planting.variants.single { it.id == "area" }.integer)
-        assertFalse(planting.variants.single { it.id == "row_length" }.integer)
-        val resources = projections.single { it.sourceId == "qneed.own_use.resource_quantity" }
-        assertFalse(resources.variants.single { it.id == "volume" }.integer)
-        val style = projections.single { it.sourceId == "measure.gait_style" }
-        val block = projections.single { it.sourceId == "measure.training_block" }
-        assertTrue((style.variants+block.variants).all { it.kind == QuantityRepresentation.FACET })
-        val styleCatalog = plan.quantityFacetVocabulary(style.pointer,"style","local",ValueKind.FREE_LABEL,Cardinality.MULTIPLE)
-        assertTrue(styleCatalog.metrics.isEmpty())
-        expect(ErrorCode.INVALID_INPUT) { plan.quantityVocabulary(style.pointer,"style","x","Style",Scope.SESSION,UnitDefinition("u","u","count")) }
-        expect(ErrorCode.INVALID_INPUT) { plan.quantityVocabulary(planting.pointer,"","x","Planting",Scope.SESSION,UnitDefinition("u","u","area")) }
-        expect(ErrorCode.INVALID_INPUT) { plan.quantityVocabulary(planting.pointer,"area","x","Area",Scope.SESSION,UnitDefinition("u","u","mass")) }
-        val words = projections.single { it.sourceId == "qneed.writing.word_count" }
-        expect(ErrorCode.INVALID_INPUT) { plan.quantityVocabulary(words.pointer,"net_delta","x","Net words",Scope.SESSION,UnitDefinition("u","u","count")) }
-        val configured = plan.configureAxis("work_learning","axis.phase","personal",ValueKind.FREE_LABEL,Cardinality.MULTIPLE)
-        val primary = plan.primarySupervisionVocabulary()
-        assertTrue(primary.types.single().id !in plan.candidateIds)
-        expect(ErrorCode.INVALID_INPUT) { plan.configureAxis("seed","axis.topic","x",ValueKind.LOCAL_CHOICE,Cardinality.SINGLE) }
-        val clock = FakeClock(); val t = Tracker(createStore(),clock)
-        t.addCatalog(t.snapshot().token,projectedCatalog)
-        assertTrue(t.addCatalog(t.snapshot().token,projectedCatalog).catalogImport!!.added.isEmpty())
-        val edited = projectedCatalog.metrics.first().copy(name = "Personal retained label")
-        t.saveMetric(t.snapshot().token,edited)
-        assertEquals(listOf(edited.id),t.addCatalog(t.snapshot().token,projectedCatalog).catalogImport!!.conflicts.map { it.id })
-        t.addCatalog(t.snapshot().token,styleCatalog)
-        t.addCatalog(t.snapshot().token,configured)
-        t.addCatalog(t.snapshot().token,primary)
-        t.start(t.snapshot().token); clock.advance(1000); t.stop(t.snapshot().token)
-        val oldHistory = t.data().segments
-        for(metric in projectedCatalog.metrics) {
-            t.measure(t.snapshot().token,Measurement(fieldId = metric.id,unit = metric.canonicalUnitId,scope = Scope.SESSION,
-                targetId = t.data().sessions.single().id,value = Decimal(if(metric.numberKind == NumberKind.INTEGER) "2" else "1.25")))
-        }
-        t.addCatalog(t.snapshot().token,scalar)
-        val metric = scalar.metrics.single()
-        t.measure(t.snapshot().token,Measurement(fieldId = metric.id,unit = metric.canonicalUnitId,
-            scope = Scope.SESSION,targetId = t.data().sessions.single().id,value = Decimal("1.25")))
-        val selected = vocabulary.types.first { it.selectable }
-        t.saveType(t.snapshot().token,selected.copy(name = "Local definition",definition = "Local meaning",researchOrigins = emptyList()))
-        val archive = FileResearchArchive(java.io.File(System.getProperty("tracker.samples")).parentFile.resolve("build/research-source-archives/${newId()}"))
-        val first = plan.apply(t,t.snapshot().token,plan.candidateIds,archive,plan.axisCandidateIds)
-        assertEquals(listOf(selected.id),first.change.catalogImport!!.conflicts.map { it.id })
-        assertEquals(oldHistory,t.data().segments)
-        val again = plan.apply(t,t.snapshot().token,plan.candidateIds,archive,plan.axisCandidateIds)
-        assertTrue(again.change.catalogImport!!.added.isEmpty())
-        assertEquals(listOf(selected.id),again.change.catalogImport!!.conflicts.map { it.id })
-        assertEquals(oldHistory,t.data().segments)
-        assertEquals("Local meaning",t.data().types.single { it.id == selected.id }.definition)
-        assertTrue(t.data().types.filter { it.id != selected.id && it.id in plan.candidateIds }.all { it.researchOrigins.isNotEmpty() })
-        val quantityReport = Reports.report(t.data(),clock.now(),clock.wall-2000,clock.wall)
-        assertEquals(116,quantityReport.measurements.size)
-        assertTrue(quantityReport.quantityTotals().isEmpty())
-        val backupJson = Backups(t,MemoryRollback()).export()
-        assertEquals(7,Backups.decode(backupJson).formatVersion)
-        val copy = Backups.decode(backupJson).data
-        assertEquals(t.data(),copy)
-        val receiver = Tracker(createStore(),clock)
-        val restoration = Backups(receiver,MemoryRollback())
-        restoration.apply(restoration.prepare(backupJson))
-        assertEquals(copy.copy(revision = receiver.data().revision),receiver.data())
-        receiver.start(receiver.snapshot().token); clock.advance(1000); receiver.stop(receiver.snapshot().token)
-        assertNull(receiver.data().sessions.last().selection.activityTypeId)
-        // Chosen source-local meanings survive the actual classification and backup boundary.
-        val facets = listOf(Facet(language.id,valueId = "es",valueMeaningVersion = 1),
-            Facet("research:leisure_sport:axis.game_genre",text = "co-op / puzzle"),
-            Facet("research:leisure_sport:axis.game_genre",text = "local personal genre"),
-            Facet(configured.axes.single().id,text = "publish/release"),
-            Facet(styleCatalog.axes.single().id,text = "freestyle"))
-        receiver.start(receiver.snapshot().token,Classification(activityTypeId = primary.types.single().id,facets = facets))
-        clock.advance(1000); receiver.stop(receiver.snapshot().token)
-        assertEquals(facets,receiver.data().sessions.last().selection.facets)
-        receiver.repeat(receiver.snapshot().token,receiver.data().sessions.last().id)
-        assertEquals(facets,receiver.data().sessions.last().selection.facets)
-        clock.advance(1000); receiver.stop(receiver.snapshot().token)
-        val priorMeasurements = receiver.data().measurements
-        receiver.repeat(receiver.snapshot().token,copy.sessions.single().id)
-        clock.advance(1000); receiver.stop(receiver.snapshot().token)
-        assertEquals(priorMeasurements,receiver.data().measurements) // repeat never invents new measured output
-        assertEquals(receiver.data(),Backups.decode(Backups(receiver,MemoryRollback()).export()).data)
-        for((_,digest) in plan.supportingHashes) assertEquals(digest,researchHash(archive.read(digest)))
-        val badArchive = object: ResearchArchive {
-            override fun put(sha256: String,bytes: ByteArray) {}
-            override fun read(sha256: String) = byteArrayOf(0)
-        }
-        val before = t.data()
-        expect(ErrorCode.STORAGE) { plan.apply(t,t.snapshot().token,plan.candidateIds,badArchive) }
-        assertEquals(before,t.data())
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { ResearchCatalog.read(bytes,"0".repeat(64)) }
-        // Full fixture structural corruption is rejected even with a freshly computed transport hash.
-        val wrongPath = bytes.toString(Charsets.UTF_8).replaceFirst("\"researchPath\": [","\"researchPath\": [\"missing-parent\",").toByteArray()
-        expect(ErrorCode.INVALID_INPUT) { ResearchCatalog.read(wrongPath,researchHash(wrongPath)) }
-        val reportDir = java.io.File(System.getProperty("tracker.samples")).parentFile.resolve("build/research-evidence")
-        reportDir.mkdirs()
-        reportDir.resolve("adapter-outcomes.json").writeText(codec.encodeToString(plan.outcomes))
-        reportDir.resolve("runtime-types.json").writeText(codec.encodeToString(vocabulary))
-        fullResearchProjection(plan,path.parentFile)
-    }
+    private fun streamingBackupFormats() {
+        val duplicateNested = Backups.encode(Dataset(),FakeClock().now()).replace(Regex("\"reportZone\"\\s*:\\s*\"[^\"]*\"")) { "${it.value},${it.value}" }
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { duplicateNested.byteInputStream() } }
 
-    private fun fullResearchProjection(base: ResearchPlan,researchDir: java.io.File) {
-        val isco = researchDir.resolve("projections/isco_full_projection_v2.json").readBytes()
-        val sports = researchDir.resolve("projections/sports_additive_catalogue_projection.json").readBytes()
-        val iscoHash = "e7a9f50cda7b40714b7da7ddedb9de4f77b36d71a9c78ffdd85d780ebd9378b3"
-        val sportsHash = "6b5e4810622ff4af4af794b2ac8093d7135caad85f1ace51e99ced62a7373955"
-        val supporting = researchDir.resolve("supporting").listFiles()!!.associate { it.name to it.readBytes() }
-        // Both inputs are valid ResearchPlans; full projection has stricter evidence requirements.
-        val otherBytes = base.sourceBytes() + byteArrayOf(10)
-        val wrongBase = ResearchCatalog.read(otherBytes,researchHash(otherBytes),supporting)
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { FullResearchCatalog.read(wrongBase,isco,iscoHash,sports,sportsHash) }
-        val missingCompanion = ResearchCatalog.read(base.sourceBytes(),base.sha256,
-            supporting - "tracker_catalog_core_compatibility.md")
-        assertEquals(4,missingCompanion.supportingHashes.size)
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { FullResearchCatalog.read(missingCompanion,isco,iscoHash,sports,sportsHash) }
-        val full = FullResearchCatalog.read(base,isco,iscoHash,sports,sportsHash)
-        reviewedDescriptionUpdate(full,researchDir)
-        explicitFullCatalogImport(full,researchDir)
-        assertContentEquals(isco,full.sourceBytes(FullResearchCatalog.ISCO))
-        assertContentEquals(sports,full.sourceBytes(FullResearchCatalog.SPORTS))
-        assertEquals(353,full.outcomes.count { it.file == FullResearchCatalog.ISCO && it.kind == "source-disposition" })
-        assertEquals(223,full.outcomes.count { it.file == FullResearchCatalog.SPORTS && it.kind == "source-disposition" })
-        assertTrue(full.vocabulary.types.size > base.candidateIds.size)
-        assertEquals(1918,full.vocabulary.types.size)
-        assertEquals(337,full.vocabulary.axes.size)
-        // Every new ISCO runtime ID must come from an explicit action/component proposal.
-        // Frozen/no-mutation rows and residual research IDs must never become fallback types.
-        val source = codec.parseToJsonElement(isco.toString(Charsets.UTF_8)).jsonObject
-        val explicitIds = source.getValue("proposedActions").jsonArray.map { it.jsonObject.getValue("researchProposalRef").jsonPrimitive.content }.toSet() +
-            source.getValue("componentActionProposals").jsonArray.map { it.jsonObject.getValue("componentProposalRef").jsonPrimitive.content }
-        val iscoTypes = full.vocabulary.types.filter { type -> type.researchOrigins.any { it.sourceFile == FullResearchCatalog.ISCO } }
-        assertEquals(explicitIds,iscoTypes.map { it.id }.toSet())
-        val residualIds = source.getValue("residualResolutions").jsonArray.map { it.jsonObject.getValue("residualId").jsonPrimitive.content }.toSet()
-        assertTrue(full.vocabulary.types.none { it.id in residualIds })
-        val pendingResiduals = full.outcomes.filter { it.kind == "residual-resolution" && it.runtimeIds.isEmpty() }
-        assertEquals(setOf("residual.engrave_etch_surface_marking", "residual.custom_orthopaedic_footwear_fit_repair",
-            "residual.photosensitive_media_manufacture", "residual.promotional_sample_goods_distribution"),pendingResiduals.map { it.key }.toSet())
-        val frozenRows = source.getValue("candidateDispositions").jsonArray.map { it.jsonObject }.filter {
-            it.getValue("projection").jsonObject["status"]?.jsonPrimitive?.content == "use_frozen_source_decision_no_new_action_proposal"
+        largeStreamingBackup()
+        val root = java.io.File(System.getProperty("tracker.samples"))
+        for(name in listOf("history-v1.json","history-v2.json","open-tail-v1.json")) {
+            val file = root.resolve(name);val streamed = StreamingBackup.read { file.inputStream() }
+            assertEquals(Backups.decode(file.readText()),streamed)
         }
-        assertTrue(frozenRows.isNotEmpty())
-        val runtimeIds = full.vocabulary.types.map { it.id }.toSet()
-        for(row in frozenRows) {
-            val key = row.getValue("recordKey").jsonPrimitive.content
-            assertFalse("isco.research.$key" in runtimeIds)
-            assertEquals(1,full.outcomes.count { it.kind == "source-disposition" && it.key == key })
+        val clock = FakeClock();val tracker = Tracker(createStore(),clock)
+        tracker.manual(tracker.snapshot().token,clock.wall-2000,clock.wall-1000,Classification(),"Streamed note")
+        val portable = StreamingBackup.portable(tracker.data(),clock.now())
+        val bytes = java.io.ByteArrayOutputStream().also { StreamingBackup.write(portable,it) }.toByteArray()
+        assertEquals(portable,StreamingBackup.read { bytes.inputStream() })
+        assertEquals(portable,Backups.decode(bytes.toString(Charsets.UTF_8)))
+        val bom = byteArrayOf(0xEF.toByte(),0xBB.toByte(),0xBF.toByte())+bytes
+        assertEquals(portable,StreamingBackup.read { bom.inputStream() })
+        val text = bytes.toString(Charsets.UTF_8)
+        val malformed = text.substringBefore("Streamed note").toByteArray() + byteArrayOf(0xC3.toByte(),0x28) + text.substringAfter("Streamed note").toByteArray()
+        for(bad in listOf(bytes.copyOf(bytes.size-2),malformed,
+            text.replaceFirst("\"formatVersion\":7","\"formatVersion\":7,\"formatVersion\":7").toByteArray(),bytes+byteArrayOf(1))) {
+            expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { bad.inputStream() } }
         }
-        assertEquals(base.vocabulary(base.candidateIds,base.axisCandidateIds).types.toSet(),
-            full.vocabulary.types.filter { it.id in base.candidateIds }.toSet())
-        val held = full.outcomes.filter { it.file == FullResearchCatalog.SPORTS && it.kind == "source-disposition" && it.runtimeIds.isEmpty() }
-        assertEquals(listOf("arisf:arISF_075"),held.map { it.key })
-        val clock = FakeClock()
-        val t = Tracker(createStore(),clock)
-        val archive = FileResearchArchive(researchDir.parentFile.resolve("build/full-source-archives/${newId()}"))
-        val initial = full.apply(t,t.snapshot().token,archive)
-        assertTrue(initial.catalogImport!!.conflicts.isEmpty())
-        assertTrue(full.apply(t,t.snapshot().token,archive).catalogImport!!.added.isEmpty())
-        for((_,digest) in full.sourceHashes) assertEquals(digest,researchHash(archive.read(digest)))
-        // All 28 sports wholes and nine occupational families work without mandatory detail.
-        val wholes = full.outcomes.filter { it.kind == "whole-event" || (it.kind == "family-or-wrapper" && it.boundary.startsWith("Whole family")) }
-            .flatMap { it.runtimeIds }.distinct()
-        assertEquals(37,wholes.size)
-        val begin = clock.wall
-        for(id in wholes) {
-            t.start(t.snapshot().token,t.typeSelection(id))
-            clock.advance(1000); t.stop(t.snapshot().token)
-        }
-        val original = t.data().sessions.last()
-        t.repeat(t.snapshot().token,original.id)
-        clock.advance(1000); t.stop(t.snapshot().token)
-        assertEquals(original.selection,t.data().sessions.last().selection)
-        assertEquals(38,t.data().segments.size) // family/component links never manufacture time
-        assertEquals(38_000L,Reports.report(t.data(),clock.now(),begin,clock.wall).recordedMs)
-        val history = t.data().segments
-        val selected = t.data().types.single { it.id == wholes.first() }
-        t.saveType(t.snapshot().token,selected.copy(name = "My whole activity"))
-        val stale = t.snapshot().token
-        val conflict = full.apply(t,stale,archive)
-        assertEquals(listOf(selected.id),conflict.catalogImport!!.conflicts.map { it.id })
-        val after = t.data()
-        expect(ErrorCode.STALE) { full.apply(t,stale,archive) }
-        assertEquals(after,t.data())
-        assertEquals(conflict.catalogImport,full.apply(t,t.snapshot().token,archive).catalogImport)
-        assertEquals(history,t.data().segments)
-        assertEquals("My whole activity",t.data().types.single { it.id == selected.id }.name)
-        val json = Backups(t,MemoryRollback()).export()
-        assertEquals(t.data(),Backups.decode(json).data)
-        val receiver = Tracker(createStore(),clock)
-        val restore = Backups(receiver,MemoryRollback())
-        restore.apply(restore.prepare(json))
-        assertEquals(t.data().copy(revision = receiver.data().revision),receiver.data())
-        val before = receiver.data()
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.dropLast(1)) }
-        assertEquals(before,receiver.data())
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { FullResearchCatalog.read(base,isco,"0".repeat(64),sports,sportsHash) }
-        val broken = sports.toString(Charsets.UTF_8).replace("\"parentId\": \"", "\"parentId\": \"missing.").toByteArray()
-        expect(ErrorCode.INVALID_INPUT) { FullResearchCatalog.read(base,isco,iscoHash,broken,researchHash(broken)) }
-        val badArchive = object: ResearchArchive {
-            override fun put(sha256: String,bytes: ByteArray) {}
-            override fun read(sha256: String) = byteArrayOf(0)
-        }
-        expect(ErrorCode.STORAGE) { full.apply(receiver,receiver.snapshot().token,badArchive) }
-        assertEquals(before,receiver.data())
-        val output = researchDir.parentFile.resolve("build/full-projection-evidence"); output.mkdirs()
-        output.resolve("runtime-vocabulary.json").writeText(codec.encodeToString(full.vocabulary))
-        output.resolve("outcomes.json").writeText(codec.encodeToString(full.outcomes))
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { (byteArrayOf(0xFF.toByte())+bytes).inputStream() } }
+        var reads = 0
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { reads++;if(reads==1) bytes.inputStream() else text.replace("Streamed note","Changed note").byteInputStream() } }
     }
+    private fun largeStreamingBackup() {
+        val directory = java.io.File(requireNotNull(System.getProperty("tracker.artifacts")),"large-backup-${newId()}").apply { mkdirs() }
+        val clock = FakeClock();val source = Tracker(createStore(),clock)
+        val count = 10_000;val start = clock.wall-count*2000L
+        source.store.transaction { old ->
+            val sessions = (0 until count).map { Session(id = "large-$it",status = SessionStatus.STOPPED,note = "Запись $it: "+"n".repeat(1200)) }
+            val segments = sessions.mapIndexed { i,s -> Segment(id = "large-segment-$i",sessionId = s.id,start = start+i*2000L,
+                end = start+i*2000L+1000,durationMs = 1000) }
+            old.copy(revision = old.revision+1,sessions = sessions,segments = segments) to Unit
+        }
+        val original = source.data();val file = java.io.File(directory,"large.json")
+        file.outputStream().use { Backups(source,MemoryRollback()).write(it) }
+        assertTrue(file.length() > MAX_BACKUP_BYTES)
+        val files = object: RollbackStore {
+            override fun save(json: String): String = newId().also { java.io.File(directory,it).writeText(json) }
+            override fun read(reference: String) = java.io.File(directory,reference).readText()
+            override fun saveSnapshot(backup: Backup): String = newId().also { reference ->
+                java.io.FileOutputStream(java.io.File(directory,reference)).use { StreamingBackup.write(backup,it);it.fd.sync() }
+            }
+            override fun readSnapshot(reference: String) = StreamingBackup.read { java.io.File(directory,reference).inputStream() }
+        }
+        var target = Tracker(createStore(),clock);val restore = Backups(target,files)
+        val before = target.data();val preview = restore.prepare { file.inputStream() }
+        assertEquals(count,preview.sessions);assertEquals(before,target.data())
+        restore.apply(preview)
+        assertEquals(original.copy(revision = target.data().revision,controlBarrier = target.data().controlBarrier),target.data())
+        val largeBefore = target.data()
+        val repeated = restore.apply(restore.prepare { file.inputStream() })
+        assertEquals(largeBefore,files.readSnapshot(repeated.rollbackReference).data)
+        target = Tracker(reopen(target.store),clock);assertEquals(count,target.data().sessions.size)
+        assertEquals(count*1000L,Reports.report(target.data(),clock.now(),start,clock.wall).recordedMs)
+    }
+    private fun chronologicalHistory() {
+        val clock = FakeClock();val t = Tracker(createStore(),clock)
+        t.manual(t.snapshot().token,clock.wall-2000,clock.wall-1000,Classification(activityTypeId = "language",name = "Today"))
+        val today = t.data().segments.single()
+        t.manual(t.snapshot().token,clock.wall-86_400_000,clock.wall-86_399_000,Classification(name = "Yesterday"))
+        assertEquals(today.id,t.choices().latestRecorded()!!.sourceSegmentId)
+        val transfer = HistoryTransfer(t,MemoryRollback())
+        val start = Instant.ofEpochMilli(clock.wall-259_200_000).toString();val end = Instant.ofEpochMilli(clock.wall-259_199_000).toString()
+        val rows = HistoryTransfer.parseCsv("id,activity,start,end\nold,Older CSV,$start,$end\n",CsvMapping("chronological","activity","start",end = "end",id = "id"))
+        transfer.apply(transfer.preview(rows,rows.activities.associateWith { Classification(name = it.activity) }))
+        assertEquals(today.id,t.choices().latestRecorded()!!.sourceSegmentId)
 
-    private fun explicitFullCatalogImport(full: FullResearchPlan,researchDir: java.io.File) {
-        val clock = FakeClock(); val tracker = Tracker(createStore(),clock)
-        tracker.start(tracker.snapshot().token); clock.advance(1000); tracker.stop(tracker.snapshot().token)
-        val before = tracker.data()
-        val saved = mutableMapOf<String,ByteArray>()
-        val archive = object: ResearchArchive {
-            override fun put(sha256: String,bytes: ByteArray) { saved[sha256] = bytes.copyOf() }
-            override fun read(sha256: String) = saved.getValue(sha256).copyOf()
-        }
-        val importer = FullCatalogImports(tracker,archive)
-        fun open(path: String) = researchDir.resolve(path).inputStream()
-        val preview = importer.prepare(::open)
-        assertTrue(preview.canApply); assertEquals(1918,preview.types); assertEquals(337,preview.axes)
-        assertEquals(8,preview.sourceHashes.size); assertEquals(before,tracker.data()); assertTrue(saved.isEmpty())
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { importer.prepare { path ->
-            if(path == "supporting/tracker_catalog_core_compatibility.md") throw java.io.FileNotFoundException()
-            open(path)
-        } }
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { importer.prepare { path ->
-            if(path == "catalog.research.json") java.io.ByteArrayInputStream(baseBadBytes(researchDir)) else open(path)
-        } }
-        assertEquals(before,tracker.data()); assertTrue(saved.isEmpty())
-        tracker.settings(tracker.snapshot().token,Settings("Europe/Berlin"))
-        val changed = tracker.data()
-        expect(ErrorCode.STALE) { importer.apply(preview) }
-        assertEquals(changed,tracker.data()); assertTrue(saved.isEmpty())
-        val installed = importer.apply(importer.prepare(::open))
-        assertTrue(installed.catalogImport!!.conflicts.isEmpty())
-        assertEquals(before.sessions,tracker.data().sessions); assertEquals(before.segments,tracker.data().segments)
-        for(source in FullCatalogImports.sources) assertEquals(source.sha256,researchHash(saved.getValue(source.sha256)))
-        val count = tracker.data().types.size
-        assertTrue(importer.apply(importer.prepare(::open)).catalogImport!!.added.isEmpty())
-        assertEquals(count,tracker.data().types.size)
-        val conflictTracker = Tracker(createStore(),clock)
-        val item = full.vocabulary.types.first { it.parentId == null }
-        conflictTracker.saveType(conflictTracker.snapshot().token,item.copy(name = "Local name",
-            suggestedAxisIds = emptySet(),suggestedMetricIds = emptySet()))
-        val conflicting = FullCatalogImports(conflictTracker,archive)
-        val conflictPreview = conflicting.prepare(::open)
-        assertFalse(conflictPreview.canApply); assertEquals(item.id,conflictPreview.report.conflicts.single().id)
-        val retained = conflictTracker.data()
-        expect(ErrorCode.INVALID_INPUT) { conflicting.apply(conflictPreview) }
-        assertEquals(retained,conflictTracker.data())
-        val installedBeforeConflict = tracker.data()
-        expect(ErrorCode.INVALID_INPUT) { tracker.addCatalog(tracker.snapshot().token,
-            VocabularyData(listOf(item.copy(name = "Different"),ActivityType("new-from-conflicting-package","New"))),rejectConflicts = true) }
-        assertEquals(count,tracker.data().types.size)
-        assertEquals(installedBeforeConflict,tracker.data())
-        assertFailsWith<UnsupportedOperationException> { (full.vocabulary.types as MutableList<ActivityType>).clear() }
+        t.correctSegment(t.snapshot().token,today.id,clock.wall-172_800_000,clock.wall-172_799_000,today.selection)
+        val latest = t.choices().latestRecorded()!!
+        assertEquals("Yesterday",latest.selection.name)
+        t.repeat(t.snapshot().token,latest.sourceSessionId!!);assertEquals("Yesterday",t.snapshot().session!!.selection.name)
+        clock.advance(1000);t.stop(t.snapshot().token)
+        val before = t.data();val view = t.view()
+        assertEquals(Reports.day(before,clock.now(),java.time.Instant.ofEpochMilli(clock.wall).atZone(java.time.ZoneId.of("UTC")).toLocalDate()),
+            view.day(java.time.Instant.ofEpochMilli(clock.wall).atZone(java.time.ZoneId.of("UTC")).toLocalDate()))
     }
-    private fun reviewedDescriptionUpdate(full: FullResearchPlan,researchDir: java.io.File) {
-        // This committed vocabulary is the exact projection installed before the description cleanup.
-        val old = codec.decodeFromString<VocabularyData>(researchDir.parentFile.resolve("evidence/full-projection/runtime-vocabulary.json").readText())
-        val oldHash = "7dd02e406bb2c34260a73179b2b6a94f19d0141aa1bb06815277eb5e23bc2498"
-        val newHash = "e7a9f50cda7b40714b7da7ddedb9de4f77b36d71a9c78ffdd85d780ebd9378b3"
-        fun advanced(origins: List<ResearchOrigin>) = origins.map {
-            if(it.sourceFile == FullResearchCatalog.ISCO && it.packageSha256 == oldHash && it.sourceSha256 == oldHash)
-                it.copy(packageSha256 = newHash,sourceSha256 = newHash) else it
+    private fun previewSnapshots() {
+        val clock = FakeClock();val tracker = Tracker(createStore(),clock)
+        val axis = Axis("preview-axis","Preview",valueKind = ValueKind.FREE_LABEL,cardinality = Cardinality.MULTIPLE)
+        tracker.saveAxis(tracker.snapshot().token,axis)
+        tracker.manual(tracker.snapshot().token,clock.wall-2000,clock.wall-1000,Classification())
+        val session = tracker.data().sessions.single();val segment = tracker.data().segments.single()
+        val details = mutableMapOf("form" to "viewed");val tags = mutableSetOf("viewed")
+        val facets = mutableListOf(Facet(axis.id,text = "viewed"));val path = mutableListOf("language")
+        val selection = Classification(name = "Viewed",activityTypeId = "language",details = details,tags = tags,
+            facets = facets,ancestorPathAtWrite = path)
+        val correction = tracker.previewCorrection(session.id,listOf(Tracker.SegmentEdit(segment.id,segment.start,segment.end!!,selection)),"Viewed note",true)
+        val viewed = correction.after.segments.single().selection
+        details["form"] = "changed";tags += "changed";facets.clear();path.clear()
+        assertEquals("viewed",viewed.details["form"])
+        assertFailsWith<UnsupportedOperationException> { (viewed.details as MutableMap)["form"] = "hidden change" }
+        assertFailsWith<UnsupportedOperationException> { (correction.after.segments as MutableList).clear() }
+        tracker.applyCorrection(correction);assertEquals(viewed,tracker.data().segments.single().selection)
+        val transfer = HistoryTransfer(tracker,MemoryRollback())
+        val file = HistoryTransfer.parseCsv("id,activity,category,note,start,end,duration_ms\nold,Task,,Note,${Instant.ofEpochMilli(clock.wall-5000)},${Instant.ofEpochMilli(clock.wall-4000)},1000\n",
+            CsvMapping("preview-forms",activity = "activity",category = "category",note = "note",id = "id",start = "start",end = "end",duration = "duration_ms",durationFormat = DurationFormat.MILLISECONDS))
+        val csvDetails = mutableMapOf("form" to "viewed-csv");val csvTags = mutableSetOf("viewed-csv")
+        val csvFacets = mutableListOf(Facet(axis.id,text = "viewed-csv"))
+        val mapping = file.activities.associateWith { Classification(name = "CSV",activityTypeId = "language",details = csvDetails,tags = csvTags,facets = csvFacets) }
+        val preview = transfer.preview(file,mapping);assertTrue(preview.canApply)
+        val viewedCsv = preview.intervals.single().selection
+        csvDetails.clear();csvTags.clear();csvFacets.clear()
+        assertFailsWith<UnsupportedOperationException> { (preview.intervals as MutableList).clear() }
+        assertFailsWith<UnsupportedOperationException> { (preview.errors as MutableList).add("hidden error") }
+        assertFailsWith<UnsupportedOperationException> { (file.rows.single().origin.fields as MutableMap).clear() }
+        transfer.apply(preview)
+        assertEquals(viewedCsv,tracker.data().segments.single { it.sessionId != session.id }.selection)
+    }
+    private fun readyPackage() = ReadyCatalog.read { path ->
+        java.io.File(System.getProperty("tracker.samples")).parentFile.resolve("catalog/$path").inputStream()
+    }
+    private fun readyCatalogLifecycle() {
+        val ready = readyPackage()
+        val empty = ready.vocabulary.types.single { it.id == "area.self_directed_creation" }
+        assertFalse(empty.selectable);assertFalse(empty.archived)
+        assertTrue(ready.vocabulary.types.none { it.parentId == empty.id })
+        val groupTracker = Tracker(createStore(),FakeClock())
+        groupTracker.addCatalog(groupTracker.snapshot().token,ready.vocabulary)
+        val groupChoices = groupTracker.choices()
+        assertTrue(groupChoices.search(ChoiceQuery(text = empty.name,kinds = setOf(ChoiceKind.TYPE))).items.none { it.entry.sourceId == empty.id })
+        assertEquals(ChoiceAvailability.EMPTY_GROUP,groupChoices.search(ChoiceQuery(text = empty.name,kinds = setOf(ChoiceKind.TYPE),includeArchived = true)).items.single { it.entry.sourceId == empty.id }.entry.availability)
+
+        val clock = FakeClock();var tracker = Tracker(createStore(),clock)
+        val previous = java.util.zip.GZIPInputStream(requireNotNull(ScenarioContract::class.java.getResourceAsStream("/previous-runtime-catalog.json.gz")))
+            .bufferedReader().use { codec.decodeFromString<VocabularyData>(it.readText()) }
+        assertEquals(178,previous.types.zip(ready.vocabulary.types).count { (old,next) -> old.definition != next.definition })
+        assertEquals(3,previous.types.zip(ready.vocabulary.types).count { (old,next) -> old.name != next.name } +
+            previous.axes.zip(ready.vocabulary.axes).count { (old,next) -> old.name != next.name })
+        for((old,next) in previous.types.zip(ready.vocabulary.types))
+            assertEquals(old,next.copy(name = old.name,definition = old.definition,researchOrigins = old.researchOrigins))
+        for((old,next) in previous.axes.zip(ready.vocabulary.axes))
+            assertEquals(old,next.copy(name = old.name,researchOrigins = old.researchOrigins))
+        val legacy = Tracker(createStore(),clock)
+        legacy.addCatalog(legacy.snapshot().token,previous,rejectConflicts = true)
+        val legacyType = previous.types.first { it.selectable }
+        legacy.start(legacy.snapshot().token,legacy.typeSelection(legacyType.id));clock.advance(1000);legacy.stop(legacy.snapshot().token)
+        legacy.saveFavorite(legacy.snapshot().token,Favorite(label = "Old favourite",selection = legacy.data().sessions.last().selection))
+        legacy.saveType(legacy.snapshot().token,legacyType.copy(name = "My old title",archived = true,aliases = listOf("old local alias")))
+        val oldData = legacy.data();val upgrade = CatalogImports(legacy) { ready }
+        val oldPreview = upgrade.prepare();assertTrue(oldPreview.canApply);assertTrue(oldPreview.report.added.isEmpty())
+        assertEquals(179,oldPreview.report.updated.size)
+        upgrade.apply(oldPreview)
+        val expectedTypes = oldData.types.map { old ->
+            val baseline = previous.types.find { it.id == old.id };val next = ready.vocabulary.types.find { it.id == old.id }
+            if(baseline == null || next == null) old else old.copy(definition = next.definition,
+                name = if(old.name == baseline.name) next.name else old.name)
         }
-        assertEquals(old.copy(types = old.types.map { it.copy(researchOrigins = advanced(it.researchOrigins)) },
-            axes = old.axes.map { it.copy(researchOrigins = advanced(it.researchOrigins)) }),full.vocabulary)
-        val clock = FakeClock(); var tracker = Tracker(createStore(),clock)
-        tracker.addCatalog(tracker.snapshot().token,old,rejectConflicts = true)
-        val selected = old.types.first { it.selectable && it.researchOrigins.any { o -> o.sourceFile == FullResearchCatalog.ISCO } }
-        tracker.start(tracker.snapshot().token,tracker.typeSelection(selected.id)); clock.advance(1000);tracker.stop(tracker.snapshot().token)
-        val before = tracker.data()
-        assertEquals(373,before.mergeCatalog(full.vocabulary).second.conflicts.size) // default import remains strict
-        val saved = mutableMapOf<String,ByteArray>()
-        val archive = object: ResearchArchive {
-            override fun put(sha256: String,bytes: ByteArray) { saved[sha256] = bytes.copyOf() }
-            override fun read(sha256: String) = saved.getValue(sha256).copyOf()
+        val expectedAxes = oldData.axes.map { old ->
+            val baseline = previous.axes.find { it.id == old.id };val next = ready.vocabulary.axes.find { it.id == old.id }
+            if(baseline == null || next == null) old else old.copy(name = if(old.name == baseline.name) next.name else old.name)
         }
-        var importer = FullCatalogImports(tracker,archive)
-        fun preview() = importer.prepare { researchDir.resolve(it).inputStream() }
-        val update = preview();assertTrue(update.canApply);assertTrue(update.report.conflicts.isEmpty());assertTrue(update.report.added.isEmpty())
-        assertEquals(before,tracker.data());assertTrue(saved.isEmpty()) // cancellation has no write
-        val result = importer.apply(update);assertTrue(result.catalogImport!!.conflicts.isEmpty())
-        assertEquals(before.copy(revision = tracker.data().revision),tracker.data()) // preserve original provenance and all history
-        assertEquals(newHash,researchHash(saved.getValue(newHash)))
-        importer.apply(preview());assertEquals(before.types,tracker.data().types);assertEquals(before.axes,tracker.data().axes)
+        assertEquals(oldData.copy(revision = legacy.data().revision,catalogVersion = ready.manifest.catalogVersion,
+            types = expectedTypes,axes = expectedAxes),legacy.data())
+        assertEquals(legacy.data(),reopen(legacy.store).read())
+        val importer = CatalogImports(tracker) { ready }
+        val before = tracker.data();val preview = importer.prepare()
+        assertTrue(preview.canApply);assertEquals(before,tracker.data())
+        importer.apply(preview);val installed = tracker.data()
+        assertEquals(ready.manifest.catalogVersion,installed.catalogVersion)
+        assertTrue(ready.vocabulary.types.all { type -> installed.types.any { it == type } })
+        assertEquals(ready.vocabulary.axes,installed.axes)
+        val selected = ready.vocabulary.types.first { it.selectable }
+        tracker.start(tracker.snapshot().token,tracker.typeSelection(selected.id));clock.advance(1000);tracker.stop(tracker.snapshot().token)
+        tracker.saveFavorite(tracker.snapshot().token,Favorite(label = "Local favourite",selection = tracker.data().sessions.last().selection))
+        val local = selected.copy(name = "My title",archived = true,aliases = listOf("local alias"))
+        tracker.saveType(tracker.snapshot().token,local)
+        val history = tracker.data().sessions;val segments = tracker.data().segments;val favorites = tracker.data().favorites
+        val update = importer.prepare();assertTrue(update.canApply)
+        importer.apply(update);assertEquals(local,tracker.data().types.single { it.id == local.id })
+        assertEquals(history,tracker.data().sessions);assertEquals(segments,tracker.data().segments);assertEquals(favorites,tracker.data().favorites)
         expect(ErrorCode.STALE) { importer.apply(update) }
-        tracker = Tracker(reopen(tracker.store),clock);assertEquals(before.sessions,tracker.data().sessions);assertEquals(before.types,tracker.data().types)
-        importer = FullCatalogImports(tracker,archive)
-        tracker.saveType(tracker.snapshot().token,selected.copy(name = "My edited definition"))
-        val edited = preview();assertFalse(edited.canApply)
-        val local = tracker.data();expect(ErrorCode.INVALID_INPUT) { importer.apply(edited) };assertEquals(local,tracker.data())
-        // Only this exact source-hash pair qualifies; edits to meaning or locators do not.
-        val fresh = full.vocabulary.types.single { it.id == selected.id }
-        assertFalse(reviewedSourceRevisionEquivalent(selected.copy(definition = "Different meaning"),fresh))
-        assertFalse(reviewedSourceRevisionEquivalent(selected.copy(researchOrigins = selected.researchOrigins.map { it.copy(sourceSha256 = "0".repeat(64)) }),fresh))
-        assertFalse(reviewedSourceRevisionEquivalent(selected.copy(researchOrigins = selected.researchOrigins.map { it.copy(pointer = "/unknown") }),fresh))
-        assertFalse(reviewedSourceRevisionEquivalent(selected,fresh.copy(researchOrigins = fresh.researchOrigins.map { it.copy(packageSha256 = "0".repeat(64)) })))
-        val oldAxis = old.axes.first { it.researchOrigins.any { o -> o.sourceFile == FullResearchCatalog.ISCO } }
-        val freshAxis = full.vocabulary.axes.single { it.id == oldAxis.id }
-        assertTrue(reviewedSourceRevisionEquivalent(oldAxis,freshAxis))
-        assertFalse(reviewedSourceRevisionEquivalent(oldAxis.copy(name = "My axis"),freshAxis))
+        tracker = Tracker(reopen(tracker.store),clock);assertEquals(local,tracker.data().types.single { it.id == local.id })
+        // Provenance is technical metadata, not meaning. The trusted package bytes are checked separately.
+        assertTrue(catalogMeaningEquivalent(selected.copy(researchOrigins = emptyList()),selected))
+        assertFalse(catalogMeaningEquivalent(selected.copy(definition = "Different meaning"),selected))
+        val axis = ready.vocabulary.axes.first()
+        assertTrue(catalogMeaningEquivalent(axis.copy(name = "My axis",archived = true,researchOrigins = emptyList()),axis))
+        assertFalse(catalogMeaningEquivalent(axis.copy(cardinality = if(axis.cardinality == Cardinality.SINGLE) Cardinality.MULTIPLE else Cardinality.SINGLE),axis))
+        val altered = ready.vocabulary.copy(types = ready.vocabulary.types.map { if(it.id == selected.id) it.copy(definition = "Changed catalogue meaning") else it })
+        val unchanged = tracker.data()
+        expect(ErrorCode.INVALID_INPUT) { tracker.addCatalog(tracker.snapshot().token,altered,true,CatalogInstallPolicy.PRESERVE_LOCAL_PRESENTATION) }
+        assertEquals(unchanged,tracker.data())
+        val root = java.io.File(System.getProperty("tracker.samples")).parentFile.resolve("catalog")
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { ReadyCatalog.read { path ->
+            if(path == "runtime-catalog.json") java.io.ByteArrayInputStream(root.resolve(path).readBytes()+byteArrayOf(10)) else root.resolve(path).inputStream()
+        } }
     }
-    private fun baseBadBytes(researchDir: java.io.File) = researchDir.resolve("catalog.research.json").readBytes()+byteArrayOf(10)
 
     private fun repeatedRestoreAndReferences(sampleJson: String) {
         val fixture = Backups.decode(sampleJson)
@@ -1401,10 +1304,10 @@ abstract class ScenarioContract {
         val exported = b.export(); val saved = Backups.decode(exported).data
         val clean = Tracker(createStore(),clock); val restore = Backups(clean,disk)
         restore.apply(restore.prepare(exported))
-        assertEquals(saved.copy(revision = clean.data().revision),clean.data())
+        assertEquals(saved.copy(revision = clean.data().revision,controlBarrier = clean.data().controlBarrier),clean.data())
         val once = clean.data()
         restore.apply(restore.prepare(exported))
-        assertEquals(once.copy(revision = once.revision+1),clean.data())
+        assertEquals(once.copy(revision = once.revision+1,controlBarrier = clean.data().controlBarrier),clean.data())
         val marker = Card(name = "New local record since backup")
         clean.saveCard(clean.snapshot().token,marker)
         val beforeReplacement = clean.data()
@@ -1413,7 +1316,7 @@ abstract class ScenarioContract {
         val rollbackJson = disk.read(result.rollbackReference)
         assertEquals(beforeReplacement,Backups.decode(rollbackJson).data)
         restore.apply(restore.prepare(rollbackJson))
-        assertEquals(beforeReplacement.copy(revision = clean.data().revision),clean.data())
+        assertEquals(beforeReplacement.copy(revision = clean.data().revision,controlBarrier = clean.data().controlBarrier),clean.data())
         val unchanged = clean.data(); val diskCount = disk.saved.size
         val source = Backups.decode(exported)
         val invalidGraphs = listOf(

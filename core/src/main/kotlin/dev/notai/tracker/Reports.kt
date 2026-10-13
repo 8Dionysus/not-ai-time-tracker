@@ -39,6 +39,10 @@ data class Report(val start: Long, val end: Long, val asOf: Long, val zone: Stri
 }
 data class Comparison(val current: Report, val previous: Report, val absoluteDifferenceMs: Long, val percent: Double?)
 object Reports {
+    internal fun indexed(d: Dataset,index: ReportIndex,now: Moment,start: Long,end: Long,filter: Filter,zone: String): Report {
+        validateMoment(now);ensure(start >= 0 && end > start && end <= MAX_TIME,"Invalid report window",ErrorCode.INVALID_INTERVAL)
+        return observedReport(d,now,start,end,ZoneId.of(zone),index.observed(now,start,end,filter),index.notes,index)
+    }
     fun report(d: Dataset, now: Moment, start: Long, end: Long, filter: Filter = Filter(), zone: String = d.settings.reportZone): Report {
         validateMoment(now)
         ensure(start >= 0 && end > start && end <= MAX_TIME, "Invalid report window", ErrorCode.INVALID_INTERVAL)
@@ -46,12 +50,13 @@ object Reports {
         val observed = d.segments.distinctBy { it.id }.filter { filter.matches(it.selection) }.map { materialize(it,now) }
         return observedReport(d,now,start,end,zoneId,observed)
     }
-    private fun observedReport(d: Dataset,now: Moment,start: Long,end: Long,zoneId: ZoneId,observed: List<Segment>): Report {
+    private fun observedReport(d: Dataset,now: Moment,start: Long,end: Long,zoneId: ZoneId,observed: List<Segment>,
+        capturedNotes: Map<String,String?>? = null,index: ReportIndex? = null): Report {
         val zone = zoneId.id
-        val notes = d.sessions.associate { it.id to it.note }
+        val notes = capturedNotes ?: d.sessions.associate { it.id to it.note }
         val rows = windowRows(observed,now,start,end,notes)
         val sessions = rows.map { it.sessionId }.toSet(); val segments = rows.map { it.segmentId }.toSet()
-        val measurements = d.measurements.filter { if (it.scope == Scope.SESSION) it.targetId in sessions else it.targetId in segments }
+        val measurements = index?.measurements(sessions,segments) ?: d.measurements.filter { if (it.scope == Scope.SESSION) it.targetId in sessions else it.targetId in segments }
         val days = mutableSetOf<LocalDate>()
         rows.forEach { row ->
             var day = Instant.ofEpochMilli(row.start).atZone(zoneId).toLocalDate()
@@ -60,8 +65,10 @@ object Reports {
         }
         val first = Instant.ofEpochMilli(start).atZone(zoneId).toLocalDate()
         val last = Instant.ofEpochMilli(end-1).atZone(zoneId).toLocalDate()
-        return Report(start,end,now.wall,zone,rows,observed.filter { it.uncertain },measurements,
-            rows.sumExact { it.durationMs },java.time.temporal.ChronoUnit.DAYS.between(first,last)+1,days,end > now.wall,d.metrics)
+        return Report(start,end,now.wall,zone,frozenList(rows.map { it.copy(selection = it.selection.frozen()) }),
+            frozenList(observed.filter { it.uncertain }.map { it.copy(selection = it.selection.frozen()) }),frozenList(measurements),
+            rows.sumExact { it.durationMs },java.time.temporal.ChronoUnit.DAYS.between(first,last)+1,frozenSet(days),end > now.wall,
+            frozenList(d.metrics.map { it.copy(scopes = frozenSet(it.scopes),researchOrigins = frozenList(it.researchOrigins)) }))
     }
     private fun windowRows(observed: List<Segment>,now: Moment,start: Long,end: Long,notes: Map<String,String?>): List<ReportRow> =
         observed.filterNot { it.uncertain }.mapNotNull { s ->
@@ -79,8 +86,19 @@ object Reports {
         ensure(start >= 0 && end > start && end <= MAX_TIME,"Calendar window is empty or out of range",ErrorCode.INVALID_INTERVAL)
         val zoneId = ZoneId.of(zone)
         val observed = d.segments.distinctBy { it.id }.filter { filter.matches(it.selection) }.map { materialize(it,now) }
-        val whole = observedReport(d,now,start,end,zoneId,observed)
-        val notes = d.sessions.associate { it.id to it.note }
+        return calendarObserved(d,now,first,days,zone,start,end,zoneId,observed)
+    }
+    internal fun indexedCalendar(d: Dataset,index: ReportIndex,now: Moment,first: LocalDate,days: Int,filter: Filter,zone: String): CalendarHistory {
+        ensure(days in 1..62,"Calendar page must contain 1..62 days",ErrorCode.INVALID_INTERVAL)
+        validateMoment(now)
+        val (start,end) = calendarBounds(first,days,zone)
+        ensure(start >= 0 && end > start && end <= MAX_TIME,"Calendar window is empty or out of range",ErrorCode.INVALID_INTERVAL)
+        return calendarObserved(d,now,first,days,zone,start,end,ZoneId.of(zone),index.observed(now,start,end,filter),index)
+    }
+    private fun calendarObserved(d: Dataset,now: Moment,first: LocalDate,days: Int,zone: String,start: Long,end: Long,
+        zoneId: ZoneId,observed: List<Segment>,index: ReportIndex? = null): CalendarHistory {
+        val whole = observedReport(d,now,start,end,zoneId,observed,index?.notes,index)
+        val notes = index?.notes ?: d.sessions.associate { it.id to it.note }
         val pages = (0 until days).map { offset ->
             val date = first.plusDays(offset.toLong()); val (a,b) = calendarBounds(date,1,zone)
             ensure(b > a,"Calendar page contains a skipped local date: $date in $zone",ErrorCode.INVALID_INTERVAL)
@@ -109,7 +127,7 @@ object Reports {
         val (b0,b1) = calendarBounds(previousStart,days,zone)
         return comparison(report(d,now,a0,a1,filter,zone),report(d,now,b0,b1,filter,zone))
     }
-    private fun calendarBounds(start: LocalDate,days: Int,zone: String): Pair<Long,Long> {
+    internal fun calendarBounds(start: LocalDate,days: Int,zone: String): Pair<Long,Long> {
         ensure(days > 0,"Calendar day count must be positive",ErrorCode.INVALID_INTERVAL)
         return try {
             val z = ZoneId.of(zone)
@@ -123,6 +141,28 @@ object Reports {
     }
     private fun proportional(total: Long,numerator: Long,denominator: Long): Long =
         BigInteger.valueOf(total).multiply(BigInteger.valueOf(numerator)).divide(BigInteger.valueOf(denominator)).longValueExact()
+}
+
+/** Constructed only for a validated immutable revision. Raw Dataset APIs retain their full oracle
+ * path; no mutable/global cache can make a caller's edits disappear. */
+internal class ReportIndex(private val data: Dataset) {
+    val notes = data.sessions.associate { it.id to it.note }
+    // Validated certain intervals do not overlap, so end order equals start order.
+    private val closed = data.segments.mapIndexed { i,s -> i to s }.filter { it.second.end != null && !it.second.uncertain }.sortedBy { it.second.start }
+    private val other = data.segments.mapIndexed { i,s -> i to s }.filter { it.second.end == null || it.second.uncertain }
+    private val sessionMeasurements = data.measurements.mapIndexed { i,m -> i to m }.filter { it.second.scope == Scope.SESSION }.groupBy { it.second.targetId }
+    private val segmentMeasurements = data.measurements.mapIndexed { i,m -> i to m }.filter { it.second.scope == Scope.SEGMENT }.groupBy { it.second.targetId }
+    fun observed(now: Moment,start: Long,end: Long,filter: Filter): List<Segment> {
+        var lo = 0;var hi = closed.size
+        while(lo < hi) { val mid = (lo+hi)/2;if(closed[mid].second.end!! <= start) lo = mid+1 else hi = mid }
+        val chosen = ArrayList<Pair<Int,Segment>>()
+        while(lo < closed.size && closed[lo].second.start < end) { val row = closed[lo++];if(filter.matches(row.second.selection)) chosen += row }
+        chosen += other.filter { filter.matches(it.second.selection) }
+        return chosen.sortedBy { it.first }.map { materialize(it.second,now) }
+    }
+    fun measurements(sessions: Set<String>,segments: Set<String>): List<Measurement> =
+        (sessions.flatMap { sessionMeasurements[it].orEmpty() } + segments.flatMap { segmentMeasurements[it].orEmpty() })
+            .sortedBy { it.first }.map { it.second }
 }
 internal fun <T> Iterable<T>.sumExact(errorCode: ErrorCode = ErrorCode.INVALID_INTERVAL,value: (T)->Long): Long = try {
     fold(0L) { a,b -> Math.addExact(a,value(b)) }

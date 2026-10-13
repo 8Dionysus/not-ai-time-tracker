@@ -1,0 +1,5 @@
+<resources>
+    <item name="form_name" type="id"/><item name="form_details" type="id"/>
+    <item name="form_note" type="id"/><item name="form_from" type="id"/>
+    <item name="form_until" type="id"/><item name="form_zone" type="id"/>
+</resources>

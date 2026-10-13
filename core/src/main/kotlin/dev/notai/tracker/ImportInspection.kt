@@ -11,7 +11,11 @@ data class ColumnInspection(val delimiter: Char,val columns: List<String>,val ex
 data class CsvTimeChoice(val localPattern: String?,val zone: String)
 
 class ImportInspection internal constructor(private val text: String,val format: ImportFormat,
-    val candidates: List<ColumnInspection>,val warnings: List<String>,val problems: List<String>) {
+    candidates: List<ColumnInspection>,warnings: List<String>,problems: List<String>) {
+    val candidates = frozenList(candidates.map { it.copy(columns = frozenList(it.columns),examples = frozenList(it.examples.map(::frozenList)),
+        suggestions = frozenMap(it.suggestions.mapValues { (_,values) -> frozenList(values) })) })
+    val warnings = frozenList(warnings)
+    val problems = frozenList(problems)
     /** This explicit call confirms column/delimiter/time/duration choices; suggestions never apply themselves. */
     fun confirmCsv(delimiter: Char,mapping: CsvMapping,time: CsvTimeChoice,durationFormat: DurationFormat?): TransferFile {
         ensure(format == ImportFormat.DELIMITED_TEXT,"File is not supported delimited text",ErrorCode.UNSUPPORTED_IMPORT)
@@ -31,7 +35,7 @@ class ImportInspection internal constructor(private val text: String,val format:
 /** Content-based inspection: no vendor selection, no file-extension trust, no persistence. */
 object HistoryFiles {
     fun inspect(bytes: ByteArray,delimiter: Char? = null): ImportInspection {
-        ensure(bytes.size <= MAX_BACKUP_BYTES,"Import exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(bytes.size <= MAX_CSV_BYTES,"Import exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
         val text = try { Charsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
             .onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(bytes)).toString() }
         catch(e: Exception) { return unsupported("Expected UTF-8 text; binary files/XLSX are not supported") }

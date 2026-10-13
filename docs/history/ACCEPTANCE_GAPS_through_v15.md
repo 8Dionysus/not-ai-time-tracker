@@ -6,8 +6,8 @@
 |---|---|---|
 | Начальная модель / JSON 1 / Room 1 | Один таймер, исправление истории, полная замена backup, ревизионная Undo | [Исходные результаты](../../evidence/core-tests.xml), [Room](../../evidence/room-tests.xml) |
 | JSON 2 / Room 2 | Рекурсивное дерево типов, исторические пути, оси и Decimal; миграция без destructive fallback | [Модель каталога](../CATALOG_IMPACT.md), схемы [1](../../app/schemas/dev.notai.tracker.android.TrackerDatabase/1.json) и [2](../../app/schemas/dev.notai.tracker.android.TrackerDatabase/2.json) |
-| JSON 3 | ResearchOrigin и архивирование исходных исследовательских документов | [Адаптер](../RESEARCH_ADAPTER.md), [исследовательские outcomes](../../evidence/research/adapter-outcomes.json) |
-| Коррекция полной проекции | Исключены 171 неявный fallback и три ошибочных residual ID; итог 1918 типов/337 осей | [Полная проекция](../FULL_CATALOG_07.md), [summary](../../evidence/full-projection/summary.json) |
+| JSON 3 | ResearchOrigin и архивирование исходных исследовательских документов | материалы сохранены в истории Git до разделения каталога, материалы сохранены в истории Git до разделения каталога |
+| Коррекция полной проекции | Исключены 171 неявный fallback и три ошибочных residual ID; итог 1918 типов/337 осей | материалы сохранены в истории Git до разделения каталога, материалы сохранены в истории Git до разделения каталога |
 | JSON 4 / Room 3 | Происхождение CSV, delta writes, vocabulary и поколение хранилища; lifecycle чтения | [Storage](../BACKEND_V10.md), [результаты](../../evidence/backend-v10/summary.json) |
 | JSON 5 | Сохраняемые настройки Android-поверхностей, общий token и проверенный горячий путь | [Android-адаптеры](../BACKEND_V13.md), [результаты](../../evidence/backend-v13/verification.json) |
 | JSON 6 | Необязательные Goals, прогресс из истории | [Goals](../GOALS.md), [результаты](../../evidence/goals-v14/verification.json) |

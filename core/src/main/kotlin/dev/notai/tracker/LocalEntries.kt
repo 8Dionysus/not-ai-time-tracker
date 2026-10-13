@@ -12,7 +12,7 @@ data class HistoryGroup(val id: String,val selection: Classification,val rows: L
  */
 fun Report.groupSimilar(): List<HistoryGroup> = frozenList(rows.distinctBy { it.segmentId }
     .groupBy { classificationKey(it.selection) }.map { (key,items) ->
-        HistoryGroup("history:"+researchHash(key.toByteArray(Charsets.UTF_8)),items.first().selection,
+        HistoryGroup("history:"+sha256(key.toByteArray(Charsets.UTF_8)),items.first().selection,
             frozenList(items.sortedWith(compareBy({it.start},{it.segmentId}))),items.sumExact { it.durationMs },items.map { it.sessionId }.distinct().size)
     }.sortedWith(compareByDescending<HistoryGroup> { it.rows.maxOf { r -> r.end } }.thenBy { it.id }))
 

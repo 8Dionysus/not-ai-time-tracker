@@ -25,7 +25,7 @@ tracker.undo(change.state.token)
 
 ## Четыре Android-поверхности
 
-Общая граница: `TrackerRuntime.get(context).tracker`. Только IO для блокирующих операций. `SurfaceAction` содержит источник, команду и полный `Token(datasetId, revision, sessionId)`. Widget/notification используют explicit immutable PendingIntent с token в identity URI. Обновление нового действия не переписывает старое. Двойное нажатие с одной ревизией применяется один раз; остальные получают STALE. Ошибка поверхности не закрывает и не удаляет таймер.
+Общая граница — TrackerRuntime на IO. Новые SurfaceAction содержат исходный TimerTarget(datasetId, sessionId, epoch, barrier) и token для совместимости. Несвязанная настройка не делает Stop устаревшим; переход таймера или restore меняет цель. Проверка исходной цели и разрешения выполняется внутри одной транзакции. Старые intents без TimerTarget сохраняют строгую token-проверку. Ошибка отображается и сохраняется в private feedback, без автоматической подстановки нового token. Immutable PendingIntent identity содержит исходную цель.
 
 Настройки: `Settings(reportZone, surfaces = SurfaceSettings(widget, notification, overlay))`; все три значения по умолчанию false, сохраняются в Room и полном JSON. UI меняет отдельный флаг через `tracker.settings(token, oldSettings.copy(...))`, сохраняя прочие настройки. Разрешение ОС и пользовательское предпочтение — разные состояния. Импорт true не предоставляет разрешений ОС и сам не запускает overlay из фона.
 
@@ -44,9 +44,9 @@ tracker.undo(change.state.token)
 
 ## Файловые и внешние входы
 
-`BackupDocuments.prepare(input, backups)` читает не больше 10 MiB + один контрольный байт и передаёт ввод в `HistoryFiles.inspect`. SAF использует общий строгий UTF‑8 decoder и BOM handling; до подтверждения restore база не меняется. Ошибки ввода не создают rollback-файл. [Контракт файлов](FILE_IMPORT.md).
+Полный SAF restore читает private staged file через потоковый Backups.prepare. Полный export сохраняет private operation/file и передаёт chooser только ID. Convenience byte API остаётся bounded для старых маленьких callers. [PORTABILITY](PORTABILITY.md) описывает большие копии и recovery.
 
-`runtime.catalogImports` — явный импорт восьми известных файлов полного исследовательского корпуса с доверенным manifest, preview и приватным архивом. Ошибки хеша, отсутствующий companion, конфликт и stale token не изменяют базу. [Полная проекция](FULL_CATALOG_07.md).
+runtime.catalogImports устанавливает проверенный [готовый словарь](RUNTIME_CATALOG.md) через preview и Apply; новая база получает его сразу. Сырые исходники и preparation readers не входят в APK.
 
 `runtime.calendarOccurrences.readSelected(reference, enabled=true)` читает только конкретное вхождение события: eventId, begin и end задаются явно и проверяются в query и результате. По умолчанию функция выключена. После явного включения требуется фактически выданный READ_CALENDAR; адаптер не вызывает prompt и не выдаёт себе доступ. Denial/revocation, отсутствующий provider и неверное вхождение возвращают отдельный результат. `occurrence.draft()` предлагает title и интервал, для all-day — interval=null. Preview не пишет историю; запись проходит только через явные команды EntryDraft.
 
@@ -66,4 +66,4 @@ tracker.undo(change.state.token)
 
 Установка/запуск на физическом устройстве не проверены. Реальные launcher/виджет, OS prompts, overlay-окно, FGS/OEM, отзыв разрешений, CalendarProvider и доставка внешнего текста требуют device QA.
 
-Восемь принятых inputs включены в APK через generated assets. Явный `runtime.prepareBundledCatalog()` и последующий `catalogImports.apply(preview)` дают исполнимый путь установки; создание runtime не импортирует каталог. Внешний комплект и командный путь описаны в [FULL_CATALOG_07](FULL_CATALOG_07.md).
+Новая база получает готовый каталог и локальную зону устройства; существующая установка сохраняется до явного обновления. CalendarOccurrences предоставляет list/nearest с ограниченным диапазоном и cursor; UI запрашивает READ_CALENDAR только при пользовательском выборе, показывает страницы и повторно проверяет выбранное вхождение.

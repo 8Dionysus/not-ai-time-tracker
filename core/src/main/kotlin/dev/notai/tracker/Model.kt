@@ -12,6 +12,9 @@ fun newId(): String = UUID.randomUUID().toString()
 val codec = Json { prettyPrint = true; encodeDefaults = true; ignoreUnknownKeys = false }
 const val MAX_TIME = 253402300799999L // last millisecond of year 9999
 
+@Serializable data class ResearchOrigin(val packageSha256: String,val sourceFile: String,val sourceSha256: String,
+    val sourceId: String,val pointer: String)
+
 @Serializable data class ActivityType(@Required val id: String = newId(), val name: String, val archived: Boolean = false,
     val parentId: String? = null, val selectable: Boolean = true, val meaningVersion: Int = 1,
     val aliases: List<String> = emptyList(), val definition: String = "",
@@ -46,23 +49,26 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
     constructor(id: String = newId(), fieldId: String, meaningVersion: Int = 1, unit: String, scope: Scope, targetId: String, value: Long):
         this(id,fieldId,meaningVersion,unit,scope,targetId,Decimal(value.toString()))
 }
-@Serializable data class SurfaceSettings(val widget: Boolean = false,val notification: Boolean = false,val overlay: Boolean = false)
+@Serializable data class SurfaceSettings(val widget: Boolean = false,val notification: Boolean = false,val overlay: Boolean = false,val focusSignal: Boolean = false)
 @Serializable data class Settings(val reportZone: String = "UTC",val surfaces: SurfaceSettings = SurfaceSettings(),val focusPlan: FocusPlan = FocusPlan())
 @Serializable data class Dataset(@Required val datasetId: String = newId(), @Required val revision: Long = 0,
     @Required val types: List<ActivityType> = Catalog.types,
     @Required val cards: List<Card> = emptyList(), @Required val favorites: List<Favorite> = emptyList(),
     @Required val sessions: List<Session> = emptyList(), @Required val segments: List<Segment> = emptyList(),
-    val goals: List<Goal> = emptyList(),val focus: FocusRun? = null,
+    val goals: List<Goal> = emptyList(),val focus: FocusRun? = null,val catalogVersion: String? = null,
+    val timerEpoch: Long = 0,val controlBarrier: String = "",
     @Required val measurements: List<Measurement> = emptyList(), @Required val settings: Settings = Settings(),
     @Required val axes: List<Axis> = Catalog.vocabulary.axes, @Required val metrics: List<Metric> = Catalog.vocabulary.metrics, @Required val units: List<UnitDefinition> = Catalog.vocabulary.units)
 
 data class Moment(val wall: Long, val elapsed: Long, val bootId: String,val processId: String? = null)
 fun interface Clock { fun now(): Moment }
 data class Token(val datasetId: String, val revision: Long, val sessionId: String?)
+data class TimerTarget(val datasetId: String,val sessionId: String?,val epoch: Long,val barrier: String)
+enum class TimerDirective { START, PAUSE, RESUME, STOP }
 enum class Mode { IDLE, RUNNING, PAUSED, RECOVERY }
 data class Snapshot(val token: Token, val mode: Mode, val session: Session?, val active: Segment?,
     val trustedDurationMs: Long, val calendarUncertain: Boolean, val safeLabel: String,
-    val actions: Set<String>,val focus: FocusSnapshot? = null)
+    val actions: Set<String>,val focus: FocusSnapshot? = null,val timerTarget: TimerTarget? = null)
 enum class ErrorCode { STALE, INVALID_INTERVAL, OVERLAP, INVALID_INPUT, STORAGE, UNSUPPORTED_IMPORT, RECOVERY_REQUIRED }
 class CoreError(val code: ErrorCode, message: String, val currentState: Snapshot? = null) : RuntimeException(message)
 fun fail(code: ErrorCode, message: String): Nothing = throw CoreError(code, message)
@@ -103,7 +109,7 @@ internal fun validateSegmentTime(s: Segment) {
 
 fun validate(data: Dataset) {
     fun ids(values: List<String>) { ensure(values.all { it.isNotBlank() } && values.distinct().size == values.size, "Empty or duplicate ID") }
-    ensure(data.datasetId.isNotBlank() && data.revision >= 0, "Invalid dataset metadata")
+    ensure(data.datasetId.isNotBlank() && data.revision >= 0 && data.timerEpoch >= 0, "Invalid dataset metadata")
     try { ZoneId.of(data.settings.reportZone) } catch (_: Exception) { fail(ErrorCode.INVALID_INPUT, "Invalid report zone") }
     ids(data.types.map { it.id }); ids(data.cards.map { it.id }); ids(data.favorites.map { it.id }); ids(data.sessions.map { it.id })
     ids(data.segments.map { it.id }); ids(data.measurements.map { it.id })

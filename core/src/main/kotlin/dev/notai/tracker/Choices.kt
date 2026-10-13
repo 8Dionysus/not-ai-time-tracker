@@ -6,7 +6,7 @@ import java.util.Locale
 /** Read-only discovery. No search call writes history, favorites, telemetry or a launch ledger. */
 enum class ChoiceKind { TYPE, CARD, FAVORITE, HISTORY }
 enum class CatalogScope { ALL, ROOTS, CHILDREN, SUBTREE }
-enum class ChoiceAvailability { AVAILABLE, ARCHIVED_CARD, ARCHIVED_TYPE, GROUP }
+enum class ChoiceAvailability { AVAILABLE, ARCHIVED_CARD, ARCHIVED_TYPE, GROUP, EMPTY_GROUP }
 enum class MatchField { NAME, ALIAS, SELECTION_NAME, CURRENT_CARD_NAME, CURRENT_TYPE_NAME, CURRENT_TYPE_ALIAS, UNCLASSIFIED }
 enum class MatchStrength { EXACT, PREFIX, CONTAINS }
 data class ChoiceQuery(val text: String = "",val kinds: Set<ChoiceKind> = setOf(ChoiceKind.TYPE,ChoiceKind.CARD,ChoiceKind.FAVORITE),
@@ -36,8 +36,10 @@ internal data class ChoiceRecord(val id: String,val kind: ChoiceKind,val sourceI
 }
 internal data class Occurrence(val segment: Segment,val sessionId: String)
 internal data class HistoryVariant(val record: ChoiceRecord,val occurrences: List<Occurrence>)
+internal val recordedSegmentOrder = compareBy<Segment>({ it.end ?: it.start },{ it.start },{ it.id })
 internal data class RankedChoice(val record: ChoiceRecord,val score: Int = 0,val matches: List<MatchEvidence> = emptyList(),val suggestion: SuggestionEvidence? = null)
 internal class CatalogChoices(types: List<ActivityType>) {
+    val parentsWithChildren = types.mapNotNull { it.parentId }.toSet()
     val byId = types.associateBy { it.id }
     val paths = types.associate { t ->
         val result = mutableListOf<ChoicePath>(); var current: ActivityType? = t
@@ -81,9 +83,9 @@ internal class ChoiceCache {
         if(history == null || completedIds != ids || completedSegments != segments) {
             val groups = segments.groupBy { classificationKey(it.selection) }
             history = groups.map { (key,values) ->
-                val latest = values.maxWith(compareBy<Segment>({ it.end ?: it.start },{ it.start },{ it.id }))
+                val latest = values.maxWith(recordedSegmentOrder)
                 val c = latest.selection
-                HistoryVariant(ChoiceRecord("history:"+researchHash(key.toByteArray(Charsets.UTF_8)),ChoiceKind.HISTORY,latest.id,c.name ?: "Без уточнения",c,
+                HistoryVariant(ChoiceRecord("history:"+sha256(key.toByteArray(Charsets.UTF_8)),ChoiceKind.HISTORY,latest.id,c.name ?: "Без уточнения",c,
                     if(c.name != null) listOf(ChoiceText(MatchField.NAME,c.name)) else if(c.activityTypeId == null) listOf(ChoiceText(MatchField.UNCLASSIFIED,"Без уточнения")) else emptyList(),latest.sessionId,latest.id),
                     frozenList(values.map { Occurrence(it,it.sessionId) }))
             }
@@ -121,7 +123,7 @@ class ChoiceView internal constructor(private val d: Dataset,private val cache: 
         }
         val ranked = records.asSequence().filter { record ->
             val availability = availability(record.selection)
-            (query.includeArchived || availability !in setOf(ChoiceAvailability.ARCHIVED_CARD,ChoiceAvailability.ARCHIVED_TYPE)) && inScope(record,query)
+            (query.includeArchived || availability !in setOf(ChoiceAvailability.ARCHIVED_CARD,ChoiceAvailability.ARCHIVED_TYPE,ChoiceAvailability.EMPTY_GROUP)) && inScope(record,query)
         }.mapNotNull { record -> match(record,text) }.sortedWith(compareBy<RankedChoice>({it.score},{kindOrder(it.record.kind)},{sortName(it.record)},{it.record.id})).toList()
         return page(request,ranked,null,pageSize)
     }
@@ -137,13 +139,24 @@ class ChoiceView internal constructor(private val d: Dataset,private val cache: 
             val known = variant.occurrences.filter { o -> !o.segment.uncertain && o.segment.durationMs > 0 && o.segment.end != null &&
                 (w == null || o.segment.start < w.end && o.segment.end > w.start) }
             if(known.isEmpty()) return@mapNotNull null
-            val latest = known.maxWith(compareBy<Occurrence>({it.segment.end},{it.segment.start},{it.segment.id}))
+            val latest = known.maxWith { a,b -> recordedSegmentOrder.compare(a.segment,b.segment) }
             val entry = variant.record.copy(sourceId = latest.segment.id,selection = latest.segment.selection,sourceSessionId = latest.sessionId,sourceSegmentId = latest.segment.id)
             RankedChoice(entry,suggestion = SuggestionEvidence(query.order,w,known.map { it.sessionId }.toSet().size,latest.segment.end!!))
         }.sortedWith(if(query.order == SuggestionOrder.RECENT_RECORDED)
             compareByDescending<RankedChoice> { it.suggestion!!.lastRecordedEnd }.thenBy { sortName(it.record) }.thenBy { it.record.id }
             else compareByDescending<RankedChoice> { it.suggestion!!.sessionCount }.thenByDescending { it.suggestion!!.lastRecordedEnd }.thenBy { sortName(it.record) }.thenBy { it.record.id })
         return page(query,ranked,null,pageSize)
+    }
+    /** Explicit history action, unlike automatic suggestions: archived variants remain selectable
+     * for Repeat. Uses the same recorded-end ordering as the suggestion index. */
+    fun latestRecorded(): ChoiceEntry? {
+        val latest = history.flatMap { variant -> variant.occurrences.map { variant.record to it } }
+            .filter { !it.second.segment.uncertain && it.second.segment.end != null && it.second.segment.durationMs > 0 }
+            .maxWithOrNull { a,b -> recordedSegmentOrder.compare(a.second.segment,b.second.segment) } ?: return null
+        val record = latest.first.copy(sourceId = latest.second.segment.id,selection = latest.second.segment.selection,
+            sourceSessionId = latest.second.sessionId,sourceSegmentId = latest.second.segment.id)
+        return ChoiceEntry(record.id,record.kind,record.sourceId,title(record),path(record),record.selection,
+            sessions[latest.second.sessionId]?.note,availability(record.selection),record.sourceSessionId,record.sourceSegmentId)
     }
     private fun page(request: Any,hits: List<RankedChoice>,cursor: ChoiceCursor?,size: Int): ChoicePage {
         ensure(size in 1..100,"Page size must be 1..100")
@@ -175,7 +188,9 @@ class ChoiceView internal constructor(private val d: Dataset,private val cache: 
     private fun availability(c: Classification): ChoiceAvailability {
         if(c.cardId?.let { personal.cardsById[it]?.archived } == true) return ChoiceAvailability.ARCHIVED_CARD
         val type = c.activityTypeId?.let(catalog.byId::get)
-        return when { type?.archived == true -> ChoiceAvailability.ARCHIVED_TYPE; type?.selectable == false -> ChoiceAvailability.GROUP; else -> ChoiceAvailability.AVAILABLE }
+        return when { type?.archived == true -> ChoiceAvailability.ARCHIVED_TYPE
+            type?.selectable == false && type.id !in catalog.parentsWithChildren -> ChoiceAvailability.EMPTY_GROUP
+            type?.selectable == false -> ChoiceAvailability.GROUP;else -> ChoiceAvailability.AVAILABLE }
     }
     private fun match(r: ChoiceRecord,text: String): RankedChoice? {
         if(text.isEmpty()) return RankedChoice(r)

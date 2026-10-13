@@ -36,7 +36,8 @@ class Tracker(val store: StateStore, val clock: Clock) {
             val old = checked.data
             val now = clock.now()
             checkToken(old, expected, now)
-            val next = edit(old, now).copy(revision = Math.addExact(old.revision, 1))
+            val edited = edit(old,now)
+            val next = edited.copy(revision = Math.addExact(old.revision,1),timerEpoch = if(timerIdentity(old) != timerIdentity(edited)) Math.addExact(old.timerEpoch,1) else old.timerEpoch)
             checked.replace(next) { validated ->
                 val changed = changedSessions(old,next)
                 Triple(Change(validated.snapshot(now), changed, undoable, validated.data, now), old, next)
@@ -46,20 +47,27 @@ class Tracker(val store: StateStore, val clock: Clock) {
             change
         }
     }
-    @Synchronized private fun timer(expected: Token,action: TimerAction,selection: Classification = Classification(),note: String? = null): Change = storage {
+    @Synchronized private fun timer(expected: Token?,action: TimerAction,selection: Classification = Classification(),note: String? = null,target: TimerTarget? = null,
+        allowed: (Dataset)->Boolean = { true }): Change = storage {
         store.checkedTransaction { checked ->
             val now = clock.now()
-            if(checked.data.focus == null) checked.timer(expected,action,now,selection,note) { next,changed ->
+            ensure(allowed(checked.data),"Surface disabled or permission denied")
+            val actualToken = if(target == null) expected!! else {
+                val current = checked.snapshot(now)
+                ensure(target == current.timerTarget,"Timer target changed; refresh controls",ErrorCode.STALE)
+                current.token // original subject target was checked atomically; no catch/retry of a stale global token
+            }
+            if(checked.data.focus == null) checked.timer(actualToken,action,now,selection,note) { next,changed ->
                 Change(next.snapshot(now),changed,action == TimerAction.SWITCH,next.data,now) to checked.data
             } else {
-                val d = checked.data; checkToken(d,expected,now)
+                val d = checked.data; checkToken(d,actualToken,now)
                 val edited = when(action) {
                     TimerAction.START -> fail(ErrorCode.INVALID_INPUT,"Focus is already tracking")
                     TimerAction.PAUSE -> FocusTransitions.pause(d,now)
                     TimerAction.RESUME -> FocusTransitions.resume(d,now)
                     TimerAction.STOP -> FocusTransitions.cancel(d,now)
                     TimerAction.SWITCH -> { checkStartable(d,selection); append(FocusTransitions.cancel(d,now),selection,note,now) }
-                }.copy(revision = Math.addExact(d.revision,1))
+                }.copy(revision = Math.addExact(d.revision,1),timerEpoch = Math.addExact(d.timerEpoch,1))
                 checked.replace(edited) { next -> Change(next.snapshot(now),changedSessions(d,next.data),action == TimerAction.SWITCH,next.data,now) to d }
             }
         }.let { (change,old) ->
@@ -67,6 +75,10 @@ class Tracker(val store: StateStore, val clock: Clock) {
             change
         }
     }
+    fun timerCommand(target: TimerTarget,directive: TimerDirective,allowed: (Dataset)->Boolean = { true }): Change = timer(null,when(directive) {
+        TimerDirective.START -> TimerAction.START;TimerDirective.PAUSE -> TimerAction.PAUSE
+        TimerDirective.RESUME -> TimerAction.RESUME;TimerDirective.STOP -> TimerAction.STOP
+    },target = target,allowed = allowed)
     fun start(expected: Token,selection: Classification = Classification(),note: String? = null) = timer(expected,TimerAction.START,selection,note)
     fun pause(expected: Token) = timer(expected,TimerAction.PAUSE)
     fun resume(expected: Token) = timer(expected,TimerAction.RESUME)
@@ -117,18 +129,20 @@ class Tracker(val store: StateStore, val clock: Clock) {
         d.copy(types = d.types.filterNot { it.id == type.id } + type)
     }
     /** Install absent definitions only; report every added, identical and conflicting key. */
-    fun addCatalog(expected: Token,catalog: VocabularyData,rejectConflicts: Boolean = false): Change {
-        return installCatalog(expected,catalog,rejectConflicts,allowReviewedSourceRevision = false)
+    fun addCatalog(expected: Token,catalog: VocabularyData,rejectConflicts: Boolean = false,
+        policy: CatalogInstallPolicy = CatalogInstallPolicy.STRICT,catalogVersion: String? = null): Change {
+        return installCatalog(expected,catalog,rejectConflicts,policy,catalogVersion)
     }
-    internal fun addReviewedFullCatalog(expected: Token,catalog: VocabularyData): Change =
-        installCatalog(expected,catalog,rejectConflicts = true,allowReviewedSourceRevision = true)
-    private fun installCatalog(expected: Token,catalog: VocabularyData,rejectConflicts: Boolean,allowReviewedSourceRevision: Boolean): Change {
+    internal fun addPreparedCatalog(expected: Token,catalog: ReadyCatalog): Change = installCatalog(expected,catalog.vocabulary,true,
+        CatalogInstallPolicy.PRESERVE_LOCAL_PRESENTATION,catalog.manifest.catalogVersion,catalog.revisions)
+    private fun installCatalog(expected: Token,catalog: VocabularyData,rejectConflicts: Boolean,policy: CatalogInstallPolicy,catalogVersion: String?,
+        revisions: List<CatalogEditorialRevision> = emptyList()): Change {
         lateinit var report: CatalogImportReport
         val change = mutate(expected) { d,_ ->
-            val merged = d.mergeCatalog(catalog,allowReviewedSourceRevision)
+            val merged = d.mergeCatalog(catalog,policy,revisions)
             report = merged.second
             ensure(!rejectConflicts || report.conflicts.isEmpty(),"Catalog conflicts require review; nothing was installed")
-            merged.first
+            merged.first.copy(catalogVersion = catalogVersion ?: d.catalogVersion)
         }
         return change.copy(catalogImport = report)
     }
@@ -208,9 +222,10 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun previewCorrection(sessionId: String,edits: List<SegmentEdit>,note: String?,reclassify: Boolean = false): CorrectionPreview = storage {
         store.transaction { d ->
             val now = clock.now(); validateMoment(now)
-            val after = correctedSession(d,now,sessionId,edits,note,reclassify)
+            val captured = frozenList(edits.map { it.copy(selection = it.selection.frozen()) })
+            val after = correctedSession(d,now,sessionId,captured,note,reclassify).frozen()
             validate(after)
-            d to CorrectionPreview(token(d),sessionId,edits.toList(),note,reclassify,d,after,now)
+            d to CorrectionPreview(token(d),sessionId,captured,note,reclassify,d.frozen(),after,now)
         }
     }
     fun applyCorrection(preview: CorrectionPreview) = correctSession(preview.expected,preview.sessionId,
@@ -357,6 +372,8 @@ class Tracker(val store: StateStore, val clock: Clock) {
 }
 
 internal fun current(d: Dataset) = d.sessions.singleOrNull { it.status != SessionStatus.STOPPED }
+private fun timerIdentity(d: Dataset): List<Any?> = listOf(current(d)?.id,current(d)?.status,
+    d.segments.singleOrNull { it.end == null }?.id,d.focus?.id,d.focus?.phaseIndex,d.focus?.phase,d.focus?.paused,d.focus?.recovery)
 internal fun token(d: Dataset) = Token(d.datasetId,d.revision,current(d)?.id)
 internal fun checkToken(d: Dataset,t: Token,n: Moment) {
     if (token(d) != t) throw CoreError(ErrorCode.STALE,"Stale action; refresh snapshot",snapshot(d,n))
@@ -370,7 +387,7 @@ fun materialize(s: Segment,n: Moment): Segment {
     validateSegmentTime(s)
     if (s.end != null) return s
     val a = s.anchor
-    if (a == null || a.bootId != n.bootId || n.elapsed < a.elapsedMs || (a.processId != null && a.processId != n.processId)) return s.copy(anchor = null,uncertain = true)
+    if (a == null || a.bootId != n.bootId || n.elapsed < a.elapsedMs) return s.copy(anchor = null,uncertain = true)
     val duration = n.elapsed-a.elapsedMs
     ensure(duration in 0..MAX_TIME,"Elapsed duration out of supported range",ErrorCode.INVALID_INTERVAL)
     val uncertain = s.uncertain || abs((n.wall-s.start)-duration) > 1000
@@ -402,5 +419,6 @@ fun snapshot(d: Dataset,n: Moment): Snapshot {
         Mode.PAUSED -> setOf("resume","stop","switch","label","details")
         Mode.RECOVERY -> setOf("resolveTail","label") }
     return Snapshot(token(d),mode,s,active,segs.sumExact { it.durationMs },uncertain || focus?.mode == FocusMode.RECOVERY,
-        focus?.safeLabel ?: when(mode) { Mode.IDLE -> "Таймер остановлен"; Mode.RUNNING -> "Идёт учёт времени"; Mode.PAUSED -> "Таймер на паузе"; Mode.RECOVERY -> "Требуется уточнить время" },actions,focus)
+        focus?.safeLabel ?: when(mode) { Mode.IDLE -> "Таймер остановлен"; Mode.RUNNING -> "Идёт учёт времени"; Mode.PAUSED -> "Таймер на паузе"; Mode.RECOVERY -> "Требуется уточнить время" },actions,focus,
+        TimerTarget(d.datasetId,s?.id,d.timerEpoch,d.controlBarrier))
 }

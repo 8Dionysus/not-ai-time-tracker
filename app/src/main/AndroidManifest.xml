@@ -15,6 +15,7 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+        <receiver android:name=".FocusAlarmReceiver" android:exported="false" />
         <receiver android:name=".TimerActionReceiver" android:exported="false" />
         <receiver android:name=".TimerWidget" android:exported="false">
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>

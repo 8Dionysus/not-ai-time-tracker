@@ -24,6 +24,26 @@ class RoomScenariosTest: ScenarioContract() {
     }
     @org.junit.After fun restoreDirectoryDurability() { DirectoryDurability.sync = originalDirectorySync;DirectoryDurability.rename = originalRename;DirectoryDurability.link = originalLink }
     private val databases = mutableMapOf<StateStore,Pair<String,TrackerDatabase>>()
+    @org.junit.Test fun validClassificationPayloadCannotChangeUnderItsOldContentId() {
+        for(reopenFirst in listOf(false,true)) {
+            var store = createStore();val tracker = Tracker(store,FakeClock());tracker.start(tracker.snapshot().token)
+            val db = databases.getValue(store).second
+            val original = db.dao().classifications().single()
+            val changed = codec.encodeToString(Classification(name = "Valid but altered classification"))
+            org.junit.Assert.assertNotEquals(original.id,HistoryColumns.key(changed))
+            db.openHelper.writableDatabase.execSQL("UPDATE history_classifications SET payload=? WHERE id=?",arrayOf(changed,original.id))
+            if(reopenFirst) store = reopen(store)
+            else db.openHelper.writableDatabase.execSQL("UPDATE store_generation SET generation=generation+1")
+            val error = org.junit.Assert.assertThrows(CoreError::class.java) { store.read() }
+            org.junit.Assert.assertEquals(ErrorCode.STORAGE,error.code)
+            org.junit.Assert.assertTrue(error.message!!.contains("content hash"))
+            val after = databases.getValue(store).second.dao().classification(original.id)!!
+            org.junit.Assert.assertEquals(changed,after.payload)
+            org.junit.Assert.assertEquals(original.id,after.id)
+            // Refusal neither rewrites the payload nor guesses which history is right.
+            org.junit.Assert.assertEquals(1,databases.getValue(store).second.dao().sessions().size)
+        }
+    }
     @org.junit.Test fun repeatedArchivesShareOnlyVerifiedImmutableCopies() {
         val context = RuntimeEnvironment.getApplication();val name = "archive-share-${newId()}.db"
         val originals = DatabaseFiles.paths(context,name).associateWith { file -> ("synthetic preserved original "+file.name).toByteArray() }

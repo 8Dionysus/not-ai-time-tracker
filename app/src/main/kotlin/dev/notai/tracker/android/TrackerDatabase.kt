@@ -207,7 +207,10 @@ class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset
         val rawVocabulary = loadPhase("sql-vocabulary") { dao.vocabulary()!!.payload }
         val vocabulary = loadPhase("decode-vocabulary") { codec.decodeFromString<VocabularyData>(rawVocabulary) }
         val rawSelections = loadPhase("sql-history-classifications") { dao.classifications() }
-        val selections = loadPhase("decode-history-classifications") { rawSelections.associate { it.id to codec.decodeFromString<Classification>(it.payload) } }
+        val selections = loadPhase("decode-history-classifications") { rawSelections.associate {
+            ensure(it.id == HistoryColumns.key(it.payload),"Historical classification content hash differs; use explicit recovery",ErrorCode.STORAGE)
+            it.id to codec.decodeFromString<Classification>(it.payload)
+        } }
         val data = base.copy(axes = vocabulary.axes,metrics = vocabulary.metrics,units = vocabulary.units,
             types = payloads("activity_types") { codec.decodeFromString<ActivityType>(it) },cards = payloads("cards") { codec.decodeFromString<Card>(it) },
             sessions = historyRows("sessions",HistoryColumns.SESSION_COLUMNS) { HistoryColumns.session(it,selections) },

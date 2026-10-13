@@ -7,7 +7,7 @@ val bundledCatalogAssets = tasks.register<Sync>("bundleCatalogAssets") {
 android {
     namespace = "dev.notai.tracker.android"
     compileSdk = 35
-    defaultConfig { applicationId = "dev.notai.tracker"; minSdk = 26; targetSdk = 35; versionCode = 10; versionName = "0.9.1" }
+    defaultConfig { applicationId = "dev.notai.tracker"; minSdk = 26; targetSdk = 35; versionCode = 10; versionName = "0.9.1";testInstrumentationRunner = "dev.notai.tracker.android.ArchiveInstrumentation" }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
     sourceSets.getByName("main").assets.srcDir(bundledCatalogAssets)

@@ -1,0 +1,46 @@
+{
+  "schema": "tracker_classification_hash_guard_verification_v1",
+  "baselineCommit": "4301a3c7fff56a7d04427d6115a91053c304cdbe",
+  "aggregate": "BUILD SUCCESSFUL in 1m 15s",
+  "checks": {
+    "core": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "smallHistoryAndExport",
+        "backupReplacementAndFailure",
+        "timerPath"
+      ],
+      "rawXmlSha256": "fa4916c0a938b99765fc207fd146d2566609fd898a117b76d60c09d78d39bdbb",
+      "rawXmlLocalPath": "/srv/abyss-machine/tmp/ai/not-ai-android-qa/aggregate-reports/hash-guard-core.xml"
+    },
+    "room": {
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "orphanSidecarsNeverInitialize",
+        "validClassificationPayloadCannotChangeUnderItsOldContentId",
+        "healthyMainWithDamagedSidecarsPreservesEveryOriginalBeforeSQLite",
+        "sessionCommandsIgnoreStaleSelectedCard",
+        "indexedPagingAndV3MigrationPreserveEveryRow",
+        "normalizedMigrationRollsBackAfterReplacementFailure",
+        "normalizedMigrationRejectsContradictionsWithoutChangingLegacyRows",
+        "repeatedArchivesShareOnlyVerifiedImmutableCopies",
+        "smallHistoryAndExport",
+        "backupReplacementAndFailure",
+        "timerPath"
+      ],
+      "rawXmlSha256": "2e478247d877cb325edd3cbf2165844bbe0ff0b165757a84a7c1d78101f091e1",
+      "rawXmlLocalPath": "/srv/abyss-machine/tmp/ai/not-ai-android-qa/aggregate-reports/hash-guard-room.xml"
+    }
+  },
+  "buildLogSha256": "9728d17717691e6163958be4e01f5abb6cb7bb8aa23b9f07a56828b8ab3d65d5",
+  "guard": "Fresh graph load verifies history_classification id equals SHA256 of stored payload before decoding",
+  "regression": "Valid altered payload with old content ID refuses on reopen and generation-invalidated reload; row IDs/payloads/history remain unchanged",
+  "cacheContract": "Owner writes increment generation; no claim that a warm cache polls every source byte for external SQL tampering",
+  "restoreMemory": "Each streamed selection defensively frozen/interned before row retention; full graph checks unchanged; large native restore still pending"
+}

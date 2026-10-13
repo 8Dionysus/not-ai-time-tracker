@@ -1,0 +1,150 @@
+{
+  "schema": "tracker_android_archive_comparison_v1",
+  "sameSourceBytes": true,
+  "sourceBytes": 56012800,
+  "execution": "Actual API35 Android instrumentation, unchanged closed store; reference copies one owned target repeatedly",
+  "countPerBlock": 5,
+  "blocks": 4,
+  "noDiscardedWarmups": true,
+  "noOSPageCacheEviction": true,
+  "sourceFiles": [
+    {
+      "name": "tracker.db",
+      "bytes": 55980032,
+      "sha256": "d9c04d3008af6e6989291df7b44167342463d33ff4fe91e2e9c0980736eb0803"
+    },
+    {
+      "name": "tracker.db-wal",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "tracker.db-shm",
+      "bytes": 32768,
+      "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+    }
+  ],
+  "samples": [
+    {
+      "mode": "legacy-durable-copy-reference",
+      "iteration": 0,
+      "durationNs": 625338780,
+      "archiveId": "f6d633c9-b4d4-4a0b-949c-15508c8dd30a"
+    },
+    {
+      "mode": "legacy-durable-copy-reference",
+      "iteration": 1,
+      "durationNs": 470130798,
+      "archiveId": "f6d633c9-b4d4-4a0b-949c-15508c8dd30a"
+    },
+    {
+      "mode": "legacy-durable-copy-reference",
+      "iteration": 2,
+      "durationNs": 504460308,
+      "archiveId": "f6d633c9-b4d4-4a0b-949c-15508c8dd30a"
+    },
+    {
+      "mode": "legacy-durable-copy-reference",
+      "iteration": 3,
+      "durationNs": 312012137,
+      "archiveId": "f6d633c9-b4d4-4a0b-949c-15508c8dd30a"
+    },
+    {
+      "mode": "legacy-durable-copy-reference",
+      "iteration": 4,
+      "durationNs": 322564455,
+      "archiveId": "f6d633c9-b4d4-4a0b-949c-15508c8dd30a"
+    },
+    {
+      "mode": "verified-archive-reuse",
+      "iteration": 0,
+      "durationNs": 449283746,
+      "archiveId": "99ad19ed-0025-4019-8865-e892052479fe"
+    },
+    {
+      "mode": "verified-archive-reuse",
+      "iteration": 1,
+      "durationNs": 378917910,
+      "archiveId": "99ad19ed-0025-4019-8865-e892052479fe"
+    },
+    {
+      "mode": "verified-archive-reuse",
+      "iteration": 2,
+      "durationNs": 323930752,
+      "archiveId": "99ad19ed-0025-4019-8865-e892052479fe"
+    },
+    {
+      "mode": "verified-archive-reuse",
+      "iteration": 3,
+      "durationNs": 326280218,
+      "archiveId": "99ad19ed-0025-4019-8865-e892052479fe"
+    },
+    {
+      "mode": "verified-archive-reuse",
+      "iteration": 4,
+      "durationNs": 341414405,
+      "archiveId": "99ad19ed-0025-4019-8865-e892052479fe"
+    },
+    {
+      "mode": "verified-archive-reuse-reverse",
+      "iteration": 0,
+      "durationNs": 319811159,
+      "archiveId": "99ad19ed-0025-4019-8865-e892052479fe"
+    },
+    {
+      "mode": "verified-archive-reuse-reverse",
+      "iteration": 1,
+      "durationNs": 319584736,
+      "archiveId": "99ad19ed-0025-4019-8865-e892052479fe"
+    },
+    {
+      "mode": "verified-archive-reuse-reverse",
+      "iteration": 2,
+      "durationNs": 355116047,
+      "archiveId": "99ad19ed-0025-4019-8865-e892052479fe"
+    },
+    {
+      "mode": "verified-archive-reuse-reverse",
+      "iteration": 3,
+      "durationNs": 372296673,
+      "archiveId": "99ad19ed-0025-4019-8865-e892052479fe"
+    },
+    {
+      "mode": "verified-archive-reuse-reverse",
+      "iteration": 4,
+      "durationNs": 366773966,
+      "archiveId": "99ad19ed-0025-4019-8865-e892052479fe"
+    },
+    {
+      "mode": "legacy-durable-copy-reference-reverse",
+      "iteration": 0,
+      "durationNs": 310632357,
+      "archiveId": "f6d633c9-b4d4-4a0b-949c-15508c8dd30a"
+    },
+    {
+      "mode": "legacy-durable-copy-reference-reverse",
+      "iteration": 1,
+      "durationNs": 345913783,
+      "archiveId": "f6d633c9-b4d4-4a0b-949c-15508c8dd30a"
+    },
+    {
+      "mode": "legacy-durable-copy-reference-reverse",
+      "iteration": 2,
+      "durationNs": 314998278,
+      "archiveId": "f6d633c9-b4d4-4a0b-949c-15508c8dd30a"
+    },
+    {
+      "mode": "legacy-durable-copy-reference-reverse",
+      "iteration": 3,
+      "durationNs": 297444967,
+      "archiveId": "f6d633c9-b4d4-4a0b-949c-15508c8dd30a"
+    },
+    {
+      "mode": "legacy-durable-copy-reference-reverse",
+      "iteration": 4,
+      "durationNs": 322555103,
+      "archiveId": "f6d633c9-b4d4-4a0b-949c-15508c8dd30a"
+    }
+  ],
+  "referenceDirectory": "f6d633c9-b4d4-4a0b-949c-15508c8dd30a"
+}

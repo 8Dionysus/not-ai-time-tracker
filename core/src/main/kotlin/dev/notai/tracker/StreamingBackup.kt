@@ -64,6 +64,10 @@ object StreamingBackup {
         val types = mutableListOf<ActivityType>();val axes = mutableListOf<Axis>();val metrics = mutableListOf<Metric>();val units = mutableListOf<UnitDefinition>()
         val cards = mutableListOf<Card>();val favorites = mutableListOf<Favorite>();val sessions = mutableListOf<Session>();val segments = mutableListOf<Segment>()
         val measurements = mutableListOf<Measurement>();val goals = mutableListOf<Goal>()
+        // Freeze/intern each decoded selection before retaining its row. A large
+        // restore must not keep thousands of identical mutable JSON collections
+        // until the final graph validation, especially alongside the live store.
+        val selections = SelectionFreezer()
         var datasetId: String? = null;var revision: Long? = null;var settings: Settings? = null;var focus: FocusRun? = null;var catalogVersion: String? = null
         var timerEpoch = 0L;var controlBarrier = ""
         val seen = mutableSetOf<String>()
@@ -86,9 +90,9 @@ object StreamingBackup {
                     "metrics" -> json.array { metrics += codec.decodeFromString<Metric>(record()) }
                     "units" -> json.array { units += codec.decodeFromString<UnitDefinition>(record()) }
                     "cards" -> json.array { cards += codec.decodeFromString<Card>(record()) }
-                    "favorites" -> json.array { favorites += codec.decodeFromString<Favorite>(record()) }
-                    "sessions" -> json.array { sessions += codec.decodeFromString<Session>(record()) }
-                    "segments" -> json.array { segments += codec.decodeFromString<Segment>(record()) }
+                    "favorites" -> json.array { val row = codec.decodeFromString<Favorite>(record());favorites += row.copy(selection = selections.capture(row.selection)) }
+                    "sessions" -> json.array { val row = codec.decodeFromString<Session>(record());sessions += row.copy(selection = selections.capture(row.selection)) }
+                    "segments" -> json.array { val row = codec.decodeFromString<Segment>(record());segments += row.copy(selection = selections.capture(row.selection)) }
                     "measurements" -> json.array { measurements += codec.decodeFromString<Measurement>(record()) }
                     "goals" -> json.array { goals += codec.decodeFromString<Goal>(record()) }
                     else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unknown dataset field: $field")

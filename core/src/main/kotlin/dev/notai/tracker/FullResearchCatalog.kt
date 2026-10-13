@@ -12,12 +12,19 @@ class FullResearchPlan internal constructor(val vocabulary: VocabularyData,val o
     val sourceHashes get() = originals.mapValues { researchHash(it.value) }
     fun sourceBytes(file: String) = originals.getValue(file).copyOf()
     fun apply(tracker: Tracker,expected: Token,archive: ResearchArchive,rejectConflicts: Boolean = false): Tracker.Change = storage {
+        preserveEvidence(archive)
+        tracker.addCatalog(expected,vocabulary,rejectConflicts)
+    }
+    internal fun applyReviewed(tracker: Tracker,expected: Token,archive: ResearchArchive): Tracker.Change = storage {
+        preserveEvidence(archive)
+        tracker.addReviewedFullCatalog(expected,vocabulary)
+    }
+    private fun preserveEvidence(archive: ResearchArchive) {
         base.preserveEvidence(archive)
         for(bytes in originals.values) {
             val hash = researchHash(bytes); archive.put(hash,bytes.copyOf())
             ensure(researchHash(archive.read(hash)) == hash,"Projection evidence readback failed",ErrorCode.STORAGE)
         }
-        tracker.addCatalog(expected,vocabulary,rejectConflicts)
     }
 }
 

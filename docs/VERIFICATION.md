@@ -34,7 +34,7 @@ Room-проверки используют дисковую SQLite, миграц
 
 Результат предыдущего состояния app 0.9.1 сохранён в [draft-validation-v18/verification.json](../evidence/draft-validation-v18/verification.json): 3 Core + 3 Room, 0 failures, lint 0 errors / 12 warnings, APK собран, deviceTested=false. Эти файлы сохранены как историческое доказательство и не пересчитываются под новые изменения.
 
-Текущий код проверен полным aggregate: **BUILD SUCCESSFUL in 59s**, 3 Core + 3 Room/Robolectric, 0 failures/errors/skips; lint **0 errors, 15 warnings и 1 hint**, APK собран и v2-подпись проверена. Code commit: `7881df5e795fe006b270787556640dd699011478`. Публичная сводка с case names, coverage, SHA‑256 исходных отчётов и APK: [backend-integration/verification.json](../evidence/backend-integration/verification.json).
+Состояние до очистки ISCO проверено полным aggregate: **BUILD SUCCESSFUL in 59s**, 3 Core + 3 Room/Robolectric, 0 failures/errors/skips; lint **0 errors, 15 warnings и 1 hint**, APK собран и v2-подпись проверена. Code commit: `7881df5e795fe006b270787556640dd699011478`. Публичная сводка с case names, coverage, SHA‑256 исходных отчётов и APK: [backend-integration/verification.json](../evidence/backend-integration/verification.json).
 
 Сводка получена из нового запуска. Неизменённые оригиналы XML/build/lint/manifest/signature сохранены локально; исторические evidence не заменены. Предупреждения относятся к target/dependency suggestions, техническим строкам/иконке, overdraw и shortcut usage; они не скрывались. Ни этот run, ни APK не являются проверкой физического телефона.
 
@@ -60,4 +60,14 @@ Room-проверки используют дисковую SQLite, миграц
 
 Физический Android: Activity/SAF, sleep/reboot/kill/restart, widgets/launcher/overlay, OS prompts и отзыв разрешений, CalendarProvider, PROCESS_TEXT chooser, OEM-поведение, TalkBack и увеличенный текст. Производительность и батарея на многолетней истории телефона не измерены. Малые JVM-замеры являются локальными измерениями, без гарантии p95, плавности или фоновой доставки сигнала.
 
-Репозиторий не содержит GitHub Actions workflow; отсутствие check runs не означает успешное CI. Remote commit проверяется отдельно от локального результата команд. Текущие функциональные ограничения — [состояние проекта](ACCEPTANCE_GAPS.md).
+Репозиторий не содержит GitHub Actions workflow; отсутствие check runs не означает успешное CI. Remote commit проверяется отдельно от локального результата команд. Действующие функциональные ограничения — [состояние проекта](ACCEPTANCE_GAPS.md).
+
+## Проверка авторских описаний ISCO
+
+Актуальный прогон и content audit: [isco-description-review/verification.json](../evidence/isco-description-review/verification.json) и [source-check.json](../evidence/isco-description-review/source-check.json). Предыдущие evidence сохранены как исторические результаты.
+
+Сценарий общего Memory/Room-контракта сравнивает полную runtime VocabularyData с принятой до исправления проекцией, разрешая только обновление ISCO source hashes в provenance. Он также устанавливает предыдущий каталог, записывает сессию, проверяет строгие конфликты обычного импорта, затем выполняет package preview/cancel/Apply/replay/reopen. Установленные определения, старый provenance и история остаются прежними. Пользовательское имя, иная definition, неизвестный hash или изменённый pointer не получают metadata-only исключение; stale Apply отклоняется.
+
+Рекурсивная проверка описаний, всех восьми manifests/inputs и действительного APK выполняется командой `python3 scripts/check_catalog_descriptions.py --apk app/build/outputs/apk/debug/app-debug.apk`. Исправление описаний не является юридическим заключением о полном clearance. Лицензия не добавлялась.
+
+Итоговый aggregate: **BUILD SUCCESSFUL in 1m 2s**; 3 Core + 3 Room, failures/errors/skips=0. Lint: 0 errors, 15 warnings, 1 hint. APK: 7259905 байт, SHA‑256 `0200eaa306e26717d4648c557bd5953b6cfbbbe38818a15cccd92a697f53a794`, v2 signature verified. Все восемь assets совпали с manifest. Физическое устройство не проверялось.

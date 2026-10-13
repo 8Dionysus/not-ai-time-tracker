@@ -1177,7 +1177,7 @@ abstract class ScenarioContract {
     private fun fullResearchProjection(base: ResearchPlan,researchDir: java.io.File) {
         val isco = researchDir.resolve("projections/isco_full_projection_v2.json").readBytes()
         val sports = researchDir.resolve("projections/sports_additive_catalogue_projection.json").readBytes()
-        val iscoHash = "7dd02e406bb2c34260a73179b2b6a94f19d0141aa1bb06815277eb5e23bc2498"
+        val iscoHash = "e7a9f50cda7b40714b7da7ddedb9de4f77b36d71a9c78ffdd85d780ebd9378b3"
         val sportsHash = "6b5e4810622ff4af4af794b2ac8093d7135caad85f1ace51e99ced62a7373955"
         val supporting = researchDir.resolve("supporting").listFiles()!!.associate { it.name to it.readBytes() }
         // Both inputs are valid ResearchPlans; full projection has stricter evidence requirements.
@@ -1189,6 +1189,7 @@ abstract class ScenarioContract {
         assertEquals(4,missingCompanion.supportingHashes.size)
         expect(ErrorCode.UNSUPPORTED_IMPORT) { FullResearchCatalog.read(missingCompanion,isco,iscoHash,sports,sportsHash) }
         val full = FullResearchCatalog.read(base,isco,iscoHash,sports,sportsHash)
+        reviewedDescriptionUpdate(full,researchDir)
         explicitFullCatalogImport(full,researchDir)
         assertContentEquals(isco,full.sourceBytes(FullResearchCatalog.ISCO))
         assertContentEquals(sports,full.sourceBytes(FullResearchCatalog.SPORTS))
@@ -1329,6 +1330,53 @@ abstract class ScenarioContract {
         assertEquals(count,tracker.data().types.size)
         assertEquals(installedBeforeConflict,tracker.data())
         assertFailsWith<UnsupportedOperationException> { (full.vocabulary.types as MutableList<ActivityType>).clear() }
+    }
+    private fun reviewedDescriptionUpdate(full: FullResearchPlan,researchDir: java.io.File) {
+        // This committed vocabulary is the exact projection installed before the description cleanup.
+        val old = codec.decodeFromString<VocabularyData>(researchDir.parentFile.resolve("evidence/full-projection/runtime-vocabulary.json").readText())
+        val oldHash = "7dd02e406bb2c34260a73179b2b6a94f19d0141aa1bb06815277eb5e23bc2498"
+        val newHash = "e7a9f50cda7b40714b7da7ddedb9de4f77b36d71a9c78ffdd85d780ebd9378b3"
+        fun advanced(origins: List<ResearchOrigin>) = origins.map {
+            if(it.sourceFile == FullResearchCatalog.ISCO && it.packageSha256 == oldHash && it.sourceSha256 == oldHash)
+                it.copy(packageSha256 = newHash,sourceSha256 = newHash) else it
+        }
+        assertEquals(old.copy(types = old.types.map { it.copy(researchOrigins = advanced(it.researchOrigins)) },
+            axes = old.axes.map { it.copy(researchOrigins = advanced(it.researchOrigins)) }),full.vocabulary)
+        val clock = FakeClock(); var tracker = Tracker(createStore(),clock)
+        tracker.addCatalog(tracker.snapshot().token,old,rejectConflicts = true)
+        val selected = old.types.first { it.selectable && it.researchOrigins.any { o -> o.sourceFile == FullResearchCatalog.ISCO } }
+        tracker.start(tracker.snapshot().token,tracker.typeSelection(selected.id)); clock.advance(1000);tracker.stop(tracker.snapshot().token)
+        val before = tracker.data()
+        assertEquals(373,before.mergeCatalog(full.vocabulary).second.conflicts.size) // default import remains strict
+        val saved = mutableMapOf<String,ByteArray>()
+        val archive = object: ResearchArchive {
+            override fun put(sha256: String,bytes: ByteArray) { saved[sha256] = bytes.copyOf() }
+            override fun read(sha256: String) = saved.getValue(sha256).copyOf()
+        }
+        var importer = FullCatalogImports(tracker,archive)
+        fun preview() = importer.prepare { researchDir.resolve(it).inputStream() }
+        val update = preview();assertTrue(update.canApply);assertTrue(update.report.conflicts.isEmpty());assertTrue(update.report.added.isEmpty())
+        assertEquals(before,tracker.data());assertTrue(saved.isEmpty()) // cancellation has no write
+        val result = importer.apply(update);assertTrue(result.catalogImport!!.conflicts.isEmpty())
+        assertEquals(before.copy(revision = tracker.data().revision),tracker.data()) // preserve original provenance and all history
+        assertEquals(newHash,researchHash(saved.getValue(newHash)))
+        importer.apply(preview());assertEquals(before.types,tracker.data().types);assertEquals(before.axes,tracker.data().axes)
+        expect(ErrorCode.STALE) { importer.apply(update) }
+        tracker = Tracker(reopen(tracker.store),clock);assertEquals(before.sessions,tracker.data().sessions);assertEquals(before.types,tracker.data().types)
+        importer = FullCatalogImports(tracker,archive)
+        tracker.saveType(tracker.snapshot().token,selected.copy(name = "My edited definition"))
+        val edited = preview();assertFalse(edited.canApply)
+        val local = tracker.data();expect(ErrorCode.INVALID_INPUT) { importer.apply(edited) };assertEquals(local,tracker.data())
+        // Only this exact source-hash pair qualifies; edits to meaning or locators do not.
+        val fresh = full.vocabulary.types.single { it.id == selected.id }
+        assertFalse(reviewedSourceRevisionEquivalent(selected.copy(definition = "Different meaning"),fresh))
+        assertFalse(reviewedSourceRevisionEquivalent(selected.copy(researchOrigins = selected.researchOrigins.map { it.copy(sourceSha256 = "0".repeat(64)) }),fresh))
+        assertFalse(reviewedSourceRevisionEquivalent(selected.copy(researchOrigins = selected.researchOrigins.map { it.copy(pointer = "/unknown") }),fresh))
+        assertFalse(reviewedSourceRevisionEquivalent(selected,fresh.copy(researchOrigins = fresh.researchOrigins.map { it.copy(packageSha256 = "0".repeat(64)) })))
+        val oldAxis = old.axes.first { it.researchOrigins.any { o -> o.sourceFile == FullResearchCatalog.ISCO } }
+        val freshAxis = full.vocabulary.axes.single { it.id == oldAxis.id }
+        assertTrue(reviewedSourceRevisionEquivalent(oldAxis,freshAxis))
+        assertFalse(reviewedSourceRevisionEquivalent(oldAxis.copy(name = "My axis"),freshAxis))
     }
     private fun baseBadBytes(researchDir: java.io.File) = researchDir.resolve("catalog.research.json").readBytes()+byteArrayOf(10)
 

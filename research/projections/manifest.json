@@ -4,8 +4,8 @@
   "files": [
     {
       "file": "isco_full_projection_v2.json",
-      "bytes": 9861886,
-      "sha256": "7dd02e406bb2c34260a73179b2b6a94f19d0141aa1bb06815277eb5e23bc2498"
+      "bytes": 9872605,
+      "sha256": "e7a9f50cda7b40714b7da7ddedb9de4f77b36d71a9c78ffdd85d780ebd9378b3"
     },
     {
       "file": "sports_additive_catalogue_projection.json",

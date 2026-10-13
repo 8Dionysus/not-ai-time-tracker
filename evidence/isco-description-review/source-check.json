@@ -1,0 +1,52 @@
+{
+  "schema": "tracker_authored_descriptions_check_v1",
+  "previousCommit": "058564b94bcbc9fd8682b2dd39965c5ac6ceb520",
+  "unitSummaries": 86,
+  "unitCategories": 60,
+  "candidateSummaries": 452,
+  "longDutyListsRemaining": 0,
+  "allResearchDecisionsAndLocatorsUnchanged": true,
+  "files": [
+    {
+      "path": "catalog.research.json",
+      "bytes": 12396625,
+      "sha256": "239faf8ccddf1102b5d5834fc3304d2a0e2abc013a008b1eb83e1a821dd4ab19"
+    },
+    {
+      "path": "supporting/tracker_catalog_core_compatibility.md",
+      "bytes": 13685,
+      "sha256": "72f56df0310ec665ff4a7b5496d5684968294b77126ef2c6913961a4bb2d1112"
+    },
+    {
+      "path": "supporting/tracker_catalog_identity_resolution.json",
+      "bytes": 5908,
+      "sha256": "215dcf1eea658675b260262d3924b1da3cba98c45071cdfc15692d305df421cc"
+    },
+    {
+      "path": "supporting/tracker_cross_domain_relations_v2_1.json",
+      "bytes": 1877236,
+      "sha256": "62c96e268b6287303b8d4665a5dd3bcbf510e74a6a793d02227c434cc9478866"
+    },
+    {
+      "path": "supporting/tracker_mobile_catalog_navigation_research.json",
+      "bytes": 88970,
+      "sha256": "8d5e262d951f7f0849b6aa5499d13cf8f267d92381ef323eab1942455727d13f"
+    },
+    {
+      "path": "supporting/tracker_work_learning_core_v4_compatibility.json",
+      "bytes": 67206,
+      "sha256": "71896e48eb808a98d6ad72468f171ee18a3f804f0e8f20626ebd3227bcbad5cf"
+    },
+    {
+      "path": "projections/isco_full_projection_v2.json",
+      "bytes": 9872605,
+      "sha256": "e7a9f50cda7b40714b7da7ddedb9de4f77b36d71a9c78ffdd85d780ebd9378b3"
+    },
+    {
+      "path": "projections/sports_additive_catalogue_projection.json",
+      "bytes": 3855880,
+      "sha256": "6b5e4810622ff4af4af794b2ac8093d7135caad85f1ace51e99ced62a7373955"
+    }
+  ],
+  "apkAssetsChecked": true
+}

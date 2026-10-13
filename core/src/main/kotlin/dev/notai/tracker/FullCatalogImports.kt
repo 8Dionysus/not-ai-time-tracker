@@ -41,14 +41,14 @@ class FullCatalogImports(private val tracker: Tracker,private val archive: Resea
         }
         val plan = verifiedPlan(files)
         val view = tracker.view()
-        val report = view.data.mergeCatalog(plan.vocabulary).second
+        val report = view.data.mergeCatalog(plan.vocabulary,allowReviewedSourceRevision = true).second
         return FullCatalogPreview(this,plan,view.snapshot().token,report.copy(entries = frozenList(report.entries)))
     }
     fun apply(preview: FullCatalogPreview): Tracker.Change {
         ensure(preview.owner === this,"Catalog preview belongs to another importer")
         checkToken(tracker.data(),preview.token,tracker.clock.now())
         ensure(preview.canApply,"Review conflicting definitions before installing the full catalog")
-        return preview.plan.apply(tracker,preview.token,archive,rejectConflicts = true)
+        return preview.plan.applyReviewed(tracker,preview.token,archive)
     }
     companion object {
         private var cachedPlan: WeakReference<FullResearchPlan>? = null

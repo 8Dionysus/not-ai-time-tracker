@@ -1,0 +1,98 @@
+{
+  "schema": "tracker_isco_description_verification_v1",
+  "baseCommit": "058564b94bcbc9fd8682b2dd39965c5ac6ceb520",
+  "recordedAtUtc": "2026-10-13T06:09:31.137074+00:00",
+  "buildInputsSha256": "3fd2b83e2cae4bc9ae4ac44d2d19aa985fe7dbd48a288177d7c0f8b084396eec",
+  "command": "./gradlew --offline --no-daemon :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug",
+  "result": "BUILD SUCCESSFUL in 1m 2s",
+  "suites": [
+    {
+      "module": "core",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 9.193,
+      "cases": [
+        "smallHistoryAndExport",
+        "backupReplacementAndFailure",
+        "timerPath"
+      ],
+      "originalXmlSha256": "b642bdb0aab9c907f2f34f6b1633d19fee2da5c6c5874b71fc961379b4ff2832"
+    },
+    {
+      "module": "room",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 27.597,
+      "cases": [
+        "smallHistoryAndExport",
+        "backupReplacementAndFailure",
+        "timerPath"
+      ],
+      "originalXmlSha256": "9b317e8947d61d57c4a86ca1e59d81ffbca556086cd2e22c56cd7751348b7f20"
+    }
+  ],
+  "lint": {
+    "Warning": 15,
+    "Hint": 1
+  },
+  "originalLintXmlSha256": "b32e4c61179848c6b167abc452fa16b396b211023aee079fe8a6136575c017cb",
+  "originalBuildLogSha256": "dfcd847cc0d8eb9a77a95178ba2952892945ea67298e9777a66bfeed12ceddf0",
+  "apk": {
+    "bytes": 7259905,
+    "sha256": "0200eaa306e26717d4648c557bd5953b6cfbbbe38818a15cccd92a697f53a794",
+    "v2SignatureVerified": true,
+    "allEightAssetsVerified": true,
+    "longIloDutyLists": 0,
+    "deviceTested": false
+  },
+  "research": {
+    "authoredUnitSummaries": 86,
+    "unitCategories": 60,
+    "shortCandidateSummaries": 452,
+    "replacedDutyListOccurrences": 51,
+    "uniqueReplacedDutyLists": 39,
+    "historySnapshotsIncluded": true,
+    "mappingAndLocatorComparison": "All fields except the declared description edits match the previous accepted source",
+    "runtimeTypes": 1918,
+    "runtimeAxes": 337,
+    "iscoDispositions": 353,
+    "sportsDispositions": 223,
+    "iscoProposals": 137,
+    "iscoComponents": 18,
+    "iscoFamilies": 12,
+    "iscoTypedRelations": 159,
+    "semanticVocabularySha256": "f8eda5067dfc4acde453fd95165848b2488960200b3ce82a76dfd4fbfa5bc850",
+    "semanticHashRule": "Canonical sorted-key JSON; only ISCO origin source/package hashes replaced by the same marker",
+    "runtimeComparison": "Full VocabularyData equals previous fixture after replacing only the known ISCO origin hash pair"
+  },
+  "installedCatalogUpdate": {
+    "ordinaryImportConflicts": 373,
+    "reviewedPackageConflicts": 0,
+    "rule": "Only the fixed predecessor/current ISCO source hash pair, with all other fields exactly equal; only trusted package importer",
+    "existingDefinitionsAndProvenance": "Preserved unchanged",
+    "history": "Preserved unchanged",
+    "newSourceArchive": "Verified by hash",
+    "tested": [
+      "preview/cancel without write",
+      "apply",
+      "replay without duplicate",
+      "reopen",
+      "stale refusal",
+      "local name refusal",
+      "definition refusal",
+      "unknown source hash refusal",
+      "origin pointer refusal",
+      "axis name refusal"
+    ]
+  },
+  "attempts": "Initial added upgrade test fixture failed because its importer still referenced the pre-reopen MemoryStore. Fixture rebound to the reopened Tracker; full aggregate then passed, and final axis/373-conflict checks also passed. Original logs retained locally.",
+  "limits": [
+    "Robolectric API 35, not physical Android",
+    "Content revision; no full legal clearance conclusion",
+    "License not selected; Git history retained"
+  ]
+}

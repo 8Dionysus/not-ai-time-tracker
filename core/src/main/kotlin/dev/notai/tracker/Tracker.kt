@@ -118,9 +118,14 @@ class Tracker(val store: StateStore, val clock: Clock) {
     }
     /** Install absent definitions only; report every added, identical and conflicting key. */
     fun addCatalog(expected: Token,catalog: VocabularyData,rejectConflicts: Boolean = false): Change {
+        return installCatalog(expected,catalog,rejectConflicts,allowReviewedSourceRevision = false)
+    }
+    internal fun addReviewedFullCatalog(expected: Token,catalog: VocabularyData): Change =
+        installCatalog(expected,catalog,rejectConflicts = true,allowReviewedSourceRevision = true)
+    private fun installCatalog(expected: Token,catalog: VocabularyData,rejectConflicts: Boolean,allowReviewedSourceRevision: Boolean): Change {
         lateinit var report: CatalogImportReport
         val change = mutate(expected) { d,_ ->
-            val merged = d.mergeCatalog(catalog)
+            val merged = d.mergeCatalog(catalog,allowReviewedSourceRevision)
             report = merged.second
             ensure(!rejectConflicts || report.conflicts.isEmpty(),"Catalog conflicts require review; nothing was installed")
             merged.first

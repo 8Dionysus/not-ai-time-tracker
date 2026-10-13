@@ -133,7 +133,25 @@ data class CatalogImportReport(val entries: List<CatalogEntryOutcome>) {
     val unchanged get() = entries.filter { it.status == CatalogEntryStatus.UNCHANGED }
     val conflicts get() = entries.filter { it.status == CatalogEntryStatus.CONFLICT }
 }
-internal fun Dataset.mergeCatalog(incoming: VocabularyData): Pair<Dataset,CatalogImportReport> {
+/** Only the reviewed descriptive cleanup may be treated as the same definition. Keep the
+ * installed origin unchanged: it truthfully identifies the source originally imported.
+ * Every other field, origin locator, source and version must still compare exactly.
+ */
+internal fun reviewedSourceRevisionEquivalent(previous: Any,entry: Any): Boolean {
+    val oldHash = "7dd02e406bb2c34260a73179b2b6a94f19d0141aa1bb06815277eb5e23bc2498"
+    val currentHash = "e7a9f50cda7b40714b7da7ddedb9de4f77b36d71a9c78ffdd85d780ebd9378b3"
+    if(FullCatalogImports.sources.single { it.path == "projections/${FullResearchCatalog.ISCO}" }.sha256 != currentHash) return false
+    fun advanced(origins: List<ResearchOrigin>) = origins.map { origin ->
+        if(origin.sourceFile == FullResearchCatalog.ISCO && origin.packageSha256 == oldHash && origin.sourceSha256 == oldHash)
+            origin.copy(packageSha256 = currentHash,sourceSha256 = currentHash) else origin
+    }
+    return when {
+        previous is ActivityType && entry is ActivityType -> previous.copy(researchOrigins = advanced(previous.researchOrigins)) == entry
+        previous is Axis && entry is Axis -> previous.copy(researchOrigins = advanced(previous.researchOrigins)) == entry
+        else -> false
+    }
+}
+internal fun Dataset.mergeCatalog(incoming: VocabularyData,allowReviewedSourceRevision: Boolean = false): Pair<Dataset,CatalogImportReport> {
     val outcomes = mutableListOf<CatalogEntryOutcome>()
     fun <T> merge(kind: String,old: List<T>,fresh: List<T>,key: (T)->Pair<String,Int?>): List<T> {
         val keys = fresh.map(key)
@@ -144,6 +162,7 @@ internal fun Dataset.mergeCatalog(incoming: VocabularyData): Pair<Dataset,Catalo
             outcomes += CatalogEntryOutcome(kind,id,version,when {
                 previous == null -> CatalogEntryStatus.ADDED
                 previous == entry -> CatalogEntryStatus.UNCHANGED
+                allowReviewedSourceRevision && reviewedSourceRevisionEquivalent(previous as Any,entry as Any) -> CatalogEntryStatus.UNCHANGED
                 else -> CatalogEntryStatus.CONFLICT
             })
         }

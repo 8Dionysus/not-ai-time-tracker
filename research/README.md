@@ -17,3 +17,5 @@
 Исходные документы не входят в обычный пользовательский JSON backup. При переносе доказательств нужен отдельный перенос ResearchArchive. В каталоге runtime отношения не создают дополнительные сегменты или время; невыбираемые группы служат навигации. Установка полного корпуса — явная операция с preview/проверкой и `Tracker.addCatalog`, без скрытой замены пользовательских определений.
 
 Восемь принятых inputs включены в APK через generated assets. Явный `runtime.prepareBundledCatalog()` и последующий `catalogImports.apply(preview)` дают исполнимый путь установки; создание runtime не импортирует каталог. Внешний комплект и командный путь описаны в [FULL_CATALOG_07](../docs/FULL_CATALOG_07.md).
+
+Текущие unit/candidate описания ISCO — авторские research summaries, включая historical snapshots внутри JSON. Официальные task lists не воспроизводятся; source codes/pages и mappings сохранены. Подробности и проверка: [авторские описания и обновление provenance](../docs/FULL_CATALOG_07.md#авторские-описания-isco-и-совместимость-установленного-каталога).

@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
 import dev.notai.tracker.*
@@ -123,9 +124,10 @@ class UiScreensTest {
 
     private var actionReady = 0
 
-    private fun render(seed: Seed,reducedMotion: Boolean = true): TrackerViewModel {
+    private fun render(seed: Seed,reducedMotion: Boolean = true,initialTheme: ThemeChoice? = null): TrackerViewModel {
         UiBackends.open = { TestBackend(seed.tracker, seed.catalog) }
         val vm = TrackerViewModel(ApplicationProvider.getApplicationContext())
+        initialTheme?.let(vm::setTheme)
         compose.setContent { TrackerApp(vm, openTechnical = {}, reducedMotion = reducedMotion, onActionReady = { actionReady++ }) }
         waitText("Сегодня")
         assertTrue("startup trace hook fires once controls are live", actionReady > 0)
@@ -217,6 +219,16 @@ class UiScreensTest {
         compose.mainClock.autoAdvance = true
         waitText("Время пойдёт сразу.")
         assertTrue(seed.tracker.data().focus == null)
+    }
+
+    @Test fun headerThemeToggleUsesCurrentAppearanceOnEveryClick() {
+        val vm = render(seed(running = false),initialTheme = ThemeChoice.LIGHT)
+        compose.onNodeWithContentDescription("Тёмная тема").performClick()
+        compose.runOnIdle { org.junit.Assert.assertEquals(ThemeChoice.DARK,vm.theme.value) }
+        compose.onNodeWithContentDescription("Светлая тема").performClick()
+        compose.runOnIdle { org.junit.Assert.assertEquals(ThemeChoice.LIGHT,vm.theme.value) }
+        compose.onNodeWithContentDescription("Тёмная тема").performClick()
+        compose.runOnIdle { org.junit.Assert.assertEquals(ThemeChoice.DARK,vm.theme.value) }
     }
 
     @Test fun overview() {

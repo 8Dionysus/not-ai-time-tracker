@@ -119,7 +119,7 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     }
     LaunchedEffect(draft) { if (draft != null) { tab = Tab.TIMER; sheet = Sheet.Picker(PickMode.START) } }
 
-    val actions = remember(vm) {
+    val actions = remember(vm,dark) {
         TimerActions(
             pick = { mode -> sheet = Sheet.Picker(mode) },
             edit = { e, d -> sheet = Sheet.Edit(e, d) },

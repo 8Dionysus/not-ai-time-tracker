@@ -12,6 +12,7 @@ def adb(*args): return subprocess.run(["adb","-s",a.serial,*args],check=True,cap
 assert a.serial.startswith("emulator-") and adb("shell","getprop","ro.boot.qemu.avd_name").strip()==a.avd
 a.evidence.parent.mkdir(parents=True,exist_ok=True)
 def bounds(node): return tuple(map(int,re.findall(r"\d+",node.get("bounds",""))))
+last_adjusted = None
 for attempt in range(a.scrolls+1):
     raw=adb("exec-out","uiautomator","dump","/dev/tty")
     a.evidence.with_name(a.evidence.stem+f"-{attempt}.xml").write_text(raw)
@@ -35,7 +36,8 @@ for attempt in range(a.scrolls+1):
         if a.tap and scrollable and attempt<a.scrolls:
             sx1,sy1,sx2,sy2=bounds(scrollable[0]);cy=(y1+y2)//2
             lo=sy1+(sy2-sy1)//4;hi=sy2-(sy2-sy1)//4;sx=(sx1+sx2)//2
-            if cy>hi or cy<lo:
+            if (cy>hi or cy<lo) and bounds(found[0]) != last_adjusted:
+                last_adjusted = bounds(found[0]) # Stop retrying a viewport edge that cannot scroll farther.
                 adb("shell","input","swipe",str(sx),str(hi if cy>hi else lo),str(sx),str((hi-min(150,max(40,(cy-(sy1+sy2)//2)//2))) if cy>hi else (lo+min(150,max(40,((sy1+sy2)//2-cy)//2)))),"500")
                 continue
         if a.tap: adb("shell","input","tap",str((x1+x2)//2),str((y1+y2)//2))

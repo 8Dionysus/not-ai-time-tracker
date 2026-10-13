@@ -33,10 +33,11 @@ class MainActivity: Activity() {
     private var reportText = ""
     private var shown: Snapshot? = null
     private var exportText: String? = null
+    private var pendingSelectedText: String? = null
+    private var inputDraft: EntryDraft? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         shortcutPending = TimerSurfaces.restoredShortcut(savedInstanceState,intent)
-        intent.action = Intent.ACTION_MAIN
         body = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(24,48,24,24) }
         setContentView(ScrollView(this).apply { addView(body) })
         status = TextView(this); body.addView(status)
@@ -46,6 +47,13 @@ class MainActivity: Activity() {
         from = input("Начало / момент переключения: ISO-8601, например 2026-10-11T12:00:00Z")
         until = input("Конец: ISO-8601")
         zone = input("Зона отчётов: например Europe/Moscow").apply { setText("UTC") }
+        if(savedInstanceState?.containsKey("selectedTextDraft") == true) {
+            note.setText(savedInstanceState.getString("selectedTextDraft"))
+            if(savedInstanceState.getBoolean("isSelectedTextDraft"))
+                inputDraft = EntryDraft(Classification(),note.text.toString().takeIf { it.isNotEmpty() },source = DraftSource.SELECTED_TEXT)
+            savedInstanceState.getString("pendingSelectedText")?.let(::reviewSelectedText)
+        } else receiveSelectedText(intent)
+        intent.action = Intent.ACTION_MAIN
         scope.launch {
             runtime = withContext(Dispatchers.IO) { TrackerRuntime.get(this@MainActivity) }
             buildActions()
@@ -57,11 +65,11 @@ class MainActivity: Activity() {
     }
     private fun input(hint: String) = EditText(this).apply { this.hint = hint; contentDescription = hint; body.addView(this) }
     private fun button(label: String,action: ()->Unit) { body.addView(Button(this).apply { text = label; setOnClickListener { action() } }) }
-    private data class Form(val note: String,val start: String,val end: String)
+    private data class Form(val note: String,val start: String,val end: String,val draft: EntryDraft?)
     private fun command(label: String,needsSelection: Boolean = false,block: (Tracker,Token,Classification,Form)->Unit) = button(label) {
         val expected = shown?.token ?: return@button
         val chosenName = name.text.toString().trim(); val activity = details.text.toString().trim()
-        val form = Form(note.text.toString(),from.text.toString(),until.text.toString())
+        val form = Form(note.text.toString(),from.text.toString(),until.text.toString(),inputDraft)
         runAction {
             val t = runtime.tracker
             val selected = t.data().cards.firstOrNull { it.name == chosenName && !it.archived }?.classification()
@@ -75,7 +83,10 @@ class MainActivity: Activity() {
             runAction { runtime.tracker.saveCard(expected,Card(name = value,details = if (activity.isBlank()) emptyMap() else mapOf("activity" to activity))) }
         }
         button("Добавить первый шаблон каталога") { val token = shown?.token ?: return@button; runAction { runtime.tracker.saveCard(token,Catalog.card(Catalog.types.first { it.selectable && !it.archived }.id)) } }
-        command("Start",true) { t,e,c,f -> t.start(e,c,f.note.takeIf { it.isNotBlank() }) }
+        command("Start",true) { t,e,c,f ->
+            if(f.draft == null) t.start(e,c,f.note.takeIf { it.isNotBlank() })
+            else t.startDraft(e,f.draft.copy(selection = c,note = f.note.takeIf { it.isNotEmpty() }))
+        }
         command("Назначить текущему занятию",true) { t,e,c,f -> t.labelCurrent(e,c,f.note) }
         command("Изменить уточнение с этого момента",true) { t,e,c,f -> t.changeDetails(e,c) }
         command("Pause") { t,e,_,f -> t.pause(e) }
@@ -85,7 +96,11 @@ class MainActivity: Activity() {
         command("Повторить последнее") { t,e,_,f -> t.repeat(e,t.data().sessions.last { it.status == SessionStatus.STOPPED }.id) }
         command("Запомнить выбранное избранное",true) { t,e,c,f -> t.saveFavorite(e,Favorite(label = c.name ?: "Без уточнения",selection = c)) }
         command("Запустить последнее избранное") { t,e,_,f -> t.startFavorite(e,t.data().favorites.last().id) }
-        command("Сохранить ручной интервал",true) { t,e,c,f -> t.manual(e,time(f.start),time(f.end),c) }
+        command("Сохранить ручной интервал",true) { t,e,c,f ->
+            if(f.draft == null) t.manual(e,time(f.start),time(f.end),c,f.note.takeIf { it.isNotBlank() })
+            else t.recordDraft(e,f.draft.copy(selection = c,note = f.note.takeIf { it.isNotEmpty() },
+                interval = DraftInterval(time(f.start),time(f.end))))
+        }
         command("Переключился раньше: сохранить",true) { t,e,c,f -> t.switchedEarlier(e,time(f.start),c) }
         command("Исправить последний закрытый сегмент",true) { t,e,c,f -> t.correctSegment(e,t.data().segments.last { it.end != null }.id,time(f.start),time(f.end),c) }
         command("Отменить доступную правку") { t,e,_,f -> t.undo(e) }
@@ -147,12 +162,39 @@ class MainActivity: Activity() {
     }
     override fun onSaveInstanceState(outState: Bundle) {
         TimerSurfaces.saveShortcut(this,outState,shortcutPending) // also covers recreation before runtime initialization
+        outState.putString("selectedTextDraft",note.text.toString())
+        outState.putString("pendingSelectedText",pendingSelectedText)
+        outState.putBoolean("isSelectedTextDraft",inputDraft?.source == DraftSource.SELECTED_TEXT)
         super.onSaveInstanceState(outState)
     }
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        receiveSelectedText(intent)
         TimerSurfaces.parse(intent)?.takeIf { it.source == Surface.SHORTCUT }?.let { shortcutPending = it }
         intent.action = Intent.ACTION_MAIN; setIntent(intent); consumeShortcut()
+    }
+    private fun receiveSelectedText(incoming: Intent) {
+        try {
+            ProcessTextDrafts.read(incoming)?.note?.let(::reviewSelectedText)
+        } catch(e: CoreError) {
+            AlertDialog.Builder(this).setMessage("${e.code}: ${e.message}").setPositiveButton("OK",null).show()
+        }
+        if(incoming.action == Intent.ACTION_PROCESS_TEXT) {
+            incoming.removeExtra(Intent.EXTRA_PROCESS_TEXT)
+            incoming.action = Intent.ACTION_MAIN
+        }
+    }
+    private fun reviewSelectedText(text: String) {
+        val draft = EntryDrafts.selectedText(text)
+        if(note.text.isEmpty() || note.text.toString() == text) {
+            note.setText(text); inputDraft = draft; pendingSelectedText = null
+        } else {
+            pendingSelectedText = text
+            AlertDialog.Builder(this).setTitle("Выделенный текст")
+                .setMessage("Заменить текущую редактируемую заметку присланным текстом?")
+                .setNegativeButton("Сохранить текущую") { _,_ -> pendingSelectedText = null }
+                .setPositiveButton("Заменить") { _,_ -> note.setText(text); inputDraft = draft; pendingSelectedText = null }.show()
+        }
     }
     private fun consumeShortcut() {
         if(!::runtime.isInitialized) return
@@ -180,8 +222,13 @@ class MainActivity: Activity() {
                 }
                 while(isActive) {
                     val s = revision.snapshot(); shown = s
-                    status.text = "Техническая оболочка · Room 3\n${s.safeLabel}\n${s.trustedDurationMs} ms · ревизия ${s.token.revision}\n${s.session?.selection ?: ""}\n$reportText"
-                    if(s.mode != Mode.RUNNING) break
+                    val focusText = s.focus?.let { "${it.safeLabel}: ${it.remainingMs} ms\n" }.orEmpty()
+                    status.text = "Техническая оболочка · Room 3\n${s.safeLabel}\n${s.trustedDurationMs} ms · ревизия ${s.token.revision}\n$focusText${s.session?.selection ?: ""}\n$reportText"
+                    runtime.focusDueSignals.consume(s.focus) { focus ->
+                        AlertDialog.Builder(this@MainActivity).setTitle("Focus").setMessage(focus.safeLabel)
+                            .setPositiveButton("OK",null).show()
+                    }
+                    if(s.focus?.let { it.mode != FocusMode.RUNNING } ?: (s.mode != Mode.RUNNING)) break
                     delay(1000)
                 }
             }
@@ -200,19 +247,9 @@ class MainActivity: Activity() {
             val bytes = exportText ?: return
             runAction { contentResolver.openOutputStream(uri,"wt")!!.bufferedWriter(Charsets.UTF_8).use { it.write(bytes) } }
         } else if (requestCode == 2) runAction {
-            val json = contentResolver.openInputStream(uri)!!.use { stream ->
-                val output = java.io.ByteArrayOutputStream()
-                val chunk = ByteArray(8192)
-                while (output.size() <= 10*1024*1024) {
-                    val count = stream.read(chunk)
-                    if (count < 0) break
-                    output.write(chunk,0,count)
-                }
-                val bytes = output.toByteArray()
-                if (bytes.size > 10*1024*1024) throw CoreError(ErrorCode.UNSUPPORTED_IMPORT,"Файл больше 10 MiB")
-                bytes.toString(Charsets.UTF_8)
+            val preview = contentResolver.openInputStream(uri)!!.use { stream ->
+                BackupDocuments.prepare(stream,runtime.backups)
             }
-            val preview = runtime.backups.prepare(json)
             withContext(Dispatchers.Main) {
                 AlertDialog.Builder(this@MainActivity).setTitle("Подтвердить полную замену")
                     .setMessage("${preview.consequence}\nКарточек: ${preview.cards}; сессий: ${preview.sessions}; сегментов: ${preview.segments}; целей: ${preview.goals}.\nАктивный хвост: ${preview.unfinishedTail}; Focus: ${preview.unfinishedFocus}")

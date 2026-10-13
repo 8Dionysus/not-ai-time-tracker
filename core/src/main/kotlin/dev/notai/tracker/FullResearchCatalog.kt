@@ -11,13 +11,13 @@ class FullResearchPlan internal constructor(val vocabulary: VocabularyData,val o
     private val base: ResearchPlan,private val originals: Map<String,ByteArray>) {
     val sourceHashes get() = originals.mapValues { researchHash(it.value) }
     fun sourceBytes(file: String) = originals.getValue(file).copyOf()
-    fun apply(tracker: Tracker,expected: Token,archive: ResearchArchive): Tracker.Change = storage {
+    fun apply(tracker: Tracker,expected: Token,archive: ResearchArchive,rejectConflicts: Boolean = false): Tracker.Change = storage {
         base.preserveEvidence(archive)
         for(bytes in originals.values) {
             val hash = researchHash(bytes); archive.put(hash,bytes.copyOf())
             ensure(researchHash(archive.read(hash)) == hash,"Projection evidence readback failed",ErrorCode.STORAGE)
         }
-        tracker.addCatalog(expected,vocabulary)
+        tracker.addCatalog(expected,vocabulary,rejectConflicts)
     }
 }
 
@@ -288,7 +288,9 @@ object FullResearchCatalog {
         for((file,doc) in listOf(ISCO to isco,SPORTS to sport)) doc.keys.sorted().forEach { section ->
             emit(file,"/$section",section,"complete-source-section",boundary = "Exact full section archived with verified digest; historical references, typed relations, source boundaries and definitions remain available without being reinterpreted as runtime rules")
         }
-        return FullResearchPlan(vocabulary,outcomes,base,originals)
+        val frozen = Dataset(types = vocabulary.types,axes = vocabulary.axes,metrics = vocabulary.metrics,units = vocabulary.units).frozen()
+        return FullResearchPlan(VocabularyData(frozen.types,frozen.axes,frozen.metrics,frozen.units),
+            frozenList(outcomes.map { it.copy(runtimeIds = frozenList(it.runtimeIds)) }),base,originals)
     }
     private fun JsonObject.s(key: String): String? = get(key)?.takeUnless { it is JsonNull }?.jsonPrimitive?.content
     private fun JsonObject.text(key: String): String = s(key)?.takeIf { it.isNotBlank() } ?: fail(ErrorCode.INVALID_INPUT,"Missing projection field: $key")

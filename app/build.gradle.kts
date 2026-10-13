@@ -8,6 +8,8 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
         unitTests.all { test ->
+            // Full research-source scenarios plus Robolectric need more than Gradle's 512 MiB default.
+            test.maxHeapSize = "1g"
             test.systemProperty("tracker.samples", rootProject.file("samples").absolutePath)
             // Robolectric writes a lock and Maven cache under user.home. Keep test-only state in the project.
             val testHome = rootProject.file(".gradle/robolectric")

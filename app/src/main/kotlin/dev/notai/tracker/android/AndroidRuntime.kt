@@ -34,6 +34,9 @@ class TrackerRuntime private constructor(context: Context) {
     private val rollback = PrivateRollbackStore(context)
     val backups = Backups(tracker,rollback)
     val historyTransfer = HistoryTransfer(tracker,rollback)
+    val catalogImports = FullCatalogImports(tracker,FileResearchArchive(File(context.noBackupFilesDir,"research")))
+    val calendarOccurrences = CalendarOccurrences(context.applicationContext)
+    val focusDueSignals = FocusDueSignals()
     private val surfaceScope = CoroutineScope(SupervisorJob()+Dispatchers.IO)
     internal val shortcuts = ShortcutCommands(tracker,surfaceScope)
     init {

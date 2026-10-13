@@ -54,6 +54,39 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertEquals(3,databases.getValue(store).second.openHelper.readableDatabase.version)
         return store.read().also { validate(it) }
     }
+    override fun backupDocumentInput() {
+        val clock = FakeClock()
+        val source = Tracker(createStore(),clock)
+        source.saveCard(source.snapshot().token,Card(name = "Marker"))
+        val json = Backups(source,MemoryRollback()).export()
+        val receiver = Tracker(createStore(),clock)
+        receiver.saveCard(receiver.snapshot().token,Card(name = "Local data"))
+        val rollback = MemoryRollback()
+        val backups = Backups(receiver,rollback)
+        fun prepare(bytes: ByteArray) = java.io.ByteArrayInputStream(bytes).use { BackupDocuments.prepare(it,backups) }
+        val before = receiver.data()
+        val malformed = json.substringBefore("Marker").toByteArray(Charsets.UTF_8) +
+            byteArrayOf(0xC3.toByte(),0x28) + json.substringAfter("Marker").toByteArray(Charsets.UTF_8)
+        for(bytes in listOf(malformed,byteArrayOf(0xFF.toByte()),json.dropLast(3).toByteArray(),ByteArray(MAX_BACKUP_BYTES+1))) {
+            val error = org.junit.Assert.assertThrows(CoreError::class.java) { prepare(bytes) }
+            org.junit.Assert.assertEquals(ErrorCode.UNSUPPORTED_IMPORT,error.code)
+            org.junit.Assert.assertEquals(before,receiver.data())
+            org.junit.Assert.assertTrue(rollback.saved.isEmpty())
+        }
+        val plain = prepare(json.toByteArray(Charsets.UTF_8))
+        val bom = prepare(byteArrayOf(0xEF.toByte(),0xBB.toByte(),0xBF.toByte())+json.toByteArray(Charsets.UTF_8))
+        org.junit.Assert.assertEquals(plain.backupId,bom.backupId)
+        org.junit.Assert.assertEquals(before,receiver.data()) // preview and cancellation do not replace data
+        val result = backups.apply(bom)
+        org.junit.Assert.assertEquals(source.data().copy(revision = before.revision+1),receiver.data())
+        org.junit.Assert.assertEquals(before,Backups.decode(rollback.read(result.rollbackReference)).data)
+        val stale = prepare(json.toByteArray(Charsets.UTF_8))
+        receiver.settings(receiver.snapshot().token,Settings("Europe/Berlin"))
+        val changed = receiver.data()
+        val error = org.junit.Assert.assertThrows(CoreError::class.java) { backups.apply(stale) }
+        org.junit.Assert.assertEquals(ErrorCode.STALE,error.code)
+        org.junit.Assert.assertEquals(changed,receiver.data())
+    }
     override fun assertImportRollback(tracker: Tracker,json: String,disk: RollbackStore) {
         val db = databases.getValue(tracker.store).second
         // Metadata is written last, after child tables were replaced: force a real SQLite write failure.
@@ -75,6 +108,7 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertEquals(before,tracker.data())
     }
     override fun surfaceActions() {
+        externalInputAdapters()
         val focusClock = FakeClock(); val focused = Tracker(createStore(),focusClock)
         focused.startFocus(focused.snapshot().token,plan = FocusPlan(1_000,1_000))
         org.junit.Assert.assertEquals(TimerCommand.PAUSE,TimerSurfaces.primary(focused.snapshot()))
@@ -179,6 +213,96 @@ class RoomScenariosTest: ScenarioContract() {
                 org.junit.Assert.assertEquals(ErrorCode.STALE,duplicate.code)
             }
         } finally { release.countDown(); activityScope.cancel(); applicationScope.cancel(); dispatcher.close() }
+    }
+    private fun externalInputAdapters() {
+        val text = "  Selected text\nwithout trimming  "
+        val shared = android.content.Intent(android.content.Intent.ACTION_PROCESS_TEXT).setType("text/plain")
+            .putExtra(android.content.Intent.EXTRA_PROCESS_TEXT,text)
+        val draft = ProcessTextDrafts.read(shared)!!
+        org.junit.Assert.assertEquals(text,draft.note)
+        org.junit.Assert.assertEquals(DraftSource.SELECTED_TEXT,draft.source)
+        org.junit.Assert.assertNull(draft.interval)
+        org.junit.Assert.assertNull(ProcessTextDrafts.read(android.content.Intent()))
+        org.junit.Assert.assertThrows(CoreError::class.java) { ProcessTextDrafts.read(android.content.Intent(shared).setType("text/html")) }
+        org.junit.Assert.assertThrows(CoreError::class.java) { ProcessTextDrafts.read(android.content.Intent(shared).putExtra(android.content.Intent.EXTRA_PROCESS_TEXT," ")) }
+        org.junit.Assert.assertThrows(CoreError::class.java) { ProcessTextDrafts.read(android.content.Intent(shared).putExtra(android.content.Intent.EXTRA_PROCESS_TEXT,"x".repeat(16385))) }
+        val reference = CalendarOccurrenceRef(7,1000,2000)
+        var permission = false; var queries = 0; var allDay = false; var revoked = false
+        val reader = CalendarOccurrences({ permission }) { uri,columns,where,args ->
+            queries++
+            org.junit.Assert.assertEquals(listOf("1000","2000"),uri.pathSegments.takeLast(2))
+            org.junit.Assert.assertEquals(listOf("7","1000","2000"),args.toList())
+            org.junit.Assert.assertTrue(where.contains("event_id = ?"))
+            if(revoked) throw SecurityException("revoked")
+            android.database.MatrixCursor(columns).apply { addRow(arrayOf<Any>(7L,1000L,2000L,"Calendar title",if(allDay) 1 else 0)) }
+        }
+        org.junit.Assert.assertEquals(CalendarReadIssue.DISABLED,reader.readSelected(reference).issue)
+        org.junit.Assert.assertEquals(CalendarReadIssue.PERMISSION_REQUIRED,reader.readSelected(reference,enabled = true).issue)
+        org.junit.Assert.assertEquals(0,queries)
+        permission = true
+        val timed = reader.readSelected(reference,enabled = true).occurrence!!.draft()
+        org.junit.Assert.assertEquals(DraftInterval(1000,2000),timed.interval)
+        org.junit.Assert.assertEquals("calendar:7:1000:2000",timed.sourceReference)
+        allDay = true
+        org.junit.Assert.assertNull(reader.readSelected(reference,enabled = true).occurrence!!.draft().interval)
+        revoked = true
+        org.junit.Assert.assertEquals(CalendarReadIssue.PERMISSION_REQUIRED,reader.readSelected(reference,enabled = true).issue)
+        org.junit.Assert.assertEquals(CalendarReadIssue.PROVIDER_UNAVAILABLE,
+            CalendarOccurrences({ true }) { _,_,_,_ -> null }.readSelected(reference,true).issue)
+        org.junit.Assert.assertEquals(CalendarReadIssue.NOT_FOUND,
+            CalendarOccurrences({ true }) { _,cols,_,_ -> android.database.MatrixCursor(cols) }.readSelected(reference,true).issue)
+        org.junit.Assert.assertEquals(CalendarReadIssue.INVALID_OCCURRENCE,
+            CalendarOccurrences({ true }) { _,cols,_,_ -> android.database.MatrixCursor(cols).apply {
+                addRow(arrayOf<Any>(8L,1000L,2000L,"Different occurrence",0))
+            } }.readSelected(reference,true).issue)
+        val clock = FakeClock(); val tracker = Tracker(createStore(),clock)
+        val before = tracker.data()
+        ProcessTextDrafts.read(shared); reader.readSelected(reference)
+        org.junit.Assert.assertEquals(before,tracker.data())
+        tracker.startDraft(tracker.snapshot().token,draft.copy(note = "Edited text"))
+        clock.advance(1); tracker.stop(tracker.snapshot().token)
+        org.junit.Assert.assertEquals("Edited text",tracker.data().sessions.last().note)
+        val beforeInvalidDraft = tracker.data()
+        org.junit.Assert.assertThrows(CoreError::class.java) { tracker.startDraft(tracker.snapshot().token,draft.copy(note = " ")) }
+        org.junit.Assert.assertEquals(beforeInvalidDraft,tracker.data())
+        org.junit.Assert.assertThrows(CoreError::class.java) { tracker.recordDraft(tracker.snapshot().token,
+            CalendarOccurrence(reference,"All day",true).draft()) }
+        org.junit.Assert.assertEquals(beforeInvalidDraft,tracker.data())
+        tracker.recordDraft(tracker.snapshot().token,timed)
+        org.junit.Assert.assertEquals("Calendar title",tracker.data().sessions.last().note)
+        tracker.startFocus(tracker.snapshot().token,plan = FocusPlan(1000,1000))
+        val signals = FocusDueSignals(); var cues = 0
+        org.junit.Assert.assertFalse(signals.consume(tracker.snapshot().focus) { cues++ })
+        clock.advance(1000); val work = tracker.snapshot().focus!!
+        org.junit.Assert.assertTrue(signals.consume(work) {
+            cues++
+            org.junit.Assert.assertFalse(signals.consume(work) { cues++ }) // re-entrant delivery is also deduplicated
+        })
+        org.junit.Assert.assertFalse(signals.consume(work) { cues++ })
+        tracker.focusNext(tracker.snapshot().token); clock.advance(1000)
+        val pause = tracker.snapshot().focus!!
+        org.junit.Assert.assertThrows(IllegalStateException::class.java) { signals.consume(pause) { throw IllegalStateException("not delivered") } }
+        org.junit.Assert.assertTrue(signals.consume(pause) { cues++ })
+        org.junit.Assert.assertFalse(signals.consume(work) { cues++ })
+        org.junit.Assert.assertEquals(2,cues)
+        org.junit.Assert.assertEquals(1000L,tracker.snapshot().trustedDurationMs) // signal consumption never starts another phase/timer
+        val controller = org.robolectric.Robolectric.buildActivity(MainActivity::class.java,android.content.Intent(shared)).create()
+        val activity = controller.get()
+        val noteField = MainActivity::class.java.getDeclaredField("note").apply { isAccessible = true }
+        val note = noteField.get(activity) as android.widget.EditText
+        org.junit.Assert.assertEquals(text,note.text.toString())
+        org.junit.Assert.assertEquals(android.content.Intent.ACTION_MAIN,activity.intent.action)
+        org.junit.Assert.assertFalse(activity.intent.hasExtra(android.content.Intent.EXTRA_PROCESS_TEXT))
+        note.setText("Edited draft")
+        controller.newIntent(android.content.Intent(shared).putExtra(android.content.Intent.EXTRA_PROCESS_TEXT,"Other text"))
+        org.junit.Assert.assertEquals("Edited draft",note.text.toString()) // explicit text input never silently destroys an existing form
+        org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog()
+            .getButton(android.content.DialogInterface.BUTTON_NEGATIVE).performClick()
+        val state = android.os.Bundle()
+        controller.saveInstanceState(state).destroy()
+        val recreated = org.robolectric.Robolectric.buildActivity(MainActivity::class.java,android.content.Intent(shared)).create(state)
+        try { org.junit.Assert.assertEquals("Edited draft",(noteField.get(recreated.get()) as android.widget.EditText).text.toString()) }
+        finally { recreated.destroy() }
     }
     override fun storageWorkload() {
         val store = createStore(); val db = databases.getValue(store).second

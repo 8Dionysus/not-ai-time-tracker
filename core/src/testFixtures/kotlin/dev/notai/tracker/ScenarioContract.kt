@@ -26,6 +26,7 @@ abstract class ScenarioContract {
     open fun storageWorkload() {}
     open fun surfaceActions() {}
     open fun assertTransferFailure(transfer: HistoryTransfer,preview: HistoryPreview,tracker: Tracker) {}
+    open fun backupDocumentInput() {}
 
     @Test fun timerPath() {
         choiceLifecycle()
@@ -926,11 +927,22 @@ abstract class ScenarioContract {
     }
 
     @Test fun backupReplacementAndFailure() {
+        backupDocumentInput()
         val sampleDir = java.io.File(System.getProperty("tracker.samples"))
         val historySample = Backups.decode(java.io.File(sampleDir,"history-v1.json").readText())
         assertEquals(1,historySample.data.sessions.size)
         assertEquals(1_200_000,historySample.data.segments.single().durationMs)
         assertEquals(historySample.data,Backups.decode(java.io.File(sampleDir,"history-v2.json").readText()).data)
+        val oldRoot = codec.parseToJsonElement(java.io.File(sampleDir,"history-v2.json").readText()).jsonObject
+        for(version in 2..7) {
+            val data = oldRoot.getValue("data").jsonObject.toMutableMap()
+            if(version >= 6) data["goals"] = JsonArray(emptyList())
+            if(version >= 7) data["focus"] = JsonNull
+            val root = JsonObject(oldRoot.toMutableMap().apply {
+                put("formatVersion",JsonPrimitive(version)); put("data",JsonObject(data))
+            })
+            assertEquals(historySample.data,Backups.decode(root.toString()).data)
+        }
         repeatedRestoreAndReferences(java.io.File(sampleDir,"history-v2.json").readText())
         val legacyJson = java.io.File(sampleDir,"history-v1.json").readText()
         val migrated = migrateStoredV1(legacyJson)
@@ -1177,6 +1189,7 @@ abstract class ScenarioContract {
         assertEquals(4,missingCompanion.supportingHashes.size)
         expect(ErrorCode.UNSUPPORTED_IMPORT) { FullResearchCatalog.read(missingCompanion,isco,iscoHash,sports,sportsHash) }
         val full = FullResearchCatalog.read(base,isco,iscoHash,sports,sportsHash)
+        explicitFullCatalogImport(full,researchDir)
         assertContentEquals(isco,full.sourceBytes(FullResearchCatalog.ISCO))
         assertContentEquals(sports,full.sourceBytes(FullResearchCatalog.SPORTS))
         assertEquals(353,full.outcomes.count { it.file == FullResearchCatalog.ISCO && it.kind == "source-disposition" })
@@ -1266,6 +1279,58 @@ abstract class ScenarioContract {
         output.resolve("runtime-vocabulary.json").writeText(codec.encodeToString(full.vocabulary))
         output.resolve("outcomes.json").writeText(codec.encodeToString(full.outcomes))
     }
+
+    private fun explicitFullCatalogImport(full: FullResearchPlan,researchDir: java.io.File) {
+        val clock = FakeClock(); val tracker = Tracker(createStore(),clock)
+        tracker.start(tracker.snapshot().token); clock.advance(1000); tracker.stop(tracker.snapshot().token)
+        val before = tracker.data()
+        val saved = mutableMapOf<String,ByteArray>()
+        val archive = object: ResearchArchive {
+            override fun put(sha256: String,bytes: ByteArray) { saved[sha256] = bytes.copyOf() }
+            override fun read(sha256: String) = saved.getValue(sha256).copyOf()
+        }
+        val importer = FullCatalogImports(tracker,archive)
+        fun open(path: String) = researchDir.resolve(path).inputStream()
+        val preview = importer.prepare(::open)
+        assertTrue(preview.canApply); assertEquals(1918,preview.types); assertEquals(337,preview.axes)
+        assertEquals(8,preview.sourceHashes.size); assertEquals(before,tracker.data()); assertTrue(saved.isEmpty())
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { importer.prepare { path ->
+            if(path == "supporting/tracker_catalog_core_compatibility.md") throw java.io.FileNotFoundException()
+            open(path)
+        } }
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { importer.prepare { path ->
+            if(path == "catalog.research.json") java.io.ByteArrayInputStream(baseBadBytes(researchDir)) else open(path)
+        } }
+        assertEquals(before,tracker.data()); assertTrue(saved.isEmpty())
+        tracker.settings(tracker.snapshot().token,Settings("Europe/Berlin"))
+        val changed = tracker.data()
+        expect(ErrorCode.STALE) { importer.apply(preview) }
+        assertEquals(changed,tracker.data()); assertTrue(saved.isEmpty())
+        val installed = importer.apply(importer.prepare(::open))
+        assertTrue(installed.catalogImport!!.conflicts.isEmpty())
+        assertEquals(before.sessions,tracker.data().sessions); assertEquals(before.segments,tracker.data().segments)
+        for(source in FullCatalogImports.sources) assertEquals(source.sha256,researchHash(saved.getValue(source.sha256)))
+        val count = tracker.data().types.size
+        assertTrue(importer.apply(importer.prepare(::open)).catalogImport!!.added.isEmpty())
+        assertEquals(count,tracker.data().types.size)
+        val conflictTracker = Tracker(createStore(),clock)
+        val item = full.vocabulary.types.first { it.parentId == null }
+        conflictTracker.saveType(conflictTracker.snapshot().token,item.copy(name = "Local name",
+            suggestedAxisIds = emptySet(),suggestedMetricIds = emptySet()))
+        val conflicting = FullCatalogImports(conflictTracker,archive)
+        val conflictPreview = conflicting.prepare(::open)
+        assertFalse(conflictPreview.canApply); assertEquals(item.id,conflictPreview.report.conflicts.single().id)
+        val retained = conflictTracker.data()
+        expect(ErrorCode.INVALID_INPUT) { conflicting.apply(conflictPreview) }
+        assertEquals(retained,conflictTracker.data())
+        val installedBeforeConflict = tracker.data()
+        expect(ErrorCode.INVALID_INPUT) { tracker.addCatalog(tracker.snapshot().token,
+            VocabularyData(listOf(item.copy(name = "Different"),ActivityType("new-from-conflicting-package","New"))),rejectConflicts = true) }
+        assertEquals(count,tracker.data().types.size)
+        assertEquals(installedBeforeConflict,tracker.data())
+        assertFailsWith<UnsupportedOperationException> { (full.vocabulary.types as MutableList<ActivityType>).clear() }
+    }
+    private fun baseBadBytes(researchDir: java.io.File) = researchDir.resolve("catalog.research.json").readBytes()+byteArrayOf(10)
 
     private fun repeatedRestoreAndReferences(sampleJson: String) {
         val fixture = Backups.decode(sampleJson)

@@ -117,11 +117,12 @@ class Tracker(val store: StateStore, val clock: Clock) {
         d.copy(types = d.types.filterNot { it.id == type.id } + type)
     }
     /** Install absent definitions only; report every added, identical and conflicting key. */
-    fun addCatalog(expected: Token,catalog: VocabularyData): Change {
+    fun addCatalog(expected: Token,catalog: VocabularyData,rejectConflicts: Boolean = false): Change {
         lateinit var report: CatalogImportReport
         val change = mutate(expected) { d,_ ->
             val merged = d.mergeCatalog(catalog)
             report = merged.second
+            ensure(!rejectConflicts || report.conflicts.isEmpty(),"Catalog conflicts require review; nothing was installed")
             merged.first
         }
         return change.copy(catalogImport = report)

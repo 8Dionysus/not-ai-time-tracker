@@ -1,0 +1,51 @@
+{
+  "schema": "tracker_ui_merge_checkpoint_v1",
+  "mainBaseline": "6367b609fb0d1366bfc8d97d216492fba87870f5",
+  "preservationParent": "a7b87511d97cf5aabfbb72f0c2b9465fcadf0da2",
+  "uiParent": "fe75c311b51a863e7dff2fb09d1f0ae0067210d2",
+  "aggregate": "BUILD SUCCESSFUL in 1m 51s",
+  "checks": {
+    "core": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "reportSha256": "fa4916c0a938b99765fc207fd146d2566609fd898a117b76d60c09d78d39bdbb"
+    },
+    "dev.notai.tracker.android.ui.UiScreensTest": {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "reportSha256": "dccf6fd8717dba1089c8e5e46ba8b2fc25365fa9568c1a071f9282a9a75e00da"
+    },
+    "dev.notai.tracker.android.ui.UiExportLifecycleTest": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "reportSha256": "99cc31b595643ff13edf32fd78d1c936c107f43e9fa196ca533f6b210767f041"
+    },
+    "dev.notai.tracker.android.RoomScenariosTest": {
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "reportSha256": "baed18eeb42200939030b3f2ada9b4a4f02017cfac090e3634d74042ae711d2f"
+    }
+  },
+  "logSha256": "27ec3b9a2c6dbb5e59c12614d4aa6116b9768e999277edefbc3e8686847165d7",
+  "roomSchema": 5,
+  "appVersion": "0.10.0",
+  "versionCode": 11,
+  "uiPolicy": "Accepted branch design/layout/text preserved; no retry control; system insets correction excluded pending explicit permission",
+  "nonvisualIntegration": "Export producer and exact file-backed document operation belong to Activity/ViewModel, not disposable tab; native navigation and process-death save verified",
+  "nativeExport": {
+    "bytes": 106803842,
+    "privateProviderSha256": "21dc20aa0bc308823ba91c6ec9dec0e9f5a30679dc14ef908d4d057601a3af9a",
+    "state": "COMPLETE",
+    "samePreparedOperationAfterNavigation": true,
+    "newProcessAfterChooserDeath": true
+  },
+  "remaining": "Full combined native action matrix, cold measurements, APK delivery, original history/privacy/remote checks, inventory; TalkBack unavailable on AOSP; 3-button insets defect awaiting UI exception"
+}

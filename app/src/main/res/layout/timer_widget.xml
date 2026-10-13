@@ -1,5 +1,13 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="8dp" android:background="#FFFFFF">
-    <TextView android:id="@+id/widget_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#000000" android:text="@string/app_name" />
-    <Button android:id="@+id/widget_primary" android:layout_width="match_parent" android:layout_height="48dp" android:text="@string/open_timer" />
-    <Button android:id="@+id/widget_stop" android:layout_width="match_parent" android:layout_height="48dp" android:text="@string/stop_timer" android:visibility="gone" />
+<!-- Compact (not)AI widget: state text, primary timer command, stop. Colours follow the system theme. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="horizontal" android:gravity="center_vertical" android:padding="10dp" android:background="@drawable/widget_background">
+    <TextView android:id="@+id/widget_status" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+        android:minHeight="44dp" android:gravity="center_vertical" android:paddingStart="8dp" android:paddingEnd="8dp"
+        android:textColor="@color/widget_ink" android:textSize="15sp" android:maxLines="2" android:ellipsize="end" android:text="@string/app_name" />
+    <Button android:id="@+id/widget_primary" android:layout_width="wrap_content" android:layout_height="44dp" android:minWidth="88dp"
+        android:background="@drawable/widget_button_tonal" android:textColor="@color/widget_ink" android:textAllCaps="false" android:textSize="15sp"
+        android:paddingStart="16dp" android:paddingEnd="16dp" android:text="@string/open_timer" />
+    <Button android:id="@+id/widget_stop" android:layout_width="wrap_content" android:layout_height="44dp" android:minWidth="72dp" android:layout_marginStart="8dp"
+        android:background="@drawable/widget_button_primary" android:textColor="@color/widget_on_ink" android:textAllCaps="false" android:textSize="15sp"
+        android:paddingStart="16dp" android:paddingEnd="16dp" android:text="@string/stop_timer" android:visibility="gone" />
 </LinearLayout>

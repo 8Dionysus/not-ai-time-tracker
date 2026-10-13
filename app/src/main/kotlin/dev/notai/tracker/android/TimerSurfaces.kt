@@ -36,6 +36,10 @@ object TimerSurfaces {
         Mode.IDLE -> TimerCommand.START; Mode.RUNNING -> TimerCommand.PAUSE
         Mode.PAUSED -> TimerCommand.RESUME; Mode.RECOVERY -> null
     }
+    /** Visible Russian labels for the same commands; identity stays in the action, never in the text. */
+    fun label(command: TimerCommand): String = when(command) {
+        TimerCommand.START -> "Начать"; TimerCommand.PAUSE -> "Пауза"; TimerCommand.RESUME -> "Продолжить"; TimerCommand.STOP -> "Стоп"
+    }
     fun notificationsAllowed(c: Context): Boolean = (Build.VERSION.SDK_INT < 33 || c.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) &&
         c.getSystemService(NotificationManager::class.java).let { it.areNotificationsEnabled() && it.getNotificationChannel(CONTROL_CHANNEL)?.importance != NotificationManager.IMPORTANCE_NONE }
     fun overlayAllowed(c: Context) = Settings.canDrawOverlays(c)
@@ -86,16 +90,16 @@ object TimerSurfaces {
             .setContentText(s?.safeLabel ?: "Открыть приложение").setContentIntent(open(c)).setOnlyAlertOnce(true)
             .setVisibility(Notification.VISIBILITY_PRIVATE).setOngoing(true).setShowWhen(false)
         if(!overlay && s != null) {
-            primary(s)?.let { cmd -> builder.addAction(Notification.Action.Builder(null,cmd.name,pending(c,SurfaceAction(Surface.NOTIFICATION,cmd,s.token,s.timerTarget))).build()) }
-            if(s.mode == Mode.RUNNING || s.mode == Mode.PAUSED) builder.addAction(Notification.Action.Builder(null,"STOP",pending(c,SurfaceAction(Surface.NOTIFICATION,TimerCommand.STOP,s.token,s.timerTarget))).build())
+            primary(s)?.let { cmd -> builder.addAction(Notification.Action.Builder(null,label(cmd),pending(c,SurfaceAction(Surface.NOTIFICATION,cmd,s.token,s.timerTarget))).build()) }
+            if(s.mode == Mode.RUNNING || s.mode == Mode.PAUSED) builder.addAction(Notification.Action.Builder(null,label(TimerCommand.STOP),pending(c,SurfaceAction(Surface.NOTIFICATION,TimerCommand.STOP,s.token,s.timerTarget))).build())
         }
         return builder.build()
     }
     fun widget(c: Context,s: Snapshot,enabled: Boolean): RemoteViews = RemoteViews(c.packageName,R.layout.timer_widget).apply {
-        setTextViewText(R.id.widget_status,if(enabled) s.safeLabel else "Виджет выключен · открыть настройки")
+        setTextViewText(R.id.widget_status,if(enabled) s.safeLabel else "Виджет выключен. Открыть настройки")
         setOnClickPendingIntent(R.id.widget_status,open(c))
         val command = if(enabled) primary(s) else null
-        setTextViewText(R.id.widget_primary,command?.name ?: "Открыть")
+        setTextViewText(R.id.widget_primary,command?.let(::label) ?: "Открыть")
         setOnClickPendingIntent(R.id.widget_primary,command?.let { pending(c,SurfaceAction(Surface.WIDGET,it,s.token,s.timerTarget)) } ?: open(c))
         val canStop = enabled && s.mode in setOf(Mode.RUNNING,Mode.PAUSED)
         setViewVisibility(R.id.widget_stop,if(canStop) android.view.View.VISIBLE else android.view.View.GONE)
@@ -113,7 +117,7 @@ object TimerSurfaces {
         val action = intent(c,SurfaceAction(Surface.SHORTCUT,command,s.token,s.timerTarget)).setClass(c,MainActivity::class.java)
         manager.enableShortcuts(listOf("timer_action"))
         manager.setDynamicShortcuts(listOf(android.content.pm.ShortcutInfo.Builder(c,"timer_action")
-            .setShortLabel("Таймер: ${command.name}").setLongLabel("Таймер: ${command.name}")
+            .setShortLabel(label(command)).setLongLabel("Таймер: ${label(command).lowercase()}")
             .setIcon(android.graphics.drawable.Icon.createWithResource(c,android.R.drawable.ic_media_play)).setIntent(action).build()))
     }
     fun refresh(c: Context,view: TrackerView,previous: SurfaceSettings? = null,forceWidget: Boolean = false) {

@@ -86,15 +86,25 @@ class CheckedState private constructor(val data: Dataset,private val sessionPosi
         return CheckedCommit(this,checked,result(checked,changed),TimerRows(frozenList(sessionRows),frozenList(segmentRows)))
     }
     companion object {
-        fun validate(data: Dataset): CheckedState = validated(data.frozen())
-        private fun validated(data: Dataset): CheckedState {
+        fun validate(data: Dataset,onPhase: ((String,Long)->Unit)? = null): CheckedState {
+            val start = if(onPhase != null) System.nanoTime() else 0
+            val frozen = data.frozen()
+            onPhase?.invoke("freeze",System.nanoTime()-start)
+            return validated(frozen,onPhase)
+        }
+        private fun validated(data: Dataset,onPhase: ((String,Long)->Unit)? = null): CheckedState {
+            var start = if(onPhase != null) System.nanoTime() else 0
             dev.notai.tracker.validate(data)
+            onPhase?.invoke("validate",System.nanoTime()-start)
+            if(onPhase != null) start = System.nanoTime()
             val session = data.sessions.indexOfFirst { it.status != SessionStatus.STOPPED }.takeIf { it >= 0 }
             val segment = data.segments.indexOfFirst { it.end == null }.takeIf { it >= 0 }
             val id = session?.let { data.sessions[it].id }
-            return CheckedState(data,session,segment,if(id == null) emptyList() else data.segments.filter { it.sessionId == id },
+            val checked = CheckedState(data,session,segment,if(id == null) emptyList() else data.segments.filter { it.sessionId == id },
                 data.segments.filter { !it.uncertain && it.end != null }.maxOfOrNull { it.end!! } ?: 0,
                 data.segments.sumExact { it.durationMs },data.types.map { it.id }.toSet(),data.cards.map { it.id }.toSet())
+            onPhase?.invoke("checked-index",System.nanoTime()-start)
+            return checked
         }
     }
 }

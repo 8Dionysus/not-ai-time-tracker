@@ -14,9 +14,9 @@ import java.util.concurrent.Callable
 @Entity(tableName = "metadata") data class MetaRow(@PrimaryKey val id: Int = 1, val payload: String)
 @Entity(tableName = "activity_types") data class TypeRow(@PrimaryKey val id: String,val position: Int,val payload: String)
 @Entity(tableName = "cards") data class CardRow(@PrimaryKey val id: String,val position: Int,val payload: String)
-@Entity(tableName = "sessions") data class SessionRow(@PrimaryKey val id: String,val position: Int,val payload: String)
+@Entity(tableName = "sessions",indices = [Index(value = ["position","id"])]) data class SessionRow(@PrimaryKey val id: String,val position: Int,val payload: String)
 @Entity(tableName = "segments", foreignKeys = [ForeignKey(entity = SessionRow::class,parentColumns = ["id"],childColumns = ["sessionId"],onDelete = ForeignKey.CASCADE)],
-    indices = [Index("sessionId"),Index(value = ["openSlot"],unique = true)])
+    indices = [Index("sessionId"),Index(value = ["openSlot"],unique = true),Index(value = ["position","id"])])
 data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId: String,val openSlot: Int?,val payload: String)
 @Entity(tableName = "favorites") data class FavoriteRow(@PrimaryKey val id: String,val position: Int,val payload: String)
 @Entity(tableName = "measurements") data class MeasurementRow(@PrimaryKey val id: String,val position: Int,val payload: String)
@@ -55,7 +55,7 @@ data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId
     @Query("DELETE FROM measurements WHERE id IN (:ids)") fun deleteMeasurements(ids: List<String>)
     @Query("SELECT * FROM measurements WHERE id IN (:ids)") fun readMeasurements(ids: List<String>): List<MeasurementRow>
 }
-@Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class,GenerationRow::class,VocabularyRow::class],version = 3,exportSchema = true)
+@Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class,GenerationRow::class,VocabularyRow::class],version = 4,exportSchema = true)
 abstract class TrackerDatabase: RoomDatabase() {
     abstract fun dao(): TrackerDao
     companion object {
@@ -94,6 +94,13 @@ abstract class TrackerDatabase: RoomDatabase() {
             }
         }
 
+        val MIGRATION_3_4 = object: androidx.room.migration.Migration(3,4) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_sessions_position_id ON sessions(position,id)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_segments_position_id ON segments(position,id)")
+            }
+        }
+
         fun open(context: Context,name: String = "tracker.db"): TrackerDatabase {
             val file = context.getDatabasePath(name)
             val existing = DatabaseFiles.paths(context,name).filter { it.exists() }
@@ -115,7 +122,7 @@ abstract class TrackerDatabase: RoomDatabase() {
                 ensure(validHeader,"Database header is damaged; originals preserved. Use explicit recovery",ErrorCode.STORAGE)
             }
             return Room.databaseBuilder(context,TrackerDatabase::class.java,name)
-            .addMigrations(MIGRATION_1_2,MIGRATION_2_3).openHelperFactory { configuration ->
+            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4).openHelperFactory { configuration ->
                 val original = configuration.callback
                 val guarded = object: androidx.sqlite.db.SupportSQLiteOpenHelper.Callback(original.version) {
                     override fun onConfigure(db: androidx.sqlite.db.SupportSQLiteDatabase) = original.onConfigure(db)
@@ -140,7 +147,8 @@ abstract class TrackerDatabase: RoomDatabase() {
  * Commands update only changed rows. No REPLACE on sessions (which would cascade-delete segments).
  * Every changed/deleted row is read back in the transaction; a failed commit discards the cache.
  */
-class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset = { Dataset() },private val allowInitialize: Boolean = true): StateStore {
+class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset = { Dataset() },private val allowInitialize: Boolean = true,
+    private val onLoadPhase: ((String,Long)->Unit)? = null,private val loadPageSize: Int? = 512): StateStore {
     @Volatile private var retired = false
     internal fun retire() { retired = true }
     private fun active() { if(retired) throw CoreError(ErrorCode.STORAGE,"Store was closed for explicit recovery") }
@@ -182,25 +190,72 @@ class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset
         val generation = dao.generation() ?: throw CoreError(ErrorCode.STORAGE,"Missing store generation")
         ensure(generation >= 0,"Invalid store generation",ErrorCode.STORAGE)
         cached?.takeIf { it.first == generation }?.let { return it.second }
-        val base = codec.decodeFromString<Dataset>(dao.metadata()!!.payload)
-        val vocabulary = codec.decodeFromString<VocabularyData>(dao.vocabulary()!!.payload)
+        val meta = loadPhase("sql-metadata") { dao.metadata()!!.payload }
+        val base = loadPhase("decode-metadata") { codec.decodeFromString<Dataset>(meta) }
+        val rawVocabulary = loadPhase("sql-vocabulary") { dao.vocabulary()!!.payload }
+        val vocabulary = loadPhase("decode-vocabulary") { codec.decodeFromString<VocabularyData>(rawVocabulary) }
         val data = base.copy(axes = vocabulary.axes,metrics = vocabulary.metrics,units = vocabulary.units,
             types = payloads("activity_types") { codec.decodeFromString<ActivityType>(it) },cards = payloads("cards") { codec.decodeFromString<Card>(it) },
             sessions = payloads("sessions") { codec.decodeFromString<Session>(it) },
             segments = payloads("segments") { codec.decodeFromString<Segment>(it) },
             favorites = payloads("favorites") { codec.decodeFromString<Favorite>(it) },
             measurements = payloads("measurements") { codec.decodeFromString<Measurement>(it) })
-        val checked = CheckedState.validate(data)
+        val checked = CheckedState.validate(data,onLoadPhase)
         cached = generation to checked
         return checked
+    }
+    private fun <T> loadPhase(name: String,read: ()->T): T {
+        if(onLoadPhase == null) return read()
+        val start = System.nanoTime();val value = read()
+        onLoadPhase.invoke(name,System.nanoTime()-start);return value
     }
     /** One cursor window / one payload at a time; never retain a second full list of JSON rows. */
     private fun <T> payloads(table: String,decode: (String)->T): List<T> {
         check(table in setOf("activity_types","cards","sessions","segments","favorites","measurements"))
+        if(loadPageSize != null && table in setOf("sessions","segments")) return pagedPayloads(table,decode,loadPageSize)
         val result = ArrayList<T>()
+        val start = if(onLoadPhase != null) System.nanoTime() else 0
         db.openHelper.readableDatabase.query("SELECT payload FROM $table ORDER BY position").use { cursor ->
-            while(cursor.moveToNext()) result += decode(cursor.getString(0))
+            if(onLoadPhase == null) while(cursor.moveToNext()) result += decode(cursor.getString(0))
+            else {
+                var sqlNs = System.nanoTime()-start;var decodeNs = 0L
+                while(true) {
+                    var tick = System.nanoTime();val next = cursor.moveToNext()
+                    val payload = if(next) cursor.getString(0) else null
+                    sqlNs += System.nanoTime()-tick
+                    if(!next) break
+                    tick = System.nanoTime();result += decode(payload!!);decodeNs += System.nanoTime()-tick
+                }
+                onLoadPhase.invoke("sql-$table",sqlNs);onLoadPhase.invoke("decode-$table",decodeNs)
+            }
         }
+        return result
+    }
+    private fun <T> pagedPayloads(table: String,decode: (String)->T,size: Int): List<T> {
+        require(size in 1..1024)
+        val result = ArrayList<T>();var position: Long? = null;var id: String? = null
+        var sqlNs = 0L;var decodeNs = 0L
+        do {
+            val tick = if(onLoadPhase != null) System.nanoTime() else 0L
+            val query = if(position == null) "SELECT payload,position,id FROM $table ORDER BY position,id LIMIT $size" else
+                "SELECT payload,position,id FROM $table WHERE position>=? AND (position>? OR id>?) ORDER BY position,id LIMIT $size"
+            val args = if(position == null) emptyArray() else arrayOf<Any>(position!!,position!!,id!!)
+            var count = 0
+            db.openHelper.readableDatabase.query(query,args).use { cursor ->
+                var previous = if(onLoadPhase != null) System.nanoTime() else 0L
+                if(onLoadPhase != null) sqlNs += previous-tick
+                while(cursor.moveToNext()) {
+                    val payload = cursor.getString(0);position = cursor.getLong(1);id = cursor.getString(2);count++
+                    val beforeDecode = if(onLoadPhase != null) System.nanoTime() else 0L
+                    if(onLoadPhase != null) sqlNs += beforeDecode-previous
+                    result += decode(payload)
+                    previous = if(onLoadPhase != null) System.nanoTime() else 0L
+                    if(onLoadPhase != null) decodeNs += previous-beforeDecode
+                }
+                if(onLoadPhase != null) sqlNs += System.nanoTime()-previous
+            }
+        } while(count == size)
+        onLoadPhase?.invoke("sql-$table",sqlNs);onLoadPhase?.invoke("decode-$table",decodeNs)
         return result
     }
     private fun <T,R> sync(old: List<T>,next: List<T>,id: (T)->String,row: (Int,T)->R,

@@ -44,7 +44,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
     val tracker = Tracker(RoomStore(database,initial = {
         val catalog = readyCatalog
         newInstallData(catalog)
-    },allowInitialize = newStore),AndroidClock(context))
+    },allowInitialize = newStore,onLoadPhase = StartupTrace.loadObserver(context)),AndroidClock(context))
     private val rollback = PrivateRollbackStore(context)
     val backups = Backups(tracker,rollback)
     val historyTransfer = HistoryTransfer(tracker,rollback)
@@ -56,7 +56,9 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
     private val surfaceScope = CoroutineScope(SupervisorJob()+Dispatchers.IO)
     internal val shortcuts = ShortcutCommands(tracker,surfaceScope)
     init {
+        StartupTrace.mark(context,"store-initialized")
         tracker.store.readChecked() // fail before publishing a runtime or starting observers
+        StartupTrace.mark(context,"history-graph-ready")
         surfaceScope.launch {
             var previous: SurfaceSettings? = null
             tracker.views.collect { view ->
@@ -74,6 +76,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
             if(recovering || DatabaseRecovery.needsAttention(context)) throw CoreError(ErrorCode.STORAGE,"A recovery operation needs completion; open recovery controls")
             instance ?: run {
                 val newStore = !DatabaseFiles.exists(context)
+                StartupTrace.mark(context,"store-open-start")
                 val database = TrackerDatabase.open(context)
                 try { TrackerRuntime(context.applicationContext,database,newStore).also { instance = it } }
                 catch(e: Exception) { database.close();throw e }

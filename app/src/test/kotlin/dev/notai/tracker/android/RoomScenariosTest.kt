@@ -22,6 +22,52 @@ class RoomScenariosTest: ScenarioContract() {
     }
     @org.junit.After fun restoreDirectoryDurability() { DirectoryDurability.sync = originalDirectorySync;DirectoryDurability.rename = originalRename }
     private val databases = mutableMapOf<StateStore,Pair<String,TrackerDatabase>>()
+    @org.junit.Test fun indexedPagingAndV3MigrationPreserveEveryRow() {
+        val context = RuntimeEnvironment.getApplication()
+        for(count in listOf(0,1,511,512,513,1024,1025)) {
+            var store = createStore()
+            val sessions = (0 until count).map { i -> Session(id = listOf("a","é","😀")[i%3]+"-$i",status = SessionStatus.STOPPED,note = "page boundary $i") }
+            val segments = sessions.mapIndexed { i,s -> Segment(id = "segment-${s.id}",sessionId = s.id,start = 1_000L+i*2_000L,end = 2_000L+i*2_000L,durationMs = 1_000) }
+            val input = Dataset(sessions = sessions,segments = segments)
+            store.transaction { input to Unit }
+            val sql = databases.getValue(store).second.openHelper.writableDatabase
+            for((table,ids) in listOf("sessions" to sessions.map { it.id },"segments" to segments.map { it.id })) {
+                ids.forEachIndexed { i,id -> sql.execSQL("UPDATE $table SET position=? WHERE id=?",arrayOf(i/3-2,id)) }
+            }
+            // Expected ordering comes from SQLite's binary collation, including Unicode IDs
+            // and duplicate positions that straddle page boundaries.
+            fun ordered(table: String): List<String> = sql.query("SELECT id FROM $table ORDER BY position,id").use { c -> buildList { while(c.moveToNext()) add(c.getString(0)) } }
+            val expected = input.copy(sessions = ordered("sessions").map(sessions.associateBy { it.id }::getValue),
+                segments = ordered("segments").map(segments.associateBy { it.id }::getValue))
+            val tables = listOf("metadata","activity_types","cards","sessions","segments","favorites","measurements","store_generation","vocabulary")
+            fun rows(db: androidx.sqlite.db.SupportSQLiteDatabase) = tables.associateWith { table -> db.query("SELECT * FROM $table ORDER BY id").use { c ->
+                buildList { while(c.moveToNext()) add((0 until c.columnCount).map { if(c.isNull(it)) null else c.getString(it) }) }
+            } }
+            val before = rows(sql)
+            val (name,old) = databases.remove(store)!!;old.close()
+            // Turn this owned fixture into the exact exported v3 schema/identity.
+            val schemaPath = java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile!!
+                .resolve("app/schemas/dev.notai.tracker.android.TrackerDatabase/3.json")
+            val identity = codec.parseToJsonElement(schemaPath.readText()).jsonObject.getValue("database").jsonObject.getValue("identityHash").jsonPrimitive.content
+            android.database.sqlite.SQLiteDatabase.openDatabase(context.getDatabasePath(name).path,null,0).use { legacy ->
+                legacy.execSQL("DROP INDEX index_sessions_position_id");legacy.execSQL("DROP INDEX index_segments_position_id")
+                legacy.execSQL("UPDATE room_master_table SET identity_hash=? WHERE id=42",arrayOf(identity));legacy.version = 3
+            }
+            store = open(name)
+            org.junit.Assert.assertEquals(expected,store.read())
+            org.junit.Assert.assertEquals(count,store.read().sessions.map { it.id }.toSet().size)
+            val migrated = databases.getValue(store).second.openHelper.readableDatabase
+            org.junit.Assert.assertEquals(4,migrated.version)
+            org.junit.Assert.assertEquals(before,rows(migrated))
+            for(table in listOf("sessions","segments")) migrated.query("EXPLAIN QUERY PLAN SELECT payload,position,id FROM $table ORDER BY position,id LIMIT 512").use { c ->
+                org.junit.Assert.assertTrue(c.moveToFirst());org.junit.Assert.assertTrue(c.getString(3).contains("index_${table}_position_id"))
+            }
+            store = reopen(store);org.junit.Assert.assertEquals(expected,store.read())
+            val tracker = Tracker(store,FakeClock());tracker.start(tracker.snapshot().token)
+            org.junit.Assert.assertEquals(1,tracker.data().segments.count { it.end == null })
+            org.junit.Assert.assertThrows(CoreError::class.java) { tracker.start(tracker.snapshot().token) }
+        }
+    }
     @org.junit.Test fun orphanSidecarsNeverInitialize() {
         val context = RuntimeEnvironment.getApplication()
         val suffixes = listOf("-wal","-shm","-journal")
@@ -164,7 +210,7 @@ class RoomScenariosTest: ScenarioContract() {
     }
     override fun createStore(): StateStore = open("test-${newId()}.db")
     private fun open(name: String): StateStore {
-        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3).allowMainThreadQueries().build()
+        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4).allowMainThreadQueries().build()
         return RoomStore(db).also { databases[it] = name to db }
     }
     override fun reopen(store: StateStore): StateStore {
@@ -200,7 +246,7 @@ class RoomScenariosTest: ScenarioContract() {
             db.version = 1
         }
         val store = open(name)
-        org.junit.Assert.assertEquals(3,databases.getValue(store).second.openHelper.readableDatabase.version)
+        org.junit.Assert.assertEquals(4,databases.getValue(store).second.openHelper.readableDatabase.version)
         return store.read().also { validate(it) }
     }
     override fun backupDocumentInput() {
@@ -647,6 +693,7 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertEquals(CalendarReadIssue.PROVIDER_UNAVAILABLE,missing.list(0,6000,true).issue)
     }
     override fun storageWorkload() {
+        if(System.getProperty("tracker.cold.profile") == "true") coldLoadHypotheses()
         if(System.getProperty("tracker.scale") == "true") realisticHistoryBenchmark()
         val store = createStore(); val db = databases.getValue(store).second
         val clock = FakeClock(); val tracker = Tracker(store,clock)
@@ -692,8 +739,8 @@ class RoomScenariosTest: ScenarioContract() {
         val saved = tracker.data(); val reopened = reopen(store)
         org.junit.Assert.assertEquals(saved,reopened.read())
     }
-    private fun realisticHistoryBenchmark() {
-        val clock = FakeClock();val root = java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile!!
+    private fun realisticHistoryInput(clock: FakeClock): Dataset {
+        val root = java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile!!
         val vocabulary = codec.decodeFromString<VocabularyData>(root.resolve("catalog/runtime-catalog.json").readText())
         val base = Dataset(types = vocabulary.types,axes = vocabulary.axes,metrics = vocabulary.metrics,units = vocabulary.units)
         val selected = vocabulary.types.filter { it.selectable }.take(3).map { base.classify(Classification(name = it.name,activityTypeId = it.id,
@@ -704,7 +751,55 @@ class RoomScenariosTest: ScenarioContract() {
         val segments = sessions.mapIndexed { i,s -> val start = first+(i/20)*86_400_000L+(i%20)*40*60_000L
             Segment(id = "scale-segment-$i",sessionId = s.id,start = start,end = start+30*60_000,durationMs = 30*60_000,
                 selection = s.selection) }
-        val input = base.copy(sessions = sessions,segments = segments)
+        return base.copy(sessions = sessions,segments = segments)
+    }
+    private fun coldLoadHypotheses() {
+        val clock = FakeClock();val input = realisticHistoryInput(clock)
+        var store = createStore();store.transaction { input to Unit }
+        val variant = System.getProperty("tracker.cold.variant","baseline")
+        val initialDb = databases.getValue(store).second
+        if(variant == "baseline") for(table in listOf("sessions","segments")) initialDb.openHelper.writableDatabase.execSQL("DROP INDEX index_${table}_position_id")
+        val plans = listOf("sessions","segments").associateWith { table -> initialDb.openHelper.readableDatabase.query("EXPLAIN QUERY PLAN SELECT payload FROM $table ORDER BY position").use { c -> buildList { while(c.moveToNext()) add(c.getString(3)) } } }
+        val samples = mutableListOf<JsonObject>()
+        for(iteration in 0 until 5) {
+            val (name,old) = databases.remove(store)!!;old.close()
+            if(iteration == 0) System.getProperty("tracker.android.fixture")?.let { destination ->
+                val directory = java.io.File(destination).apply { mkdirs() }
+                RuntimeEnvironment.getApplication().getDatabasePath(name).copyTo(java.io.File(directory,"history.db"),overwrite = false)
+                java.io.File(directory,"history.json").outputStream().use { StreamingBackup.write(StreamingBackup.portable(input,clock.now()),it) }
+            }
+            val phases = linkedMapOf<String,Long>()
+            val start = System.nanoTime()
+            val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name)
+                .addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4).allowMainThreadQueries().build()
+            val reopened = RoomStore(db,onLoadPhase = { key,ns -> phases[key] = (phases[key] ?: 0)+ns },loadPageSize = if(variant == "keyset-index") 512 else null)
+            databases[reopened] = name to db;store = reopened
+            val initDone = System.nanoTime()-start
+            val tracker = Tracker(store,clock)
+            org.junit.Assert.assertEquals(Mode.IDLE,tracker.snapshot().mode)
+            val ready = System.nanoTime()-start
+            println("COLD_PHASE_SAMPLE "+buildJsonObject { put("iteration",iteration);put("actionReadyNs",ready);put("phases",JsonObject(phases.mapValues { JsonPrimitive(it.value) })) })
+            org.junit.Assert.assertEquals(input,tracker.data())
+            val actionStart = System.nanoTime();tracker.start(tracker.snapshot().token);val action = System.nanoTime()-actionStart
+            clock.advance(1000);tracker.stop(tracker.snapshot().token)
+            val date = java.time.Instant.ofEpochMilli(clock.wall-86_400_000L).atZone(java.time.ZoneId.of("UTC")).toLocalDate()
+            val reportStart = System.nanoTime();val report = tracker.view().day(date);val reportNs = System.nanoTime()-reportStart
+            org.junit.Assert.assertEquals(20*30*60_000L,report.recordedMs)
+            samples += buildJsonObject {
+                put("iteration",iteration);put("storeInitializeNs",initDone);put("actionReadyNs",ready);put("historyGraphReadyNs",ready)
+                put("firstStartNs",action);put("firstDayReportNs",reportNs)
+                put("phasesNs",JsonObject(phases.mapValues { JsonPrimitive(it.value) }))
+            }
+            store.transaction { input to Unit };clock.wall = FakeClock().wall;clock.elapsed = FakeClock().elapsed
+        }
+        val directory = java.io.File(requireNotNull(System.getProperty("tracker.artifacts"))).apply { mkdirs() }
+        java.io.File(directory,"cold-load-profile.json").writeText(buildJsonObject {
+            put("schema","tracker_cold_phase_profile_v1");put("execution","Robolectric API35 JVM Room; not Android process startup; no OS page-cache eviction")
+            put("sessions",73000);put("segments",73000);put("variant",variant);put("plans",JsonObject(plans.mapValues { JsonArray(it.value.map(::JsonPrimitive)) }));put("dataIdenticalAcrossSamples",true);put("samples",JsonArray(samples));put("maxHeapBytes",Runtime.getRuntime().maxMemory())
+        }.toString())
+    }
+    private fun realisticHistoryBenchmark() {
+        val clock = FakeClock();val input = realisticHistoryInput(clock);val count = input.sessions.size
         fun time(block: ()->Unit): Long { val start = System.nanoTime();block();return System.nanoTime()-start }
         val validation = time { validate(input) };var store = createStore()
         val persisted = time { store.transaction { input to Unit } }

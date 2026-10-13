@@ -1,0 +1,260 @@
+{
+  "schema": "tracker_cold_start_sql_verification_v1",
+  "baselineCommit": "39dcdbd59ea40b61b314af2fcd9ca81fe74a7e7a",
+  "createdAtUtc": "2026-10-13T16:45:21.604929+00:00",
+  "stage": "SQL fix verified; further responsiveness and system QA in progress",
+  "roomSchema": 4,
+  "aggregate": "BUILD SUCCESSFUL in 1m 12s",
+  "checks": {
+    "core": {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "smallHistoryAndExport",
+        "backupReplacementAndFailure",
+        "timerPath"
+      ],
+      "reportSha256": "5d2a37eb121206fdf8f3e773d3ad2eb286c5eb3620ec42616a0651921c526819"
+    },
+    "room": {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "orphanSidecarsNeverInitialize",
+        "sessionCommandsIgnoreStaleSelectedCard",
+        "indexedPagingAndV3MigrationPreserveEveryRow",
+        "smallHistoryAndExport",
+        "backupReplacementAndFailure",
+        "timerPath"
+      ],
+      "reportSha256": "15ee39b89b5785bfc8388b00d909a2f22a690ce0f581fa422f49d7ddb8b83700"
+    }
+  },
+  "lint": {
+    "Warning": 34,
+    "Hint": 1
+  },
+  "buildLogSha256": "46291f2575c120d5bc5691d6c065e13043af41fa0d4cedf3443ee68da5586555",
+  "implementationFiles": [
+    {
+      "path": "app/build.gradle.kts",
+      "sha256": "b86dd885af06271a584a6e284b9b1b0bd85179b7c9884c6244bec4e99313abb9"
+    },
+    {
+      "path": "app/schemas/dev.notai.tracker.android.TrackerDatabase/1.json",
+      "sha256": "d2ce971d7d97e594862fc9370eeb1c01c8f0e343f52038325af26655cf18b1fb"
+    },
+    {
+      "path": "app/schemas/dev.notai.tracker.android.TrackerDatabase/2.json",
+      "sha256": "f8b482f96bc97821ac08d49682b58d496a1b889a6b5aa7813def76b6d364415b"
+    },
+    {
+      "path": "app/schemas/dev.notai.tracker.android.TrackerDatabase/3.json",
+      "sha256": "aacce33a2aa0f5877979100afef2eb0157541312dbd1d35d7d49adf10d3051bf"
+    },
+    {
+      "path": "app/schemas/dev.notai.tracker.android.TrackerDatabase/4.json",
+      "sha256": "227eaa27771307f19d36534fa30aa8f86f5250bbe569334abe963df221125702"
+    },
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "sha256": "cc90b356f155ac3f663dff8e42e50170923a7e7fcefc241774dde8d3c7efa8b2"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/AndroidRuntime.kt",
+      "sha256": "a7b568553b9d3ea275fdd2dff328db37d9b0b8941327f0562a5b0e7de7a06fab"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/BackupDocuments.kt",
+      "sha256": "b901af0305ffd6b366091c7086bca774e5f0ad2286ad132e183465803819a7c1"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/DatabaseRecovery.kt",
+      "sha256": "196d7056f492e2b9e299fa7778a79606ce9f070982d811cb93e6567240d59110"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/EntryInputs.kt",
+      "sha256": "e9cf05dbe12f2f4894f610dde4cd5bef6bf3e8ed39fb80fc01df1e2f6f316c9b"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/FloatingTimerService.kt",
+      "sha256": "0037d620b53f3de84bc558babde8ddedb7119138afcf365e91eb52c1aa5b110d"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/FocusDueSignals.kt",
+      "sha256": "41c4bf89597b702d858f3536bb085d73cfca82f0de37707051e6f031792fcc6f"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/FocusSignals.kt",
+      "sha256": "4357815d58316930edf6016bd1f51901faf4fc05b2ae438177324a89710d5bca"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/MainActivity.kt",
+      "sha256": "dcf757a7f98970e9ccc7850f0b916e3caf677f130c862fc3c54f881ebed352f2"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/PrivateFiles.kt",
+      "sha256": "b10688a92adec0018c0b5c1ee789d3f33325e243941a4306d6bc8cebdc637c6c"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/StartupTrace.kt",
+      "sha256": "dd83cc28c721a3ce323f22c1439b0436d1766951d3c10a0804b5d272bcd9a104"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/TimerSurfaces.kt",
+      "sha256": "7d59a1acf36527c09c25921dbde4b39c1c197651e5af24004a8cd1305bd83b17"
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/TrackerDatabase.kt",
+      "sha256": "3e2b314cc526d83a33e16ccc0b262c84e724130ffa415ac1e5b9625ef37df9b5"
+    },
+    {
+      "path": "app/src/main/res/layout/timer_widget.xml",
+      "sha256": "26fe15c1f6900e153e2ea2fb49150ffa377af2bb3667dbcee91776e953495ec2"
+    },
+    {
+      "path": "app/src/main/res/values/ids.xml",
+      "sha256": "773a1a3bff330b5279d7579034b9d3fc532ed094b94f33667ae1af573ab74731"
+    },
+    {
+      "path": "app/src/main/res/values/strings.xml",
+      "sha256": "928989d0f30ddd30135c53fbb355f5248224d94202ad3eb7100d6684f1725668"
+    },
+    {
+      "path": "app/src/main/res/xml/data_extraction_rules.xml",
+      "sha256": "a0d81ccff94f23b8dfb475cbf11e99f16e1fea062d64c7d0a4537b117ef1d259"
+    },
+    {
+      "path": "app/src/main/res/xml/shortcuts.xml",
+      "sha256": "2172f4b79a77dfac4b197e9bfd04038fb8a0a4f08cd01e57c175c6e6e04b0c0b"
+    },
+    {
+      "path": "app/src/main/res/xml/timer_widget_info.xml",
+      "sha256": "9ac1dd397eddcf354723d5eb3fed745b9f151ba945a229e935f6e5860ec48c5e"
+    },
+    {
+      "path": "app/src/test/kotlin/dev/notai/tracker/android/RoomScenariosTest.kt",
+      "sha256": "c5008dcf4ac92d85a8a012b938a0951b8d383d2d196291a6d12277982ab6c42c"
+    },
+    {
+      "path": "core/build.gradle.kts",
+      "sha256": "ccfde10a2668653c9501f30e7d418daa123e79a2d6a7ca2e3379ab7defe847e9"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Backup.kt",
+      "sha256": "9f6d9f3bd36c77f9e6eb8713d3ee5cc0f38ca9df4f20b423d8344adf7c98429d"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/CheckedState.kt",
+      "sha256": "87cec59d36dab0dcac7d8a16a0ed4073372724cc5b74564532ff4ba6f72144e8"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Choices.kt",
+      "sha256": "654036e62475aad1af92e3e795280223eb0ccccaa047a3472ddd0682f47ad837"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Focus.kt",
+      "sha256": "d8750580267731fa6ecbf371857b7be8ca8000ddae68bb865f85eea735f7906e"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Goals.kt",
+      "sha256": "042ab78a6ee394b9380e2de0f40877b42e98256266dcc57cc4e9ca35e926d8d4"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/HistoryTransfer.kt",
+      "sha256": "dfbfddf5d8852f62576997940764d30db91b59f610cdfc35e8dbc00c746bc7bd"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ImmutableData.kt",
+      "sha256": "42c68ffe9dcaa98c4652c5ffa69e1768011135ba67d1c3fabc8e20158ef97980"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ImportInspection.kt",
+      "sha256": "bd76397d33b532a7d87b3715c918bd4df45dd298c10a584822ad6c9e9f468e38"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/LocalEntries.kt",
+      "sha256": "7e7cb8888c3287b17daa450e280422d88e409cfa29b691740c60dd71842675ab"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Migration.kt",
+      "sha256": "41082c3229d0c2f43015914162b9af4579646f9ffefe09919b81d4008abdb6e7"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Model.kt",
+      "sha256": "5bbe0722ab3f6b780f17ebb0b76ec5301a94ea67e2faa699974b8b14423f413e"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ReadyCatalog.kt",
+      "sha256": "f5a88bb9fbaa111e855126b524b62c4a7a8923226c4661e9fa3f017489db2442"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Reports.kt",
+      "sha256": "b2ff9a2b509ce215d0a872f04f970e2d7c08a4d8a5dc965131e33c91c4e92408"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/StreamingBackup.kt",
+      "sha256": "eeab6837f2e69837bf87d6dc0ce32aed62a07be46695f86c6c585b12957c9e02"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Tracker.kt",
+      "sha256": "1f013c0a8a1d1e5abc16d0d331f9f6e1366082b50ace5cf5a517d84ca8a05406"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/TrackerView.kt",
+      "sha256": "015673b6d781e8d0e4421997b672ab8f6583a07de0323b01f3efdd450bb6fb63"
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Vocabulary.kt",
+      "sha256": "c59eefef94876b9d2765ba156e708e3d8b9d26e342e81cba594eaa031d1f1fc5"
+    },
+    {
+      "path": "core/src/main/resources/catalog-bootstrap.json",
+      "sha256": "16a9ad1415182a7c392285d117e1ad5b98d1bfcadb1086def4cf832bb823923b"
+    },
+    {
+      "path": "core/src/test/kotlin/dev/notai/tracker/CoreScenariosTest.kt",
+      "sha256": "8704e5952ec1e33973be46cf666f5048703efa0b21e0151fdc86419f0ce2b9b2"
+    },
+    {
+      "path": "core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt",
+      "sha256": "f889245e3f3f948f6f4421401ec47232c590a5aa899c8b33c901325cf4096c2e"
+    },
+    {
+      "path": "core/src/testFixtures/resources/previous-runtime-catalog.json.gz",
+      "sha256": "d8212d4a404117bd3427890bff08bd1ca4b7bc8eff2f2b0006b1e4925fa635c5"
+    }
+  ],
+  "apk": {
+    "bytes": 3285710,
+    "sha256": "75b69d24dba18d2930260a48e012716f9d94aa7ea7a3184da562d5acba08ccbc"
+  },
+  "android": {
+    "abi": "x86_64",
+    "api": 35,
+    "image": "AOSP default API35 revision2",
+    "emulator": "37.2.12 build16428233",
+    "kvm": "KVM v12 usable, acceleration enabled",
+    "graphics": "swangle software GLES, Vulkan disabled",
+    "ramMiB": 2048,
+    "cores": 2,
+    "display": "480x854 density240",
+    "perVariant": {
+      "coldProcessSamples": 5,
+      "warmProcessNewActivitySamples": 5
+    },
+    "processStart": "Process.getStartElapsedRealtime",
+    "actionReady": "First snapshot assigned after complete graph validation and current-day report; real command handlers installed",
+    "historyReady": "Full validated Room graph, before runtime publication",
+    "limits": [
+      "Software graphics and emulator ART/JIT/KVM overhead; no physical-device claim",
+      "No OS page-cache eviction; no discarded warmups",
+      "Warm process-start metric is process age, use activity-create delta",
+      "Single host, sequential variant runs; thermal/JIT/order effects not fully controlled"
+    ]
+  }
+}

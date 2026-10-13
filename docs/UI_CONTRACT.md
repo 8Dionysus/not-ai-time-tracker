@@ -1,6 +1,6 @@
 # Контракт интеграции интерфейса
 
-Действующий контракт для Android-оболочки 0.9.1 и Kotlin-ядра. Room schema 3; JSON export 7 и read 1–7. Предыдущие схемы относятся к [истории реализации](history/ACCEPTANCE_GAPS_through_v15.md), а не к текущим инструкциям.
+Действующий контракт для Android-оболочки 0.9.1 и Kotlin-ядра. Room schema 4; JSON export 7 и read 1–7. Предыдущие схемы относятся к [истории реализации](history/ACCEPTANCE_GAPS_through_v15.md), а не к текущим инструкциям.
 
 ## Runtime, чтение и команды
 

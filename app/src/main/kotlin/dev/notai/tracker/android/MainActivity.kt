@@ -39,8 +39,10 @@ class MainActivity: Activity() {
     private val formFiles by lazy { FormFiles(applicationContext) }
     private var pendingSelectedText: String? = null
     private var inputDraft: EntryDraft? = null
+    private var tracedReady = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        StartupTrace.mark(this,"activity-create")
         shortcutPending = TimerSurfaces.restoredShortcut(savedInstanceState,intent)
         body = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(24,48,24,24) }
         setContentView(ScrollView(this).apply { addView(body) })
@@ -443,8 +445,19 @@ class MainActivity: Activity() {
                 }
                 while(isActive) {
                     val s = revision.snapshot(); shown = s
+                    if(!tracedReady) {
+                        tracedReady = true
+                        StartupTrace.mark(this@MainActivity,"action-ready")
+                        body.viewTreeObserver.addOnPreDrawListener(object: android.view.ViewTreeObserver.OnPreDrawListener {
+                            override fun onPreDraw(): Boolean {
+                                body.viewTreeObserver.removeOnPreDrawListener(this)
+                                StartupTrace.mark(this@MainActivity,"action-first-frame")
+                                return true
+                            }
+                        })
+                    }
                     val focusText = s.focus?.let { "${it.safeLabel}: ${it.remainingMs} ms\n" }.orEmpty()
-                    status.text = "Техническая оболочка · Room 3\n${s.safeLabel}\n${s.trustedDurationMs} ms · ревизия ${s.token.revision}\n$focusText${s.session?.selection ?: ""}\n$reportText"
+                    status.text = "Техническая оболочка · Room 4\n${s.safeLabel}\n${s.trustedDurationMs} ms · ревизия ${s.token.revision}\n$focusText${s.session?.selection ?: ""}\n$reportText"
                     runtime.focusDueSignals.consume(s.focus) { focus ->
                         if(revision.data.settings.surfaces.focusSignal && FocusSignals.allowed(this@MainActivity)) FocusSignals.deliver(this@MainActivity,focus)
                         else AlertDialog.Builder(this@MainActivity).setTitle("Focus").setMessage(focus.safeLabel)

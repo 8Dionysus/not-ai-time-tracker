@@ -184,7 +184,7 @@ private fun BottomBar(tab: Tab, onSelect: (Tab) -> Unit, live: Boolean) {
     val c = NotAi.colors
     Column(Modifier.fillMaxWidth().background(c.paper)) {
         Hairline()
-        Row(Modifier.fillMaxWidth().height(64.dp).navigationBarsPadding()) {
+        Row(Modifier.fillMaxWidth().navigationBarsPadding().height(64.dp)) {
             Tab.entries.forEach { t ->
                 val on = t == tab
                 val icon: ImageVector = when (t) { Tab.TIMER -> Icon.TabTimer; Tab.OVERVIEW -> Icon.TabOverview; Tab.DATA -> Icon.TabData }

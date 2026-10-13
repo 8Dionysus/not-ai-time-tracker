@@ -58,7 +58,7 @@ fun SheetHeader(title: String, onClose: () -> Unit, back: (() -> Unit)? = null) 
 @Composable
 fun SearchField(value: String, onChange: (String) -> Unit, placeholder: String, modifier: Modifier = Modifier) {
     val c = NotAi.colors
-    Row(modifier.fillMaxWidth().height(48.dp).clip(RoundedCornerShape(14.dp)).background(c.sunk).padding(horizontal = 14.dp),
+    Row(modifier.fillMaxWidth().heightIn(min = 48.dp).clip(RoundedCornerShape(14.dp)).background(c.sunk).padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         M3Icon(Icon.Search, null, Modifier.size(18.dp), tint = c.ink2)
         Box(Modifier.weight(1f)) {

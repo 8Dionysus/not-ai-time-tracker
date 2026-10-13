@@ -11,6 +11,14 @@ import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performClick
@@ -221,6 +229,20 @@ class UiScreensTest {
         compose.mainClock.autoAdvance = true
         waitText("Время пойдёт сразу.")
         assertTrue(seed.tracker.data().focus == null)
+    }
+
+    @Test fun largeFontSearchPlaceholderFitsItsContainer() {
+        compose.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density,1.5f)) {
+                NotAiTheme(ThemeChoice.LIGHT,reducedMotion = true) {
+                    SearchField("",{},"Найти или создать занятие",Modifier.width(320.dp).testTag("qa-search"))
+                }
+            }
+        }
+        compose.waitForIdle()
+        val container = compose.onNodeWithTag("qa-search").fetchSemanticsNode().boundsInRoot
+        val text = compose.onNodeWithText("Найти или создать занятие").fetchSemanticsNode().boundsInRoot
+        assertTrue("two-line placeholder fits vertically",text.top >= container.top && text.bottom <= container.bottom)
     }
 
     @Test fun crossMidnightSegmentHasDistinctKeysForEachCalendarDay() {

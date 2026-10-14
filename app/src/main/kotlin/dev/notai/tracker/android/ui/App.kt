@@ -34,11 +34,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
+import kotlinx.coroutines.launch
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.notai.tracker.Classification
 import dev.notai.tracker.Mode
 
-enum class Tab(val title: String) { TIMER("Таймер"), OVERVIEW("Обзор"), DATA("Данные") }
+enum class Tab(val title: String) { TIMER("Таймер"), OVERVIEW("Обзор"), SETTINGS("Настройки") }
 
 private sealed interface Sheet {
     data class Picker(val mode: PickMode, val boundary: Long? = null) : Sheet
@@ -106,6 +107,7 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     val home by vm.home.collectAsStateWithLifecycle()
     val view by vm.view.collectAsStateWithLifecycle()
     val draft by vm.draft.collectAsStateWithLifecycle()
+    val surfacePicker by vm.surfacePicker.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     val dark = c.isDark
     if (snapshot != null) SideEffect(onActionReady)
@@ -119,6 +121,16 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     }
     LaunchedEffect(draft) { if (draft != null) { tab = Tab.TIMER; sheet = Sheet.Picker(PickMode.START) } }
 
+    var confirmDelete by remember { mutableStateOf<DeleteRequest.Confirm?>(null) }
+    val requestDelete: suspend (EntryUi) -> Boolean = { e ->
+        when (val r = vm.requestDelete(e.sessionId)) {
+            DeleteRequest.Applied -> true
+            DeleteRequest.Failed -> false
+            is DeleteRequest.Confirm -> { confirmDelete = r; false }
+        }
+    }
+    val scope = rememberCoroutineScope()
+
     val actions = remember(vm,dark) {
         TimerActions(
             pick = { mode -> sheet = Sheet.Picker(mode) },
@@ -127,6 +139,7 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
             earlier = { sheet = Sheet.Earlier },
             resolve = { sheet = Sheet.Resolve },
             toggleTheme = { vm.setTheme(if (dark) ThemeChoice.LIGHT else ThemeChoice.DARK) },
+            delete = requestDelete,
         )
     }
 
@@ -136,7 +149,7 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
                 when (t) {
                     Tab.TIMER -> TimerScreen(snapshot, home, vm, actions, dark)
                     Tab.OVERVIEW -> OverviewScreen(vm, view)
-                    Tab.DATA -> DataScreen(vm, view, theme, openTechnical)
+                    Tab.SETTINGS -> SettingsScreen(vm, view, theme, openTechnical)
                 }
             }
             SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter).padding(12.dp)) { data ->
@@ -161,7 +174,8 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
                 onDismiss = { sheet = null })
         }
         // The form stays open underneath; the picker hands its choice back to it.
-        is Sheet.Edit -> EntrySheet(vm, zone, s.day, s.entry, onDismiss = { sheet = null }) { callback -> formPicker = callback }
+        is Sheet.Edit -> EntrySheet(vm, zone, s.day, s.entry, onDismiss = { sheet = null }, onPickActivity = { callback -> formPicker = callback },
+            onDelete = { e -> scope.launch { if (requestDelete(e) || confirmDelete != null) sheet = null } })
         Sheet.Earlier -> {
             val seg = snapshot?.active
             if (seg != null) EarlierSheet(zone, seg.start, remember { vm.now() }, onNext = { at -> sheet = Sheet.Picker(PickMode.EARLIER, at) }, onDismiss = { sheet = null })
@@ -173,6 +187,22 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
             else LaunchedEffect(Unit) { sheet = null }
         }
         null -> Unit
+    }
+    // Opened from the notification ("Все занятия") or a saved stopped record: the same quick choices, applied by route.
+    surfacePicker?.let { state ->
+        val d = view?.data
+        if (d != null) QuickPickSheet(state, d, onChoose = { vm.chooseSurface(it) }, onDismiss = vm::cancelSurfacePicker, onAll = {
+            val switch = state.route.application == dev.notai.tracker.ChoiceApplication.SWITCH
+            vm.cancelSurfacePicker(); tab = Tab.TIMER; sheet = Sheet.Picker(if (switch) PickMode.SWITCH else PickMode.START)
+        })
+    }
+    confirmDelete?.let { r ->
+        val parts = buildList {
+            if (r.segments > 1) add(Format.plural(r.segments, "отрезок", "отрезка", "отрезков") + " между паузами")
+            if (r.measurements > 0) add(Format.plural(r.measurements, "измерение", "измерения", "измерений"))
+        }.joinToString(" и ")
+        ConfirmDialog("Удалить запись целиком?", "${r.range}: вместе с записью удалятся $parts. Сразу после удаления можно отменить.",
+            "Удалить", onConfirm = { vm.applyDeleteSession(r.preview); confirmDelete = null }, onDismiss = { confirmDelete = null }, destructive = true)
     }
     formPicker?.let { back ->
         PickerSheet(vm, PickMode.MANUAL, false, null, null, null, onDismiss = { formPicker = null }, onReturn = { sel, label -> back(sel, label) })
@@ -187,7 +217,7 @@ private fun BottomBar(tab: Tab, onSelect: (Tab) -> Unit, live: Boolean) {
         Row(Modifier.fillMaxWidth().navigationBarsPadding().height(64.dp)) {
             Tab.entries.forEach { t ->
                 val on = t == tab
-                val icon: ImageVector = when (t) { Tab.TIMER -> Icon.TabTimer; Tab.OVERVIEW -> Icon.TabOverview; Tab.DATA -> Icon.TabData }
+                val icon: ImageVector = when (t) { Tab.TIMER -> Icon.TabTimer; Tab.OVERVIEW -> Icon.TabOverview; Tab.SETTINGS -> Icon.TabSettings }
                 Column(Modifier.weight(1f).fillMaxHeight().semantics { selected = on }.pressable({ onSelect(t) }, role = Role.Tab, label = t.title),
                     horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     Box(contentAlignment = Alignment.Center) {
@@ -199,6 +229,30 @@ private fun BottomBar(tab: Tab, onSelect: (Tab) -> Unit, live: Boolean) {
                         fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal), color = if (on) c.ink else c.ink2)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun QuickPickSheet(state: dev.notai.tracker.android.SurfacePickerState, d: dev.notai.tracker.Dataset,
+                           onChoose: (dev.notai.tracker.ChoiceReference) -> Unit, onDismiss: () -> Unit, onAll: () -> Unit) {
+    val c = NotAi.colors
+    val assignment = state.assignment != null
+    val switch = state.route.application == dev.notai.tracker.ChoiceApplication.SWITCH
+    NotAiSheet(onDismiss, fullHeight = false) {
+        SheetHeader(when { assignment -> "Чем ты был занят?"; switch -> "Переключиться на"; else -> "Начать сразу" }, onDismiss)
+        Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(when { assignment -> "Время уже сохранено, осталось выбрать занятие."; switch -> "Текущая запись закончится сейчас, новая начнётся с этой минуты."
+                else -> "Избранное и частые занятия за 30 дней." }, style = NotAi.type.bodySmall, color = c.ink2, modifier = Modifier.padding(bottom = 6.dp))
+            state.choices.filter { it.entry.canStart && !d.label(it.entry.selection).unclassified }.forEach { q ->
+                val l = d.label(q.entry.selection)
+                ListRow(if (q.entry.kind == dev.notai.tracker.ChoiceKind.FAVORITE) q.entry.title else l.title,
+                    detail = if (q.entry.kind == dev.notai.tracker.ChoiceKind.FAVORITE) null else l.detail, onClick = { onChoose(q.reference) },
+                    leading = { ActivityGlyph(l) })
+            }
+            if (state.choices.isEmpty()) Text("Частых занятий пока нет.", style = NotAi.type.body, color = c.ink2)
+            if (!assignment) PillButton("Все занятия", onAll, Modifier.fillMaxWidth().padding(top = 8.dp), ButtonKind.TONAL, height = 48.dp)
+            else PillButton("Оставить без занятия", onDismiss, Modifier.fillMaxWidth().padding(top = 8.dp), ButtonKind.TONAL, height = 48.dp)
         }
     }
 }

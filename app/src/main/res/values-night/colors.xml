@@ -1,7 +1,16 @@
 <resources>
     <color name="paper">#11161E</color>
     <color name="widget_surface">#1D2531</color>
-    <color name="widget_tonal">#232C38</color>
+    <color name="widget_tonal">#2A3442</color>
     <color name="widget_ink">#ECEAE4</color>
+    <color name="widget_ink2">#A3ABB7</color>
     <color name="widget_on_ink">#11161E</color>
+    <color name="widget_amber">#FFB23C</color>
+    <color name="widget_amber_ink">#FFC266</color>
+    <color name="area_0">#35A078</color>
+    <color name="area_1">#3D8FD1</color>
+    <color name="area_2">#DE6A45</color>
+    <color name="area_3">#9C70DA</color>
+    <color name="area_4">#A88B2C</color>
+    <color name="area_5">#DA5F92</color>
 </resources>

@@ -22,6 +22,14 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.longClick
+import androidx.compose.ui.test.swipeLeft
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.test.core.app.ApplicationProvider
 import dev.notai.tracker.*
 import dev.notai.tracker.android.FocusDueSignals
@@ -166,11 +174,42 @@ class UiScreensTest {
             val first = views.first()
             val base = Bitmap.createBitmap(first.width, first.height, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(base)
-            views.forEach { v ->
-                canvas.save(); canvas.translate(0f, (first.height - v.height).toFloat()); v.draw(canvas); canvas.restore()
-            }
-            val dir = File(System.getProperty("tracker.screenshotDir")!!).apply { mkdirs() }
-            FileOutputStream(File(dir, "$name-${theme.name.lowercase()}.png")).use { base.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            views.forEach { v -> drawWindow(canvas, first, v) }
+            save(base, "$name-${theme.name.lowercase()}")
+        }
+    }
+
+    /** Popups (menus) at their own window position; sheets and dialogs bottom-aligned as the system places them. */
+    private fun drawWindow(canvas: Canvas, first: android.view.View, v: android.view.View) {
+        val lp = v.layoutParams as? android.view.WindowManager.LayoutParams
+        val positioned = lp != null && v !== first && (lp.gravity and android.view.Gravity.VERTICAL_GRAVITY_MASK) == android.view.Gravity.TOP && (lp.x != 0 || lp.y != 0)
+        val centred = lp != null && v !== first && (lp.gravity and android.view.Gravity.VERTICAL_GRAVITY_MASK) == android.view.Gravity.CENTER_VERTICAL
+        canvas.save()
+        when {
+            positioned -> canvas.translate(lp!!.x.toFloat(), lp.y.toFloat())
+            centred -> canvas.translate((first.width - v.width) / 2f, (first.height - v.height) / 2f)
+            else -> canvas.translate(0f, (first.height - v.height).toFloat())
+        }
+        v.draw(canvas); canvas.restore()
+    }
+
+    private fun save(bitmap: Bitmap, file: String) {
+        if (System.getProperty("tracker.screenshots") != "true") return
+        val dir = File(System.getProperty("tracker.screenshotDir")!!).apply { mkdirs() }
+        FileOutputStream(File(dir, "$file.png")).use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    }
+
+    /** Composables outside the app shell (floating button), drawn in both themes. */
+    private fun shotContent(name: String, content: @androidx.compose.runtime.Composable (ThemeChoice) -> Unit) {
+        val theme = androidx.compose.runtime.mutableStateOf(ThemeChoice.LIGHT)
+        compose.setContent { content(theme.value) }
+        for (t in listOf(ThemeChoice.LIGHT, ThemeChoice.DARK)) {
+            theme.value = t
+            repeat(3) { compose.waitForIdle(); org.robolectric.shadows.ShadowLooper.idleMainLooper(); Thread.sleep(120) }
+            val views = windows(); val first = views.first()
+            val base = Bitmap.createBitmap(first.width, first.height, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(base); views.forEach { v -> drawWindow(canvas, first, v) }
+            save(base, "$name-${t.name.lowercase()}")
         }
     }
 
@@ -273,11 +312,196 @@ class UiScreensTest {
         shot("05-overview", vm)
     }
 
-    @Test fun data() {
+    @Test fun settings() {
         val vm = render(seed())
-        compose.onNodeWithText("Данные").performClick()
+        compose.onNodeWithText("Настройки").performClick()
+        waitText("Таймер вне приложения")
         waitText("Резервная копия")
-        shot("06-data", vm)
+        shot("06-settings", vm)
+    }
+
+    /** The whole settings page at once (tall window) for review. */
+    @Config(qualifiers = "w400dp-h1960dp-xhdpi")
+    @Test fun settingsFullPage() {
+        val vm = render(seed())
+        compose.onNodeWithText("Настройки").performClick()
+        waitText("Техническая оболочка")
+        shot("06b-settings-full", vm)
+    }
+
+    /** A new install: no history, no favourites. The first screen a person sees. */
+    @Test fun firstLaunch() {
+        val app = ApplicationProvider.getApplicationContext<android.app.Application>()
+        val catalog = ReadyCatalog.read { app.assets.open("catalog/$it") }
+        val clock = MutableClock(at(today, 9, 41), 1_000_000L)
+        val tracker = Tracker(MemoryStore(newInstallData(catalog, zone.id)), clock)
+        val vm = render(Seed(tracker, clock, catalog))
+        waitText("Чем ты занимаешься чаще всего?")
+        shot("13-first-launch", vm)
+        assertTrue("nothing older to show on a new install", compose.onAllNodesWithText("Показать раньше").fetchSemanticsNodes().isEmpty())
+        listOf("Работа", "Язык", "Чтение").forEach { compose.onNodeWithText(it).performClick() }
+        compose.onNodeWithText("Готово · 3").performClick()
+        compose.waitUntil(5_000) { tracker.data().favorites.size == 3 }
+        waitText("Начать сразу")
+        assertTrue("the card gives way to the quick-start chips", compose.onAllNodesWithText("Чем ты занимаешься чаще всего?").fetchSemanticsNodes().isEmpty())
+        shot("15-first-picked", vm)
+        compose.onNodeWithText("Обзор").performClick()
+        waitText("Обзор соберётся сам")
+        shot("14-first-overview", vm)
+    }
+
+    /** Long press opens the menu; delete goes straight through with Undo for a one-segment record. Swipe does the same. */
+    @Test fun deleteFromMenuAndSwipe() {
+        val seed = seed()
+        val vm = render(seed)
+        waitText("8:30–8:55")
+        val before = seed.tracker.data().sessions.size
+        compose.onAllNodesWithText("9:10–11:02", substring = true).onFirst().performTouchInput { longClick() }
+        waitText("Удалить")
+        shot("08-entry-menu", vm)
+        compose.onNodeWithText("Удалить").performClick()
+        compose.waitUntil(5_000) { seed.tracker.data().sessions.size == before - 1 }
+        waitText("Запись удалена")
+        compose.onAllNodesWithText("8:30–8:55", substring = true).onFirst().performTouchInput { swipeLeft() }
+        compose.waitUntil(5_000) { seed.tracker.data().sessions.size == before - 2 }
+        compose.waitUntil(5_000) { compose.onAllNodesWithText("8:30–8:55", substring = true).fetchSemanticsNodes().isEmpty() }
+    }
+
+    /** A record split by a pause takes all its segments with it: one explicit confirmation first. */
+    @Test fun deleteMultiSegmentAsksFirstAndSheetIcon() {
+        val seed = seed(running = false)
+        val t = seed.tracker
+        t.start(t.snapshot().token); seed.clock.advance(10 * 60_000L)
+        t.pause(t.snapshot().token); seed.clock.advance(5 * 60_000L)
+        t.resume(t.snapshot().token); seed.clock.advance(10 * 60_000L)
+        t.stop(t.snapshot().token)
+        val vm = render(seed)
+        waitText("15:29–15:39")
+        val before = t.data().sessions.size
+        compose.onAllNodesWithText("15:29–15:39", substring = true).onFirst().performClick()
+        waitText("Исправить запись")
+        compose.onNodeWithContentDescription("Удалить запись").performClick()
+        waitText("Удалить запись целиком?")
+        shot("09-delete-confirm", vm)
+        compose.onNodeWithText("Удалить").performClick()
+        compose.waitUntil(5_000) { t.data().sessions.size == before - 1 }
+    }
+
+    /** "Все занятия" in the notification opens the app with the route's quick choices. */
+    @Test fun notificationQuickPick() {
+        val seed = seed()
+        val vm = render(seed)
+        vm.receiveSurfacePicker(dev.notai.tracker.android.SurfaceChoices.route(dev.notai.tracker.android.Surface.NOTIFICATION, seed.tracker.snapshot()))
+        waitText("Переключиться на")
+        waitText("Утренний английский")
+        assertTrue("unlabelled records are not quick choices", compose.onAllNodesWithText("Без занятия").fetchSemanticsNodes().isEmpty())
+        shot("10-quick-pick", vm)
+    }
+
+    /** Notification (collapsed, expanded, idle) and widget as RemoteViews inflated from the real resources. */
+    @Test fun surfacesOutsideTheApp() {
+        val running = seed()
+        val idle = seed(running = false)
+        for (night in listOf(false, true)) {
+            org.robolectric.RuntimeEnvironment.setQualifiers(if (night) "+night" else "+notnight")
+            val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+            val density = context.resources.displayMetrics.density
+            fun dp(v: Int) = (v * density).toInt()
+            val backdrop = android.widget.LinearLayout(context).apply {
+                orientation = android.widget.LinearLayout.VERTICAL; setPadding(dp(12), dp(16), dp(12), dp(16))
+                setBackgroundColor(if (night) 0xFF0B0F15.toInt() else 0xFFE4E7E1.toInt())
+            }
+            fun caption(text: String) = backdrop.addView(android.widget.TextView(context).apply {
+                this.text = text; textSize = 12f; setTextColor(if (night) 0xFFA3ABB7.toInt() else 0xFF5E646E.toInt()); setPadding(dp(6), dp(10), 0, dp(6))
+            })
+            fun card(views: android.widget.RemoteViews, widget: Boolean = false) {
+                val frame = android.widget.FrameLayout(context).apply {
+                    if (!widget) {
+                        background = android.graphics.drawable.GradientDrawable().apply { cornerRadius = dp(24).toFloat(); setColor(if (night) 0xFF1E242C.toInt() else 0xFFFFFFFF.toInt()) }
+                        setPadding(dp(16), dp(12), dp(16), dp(12))
+                    }
+                    addView(views.apply(context, this))
+                }
+                backdrop.addView(frame, android.widget.LinearLayout.LayoutParams(-1, if (widget) dp(76) else -2).apply { bottomMargin = dp(4) })
+            }
+            val (small, big) = dev.notai.tracker.android.SurfaceViews.notificationViews(context, running.tracker.view())
+            val (_, idleBig) = dev.notai.tracker.android.SurfaceViews.notificationViews(context, idle.tracker.view())
+            caption("Шторка, свёрнуто"); card(small)
+            caption("Шторка, развёрнуто"); card(requireNotNull(big))
+            caption("Шторка, учёт не идёт"); card(requireNotNull(idleBig))
+            caption("Виджет 4×1"); card(dev.notai.tracker.android.SurfaceViews.widget(context, running.tracker.view(), true), widget = true)
+            backdrop.measure(android.view.View.MeasureSpec.makeMeasureSpec(dp(400), android.view.View.MeasureSpec.EXACTLY),
+                android.view.View.MeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.UNSPECIFIED))
+            backdrop.layout(0, 0, backdrop.measuredWidth, backdrop.measuredHeight)
+            val bitmap = Bitmap.createBitmap(backdrop.measuredWidth, backdrop.measuredHeight, Bitmap.Config.ARGB_8888)
+            backdrop.draw(Canvas(bitmap))
+            save(bitmap, "11-surfaces-${if (night) "dark" else "light"}")
+        }
+        org.robolectric.RuntimeEnvironment.setQualifiers("+notnight")
+    }
+
+    /** The floating button over another app, idle and running, and the short card after STOP. */
+    @Test fun floatingButtonAndAssignmentCard() {
+        val seed = seed(running = false)
+        val view = seed.tracker.view()
+        val d = view.data
+        val end = seed.clock.now().wall + 1
+        val choices = view.choices().quick(HistoryWindow(end - 30L * 24 * 60 * 60 * 1000, end), 6).map { q ->
+            val l = d.label(q.entry.selection)
+            dev.notai.tracker.android.OverlayChoice(q, if (q.entry.kind == ChoiceKind.FAVORITE) q.entry.title else l.title, l.glyph, l.slot)
+        }
+        val idle = seed.tracker.snapshot()
+        seed.tracker.start(idle.token); seed.clock.advance(12 * 60_000L)
+        val running = seed.tracker.snapshot()
+        val route = dev.notai.tracker.android.SurfacePickerRoute("preview", "OVERLAY", requireNotNull(running.timerTarget), "receipt")
+        val card = dev.notai.tracker.android.OverlayAssignment(route, "14:05–15:29", choices)
+        shotContent("12-floating") { theme ->
+            NotAiTheme(theme, reducedMotion = true) {
+                val c = NotAi.colors
+                androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().background(c.paper)) {
+                    androidx.compose.foundation.layout.Column(Modifier.padding(20.dp).padding(top = 40.dp), verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(14.dp)) {
+                        repeat(9) { i -> androidx.compose.foundation.layout.Box(Modifier.fillMaxWidth(if (i % 3 == 2) 0.6f else 1f).height(14.dp).background(c.sunk)) }
+                    }
+                    androidx.compose.foundation.layout.Column(Modifier.align(androidx.compose.ui.Alignment.TopEnd).padding(top = 140.dp, end = 8.dp),
+                        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(24.dp)) {
+                        dev.notai.tracker.android.Puck(idle, false, {}, { _, _ -> }, {})
+                        dev.notai.tracker.android.Puck(running, false, {}, { _, _ -> }, {})
+                    }
+                    androidx.compose.foundation.layout.Box(Modifier.align(androidx.compose.ui.Alignment.BottomCenter).padding(bottom = 56.dp)) {
+                        dev.notai.tracker.android.AssignmentCard(card, {}, {})
+                    }
+                }
+            }
+        }
+        waitText("Чем ты был занят?")
+    }
+
+    /** 150 % font on a narrow screen: the time and button labels shrink or wrap, never lose characters. */
+    @Test fun largeFontTimeAndButtonsKeepTheirText() {
+        compose.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 1.5f)) {
+                NotAiTheme(ThemeChoice.LIGHT, reducedMotion = true) {
+                    // 320 dp screen minus the 20 dp gutters.
+                    androidx.compose.foundation.layout.Column(Modifier.width(280.dp)) {
+                        TimeField("Начало", at(today, 11, 2), zone, {}, Modifier.fillMaxWidth())
+                        PillButton("Указать, когда закончил", {}, Modifier.fillMaxWidth())
+                        ButtonPair { m -> PillButton("Сохранить", {}, m); PillButton("Восстановить", {}, m) }
+                    }
+                }
+            }
+        }
+        compose.waitForIdle()
+        fun overflow(text: String): Boolean {
+            val results = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+            compose.onNodeWithText(text).fetchSemanticsNode().config[androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult].action!!.invoke(results)
+            // Centred single lines report a wider paragraph than their box; what matters is ellipsis or lost height.
+            val r = results.first()
+            return r.didOverflowHeight || (0 until r.lineCount).any { r.isLineEllipsized(it) }
+        }
+        org.junit.Assert.assertFalse("time keeps its digits", overflow("11:02"))
+        org.junit.Assert.assertTrue("time field keeps its own height", compose.onNodeWithText("11:02").fetchSemanticsNode().boundsInRoot.height < 200f)
+        org.junit.Assert.assertFalse("button keeps its label", overflow("Указать, когда закончил"))
+        org.junit.Assert.assertFalse("paired buttons stack instead of cutting", overflow("Восстановить"))
     }
 
     @Test fun recovery() {

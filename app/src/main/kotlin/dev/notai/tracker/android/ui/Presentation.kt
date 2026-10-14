@@ -1,5 +1,6 @@
 package dev.notai.tracker.android.ui
 
+import dev.notai.tracker.ActivityIcons
 import dev.notai.tracker.Classification
 import dev.notai.tracker.CoreError
 import dev.notai.tracker.Dataset
@@ -95,7 +96,7 @@ object Areas {
 }
 
 /** How a saved classification reads on screen. Names are never used to classify anything. */
-data class Label(val title: String, val detail: String?, val slot: Int?, val unclassified: Boolean)
+data class Label(val title: String, val detail: String?, val slot: Int?, val unclassified: Boolean, val glyph: Int = ActivityGlyphs.custom)
 
 fun Dataset.label(c: Classification): Label {
     val type = c.activityTypeId?.let { id -> types.firstOrNull { it.id == id } }
@@ -103,7 +104,20 @@ fun Dataset.label(c: Classification): Label {
     val root = c.ancestorPathAtWrite.firstOrNull() ?: type?.let { rootOf(it.id) }
     val details = c.details.values.filter { it.isNotBlank() }.joinToString(", ").takeIf { it.isNotEmpty() }
     val rootName = root?.takeIf { it != c.activityTypeId }?.let { r -> types.firstOrNull { it.id == r }?.name?.lowercase() }
-    return Label(title ?: "Без занятия", details ?: rootName, Areas.slot(root), title == null && c.cardId == null)
+    return Label(title ?: "Без занятия", details ?: rootName, Areas.slot(root), title == null && c.cardId == null, glyph(c))
+}
+
+/** Icon through the core's semantic keys; a named choice without a type is "custom", never "unclassified". */
+fun Dataset.glyph(c: Classification): Int {
+    val key = "${System.identityHashCode(types)}|${System.identityHashCode(cards)}|${c.cardId}|${c.activityTypeId}|${c.name != null}"
+    synchronized(glyphCache) { glyphCache[key]?.let { return it } }
+    val icon = ActivityIcons.resolve(this, c)
+    val glyph = if (icon.keys.isEmpty() && c.name != null) ActivityGlyphs.custom else ActivityGlyphs.resolve(icon)
+    synchronized(glyphCache) { glyphCache[key] = glyph }
+    return glyph
+}
+private val glyphCache = object : LinkedHashMap<String, Int>(256, 0.75f, true) {
+    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Int>?) = size > 512
 }
 
 private fun Dataset.rootOf(typeId: String): String {

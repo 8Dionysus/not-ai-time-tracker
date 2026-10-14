@@ -1,1 +1,11 @@
-<resources><string name="shortcut_start">Открыть таймер</string><string name="app_name">(not)AI Time Tracker</string><string name="launcher_name">(not)AI Time</string><string name="technical_name">(not)AI: техническая оболочка</string><string name="open_timer">Открыть</string><string name="stop_timer">Стоп</string></resources>
+<resources>
+    <string name="shortcut_start">Открыть таймер</string>
+    <string name="app_name">(not)AI Time Tracker</string>
+    <string name="launcher_name">(not)AI Time</string>
+    <string name="technical_name">(not)AI: техническая оболочка</string>
+    <string name="widget_description">Таймер: старт и стоп, текущее занятие и время</string>
+    <string name="start_timer">Начать</string>
+    <string name="pause_timer">Пауза</string>
+    <string name="quick_start">Начать сразу</string>
+    <string name="all_activities">Все занятия</string>
+</resources>

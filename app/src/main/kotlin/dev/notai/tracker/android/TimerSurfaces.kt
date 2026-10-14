@@ -18,7 +18,8 @@ enum class TimerCommand { START, PAUSE, RESUME, STOP }
 data class SurfaceAction(val source: Surface,val command: TimerCommand,val token: Token,val target: TimerTarget? = null)
 object TimerSurfaces {
     const val CONTROL_CHANNEL = "timer_controls"
-    const val OVERLAY_CHANNEL = "floating_controls"
+    /** Minimal-importance channel: the system indicator the floating button's service must show. */
+    const val OVERLAY_CHANNEL = "floating_indicator"
     const val CONTROL_ID = 41
     const val OVERLAY_ID = 42
     private const val PENDING_SHORTCUT = "pendingShortcut"
@@ -91,32 +92,21 @@ object TimerSurfaces {
     fun open(c: Context): PendingIntent = PendingIntent.getActivity(c,0,Intent(c,MainActivity::class.java),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
     fun channels(c: Context) {
         c.getSystemService(NotificationManager::class.java).apply {
-            createNotificationChannel(NotificationChannel(CONTROL_CHANNEL,"Управление таймером",NotificationManager.IMPORTANCE_LOW))
-            createNotificationChannel(NotificationChannel(OVERLAY_CHANNEL,"Плавающая кнопка: системный индикатор",NotificationManager.IMPORTANCE_LOW))
+            createNotificationChannel(NotificationChannel(CONTROL_CHANNEL,"Таймер в шторке",NotificationManager.IMPORTANCE_LOW).apply { setShowBadge(false) })
+            createNotificationChannel(NotificationChannel(OVERLAY_CHANNEL,"Плавающая кнопка: системный индикатор",NotificationManager.IMPORTANCE_MIN).apply { setShowBadge(false) })
+            deleteNotificationChannel("floating_controls") // replaced by the minimal-importance indicator
         }
     }
-    fun notification(c: Context,s: Snapshot?,overlay: Boolean = false): Notification {
+    /** Shade controls: rendered by SurfaceViews (row with start/stop, quick choices when expanded). */
+    fun notification(c: Context,view: TrackerView): Notification = SurfaceViews.notification(c,view)
+    /** The floating button's mandatory foreground-service indicator. */
+    fun overlayNotification(c: Context): Notification {
         channels(c)
-        val builder = Notification.Builder(c,if(overlay) OVERLAY_CHANNEL else CONTROL_CHANNEL)
-            .setSmallIcon(android.R.drawable.ic_media_play).setContentTitle(if(overlay) "Плавающее управление включено" else "(not)AI Time Tracker")
-            .setContentText(s?.safeLabel ?: "Открыть приложение").setContentIntent(open(c)).setOnlyAlertOnce(true)
-            .setVisibility(Notification.VISIBILITY_PRIVATE).setOngoing(true).setShowWhen(false)
-        if(!overlay && s != null) {
-            primary(s)?.let { cmd -> builder.addAction(Notification.Action.Builder(null,label(cmd),pending(c,SurfaceAction(Surface.NOTIFICATION,cmd,s.token,s.timerTarget))).build()) }
-            if(s.mode == Mode.RUNNING || s.mode == Mode.PAUSED) builder.addAction(Notification.Action.Builder(null,label(TimerCommand.STOP),pending(c,SurfaceAction(Surface.NOTIFICATION,TimerCommand.STOP,s.token,s.timerTarget))).build())
-        }
-        return builder.build()
+        return Notification.Builder(c,OVERLAY_CHANNEL).setSmallIcon(R.drawable.ic_stat_notai).setColor(c.getColor(R.color.widget_amber))
+            .setContentTitle("Плавающая кнопка включена").setContentText("Выключить можно в настройках приложения").setContentIntent(open(c))
+            .setVisibility(Notification.VISIBILITY_PRIVATE).setOngoing(true).setShowWhen(false).build()
     }
-    fun widget(c: Context,s: Snapshot,enabled: Boolean): RemoteViews = RemoteViews(c.packageName,R.layout.timer_widget).apply {
-        setTextViewText(R.id.widget_status,if(enabled) s.safeLabel else "Виджет выключен. Открыть настройки")
-        setOnClickPendingIntent(R.id.widget_status,open(c))
-        val command = if(enabled) primary(s) else null
-        setTextViewText(R.id.widget_primary,command?.let(::label) ?: "Открыть")
-        setOnClickPendingIntent(R.id.widget_primary,command?.let { pending(c,SurfaceAction(Surface.WIDGET,it,s.token,s.timerTarget)) } ?: open(c))
-        val canStop = enabled && s.mode in setOf(Mode.RUNNING,Mode.PAUSED)
-        setViewVisibility(R.id.widget_stop,if(canStop) android.view.View.VISIBLE else android.view.View.GONE)
-        setOnClickPendingIntent(R.id.widget_stop,if(canStop) pending(c,SurfaceAction(Surface.WIDGET,TimerCommand.STOP,s.token,s.timerTarget)) else open(c))
-    }
+    fun widget(c: Context,view: TrackerView,enabled: Boolean): RemoteViews = SurfaceViews.widget(c,view,enabled)
     /** Launcher may throttle updates. A retained/pinned old shortcut fails STALE, never replays. */
     fun shortcut(c: Context,s: Snapshot) {
         val manager = c.getSystemService(android.content.pm.ShortcutManager::class.java)
@@ -130,7 +120,7 @@ object TimerSurfaces {
         manager.enableShortcuts(listOf("timer_action"))
         manager.setDynamicShortcuts(listOf(android.content.pm.ShortcutInfo.Builder(c,"timer_action")
             .setShortLabel(label(command)).setLongLabel("Таймер: ${label(command).lowercase()}")
-            .setIcon(android.graphics.drawable.Icon.createWithResource(c,android.R.drawable.ic_media_play)).setIntent(action).build()))
+            .setIcon(android.graphics.drawable.Icon.createWithResource(c,R.drawable.ic_shortcut)).setIntent(action).build()))
     }
     fun refresh(c: Context,view: TrackerView,previous: SurfaceSettings? = null,forceWidget: Boolean = false) {
         val settings = view.data.settings.surfaces
@@ -140,11 +130,11 @@ object TimerSurfaces {
         if(settings.widget || previous?.widget == true || forceWidget) {
             val manager = AppWidgetManager.getInstance(c)
             val ids = manager.getAppWidgetIds(ComponentName(c,TimerWidget::class.java))
-            if(ids.isNotEmpty()) manager.updateAppWidget(ids,widget(c,view.snapshot(),settings.widget))
+            if(ids.isNotEmpty()) manager.updateAppWidget(ids,widget(c,view,settings.widget))
         }
         val notifications = c.getSystemService(NotificationManager::class.java)
         if(settings.notification && notificationsAllowed(c)) {
-            try { notifications.notify(CONTROL_ID,notification(c,view.snapshot())) } catch(_: SecurityException) { notifications.cancel(CONTROL_ID) }
+            try { notifications.notify(CONTROL_ID,notification(c,view)) } catch(_: SecurityException) { notifications.cancel(CONTROL_ID) }
         } else if(previous == null || previous.notification) notifications.cancel(CONTROL_ID)
         if(previous?.overlay == true && !settings.overlay) c.stopService(Intent(c,FloatingTimerService::class.java))
     }

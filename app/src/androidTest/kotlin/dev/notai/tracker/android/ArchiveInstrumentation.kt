@@ -16,10 +16,15 @@ import kotlinx.serialization.json.*
 class ArchiveInstrumentation: Instrumentation() {
     private var mode = "archive"
     private var actionLabel: String? = null
-    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments);mode = arguments?.getString("mode") ?: "archive";actionLabel = arguments?.getString("actionLabel");start() }
+    private var backendName: String? = null
+    override fun onCreate(arguments: Bundle?) { super.onCreate(arguments);mode = arguments?.getString("mode") ?: "archive";actionLabel = arguments?.getString("actionLabel");backendName = arguments?.getString("backendName");start() }
     override fun onStart() {
         try {
             val context = targetContext
+            if(mode.startsWith("backend-")) {
+                val report = BackendNativeChecks.run(context,mode,requireNotNull(backendName))
+                finish(Activity.RESULT_OK,Bundle().apply { putString("report",report.toString()) });return
+            }
             if(mode == "overlay-window") {
                 // Observe the already permitted QA overlay through public Android
                 // accessibility APIs; the default CLI dump omits unfocused windows.

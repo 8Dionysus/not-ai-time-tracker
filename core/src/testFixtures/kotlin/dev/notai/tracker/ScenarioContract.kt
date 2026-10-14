@@ -28,7 +28,110 @@ abstract class ScenarioContract {
     open fun assertTransferFailure(transfer: HistoryTransfer,preview: HistoryPreview,tracker: Tracker) {}
     open fun backupDocumentInput() {}
 
+    private fun surfaceChoiceAndAssignmentLifecycle() {
+        val clock = FakeClock(); var t = Tracker(createStore(),clock)
+        fun token() = t.snapshot().token
+        val a = Card(id = "surface-a",name = "Same",activityTypeId = "language")
+        val b = a.copy(id = "surface-b")
+        t.saveCard(token(),a); t.saveCard(token(),b)
+        t.saveFavorite(token(),Favorite(id = "surface-f1",label = "Same",selection = a.classification()))
+        t.saveFavorite(token(),Favorite(id = "surface-f2",label = "Same",selection = b.classification()))
+        t.saveFavorite(token(),Favorite(id = "surface-f3",label = "Duplicate",selection = a.classification()))
+        fun quick() = t.choices().quick(HistoryWindow(clock.wall-100_000,clock.wall+1))
+        val q = quick(); assertEquals(2,q.size); assertEquals(setOf(a.id,b.id),q.map { it.entry.selection.cardId }.toSet())
+        assertNotEquals(q[0].reference,q[1].reference)
+        assertEquals("card:${q[0].entry.selection.cardId}",q[0].icon.keys.first())
+        assertEquals("activity.unclassified",ActivityIcons.resolve(t.data(),Classification()).fallback)
+        val ref = q.first { it.entry.selection.cardId == a.id }.reference
+        val idle = t.snapshot().timerTarget!!
+        t.startChoice(idle,ref); expect(ErrorCode.STALE) { t.startChoice(idle,ref) }
+        clock.advance(1_000); val result = t.stopForAssignment(t.snapshot().timerTarget!!)
+        val offer = result.assignment!!; val stopped = offer.sessionId
+        assertEquals(1_000,t.data().segments.single().durationMs)
+        assertEquals(offer,t.pendingAssignments().single())
+        val serialized = codec.encodeToString(t.data()); assertEquals(t.data(),codec.decodeFromString<Dataset>(serialized))
+        t = Tracker(reopen(t.store),clock)
+        assertEquals(offer,t.pendingAssignments().single())
+        t.assignStopped(offer.id,quick().first { it.entry.selection.cardId == b.id }.reference,"assigned")
+        assertEquals(b.id,t.data().sessions.single { it.id == stopped }.selection.cardId)
+        assertEquals(1_000,t.data().segments.single().durationMs)
+        expect(ErrorCode.STALE) { t.assignStopped(offer.id,ref) }
+        t.undo(token()); assertTrue(t.pendingAssignments().isEmpty())
+        expect(ErrorCode.STALE) { t.assignStopped(offer.id,ref) }
+        t.start(token()); clock.advance(1_000); val cancelled = t.stopForAssignment(t.snapshot().timerTarget!!).assignment!!
+        t.cancelAssignment(cancelled.id); expect(ErrorCode.STALE) { t.cancelAssignment(cancelled.id) }
+        assertEquals(2,t.data().sessions.size)
+        t.start(token()); clock.advance(1_000); val old = t.stopForAssignment(t.snapshot().timerTarget!!).assignment!!
+        t.start(token()); val current = token().sessionId
+        expect(ErrorCode.STALE) { t.assignStopped(old.id,ref) }
+        assertEquals(current,token().sessionId); clock.advance(1_000); t.stop(token())
+        t.start(token()); clock.advance(1_000)
+        val changedOffer = t.stopForAssignment(t.snapshot().timerTarget!!).assignment!!
+        t.measure(token(),Measurement(fieldId = "pages",unit = "page",scope = Scope.SESSION,targetId = changedOffer.sessionId,value = 1))
+        assertTrue(t.pendingAssignments().isEmpty())
+        expect(ErrorCode.STALE) { t.assignStopped(changedOffer.id,ref) }
+        val beforeDenied = t.data()
+        expect(ErrorCode.INVALID_INPUT) { t.startChoice(t.snapshot().timerTarget!!,ref) { false } }
+        assertEquals(beforeDenied,t.data())
+        val stale = t.choices().reference(t.choices().resolve("card:${a.id}")!!)
+        t.saveCard(token(),a.copy(archived = true))
+        expect(ErrorCode.STALE) { t.startChoice(t.snapshot().timerTarget!!,stale) }
+        t.saveCard(token(),a); val renamed = t.choices().reference(t.choices().resolve("card:${a.id}")!!)
+        t.saveCard(token(),a.copy(name = "Changed"))
+        expect(ErrorCode.STALE) { t.startChoice(t.snapshot().timerTarget!!,renamed) }
+        t.startFocus(token(),plan = FocusPlan(workMs = 2_000)); clock.advance(1_000)
+        val focusOffer = t.stopForAssignment(t.snapshot().timerTarget!!).assignment!!
+        assertNull(t.data().focus); assertEquals(SessionStatus.STOPPED,t.data().sessions.find { it.id == focusOffer.sessionId }!!.status)
+        t.deleteSession(token(),focusOffer.sessionId)
+        expect(ErrorCode.STALE) { t.assignStopped(focusOffer.id,ref) }
+    }
+    private fun completedDeletionLifecycle() {
+        val clock = FakeClock();var t = Tracker(createStore(),clock)
+        fun token() = t.snapshot().token
+        val goal = Goal(id = "delete-goal",name = "Time",metric = GoalMetric.DURATION_MS,target = 2_000)
+        t.saveGoal(token(),goal); t.start(token()); val id = token().sessionId!!
+        expect(ErrorCode.INVALID_INPUT) { t.previewDeleteSession(id) }
+        clock.advance(1_000); t.pause(token());t.resume(token());clock.advance(1_000);t.stop(token())
+        val segments = t.data().segments.filter { it.sessionId == id }
+        t.measure(token(),Measurement(id = "delete-pages",fieldId = "pages",unit = "page",scope = Scope.SESSION,targetId = id,value = 3))
+        t.measure(token(),Measurement(id = "delete-reps",fieldId = "reps",unit = "rep",scope = Scope.SEGMENT,targetId = segments[0].id,value = 2))
+        val before = t.data();val preview = t.previewDeleteSession(id)
+        assertEquals(before,t.data());assertEquals(2,preview.segmentCount);assertEquals(2,preview.measurementCount)
+        assertEquals(2_000,preview.reports(clock.wall-10_000,clock.wall+1).first.recordedMs)
+        assertEquals(0,preview.reports(clock.wall-10_000,clock.wall+1).second.recordedMs)
+        val change = t.applyDeleteSession(preview)
+        assertEquals(setOf(id),change.changedSessionIds);assertTrue(change.undoAvailable)
+        assertTrue(t.data().sessions.isEmpty());assertTrue(t.data().segments.isEmpty());assertTrue(t.data().measurements.isEmpty())
+        assertEquals(0,t.goalProgress(goal.id).actual)
+        expect(ErrorCode.STALE) { t.applyDeleteSession(preview) }
+        t.undo(token());assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments);assertEquals(before.measurements,t.data().measurements)
+        assertEquals(2_000,t.goalProgress(goal.id).actual)
+        t = Tracker(reopen(t.store),clock);assertEquals(before.measurements,t.data().measurements)
+        val old = t.previewDeleteSession(id);t.settings(token(),t.data().settings.copy(reportZone = "Europe/Paris"))
+        expect(ErrorCode.STALE) { t.applyDeleteSession(old) }
+        val deleted = t.deleteSession(token(),id);assertTrue(deleted.undoAvailable)
+        t = Tracker(reopen(t.store),clock);assertTrue(t.data().sessions.isEmpty());assertTrue(t.data().measurements.isEmpty())
+        assertFalse(t.canUndo(token())) // existing process-local undo, never promised after process death
+    }
+    private fun assignmentRestoreBoundary() {
+        val clock = FakeClock();val t = Tracker(createStore(),clock)
+        t.start(t.snapshot().token);clock.advance(1_000)
+        val offer = t.stopForAssignment(t.snapshot().timerTarget!!).assignment!!
+        val card = Card(id = "restore-choice",name = "Restore")
+        t.saveCard(t.snapshot().token,card)
+        val ref = t.choices().reference(t.choices().resolve("card:${card.id}")!!)
+        val json = Backups.encode(t.data(),clock.now());assertFalse(json.contains("pendingAssignments"))
+        val bytes = java.io.ByteArrayOutputStream();StreamingBackup.write(StreamingBackup.portable(t.data(),clock.now()),bytes)
+        assertFalse(bytes.toString("UTF-8").contains("pendingAssignments"))
+        val decoded = StreamingBackup.read { bytes.toByteArray().inputStream() };assertTrue(decoded.data.pendingAssignments.isEmpty())
+        val backups = Backups(t,MemoryRollback());backups.apply(backups.prepare(json))
+        expect(ErrorCode.STALE) { t.assignStopped(offer.id,ref) }
+        expect(ErrorCode.STALE) { t.startChoice(t.snapshot().timerTarget!!,ref) }
+        assertEquals(1_000,t.data().segments.single().durationMs)
+    }
+
     @Test fun timerPath() {
+        surfaceChoiceAndAssignmentLifecycle()
         indexedReportOracle()
         subjectCommands()
         choiceLifecycle()
@@ -767,6 +870,7 @@ abstract class ScenarioContract {
     }
 
     @Test fun smallHistoryAndExport() {
+        completedDeletionLifecycle()
         chronologicalHistory()
         previewSnapshots()
         localEntryLifecycle()
@@ -1007,6 +1111,7 @@ abstract class ScenarioContract {
     }
 
     @Test fun backupReplacementAndFailure() {
+        assignmentRestoreBoundary()
         streamingBackupFormats()
         backupDocumentInput()
         val sampleDir = java.io.File(System.getProperty("tracker.samples"))

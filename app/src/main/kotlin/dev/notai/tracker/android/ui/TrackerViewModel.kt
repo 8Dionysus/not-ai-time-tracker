@@ -154,10 +154,84 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
             .filter { it.entry.canStart }.map { QuickStart(it.entry.title, d.label(it.entry.selection).slot, it.entry, true) }
         val recents = choices.suggestions(SuggestionQuery(enabled = true), pageSize = 6).items
             .map { QuickStart(d.label(it.entry.selection).title, d.label(it.entry.selection).slot, it.entry, false) }
-        val quick = (favorites + recents).distinctBy { it.title }.take(4)
+        val quick = (favorites + recents).distinctBy { selectionIdentity(it.entry.selection) }.take(4)
         return HomeData(today, zone, dayList, quick, open?.let { d.label(it.selection) }, open?.let { s -> d.segments.filter { it.sessionId == s.id }.minOfOrNull { it.start } },
             days < 62, d.settings.focusPlan.workMs / 60_000L)
     }
+
+    /** Renderer-facing backend state; Compose screens are supplied separately by Claude. */
+    private val _surfacePicker = MutableStateFlow<dev.notai.tracker.android.SurfacePickerState?>(null)
+    val surfacePicker: StateFlow<dev.notai.tracker.android.SurfacePickerState?> = _surfacePicker
+    private val pickerLock = Any()
+    @Volatile private var pickerRoute: dev.notai.tracker.android.SurfacePickerRoute? = null
+    fun surfacePickerRoute() = pickerRoute
+    fun receiveSurfacePicker(route: dev.notai.tracker.android.SurfacePickerRoute?) {
+        synchronized(pickerLock) { pickerRoute = route; _surfacePicker.value = null }
+        viewModelScope.launch(Dispatchers.IO) {
+            val rt = waitRuntime() ?: return@launch
+            try {
+                val next = route?.let { dev.notai.tracker.android.SurfaceChoices.read(rt.tracker,it) }
+                synchronized(pickerLock) { if(pickerRoute == route) _surfacePicker.value = next }
+            } catch(e: Exception) { if(clearSurfacePicker(route)) notice(Format.error(e)) }
+        }
+    }
+    private fun clearSurfacePicker(route: dev.notai.tracker.android.SurfacePickerRoute?) = synchronized(pickerLock) {
+        if(pickerRoute != route) false else { pickerRoute = null; _surfacePicker.value = null; true }
+    }
+    fun chooseSurface(reference: ChoiceReference,note: String? = null) {
+        val route = pickerRoute ?: return
+        command({ "Записано" }) { rt,_ ->
+            dev.notai.tracker.android.SurfaceChoices.choose(app,rt.tracker,route,reference,note).also { clearSurfacePicker(route) }
+        }
+    }
+    fun cancelSurfacePicker() {
+        val route = pickerRoute
+        if(route?.assignmentId == null) { clearSurfacePicker(route); return }
+        command { rt,_ -> rt.tracker.cancelAssignment(route.assignmentId).also { clearSurfacePicker(route) } }
+    }
+    suspend fun pendingStoppedAssignments(): List<StoppedAssignment> = withContext(Dispatchers.IO) { waitRuntime()?.tracker?.pendingAssignments().orEmpty() }
+    private val _capabilities = MutableStateFlow<dev.notai.tracker.android.SettingsCapabilities?>(null)
+    val capabilities: StateFlow<dev.notai.tracker.android.SettingsCapabilities?> = _capabilities
+    private val _capabilityProblem = MutableStateFlow<dev.notai.tracker.android.SurfaceProblem?>(null)
+    val capabilityProblem: StateFlow<dev.notai.tracker.android.SurfaceProblem?> = _capabilityProblem
+    private val _widgetRequest = MutableStateFlow<dev.notai.tracker.android.WidgetState?>(null)
+    val widgetRequest: StateFlow<dev.notai.tracker.android.WidgetState?> = _widgetRequest
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            boot.flatMapLatest { ready -> (ready as? Boot.Ready)?.backend?.tracker?.views ?: emptyFlow() }.collect {
+                val route = pickerRoute
+                if(route != null) receiveSurfacePicker(route)
+                refreshCapabilities()
+            }
+        }
+    }
+    fun refreshCapabilities(reconcileForeground: Boolean = false) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val rt = waitRuntime() ?: return@launch
+            try {
+                _capabilities.value = dev.notai.tracker.android.SurfaceSettingsBackend.read(app,rt.tracker.data().settings.surfaces,reconcileForeground)
+                _capabilityProblem.value = null
+            } catch(e: Exception) { _capabilityProblem.value = dev.notai.tracker.android.SurfaceProblem.PLATFORM_FAILURE; notice(Format.error(e)) }
+        }
+    }
+    /** System confirmation remains mandatory; this never changes the widget control preference. */
+    fun requestWidgetPlacement(activity: android.app.Activity): dev.notai.tracker.android.WidgetState {
+        val result = dev.notai.tracker.android.WidgetPlacementController(app).request(activity)
+        _widgetRequest.value = result
+        refreshCapabilities()
+        return result
+    }
+    fun setSurfaceEnabled(surface: dev.notai.tracker.android.Surface,enabled: Boolean) = setSurfaces { settings -> when(surface) {
+        dev.notai.tracker.android.Surface.WIDGET -> settings.copy(widget = enabled)
+        dev.notai.tracker.android.Surface.NOTIFICATION -> settings.copy(notification = enabled)
+        dev.notai.tracker.android.Surface.OVERLAY -> settings.copy(overlay = enabled)
+        dev.notai.tracker.android.Surface.SHORTCUT -> fail(ErrorCode.INVALID_INPUT,"Shortcut has no enable preference")
+    } }
+    suspend fun previewDeleteSession(id: String): Tracker.DeletePreview? = withContext(Dispatchers.IO) {
+        val rt = waitRuntime() ?: return@withContext null
+        rt.tracker.previewDeleteSession(id)
+    }
+    fun applyDeleteSession(preview: Tracker.DeletePreview) = command({ "Запись удалена" }) { rt,_ -> rt.tracker.applyDeleteSession(preview) }
 
     // ---------- commands ----------
 

@@ -68,7 +68,7 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore) 
             StreamingBackup.validateBackup(backup)
             val source = backup.data
             val imported = source.copy(revision = revision,
-                controlBarrier = newId(),
+                controlBarrier = newId(),pendingAssignments = emptyList(),
                 sessions = source.sessions.map { if(it.status in setOf(SessionStatus.RUNNING,SessionStatus.RECOVERY)) it.copy(status = SessionStatus.RECOVERY) else it },
                 segments = source.segments.map { it.copy(anchor = null,uncertain = it.uncertain || it.end == null) }).frozen()
             validate(imported);return imported
@@ -76,7 +76,7 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore) 
         fun encode(d: Dataset,n: Moment): String {
             validateMoment(n)
             validate(d)
-            val frozen = d.copy(segments = d.segments.map { materialize(it,n).copy(anchor = null) },focus = Focus.freeze(d,n))
+            val frozen = d.copy(pendingAssignments = emptyList(),segments = d.segments.map { materialize(it,n).copy(anchor = null) },focus = Focus.freeze(d,n))
             val json = codec.encodeToString(Backup(asOf = n.wall,data = frozen))
             ensure(json.toByteArray(Charsets.UTF_8).size <= MAX_BACKUP_BYTES,
                 "Backup exceeds supported 10 MiB restore limit; no usable backup was produced",ErrorCode.INVALID_INPUT)

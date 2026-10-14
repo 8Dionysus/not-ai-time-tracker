@@ -25,19 +25,21 @@ class Tracker(val store: StateStore, val clock: Clock) {
     }
 
     data class Change(val state: Snapshot, val changedSessionIds: Set<String>, val undoAvailable: Boolean,
-        val data: Dataset, val asOf: Moment, val catalogImport: CatalogImportReport? = null) {
+        val data: Dataset, val asOf: Moment, val catalogImport: CatalogImportReport? = null, val assignment: StoppedAssignment? = null) {
         val changedSessions get() = data.sessions.filter { it.id in changedSessionIds }
         val changedSegments get() = data.segments.filter { it.sessionId in changedSessionIds }
         fun report(start: Long,end: Long,filter: Filter = Filter()) = Reports.report(data,asOf,start,end,filter)
         fun day(date: java.time.LocalDate,filter: Filter = Filter()) = Reports.day(data,asOf,date,filter)
     }
-    @Synchronized private fun mutate(expected: Token, undoable: Boolean = false, edit: (Dataset, Moment) -> Dataset): Change = storage {
+    @Synchronized private fun mutate(expected: Token?, undoable: Boolean = false, edit: (Dataset, Moment) -> Dataset): Change = storage {
         store.checkedTransaction { checked ->
             val old = checked.data
             val now = clock.now()
-            checkToken(old, expected, now)
+            if(expected != null) checkToken(old, expected, now)
             val edited = edit(old,now)
-            val next = edited.copy(revision = Math.addExact(old.revision,1),timerEpoch = if(timerIdentity(old) != timerIdentity(edited)) Math.addExact(old.timerEpoch,1) else old.timerEpoch)
+            val identityChanged = timerIdentity(old) != timerIdentity(edited)
+            val next = edited.copy(revision = Math.addExact(old.revision,1),timerEpoch = if(identityChanged) Math.addExact(old.timerEpoch,1) else old.timerEpoch,
+                pendingAssignments = if(identityChanged) emptyList() else edited.pendingAssignments)
             checked.replace(next) { validated ->
                 val changed = changedSessions(old,next)
                 Triple(Change(validated.snapshot(now), changed, undoable, validated.data, now), old, next)
@@ -48,7 +50,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
         }
     }
     @Synchronized private fun timer(expected: Token?,action: TimerAction,selection: Classification = Classification(),note: String? = null,target: TimerTarget? = null,
-        allowed: (Dataset)->Boolean = { true }): Change = storage {
+        allowed: (Dataset)->Boolean = { true },assignmentAfterStop: Boolean = false): Change = storage {
         store.checkedTransaction { checked ->
             val now = clock.now()
             ensure(allowed(checked.data),"Surface disabled or permission denied")
@@ -57,7 +59,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
                 ensure(target == current.timerTarget,"Timer target changed; refresh controls",ErrorCode.STALE)
                 current.token // original subject target was checked atomically; no catch/retry of a stale global token
             }
-            if(checked.data.focus == null) checked.timer(actualToken,action,now,selection,note) { next,changed ->
+            val commit = if(checked.data.focus == null) checked.timer(actualToken,action,now,selection,note) { next,changed ->
                 Change(next.snapshot(now),changed,action == TimerAction.SWITCH,next.data,now) to checked.data
             } else {
                 val d = checked.data; checkToken(d,actualToken,now)
@@ -67,9 +69,15 @@ class Tracker(val store: StateStore, val clock: Clock) {
                     TimerAction.RESUME -> FocusTransitions.resume(d,now)
                     TimerAction.STOP -> FocusTransitions.cancel(d,now)
                     TimerAction.SWITCH -> { checkStartable(d,selection); append(FocusTransitions.cancel(d,now),selection,note,now) }
-                }.copy(revision = Math.addExact(d.revision,1),timerEpoch = Math.addExact(d.timerEpoch,1))
+                }.copy(revision = Math.addExact(d.revision,1),timerEpoch = Math.addExact(d.timerEpoch,1),pendingAssignments = emptyList())
                 checked.replace(edited) { next -> Change(next.snapshot(now),changedSessions(d,next.data),action == TimerAction.SWITCH,next.data,now) to d }
             }
+            if(assignmentAfterStop) {
+                ensure(action == TimerAction.STOP && actualToken.sessionId != null,"Assignment requires Stop")
+                checked.addAssignment(commit,actualToken.sessionId!!) { next,offer ->
+                    commit.result.first.copy(data = next.data,assignment = offer) to checked.data
+                }
+            } else commit
         }.let { (change,old) ->
             undo = if(change.undoAvailable) change.state.token to old else null
             change
@@ -84,6 +92,68 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun resume(expected: Token) = timer(expected,TimerAction.RESUME)
     fun stop(expected: Token) = timer(expected,TimerAction.STOP)
     fun switch(expected: Token,selection: Classification) = timer(expected,TimerAction.SWITCH,selection)
+    /** Stop commits elapsed time and its durable assignment receipt in the same transaction. */
+    fun stopForAssignment(target: TimerTarget,allowed: (Dataset)->Boolean = { true }) =
+        timer(null,TimerAction.STOP,target = target,allowed = allowed,assignmentAfterStop = true)
+    fun pendingAssignments(): List<StoppedAssignment> = data().let { d -> d.pendingAssignments.filter { offer ->
+        offer.timerEpoch == d.timerEpoch && d.sessions.any { it.id == offer.sessionId && it.status == SessionStatus.STOPPED } &&
+            recordFingerprint(d,offer.sessionId) == offer.recordFingerprint
+    } }
+    private fun checkedOffer(d: Dataset,id: String): StoppedAssignment {
+        val offer = d.pendingAssignments.find { it.id == id } ?: fail(ErrorCode.STALE,"Assignment was handled or expired")
+        ensure(offer.datasetId == d.datasetId && offer.barrier == d.controlBarrier && offer.timerEpoch == d.timerEpoch &&
+            d.sessions.any { it.id == offer.sessionId && it.status == SessionStatus.STOPPED } &&
+            recordFingerprint(d,offer.sessionId) == offer.recordFingerprint,"Completed record changed",ErrorCode.STALE)
+        return offer
+    }
+    /** Explicit cancellation retains the completed time; receipt consumption is durable and replay-safe. */
+    fun cancelAssignment(id: String) = mutate(null) { d,_ ->
+        checkedOffer(d,id); d.copy(pendingAssignments = d.pendingAssignments.filterNot { it.id == id })
+    }
+    fun assignStopped(id: String,choice: ChoiceReference,note: String? = null,allowed: (Dataset)->Boolean = { true }) = mutate(null,true) { d,n ->
+        ensure(allowed(d),"Surface disabled or permission denied")
+        val offer = checkedOffer(d,id)
+        val entry = ChoiceView(d,choiceCache) { snapshot(d,n) }.resolve(choice)
+        checkStartable(d,entry.selection)
+        val selected = d.classify(entry.selection)
+        d.copy(sessions = d.sessions.map { if(it.id == offer.sessionId) it.copy(selection = selected,note = note ?: it.note) else it },
+            segments = d.segments.map { if(it.sessionId == offer.sessionId) it.copy(selection = selected) else it },
+            pendingAssignments = d.pendingAssignments.filterNot { it.id == id })
+    }
+    /** Fresh resolution and timer subject validation occur inside the same transaction. */
+    fun startChoice(target: TimerTarget,choice: ChoiceReference,allowed: (Dataset)->Boolean = { true }) = applyChoice(target,choice,ChoiceApplication.START,allowed)
+    fun applyChoice(target: TimerTarget,choice: ChoiceReference,application: ChoiceApplication,allowed: (Dataset)->Boolean = { true }) = mutate(null,application == ChoiceApplication.SWITCH) { d,n ->
+        ensure(allowed(d),"Surface disabled or permission denied")
+        ensure(snapshot(d,n).timerTarget == target,"Timer target changed",ErrorCode.STALE)
+        val entry = ChoiceView(d,choiceCache) { snapshot(d,n) }.resolve(choice)
+        checkStartable(d,entry.selection)
+        val base = when(application) {
+            ChoiceApplication.START -> { ensure(current(d) == null && d.focus == null,"Stop current session first"); d }
+            ChoiceApplication.SWITCH -> {
+                ensure(snapshot(d,n).mode != Mode.RECOVERY,"Resolve uncertain time first",ErrorCode.RECOVERY_REQUIRED)
+                if(d.focus != null) FocusTransitions.cancel(d,n) else close(d,current(d) ?: fail(ErrorCode.INVALID_INPUT,"No current session"),n,SessionStatus.STOPPED)
+            }
+        }
+        append(base,entry.selection,entry.note,n)
+    }
+    class DeletePreview internal constructor(val expected: Token,val sessionId: String,val before: Dataset,val after: Dataset,val asOf: Moment) {
+        val segmentCount get() = before.segments.count { it.sessionId == sessionId }
+        val measurementCount get() = before.measurements.size-after.measurements.size
+        fun reports(start: Long,end: Long,filter: Filter = Filter()) = Reports.report(before,asOf,start,end,filter) to Reports.report(after,asOf,start,end,filter)
+    }
+    /** Opening/cancelling confirmation has no writes. Applying is the explicit confirmation. */
+    fun previewDeleteSession(id: String): DeletePreview = storage { store.transaction { d ->
+        val now = clock.now(); d to DeletePreview(token(d),id,d.frozen(),deletedSession(d,id).frozen(),now)
+    } }
+    fun applyDeleteSession(preview: DeletePreview) = deleteSession(preview.expected,preview.sessionId)
+    fun deleteSession(expected: Token,id: String) = mutate(expected,true) { d,_ -> deletedSession(d,id) }
+    private fun deletedSession(d: Dataset,id: String): Dataset {
+        ensure(d.sessions.any { it.id == id && it.status == SessionStatus.STOPPED } && d.focus?.sessionId != id,"Only completed sessions can be deleted")
+        val segmentIds = d.segments.filter { it.sessionId == id }.map { it.id }.toSet()
+        return d.copy(sessions = d.sessions.filterNot { it.id == id },segments = d.segments.filterNot { it.sessionId == id },
+            measurements = d.measurements.filterNot { (it.scope == Scope.SESSION && it.targetId == id) || (it.scope == Scope.SEGMENT && it.targetId in segmentIds) },
+            pendingAssignments = d.pendingAssignments.filterNot { it.sessionId == id })
+    }
     /** Explicit late labeling applies to the entire current session, including its earlier segments. */
     fun labelCurrent(expected: Token, selection: Classification, note: String? = null) = mutate(expected, true) { d,_ ->
         val selected = d.classify(selection)
@@ -329,7 +399,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
     @Synchronized fun undo(expected: Token): Change {
         val saved = undo
         if (saved == null || saved.first != expected) throw CoreError(ErrorCode.STALE,"No matching available undo",snapshot())
-        return mutate(expected) { _,_ -> saved.second }
+        return mutate(expected) { _,_ -> saved.second.copy(pendingAssignments = emptyList()) }
     }
     private fun changedSessions(old: Dataset,next: Dataset): Set<String> {
         val changed = mutableSetOf<String>()

@@ -36,6 +36,12 @@ object TimerSurfaces {
         Mode.IDLE -> TimerCommand.START; Mode.RUNNING -> TimerCommand.PAUSE
         Mode.PAUSED -> TimerCommand.RESUME; Mode.RECOVERY -> null
     }
+    /** Overlay has a separate simple START/STOP policy; other surfaces keep pause/resume. */
+    fun overlayPrimary(s: Snapshot): TimerCommand? = when {
+        s.mode == Mode.RECOVERY || s.focus?.mode == FocusMode.RECOVERY -> null
+        s.session != null || s.focus != null -> TimerCommand.STOP
+        else -> TimerCommand.START
+    }
     /** Visible Russian labels for the same commands; identity stays in the action, never in the text. */
     fun label(command: TimerCommand): String = when(command) {
         TimerCommand.START -> "Начать"; TimerCommand.PAUSE -> "Пауза"; TimerCommand.RESUME -> "Продолжить"; TimerCommand.STOP -> "Стоп"
@@ -48,6 +54,12 @@ object TimerSurfaces {
     }
     /** Policy is checked again after process recreation, before the core revision check/write. */
     fun execute(tracker: Tracker,action: SurfaceAction,permission: Boolean = true): Tracker.Change {
+        if(action.source == Surface.OVERLAY && action.command == TimerCommand.STOP) {
+            val target = action.target ?: tracker.snapshot().let { s ->
+                ensure(s.token == action.token,"Timer target changed",ErrorCode.STALE); s.timerTarget!!
+            }
+            return tracker.stopForAssignment(target) { permission && enabled(it.settings.surfaces,Surface.OVERLAY) }
+        }
         if(action.target != null) return tracker.timerCommand(action.target,TimerDirective.valueOf(action.command.name)) { data ->
             permission && enabled(data.settings.surfaces,action.source)
         }

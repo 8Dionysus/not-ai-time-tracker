@@ -30,6 +30,7 @@ internal fun Dataset.frozen(base: Dataset? = null): Dataset {
     val selections = SelectionFreezer()
     fun capture(value: Classification) = selections.capture(value)
     return copy(
+    pendingAssignments = if(pendingAssignments === base?.pendingAssignments) pendingAssignments else frozenList(pendingAssignments),
     focus = if(focus === base?.focus) focus else focus?.copy(segmentIds = frozenList(focus.segmentIds)),
     goals = if(goals === base?.goals) goals else frozenList(goals.map { it.copy(filter = it.filter.copy(details = frozenMap(it.filter.details),tags = frozenSet(it.filter.tags),facets = frozenList(it.filter.facets))) }),
     types = if(types === base?.types) types else frozenList(types.map { it.copy(aliases = frozenList(it.aliases),

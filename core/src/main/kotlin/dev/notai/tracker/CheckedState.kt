@@ -80,10 +80,23 @@ class CheckedState private constructor(val data: Dataset,private val sessionPosi
         fun <E> edited(old: List<E>,rows: List<Positioned<E>>): List<E> = if(rows.isEmpty()) old else frozenList(old.toMutableList().apply {
             for(row in rows) if(row.position == size) add(row.value) else set(row.position,row.value)
         })
-        val next = data.copy(revision = Math.addExact(data.revision,1),timerEpoch = Math.addExact(data.timerEpoch,1),sessions = edited(data.sessions,sessionRows),segments = edited(data.segments,segmentRows))
+        val next = data.copy(revision = Math.addExact(data.revision,1),timerEpoch = Math.addExact(data.timerEpoch,1),pendingAssignments = emptyList(),sessions = edited(data.sessions,sessionRows),segments = edited(data.segments,segmentRows))
         val checked = CheckedState(next,nextSession,nextSegment,own,end,total,typeIds,cardIds)
         val changed = sessionRows.map { it.value.id }.toSet()
         return CheckedCommit(this,checked,result(checked,changed),TimerRows(frozenList(sessionRows),frozenList(segmentRows)))
+    }
+    /** Only a core-created stopped-record receipt can extend the small checked timer commit. */
+    internal fun withAssignment(sessionId: String): Pair<CheckedState,StoppedAssignment> {
+        ensure(data.sessions.any { it.id == sessionId && it.status == SessionStatus.STOPPED },"Assignment requires a completed session")
+        val offer = StoppedAssignment(newId(),data.datasetId,data.controlBarrier,data.timerEpoch,sessionId,recordFingerprint(data,sessionId))
+        val next = data.copy(pendingAssignments = frozenList((data.pendingAssignments+offer).takeLast(32)))
+        validateAssignments(next)
+        return CheckedState(next,sessionPosition,segmentPosition,ownSegments,lastCertainEnd,totalDuration,typeIds,cardIds) to offer
+    }
+    internal fun <T> addAssignment(commit: CheckedCommit<T>,sessionId: String,result: (CheckedState,StoppedAssignment)->T): CheckedCommit<T> {
+        commit.requireBase(this)
+        val (next,offer) = commit.state.withAssignment(sessionId)
+        return CheckedCommit(this,next,result(next,offer),commit.timerRows)
     }
     companion object {
         fun validate(data: Dataset,onPhase: ((String,Long)->Unit)? = null): CheckedState {

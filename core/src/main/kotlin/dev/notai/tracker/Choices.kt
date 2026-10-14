@@ -158,6 +158,34 @@ class ChoiceView internal constructor(private val d: Dataset,private val cache: 
         return ChoiceEntry(record.id,record.kind,record.sourceId,title(record),path(record),record.selection,
             sessions[latest.second.sessionId]?.note,availability(record.selection),record.sourceSessionId,record.sourceSegmentId)
     }
+    /** Resolve a stable source ID on this snapshot; no title lookup or positional alias. */
+    fun resolve(id: String): ChoiceEntry? {
+        val record = when {
+            id.startsWith("type:") -> catalog.records.find { it.id == id }
+            id.startsWith("card:") || id.startsWith("favorite:") -> personal.records.find { it.id == id }
+            id.startsWith("history:") -> history.find { it.record.id == id }?.record
+            else -> null
+        } ?: return null
+        return page(id,listOf(RankedChoice(record)),null,1).items.single().entry
+    }
+    fun reference(entry: ChoiceEntry) = ChoiceReference(d.datasetId,d.controlBarrier,entry.id,
+        sha256(classificationKey(entry.selection).toByteArray(Charsets.UTF_8)))
+    fun resolve(reference: ChoiceReference): ChoiceEntry {
+        ensure(reference.datasetId == d.datasetId && reference.barrier == d.controlBarrier,"Choice dataset changed",ErrorCode.STALE)
+        val entry = resolve(reference.choiceId) ?: fail(ErrorCode.STALE,"Choice no longer exists")
+        ensure(entry.canStart && reference(entry) == reference,"Choice changed or is unavailable",ErrorCode.STALE)
+        return entry
+    }
+    /** Bounded favorites first, followed by recorded frequency within an explicit window. */
+    fun quick(window: HistoryWindow,limit: Int = 6): List<QuickChoice> {
+        ensure(limit in 1..20,"Quick choice limit must be 1..20")
+        val favorites = personal.records.filter { it.kind == ChoiceKind.FAVORITE }.sortedWith(compareBy({it.sortName},{it.id}))
+            .mapNotNull { resolve(it.id)?.takeIf { entry -> entry.canStart } }
+        val frequent = suggestions(SuggestionQuery(true,SuggestionOrder.FREQUENT_RECORDED,window),pageSize = 100).items.map { it.entry }
+        return frozenList((favorites+frequent).distinctBy { selectionIdentity(it.selection) }.take(limit).map {
+            QuickChoice(it,reference(it),ActivityIcons.resolve(d,it.selection))
+        })
+    }
     private fun page(request: Any,hits: List<RankedChoice>,cursor: ChoiceCursor?,size: Int): ChoicePage {
         ensure(size in 1..100,"Page size must be 1..100")
         if(cursor != null && (cursor.owner !== this || cursor.request != request)) throw CoreError(ErrorCode.STALE,"Cursor belongs to another snapshot/query",state())

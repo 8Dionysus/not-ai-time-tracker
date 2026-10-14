@@ -39,6 +39,7 @@ class MainActivity : ComponentActivity() {
         launchedDocumentExport = savedInstanceState?.getString("launchedDocumentExport")
         launchedDocumentExportOwner = savedInstanceState?.getString("launchedDocumentExportOwner")
         vm.recoverDocumentExport(launchedDocumentExport,launchedDocumentExportOwner)
+        vm.receiveSurfacePicker(SurfaceChoices.restore(savedInstanceState,intent))
         shortcutPending = TimerSurfaces.restoredShortcut(savedInstanceState, intent)
         if (savedInstanceState == null) receiveSelectedText(intent)
         intent.action = Intent.ACTION_MAIN
@@ -66,6 +67,7 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         receiveSelectedText(intent)
+        SurfaceChoices.parse(intent)?.let(vm::receiveSurfacePicker)
         TimerSurfaces.parse(intent)?.takeIf { it.source == Surface.SHORTCUT }?.let { shortcutPending = it }
         intent.action = Intent.ACTION_MAIN; setIntent(intent)
         consumeShortcut()
@@ -73,6 +75,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        vm.refreshCapabilities(reconcileForeground = true)
         // Overlay may only start from a visible Activity; widget/notification are redrawn on explicit events.
         vm.refreshSurfaces { runtime, view ->
             TimerSurfaces.refresh(this, view, forceWidget = true)
@@ -83,6 +86,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         TimerSurfaces.saveShortcut(this, outState, shortcutPending)
+        SurfaceChoices.save(outState,vm.surfacePickerRoute())
         launchedDocumentExport?.let { outState.putString("launchedDocumentExport",it) }
         launchedDocumentExportOwner?.let { outState.putString("launchedDocumentExportOwner",it) }
         super.onSaveInstanceState(outState)

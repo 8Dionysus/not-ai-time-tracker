@@ -51,19 +51,21 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
 }
 @Serializable data class SurfaceSettings(val widget: Boolean = false,val notification: Boolean = false,val overlay: Boolean = false,val focusSignal: Boolean = false)
 @Serializable data class Settings(val reportZone: String = "UTC",val surfaces: SurfaceSettings = SurfaceSettings(),val focusPlan: FocusPlan = FocusPlan())
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 @Serializable data class Dataset(@Required val datasetId: String = newId(), @Required val revision: Long = 0,
     @Required val types: List<ActivityType> = Catalog.types,
     @Required val cards: List<Card> = emptyList(), @Required val favorites: List<Favorite> = emptyList(),
     @Required val sessions: List<Session> = emptyList(), @Required val segments: List<Segment> = emptyList(),
     val goals: List<Goal> = emptyList(),val focus: FocusRun? = null,val catalogVersion: String? = null,
     val timerEpoch: Long = 0,val controlBarrier: String = "",
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val pendingAssignments: List<StoppedAssignment> = emptyList(),
     @Required val measurements: List<Measurement> = emptyList(), @Required val settings: Settings = Settings(),
     @Required val axes: List<Axis> = Catalog.vocabulary.axes, @Required val metrics: List<Metric> = Catalog.vocabulary.metrics, @Required val units: List<UnitDefinition> = Catalog.vocabulary.units)
 
 data class Moment(val wall: Long, val elapsed: Long, val bootId: String,val processId: String? = null)
 fun interface Clock { fun now(): Moment }
-data class Token(val datasetId: String, val revision: Long, val sessionId: String?)
-data class TimerTarget(val datasetId: String,val sessionId: String?,val epoch: Long,val barrier: String)
+@Serializable data class Token(val datasetId: String, val revision: Long, val sessionId: String?)
+@Serializable data class TimerTarget(val datasetId: String,val sessionId: String?,val epoch: Long,val barrier: String)
 enum class TimerDirective { START, PAUSE, RESUME, STOP }
 enum class Mode { IDLE, RUNNING, PAUSED, RECOVERY }
 data class Snapshot(val token: Token, val mode: Mode, val session: Session?, val active: Segment?,
@@ -117,6 +119,7 @@ fun validate(data: Dataset) {
     validateVocabulary(data)
     validateGoals(data)
     validateFocus(data)
+    validateAssignments(data)
     val cards = data.cards.associateBy { it.id }; val sessions = data.sessions.associateBy { it.id }
     fun selection(c: Classification) = validateSelection(data,c,typeIds,cards.keys)
     data.cards.forEach { ensure(it.name.isNotBlank(), "Card needs a name"); selection(it.classification()) }

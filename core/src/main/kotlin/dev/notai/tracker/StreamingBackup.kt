@@ -17,7 +17,7 @@ import kotlinx.serialization.json.*
 object StreamingBackup {
     fun portable(data: Dataset,now: Moment): Backup {
         validateMoment(now);validate(data)
-        return Backup(asOf = now.wall,data = data.copy(segments = data.segments.map { materialize(it,now).copy(anchor = null) },
+        return Backup(asOf = now.wall,data = data.copy(pendingAssignments = emptyList(),segments = data.segments.map { materialize(it,now).copy(anchor = null) },
             focus = Focus.freeze(data,now)))
     }
     fun write(backup: Backup,output: OutputStream) {

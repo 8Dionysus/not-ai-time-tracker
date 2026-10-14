@@ -1,0 +1,133 @@
+{
+  "tests": [
+    {
+      "name": "dev.notai.tracker.CoreScenariosTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "7.94"
+    },
+    {
+      "name": "dev.notai.tracker.android.RoomScenariosTest",
+      "tests": "12",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "36.737"
+    },
+    {
+      "name": "dev.notai.tracker.android.ui.UiExportLifecycleTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.329"
+    },
+    {
+      "name": "dev.notai.tracker.android.ui.UiScreensTest",
+      "tests": "12",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "22.856"
+    }
+  ],
+  "lint": {
+    "Warning": 65,
+    "Hint": 1
+  },
+  "apkBytes": 12468558,
+  "apkSha256": "4cb5e3dc25acc6c15623e5d514fbc957649b2c546c8b6785dac1ec9086c59c62",
+  "signerSame": true,
+  "zipCrcPass": true,
+  "buildSucceeded": true,
+  "codeSha": "17895f2d272eb2602236b50a2edcaf80e1b67992",
+  "apkName": "not-ai-time-tracker-0.10.0-17895f2-debug.apk",
+  "apkSignerSha256": "86e221956fd1ed4dab261a10c1baeac3537816d271601037b309f2ddf186c3cc",
+  "native": {
+    "api": 35,
+    "separateProcesses": true,
+    "isolatedDataOnly": true,
+    "reports": [
+      {
+        "schema": "tracker_backend_native_v2",
+        "mode": "backend-create",
+        "isolatedDatabase": "qa-backend-20261014-fix.db",
+        "clock": "Synthetic fixed wall/monotonic samples, real Android processes and Room/SQLite",
+        "liveRecordsUnchanged": true,
+        "liveDigest": "13305987b349cef56efa220cafd08d02d88e2cf49ecf0e9f6fb5c9a4eff3f43a",
+        "sessions": 2,
+        "segments": 2,
+        "measurements": 4,
+        "pendingAssignments": 1,
+        "timerMode": "RUNNING",
+        "currentDurationMs": 2000,
+        "nextStartBeforeProcessDeath": true,
+        "freshAssignmentSucceeded": false,
+        "widgetPinSupported": true,
+        "widgetInstanceCount": 1,
+        "widgetPlacement": "PINNED",
+        "platformPinRequested": false,
+        "processId": 5092
+      },
+      {
+        "schema": "tracker_backend_native_v2",
+        "mode": "backend-reopen",
+        "isolatedDatabase": "qa-backend-20261014-fix.db",
+        "clock": "Synthetic fixed wall/monotonic samples, real Android processes and Room/SQLite",
+        "liveRecordsUnchanged": true,
+        "liveDigest": "13305987b349cef56efa220cafd08d02d88e2cf49ecf0e9f6fb5c9a4eff3f43a",
+        "sessions": 2,
+        "segments": 2,
+        "measurements": 4,
+        "pendingAssignments": 0,
+        "timerMode": "RUNNING",
+        "currentDurationMs": 2000,
+        "nextStartBeforeProcessDeath": true,
+        "freshAssignmentSucceeded": true,
+        "currentSessionUnchanged": true,
+        "allTimesUnchanged": true,
+        "allMeasurementsUnchanged": true,
+        "oldSurfaceTargetRejected": true,
+        "rotatedNonceRejected": true,
+        "replayRejected": true,
+        "widgetPinSupported": true,
+        "widgetInstanceCount": 1,
+        "widgetPlacement": "PINNED",
+        "platformPinRequested": false,
+        "processId": 5133
+      }
+    ]
+  },
+  "catalogAssetsExact": true,
+  "library": {
+    "libraryFileId": "libfile_dc0b457de35881918bca0dae9783f6c3",
+    "fileId": "file_00000000035c81f59f9b2c9a6f388eda",
+    "version": 8,
+    "pinnedReadbackMatches": true
+  },
+  "supersedesCodeSha": "9a6cffb3c44916fe8100db23f11e7c01b02f791d",
+  "assignmentFix": {
+    "positiveScenario": "Stop -> next Start -> process death/reopen -> explicit reopen by saved session ID -> assign old record",
+    "freshRequestRotatesNonce": true,
+    "recordValidityIndependentOfCurrentTimerEpoch": true,
+    "oldSurfaceTimerTargetRejectedAtomically": true,
+    "currentSessionUnchanged": true,
+    "allTimesUnchanged": true,
+    "allMeasurementsUnchanged": true,
+    "replayRejected": true,
+    "editDeleteRestoreDatasetGuards": true,
+    "undoDoesNotResurrectConsumedNonce": true,
+    "otherLiveOffersSurviveUnrelatedUndo": true,
+    "pendingLedgerLimit": 32,
+    "freshReopenRequiresValidUnconsumedSavedOffer": true
+  },
+  "boundary": {
+    "frontendLayoutResourcesCatalogDependenciesUnchanged": true,
+    "newPermissions": [],
+    "newNetworkDependency": false,
+    "liveRecordsRemovedByTests": false,
+    "claudeInstructionExpanded": false
+  }
+}

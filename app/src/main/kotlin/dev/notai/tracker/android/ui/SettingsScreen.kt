@@ -172,8 +172,9 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
             Divider()
             val device = ZoneId.systemDefault().id
             val differs = settings != null && settings.reportZone != device
-            NavRow(rememberVectorPainter(Icon.Globe), "Часовой пояс отчётов", settings?.reportZone.orEmpty(),
-                note = if (differs) "На телефоне сейчас $device. Нажми, чтобы перейти на него" else "Границы дней в истории и обзоре",
+            NavRow(rememberVectorPainter(Icon.Globe), "Часовой пояс отчётов",
+                note = settings?.reportZone.orEmpty().replace('_', ' ') +
+                    if (differs) ". На телефоне сейчас ${device.replace('_', ' ')}, нажми, чтобы перейти" else ". По нему делятся дни в истории и обзоре",
                 onClick = if (differs) ({ zoneConfirm = device }) else null)
         }
 
@@ -183,7 +184,7 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                     M3Icon(Icon.Download, null, Modifier.size(22.dp), tint = c.ink2)
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         Text("Резервная копия", style = NotAi.type.body, color = c.ink)
-                        Text(last?.let { "Последняя ${Format.dayTitle(Instant.ofEpochMilli(it.at).atZone(zone).toLocalDate(), java.time.LocalDate.now(zone)).lowercase()} в ${Format.clock(it.at, zone)}" +
+                        Text(last?.let { "Последняя ${Format.dayTitle(Instant.ofEpochMilli(it.at).atZone(zone).toLocalDate(), Instant.ofEpochMilli(vm.now()).atZone(zone).toLocalDate()).lowercase()} в ${Format.clock(it.at, zone)}" +
                             if (it.verified) ", файл проверен" else "" } ?: "С этого телефона копий ещё не было", style = NotAi.type.caption, color = c.ink2)
                         view?.data?.let { d ->
                             Text(Format.plural(d.sessions.size, "запись", "записи", "записей") + ", " + Format.plural(d.cards.size, "своё занятие", "своих занятия", "своих занятий") +
@@ -204,8 +205,9 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 onClick = openTechnical)
             Divider()
             val types = view?.data?.types?.size ?: 0
-            NavRow(rememberVectorPainter(Icon.Layers), "Каталог занятий", "%,d".format(types).replace(',', ' '),
-                note = "Версия ${view?.data?.catalogVersion ?: "базовая"}. Проверить обновление", onClick = { scope.launch { busy = true; catalog = vm.prepareCatalog(); busy = false } })
+            NavRow(rememberVectorPainter(Icon.Layers), "Каталог занятий",
+                note = "${Format.plural(types, "занятие", "занятия", "занятий").replace(Regex("^(\\d)(\\d{3})"), "$1 $2")}, версия ${view?.data?.catalogVersion ?: "базовая"}. Нажми, чтобы проверить обновление",
+                onClick = { scope.launch { busy = true; catalog = vm.prepareCatalog(); busy = false } })
         }
 
         Group("Ещё") {
@@ -213,8 +215,8 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 onClick = openTechnical)
             Divider()
             val version = remember { runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() }
-            NavRow(rememberVectorPainter(Icon.Info), "(not)AI Time Tracker", version.orEmpty(),
-                note = "Все данные только на этом телефоне. Шрифт Onest, SIL Open Font License")
+            NavRow(rememberVectorPainter(Icon.Info), "(not)AI Time Tracker ${version.orEmpty()}".trim(),
+                note = "Все данные хранятся только на этом телефоне. Шрифт Onest, SIL Open Font License")
         }
     }
 
@@ -267,16 +269,18 @@ private fun FocusGroup(vm: TrackerViewModel, work: Int, rest: Int) {
         vm.configureFocus(w, b)
     }
     Group("Фокус") {
-        StepRow("Отрезок работы", w, { w = (w - 5).coerceAtLeast(5) }, { w = (w + 5).coerceAtMost(180) })
+        StepRow(painterResource(R.drawable.act_focus), "Отрезок работы", w, { w = (w - 5).coerceAtLeast(5) }, { w = (w + 5).coerceAtMost(180) })
         Divider()
-        StepRow("Перерыв", b, { b = if (b > 5) b - 5 else (b - 1).coerceAtLeast(1) }, { b = if (b >= 5) (b + 5).coerceAtMost(60) else b + 1 })
+        StepRow(painterResource(R.drawable.act_cup), "Перерыв", b, { b = if (b > 5) b - 5 else (b - 1).coerceAtLeast(1) }, { b = if (b >= 5) (b + 5).coerceAtMost(60) else b + 1 })
     }
 }
 
 @Composable
-private fun StepRow(title: String, minutes: Int, minus: () -> Unit, plus: () -> Unit) {
+private fun StepRow(icon: Painter, title: String, minutes: Int, minus: () -> Unit, plus: () -> Unit) {
     val c = NotAi.colors
-    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = 52.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = 16.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        M3Icon(icon, null, Modifier.size(22.dp), tint = c.ink2)
+        Spacer(Modifier.width(14.dp))
         Text(title, Modifier.weight(1f), style = NotAi.type.body, color = c.ink)
         IconAction(Icon.Minus, "$title: меньше", minus, size = 16.dp, tint = c.ink)
         Text("$minutes мин", Modifier.widthIn(min = 64.dp).semantics { contentDescription = "$title: $minutes минут" }, style = NotAi.type.body.copy(fontWeight = FontWeight.Medium),

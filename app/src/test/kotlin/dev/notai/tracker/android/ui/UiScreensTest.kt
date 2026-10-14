@@ -320,6 +320,29 @@ class UiScreensTest {
         shot("06-settings", vm)
     }
 
+    /** The whole settings page at once (tall window) for review. */
+    @Config(qualifiers = "w400dp-h1960dp-xhdpi")
+    @Test fun settingsFullPage() {
+        val vm = render(seed())
+        compose.onNodeWithText("Настройки").performClick()
+        waitText("Техническая оболочка")
+        shot("06b-settings-full", vm)
+    }
+
+    /** A new install: no history, no favourites. The first screen a person sees. */
+    @Test fun firstLaunch() {
+        val app = ApplicationProvider.getApplicationContext<android.app.Application>()
+        val catalog = ReadyCatalog.read { app.assets.open("catalog/$it") }
+        val clock = MutableClock(at(today, 9, 41), 1_000_000L)
+        val vm = render(Seed(Tracker(MemoryStore(newInstallData(catalog, zone.id)), clock), clock, catalog))
+        waitText("Начать")
+        shot("13-first-launch", vm)
+        assertTrue("nothing older to show on a new install", compose.onAllNodesWithText("Показать раньше").fetchSemanticsNodes().isEmpty())
+        compose.onNodeWithText("Обзор").performClick()
+        waitText("Обзор соберётся сам")
+        shot("14-first-overview", vm)
+    }
+
     /** Long press opens the menu; delete goes straight through with Undo for a one-segment record. Swipe does the same. */
     @Test fun deleteFromMenuAndSwipe() {
         val seed = seed()

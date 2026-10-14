@@ -38,7 +38,7 @@ fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier 
             val title = if (d.period == Period.DAY) "Сегодня" else Format.period(d.first, d.last)
             Text(title + if (d.incomplete) ", день ещё идёт" else "", style = NotAi.type.bodySmall, color = c.ink2)
             Text(Format.duration(d.totalMs), style = NotAi.type.big, color = c.ink)
-            d.differenceMs?.let { diff ->
+            d.differenceMs?.takeIf { d.totalMs > 0 || (d.previousMs ?: 0L) > 0 }?.let { diff ->
                 val prev = if (d.period == Period.DAY) "вчера" else Format.period(d.previousFirst, d.previousLast)
                 Text(when {
                     d.previousMs == 0L -> if (d.period == Period.DAY) "Вчера записей нет" else "За $prev записей нет"
@@ -47,6 +47,13 @@ fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier 
                     else -> "столько же, сколько ${if (d.period == Period.DAY) prev else "за $prev"}"
                 }, style = NotAi.type.bodySmall, color = c.ink2)
             }
+        }
+        // Nothing recorded in the window: a calm note instead of an empty chart and an empty list.
+        if (d.totalMs == 0L && d.areas.isEmpty() && d.unresolved == 0) {
+            Note(if (d.period == Period.DAY) "Сегодня записей пока нет. Обзор соберётся сам, как только появится первая."
+                else "За эти дни записей нет. Обзор соберётся сам, как только они появятся.", Modifier.padding(top = 4.dp))
+            if (d.goals.isNotEmpty()) Goals(d.goals)
+            return@Column
         }
         if (d.period == Period.DAY) {
             DayRibbon(d.dayStart, d.dayEnd, d.ribbon.map { RibbonPiece(it.start, it.end, it.slot?.let { s -> c.areas[s] } ?: c.none) }, height = 16.dp)
@@ -68,14 +75,18 @@ fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier 
                 }
             }
         }
-        if (d.goals.isNotEmpty()) {
-            Text("Цели", Modifier.padding(top = 18.dp, bottom = 4.dp), style = NotAi.type.section, color = c.ink)
-            d.goals.forEach { g ->
-                ListRow(g.name, subtitle = "${g.value}, ${g.status}", leading = {
-                    M3Icon(if (g.ok) Icon.Check else Icon.Limit, null, Modifier.size(18.dp), tint = if (g.ok) c.areas[Areas.WORK] else c.ink2)
-                })
-            }
-        }
+        if (d.goals.isNotEmpty()) Goals(d.goals)
+    }
+}
+
+@Composable
+private fun ColumnScope.Goals(goals: List<GoalUi>) {
+    val c = NotAi.colors
+    Text("Цели", Modifier.padding(top = 18.dp, bottom = 4.dp), style = NotAi.type.section, color = c.ink)
+    goals.forEach { g ->
+        ListRow(g.name, subtitle = "${g.value}, ${g.status}", leading = {
+            M3Icon(if (g.ok) Icon.Check else Icon.Limit, null, Modifier.size(18.dp), tint = if (g.ok) c.areas[Areas.WORK] else c.ink2)
+        })
     }
 }
 

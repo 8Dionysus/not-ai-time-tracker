@@ -220,7 +220,7 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
             if (entry != null && st != null) {
                 if (st.error != null) Note(st.error)
                 else Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(c.amberWash).padding(horizontal = 14.dp, vertical = 12.dp)) {
-                    Row { Text("${Format.dayTitle(day.date, java.time.LocalDate.now(zone))}, итог", Modifier.weight(1f), style = NotAi.type.bodySmall, color = c.ink)
+                    Row { Text("${Format.dayTitle(day.date, Instant.ofEpochMilli(now).atZone(zone).toLocalDate())}, итог", Modifier.weight(1f), style = NotAi.type.bodySmall, color = c.ink)
                         Text(Format.duration(st.beforeMs), style = NotAi.type.bodySmall, color = c.ink2)
                         Text(" → ${Format.duration(st.afterMs)}", style = NotAi.type.bodySmall, color = c.ink) }
                 }

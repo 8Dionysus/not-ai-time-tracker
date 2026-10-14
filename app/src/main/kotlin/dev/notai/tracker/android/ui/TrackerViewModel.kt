@@ -168,7 +168,9 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
         // Same bounded source as the notification: favourites, then the most frequent of the last 30 days.
         val quick = quickChoices(v, 8).filter { it.entry.canStart && !d.label(it.entry.selection).unclassified }.take(5).map { q -> q.toQuickStart(d) }
         return HomeData(today, zone, dayList, quick, open?.let { d.label(it.selection) }, open?.let { s -> d.segments.filter { it.sessionId == s.id }.minOfOrNull { it.start } },
-            days < 62, d.settings.focusPlan.workMs / 60_000L)
+            // Older days only when something older exists: a new install has nothing to load.
+            days < 62 && (d.segments.minOfOrNull { it.start } ?: Long.MAX_VALUE) < (calendar.days.firstOrNull()?.start ?: Long.MIN_VALUE),
+            d.settings.focusPlan.workMs / 60_000L)
     }
 
     /** Renderer-facing backend state; Compose screens are supplied separately by Claude. */

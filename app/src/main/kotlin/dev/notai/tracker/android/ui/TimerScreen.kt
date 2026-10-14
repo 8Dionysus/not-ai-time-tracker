@@ -129,7 +129,7 @@ private fun IdleHero(home: HomeData?, vm: TrackerViewModel, actions: TimerAction
     val c = NotAi.colors
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Box(Modifier.height(128.dp).widthIn(min = 280.dp).clip(RoundedCornerShape(64.dp))
-            .pressable(vm::startBlank, label = "Начать учёт времени").semantics { contentDescription = "Начать учёт времени" },
+            .pressable(haptic(HapticFeedbackType.Confirm, vm::startBlank), label = "Начать учёт времени").semantics { contentDescription = "Начать учёт времени" },
             contentAlignment = Alignment.Center) {
             IntervalFrame(IntervalState.IDLE, bracketWidth = 26.dp, bracketHeight = 104.dp, gap = 22.dp, opening = false) {
                 Text("Начать", style = NotAi.type.start, color = c.ink)
@@ -137,12 +137,14 @@ private fun IdleHero(home: HomeData?, vm: TrackerViewModel, actions: TimerAction
         }
         Text("Время пойдёт сразу.\nЗанятие можно выбрать потом.", style = NotAi.type.bodySmall, color = c.ink2, textAlign = TextAlign.Center)
         Column(Modifier.fillMaxWidth().padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            SectionLabel("Начать сразу")
+            val quick = home?.quick.orEmpty()
+            // A new install has no favourites or history yet: one honest choice instead of an empty "quick" section.
+            if (quick.isNotEmpty()) SectionLabel("Начать сразу")
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                home?.quick?.forEach { q ->
+                quick.forEach { q ->
                     Chip(q.title, { vm.choose(q.entry, PickMode.START) }, slot = q.slot, glyph = q.glyph)
                 }
-                Chip("Все занятия", { actions.pick(PickMode.START) }, dashed = true, icon = Icon.Plus)
+                Chip(if (quick.isEmpty()) "Начать с занятием" else "Все занятия", { actions.pick(PickMode.START) }, dashed = true, icon = Icon.Plus)
             }
             PillButton("Фокус: ${home?.focusMinutes ?: 25} мин работы", vm::startFocus, kind = ButtonKind.TEXT, height = 44.dp,
                 modifier = Modifier.align(Alignment.Start).offset(x = (-18).dp))
@@ -203,9 +205,9 @@ private fun ActiveHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, actio
         }
         Text(line, style = NotAi.type.caption, color = c.ink2, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
         ButtonPair(Modifier.padding(top = 4.dp)) { m ->
-            if (s.mode == Mode.RUNNING) PillButton("Пауза", vm::pause, m, ButtonKind.TONAL, Icon.Pause)
-            else PillButton("Продолжить", vm::resume, m, ButtonKind.AMBER, Icon.Play)
-            PillButton("Стоп", vm::stop, m, ButtonKind.PRIMARY, Icon.Stop)
+            if (s.mode == Mode.RUNNING) PillButton("Пауза", haptic(HapticFeedbackType.ToggleOff, vm::pause), m, ButtonKind.TONAL, Icon.Pause)
+            else PillButton("Продолжить", haptic(HapticFeedbackType.ToggleOn, vm::resume), m, ButtonKind.AMBER, Icon.Play)
+            PillButton("Стоп", haptic(HapticFeedbackType.Confirm, vm::stop), m, ButtonKind.PRIMARY, Icon.Stop)
         }
         if (s.mode == Mode.RUNNING && "switchedEarlier" in s.actions) Row(Modifier.heightIn(min = 44.dp).pressable(actions.earlier).padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically) {
@@ -268,11 +270,11 @@ private fun FocusHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, action
         if (work) CurrentLabel(home) { actions.pick(PickMode.LABEL) }
         ButtonPair(Modifier.padding(top = 4.dp)) { m ->
             when (f.mode) {
-                FocusMode.RUNNING -> PillButton("Пауза", vm::pause, m, ButtonKind.TONAL, Icon.Pause)
-                FocusMode.PAUSED -> PillButton("Продолжить", vm::resume, m, ButtonKind.AMBER, Icon.Play)
+                FocusMode.RUNNING -> PillButton("Пауза", haptic(HapticFeedbackType.ToggleOff, vm::pause), m, ButtonKind.TONAL, Icon.Pause)
+                FocusMode.PAUSED -> PillButton("Продолжить", haptic(HapticFeedbackType.ToggleOn, vm::resume), m, ButtonKind.AMBER, Icon.Play)
                 else -> PillButton(if (work) "Начать перерыв" else "Начать работу", vm::focusNext, m, ButtonKind.AMBER)
             }
-            PillButton("Завершить", vm::stop, m, ButtonKind.PRIMARY, Icon.Stop)
+            PillButton("Завершить", haptic(HapticFeedbackType.Confirm, vm::stop), m, ButtonKind.PRIMARY, Icon.Stop)
         }
         if (f.mode != FocusMode.DUE) PillButton(if (work) "Пропустить отрезок" else "Пропустить перерыв", vm::focusSkip, kind = ButtonKind.TEXT, height = 44.dp)
         Text("Перерыв не входит во время занятия. Следующий отрезок начнётся, когда ты нажмёшь.", style = NotAi.type.caption, color = c.ink2,
@@ -285,11 +287,16 @@ private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: Track
         item(key = "day-${day.date}") {
             val c = NotAi.colors
             Column(Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 22.dp, bottom = 4.dp)) {
-                SectionTitle(Format.dayTitle(day.date, home.today), trailing = Format.duration(day.recordedMs))
+                val empty = day.entries.isEmpty() && day.live.isEmpty() && day.recordedMs == 0L
+                SectionTitle(Format.dayTitle(day.date, home.today), trailing = if (empty) null else Format.duration(day.recordedMs))
                 Spacer(Modifier.height(10.dp))
-                val pieces = day.ribbon.map { RibbonPiece(it.start, it.end, it.slot?.let { s -> c.areas[s] } ?: c.none) } +
-                    day.live.map { RibbonPiece(it.start, it.end, c.amber, live = true) }
-                DayRibbon(day.start, day.end, pieces)
+                if (empty) Text(if (day.date == home.today) "Записей пока нет. Здесь появится каждый отрезок." else "Записей нет.",
+                    style = NotAi.type.bodySmall, color = c.ink2)
+                else {
+                    val pieces = day.ribbon.map { RibbonPiece(it.start, it.end, it.slot?.let { s -> c.areas[s] } ?: c.none) } +
+                        day.live.map { RibbonPiece(it.start, it.end, c.amber, live = true) }
+                    DayRibbon(day.start, day.end, pieces)
+                }
             }
         }
         items(day.entries, key = { "${day.date}:${it.segmentId}" }) { e ->
@@ -318,6 +325,10 @@ private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: Track
 private fun SwipeToDelete(e: EntryUi, delete: suspend (EntryUi) -> Boolean, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     val c = NotAi.colors
     val state = rememberSwipeToDismissBoxState(positionalThreshold = { it * 0.35f })
+    val haptics = LocalHapticFeedback.current
+    LaunchedEffect(state.targetValue) {
+        if (state.targetValue == SwipeToDismissBoxValue.EndToStart) haptics.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+    }
     LaunchedEffect(state.currentValue) {
         if (state.currentValue == SwipeToDismissBoxValue.EndToStart) {
             if (!delete(e)) state.reset()
@@ -381,4 +392,11 @@ private fun EntryMenu(open: Boolean, onDismiss: () -> Unit, onOpen: () -> Unit, 
         item("Повторить", Icon.Repeat, c.ink, onRepeat)
         if (onDelete != null) item("Удалить", Icon.Trash, c.danger, onDelete)
     }
+}
+
+/** Light, meaningful haptics: confirm for start/stop, toggle for pause/resume. Nothing on ordinary taps. */
+@Composable
+private fun haptic(type: HapticFeedbackType, action: () -> Unit): () -> Unit {
+    val h = LocalHapticFeedback.current
+    return { h.performHapticFeedback(type); action() }
 }

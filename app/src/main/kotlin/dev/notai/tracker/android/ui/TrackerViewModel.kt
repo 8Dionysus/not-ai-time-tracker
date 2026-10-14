@@ -189,6 +189,14 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
         if(route?.assignmentId == null) { clearSurfacePicker(route); return }
         command { rt,_ -> rt.tracker.cancelAssignment(route.assignmentId).also { clearSurfacePicker(route) } }
     }
+    fun reopenStoppedAssignment(sessionId: String,source: dev.notai.tracker.android.Surface) {
+        val rt = runtime ?: return
+        val shown = snapshot.value ?: view.value?.snapshot() ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            try { receiveSurfacePicker(dev.notai.tracker.android.SurfaceChoices.reopen(app,rt.tracker,source,shown.token,sessionId)) }
+            catch(e: Exception) { notice(Format.error(e)) }
+        }
+    }
     suspend fun pendingStoppedAssignments(): List<StoppedAssignment> = withContext(Dispatchers.IO) { waitRuntime()?.tracker?.pendingAssignments().orEmpty() }
     private val _capabilities = MutableStateFlow<dev.notai.tracker.android.SettingsCapabilities?>(null)
     val capabilities: StateFlow<dev.notai.tracker.android.SettingsCapabilities?> = _capabilities

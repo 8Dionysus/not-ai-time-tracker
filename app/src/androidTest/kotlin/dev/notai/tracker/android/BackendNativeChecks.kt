@@ -16,7 +16,9 @@ object BackendNativeChecks {
         val db = TrackerDatabase.open(context,name)
         try {
             val store = RoomStore(db)
-            var wall = System.currentTimeMillis()-60_000; var elapsed = 100_000L
+            val saved = if(mode == "backend-create") null else codec.parseToJsonElement(receipt.readText()).jsonObject
+            var wall = saved?.getValue("wall")?.jsonPrimitive?.long ?: (System.currentTimeMillis()-60_000)
+            var elapsed = saved?.getValue("elapsed")?.jsonPrimitive?.long ?: 100_000L
             val clock = Clock { Moment(wall,elapsed,"qa-backend-boot") }
             val tracker = Tracker(store,clock)
             if(mode == "backend-create") {
@@ -24,51 +26,88 @@ object BackendNativeChecks {
                 tracker.saveCard(tracker.snapshot().token,card)
                 tracker.saveFavorite(tracker.snapshot().token,Favorite(id = "qa-backend-favorite",label = "Synthetic",selection = card.classification()))
                 tracker.start(tracker.snapshot().token)
+                val oldId = tracker.snapshot().session!!.id
+                tracker.measure(tracker.snapshot().token,Measurement(id = "qa-old-pages",fieldId = "pages",unit = "page",scope = Scope.SESSION,targetId = oldId,value = 3))
+                tracker.measure(tracker.snapshot().token,Measurement(id = "qa-old-reps",fieldId = "reps",unit = "rep",scope = Scope.SEGMENT,targetId = tracker.snapshot().active!!.id,value = 2))
                 wall += 1000;elapsed += 1000
-                val offer = tracker.stopForAssignment(tracker.snapshot().timerTarget!!).assignment!!
+                val stopped = tracker.stopForAssignment(tracker.snapshot().timerTarget!!)
+                val offer = stopped.assignment!!
                 val choice = tracker.choices().reference(tracker.choices().resolve("card:${card.id}")!!)
-                atomicText(receipt,buildJsonObject { put("offer",codec.encodeToJsonElement(offer));put("choice",codec.encodeToJsonElement(choice)) }.toString())
-                check(tracker.data().segments.single().durationMs == 1000L)
+                tracker.start(tracker.snapshot().token,Classification(name = "Current must remain unchanged"))
+                val currentId = tracker.snapshot().session!!.id
+                tracker.measure(tracker.snapshot().token,Measurement(id = "qa-current-pages",fieldId = "pages",unit = "page",scope = Scope.SESSION,targetId = currentId,value = 7))
+                tracker.measure(tracker.snapshot().token,Measurement(id = "qa-current-reps",fieldId = "reps",unit = "rep",scope = Scope.SEGMENT,targetId = tracker.snapshot().active!!.id,value = 9))
+                wall += 2000;elapsed += 2000
+                atomicText(receipt,buildJsonObject {
+                    put("offer",codec.encodeToJsonElement(offer));put("choice",codec.encodeToJsonElement(choice))
+                    put("stoppedTarget",codec.encodeToJsonElement(stopped.state.timerTarget!!))
+                    put("oldRoute",codec.encodeToJsonElement(SurfaceChoices.route(Surface.NOTIFICATION,stopped.state,offer)))
+                    put("wall",wall);put("elapsed",elapsed);put("currentId",currentId)
+                }.toString())
+                check(tracker.data().segments.single { it.sessionId == oldId }.durationMs == 1000L)
+                check(tracker.snapshot().trustedDurationMs == 2000L && tracker.snapshot().mode == Mode.RUNNING)
+                check(tracker.pendingAssignments().single() == offer)
             } else {
                 check(mode == "backend-reopen")
-                val saved = codec.parseToJsonElement(receipt.readText()).jsonObject
-                val offer = codec.decodeFromJsonElement<StoppedAssignment>(saved.getValue("offer"))
+                val original = codec.decodeFromJsonElement<StoppedAssignment>(saved!!.getValue("offer"))
                 val choice = codec.decodeFromJsonElement<ChoiceReference>(saved.getValue("choice"))
-                check(tracker.pendingAssignments().single() == offer)
-                tracker.assignStopped(offer.id,choice)
-                check(tracker.data().sessions.single().selection.cardId == "qa-backend-card")
-                check(tracker.data().segments.single().durationMs == 1000L)
-                check(runCatching { tracker.assignStopped(offer.id,choice) }.exceptionOrNull().let { it is CoreError && it.code == ErrorCode.STALE })
-                val id = tracker.data().sessions.single().id
-                tracker.measure(tracker.snapshot().token,Measurement(fieldId = "pages",unit = "page",scope = Scope.SESSION,targetId = id,value = 3))
-                tracker.measure(tracker.snapshot().token,Measurement(fieldId = "reps",unit = "rep",scope = Scope.SEGMENT,targetId = tracker.data().segments.single().id,value = 2))
-                val before = tracker.data()
-                val preview = tracker.previewDeleteSession(id);check(preview.measurementCount == 2)
-                tracker.applyDeleteSession(preview);check(tracker.data().sessions.isEmpty() && tracker.data().measurements.isEmpty())
+                val oldTarget = codec.decodeFromJsonElement<TimerTarget>(saved.getValue("stoppedTarget"))
+                val oldRoute = codec.decodeFromJsonElement<SurfacePickerRoute>(saved.getValue("oldRoute"))
+                val currentId = saved.getValue("currentId").jsonPrimitive.content
+                check(tracker.pendingAssignments().single() == original)
+                check(tracker.snapshot().session!!.id == currentId && tracker.snapshot().mode == Mode.RUNNING)
+                val before = tracker.data();val beforeSnapshot = tracker.snapshot()
+                fun stale(block: ()->Unit) { check(runCatching(block).exceptionOrNull().let { it is CoreError && it.code == ErrorCode.STALE }) }
+                stale { tracker.timerCommand(oldTarget,TimerDirective.START) }
+                stale { SurfaceChoices.read(tracker,oldRoute) }
+                stale { tracker.assignStopped(original.id,choice,requestTarget = oldTarget) }
+                check(before == tracker.data())
+                val renewed = tracker.reopenAssignment(tracker.snapshot().token,original.sessionId).assignment!!
+                check(renewed.id != original.id)
+                stale { tracker.assignStopped(original.id,choice) }
+                val freshRoute = SurfaceChoices.route(Surface.NOTIFICATION,tracker.snapshot(),renewed)
+                check(SurfaceChoices.read(tracker,freshRoute).assignment == renewed)
+                tracker.assignStopped(renewed.id,choice,"Past record only",requestTarget = freshRoute.target)
+                val after = tracker.data();val afterSnapshot = tracker.snapshot()
+                check(after.sessions.single { it.id == original.sessionId }.selection.cardId == "qa-backend-card")
+                check(before.sessions.single { it.id == currentId } == after.sessions.single { it.id == currentId })
+                check(before.segments.filter { it.sessionId == currentId } == after.segments.filter { it.sessionId == currentId })
+                check(before.segments.map { listOf(it.id,it.start,it.end,it.durationMs,it.anchor,it.uncertain,it.observedUntil,it.limitMs) } ==
+                    after.segments.map { listOf(it.id,it.start,it.end,it.durationMs,it.anchor,it.uncertain,it.observedUntil,it.limitMs) })
+                check(before.measurements == after.measurements)
+                check(beforeSnapshot.session == afterSnapshot.session && beforeSnapshot.timerTarget == afterSnapshot.timerTarget)
+                check(beforeSnapshot.trustedDurationMs == afterSnapshot.trustedDurationMs && afterSnapshot.trustedDurationMs == 2000L)
+                stale { tracker.assignStopped(renewed.id,choice) }
+                stale { tracker.reopenAssignment(tracker.snapshot().token,original.sessionId) }
+                tracker.undo(tracker.snapshot().token)
+                stale { tracker.reopenAssignment(tracker.snapshot().token,original.sessionId) }
+                check(before.sessions == tracker.data().sessions && before.segments == tracker.data().segments && before.measurements == tracker.data().measurements)
+                val preview = tracker.previewDeleteSession(original.sessionId);check(preview.measurementCount == 2)
+                tracker.applyDeleteSession(preview)
+                check(tracker.data().sessions.single().id == currentId && tracker.data().measurements.size == 2)
                 tracker.undo(tracker.snapshot().token)
                 check(before.sessions == tracker.data().sessions && before.segments == tracker.data().segments && before.measurements == tracker.data().measurements)
-                tracker.start(tracker.snapshot().token);wall += 1000;elapsed += 1000
-                val old = tracker.stopForAssignment(tracker.snapshot().timerTarget!!).assignment!!
-                tracker.start(tracker.snapshot().token)
-                val current = tracker.snapshot().session!!.id
-                check(runCatching { tracker.assignStopped(old.id,choice) }.exceptionOrNull().let { it is CoreError && it.code == ErrorCode.STALE })
-                check(tracker.snapshot().session!!.id == current)
-                wall += 1000;elapsed += 1000;tracker.stop(tracker.snapshot().token)
-                val route = SurfaceChoices.route(Surface.NOTIFICATION,tracker.snapshot())
-                val pending = SurfaceChoices.pending(context,route);check(pending.isActivity && pending.isImmutable)
-                val savedRoute = android.os.Bundle();SurfaceChoices.save(savedRoute,route)
-                check(route == SurfaceChoices.restore(savedRoute,android.content.Intent()))
-                check(tracker.data().sessions.size == 3)
+                val pending = SurfaceChoices.pending(context,freshRoute);check(pending.isActivity && pending.isImmutable)
+                val bundle = android.os.Bundle();SurfaceChoices.save(bundle,freshRoute)
+                check(freshRoute == SurfaceChoices.restore(bundle,android.content.Intent()))
             }
             check(live == liveDigest(context)) { "Existing live records changed" }
             val widget = WidgetPlacementController(context).read()
             return buildJsonObject {
-                put("schema","tracker_backend_native_v1");put("mode",mode);put("isolatedDatabase",name)
+                put("schema","tracker_backend_native_v2");put("mode",mode);put("isolatedDatabase",name)
+                put("clock","Synthetic fixed wall/monotonic samples, real Android processes and Room/SQLite")
                 put("liveRecordsUnchanged",true);put("liveDigest",live);put("sessions",tracker.data().sessions.size)
                 put("segments",tracker.data().segments.size);put("measurements",tracker.data().measurements.size)
-                put("pendingAssignments",tracker.pendingAssignments().size);put("widgetPinSupported",widget.supported)
-                put("widgetInstanceCount",widget.ids.size);put("widgetPlacement",widget.placement.name)
-                put("platformPinRequested",false);put("processId",android.os.Process.myPid())
+                put("pendingAssignments",tracker.pendingAssignments().size);put("timerMode",tracker.snapshot().mode.name)
+                put("currentDurationMs",tracker.snapshot().trustedDurationMs)
+                put("nextStartBeforeProcessDeath",true)
+                put("freshAssignmentSucceeded",mode == "backend-reopen")
+                if(mode == "backend-reopen") {
+                    put("currentSessionUnchanged",true);put("allTimesUnchanged",true);put("allMeasurementsUnchanged",true)
+                    put("oldSurfaceTargetRejected",true);put("rotatedNonceRejected",true);put("replayRejected",true)
+                }
+                put("widgetPinSupported",widget.supported);put("widgetInstanceCount",widget.ids.size)
+                put("widgetPlacement",widget.placement.name);put("platformPinRequested",false);put("processId",android.os.Process.myPid())
             }
         } finally { db.close() }
     }

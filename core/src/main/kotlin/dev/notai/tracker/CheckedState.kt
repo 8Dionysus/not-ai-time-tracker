@@ -80,7 +80,7 @@ class CheckedState private constructor(val data: Dataset,private val sessionPosi
         fun <E> edited(old: List<E>,rows: List<Positioned<E>>): List<E> = if(rows.isEmpty()) old else frozenList(old.toMutableList().apply {
             for(row in rows) if(row.position == size) add(row.value) else set(row.position,row.value)
         })
-        val next = data.copy(revision = Math.addExact(data.revision,1),timerEpoch = Math.addExact(data.timerEpoch,1),pendingAssignments = emptyList(),sessions = edited(data.sessions,sessionRows),segments = edited(data.segments,segmentRows))
+        val next = data.copy(revision = Math.addExact(data.revision,1),timerEpoch = Math.addExact(data.timerEpoch,1),sessions = edited(data.sessions,sessionRows),segments = edited(data.segments,segmentRows))
         val checked = CheckedState(next,nextSession,nextSegment,own,end,total,typeIds,cardIds)
         val changed = sessionRows.map { it.value.id }.toSet()
         return CheckedCommit(this,checked,result(checked,changed),TimerRows(frozenList(sessionRows),frozenList(segmentRows)))

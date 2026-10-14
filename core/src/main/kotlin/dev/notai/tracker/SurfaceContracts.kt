@@ -33,8 +33,14 @@ internal fun recordFingerprint(d: Dataset,id: String): String {
     val measurements = d.measurements.filter { (it.scope == Scope.SESSION && it.targetId == id) || (it.scope == Scope.SEGMENT && it.targetId in ids) }.sortedBy { it.id }
     return sha256((codec.encodeToString(s)+codec.encodeToString(segments)+codec.encodeToString(measurements)).toByteArray(Charsets.UTF_8))
 }
+/** Record validity is independent of the current timer's epoch. */
+internal fun assignmentValid(d: Dataset,offer: StoppedAssignment): Boolean =
+    offer.datasetId == d.datasetId && offer.barrier == d.controlBarrier &&
+        d.sessions.any { it.id == offer.sessionId && it.status == SessionStatus.STOPPED } &&
+        recordFingerprint(d,offer.sessionId) == offer.recordFingerprint
 internal fun validateAssignments(d: Dataset) {
-    ensure(d.pendingAssignments.size <= 32 && d.pendingAssignments.map { it.id }.distinct().size == d.pendingAssignments.size,"Invalid assignment ledger")
+    ensure(d.pendingAssignments.size <= 32 && d.pendingAssignments.map { it.id }.distinct().size == d.pendingAssignments.size &&
+        d.pendingAssignments.map { it.sessionId }.distinct().size == d.pendingAssignments.size,"Invalid assignment ledger")
     d.pendingAssignments.forEach { offer ->
         ensure(offer.id.isNotBlank() && offer.datasetId == d.datasetId && offer.barrier == d.controlBarrier &&
             offer.timerEpoch >= 0 && offer.timerEpoch <= d.timerEpoch && offer.sessionId.isNotBlank() &&

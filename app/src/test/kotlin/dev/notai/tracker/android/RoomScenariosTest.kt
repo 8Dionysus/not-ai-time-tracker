@@ -380,6 +380,23 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertNotNull(stopped.assignment)
         org.junit.Assert.assertEquals(TimerCommand.START,TimerSurfaces.overlayPrimary(stopped.state))
         org.junit.Assert.assertThrows(CoreError::class.java) { TimerSurfaces.execute(tracker,overlay,true) }
+        val oldAssignmentRoute = SurfaceChoices.route(Surface.NOTIFICATION,stopped.state,stopped.assignment)
+        tracker.start(tracker.snapshot().token)
+        val currentBefore = tracker.snapshot()
+        val dataBefore = tracker.data()
+        org.junit.Assert.assertThrows(CoreError::class.java) { SurfaceChoices.read(tracker,oldAssignmentRoute) }
+        org.junit.Assert.assertThrows(CoreError::class.java) { SurfaceChoices.choose(context,tracker,oldAssignmentRoute,state.choices.single().reference) }
+        org.junit.Assert.assertEquals(dataBefore,tracker.data())
+        tracker = Tracker(reopen(tracker.store),clock)
+        val freshRoute = SurfaceChoices.reopen(context,tracker,Surface.NOTIFICATION,tracker.snapshot().token,stopped.assignment!!.sessionId)
+        org.junit.Assert.assertNotEquals(oldAssignmentRoute.assignmentId,freshRoute.assignmentId)
+        val freshState = SurfaceChoices.read(tracker,freshRoute)
+        SurfaceChoices.choose(context,tracker,freshRoute,freshState.choices.single().reference,"Saved record")
+        org.junit.Assert.assertEquals(currentBefore.session,tracker.snapshot().session)
+        org.junit.Assert.assertEquals(currentBefore.timerTarget,tracker.snapshot().timerTarget)
+        org.junit.Assert.assertEquals(currentBefore.trustedDurationMs,tracker.snapshot().trustedDurationMs)
+        org.junit.Assert.assertThrows(CoreError::class.java) { SurfaceChoices.choose(context,tracker,freshRoute,freshState.choices.single().reference) }
+        clock.advance(1_000);tracker.stop(tracker.snapshot().token)
         val controller = WidgetPlacementController(context)
         val manager = android.appwidget.AppWidgetManager.getInstance(context)
         val widgets = org.robolectric.Shadows.shadowOf(manager)

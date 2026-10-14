@@ -38,8 +38,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
             if(expected != null) checkToken(old, expected, now)
             val edited = edit(old,now)
             val identityChanged = timerIdentity(old) != timerIdentity(edited)
-            val next = edited.copy(revision = Math.addExact(old.revision,1),timerEpoch = if(identityChanged) Math.addExact(old.timerEpoch,1) else old.timerEpoch,
-                pendingAssignments = if(identityChanged) emptyList() else edited.pendingAssignments)
+            val next = edited.copy(revision = Math.addExact(old.revision,1),timerEpoch = if(identityChanged) Math.addExact(old.timerEpoch,1) else old.timerEpoch)
             checked.replace(next) { validated ->
                 val changed = changedSessions(old,next)
                 Triple(Change(validated.snapshot(now), changed, undoable, validated.data, now), old, next)
@@ -69,7 +68,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
                     TimerAction.RESUME -> FocusTransitions.resume(d,now)
                     TimerAction.STOP -> FocusTransitions.cancel(d,now)
                     TimerAction.SWITCH -> { checkStartable(d,selection); append(FocusTransitions.cancel(d,now),selection,note,now) }
-                }.copy(revision = Math.addExact(d.revision,1),timerEpoch = Math.addExact(d.timerEpoch,1),pendingAssignments = emptyList())
+                }.copy(revision = Math.addExact(d.revision,1),timerEpoch = Math.addExact(d.timerEpoch,1))
                 checked.replace(edited) { next -> Change(next.snapshot(now),changedSessions(d,next.data),action == TimerAction.SWITCH,next.data,now) to d }
             }
             if(assignmentAfterStop) {
@@ -96,22 +95,33 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun stopForAssignment(target: TimerTarget,allowed: (Dataset)->Boolean = { true }) =
         timer(null,TimerAction.STOP,target = target,allowed = allowed,assignmentAfterStop = true)
     fun pendingAssignments(): List<StoppedAssignment> = data().let { d -> d.pendingAssignments.filter { offer ->
-        offer.timerEpoch == d.timerEpoch && d.sessions.any { it.id == offer.sessionId && it.status == SessionStatus.STOPPED } &&
-            recordFingerprint(d,offer.sessionId) == offer.recordFingerprint
+        assignmentValid(d,offer)
     } }
     private fun checkedOffer(d: Dataset,id: String): StoppedAssignment {
         val offer = d.pendingAssignments.find { it.id == id } ?: fail(ErrorCode.STALE,"Assignment was handled or expired")
-        ensure(offer.datasetId == d.datasetId && offer.barrier == d.controlBarrier && offer.timerEpoch == d.timerEpoch &&
-            d.sessions.any { it.id == offer.sessionId && it.status == SessionStatus.STOPPED } &&
-            recordFingerprint(d,offer.sessionId) == offer.recordFingerprint,"Completed record changed",ErrorCode.STALE)
+        ensure(assignmentValid(d,offer),"Completed record changed",ErrorCode.STALE)
         return offer
+    }
+    /** Explicit fresh request for a saved record. Rotate the nonce; don't rebind an old surface command. */
+    fun reopenAssignment(expected: Token,sessionId: String,allowed: (Dataset)->Boolean = { true }): Change {
+        lateinit var renewed: StoppedAssignment
+        val change = mutate(expected) { d,_ ->
+            ensure(allowed(d),"Surface disabled or permission denied")
+            val previous = d.pendingAssignments.find { it.sessionId == sessionId }
+                ?: fail(ErrorCode.STALE,"Saved assignment was handled, deleted or is unavailable")
+            checkedOffer(d,previous.id)
+            renewed = previous.copy(id = newId(),timerEpoch = d.timerEpoch)
+            d.copy(pendingAssignments = d.pendingAssignments.map { if(it.id == previous.id) renewed else it })
+        }
+        return change.copy(assignment = renewed)
     }
     /** Explicit cancellation retains the completed time; receipt consumption is durable and replay-safe. */
     fun cancelAssignment(id: String) = mutate(null) { d,_ ->
         checkedOffer(d,id); d.copy(pendingAssignments = d.pendingAssignments.filterNot { it.id == id })
     }
-    fun assignStopped(id: String,choice: ChoiceReference,note: String? = null,allowed: (Dataset)->Boolean = { true }) = mutate(null,true) { d,n ->
+    fun assignStopped(id: String,choice: ChoiceReference,note: String? = null,requestTarget: TimerTarget? = null,allowed: (Dataset)->Boolean = { true }) = mutate(null,true) { d,n ->
         ensure(allowed(d),"Surface disabled or permission denied")
+        ensure(requestTarget == null || snapshot(d,n).timerTarget == requestTarget,"Picker timer target changed",ErrorCode.STALE)
         val offer = checkedOffer(d,id)
         val entry = ChoiceView(d,choiceCache) { snapshot(d,n) }.resolve(choice)
         checkStartable(d,entry.selection)
@@ -399,7 +409,10 @@ class Tracker(val store: StateStore, val clock: Clock) {
     @Synchronized fun undo(expected: Token): Change {
         val saved = undo
         if (saved == null || saved.first != expected) throw CoreError(ErrorCode.STALE,"No matching available undo",snapshot())
-        return mutate(expected) { _,_ -> saved.second.copy(pendingAssignments = emptyList()) }
+        return mutate(expected) { live,_ ->
+            // Preserve still-live requests for unchanged saved records, never resurrect consumed nonces.
+            saved.second.copy(pendingAssignments = live.pendingAssignments.filter { assignmentValid(saved.second,it) })
+        }
     }
     private fun changedSessions(old: Dataset,next: Dataset): Set<String> {
         val changed = mutableSetOf<String>()

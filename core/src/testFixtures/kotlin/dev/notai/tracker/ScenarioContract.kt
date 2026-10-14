@@ -61,14 +61,16 @@ abstract class ScenarioContract {
         t.start(token()); clock.advance(1_000); val cancelled = t.stopForAssignment(t.snapshot().timerTarget!!).assignment!!
         t.cancelAssignment(cancelled.id); expect(ErrorCode.STALE) { t.cancelAssignment(cancelled.id) }
         assertEquals(2,t.data().sessions.size)
-        t.start(token()); clock.advance(1_000); val old = t.stopForAssignment(t.snapshot().timerTarget!!).assignment!!
+        t.start(token()); clock.advance(1_000); val oldChange = t.stopForAssignment(t.snapshot().timerTarget!!)
+        val old = oldChange.assignment!!
         t.start(token()); val current = token().sessionId
-        expect(ErrorCode.STALE) { t.assignStopped(old.id,ref) }
+        expect(ErrorCode.STALE) { t.assignStopped(old.id,ref,requestTarget = oldChange.state.timerTarget) }
         assertEquals(current,token().sessionId); clock.advance(1_000); t.stop(token())
         t.start(token()); clock.advance(1_000)
         val changedOffer = t.stopForAssignment(t.snapshot().timerTarget!!).assignment!!
         t.measure(token(),Measurement(fieldId = "pages",unit = "page",scope = Scope.SESSION,targetId = changedOffer.sessionId,value = 1))
-        assertTrue(t.pendingAssignments().isEmpty())
+        assertFalse(t.pendingAssignments().any { it.id == changedOffer.id })
+        assertTrue(t.pendingAssignments().any { it.id == old.id })
         expect(ErrorCode.STALE) { t.assignStopped(changedOffer.id,ref) }
         val beforeDenied = t.data()
         expect(ErrorCode.INVALID_INPUT) { t.startChoice(t.snapshot().timerTarget!!,ref) { false } }
@@ -84,6 +86,71 @@ abstract class ScenarioContract {
         assertNull(t.data().focus); assertEquals(SessionStatus.STOPPED,t.data().sessions.find { it.id == focusOffer.sessionId }!!.status)
         t.deleteSession(token(),focusOffer.sessionId)
         expect(ErrorCode.STALE) { t.assignStopped(focusOffer.id,ref) }
+    }
+    private fun savedAssignmentAcrossNextSession() {
+        val clock = FakeClock();var t = Tracker(createStore(),clock)
+        fun token() = t.snapshot().token
+        val card = Card(id = "saved-record-choice",name = "Saved record",activityTypeId = "language")
+        t.saveCard(token(),card)
+        t.start(token());val oldId = token().sessionId!!
+        val oldSegment = t.snapshot().active!!.id
+        t.measure(token(),Measurement(id = "saved-old-pages",fieldId = "pages",unit = "page",scope = Scope.SESSION,targetId = oldId,value = 3))
+        t.measure(token(),Measurement(id = "saved-old-reps",fieldId = "reps",unit = "rep",scope = Scope.SEGMENT,targetId = oldSegment,value = 2))
+        clock.advance(1_000)
+        val stopped = t.stopForAssignment(t.snapshot().timerTarget!!)
+        val original = stopped.assignment!!
+        t.start(token(),Classification(name = "Current must stay unchanged"));val currentId = token().sessionId!!
+        t.measure(token(),Measurement(id = "saved-current-pages",fieldId = "pages",unit = "page",scope = Scope.SESSION,targetId = currentId,value = 7))
+        t.measure(token(),Measurement(id = "saved-current-reps",fieldId = "reps",unit = "rep",scope = Scope.SEGMENT,targetId = t.snapshot().active!!.id,value = 9))
+        clock.advance(2_000)
+        assertEquals(original,t.pendingAssignments().single())
+        val beforeReopen = t.data()
+        t = Tracker(reopen(t.store),clock);clock.process = "after-process-death"
+        assertEquals(beforeReopen,t.data());assertEquals(original,t.pendingAssignments().single())
+        val shown = t.snapshot();assertEquals(currentId,shown.session!!.id)
+        val beforeStale = t.data();val reference = t.choices().reference(t.choices().resolve("card:${card.id}")!!)
+        expect(ErrorCode.STALE) { t.timerCommand(stopped.state.timerTarget!!,TimerDirective.START) }
+        expect(ErrorCode.STALE) { t.assignStopped(original.id,reference,requestTarget = stopped.state.timerTarget) }
+        assertEquals(beforeStale,t.data())
+        val fresh = t.reopenAssignment(token(),oldId).assignment!!
+        assertNotEquals(original.id,fresh.id);assertEquals(oldId,fresh.sessionId)
+        expect(ErrorCode.STALE) { t.assignStopped(original.id,reference) }
+        val before = t.data();val beforeSnapshot = t.snapshot()
+        val change = t.assignStopped(fresh.id,reference,"Past record only",requestTarget = beforeSnapshot.timerTarget)
+        assertEquals(setOf(oldId),change.changedSessionIds)
+        assertEquals(card.id,t.data().sessions.single { it.id == oldId }.selection.cardId)
+        assertEquals(before.sessions.single { it.id == currentId },t.data().sessions.single { it.id == currentId })
+        assertEquals(before.segments.filter { it.sessionId == currentId },t.data().segments.filter { it.sessionId == currentId })
+        assertEquals(before.segments.map { listOf(it.id,it.start,it.end,it.durationMs,it.anchor,it.uncertain,it.observedUntil,it.limitMs) },
+            t.data().segments.map { listOf(it.id,it.start,it.end,it.durationMs,it.anchor,it.uncertain,it.observedUntil,it.limitMs) })
+        assertEquals(before.measurements,t.data().measurements)
+        assertEquals(beforeSnapshot.session,t.snapshot().session);assertEquals(beforeSnapshot.timerTarget,t.snapshot().timerTarget)
+        assertEquals(beforeSnapshot.trustedDurationMs,t.snapshot().trustedDurationMs)
+        expect(ErrorCode.STALE) { t.assignStopped(fresh.id,reference) }
+        expect(ErrorCode.STALE) { t.reopenAssignment(token(),oldId) }
+        t.undo(token());expect(ErrorCode.STALE) { t.reopenAssignment(token(),oldId) }
+        assertEquals(beforeSnapshot.session,t.snapshot().session)
+        clock.advance(1_000);t.stop(token())
+        // Unrelated Undo retains an outstanding request; a record edit invalidates it.
+        t.start(token());clock.advance(1_000);val edited = t.stopForAssignment(t.snapshot().timerTarget!!).assignment!!
+        t.saveGoal(token(),Goal(id = "saved-unrelated-goal",name = "Goal",metric = GoalMetric.DURATION_MS,target = 1_000))
+        t.undo(token());assertTrue(t.pendingAssignments().any { it.id == edited.id })
+        val segment = t.data().segments.single { it.sessionId == edited.sessionId }
+        t.correctSession(token(),edited.sessionId,listOf(Tracker.SegmentEdit(segment.id,segment.start,segment.end!!,segment.selection)),"Edited")
+        expect(ErrorCode.STALE) { t.reopenAssignment(token(),edited.sessionId) }
+        // Deleted request does not resurrect with Undo; restore and dataset switches also reject.
+        t.start(token());clock.advance(1_000);val deleted = t.stopForAssignment(t.snapshot().timerTarget!!).assignment!!
+        t.deleteSession(token(),deleted.sessionId);t.undo(token())
+        expect(ErrorCode.STALE) { t.reopenAssignment(token(),deleted.sessionId) }
+        t.start(token());clock.advance(1_000);val restoreOffer = t.stopForAssignment(t.snapshot().timerTarget!!).assignment!!
+        val oldToken = token();val backups = Backups(t,MemoryRollback());backups.apply(backups.prepare(backups.export()))
+        expect(ErrorCode.STALE) { t.assignStopped(restoreOffer.id,reference) }
+        expect(ErrorCode.STALE) { t.reopenAssignment(oldToken,restoreOffer.sessionId) }
+        expect(ErrorCode.STALE) { t.reopenAssignment(token(),restoreOffer.sessionId) }
+        val beforeDatasetSwitch = token()
+        t.store.transaction { d -> d.copy(datasetId = newId(),pendingAssignments = emptyList()) to Unit }
+        expect(ErrorCode.STALE) { t.reopenAssignment(beforeDatasetSwitch,restoreOffer.sessionId) }
+        expect(ErrorCode.STALE) { t.assignStopped(restoreOffer.id,reference) }
     }
     private fun completedDeletionLifecycle() {
         val clock = FakeClock();var t = Tracker(createStore(),clock)
@@ -131,6 +198,7 @@ abstract class ScenarioContract {
     }
 
     @Test fun timerPath() {
+        savedAssignmentAcrossNextSession()
         surfaceChoiceAndAssignmentLifecycle()
         indexedReportOracle()
         subjectCommands()

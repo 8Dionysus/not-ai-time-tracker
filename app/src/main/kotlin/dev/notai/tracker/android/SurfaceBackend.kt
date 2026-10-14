@@ -102,9 +102,15 @@ object SurfaceChoices {
         val end = minOf(MAX_TIME,tracker.clock.now().wall+1)
         return SurfacePickerState(route,view.choices().quick(HistoryWindow(maxOf(0,end-30L*24*60*60*1000),end)),offer)
     }
+    /** User explicitly reopens a saved record; stale routes/nonces are not silently refreshed. */
+    fun reopen(context: Context,tracker: Tracker,source: Surface,expected: Token,sessionId: String): SurfacePickerRoute {
+        require(source == Surface.NOTIFICATION || source == Surface.OVERLAY)
+        val change = tracker.reopenAssignment(expected,sessionId) { allowed(context,it,source) }
+        return route(source,change.state,change.assignment!!)
+    }
     fun choose(context: Context,tracker: Tracker,route: SurfacePickerRoute,choice: ChoiceReference,note: String? = null): Tracker.Change {
         val source = runCatching { Surface.valueOf(route.source) }.getOrElse { fail(ErrorCode.INVALID_INPUT,"Unknown picker source") }
-        return if(route.assignmentId != null) tracker.assignStopped(route.assignmentId,choice,note) { allowed(context,it,source) }
+        return if(route.assignmentId != null) tracker.assignStopped(route.assignmentId,choice,note,requestTarget = route.target) { allowed(context,it,source) }
         else tracker.applyChoice(route.target,choice,route.application) { allowed(context,it,source) }
     }
 }

@@ -1,0 +1,110 @@
+{
+  "codeSha": "9a6cffb3c44916fe8100db23f11e7c01b02f791d",
+  "apkName": "not-ai-time-tracker-0.10.0-9a6cffb-debug.apk",
+  "apkBytes": 12467825,
+  "apkSha256": "0d54eac88dbffe0c262baf9e65594ef7a9c03af42cdaa790a5a1917ab9b3f93e",
+  "apkSignerSha256": "86e221956fd1ed4dab261a10c1baeac3537816d271601037b309f2ddf186c3cc",
+  "catalogAssetsExact": true,
+  "zipCrcPass": true,
+  "tests": [
+    {
+      "name": "dev.notai.tracker.CoreScenariosTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "7.965"
+    },
+    {
+      "name": "dev.notai.tracker.android.RoomScenariosTest",
+      "tests": "12",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "30.313"
+    },
+    {
+      "name": "dev.notai.tracker.android.ui.UiExportLifecycleTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.307"
+    },
+    {
+      "name": "dev.notai.tracker.android.ui.UiScreensTest",
+      "tests": "12",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "23.418"
+    }
+  ],
+  "lint": {
+    "Warning": 65,
+    "Hint": 1
+  },
+  "build": [
+    "core:test",
+    "app:testDebugUnitTest",
+    "app:lintDebug",
+    "app:assembleDebug",
+    "app:assembleDebugAndroidTest"
+  ],
+  "native": {
+    "api": 35,
+    "separateProcesses": true,
+    "isolatedDataOnly": true,
+    "reports": [
+      {
+        "schema": "tracker_backend_native_v1",
+        "mode": "backend-create",
+        "isolatedDatabase": "qa-backend-20261014-final.db",
+        "liveRecordsUnchanged": true,
+        "liveDigest": "13305987b349cef56efa220cafd08d02d88e2cf49ecf0e9f6fb5c9a4eff3f43a",
+        "sessions": 1,
+        "segments": 1,
+        "measurements": 0,
+        "pendingAssignments": 1,
+        "widgetPinSupported": true,
+        "widgetInstanceCount": 1,
+        "widgetPlacement": "PINNED",
+        "platformPinRequested": false,
+        "processId": 4954
+      },
+      {
+        "schema": "tracker_backend_native_v1",
+        "mode": "backend-reopen",
+        "isolatedDatabase": "qa-backend-20261014-final.db",
+        "liveRecordsUnchanged": true,
+        "liveDigest": "13305987b349cef56efa220cafd08d02d88e2cf49ecf0e9f6fb5c9a4eff3f43a",
+        "sessions": 3,
+        "segments": 3,
+        "measurements": 2,
+        "pendingAssignments": 0,
+        "widgetPinSupported": true,
+        "widgetInstanceCount": 1,
+        "widgetPlacement": "PINNED",
+        "platformPinRequested": false,
+        "processId": 4994
+      }
+    ]
+  },
+  "library": {
+    "libraryFileId": "libfile_dc0b457de35881918bca0dae9783f6c3",
+    "fileId": "file_00000000cf8881f59a6b4c02571be3c6",
+    "version": 7,
+    "pinnedReadbackSha256Equal": true,
+    "pinnedReadbackCatalogAssetsExact": true,
+    "pinnedReadbackZipCrcPass": true
+  },
+  "boundary": {
+    "composeLayoutResourcesCatalogDependenciesUnchanged": true,
+    "newPermissions": [],
+    "newReceiverExported": false,
+    "newProprietarySdk": false,
+    "newNetworkDependency": false,
+    "liveRecordsRemovedByTests": false,
+    "nativePlatformPinRequested": false
+  }
+}

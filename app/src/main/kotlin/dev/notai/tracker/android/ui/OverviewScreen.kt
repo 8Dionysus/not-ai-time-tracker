@@ -59,7 +59,7 @@ fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier 
         d.areas.forEach { a ->
             Column(Modifier.fillMaxWidth().padding(vertical = 5.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    ActivityDot(a.slot, size = 9.dp)
+                    ActivityGlyph(a.glyph, a.slot, size = 18.dp)
                     Text(a.name, Modifier.weight(1f), style = NotAi.type.bodySmall, color = c.ink)
                     Text(Format.duration(a.ms), style = NotAi.type.bodySmall, color = c.ink)
                 }

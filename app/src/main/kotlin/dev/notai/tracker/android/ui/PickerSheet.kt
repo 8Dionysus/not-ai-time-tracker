@@ -47,10 +47,11 @@ fun NotAiSheet(onDismiss: () -> Unit, fullHeight: Boolean = true, content: @Comp
 }
 
 @Composable
-fun SheetHeader(title: String, onClose: () -> Unit, back: (() -> Unit)? = null) {
+fun SheetHeader(title: String, onClose: () -> Unit, back: (() -> Unit)? = null, extra: (@Composable () -> Unit)? = null) {
     Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).padding(start = if (back == null) 20.dp else 8.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         if (back != null) IconAction(Icon.ChevronLeft, "Назад", back, tint = NotAi.colors.ink)
         Text(title, Modifier.weight(1f), style = NotAi.type.sheetTitle, color = NotAi.colors.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        extra?.invoke()
         IconAction(Icon.Close, "Закрыть", onClose)
     }
 }
@@ -198,7 +199,7 @@ private fun ChoiceRow(item: PickerItem, onPick: (PickerItem) -> Unit, title: Str
     ListRow(title, detail = if (group || square) null else item.label.detail,
         subtitle = if (!enabled) "в архиве" else null,
         onClick = { onPick(item) },
-        leading = { ActivityDot(item.label.slot, square = square || group) },
+        leading = { ActivityGlyph(item.label) },
         trailing = {
             if (trailing != null) trailing()
             if (item.count != null && item.count > 0) Text("${item.count}", style = NotAi.type.bodySmall, color = c.ink2)

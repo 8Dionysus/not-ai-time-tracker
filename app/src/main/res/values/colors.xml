@@ -1,8 +1,19 @@
 <resources>
     <color name="paper">#F2F3EF</color>
     <color name="icon_background">#1D2024</color>
+    <!-- Surfaces outside the app (widget, notification, floating panel) follow the system light/dark mode. -->
     <color name="widget_surface">#FBFBF8</color>
     <color name="widget_tonal">#E3E6DF</color>
     <color name="widget_ink">#1D2024</color>
+    <color name="widget_ink2">#5E646E</color>
     <color name="widget_on_ink">#F2F3EF</color>
+    <color name="widget_amber">#E39508</color>
+    <color name="widget_amber_ink">#8A5200</color>
+    <!-- Area palette, same order as NotAiColors.areas: work, languages, movement, learning, reading, leisure; none. -->
+    <color name="area_0">#2F8F6A</color>
+    <color name="area_1">#2479B5</color>
+    <color name="area_2">#D0573A</color>
+    <color name="area_3">#8C56C0</color>
+    <color name="area_4">#9C8420</color>
+    <color name="area_5">#C84B7E</color>
 </resources>

@@ -8,7 +8,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -51,12 +53,14 @@ fun TimeField(label: String, value: Long, zone: ZoneId, onChange: (Long) -> Unit
     var dial by remember { mutableStateOf(false) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(label, style = NotAi.type.caption, color = c.ink2)
-        Row(Modifier.fillMaxWidth().height(52.dp).clip(RoundedCornerShape(14.dp))
+        Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(RoundedCornerShape(14.dp))
             .border(if (focused) 1.5.dp else 1.dp, if (focused) c.amber else c.rule, RoundedCornerShape(14.dp)).padding(horizontal = 4.dp),
             verticalAlignment = Alignment.CenterVertically) {
             IconAction(Icon.Minus, "$label раньше на 5 минут", { onChange(value - 5 * MINUTE) }, size = 18.dp)
-            Box(Modifier.weight(1f).fillMaxHeight().pressable({ dial = true }, label = "Выбрать время: $label"), contentAlignment = Alignment.Center) {
-                Text(Format.clock(value, zone), style = NotAi.type.sheetTitle.copy(fontSize = 22.sp, fontWeight = FontWeight.Normal), color = c.ink)
+            Box(Modifier.weight(1f).heightIn(min = 52.dp).pressable({ dial = true }, label = "Выбрать время: $label"), contentAlignment = Alignment.Center) {
+                // Never wraps: shrinks with large system fonts instead of losing digits.
+                BasicText(Format.clock(value, zone), style = NotAi.type.sheetTitle.copy(fontSize = 22.sp, fontWeight = FontWeight.Normal, color = c.ink),
+                    maxLines = 1, softWrap = false, autoSize = TextAutoSize.StepBased(minFontSize = 13.sp, maxFontSize = 22.sp))
             }
             IconAction(Icon.Plus, "$label позже на 5 минут", { onChange(value + 5 * MINUTE) }, size = 18.dp)
         }
@@ -84,6 +88,16 @@ fun TimeField(label: String, value: Long, zone: ZoneId, onChange: (Long) -> Unit
     }
 }
 
+/** Start and end side by side when both fit with their ±5 buttons, stacked on narrow screens or large fonts. */
+@Composable
+private fun TimePair(content: @Composable (Modifier) -> Unit) {
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val fontScale = androidx.compose.ui.platform.LocalDensity.current.fontScale.coerceAtLeast(1f)
+        if (maxWidth >= 330.dp * fontScale) Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { content(Modifier.weight(1f)) }
+        else Column(verticalArrangement = Arrangement.spacedBy(12.dp)) { content(Modifier.fillMaxWidth()) }
+    }
+}
+
 @Composable
 fun NoteField(value: String, onChange: (String) -> Unit, modifier: Modifier = Modifier) {
     val c = NotAi.colors
@@ -103,7 +117,7 @@ private fun ActivityField(label: Label, onClick: () -> Unit) {
     val c = NotAi.colors
     Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(RoundedCornerShape(14.dp)).background(c.sunk).pressable(onClick, label = "Изменить занятие")
         .padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        ActivityDot(label.slot, unclassified = label.unclassified)
+        ActivityGlyph(label)
         Row(Modifier.weight(1f)) {
             Text(label.title, style = NotAi.type.body, color = c.ink, maxLines = 1)
             label.detail?.let { Text(" $it", style = NotAi.type.body, color = c.ink2, maxLines = 1) }
@@ -163,7 +177,8 @@ private fun DrawScope.bracket(left: Float, isLeft: Boolean, color: androidx.comp
  * Nothing is written until Save; Cancel needs no command.
  */
 @Composable
-fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, onDismiss: () -> Unit, onPickActivity: ((Classification, Label) -> Unit) -> Unit) {
+fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, onDismiss: () -> Unit, onPickActivity: ((Classification, Label) -> Unit) -> Unit,
+               onDelete: ((EntryUi) -> Unit)? = null) {
     val c = NotAi.colors
     val session = remember(entry) { entry?.let { vm.session(it.sessionId) } }
     val origStart = session?.second?.firstOrNull()?.start
@@ -186,15 +201,17 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
         pending = false
     }
     NotAiSheet(onDismiss) {
-        SheetHeader(if (entry != null) "Исправить запись" else "Добавить запись", onDismiss)
+        SheetHeader(if (entry != null) "Исправить запись" else "Добавить запись", onDismiss, extra = if (entry != null && onDelete != null) {
+            { IconAction(Icon.Trash, "Удалить запись", { onDelete(entry) }, size = 19.dp) }
+        } else null)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             ActivityField(label) { onPickActivity { sel, l -> selection = sel; label = l } }
             MiniTimeline(day, entry?.sessionId, start, end, origStart, origEnd, label.slot, zone)
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                TimeField("Начало", start, zone, { start = it }, Modifier.weight(1f), focused = origStart != null && start != origStart,
+            TimePair {
+                TimeField("Начало", start, zone, { start = it }, it, focused = origStart != null && start != origStart,
                     hint = when { origStart != null && start != origStart -> "было ${Format.clock(origStart, zone)}"
                         state?.freeFrom != null -> "свободно с ${Format.clock(state!!.freeFrom!!, zone)}"; else -> null })
-                TimeField("Конец", end, zone, { end = it }, Modifier.weight(1f), focused = origEnd != null && end != origEnd,
+                TimeField("Конец", end, zone, { end = it }, it, focused = origEnd != null && end != origEnd,
                     hint = when { origEnd != null && end != origEnd -> "было ${Format.clock(origEnd, zone)}"
                         state?.freeUntil != null -> "свободно до ${Format.clock(state!!.freeUntil!!, zone)}"; else -> null })
             }
@@ -214,13 +231,13 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
                 Text(if (favorite) "В избранном" else "Добавить в избранное", style = NotAi.type.bodySmall, color = c.ink2)
             }
         }
-        Row(Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 20.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            PillButton("Отмена", onDismiss, Modifier.weight(1f), ButtonKind.TONAL)
-            val preview = state?.preview
+        val preview = state?.preview
+        ButtonPair(Modifier.padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 20.dp)) { m ->
+            PillButton("Отмена", onDismiss, m, ButtonKind.TONAL)
             PillButton("Сохранить", {
                 if (entry != null) preview?.let(vm::applyCorrection) else vm.manual(start, end, selection ?: Classification(), note)
                 onDismiss()
-            }, Modifier.weight(1f), ButtonKind.PRIMARY, enabled = entry == null || (preview != null && !pending))
+            }, m, ButtonKind.PRIMARY, enabled = entry == null || (preview != null && !pending))
         }
     }
 }
@@ -248,9 +265,9 @@ fun ResolveSheet(zone: ZoneId, knownStart: Long, now: Long, onConfirm: (Long, Lo
     NotAiSheet(onDismiss, fullHeight = false) {
         SheetHeader("Когда ты закончил?", onDismiss)
         Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                TimeField("Начало", start, zone, { start = it }, Modifier.weight(1f), hint = "записано ${Format.clock(knownStart, zone)}")
-                TimeField("Конец", end, zone, { end = minOf(it, now) }, Modifier.weight(1f), focused = true, hint = "не позже, чем сейчас")
+            TimePair {
+                TimeField("Начало", start, zone, { start = it }, it, hint = "записано ${Format.clock(knownStart, zone)}")
+                TimeField("Конец", end, zone, { end = minOf(it, now) }, it, focused = true, hint = "не позже, чем сейчас")
             }
             Text("Запись закроется с этими границами. Если занятие ещё идёт, начни новую запись после сохранения.",
                 style = NotAi.type.bodySmall, color = NotAi.colors.ink2)

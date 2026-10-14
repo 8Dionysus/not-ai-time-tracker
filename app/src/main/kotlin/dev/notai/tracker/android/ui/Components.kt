@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -83,7 +84,19 @@ fun PillButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier,
         horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) { M3Icon(icon, null, Modifier.size(16.dp), tint = fg); Spacer(Modifier.width(8.dp)) }
-        Text(text, style = NotAi.type.button, color = if (enabled) fg else fg.copy(alpha = 0.6f), textAlign = TextAlign.Center, maxLines = 1)
+        // Large system fonts wrap a phrase to two lines (the button grows); paired buttons stack via ButtonPair.
+        Text(text, Modifier.padding(vertical = 6.dp), style = NotAi.type.button, color = if (enabled) fg else fg.copy(alpha = 0.6f), textAlign = TextAlign.Center,
+            maxLines = 2, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+/** Two buttons side by side while both labels fit; stacked full-width on narrow screens or large fonts. */
+@Composable
+fun ButtonPair(modifier: Modifier = Modifier, spacing: Dp = 10.dp, content: @Composable (Modifier) -> Unit) {
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        val fontScale = androidx.compose.ui.platform.LocalDensity.current.fontScale.coerceAtLeast(1f)
+        if ((maxWidth - spacing) / 2 >= 140.dp * fontScale) Row(horizontalArrangement = Arrangement.spacedBy(spacing)) { content(Modifier.weight(1f)) }
+        else Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { content(Modifier.fillMaxWidth()) }
     }
 }
 
@@ -105,6 +118,18 @@ fun ActivityDot(slot: Int?, modifier: Modifier = Modifier, size: Dp = 10.dp, unc
             style = Stroke(1.5.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(2.dp.toPx(), 1.6.dp.toPx()))))
     } else Box(modifier.size(size).clip(if (square) RoundedCornerShape(3.dp) else CircleShape).background(color))
 }
+
+/** Activity icon in its area colour. "No activity yet" keeps the dashed ring in amber ink: a choice still open. */
+@Composable
+fun ActivityGlyph(glyph: Int, slot: Int?, modifier: Modifier = Modifier, size: Dp = 20.dp, unclassified: Boolean = false) {
+    val c = NotAi.colors
+    val tint = when { unclassified -> c.amberInk; slot != null -> c.areas[slot]; else -> c.ink2 }
+    M3Icon(painterResource(if (unclassified) ActivityGlyphs.unclassified else glyph), null, modifier.size(size), tint = tint)
+}
+
+@Composable
+fun ActivityGlyph(label: Label, modifier: Modifier = Modifier, size: Dp = 20.dp) =
+    ActivityGlyph(label.glyph, label.slot, modifier, size, label.unclassified)
 
 @Composable
 fun SectionLabel(text: String, modifier: Modifier = Modifier) =
@@ -204,15 +229,17 @@ fun ListRow(title: String, modifier: Modifier = Modifier, detail: String? = null
 }
 
 @Composable
-fun Chip(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, slot: Int? = null, dashed: Boolean = false, icon: ImageVector? = null) {
+fun Chip(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, slot: Int? = null, dashed: Boolean = false, icon: ImageVector? = null,
+         glyph: Int? = null) {
     val c = NotAi.colors
     Row(
-        modifier.height(40.dp).clip(RoundedCornerShape(50))
+        modifier.heightIn(min = 40.dp).clip(RoundedCornerShape(50))
             .then(if (dashed) Modifier.dashedBorder(c.ink3) else Modifier.background(c.raised).border(BorderStroke(1.dp, c.rule), RoundedCornerShape(50)))
-            .pressable(onClick).padding(start = if (icon != null || slot != null) 12.dp else 14.dp, end = 14.dp),
-        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp),
+            .pressable(onClick).padding(start = if (icon != null || slot != null || glyph != null) 11.dp else 14.dp, end = 14.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp),
     ) {
         if (icon != null) M3Icon(icon, null, Modifier.size(14.dp), tint = c.ink2)
+        else if (glyph != null) ActivityGlyph(glyph, slot, size = 17.dp)
         else if (slot != null || !dashed) ActivityDot(slot, size = 8.dp)
         Text(text, style = NotAi.type.bodySmall, color = if (dashed) c.ink2 else c.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }

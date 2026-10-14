@@ -18,8 +18,28 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon as M3Icon
 import androidx.compose.material3.Text
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.DpOffset
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +66,8 @@ class TimerActions(
     val earlier: () -> Unit,
     val resolve: () -> Unit,
     val toggleTheme: () -> Unit,
+    /** Shared by swipe and the long-press menu. Returns true when the record is already gone. */
+    val delete: suspend (EntryUi) -> Boolean = { false },
 )
 
 private enum class HeroKind { LOADING, IDLE, ACTIVE, RECOVERY, FOCUS }
@@ -118,7 +140,7 @@ private fun IdleHero(home: HomeData?, vm: TrackerViewModel, actions: TimerAction
             SectionLabel("Начать сразу")
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 home?.quick?.forEach { q ->
-                    Chip(q.title, { vm.choose(q.entry, PickMode.START) }, slot = q.slot, icon = null)
+                    Chip(q.title, { vm.choose(q.entry, PickMode.START) }, slot = q.slot, glyph = q.glyph)
                 }
                 Chip("Все занятия", { actions.pick(PickMode.START) }, dashed = true, icon = Icon.Plus)
             }
@@ -145,14 +167,14 @@ private fun CurrentLabel(home: HomeData?, onClick: () -> Unit) {
     if (label == null || label.unclassified) {
         Row(Modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp)).background(c.amberWash).pressable(onClick, label = "Выбрать занятие")
             .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            ActivityDot(null, unclassified = true)
+            ActivityGlyph(ActivityGlyphs.unclassified, null, size = 18.dp, unclassified = true)
             Text("Без занятия", style = NotAi.type.label, color = c.ink)
             Text("выбрать", style = NotAi.type.label.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
         }
     } else {
         Row(Modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp)).pressable(onClick, label = "Сменить или уточнить занятие")
             .padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            ActivityDot(label.slot)
+            ActivityGlyph(label)
             Row(Modifier.weight(1f, fill = false)) {
                 Text(label.title, style = NotAi.type.label, color = c.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 label.detail?.let { Text(" $it", style = NotAi.type.label, color = c.ink2, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false)) }
@@ -180,10 +202,10 @@ private fun ActiveHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, actio
             else -> "Идёт с ${Format.clock(start, zone)}. Начало сохранится при выборе."
         }
         Text(line, style = NotAi.type.caption, color = c.ink2, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
-        Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            if (s.mode == Mode.RUNNING) PillButton("Пауза", vm::pause, Modifier.weight(1f), ButtonKind.TONAL, Icon.Pause)
-            else PillButton("Продолжить", vm::resume, Modifier.weight(1f), ButtonKind.AMBER, Icon.Play)
-            PillButton("Стоп", vm::stop, Modifier.weight(1f), ButtonKind.PRIMARY, Icon.Stop)
+        ButtonPair(Modifier.padding(top = 4.dp)) { m ->
+            if (s.mode == Mode.RUNNING) PillButton("Пауза", vm::pause, m, ButtonKind.TONAL, Icon.Pause)
+            else PillButton("Продолжить", vm::resume, m, ButtonKind.AMBER, Icon.Play)
+            PillButton("Стоп", vm::stop, m, ButtonKind.PRIMARY, Icon.Stop)
         }
         if (s.mode == Mode.RUNNING && "switchedEarlier" in s.actions) Row(Modifier.heightIn(min = 44.dp).pressable(actions.earlier).padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically) {
@@ -208,7 +230,7 @@ private fun RecoveryHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, act
         }
         home?.currentLabel?.takeIf { !it.unclassified }?.let { l ->
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                ActivityDot(l.slot); Row { Text(l.title, style = NotAi.type.label, color = c.ink); l.detail?.let { Text(" $it", style = NotAi.type.label, color = c.ink2) } }
+                ActivityGlyph(l); Row { Text(l.title, style = NotAi.type.label, color = c.ink); l.detail?.let { Text(" $it", style = NotAi.type.label, color = c.ink2) } }
             }
         }
         Text(if (start != null) "Конец неизвестен" else "Время неизвестно",
@@ -244,13 +266,13 @@ private fun FocusHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, action
             Box(Modifier.fillMaxWidth(fraction).fillMaxHeight().clip(RoundedCornerShape(4.dp)).background(if (work) c.amber else c.ink3))
         }
         if (work) CurrentLabel(home) { actions.pick(PickMode.LABEL) }
-        Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        ButtonPair(Modifier.padding(top = 4.dp)) { m ->
             when (f.mode) {
-                FocusMode.RUNNING -> PillButton("Пауза", vm::pause, Modifier.weight(1f), ButtonKind.TONAL, Icon.Pause)
-                FocusMode.PAUSED -> PillButton("Продолжить", vm::resume, Modifier.weight(1f), ButtonKind.AMBER, Icon.Play)
-                else -> PillButton(if (work) "Начать перерыв" else "Начать работу", vm::focusNext, Modifier.weight(1f), ButtonKind.AMBER)
+                FocusMode.RUNNING -> PillButton("Пауза", vm::pause, m, ButtonKind.TONAL, Icon.Pause)
+                FocusMode.PAUSED -> PillButton("Продолжить", vm::resume, m, ButtonKind.AMBER, Icon.Play)
+                else -> PillButton(if (work) "Начать перерыв" else "Начать работу", vm::focusNext, m, ButtonKind.AMBER)
             }
-            PillButton("Завершить", vm::stop, Modifier.weight(1f), ButtonKind.PRIMARY, Icon.Stop)
+            PillButton("Завершить", vm::stop, m, ButtonKind.PRIMARY, Icon.Stop)
         }
         if (f.mode != FocusMode.DUE) PillButton(if (work) "Пропустить отрезок" else "Пропустить перерыв", vm::focusSkip, kind = ButtonKind.TEXT, height = 44.dp)
         Text("Перерыв не входит во время занятия. Следующий отрезок начнётся, когда ты нажмёшь.", style = NotAi.type.caption, color = c.ink2,
@@ -271,8 +293,10 @@ private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: Track
             }
         }
         items(day.entries, key = { "${day.date}:${it.segmentId}" }) { e ->
-            EntryRow(e, home.zone, onOpen = { actions.edit(e, day) }, onRepeat = { vm.repeat(e) },
-                modifier = Modifier.padding(horizontal = 20.dp).animateItem())
+            SwipeToDelete(e, actions.delete, Modifier.animateItem()) {
+                EntryRow(e, home.zone, onOpen = { actions.edit(e, day) }, onRepeat = { vm.repeat(e) },
+                    onDelete = { actions.delete(e) }, modifier = Modifier.padding(horizontal = 20.dp))
+            }
         }
         if (day.date == home.today) item(key = "manual") {
             Row(Modifier.padding(horizontal = 20.dp).fillMaxWidth().heightIn(min = 48.dp).pressable({ actions.manual(day) }),
@@ -289,13 +313,46 @@ private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: Track
     }
 }
 
+/** Swipe left to delete. The row stays away while the record goes; it comes back if nothing was deleted. */
 @Composable
-fun EntryRow(e: EntryUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: () -> Unit, modifier: Modifier = Modifier) {
+private fun SwipeToDelete(e: EntryUi, delete: suspend (EntryUi) -> Boolean, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     val c = NotAi.colors
+    val state = rememberSwipeToDismissBoxState(positionalThreshold = { it * 0.35f })
+    LaunchedEffect(state.currentValue) {
+        if (state.currentValue == SwipeToDismissBoxValue.EndToStart) {
+            if (!delete(e)) state.reset()
+            else { delay(2_500); state.reset() } // still composed: the write failed or Undo restored it
+        }
+    }
+    SwipeToDismissBox(state, modifier = modifier, enableDismissFromStartToEnd = false, backgroundContent = {
+        if (state.dismissDirection != SwipeToDismissBoxValue.EndToStart) return@SwipeToDismissBox
+        val active = state.targetValue == SwipeToDismissBoxValue.EndToStart
+        Row(Modifier.fillMaxSize().background(if (active) c.danger.copy(alpha = 0.16f) else c.sunk).padding(horizontal = 24.dp),
+            horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+            Text("Удалить", style = NotAi.type.bodySmall.copy(fontWeight = FontWeight.Medium), color = if (active) c.danger else c.ink2)
+            Spacer(Modifier.width(10.dp))
+            M3Icon(Icon.Trash, null, Modifier.size(20.dp), tint = if (active) c.danger else c.ink2)
+        }
+    }) { Box(Modifier.background(c.paper)) { content() } }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun EntryRow(e: EntryUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: () -> Unit, modifier: Modifier = Modifier, onDelete: (suspend () -> Unit)? = null) {
+    val c = NotAi.colors
+    var menu by remember { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
+    val scope = rememberCoroutineScope()
     Column(modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).pressable(onOpen, label = "Исправить запись"),
+        Box {
+            EntryMenu(menu, onDismiss = { menu = false }, onOpen = onOpen, onRepeat = onRepeat,
+                onDelete = onDelete?.let { d -> { scope.launch { d() } } })
+        }
+        Row(Modifier.fillMaxWidth().heightIn(min = 60.dp)
+            .combinedClickable(onClickLabel = "Исправить запись", onLongClickLabel = "Действия с записью",
+                onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); menu = true }, onClick = onOpen),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            ActivityDot(e.label.slot, unclassified = e.label.unclassified)
+            ActivityGlyph(e.label)
             Column(Modifier.weight(1f).padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Row {
                     Text(e.label.title, style = NotAi.type.body, color = c.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -308,5 +365,20 @@ fun EntryRow(e: EntryUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: () -> Unit,
             IconAction(Icon.Repeat, "Повторить: ${e.label.title}", onRepeat, size = 16.dp)
         }
         Hairline()
+    }
+}
+
+/** Long press: the same three actions as elsewhere, delete last and in the danger colour. */
+@Composable
+private fun EntryMenu(open: Boolean, onDismiss: () -> Unit, onOpen: () -> Unit, onRepeat: () -> Unit, onDelete: (() -> Unit)?) {
+    val c = NotAi.colors
+    DropdownMenu(open, onDismiss, offset = DpOffset(56.dp, 0.dp), shape = RoundedCornerShape(16.dp), containerColor = c.raised,
+        border = BorderStroke(1.dp, c.rule), shadowElevation = 8.dp) {
+        @Composable fun item(text: String, icon: ImageVector, color: Color, action: () -> Unit) = DropdownMenuItem(
+            text = { Text(text, style = NotAi.type.body, color = color) }, onClick = { onDismiss(); action() },
+            leadingIcon = { M3Icon(icon, null, Modifier.size(18.dp), tint = color) }, modifier = Modifier.widthIn(min = 196.dp))
+        item("Исправить", Icon.Edit, c.ink, onOpen)
+        item("Повторить", Icon.Repeat, c.ink, onRepeat)
+        if (onDelete != null) item("Удалить", Icon.Trash, c.danger, onDelete)
     }
 }

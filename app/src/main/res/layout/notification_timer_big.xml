@@ -1,0 +1,53 @@
+<!-- Expanded notification: the timer row and up to four quick choices (favourites, then frequent), two per row so names fit. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <include layout="@layout/surface_timer_row" />
+    <LinearLayout android:id="@+id/surface_quick" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:layout_marginTop="8dp" android:visibility="gone">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+            <TextView android:id="@+id/surface_quick_label" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:textColor="@color/widget_ink2" android:textSize="12sp" android:text="@string/quick_start" />
+            <TextView android:id="@+id/surface_more" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="32dp"
+                android:gravity="center_vertical" android:paddingStart="12dp" android:paddingEnd="4dp" android:textColor="@color/widget_amber_ink"
+                android:textSize="12sp" android:text="@string/all_activities" />
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"
+            android:layout_marginTop="6dp" android:baselineAligned="false">
+            <LinearLayout android:id="@+id/surface_chip_0" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1"
+                android:background="@drawable/surface_chip" android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="12dp" android:paddingEnd="10dp">
+                <ImageView android:id="@+id/surface_chip_0_icon" android:layout_width="16dp" android:layout_height="16dp" android:layout_marginEnd="8dp"
+                    android:importantForAccessibility="no" />
+                <TextView android:id="@+id/surface_chip_0_text" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:textColor="@color/widget_ink" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/surface_chip_1" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1"
+                android:layout_marginStart="6dp" android:background="@drawable/surface_chip" android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="12dp" android:paddingEnd="10dp">
+                <ImageView android:id="@+id/surface_chip_1_icon" android:layout_width="16dp" android:layout_height="16dp" android:layout_marginEnd="8dp"
+                    android:importantForAccessibility="no" />
+                <TextView android:id="@+id/surface_chip_1_text" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:textColor="@color/widget_ink" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"
+            android:layout_marginTop="6dp" android:baselineAligned="false">
+            <LinearLayout android:id="@+id/surface_chip_2" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1"
+                android:background="@drawable/surface_chip" android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="12dp" android:paddingEnd="10dp">
+                <ImageView android:id="@+id/surface_chip_2_icon" android:layout_width="16dp" android:layout_height="16dp" android:layout_marginEnd="8dp"
+                    android:importantForAccessibility="no" />
+                <TextView android:id="@+id/surface_chip_2_text" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:textColor="@color/widget_ink" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/surface_chip_3" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1"
+                android:layout_marginStart="6dp" android:background="@drawable/surface_chip" android:orientation="horizontal" android:gravity="center_vertical"
+                android:paddingStart="12dp" android:paddingEnd="10dp">
+                <ImageView android:id="@+id/surface_chip_3_icon" android:layout_width="16dp" android:layout_height="16dp" android:layout_marginEnd="8dp"
+                    android:importantForAccessibility="no" />
+                <TextView android:id="@+id/surface_chip_3_text" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:textColor="@color/widget_ink" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -1,5 +1,5 @@
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
-    <shortcut android:shortcutId="open_timer" android:enabled="true" android:icon="@android:drawable/ic_media_play" android:shortcutShortLabel="@string/shortcut_start">
+    <shortcut android:shortcutId="open_timer" android:enabled="true" android:icon="@drawable/ic_shortcut" android:shortcutShortLabel="@string/shortcut_start">
         <intent android:action="android.intent.action.MAIN" android:targetPackage="dev.notai.tracker" android:targetClass="dev.notai.tracker.android.MainActivity" />
     </shortcut>
 </shortcuts>

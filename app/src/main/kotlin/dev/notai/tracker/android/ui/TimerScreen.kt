@@ -11,6 +11,11 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.Role
+import androidx.compose.runtime.produceState
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -138,13 +143,17 @@ private fun IdleHero(home: HomeData?, vm: TrackerViewModel, actions: TimerAction
         Text("Время пойдёт сразу.\nЗанятие можно выбрать потом.", style = NotAi.type.bodySmall, color = c.ink2, textAlign = TextAlign.Center)
         Column(Modifier.fillMaxWidth().padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             val quick = home?.quick.orEmpty()
-            // A new install has no favourites or history yet: one honest choice instead of an empty "quick" section.
-            if (quick.isNotEmpty()) SectionLabel("Начать сразу")
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                quick.forEach { q ->
-                    Chip(q.title, { vm.choose(q.entry, PickMode.START) }, slot = q.slot, glyph = q.glyph)
+            val dismissed by vm.starterDismissed.collectAsStateWithLifecycle()
+            // A new install has no favourites or history yet: invite a few own activities instead of an empty section.
+            if (home != null && quick.isEmpty() && !dismissed) StarterCard(vm)
+            else {
+                if (quick.isNotEmpty()) SectionLabel("Начать сразу")
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    quick.forEach { q ->
+                        Chip(q.title, { vm.choose(q.entry, PickMode.START) }, slot = q.slot, glyph = q.glyph)
+                    }
+                    Chip(if (quick.isEmpty()) "Начать с занятием" else "Все занятия", { actions.pick(PickMode.START) }, dashed = true, icon = Icon.Plus)
                 }
-                Chip(if (quick.isEmpty()) "Начать с занятием" else "Все занятия", { actions.pick(PickMode.START) }, dashed = true, icon = Icon.Plus)
             }
             PillButton("Фокус: ${home?.focusMinutes ?: 25} мин работы", vm::startFocus, kind = ButtonKind.TEXT, height = 44.dp,
                 modifier = Modifier.align(Alignment.Start).offset(x = (-18).dp))
@@ -399,4 +408,46 @@ private fun EntryMenu(open: Boolean, onDismiss: () -> Unit, onOpen: () -> Unit, 
 private fun haptic(type: HapticFeedbackType, action: () -> Unit): () -> Unit {
     val h = LocalHapticFeedback.current
     return { h.performHapticFeedback(type); action() }
+}
+
+/**
+ * First launch: a dozen everyday activities to pick from. "Done" stores the picked ones as favourites, which
+ * are the quick-start chips from then on. "Not now" hides the card for good; everything stays in the search.
+ */
+@Composable
+private fun StarterCard(vm: TrackerViewModel) {
+    val c = NotAi.colors
+    val starters by produceState(emptyList<Starter>()) { value = vm.starterChoices() }
+    var picked by remember { mutableStateOf(listOf<String>()) }
+    if (starters.isEmpty()) return
+    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(c.raised).border(1.dp, c.rule, RoundedCornerShape(20.dp))
+        .padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text("Чем ты занимаешься чаще всего?", style = NotAi.type.section, color = c.ink)
+            Text("Отметь два-три занятия: они встанут сюда, и старт будет в одно касание. Остальное найдётся в поиске.",
+                style = NotAi.type.caption, color = c.ink2)
+        }
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            starters.forEach { st ->
+                val on = st.title in picked
+                Row(Modifier.heightIn(min = 40.dp).clip(RoundedCornerShape(50))
+                    .background(if (on) c.ink else c.paper).border(1.dp, if (on) c.ink else c.rule, RoundedCornerShape(50))
+                    .semantics { selected = on }
+                    .pressable({ picked = if (on) picked - st.title else picked + st.title }, role = Role.Checkbox, label = st.title)
+                    .padding(start = 11.dp, end = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+                    if (on) M3Icon(Icon.Check, null, Modifier.size(16.dp), tint = c.paper)
+                    else ActivityGlyph(st.glyph, st.slot, size = 16.dp)
+                    Text(st.title, style = NotAi.type.bodySmall, color = if (on) c.paper else c.ink, maxLines = 1)
+                }
+            }
+        }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            PillButton("Не сейчас", vm::dismissStarter, kind = ButtonKind.TEXT, height = 44.dp, modifier = Modifier.offset(x = (-12).dp))
+            Spacer(Modifier.weight(1f))
+            PillButton(if (picked.isEmpty()) "Готово" else "Готово · ${picked.size}", {
+                vm.saveStarters(starters.filter { it.title in picked })
+            }, kind = ButtonKind.PRIMARY, height = 44.dp, enabled = picked.isNotEmpty())
+        }
+    }
 }

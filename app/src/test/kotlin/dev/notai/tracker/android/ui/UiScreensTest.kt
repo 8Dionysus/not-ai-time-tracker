@@ -334,10 +334,17 @@ class UiScreensTest {
         val app = ApplicationProvider.getApplicationContext<android.app.Application>()
         val catalog = ReadyCatalog.read { app.assets.open("catalog/$it") }
         val clock = MutableClock(at(today, 9, 41), 1_000_000L)
-        val vm = render(Seed(Tracker(MemoryStore(newInstallData(catalog, zone.id)), clock), clock, catalog))
-        waitText("Начать")
+        val tracker = Tracker(MemoryStore(newInstallData(catalog, zone.id)), clock)
+        val vm = render(Seed(tracker, clock, catalog))
+        waitText("Чем ты занимаешься чаще всего?")
         shot("13-first-launch", vm)
         assertTrue("nothing older to show on a new install", compose.onAllNodesWithText("Показать раньше").fetchSemanticsNodes().isEmpty())
+        listOf("Работа", "Язык", "Чтение").forEach { compose.onNodeWithText(it).performClick() }
+        compose.onNodeWithText("Готово · 3").performClick()
+        compose.waitUntil(5_000) { tracker.data().favorites.size == 3 }
+        waitText("Начать сразу")
+        assertTrue("the card gives way to the quick-start chips", compose.onAllNodesWithText("Чем ты занимаешься чаще всего?").fetchSemanticsNodes().isEmpty())
+        shot("15-first-picked", vm)
         compose.onNodeWithText("Обзор").performClick()
         waitText("Обзор соберётся сам")
         shot("14-first-overview", vm)

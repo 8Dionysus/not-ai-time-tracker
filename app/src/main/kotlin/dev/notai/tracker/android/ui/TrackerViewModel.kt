@@ -52,6 +52,15 @@ data class CorrectionState(val preview: Tracker.CorrectionPreview?, val beforeMs
                            val freeFrom: Long?, val freeUntil: Long?)
 
 data class BackupInfo(val at: Long, val bytes: Long, val verified: Boolean)
+/** A suggested everyday activity on first launch. */
+data class Starter(val title: String, val entry: ChoiceEntry, val glyph: Int, val slot: Int?)
+private val STARTERS = listOf(
+    "activity.work.focused_work" to "Работа", "activity.learning.focused_study" to "Учёба", "activity.language.practice" to "Язык",
+    "activity.reading.book" to "Чтение", "activity.writing.draft" to "Письмо", "activity.movement.strength" to "Силовая",
+    "activity.movement.cardio" to "Кардио", "activity.leisure.outdoor_leisure" to "Прогулка", "activity.household.cook" to "Готовка",
+    "activity.household.clean" to "Уборка", "activity.media.watch_film" to "Кино и сериалы", "activity.leisure.unstructured_rest" to "Отдых",
+)
+
 sealed interface DeleteRequest {
     data object Applied : DeleteRequest
     data object Failed : DeleteRequest
@@ -377,6 +386,36 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
         rt.tracker.saveFavorite(s.token, Favorite(label = title, selection = selection))
     }
     fun removeFavorite(id: String) = command({ "Убрано из избранного" }) { rt, s -> rt.tracker.removeFavorite(s.token, id) }
+
+    // ---------- first launch: a few own activities for one-tap start ----------
+
+    private val _starterDismissed = MutableStateFlow(prefs.getBoolean("starterDismissed", false))
+    val starterDismissed: StateFlow<Boolean> = _starterDismissed
+    fun dismissStarter() { prefs.edit().putBoolean("starterDismissed", true).apply(); _starterDismissed.value = true }
+
+    /** Everyday catalog types with short names; only those present and startable in this catalog are offered. */
+    suspend fun starterChoices(): List<Starter> = withContext(Dispatchers.IO) {
+        val v = view.value ?: waitRuntime()?.tracker?.view() ?: return@withContext emptyList()
+        val d = v.data; val choices = v.choices()
+        STARTERS.mapNotNull { (id, title) ->
+            val entry = runCatching { choices.resolve("type:$id") }.getOrNull()?.takeIf { it.canStart } ?: return@mapNotNull null
+            val l = d.label(entry.selection)
+            Starter(title, entry, l.glyph, l.slot)
+        }
+    }
+
+    /** One explicit "Done": each favourite is written with the token of the change before it, never a silent retry. */
+    fun saveStarters(picked: List<Starter>) {
+        val rt = runtime ?: return
+        val shown = snapshot.value ?: view.value?.snapshot() ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                var token = shown.token
+                picked.forEach { st -> token = rt.tracker.saveFavorite(token, Favorite(label = st.title, selection = st.entry.selection)).state.token }
+                notice(if (picked.size == 1) "«${picked.single().title}» — теперь старт в одно касание" else "Готово: ${Format.plural(picked.size, "занятие", "занятия", "занятий")} для быстрого старта")
+            } catch (e: Exception) { notice(Format.error(e)) }
+        }
+    }
 
     // ---------- picker ----------
 

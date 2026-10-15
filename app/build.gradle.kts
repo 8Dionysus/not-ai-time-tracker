@@ -22,6 +22,8 @@ android {
             test.maxHeapSize = "1g"
             // Robolectric Android 16/API36 requires a Java 21 runtime. Bytecode target stays 17.
             test.javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+            // Robolectric 4.17 FileDescriptor interception on Java21 uses this public internal interface.
+            test.jvmArgs("--add-opens=java.base/jdk.internal.access=ALL-UNNAMED")
             test.systemProperty("tracker.samples", rootProject.file("samples").absolutePath)
             test.systemProperty("tracker.artifacts", layout.buildDirectory.dir("test-artifacts").get().asFile.absolutePath)
             test.systemProperty("tracker.scale", providers.gradleProperty("trackerScale").getOrElse("false"))

@@ -1,0 +1,30 @@
+{
+  "sourceCatalogSha256": "9efaea5313b40ed2ae762437450f1a69759bfdd1e5fe1bb28e7ca2f8f5dc36b3",
+  "candidateSha256": "2db9965c2aed877151ed3c84b864832c83ddd70101c4a862cc23b500e7f03093",
+  "locale": "es",
+  "rightsStatus": "source_rights_review_pending",
+  "nativeSpeakerQA": false,
+  "entries": 2385,
+  "parts": [
+    {
+      "path": "es-reviewed-part-1.json",
+      "bytes": 323886,
+      "sha256": "77770b0a3acd476d8578cbae774a57ed0e16650c84736f97d19eaefac272b4b7"
+    },
+    {
+      "path": "es-reviewed-part-2.json",
+      "bytes": 349431,
+      "sha256": "234b482b546d7d6d59bc529c50200f4a4fde2f981248c1b52a75af8a0d528835"
+    },
+    {
+      "path": "es-reviewed-part-3.json",
+      "bytes": 303339,
+      "sha256": "9e90bc5b45b30e59847f0d5d85f2cdcbd1228e4741cc2947b6df4b20416a8828"
+    },
+    {
+      "path": "es-reviewed-part-4.json",
+      "bytes": 231218,
+      "sha256": "c1cfa0ddf3089ed6059e1739ed8724d948c6706307ec199d98771cbbdd71fa05"
+    }
+  ]
+}

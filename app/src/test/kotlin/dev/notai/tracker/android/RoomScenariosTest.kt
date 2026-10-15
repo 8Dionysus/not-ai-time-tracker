@@ -24,6 +24,28 @@ class RoomScenariosTest: ScenarioContract() {
     }
     @org.junit.After fun restoreDirectoryDurability() { DirectoryDurability.sync = originalDirectorySync;DirectoryDurability.rename = originalRename;DirectoryDurability.link = originalLink }
     private val databases = mutableMapOf<StateStore,Pair<String,TrackerDatabase>>()
+    @org.junit.Test fun largeTransferMetadataReopensWithoutWholeCursorRows() {
+        val store = createStore();val note = "🙂".repeat(8192)
+        store.transaction { d ->
+            val contents = (0 until 32).map { i ->
+                val session = Session(id = "large-$i",status = SessionStatus.STOPPED,note = note)
+                TransferContent(sessions = listOf(session),segments = listOf(Segment(id = "large-seg-$i",sessionId = session.id,start = 1000L+i*2000,end = 2000L+i*2000,durationMs = 1000)))
+            }
+            val groups = contents.mapIndexed { i,c -> SelectiveTransfer.group("group-$i","origin-$i",0,c) }
+            val op = TransferOperation("large-op","a".repeat(128),d.datasetId,d.controlBarrier,1,groups.map { TransferGroupProgress(it,TransferConflictPolicy.BLOCK,TransferGroupState.APPLIED,inserted = it.content) })
+            val origins = groups.map { TransferOrigin(it.originId,it.hash,it.content,it.hash) }
+            d.copy(revision = 1,sessions = contents.flatMap { it.sessions },segments = contents.flatMap { it.segments },transfer = TransferState(origins,listOf(op))) to Unit
+        }
+        val expected = store.read();val db = databases.getValue(store).second
+        val bytes = db.openHelper.readableDatabase.query("SELECT length(CAST(payload AS BLOB)) FROM metadata WHERE id=1").use { c -> c.moveToFirst();c.getLong(0) }
+        org.junit.Assert.assertTrue(bytes > 2*1024*1024)
+        val reopened = reopen(store);org.junit.Assert.assertEquals(expected,reopened.read())
+        val tracker = Tracker(reopened,FakeClock());tracker.settings(tracker.snapshot().token,Settings("Europe/Berlin"))
+        org.junit.Assert.assertEquals(note,tracker.data().sessions.first().note)
+        val output = java.io.ByteArrayOutputStream();Backups(tracker,MemoryRollback()).write(output)
+        val restored = StreamingBackup.read { output.toByteArray().inputStream() }
+        org.junit.Assert.assertEquals(tracker.data().transfer,restored.data.transfer)
+    }
     @org.junit.Test fun v5MigrationPreservesStoppedPausedRunningAndRecovery() {
         val context = RuntimeEnvironment.getApplication()
         for(status in SessionStatus.entries) {

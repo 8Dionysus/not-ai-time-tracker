@@ -24,7 +24,7 @@ Gap resolution uses the first valid local time after the gap; overlap uses the e
 
 ## C — persistence and full replacement
 
-Room schema 6 adds domain fields in the existing transactional metadata payload. Migration 5→6 adds empty schedule/transfer fields; history tables/IDs/anchors are untouched. Earlier migration paths may materialize empty defaults and are accepted; nonempty unexpected v5 additions reject. No destructive fallback was added.
+Room schema 6 adds domain fields in the existing transactional metadata payload. Migration 5→6 adds empty schedule/transfer fields; history tables/IDs/anchors are untouched. Earlier migration paths may materialize empty defaults and are accepted; nonempty unexpected v5 additions reject. No destructive fallback was added. Metadata is read/read-back in fixed SQL text slices so a durable transfer journal is not required to fit one CursorWindow row; a multi-megabyte Unicode fixture checks reopen and archive round-trip. The complete domain graph still needs memory and is not claimed to have device-independent capacity.
 
 Full archive version is independently 8. Both string and streaming readers migrate formats 1–7, require new fields for v8, and reject new fields smuggled into legacy formats. Schedule rules, exceptions, links, receipts, transfer provenance and journals round-trip in a consistent snapshot. Restoring still requires preview, verified rollback, stale check and atomic replacement. Running sessions restore as RECOVERY with detached device anchors. Historic command revision numbers are not reinterpreted as current local revisions. Pending transfer journals also bind controlBarrier; full restore invalidates their old base.
 

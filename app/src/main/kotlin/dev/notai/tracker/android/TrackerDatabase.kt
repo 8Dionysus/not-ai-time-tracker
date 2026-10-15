@@ -37,6 +37,7 @@ data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId
     @Query("SELECT * FROM vocabulary WHERE id=1") fun vocabulary(): VocabularyRow?
     @Insert(onConflict = OnConflictStrategy.REPLACE) fun vocabulary(row: VocabularyRow)
     @Query("SELECT * FROM metadata WHERE id=1") fun metadata(): MetaRow?
+    @Query("SELECT EXISTS(SELECT 1 FROM metadata WHERE id=1)") fun hasMetadata(): Boolean
     @Query("SELECT * FROM activity_types ORDER BY position") fun types(): List<TypeRow>
     @Query("SELECT * FROM cards ORDER BY position") fun cards(): List<CardRow>
     @Query("SELECT * FROM sessions ORDER BY position") fun sessions(): List<SessionRow>
@@ -115,13 +116,13 @@ abstract class TrackerDatabase: RoomDatabase() {
         // Domain additions live in the existing transactional metadata payload. No history rows change.
         val MIGRATION_5_6 = object: androidx.room.migration.Migration(5,6) {
             override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
-                db.query("SELECT payload FROM metadata WHERE id=1").use { c -> if(c.moveToFirst()) {
-                    val old = codec.parseToJsonElement(c.getString(0)).jsonObject
+                readMetadataPayload(db)?.let { payload ->
+                    val old = codec.parseToJsonElement(payload).jsonObject
                     ensure(old["schedule"] == null || codec.decodeFromJsonElement<ScheduleData>(old.getValue("schedule")) == ScheduleData(),"Unexpected schedule in v5 metadata",ErrorCode.STORAGE)
                     ensure(old["transfer"] == null || codec.decodeFromJsonElement<TransferState>(old.getValue("transfer")) == TransferState(),"Unexpected transfer in v5 metadata",ErrorCode.STORAGE)
                     val next = JsonObject(old + mapOf("schedule" to codec.encodeToJsonElement(ScheduleData()),"transfer" to codec.encodeToJsonElement(TransferState())))
                     db.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(next.toString()))
-                } }
+                }
             }
         }
 
@@ -180,7 +181,7 @@ class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset
     private val dao = db.dao()
     @Volatile private var cached: Pair<Long,CheckedState>? = null // accessed only inside Room transactions
     init { db.runInTransaction {
-        if(dao.metadata() == null) {
+        if(!dao.hasMetadata()) {
             val tables = listOf("metadata","activity_types","cards","sessions","segments","favorites","measurements","vocabulary","store_generation","history_classifications")
             val remnants = tables.any { table -> db.openHelper.readableDatabase.query("SELECT 1 FROM $table LIMIT 1").use { it.moveToFirst() } }
             if(remnants || !allowInitialize) throw CoreError(ErrorCode.STORAGE,"Metadata is missing from an existing store; use explicit recovery. Nothing was initialized.")
@@ -215,7 +216,7 @@ class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset
         val generation = dao.generation() ?: throw CoreError(ErrorCode.STORAGE,"Missing store generation")
         ensure(generation >= 0,"Invalid store generation",ErrorCode.STORAGE)
         cached?.takeIf { it.first == generation }?.let { return it.second }
-        val meta = loadPhase("sql-metadata") { dao.metadata()!!.payload }
+        val meta = loadPhase("sql-metadata") { readMetadataPayload(db.openHelper.readableDatabase) ?: fail(ErrorCode.STORAGE,"Missing metadata") }
         val base = loadPhase("decode-metadata") { codec.decodeFromString<Dataset>(meta) }
         val rawVocabulary = loadPhase("sql-vocabulary") { dao.vocabulary()!!.payload }
         val vocabulary = loadPhase("decode-vocabulary") { codec.decodeFromString<VocabularyData>(rawVocabulary) }
@@ -338,10 +339,30 @@ class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset
         }
         }
         val meta = MetaRow(payload = codec.encodeToString(d.copy(types = emptyList(),cards = emptyList(),sessions = emptyList(),segments = emptyList(),favorites = emptyList(),measurements = emptyList(),axes = emptyList(),metrics = emptyList(),units = emptyList())))
-        dao.metadata(meta); check(dao.metadata() == meta) { "Metadata verification failed" }
+        dao.metadata(meta); check(readMetadataPayload(db.openHelper.readableDatabase) == meta.payload) { "Metadata verification failed" }
         val generation = Math.addExact(dao.generation() ?: 0,1)
         dao.generation(GenerationRow(generation = generation))
         check(dao.generation() == generation) { "Generation verification failed" }
         cached = generation to state
     }
+}
+
+/** Transfer journals can exceed a single CursorWindow row. Read fixed-size SQL text slices
+ * inside the caller's transaction; SQLite substr offsets count Unicode code points, not UTF-16.
+ * Whole-state decoding remains explicit; this does not claim bounded total domain memory.
+ */
+internal fun readMetadataPayload(db: androidx.sqlite.db.SupportSQLiteDatabase): String? {
+    val length = db.query("SELECT length(payload) FROM metadata WHERE id=1").use { c ->
+        if(!c.moveToFirst()) return null
+        ensure(!c.isNull(0),"Null metadata payload",ErrorCode.STORAGE);c.getLong(0)
+    }
+    ensure(length in 0..Int.MAX_VALUE.toLong(),"Metadata text exceeds supported memory range",ErrorCode.STORAGE)
+    val text = StringBuilder();var offset = 1L
+    while(offset <= length) {
+        val chunk = db.query("SELECT substr(payload,?,131072) FROM metadata WHERE id=1",arrayOf<Any>(offset)).use { c ->
+            ensure(c.moveToFirst() && !c.isNull(0),"Metadata disappeared during read",ErrorCode.STORAGE);c.getString(0)
+        }
+        ensure(chunk.isNotEmpty(),"Metadata slice is missing",ErrorCode.STORAGE);text.append(chunk);offset += 131072
+    }
+    return text.toString()
 }

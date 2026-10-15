@@ -40,7 +40,7 @@ object StreamingBackup {
             }
             writer.write("]")
         }
-        writer.write("{");field("formatVersion","10",true);field("backupId",codec.encodeToString(backup.backupId));field("asOf",backup.asOf.toString())
+        writer.write("{");field("formatVersion","11",true);field("backupId",codec.encodeToString(backup.backupId));field("asOf",backup.asOf.toString())
         writer.write(",\"data\":{");val d = backup.data
         field("datasetId",codec.encodeToString(d.datasetId),true);field("revision",d.revision.toString())
         field("transfer",codec.encodeToString(d.transfer));field("schedule",codec.encodeToString(d.schedule));field("settings",codec.encodeToString(d.settings));field("focus",codec.encodeToString(d.focus))
@@ -66,7 +66,7 @@ object StreamingBackup {
                 else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unknown backup field: $key")
             } };json.finish()
         }
-        ensure(version in 1..10 && !id.isNullOrBlank() && asOf != null && hasData,"Unsupported backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(version in 1..11 && !id.isNullOrBlank() && asOf != null && hasData,"Unsupported backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
         val format = version!!
         val types = mutableListOf<ActivityType>();val axes = mutableListOf<Axis>();val metrics = mutableListOf<Metric>();val units = mutableListOf<UnitDefinition>()
         val cards = mutableListOf<Card>();val favorites = mutableListOf<Favorite>();val sessions = mutableListOf<Session>();val segments = mutableListOf<Segment>()
@@ -120,13 +120,14 @@ object StreamingBackup {
             schedule = schedule,transfer = transfer,goals = goals,focus = focus,catalogVersion = catalogVersion,timerEpoch = timerEpoch,controlBarrier = controlBarrier)
         ensure(format >= 9 || !data.transfer.hasCompactionState(),"Compaction in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format >= 10 || (data.settings.schedule == ScheduleSettings() && !data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
-        Backup(formatVersion = 10,backupId = id!!,asOf = asOf!!,data = data.frozen()).also(::validateBackup)
+        ensure(format >= 11 || data.settings.surfaces.shortcut,"Shortcut preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+        Backup(formatVersion = 11,backupId = id!!,asOf = asOf!!,data = data.frozen()).also(::validateBackup)
     } catch(e: CoreError) { if(e.code == ErrorCode.UNSUPPORTED_IMPORT) throw e else fail(ErrorCode.UNSUPPORTED_IMPORT,"Invalid backup: ${e.message}") }
       catch(_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed or unreadable backup") }
     private fun reader(input: InputStream): Reader = InputStreamReader(input,Charsets.UTF_8.newDecoder()
         .onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT)).buffered(64*1024)
     internal fun validateBackup(b: Backup) {
-        ensure(b.formatVersion == 10 && b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(b.formatVersion == 11 && b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
         validate(b.data)
         ensure(b.data.focus?.breakAnchor == null && b.data.segments.all { it.anchor == null },"Backup contains device anchors",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(b.data.segments.all { (it.start <= b.asOf || it.uncertain) && (it.end == null || it.end <= b.asOf || it.uncertain) &&

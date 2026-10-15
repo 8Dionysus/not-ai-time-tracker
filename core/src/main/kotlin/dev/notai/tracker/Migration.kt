@@ -34,9 +34,9 @@ private fun migrateV1(element: JsonElement): JsonElement = when(element) {
 internal fun decodeBackupVersion(json: String): Backup {
     val root = codec.parseToJsonElement(json).jsonObject
     val version = root["formatVersion"]?.jsonPrimitive?.intOrNull
-    ensure(version in 8..10 || listOf("schedule","transfer").none { it in root.getValue("data").jsonObject },"Schedule in legacy archive")
+    ensure(version in 8..11 || listOf("schedule","transfer").none { it in root.getValue("data").jsonObject },"Schedule in legacy archive")
     val backup = when(version) {
-        8,9,10 -> {
+        8,9,10,11 -> {
             ensure(listOf("goals","focus","schedule","transfer").all { it in root.getValue("data").jsonObject },"Missing v8 backup fields")
             codec.decodeFromJsonElement<Backup>(root).also { ensure(version != 8 || !it.data.transfer.hasCompactionState(),"Compaction in v8 archive") }
         }
@@ -54,11 +54,12 @@ internal fun decodeBackupVersion(json: String): Backup {
         2 -> codec.decodeFromJsonElement<Backup>(root)
         1 -> {
             val migrated = migrateV1(root).jsonObject.toMutableMap()
-            migrated["formatVersion"] = JsonPrimitive(10)
+            migrated["formatVersion"] = JsonPrimitive(11)
             codec.decodeFromJsonElement<Backup>(JsonObject(migrated))
         }
         else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unsupported backup version")
     }
-    ensure(version == 10 || (backup.data.settings.schedule == ScheduleSettings() && !backup.data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive")
-    return backup.copy(formatVersion = 10)
+    ensure(version in 10..11 || (backup.data.settings.schedule == ScheduleSettings() && !backup.data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive")
+    ensure(version == 11 || backup.data.settings.surfaces.shortcut,"Shortcut preference in legacy archive")
+    return backup.copy(formatVersion = 11)
 }

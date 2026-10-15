@@ -51,7 +51,7 @@ object TimerSurfaces {
         c.getSystemService(NotificationManager::class.java).let { it.areNotificationsEnabled() && it.getNotificationChannel(CONTROL_CHANNEL)?.importance != NotificationManager.IMPORTANCE_NONE }
     fun overlayAllowed(c: Context) = Settings.canDrawOverlays(c)
     fun enabled(s: SurfaceSettings,source: Surface) = when(source) {
-        Surface.WIDGET -> s.widget; Surface.NOTIFICATION -> s.notification; Surface.OVERLAY -> s.overlay; Surface.SHORTCUT -> true
+        Surface.WIDGET -> s.widget; Surface.NOTIFICATION -> s.notification; Surface.OVERLAY -> s.overlay; Surface.SHORTCUT -> s.shortcut
     }
     /** Policy is checked again after process recreation, before the core revision check/write. */
     fun execute(tracker: Tracker,action: SurfaceAction,permission: Boolean = true): Tracker.Change {
@@ -108,8 +108,13 @@ object TimerSurfaces {
     }
     fun widget(c: Context,view: TrackerView,enabled: Boolean): RemoteViews = SurfaceViews.widget(c,view,enabled)
     /** Launcher may throttle updates. A retained/pinned old shortcut fails STALE, never replays. */
-    fun shortcut(c: Context,s: Snapshot) {
+    fun shortcut(c: Context,s: Snapshot,settings: SurfaceSettings) {
         val manager = c.getSystemService(android.content.pm.ShortcutManager::class.java)
+        if(!settings.shortcut) {
+            manager.disableShortcuts(listOf("timer_action"))
+            manager.removeDynamicShortcuts(listOf("timer_action"))
+            return
+        }
         val command = primary(s)
         if(command == null) {
             manager.disableShortcuts(listOf("timer_action"),"Откройте приложение для уточнения времени")
@@ -124,7 +129,7 @@ object TimerSurfaces {
     }
     fun refresh(c: Context,view: TrackerView,previous: SurfaceSettings? = null,forceWidget: Boolean = false) {
         val settings = view.data.settings.surfaces
-        try { shortcut(c,view.snapshot()) } catch(_: RuntimeException) { android.util.Log.w("TimerSurfaces","Launcher shortcut update unavailable") }
+        try { shortcut(c,view.snapshot(),settings) } catch(_: RuntimeException) { android.util.Log.w("TimerSurfaces","Launcher shortcut update unavailable") }
         if(!forceWidget && settings == SurfaceSettings() && previous == SurfaceSettings()) return
         // No per-second work; called on committed revisions or explicit widget/permission events only.
         if(settings.widget || previous?.widget == true || forceWidget) {

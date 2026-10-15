@@ -53,6 +53,11 @@ object BackendIntegrationChecks {
                 tracker.saveType(tracker.snapshot().token,ActivityType("qa-philosophy","Философия",parentId = "qa-reading"))
                 val card = Card("qa-book","Заратустра",activityTypeId = "qa-philosophy")
                 tracker.saveCard(tracker.snapshot().token,card)
+                val shown = tracker.snapshot()
+                tracker.settings(shown.token,tracker.data().settings.copy(surfaces = SurfaceSettings(shortcut = false)))
+                val disabled = tracker.data()
+                check(runCatching { TimerSurfaces.execute(tracker,SurfaceAction(Surface.SHORTCUT,TimerCommand.START,shown.token,shown.timerTarget)) }.exceptionOrNull() is CoreError)
+                check(disabled == tracker.data())
                 tracker.start(tracker.snapshot().token,card.classification())
                 wall += 1000;elapsed += 1000;tracker.pause(tracker.snapshot().token)
                 wall += 1000;elapsed += 1000;tracker.resume(tracker.snapshot().token)
@@ -89,6 +94,7 @@ object BackendIntegrationChecks {
                 atomicText(File(root,"clock.json"),buildJsonObject { put("wall",wall);put("elapsed",elapsed) }.toString())
             }
             domainHash = sha256(codec.encodeToString(tracker.data()).toByteArray())
+            check(!tracker.data().settings.surfaces.shortcut)
             if(!create) check(domainHash == saved!!.getValue("domainSha256").jsonPrimitive.content)
         } finally { db.close() }
         val exportId = "00000000-0000-0000-0000-000000000001"
@@ -138,6 +144,8 @@ object BackendIntegrationChecks {
         val report = buildJsonObject {
             put("schema","tracker_android_backend_integration_v1");put("mode",mode);put("fixtureTag",tag)
             put("processId",android.os.Process.myPid());put("sdk",android.os.Build.VERSION.SDK_INT)
+            put("roomVersion",TRACKER_DATABASE_VERSION);put("fullJsonFormat",Backups.decode(File(root,"full-archive.json").readText()).formatVersion)
+            put("shortcutDisabledPersisted",true);put("shortcutCommandRefused",true)
             put("abi",android.os.Build.SUPPORTED_ABIS.first());put("privateRootMode",Integer.toOctalString(rootStat.st_mode))
             put("contextDescriptorBinding",true);put("liveDatasetUnchanged",true);put("liveDatasetDigest",liveBefore)
             put("indexedReceiptCount",33);put("legacyBytesPreserved",true);put("duplicateReserveRejected",true)

@@ -24,6 +24,63 @@ class RoomScenariosTest: ScenarioContract() {
     }
     @org.junit.After fun restoreDirectoryDurability() { DirectoryDurability.sync = originalDirectorySync;DirectoryDurability.rename = originalRename;DirectoryDurability.link = originalLink }
     private val databases = mutableMapOf<StateStore,Pair<String,TrackerDatabase>>()
+    @org.junit.Test fun shortcutPreferenceMigrationFromV8PreservesAllTimerStatesAndRejectsFutureMeaning() {
+        val context = RuntimeEnvironment.getApplication()
+        for(status in SessionStatus.entries) {
+            val clock = FakeClock();var store = createStore();val tracker = Tracker(store,clock)
+            tracker.start(tracker.snapshot().token);clock.advance(1000)
+            if(status == SessionStatus.PAUSED) tracker.pause(tracker.snapshot().token)
+            if(status == SessionStatus.STOPPED) tracker.stop(tracker.snapshot().token)
+            if(status == SessionStatus.RECOVERY) store.transaction { d -> d.copy(sessions = d.sessions.map { it.copy(status = SessionStatus.RECOVERY) },segments = d.segments.map { it.copy(anchor = null,uncertain = true) }) to Unit }
+            val expected = store.read();val (name,db) = databases.remove(store)!!;db.close()
+            android.database.sqlite.SQLiteDatabase.openDatabase(context.getDatabasePath(name).path,null,0).use { sql ->
+                val payload = sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> c.moveToFirst();codec.parseToJsonElement(c.getString(0)).jsonObject.toMutableMap() }
+                val settings = payload.getValue("settings").jsonObject.toMutableMap()
+                settings["surfaces"] = JsonObject(settings.getValue("surfaces").jsonObject.filterKeys { it != "shortcut" })
+                payload["settings"] = JsonObject(settings)
+                sql.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(JsonObject(payload).toString()));sql.version = 8
+            }
+            store = open(name);org.junit.Assert.assertEquals(expected,store.read());store = reopen(store)
+            org.junit.Assert.assertEquals(expected,store.read());org.junit.Assert.assertTrue(store.read().settings.surfaces.shortcut)
+        }
+        val store = createStore();val tracker = Tracker(store,FakeClock())
+        tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(shortcut = false)))
+        val (name,db) = databases.remove(store)!!;db.close();val file = context.getDatabasePath(name)
+        val prior = android.database.sqlite.SQLiteDatabase.openDatabase(file.path,null,0).use { sql ->
+            sql.version = 8;sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> c.moveToFirst();c.getString(0) }
+        }
+        org.junit.Assert.assertThrows(Exception::class.java) { open(name) }
+        android.database.sqlite.SQLiteDatabase.openDatabase(file.path,null,0).use { sql ->
+            org.junit.Assert.assertEquals(8,sql.version)
+            sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> c.moveToFirst();org.junit.Assert.assertEquals(prior,c.getString(0)) }
+        }
+    }
+    @org.junit.Test fun shortcutDisableWithdrawsMutableEntriesAndGatesRetainedActionsAfterReopen() {
+        val context = RuntimeEnvironment.getApplication();val tracker = Tracker(createStore(),FakeClock())
+        val shown = tracker.snapshot();val oldAction = SurfaceAction(Surface.SHORTCUT,TimerCommand.START,shown.token,shown.timerTarget)
+        val manager = context.getSystemService(android.content.pm.ShortcutManager::class.java)
+        TimerSurfaces.shortcut(context,shown,tracker.data().settings.surfaces)
+        val published = manager.dynamicShortcuts.single();org.junit.Assert.assertEquals("timer_action",published.id)
+        org.junit.Assert.assertTrue(manager.requestPinShortcut(published,null))
+        val timer = tracker.snapshot().timerTarget
+        tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(shortcut = false)))
+        org.junit.Assert.assertEquals(timer,tracker.snapshot().timerTarget)
+        // This is the ordinary refresh path; it must not republish while disabled.
+        TimerSurfaces.refresh(context,tracker.view(),SurfaceSettings(shortcut = true))
+        org.junit.Assert.assertTrue(manager.dynamicShortcuts.isEmpty())
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) { manager.requestPinShortcut(published,null) }
+        val reopened = Tracker(reopen(tracker.store),tracker.clock);val before = reopened.data()
+        org.junit.Assert.assertFalse(SurfaceSettingsBackend.read(context,before.settings.surfaces).shortcut.enabled)
+        org.junit.Assert.assertThrows(CoreError::class.java) { TimerSurfaces.execute(reopened,oldAction) }
+        org.junit.Assert.assertEquals(before,reopened.data());org.junit.Assert.assertTrue(before.sessions.isEmpty())
+        reopened.settings(reopened.snapshot().token,before.settings.copy(surfaces = before.settings.surfaces.copy(shortcut = true)))
+        TimerSurfaces.refresh(context,reopened.view(),before.settings.surfaces)
+        org.junit.Assert.assertEquals("timer_action",manager.dynamicShortcuts.single().id)
+        org.junit.Assert.assertTrue(manager.requestPinShortcut(published,null))
+        val fresh = reopened.snapshot()
+        TimerSurfaces.execute(reopened,SurfaceAction(Surface.SHORTCUT,TimerCommand.START,fresh.token,fresh.timerTarget))
+        org.junit.Assert.assertEquals(Mode.RUNNING,reopened.snapshot().mode)
+    }
     @org.junit.Test fun v7FunctionalMigrationPreservesEverySessionStateAndRejectsFuturePayloads() {
         val context = RuntimeEnvironment.getApplication()
         for(status in SessionStatus.entries) {
@@ -757,7 +814,7 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertEquals(latest.safeLabel,notification.extras.getCharSequence(android.app.Notification.EXTRA_TEXT))
         org.junit.Assert.assertEquals(0,notification.actions?.size ?: 0) // buttons live in the custom row, visible collapsed
         org.junit.Assert.assertEquals(android.app.Notification.VISIBILITY_PRIVATE,notification.visibility)
-        TimerSurfaces.shortcut(context,latest)
+        TimerSurfaces.shortcut(context,latest,tracker.data().settings.surfaces)
         val launcher = context.getSystemService(android.content.pm.ShortcutManager::class.java).dynamicShortcuts.single()
         val launcherAction = requireNotNull(TimerSurfaces.parse(launcher.intent!!))
         org.junit.Assert.assertEquals(Surface.SHORTCUT,launcherAction.source)

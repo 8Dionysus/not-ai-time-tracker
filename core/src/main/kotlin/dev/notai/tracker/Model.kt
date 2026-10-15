@@ -49,7 +49,8 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
     constructor(id: String = newId(), fieldId: String, meaningVersion: Int = 1, unit: String, scope: Scope, targetId: String, value: Long):
         this(id,fieldId,meaningVersion,unit,scope,targetId,Decimal(value.toString()))
 }
-@Serializable data class SurfaceSettings(val widget: Boolean = false,val notification: Boolean = false,val overlay: Boolean = false,val focusSignal: Boolean = false)
+@Serializable data class SurfaceSettings(val widget: Boolean = false,val notification: Boolean = false,val overlay: Boolean = false,val focusSignal: Boolean = false,
+    val shortcut: Boolean = true) // Preserve the previously always-enabled launcher timer on legacy decode.
 @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 @Serializable data class Settings(val reportZone: String = "UTC",val surfaces: SurfaceSettings = SurfaceSettings(),val focusPlan: FocusPlan = FocusPlan(),
     @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val schedule: ScheduleSettings = ScheduleSettings())

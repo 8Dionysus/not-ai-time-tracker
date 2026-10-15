@@ -117,7 +117,8 @@ object SurfaceChoices {
 
 enum class SurfaceSettingsAction { REQUEST_NOTIFICATION_PERMISSION, OPEN_NOTIFICATION_SETTINGS, OPEN_OVERLAY_PERMISSION, ADD_WIDGET, RETRY_WIDGET, REFRESH }
 data class SurfaceCapability(val enabled: Boolean,val permitted: Boolean,val problem: SurfaceProblem?,val actions: Set<SurfaceSettingsAction>)
-data class SettingsCapabilities(val widget: SurfaceCapability,val widgetPlacement: WidgetState,val notification: SurfaceCapability,val overlay: SurfaceCapability,val focusSignal: SurfaceCapability)
+data class SettingsCapabilities(val widget: SurfaceCapability,val widgetPlacement: WidgetState,val notification: SurfaceCapability,val overlay: SurfaceCapability,val focusSignal: SurfaceCapability,
+    val shortcut: SurfaceCapability)
 object SurfaceSettingsBackend {
     fun read(context: Context,settings: SurfaceSettings,reconcileForeground: Boolean = false): SettingsCapabilities {
         val widget = WidgetPlacementController(context).read(reconcileForeground)
@@ -129,7 +130,8 @@ object SurfaceSettingsBackend {
         return SettingsCapabilities(SurfaceCapability(settings.widget,true,widget.problem,setOf(if(widget.placement == WidgetPlacement.UNCONFIRMED) SurfaceSettingsAction.RETRY_WIDGET else SurfaceSettingsAction.ADD_WIDGET)),widget,
             SurfaceCapability(settings.notification,notifications,notificationProblem,setOf(SurfaceSettingsAction.REQUEST_NOTIFICATION_PERMISSION,SurfaceSettingsAction.OPEN_NOTIFICATION_SETTINGS)),
             SurfaceCapability(settings.overlay,overlay,if(overlay) null else SurfaceProblem.PERMISSION_REQUIRED,setOf(SurfaceSettingsAction.OPEN_OVERLAY_PERMISSION)),
-            SurfaceCapability(settings.focusSignal,focus,if(focus) null else if(permission) SurfaceProblem.CHANNEL_BLOCKED else SurfaceProblem.PERMISSION_REQUIRED,setOf(SurfaceSettingsAction.OPEN_NOTIFICATION_SETTINGS)))
+            SurfaceCapability(settings.focusSignal,focus,if(focus) null else if(permission) SurfaceProblem.CHANNEL_BLOCKED else SurfaceProblem.PERMISSION_REQUIRED,setOf(SurfaceSettingsAction.OPEN_NOTIFICATION_SETTINGS)),
+            SurfaceCapability(settings.shortcut,true,null,emptySet()))
     }
     fun settingsIntent(context: Context,action: SurfaceSettingsAction): Intent? = when(action) {
         SurfaceSettingsAction.OPEN_NOTIFICATION_SETTINGS -> Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE,context.packageName)

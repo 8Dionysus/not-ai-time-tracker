@@ -71,3 +71,8 @@ Project-owned code is licensed under [Apache-2.0](LICENSE). The [NOTICE](NOTICE)
 Текущая backend-схема — Room 7, полный архив — JSON 9 (read 1–9). [BACKEND_PASS_2026_10](docs/BACKEND_PASS_2026_10.md) фиксирует новые API и незакрытые границы; production-удаление private copies и полноценная локализация не объявлены готовыми.
 
 Явная compaction текущих SQLite operational snapshots: [TRANSFER_RETENTION](docs/TRANSFER_RETENTION.md). Typed CSV issue contract: [IMPORT_ISSUES](docs/IMPORT_ISSUES.md). Нативные dependency/source ограничения: [NATIVE_LICENSE_EVIDENCE](docs/NATIVE_LICENSE_EVIDENCE.md).
+
+
+## Локализация для подключения фронтенда
+
+[Проверенный редакционный пакет RU и 11 переводных языков](docs/localization/README.md) находится в main вместе с точными хешами и инструкцией для Опуса. Он включает составные сообщения и 64 typed CSV issue codes; подключение ресурсов к Android UI и проверка на устройстве ещё предстоят.

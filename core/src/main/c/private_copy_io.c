@@ -16,7 +16,8 @@
 #define JNI(name) Java_dev_notai_tracker_NativeCopyIo_##name
 static void error(JNIEnv *e,const char *op) {
     int saved=errno;char message[256];snprintf(message,sizeof message,"%s: %s",op,strerror(saved));
-    (*e)->ThrowNew(e,(*e)->FindClass(e,"java/io/IOException"),message);
+    jclass type=(*e)->FindClass(e,"java/io/IOException");
+    if(type) { (*e)->ThrowNew(e,type,message);(*e)->DeleteLocalRef(e,type); }
     errno=saved;
 }
 static int safe(const char *s) {
@@ -59,10 +60,10 @@ JNIEXPORT jlongArray JNICALL JNI(fstat)(JNIEnv *e,jobject self,jlong fd) {
 }
 JNIEXPORT jlongArray JNICALL JNI(stat)(JNIEnv *e,jobject self,jlong root,jstring path) {
     (void)self;const char *s=(*e)->GetStringUTFChars(e,path,NULL);if(!s) return NULL;
-    char *leaf=NULL;int p=parent(e,(int)root,s,&leaf);struct stat st;int result=-1,saved=0;
+    char *leaf=NULL;int p=parent(e,(int)root,s,&leaf);struct stat st;int result=-1,saved=errno;
     if(p>=0) { result=fstatat(p,leaf,&st,AT_SYMLINK_NOFOLLOW);saved=errno;free(leaf);close(p); }
     (*e)->ReleaseStringUTFChars(e,path,s);
-    if(p<0) { if(errno==ENOENT) (*e)->ExceptionClear(e);return NULL; }
+    if(p<0) { if(saved==ENOENT) (*e)->ExceptionClear(e);return NULL; }
     if(result<0) { if(saved!=ENOENT) { errno=saved;error(e,"stat"); }return NULL; }return attributes(e,&st);
 }
 JNIEXPORT jobjectArray JNICALL JNI(names)(JNIEnv *e,jobject self,jlong root,jstring path) {

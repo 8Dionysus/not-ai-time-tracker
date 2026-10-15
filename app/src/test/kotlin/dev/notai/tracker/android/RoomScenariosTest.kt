@@ -24,6 +24,32 @@ class RoomScenariosTest: ScenarioContract() {
     }
     @org.junit.After fun restoreDirectoryDurability() { DirectoryDurability.sync = originalDirectorySync;DirectoryDurability.rename = originalRename;DirectoryDurability.link = originalLink }
     private val databases = mutableMapOf<StateStore,Pair<String,TrackerDatabase>>()
+    @org.junit.Test fun v5MigrationPreservesStoppedPausedRunningAndRecovery() {
+        val context = RuntimeEnvironment.getApplication()
+        for(status in SessionStatus.entries) {
+            val clock = FakeClock();var store = createStore();val tracker = Tracker(store,clock)
+            tracker.start(tracker.snapshot().token);clock.advance(1000)
+            if(status == SessionStatus.PAUSED) tracker.pause(tracker.snapshot().token)
+            if(status == SessionStatus.STOPPED) tracker.stop(tracker.snapshot().token)
+            if(status == SessionStatus.RECOVERY) store.transaction { d -> d.copy(sessions = d.sessions.map { it.copy(status = SessionStatus.RECOVERY) },segments = d.segments.map { it.copy(anchor = null,uncertain = true) }) to Unit }
+            val expected = store.read();val (name,db) = databases.remove(store)!!;db.close()
+            android.database.sqlite.SQLiteDatabase.openDatabase(context.getDatabasePath(name).path,null,0).use { sql ->
+                val old = sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> c.moveToFirst();codec.parseToJsonElement(c.getString(0)).jsonObject }
+                val legacy = JsonObject(old.filterKeys { it !in setOf("schedule","transfer") })
+                sql.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(legacy.toString()));sql.version = 5
+            }
+            store = open(name);org.junit.Assert.assertEquals(expected,store.read())
+            org.junit.Assert.assertEquals(6,databases.getValue(store).second.openHelper.readableDatabase.version)
+            store = reopen(store);org.junit.Assert.assertEquals(expected,store.read())
+            val migrated = Tracker(store,clock);val archive = Backups(migrated,MemoryRollback()).export()
+            val destination = Tracker(createStore(),clock);val backups = Backups(destination,MemoryRollback())
+            backups.apply(backups.prepare(archive))
+            org.junit.Assert.assertEquals(Backups.decode(archive).data.sessions.map { if(it.status == SessionStatus.RUNNING) it.copy(status = SessionStatus.RECOVERY) else it },destination.data().sessions)
+            org.junit.Assert.assertEquals(expected.types,destination.data().types)
+            org.junit.Assert.assertEquals(expected.cards,destination.data().cards)
+            org.junit.Assert.assertEquals(expected.segments.map { it.id },destination.data().segments.map { it.id })
+        }
+    }
     @org.junit.Test fun validClassificationPayloadCannotChangeUnderItsOldContentId() {
         for(reopenFirst in listOf(false,true)) {
             var store = createStore();val tracker = Tracker(store,FakeClock());tracker.start(tracker.snapshot().token)
@@ -121,7 +147,7 @@ class RoomScenariosTest: ScenarioContract() {
             org.junit.Assert.assertEquals(expected,store.read())
             org.junit.Assert.assertEquals(count,store.read().sessions.map { it.id }.toSet().size)
             val migrated = databases.getValue(store).second.openHelper.readableDatabase
-            org.junit.Assert.assertEquals(5,migrated.version)
+            org.junit.Assert.assertEquals(6,migrated.version)
             for(table in listOf("sessions","segments")) {
                 val after = migrated.query("SELECT id,position FROM $table ORDER BY position,id").use { c -> buildList { while(c.moveToNext()) add(c.getString(0) to c.getInt(1)) } }
                 org.junit.Assert.assertEquals(positions[table],after)
@@ -175,7 +201,7 @@ class RoomScenariosTest: ScenarioContract() {
                 })
             }
         }
-        val db = androidx.room.Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(fault).allowMainThreadQueries().build()
+        val db = androidx.room.Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(fault,TrackerDatabase.MIGRATION_5_6).allowMainThreadQueries().build()
         try { org.junit.Assert.assertThrows(Exception::class.java) { RoomStore(db) } } finally { db.close() }
         org.junit.Assert.assertEquals(before,snapshot())
         org.junit.Assert.assertEquals(input,open(name).read())
@@ -426,7 +452,7 @@ class RoomScenariosTest: ScenarioContract() {
     }
     override fun createStore(): StateStore = open("test-${newId()}.db")
     private fun open(name: String): StateStore {
-        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5).allowMainThreadQueries().build()
+        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6).allowMainThreadQueries().build()
         return try { RoomStore(db).also { databases[it] = name to db } } catch(e: Exception) { db.close();throw e }
     }
     override fun reopen(store: StateStore): StateStore {
@@ -462,7 +488,7 @@ class RoomScenariosTest: ScenarioContract() {
             db.version = 1
         }
         val store = open(name)
-        org.junit.Assert.assertEquals(5,databases.getValue(store).second.openHelper.readableDatabase.version)
+        org.junit.Assert.assertEquals(6,databases.getValue(store).second.openHelper.readableDatabase.version)
         return store.read().also { validate(it) }
     }
     override fun backupDocumentInput() {
@@ -990,7 +1016,7 @@ class RoomScenariosTest: ScenarioContract() {
             val phases = linkedMapOf<String,Long>()
             val start = System.nanoTime()
             val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name)
-                .addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5).allowMainThreadQueries().build()
+                .addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6).allowMainThreadQueries().build()
             val reopened = RoomStore(db,onLoadPhase = { key,ns -> phases[key] = (phases[key] ?: 0)+ns },loadPageSize = if(variant == "normalized") 512 else null)
             databases[reopened] = name to db;store = reopened
             val initDone = System.nanoTime()-start

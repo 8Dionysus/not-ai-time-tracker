@@ -159,6 +159,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun deleteSession(expected: Token,id: String) = mutate(expected,true) { d,_ -> deletedSession(d,id) }
     private fun deletedSession(d: Dataset,id: String): Dataset {
         ensure(d.sessions.any { it.id == id && it.status == SessionStatus.STOPPED } && d.focus?.sessionId != id,"Only completed sessions can be deleted")
+        ensure(d.schedule.links.none { it.sessionId == id },"Session is linked to a schedule occurrence")
         val segmentIds = d.segments.filter { it.sessionId == id }.map { it.id }.toSet()
         return d.copy(sessions = d.sessions.filterNot { it.id == id },segments = d.segments.filterNot { it.sessionId == id },
             measurements = d.measurements.filterNot { (it.scope == Scope.SESSION && it.targetId == id) || (it.scope == Scope.SEGMENT && it.targetId in segmentIds) },

@@ -62,4 +62,8 @@ adb shell am start -n dev.notai.tracker/dev.notai.tracker.android.MainActivity
 
 Зона новой установки берётся с устройства один раз. Дальнейшие изменения зоны отчётов подтверждаются явно; зоны целей независимы. Технический экран (`TechnicalActivity`) предоставляет выбор карточки и избранного по ID, полный каталог с поиском и страницами, Focus с необязательным фоновым уведомлением, выбор календарного вхождения, явный CSV mapping, количества целого target, устойчивый SAF-экспорт и recovery без открытия неисправной базы.
 
-Файл лицензии пока отсутствует; условия распространения ещё не выбраны.
+Для собственного кода выбрана Apache-2.0; границы стороннего контента описаны в LICENSE и NOTICE.
+
+## License
+
+Project-owned code is licensed under [Apache-2.0](LICENSE). The [NOTICE](NOTICE) preserves the separate Onest OFL and third-party/content boundaries. Catalog research and assets do not acquire new rights through this source-code license.

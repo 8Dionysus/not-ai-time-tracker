@@ -56,6 +56,7 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
     @Required val types: List<ActivityType> = Catalog.types,
     @Required val cards: List<Card> = emptyList(), @Required val favorites: List<Favorite> = emptyList(),
     @Required val sessions: List<Session> = emptyList(), @Required val segments: List<Segment> = emptyList(),
+    val schedule: ScheduleData = ScheduleData(),val transfer: TransferState = TransferState(),
     val goals: List<Goal> = emptyList(),val focus: FocusRun? = null,val catalogVersion: String? = null,
     val timerEpoch: Long = 0,val controlBarrier: String = "",
     @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val pendingAssignments: List<StoppedAssignment> = emptyList(),
@@ -71,8 +72,11 @@ enum class Mode { IDLE, RUNNING, PAUSED, RECOVERY }
 data class Snapshot(val token: Token, val mode: Mode, val session: Session?, val active: Segment?,
     val trustedDurationMs: Long, val calendarUncertain: Boolean, val safeLabel: String,
     val actions: Set<String>,val focus: FocusSnapshot? = null,val timerTarget: TimerTarget? = null)
-enum class ErrorCode { STALE, INVALID_INTERVAL, OVERLAP, INVALID_INPUT, STORAGE, UNSUPPORTED_IMPORT, RECOVERY_REQUIRED }
-class CoreError(val code: ErrorCode, message: String, val currentState: Snapshot? = null) : RuntimeException(message)
+@Serializable enum class ErrorCode { STALE, INVALID_INTERVAL, OVERLAP, INVALID_INPUT, STORAGE, UNSUPPORTED_IMPORT, RECOVERY_REQUIRED }
+class CoreError(val code: ErrorCode, message: String, val currentState: Snapshot? = null,
+    val arguments: Map<String,ErrorArgument> = emptyMap(), val fieldPath: String? = null) : RuntimeException(message) {
+    val localized get() = LocalizedError(code,arguments,fieldPath)
+}
 fun fail(code: ErrorCode, message: String): Nothing = throw CoreError(code, message)
 fun ensure(ok: Boolean, message: String, code: ErrorCode = ErrorCode.INVALID_INPUT) { if (!ok) fail(code, message) }
 
@@ -120,6 +124,8 @@ fun validate(data: Dataset) {
     validateGoals(data)
     validateFocus(data)
     validateAssignments(data)
+    validateSchedule(data)
+    validateTransfer(data)
     val cards = data.cards.associateBy { it.id }; val sessions = data.sessions.associateBy { it.id }
     fun selection(c: Classification) = validateSelection(data,c,typeIds,cards.keys)
     data.cards.forEach { ensure(it.name.isNotBlank(), "Card needs a name"); selection(it.classification()) }

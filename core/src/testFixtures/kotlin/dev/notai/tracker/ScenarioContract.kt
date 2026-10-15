@@ -23,6 +23,150 @@ abstract class ScenarioContract {
     open fun reopen(store: StateStore): StateStore = store
     private fun expect(code: ErrorCode,block: ()->Unit) { assertEquals(code,assertFailsWith<CoreError>(block = block).code) }
 
+    @Test fun scheduleLocalizationAndArchiveContract() {
+        val clock = FakeClock();var t = Tracker(createStore(),clock)
+        val beforeLocale = t.data();val labels = CatalogLabels(emptyList())
+        assertEquals("User original",labels.label("catalog","language",1,"Source","es-MX","User original").displayLabel)
+        assertEquals(listOf("es-MX","es-419","es"),localeFallbacks("es-MX"))
+        assertEquals(listOf("zh-Hant"),localeFallbacks("zh-Hant"))
+        assertEquals(beforeLocale,t.data())
+        val rule = ScheduleRule(t.typeSelection("language"),"2026-10-10",weekdays = setOf(2,4),extraDates = setOf("2026-10-10"))
+        val create = ScheduleCommand("create",t.snapshot().token,ScheduleAction.CREATE,"weekly",rule = rule)
+        val receipt = t.scheduleCommand(create);assertEquals(receipt,t.scheduleCommand(create));assertTrue(t.data().sessions.isEmpty())
+        expect(ErrorCode.STALE) { t.scheduleCommand(create.copy(rule = rule.copy(localTime = "19:00"))) }
+        val key = OccurrenceKey("weekly","2026-10-13")
+        val move = ScheduleCommand("move",t.snapshot().token,ScheduleAction.OVERRIDE,"weekly",1,occurrence = key,
+            override = OccurrenceOverride(key,OverrideOperation.MOVE,date = "2026-10-15"))
+        expect(ErrorCode.INVALID_INPUT) { t.scheduleCommand(move) }
+        t.scheduleCommand(move.copy(key = "allowed-move",override = move.override!!.copy(allowCollision = true)))
+        val projections = t.listOccurrences(LocalDate.parse("2026-10-15"),LocalDate.parse("2026-10-15"),java.time.ZoneId.of("UTC"))
+        assertEquals(2,projections.size);assertTrue(projections.all { it.instant == null && it.reminderInstant == null });assertTrue(projections.any { it.key == key })
+        val start = ScheduleCommand("start",t.snapshot().token,ScheduleAction.START,"weekly",1,occurrence = key,expectedOverrideRevision = 1)
+        val result = t.scheduleCommand(start);assertEquals(result,t.scheduleCommand(start));assertEquals(1,t.data().sessions.size)
+        t = Tracker(reopen(t.store),clock);assertEquals(result,t.scheduleCommand(start));assertEquals(result.sessionId,t.data().schedule.links.single().sessionId)
+        clock.advance(1000);t.stop(t.snapshot().token)
+        val backups = Backups(t,MemoryRollback());val backup = backups.export();assertEquals(8,Backups.decode(backup).formatVersion)
+        val clean = Tracker(createStore(),clock);val restore = Backups(clean,MemoryRollback());val preview = restore.prepare(backup)
+        assertEquals(1,preview.scheduleSeries);assertEquals(1,preview.scheduleLinks);restore.apply(preview)
+        assertEquals(t.data().schedule,clean.data().schedule);assertEquals(t.data().sessions,clean.data().sessions)
+        val broken = Backups.decode(backup).let { it.copy(data = it.data.copy(schedule = it.data.schedule.copy(links = it.data.schedule.links.map { l -> l.copy(sessionId = "missing") }))) }
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(codec.encodeToString(broken)) }
+        val immutable = t.data().schedule
+        assertFails { (immutable.series as MutableList<ScheduleSeries>).clear() }
+    }
+
+    @Test fun scheduleDstFutureAndNoAutomaticFacts() {
+        val clock = FakeClock();val t = Tracker(createStore(),clock)
+        val rule = ScheduleRule(Classification(),"2026-01-01",weekdays = setOf(7),localTime = "02:30",zonePolicy = ScheduleZonePolicy.FIXED,zoneId = "Europe/Berlin",alertsEnabled = true,reminderTime = "02:20")
+        t.scheduleCommand(ScheduleCommand("dst",t.snapshot().token,ScheduleAction.CREATE,"dst",rule = rule))
+        val gap = t.listOccurrences(LocalDate.parse("2026-03-29"),LocalDate.parse("2026-03-29"),java.time.ZoneId.of("UTC")).single()
+        assertEquals(Instant.parse("2026-03-29T01:00:00Z"),gap.instant);assertEquals(DstResolution.GAP_FIRST_VALID,gap.dstResolution)
+        assertEquals(gap.instant,gap.reminderInstant)
+        val overlap = t.listOccurrences(LocalDate.parse("2026-10-25"),LocalDate.parse("2026-10-25"),java.time.ZoneId.of("UTC")).single()
+        assertEquals(Instant.parse("2026-10-25T00:30:00Z"),overlap.instant);assertEquals(DstResolution.OVERLAP_EARLIER,overlap.dstResolution)
+        t.scheduleCommand(ScheduleCommand("future",t.snapshot().token,ScheduleAction.UPDATE_FUTURE,"dst",1,rule = rule.copy(localTime = "19:00"),effectiveFrom = "2026-10-20"))
+        assertEquals(gap.instant,t.listOccurrences(gap.date,gap.date,java.time.ZoneId.of("UTC")).single().instant)
+        assertEquals(java.time.LocalTime.of(19,0),t.listOccurrences(overlap.date,overlap.date,java.time.ZoneId.of("UTC")).single().localTime)
+        t.scheduleCommand(ScheduleCommand("archive",t.snapshot().token,ScheduleAction.SET_STATE,"dst",2,state = ScheduleState.ARCHIVED))
+        assertTrue(t.listOccurrences(overlap.date,overlap.date,java.time.ZoneId.of("UTC")).isEmpty())
+        t.scheduleCommand(ScheduleCommand("restore",t.snapshot().token,ScheduleAction.SET_STATE,"dst",3,state = ScheduleState.ACTIVE))
+        assertEquals(1,t.listOccurrences(overlap.date,overlap.date,java.time.ZoneId.of("UTC")).size)
+        assertTrue(t.data().sessions.isEmpty());assertTrue(t.data().segments.isEmpty())
+    }
+
+    @Test fun selectiveGroupsRepeatConflictAndStale() {
+        val clock = FakeClock();val source = Tracker(createStore(),clock)
+        source.manual(source.snapshot().token,clock.wall-3000,clock.wall-2000,source.typeSelection("language"),"private")
+        val session = source.data().sessions.single()
+        val transfer = SelectiveTransfer(source);val pack = transfer.export(TransferSelection(sessionIds = setOf(session.id)))
+        assertEquals(1,pack.groups.size);assertTrue(pack.groups.single().content.types.size < source.data().types.size)
+        var target = Tracker(createStore(),clock);var importer = SelectiveTransfer(target)
+        val plan = importer.plan(pack,pack.groups.map { it.id }.toSet());assertTrue(plan.conflicts.isEmpty())
+        val done = importer.apply(plan,"op");assertTrue(done.complete);assertFalse(done.partial);assertEquals(session,target.data().sessions.single())
+        assertEquals(done,importer.apply(plan,"op"));target = Tracker(reopen(target.store),clock);importer = SelectiveTransfer(target)
+        assertEquals(done,importer.resume("op"))
+        val again = importer.plan(pack,pack.groups.map { it.id }.toSet());assertEquals(TransferGroupState.UNCHANGED,importer.apply(again,"again").groups.single().state)
+        val stale = importer.plan(pack,pack.groups.map { it.id }.toSet());target.settings(target.snapshot().token,Settings("Europe/Berlin"))
+        expect(ErrorCode.STALE) { importer.apply(stale,"stale") }
+        val changedContent = pack.groups.single().content.let { it.copy(sessions = it.sessions.map { s -> s.copy(note = "source changed") },segments = it.segments.map { seg -> seg.copy(start = clock.wall-1000,end = clock.wall) }) }
+        val changed = pack.copy(groups = listOf(SelectiveTransfer.group(pack.groups.single().id,pack.groups.single().originId,pack.groups.single().sourceRevision,changedContent)))
+        // Hash computation uses the public inspection round-trip below, not locale/display names.
+        val blocked = importer.plan(changed,changed.groups.map { it.id }.toSet());assertTrue(blocked.conflicts.isNotEmpty())
+        assertEquals(TransferGroupState.REJECTED,importer.apply(blocked,"blocked").groups.single().state)
+        val copy = importer.plan(changed,changed.groups.map { it.id }.toSet(),mapOf(changed.groups.single().id to TransferConflictPolicy.COPY))
+        assertEquals(TransferGroupState.APPLIED,importer.apply(copy,"copy").groups.single().state)
+        assertEquals(2,target.data().sessions.size);assertEquals(2,target.data().sessions.map { it.id }.distinct().size)
+    }
+
+    @Test fun selectiveScheduleMeasurementClosureAndResume() {
+        val clock = FakeClock();val source = Tracker(createStore(),clock)
+        val rule = ScheduleRule(source.typeSelection("language"),"2026-10-10",extraDates = setOf("2026-10-10"))
+        source.scheduleCommand(ScheduleCommand("create",source.snapshot().token,ScheduleAction.CREATE,"linked",rule = rule))
+        val key = OccurrenceKey("linked","2026-10-10")
+        source.scheduleCommand(ScheduleCommand("start",source.snapshot().token,ScheduleAction.START,"linked",1,occurrence = key))
+        clock.advance(1000);source.stop(source.snapshot().token)
+        val session = source.data().sessions.single();val segment = source.data().segments.single()
+        source.measure(source.snapshot().token,Measurement(id = "selected",fieldId = "own-field",unit = "own-unit",scope = Scope.SESSION,targetId = session.id,value = Decimal("1.25")))
+        source.measure(source.snapshot().token,Measurement(id = "excluded",fieldId = "other-own-field",unit = "own-unit",scope = Scope.SEGMENT,targetId = segment.id,value = Decimal("2.5")))
+        val exporter = SelectiveTransfer(source)
+        expect(ErrorCode.INVALID_INPUT) { exporter.export(TransferSelection(sessionIds = setOf(session.id))) }
+        val oneSided = exporter.export(TransferSelection(sessionIds = setOf(session.id),discardLinks = setOf(key)))
+        assertTrue(oneSided.groups.single().content.links.isEmpty())
+        val pack = exporter.export(TransferSelection(sessionIds = setOf(session.id),seriesIds = setOf("linked"),measurementIds = setOf("selected")))
+        assertEquals(1,pack.groups.size);assertEquals(setOf("selected"),pack.groups.single().content.measurements.map { it.id }.toSet())
+        val destination = Tracker(createStore(),clock);val importer = SelectiveTransfer(destination)
+        val plan = importer.plan(pack,pack.groups.map { it.id }.toSet());val result = importer.apply(plan,"linked-op")
+        assertEquals(TransferGroupState.APPLIED,result.groups.single().state)
+        assertEquals(1,destination.data().schedule.links.size);assertEquals(1,destination.data().measurements.size)
+        assertEquals(destination.data().sessions.single().id,destination.data().schedule.links.single().sessionId)
+
+        // Two independent atomic groups: fail before the second group's commit, then reopen/resume.
+        val plain = Tracker(createStore(),clock)
+        plain.manual(plain.snapshot().token,clock.wall-6000,clock.wall-5000,Classification())
+        plain.manual(plain.snapshot().token,clock.wall-4000,clock.wall-3000,Classification())
+        val multiple = SelectiveTransfer(plain).export(TransferSelection(sessionIds = plain.data().sessions.map { it.id }.toSet()))
+        var backing = createStore();var calls = 0
+        val faulty = object: StateStore by backing {
+            override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T {
+                calls++;if(calls == 3) throw CoreError(ErrorCode.STORAGE,"injected interruption between groups")
+                return backing.transaction(block)
+            }
+        }
+        val interrupted = SelectiveTransfer(Tracker(faulty,clock));val interruptedPlan = interrupted.plan(multiple,multiple.groups.map { it.id }.toSet())
+        expect(ErrorCode.STORAGE) { interrupted.apply(interruptedPlan,"resume-op") }
+        assertEquals(1,backing.read().sessions.size)
+        assertEquals(listOf(TransferGroupState.APPLIED,TransferGroupState.PENDING),backing.read().transfer.operations.single().groups.map { it.state })
+        backing = reopen(backing)
+        val resumed = SelectiveTransfer(Tracker(backing,clock)).resume("resume-op")
+        assertTrue(resumed.complete);assertFalse(resumed.partial);assertEquals(2,backing.read().sessions.size)
+    }
+
+    @Test fun selectiveGoalsFavoritesFocusAndUndo() {
+        val clock = FakeClock();val source = Tracker(createStore(),clock)
+        source.saveGoal(source.snapshot().token,Goal(id = "selected-goal",name = "Original goal",metric = GoalMetric.DURATION_MS,target = 1000,filter = Filter(activityTypeId = "language")))
+        source.saveFavorite(source.snapshot().token,Favorite(id = "selected-favorite",label = "Original personal label",selection = source.typeSelection("language")))
+        val packageValue = SelectiveTransfer(source).export(TransferSelection(goalIds = setOf("selected-goal"),favoriteIds = setOf("selected-favorite")))
+        assertEquals(2,packageValue.groups.size);assertTrue(packageValue.groups.all { it.content.sessions.isEmpty() })
+        val target = Tracker(createStore(),clock);val before = target.data();val importer = SelectiveTransfer(target)
+        val plan = importer.plan(packageValue,packageValue.groups.map { it.id }.toSet());importer.apply(plan,"goals")
+        assertEquals(source.data().goals,target.data().goals);assertEquals(source.data().favorites,target.data().favorites)
+        assertTrue(importer.undo("goals",target.snapshot().token).undone)
+        assertEquals(before.goals,target.data().goals);assertEquals(before.favorites,target.data().favorites);assertEquals(before.types,target.data().types)
+        val again = importer.plan(packageValue,packageValue.groups.map { it.id }.toSet());importer.apply(again,"goals-again")
+        target.settings(target.snapshot().token,Settings("Europe/Berlin"))
+        expect(ErrorCode.STALE) { importer.undo("goals-again",target.snapshot().token) }
+        source.startFocus(source.snapshot().token,source.typeSelection("language"),FocusPlan(10000,1000));clock.advance(1000)
+        val focusSession = source.data().focus!!.sessionId
+        expect(ErrorCode.INVALID_INPUT) { SelectiveTransfer(source).export(TransferSelection(sessionIds = setOf(focusSession))) }
+        val focusPackage = SelectiveTransfer(source).export(TransferSelection(includeFocus = true))
+        assertNotNull(focusPackage.groups.single().content.focus)
+        val focusTarget = Tracker(createStore(),clock);val focusImporter = SelectiveTransfer(focusTarget)
+        val focusPlan = focusImporter.plan(focusPackage,focusPackage.groups.map { it.id }.toSet())
+        assertEquals(TransferGroupState.APPLIED,focusImporter.apply(focusPlan,"focus").groups.single().state)
+        assertEquals(Mode.RECOVERY,focusTarget.snapshot().mode)
+        assertTrue(focusImporter.undo("focus",focusTarget.snapshot().token).undone);assertEquals(Mode.IDLE,focusTarget.snapshot().mode)
+    }
+
     open fun storageWorkload() {}
     open fun surfaceActions() {}
     open fun assertTransferFailure(transfer: HistoryTransfer,preview: HistoryPreview,tracker: Tracker) {}
@@ -542,7 +686,7 @@ abstract class ScenarioContract {
         val invalid = t.data(); expect(ErrorCode.INVALID_INPUT) { t.configureFocus(token(),FocusPlan(0,1)) }; assertEquals(invalid,t.data())
         val legacy = codec.parseToJsonElement(Backups(t,MemoryRollback()).export()).jsonObject.toMutableMap()
         legacy["formatVersion"] = JsonPrimitive(6)
-        legacy["data"] = JsonObject(legacy.getValue("data").jsonObject.filterKeys { it != "focus" })
+        legacy["data"] = JsonObject(legacy.getValue("data").jsonObject.filterKeys { it !in setOf("focus","schedule","transfer") })
         assertNull(Backups.decode(JsonObject(legacy).toString()).data.focus)
         val v14 = java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile.resolve("evidence/goals-v14/goals-example.json").readText()
         val old = Backups.decode(v14); assertNull(old.data.focus); assertEquals(FocusPlan(),old.data.settings.focusPlan)
@@ -643,7 +787,7 @@ abstract class ScenarioContract {
         java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile.resolve("build/goals-example.json").writeText(closedBackup)
         val legacy = codec.parseToJsonElement(closedBackup).jsonObject.toMutableMap()
         legacy["formatVersion"] = JsonPrimitive(5)
-        legacy["data"] = JsonObject(legacy.getValue("data").jsonObject.filterKeys { it != "goals" })
+        legacy["data"] = JsonObject(legacy.getValue("data").jsonObject.filterKeys { it !in setOf("goals","schedule","transfer") })
         assertTrue(Backups.decode(JsonObject(legacy).toString()).data.goals.isEmpty())
         val malformed = closedBackup.replace("\"target\": 120000","\"target\": 0")
         val beforeBad = clean.data()
@@ -679,7 +823,7 @@ abstract class ScenarioContract {
         assertFailsWith<UnsupportedOperationException> { (clean.data().goals as MutableList).clear() }
         assertFailsWith<UnsupportedOperationException> { (clean.data().goals.first().filter.tags as MutableSet).clear() }
         val jsonWithoutGoals = codec.parseToJsonElement(closedBackup).jsonObject.toMutableMap()
-        jsonWithoutGoals["data"] = JsonObject(jsonWithoutGoals.getValue("data").jsonObject.filterKeys { it != "goals" })
+        jsonWithoutGoals["data"] = JsonObject(jsonWithoutGoals.getValue("data").jsonObject.filterKeys { it !in setOf("goals","schedule","transfer") })
         expect(ErrorCode.UNSUPPORTED_IMPORT) { backups.prepare(JsonObject(jsonWithoutGoals).toString()) }
         assertEquals(beforeInvalid.goals,clean.data().goals)
         assertEquals(beforeInvalid.segments,clean.data().segments)
@@ -1237,7 +1381,7 @@ abstract class ScenarioContract {
         assertTrue(Backups.decode(disk.read(result.rollbackReference)).data.sessions.isEmpty())
         val full = clean.data()
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.dropLast(7)) }; assertEquals(full,clean.data())
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 7","\"formatVersion\": 999")) }; assertEquals(full,clean.data())
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 8","\"formatVersion\": 999")) }; assertEquals(full,clean.data())
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"datasetId\": \"${raw.data.datasetId}\",", "")) }; assertEquals(full,clean.data())
         val broken = raw.copy(data = raw.data.copy(segments = raw.data.segments+raw.data.segments.first()))
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(codec.encodeToString(broken)) }; assertEquals(full,clean.data())
@@ -1292,7 +1436,7 @@ abstract class ScenarioContract {
         val text = bytes.toString(Charsets.UTF_8)
         val malformed = text.substringBefore("Streamed note").toByteArray() + byteArrayOf(0xC3.toByte(),0x28) + text.substringAfter("Streamed note").toByteArray()
         for(bad in listOf(bytes.copyOf(bytes.size-2),malformed,
-            text.replaceFirst("\"formatVersion\":7","\"formatVersion\":7,\"formatVersion\":7").toByteArray(),bytes+byteArrayOf(1))) {
+            text.replaceFirst("\"formatVersion\":8","\"formatVersion\":8,\"formatVersion\":8").toByteArray(),bytes+byteArrayOf(1))) {
             expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { bad.inputStream() } }
         }
         expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { (byteArrayOf(0xFF.toByte())+bytes).inputStream() } }

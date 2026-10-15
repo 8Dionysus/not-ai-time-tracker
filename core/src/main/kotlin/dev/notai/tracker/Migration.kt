@@ -33,22 +33,28 @@ private fun migrateV1(element: JsonElement): JsonElement = when(element) {
 }
 internal fun decodeBackupVersion(json: String): Backup {
     val root = codec.parseToJsonElement(json).jsonObject
+    val version = root["formatVersion"]?.jsonPrimitive?.intOrNull
+    ensure(version == 8 || listOf("schedule","transfer").none { it in root.getValue("data").jsonObject },"Schedule in legacy archive")
     return when(root["formatVersion"]?.jsonPrimitive?.intOrNull) {
+        8 -> {
+            ensure(listOf("goals","focus","schedule","transfer").all { it in root.getValue("data").jsonObject },"Missing v8 backup fields")
+            codec.decodeFromJsonElement<Backup>(root)
+        }
         7 -> {
             ensure(listOf("goals","focus").all { it in root.getValue("data").jsonObject },"Missing v7 backup fields")
-            codec.decodeFromJsonElement<Backup>(root)
+            codec.decodeFromJsonElement<Backup>(root).copy(formatVersion = 8)
         }
         6 -> {
             ensure("goals" in root.getValue("data").jsonObject,"Missing goals in v6 backup")
-            codec.decodeFromJsonElement<Backup>(root).copy(formatVersion = 7)
+            codec.decodeFromJsonElement<Backup>(root).copy(formatVersion = 8)
         }
-        5 -> codec.decodeFromJsonElement<Backup>(root).copy(formatVersion = 7)
-        4 -> codec.decodeFromJsonElement<Backup>(root).copy(formatVersion = 7)
-        3 -> codec.decodeFromJsonElement<Backup>(root).copy(formatVersion = 7)
-        2 -> codec.decodeFromJsonElement<Backup>(root).copy(formatVersion = 7)
+        5 -> codec.decodeFromJsonElement<Backup>(root).copy(formatVersion = 8)
+        4 -> codec.decodeFromJsonElement<Backup>(root).copy(formatVersion = 8)
+        3 -> codec.decodeFromJsonElement<Backup>(root).copy(formatVersion = 8)
+        2 -> codec.decodeFromJsonElement<Backup>(root).copy(formatVersion = 8)
         1 -> {
             val migrated = migrateV1(root).jsonObject.toMutableMap()
-            migrated["formatVersion"] = JsonPrimitive(7)
+            migrated["formatVersion"] = JsonPrimitive(8)
             codec.decodeFromJsonElement<Backup>(JsonObject(migrated))
         }
         else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unsupported backup version")

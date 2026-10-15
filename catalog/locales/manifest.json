@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "scope": "catalog sidecars only; not Android UI LocaleConfig",
+  "key": ["catalogId", "stableId", "meaningVersion", "localeTag"],
+  "installedReviewedPacks": [],
+  "plannedLocales": ["ru", "ru-RU", "en", "en-US", "es", "es-419", "es-MX", "pt", "pt-BR", "pt-PT", "fr-FR", "de-DE", "it-IT", "zh-Hans", "zh-Hant", "ja-JP", "ko-KR", "ar", "hi-IN"],
+  "plannedStatus": "missing; no translation support claimed",
+  "qualityValues": ["SOURCE_ONLY", "DRAFT", "REVIEWED"],
+  "availabilityValues": ["AVAILABLE_OFFLINE", "NOT_INSTALLED", "UNAVAILABLE"],
+  "fallbacks": {"es-MX": ["es-419", "es"], "pt-BR": ["pt"], "pt-PT": ["pt"]},
+  "scriptBoundary": "zh-Hans and zh-Hant never inherit each other",
+  "originals": "Current catalog names and personal overrides remain unchanged. Unavailable translations display the canonical original with missing=true."
+}

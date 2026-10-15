@@ -6,11 +6,12 @@ val bundledCatalogAssets = tasks.register<Sync>("bundleCatalogAssets") {
 }
 android {
     namespace = "dev.notai.tracker.android"
-    compileSdk = 35
-    defaultConfig { applicationId = "dev.notai.tracker"; minSdk = 26; targetSdk = 35; versionCode = 12; versionName = "0.11.0";testInstrumentationRunner = "dev.notai.tracker.android.ArchiveInstrumentation" }
+    compileSdk = 36
+    defaultConfig { applicationId = "dev.notai.tracker"; minSdk = 26; targetSdk = 36; versionCode = 12; versionName = "0.11.0";testInstrumentationRunner = "dev.notai.tracker.android.ArchiveInstrumentation" }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true }
+    if(providers.gradleProperty("trackerUnsigned").orNull == "true") buildTypes.getByName("debug").signingConfig = null
     sourceSets.getByName("main").assets.srcDir(bundledCatalogAssets)
     testOptions {
         unitTests.isIncludeAndroidResources = true
@@ -45,7 +46,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.7.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     ksp("androidx.room:room-compiler:2.7.2")
-    // Product interface. Versions stay on compileSdk 35 / Kotlin 2.1 compatible releases.
+    // Product interface. Versions are retained while moving compileSdk to 36 / Kotlin 2.1 compatible releases.
     val composeBom = platform("androidx.compose:compose-bom:2025.05.01")
     implementation(composeBom)
     implementation("androidx.compose.ui:ui")

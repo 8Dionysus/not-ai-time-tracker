@@ -1,0 +1,24 @@
+Categories:
+  - Time Tracker
+License: Apache-2.0
+SourceCode: https://github.com/8Dionysus/not-ai-time-tracker
+IssueTracker: https://github.com/8Dionysus/not-ai-time-tracker/issues
+Summary: Offline timer and time log
+Description: |-
+  Local time tracking with timer controls, activity labels, history, and explicit
+  JSON backup and restore. Backend schedule and selective transfer APIs require
+  frontend integration. This disabled recipe is a review draft.
+RepoType: git
+Repo: https://github.com/8Dionysus/not-ai-time-tracker.git
+Builds:
+  - versionName: 0.11.0
+    versionCode: 12
+    disable: Unreleased backend branch; integration, rights and device checks pending
+    commit: ee0ab1f52d07c9957f9a198312d6584aebc9d170
+    subdir: app
+    gradle:
+      - 'yes'
+AutoUpdateMode: None
+UpdateCheckMode: None
+CurrentVersion: 0.11.0
+CurrentVersionCode: 12

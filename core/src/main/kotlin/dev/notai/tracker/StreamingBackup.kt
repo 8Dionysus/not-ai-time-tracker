@@ -10,7 +10,7 @@ import java.security.MessageDigest
 import java.nio.charset.CodingErrorAction
 import kotlinx.serialization.json.*
 
-/** Portable JSON 7 without a whole-file String/ByteArray/JSON tree. Only one record is decoded
+/** Portable JSON 8 without a whole-file String/ByteArray/JSON tree. Only one record is decoded
  * at a time; the resulting domain graph has the same size as a loaded store. Total file size
  * is not capped by CSV's text limit. Re-openable inputs permit a bounded metadata first pass.
  */
@@ -33,10 +33,10 @@ object StreamingBackup {
             values.forEachIndexed { i,row -> if(i != 0) writer.write(",");writer.write(encode(row)) }
             writer.write("]")
         }
-        writer.write("{");field("formatVersion","7",true);field("backupId",codec.encodeToString(backup.backupId));field("asOf",backup.asOf.toString())
+        writer.write("{");field("formatVersion","8",true);field("backupId",codec.encodeToString(backup.backupId));field("asOf",backup.asOf.toString())
         writer.write(",\"data\":{");val d = backup.data
         field("datasetId",codec.encodeToString(d.datasetId),true);field("revision",d.revision.toString())
-        field("settings",codec.encodeToString(d.settings));field("focus",codec.encodeToString(d.focus))
+        field("transfer",codec.encodeToString(d.transfer));field("schedule",codec.encodeToString(d.schedule));field("settings",codec.encodeToString(d.settings));field("focus",codec.encodeToString(d.focus))
         field("catalogVersion",codec.encodeToString(d.catalogVersion))
         field("timerEpoch",d.timerEpoch.toString());field("controlBarrier",codec.encodeToString(d.controlBarrier))
         rows("types",d.types) { codec.encodeToString(it) };rows("axes",d.axes) { codec.encodeToString(it) }
@@ -59,7 +59,7 @@ object StreamingBackup {
                 else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unknown backup field: $key")
             } };json.finish()
         }
-        ensure(version in 1..7 && !id.isNullOrBlank() && asOf != null && hasData,"Unsupported backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(version in 1..8 && !id.isNullOrBlank() && asOf != null && hasData,"Unsupported backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
         val format = version!!
         val types = mutableListOf<ActivityType>();val axes = mutableListOf<Axis>();val metrics = mutableListOf<Metric>();val units = mutableListOf<UnitDefinition>()
         val cards = mutableListOf<Card>();val favorites = mutableListOf<Favorite>();val sessions = mutableListOf<Session>();val segments = mutableListOf<Segment>()
@@ -69,6 +69,7 @@ object StreamingBackup {
         // until the final graph validation, especially alongside the live store.
         val selections = SelectionFreezer()
         var datasetId: String? = null;var revision: Long? = null;var settings: Settings? = null;var focus: FocusRun? = null;var catalogVersion: String? = null
+        var schedule = ScheduleData();var transfer = TransferState()
         var timerEpoch = 0L;var controlBarrier = ""
         val seen = mutableSetOf<String>()
         val secondDigest = MessageDigest.getInstance("SHA-256")
@@ -78,6 +79,8 @@ object StreamingBackup {
             json.members { key -> if(key != "data") json.skip() else json.members { field ->
                 seen += field
                 when(field) {
+                    "transfer" -> { ensure(format == 8,"Transfer in legacy archive",ErrorCode.UNSUPPORTED_IMPORT);transfer = codec.decodeFromString(json.value()) }
+                    "schedule" -> { ensure(format == 8,"Schedule in legacy archive",ErrorCode.UNSUPPORTED_IMPORT);schedule = codec.decodeFromString(json.value()) }
                     "datasetId" -> datasetId = codec.decodeFromString(json.value())
                     "revision" -> revision = codec.decodeFromString(json.value())
                     "settings" -> settings = codec.decodeFromString(json.value())
@@ -104,16 +107,17 @@ object StreamingBackup {
         ensure(if(format == 1) seen.none { it in setOf("axes","metrics","units") } else seen.containsAll(listOf("axes","metrics","units")),"Missing or incompatible dictionary fields",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format < 6 || "goals" in seen,"Missing goals",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format < 7 || "focus" in seen,"Missing Focus",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(format < 8 || seen.containsAll(listOf("schedule","transfer")),"Missing schedule",ErrorCode.UNSUPPORTED_IMPORT)
         val data = Dataset(datasetId = datasetId!!,revision = revision!!,types = types,cards = cards,favorites = favorites,
             sessions = sessions,segments = segments,measurements = measurements,settings = settings!!,axes = axes,metrics = metrics,units = units,
-            goals = goals,focus = focus,catalogVersion = catalogVersion,timerEpoch = timerEpoch,controlBarrier = controlBarrier)
-        Backup(formatVersion = 7,backupId = id!!,asOf = asOf!!,data = data.frozen()).also(::validateBackup)
+            schedule = schedule,transfer = transfer,goals = goals,focus = focus,catalogVersion = catalogVersion,timerEpoch = timerEpoch,controlBarrier = controlBarrier)
+        Backup(formatVersion = 8,backupId = id!!,asOf = asOf!!,data = data.frozen()).also(::validateBackup)
     } catch(e: CoreError) { if(e.code == ErrorCode.UNSUPPORTED_IMPORT) throw e else fail(ErrorCode.UNSUPPORTED_IMPORT,"Invalid backup: ${e.message}") }
       catch(_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed or unreadable backup") }
     private fun reader(input: InputStream): Reader = InputStreamReader(input,Charsets.UTF_8.newDecoder()
         .onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT)).buffered(64*1024)
     internal fun validateBackup(b: Backup) {
-        ensure(b.formatVersion == 7 && b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(b.formatVersion == 8 && b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
         validate(b.data)
         ensure(b.data.focus?.breakAnchor == null && b.data.segments.all { it.anchor == null },"Backup contains device anchors",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(b.data.segments.all { (it.start <= b.asOf || it.uncertain) && (it.end == null || it.end <= b.asOf || it.uncertain) &&

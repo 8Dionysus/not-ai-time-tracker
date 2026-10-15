@@ -63,7 +63,7 @@ data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId
     @Query("DELETE FROM measurements WHERE id IN (:ids)") fun deleteMeasurements(ids: List<String>)
     @Query("SELECT * FROM measurements WHERE id IN (:ids)") fun readMeasurements(ids: List<String>): List<MeasurementRow>
 }
-@Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class,GenerationRow::class,VocabularyRow::class,ClassificationRow::class],version = 5,exportSchema = true)
+@Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class,GenerationRow::class,VocabularyRow::class,ClassificationRow::class],version = 6,exportSchema = true)
 abstract class TrackerDatabase: RoomDatabase() {
     abstract fun dao(): TrackerDao
     companion object {
@@ -112,6 +112,19 @@ abstract class TrackerDatabase: RoomDatabase() {
             override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) = migrateNormalizedHistory(db)
         }
 
+        // Domain additions live in the existing transactional metadata payload. No history rows change.
+        val MIGRATION_5_6 = object: androidx.room.migration.Migration(5,6) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.query("SELECT payload FROM metadata WHERE id=1").use { c -> if(c.moveToFirst()) {
+                    val old = codec.parseToJsonElement(c.getString(0)).jsonObject
+                    ensure(old["schedule"] == null || codec.decodeFromJsonElement<ScheduleData>(old.getValue("schedule")) == ScheduleData(),"Unexpected schedule in v5 metadata",ErrorCode.STORAGE)
+                    ensure(old["transfer"] == null || codec.decodeFromJsonElement<TransferState>(old.getValue("transfer")) == TransferState(),"Unexpected transfer in v5 metadata",ErrorCode.STORAGE)
+                    val next = JsonObject(old + mapOf("schedule" to codec.encodeToJsonElement(ScheduleData()),"transfer" to codec.encodeToJsonElement(TransferState())))
+                    db.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(next.toString()))
+                } }
+            }
+        }
+
         fun open(context: Context,name: String = "tracker.db"): TrackerDatabase {
             val file = context.getDatabasePath(name)
             val existing = DatabaseFiles.paths(context,name).filter { it.exists() }
@@ -129,12 +142,12 @@ abstract class TrackerDatabase: RoomDatabase() {
                 // SQLite may discard invalid sidecars before its corruption callback. Preserve
                 // them before opening. Clean closed stores without sidecars avoid this copy.
                 val storedVersion = if(validHeader) java.nio.ByteBuffer.wrap(header,60,4).int else null
-                if(!validHeader || storedVersion != 5 || existing.any { it != file })
+                if(!validHeader || storedVersion != 6 || existing.any { it != file })
                     DatabaseArchives.capture(context,name)
                 ensure(validHeader,"Database header is damaged; originals preserved. Use explicit recovery",ErrorCode.STORAGE)
             }
             return Room.databaseBuilder(context,TrackerDatabase::class.java,name)
-            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5).openHelperFactory { configuration ->
+            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5,MIGRATION_5_6).openHelperFactory { configuration ->
                 val original = configuration.callback
                 val guarded = object: androidx.sqlite.db.SupportSQLiteOpenHelper.Callback(original.version) {
                     override fun onConfigure(db: androidx.sqlite.db.SupportSQLiteDatabase) = original.onConfigure(db)

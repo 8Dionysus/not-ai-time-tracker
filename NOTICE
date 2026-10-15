@@ -1,0 +1,13 @@
+(not)AI Time Tracker
+
+Project-owned source code is licensed under Apache License 2.0 (LICENSE).
+This grant does not relicense third-party dependencies, the Onest font,
+source research, catalog source material, or third-party derived assets.
+
+Onest font: Copyright 2021 The Onest Project Authors.
+Distributed under the SIL Open Font License, Version 1.1.
+See app/src/main/assets/licenses/onest-OFL.txt for the retained exact notice.
+
+The dependency license inventory and remaining catalog/asset rights review
+are documented in docs/BACKEND_PASS_2026_10.md. Do not treat that inventory
+as clearance for materials whose rights have not been established.

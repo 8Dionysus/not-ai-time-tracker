@@ -30,6 +30,13 @@ internal fun Dataset.frozen(base: Dataset? = null): Dataset {
     val selections = SelectionFreezer()
     fun capture(value: Classification) = selections.capture(value)
     return copy(
+    transfer = if(transfer === base?.transfer) transfer else transfer.copy(
+        origins = frozenList(transfer.origins.map { it.copy(localGroup = it.localGroup.frozen()) }),
+        operations = frozenList(transfer.operations.map { it.copy(groups = frozenList(it.groups.map { g -> g.copy(group = g.group.copy(content = g.group.content.frozen(),entities = frozenList(g.group.entities)),inserted = g.inserted?.frozen(),previousOrigin = g.previousOrigin?.let { o -> o.copy(localGroup = o.localGroup.frozen()) }) })) })),
+    schedule = if(schedule === base?.schedule) schedule else schedule.copy(
+        series = frozenList(schedule.series.map { it.copy(revisions = frozenList(it.revisions.map { v -> v.copy(rule = v.rule.copy(selection = capture(v.rule.selection),weekdays = frozenSet(v.rule.weekdays),extraDates = frozenSet(v.rule.extraDates))) })) }),
+        overrides = frozenList(schedule.overrides.map { it.copy(selection = it.selection?.let { c -> capture(c) }) }),
+        links = frozenList(schedule.links),receipts = frozenList(schedule.receipts)),
     pendingAssignments = if(pendingAssignments === base?.pendingAssignments) pendingAssignments else frozenList(pendingAssignments),
     focus = if(focus === base?.focus) focus else focus?.copy(segmentIds = frozenList(focus.segmentIds)),
     goals = if(goals === base?.goals) goals else frozenList(goals.map { it.copy(filter = it.filter.copy(details = frozenMap(it.filter.details),tags = frozenSet(it.filter.tags),facets = frozenList(it.filter.facets))) }),
@@ -45,4 +52,11 @@ internal fun Dataset.frozen(base: Dataset? = null): Dataset {
     metrics = if(metrics === base?.metrics) metrics else frozenList(metrics.map { it.copy(scopes = frozenSet(it.scopes),researchOrigins = frozenList(it.researchOrigins)) }),
     units = if(units === base?.units) units else frozenList(units)
 )
+}
+
+internal fun TransferContent.frozen(): TransferContent {
+    val d = Dataset(types = types,cards = cards,axes = axes,metrics = metrics,units = units,sessions = sessions,segments = segments,measurements = measurements,
+        schedule = ScheduleData(series,overrides,links),focus = focus,goals = goals,favorites = favorites).frozen()
+    return copy(types = d.types,cards = d.cards,axes = d.axes,metrics = d.metrics,units = d.units,sessions = d.sessions,segments = d.segments,measurements = d.measurements,
+        series = d.schedule.series,overrides = d.schedule.overrides,links = d.schedule.links,focus = d.focus,goals = d.goals,favorites = d.favorites)
 }

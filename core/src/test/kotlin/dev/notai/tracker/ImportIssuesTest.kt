@@ -34,6 +34,7 @@ class ImportIssuesTest {
         assertFailsWith<UnsupportedOperationException> { ((missing.arguments.getValue("columns") as ErrorArgument.Texts).values as MutableList).clear() }
         fatal(ImportIssueCode.END_OR_DURATION_REQUIRED) { parse(m = mapping.copy(end = null,duration = null)) }
         fatal(ImportIssueCode.SOURCE_ZONE_INVALID) { parse(m = mapping.copy(zone = "Not/AZone")) }
+        fatal(ImportIssueCode.SOURCE_LOCALE_INVALID) { parse(m = mapping.copy(sourceLocale = "invalid_locale!")) }
         fatal(ImportIssueCode.TIMESTAMP_PATTERN_INVALID) { parse(m = mapping.copy(localPattern = "[invalid#")) }
         fatal(ImportIssueCode.CSV_DELIMITER_INVALID) { CsvTable.parse("",'"') }
         fatal(ImportIssueCode.CSV_COLUMN_LIMIT) { CsvTable.parse((0..128).joinToString(","),',') }

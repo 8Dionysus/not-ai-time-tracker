@@ -16,7 +16,8 @@ data class CsvMapping(val namespace: String,val activity: String,val start: Stri
     val end: String? = null,val duration: String? = null,val durationFormat: DurationFormat = DurationFormat.HMS,
     val category: String? = null,val note: String? = null,val id: String? = null,
     val startTime: String? = null,val endTime: String? = null,
-    val localPattern: String? = null,val zone: String = "UTC",val delimiter: Char = ',',val clockToleranceMs: Long = 0) {
+    val localPattern: String? = null,val zone: String = "UTC",val delimiter: Char = ',',val clockToleranceMs: Long = 0,
+    val sourceLocale: String? = null) {
     companion object {
         /** Confirmed Toggl time-entry CSV columns. Date pattern/zone must match the exported profile.
          * Summary reports, decimal durations and localized headers need an explicit CsvMapping.
@@ -147,7 +148,12 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
             importEnsure(mapping.end != null || mapping.duration != null,ImportIssueCode.END_OR_DURATION_REQUIRED,"End or duration is required",fieldPath = "csvMapping")
             val zone = try { ZoneId.of(mapping.zone) } catch(e: Exception) { importFail(ImportIssueCode.SOURCE_ZONE_INVALID,"Unknown source zone",
                 arguments = mapOf("zone" to ErrorArgument.Text(mapping.zone)),fieldPath = "csvMapping.zone") }
-            val format = mapping.localPattern?.let { pattern -> try { DateTimeFormatter.ofPattern(pattern).withResolverStyle(ResolverStyle.STRICT) }
+            val sourceLocale = mapping.sourceLocale?.let { tag -> try { java.util.Locale.Builder().setLanguageTag(tag).build().also {
+                importEnsure(it.language.isNotBlank(),ImportIssueCode.SOURCE_LOCALE_INVALID,"Source locale must identify a language",arguments = mapOf("localeTag" to ErrorArgument.Text(tag)),fieldPath = "csvMapping.sourceLocale")
+            } } catch(e: CoreError) { throw e } catch(_: java.util.IllformedLocaleException) {
+                importFail(ImportIssueCode.SOURCE_LOCALE_INVALID,"Invalid source BCP-47 locale",arguments = mapOf("localeTag" to ErrorArgument.Text(tag)),fieldPath = "csvMapping.sourceLocale")
+            } } ?: java.util.Locale.ROOT
+            val format = mapping.localPattern?.let { pattern -> try { DateTimeFormatter.ofPattern(pattern,sourceLocale).withResolverStyle(ResolverStyle.STRICT) }
                 catch(e: IllegalArgumentException) { importFail(ImportIssueCode.TIMESTAMP_PATTERN_INVALID,e.message.orEmpty(),arguments = mapOf("pattern" to ErrorArgument.Text(pattern)),fieldPath = "csvMapping.localPattern") } }
             val rows = mutableListOf<TransferRow>();val errors = mutableListOf<String>();val issues = mutableListOf<ImportIssue>()
             fun timestamp(value: String,row: Int,field: ImportField,column: String): Long {

@@ -1,5 +1,9 @@
 # Backend pass, 15 October 2026
 
+Historical first-pass implementation record. The current follow-up boundary and
+verified API deltas are in [BACKEND_AUDIT_HANDOFF.md](BACKEND_AUDIT_HANDOFF.md);
+its cleanup implementation supersedes the first-pass missing-native statement below.
+
 Base: `ee0ab1f52d07c9957f9a198312d6584aebc9d170` (main at clone). Clean HTTPS clone; isolated branch `backend/2026-10-next-pass`. No UI files, TechnicalActivity, RemoteViews, sibling projects, publishing, store accounts or release keys are part of this change. Verification/results are recorded separately in the delivery evidence; this document describes the implementation boundary.
 
 Requirements read in full: Tracker next-pass package seq169 and complete Tracker specification; localization/migration seq3; private-copy cleanup contract; common transfer seq7; Tracker listing/privacy/license sections. These are user requirements, not claims that the old app implemented the features. Requested API configuration was gpt-6.1-sol/high; no independent runtime model/effort attestation was available.

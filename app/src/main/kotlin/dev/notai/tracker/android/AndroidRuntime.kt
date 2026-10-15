@@ -7,6 +7,7 @@ import dev.notai.tracker.*
 import java.io.File
 import java.io.FileOutputStream
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.catch
 
 class AndroidClock(context: Context): Clock {
     private val resolver = context.applicationContext.contentResolver
@@ -14,9 +15,10 @@ class AndroidClock(context: Context): Clock {
         "boot:" + Settings.Global.getInt(resolver,Settings.Global.BOOT_COUNT).toString(),PROCESS_ID)
     companion object { private val PROCESS_ID = newId() }
 }
-class PrivateRollbackStore(context: Context): RollbackStore {
+class PrivateRollbackStore(private val context: Context): RollbackStore {
     private val directory = File(context.noBackupFilesDir,"rollback").apply { mkdirs() }
-    override fun save(json: String): String {
+    override fun save(json: String): String = PrivateFileMaintenance.writing(context,"rollback-save") { saveUnsafe(json) }
+    private fun saveUnsafe(json: String): String {
         val file = File(directory,"rollback-${newId()}.json")
         FileOutputStream(file).use { it.write(json.toByteArray(Charsets.UTF_8)); it.fd.sync() }
         syncDirectory(directory)
@@ -27,7 +29,8 @@ class PrivateRollbackStore(context: Context): RollbackStore {
         return File(directory,reference).readText(Charsets.UTF_8)
     }
     fun files(): List<File> = directory.listFiles().orEmpty().filter { it.isFile && it.name.startsWith("rollback-") && it.name.endsWith(".json") }.sortedByDescending { it.lastModified() }
-    override fun saveSnapshot(backup: Backup): String {
+    override fun saveSnapshot(backup: Backup): String = PrivateFileMaintenance.writing(context,"rollback-snapshot") { saveSnapshotUnsafe(backup) }
+    private fun saveSnapshotUnsafe(backup: Backup): String {
         val file = File(directory,"rollback-${newId()}.json")
         FileOutputStream(file).use { StreamingBackup.write(backup,it);it.fd.sync() }
         syncDirectory(directory)
@@ -61,8 +64,11 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
         StartupTrace.mark(context,"history-graph-ready")
         surfaceScope.launch {
             var previous: SurfaceSettings? = null
-            tracker.views.collect { view ->
-                try { TimerSurfaces.refresh(context,view,previous);FocusSignals.refresh(context,view) }
+            tracker.views.catch { e ->
+                if(e is CancellationException) throw e
+                android.util.Log.w("TimerSurfaces","Store observation unavailable; open recovery controls")
+            }.collect { view ->
+                try { TimerSurfaces.refresh(context,view,previous);FocusSignals.refresh(context,tracker) }
                 catch(e: Exception) { if(e is CancellationException) throw e; android.util.Log.w("TimerSurfaces","Surface refresh unavailable") }
                 previous = view.data.settings.surfaces
             }
@@ -71,8 +77,18 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
     companion object {
         @Volatile private var instance: TrackerRuntime? = null
         @Volatile private var recovering = false
+        internal fun refreshExistingFocus(context: Context) {
+            val runtime = instance ?: return
+            runtime.surfaceScope.launch {
+                try { FocusSignals.refresh(context.applicationContext,runtime.tracker) }
+                catch(e: Exception) {
+                    if(e is CancellationException) throw e
+                    android.util.Log.w("FocusSignals","Current signal refresh unavailable")
+                }
+            }
+        }
         /** Initialize on IO. All future surfaces share this boundary and expected-revision tokens. */
-        fun get(context: Context): TrackerRuntime = instance ?: synchronized(this) {
+        fun get(context: Context): TrackerRuntime = PrivateFileMaintenance.forContext(context).locked { instance ?: synchronized(this) {
             if(recovering || DatabaseRecovery.needsAttention(context)) throw CoreError(ErrorCode.STORAGE,"A recovery operation needs completion; open recovery controls")
             instance ?: run {
                 val newStore = !DatabaseFiles.exists(context)
@@ -81,7 +97,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
                 try { TrackerRuntime(context.applicationContext,database,newStore).also { instance = it } }
                 catch(e: Exception) { database.close();throw e }
             }
-        }
+        } }
         internal fun beginRecovery() = synchronized(this) {
             ensure(!recovering,"Recovery already in progress",ErrorCode.STORAGE)
             recovering = true;instance?.surfaceScope?.cancel();(instance?.tracker?.store as? RoomStore)?.retire();instance?.database?.close();instance = null

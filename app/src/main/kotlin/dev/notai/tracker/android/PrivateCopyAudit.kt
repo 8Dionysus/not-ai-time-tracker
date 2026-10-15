@@ -6,13 +6,14 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.LinkOption
 
-/** Read-only adapter while the platform delete primitive and shared reference registry are absent.
+/** Read-only adapter until Android descriptor binding and frontend lifecycle adoption are verified.
  * These are audit candidates, NOT a selectable CleanupInventory. No cleanup storage is bound to
  * production, so no caller can accidentally turn path checks into deletion authority.
  */
 data class PrivateCopyAuditSnapshot(val items: List<PrivateCopy>,val unavailableCapabilities: Set<String>)
 class PrivateCopyAudit(context: Context) {
     private val root = context.noBackupFilesDir
+    private val maintenance = PrivateFileMaintenance.forContext(context)
     fun inspect(live: Dataset): PrivateCopyAuditSnapshot {
         val items = mutableListOf<PrivateCopy>()
         fun unsafe(file: File): Boolean {
@@ -25,9 +26,10 @@ class PrivateCopyAudit(context: Context) {
             return p != root
         }
         fun add(file: File,kind: CopyKind) {
-            val blockers = mutableSetOf(CopyBlocker.PATH_NOT_SAFE) // no proven descriptor-relative Android primitive
+            val blockers = mutableSetOf(CopyBlocker.PATH_NOT_SAFE) // no verified Android descriptor binding
             val warnings = mutableSetOf<CopyWarning>();var state = "UNKNOWN";val members = mutableListOf<CopyMember>();val missing = mutableSetOf<String>()
             val id = sha256(root.toPath().relativize(file.toPath()).toString().toByteArray())
+            blockers += maintenance.blockers(id)
             try {
                 ensure(!unsafe(file),"Unsafe copy path")
                 val files = if(file.isDirectory) {
@@ -82,6 +84,6 @@ class PrivateCopyAudit(context: Context) {
         File(root,"recovery-pending.json").takeIf { it.exists() }?.let { add(it,CopyKind.RECOVERY_JOURNAL) }
         val copies = items.count { it.kind in setOf(CopyKind.ROLLBACK,CopyKind.DATABASE_ARCHIVE) }
         return PrivateCopyAuditSnapshot(items.map { if(copies == 1 && it.kind in setOf(CopyKind.ROLLBACK,CopyKind.DATABASE_ARCHIVE)) it.copy(confirmableWarnings = it.confirmableWarnings+CopyWarning.LAST_RECOVERY_COPY) else it },
-            setOf("DESCRIPTOR_RELATIVE_NOFOLLOW","SHARED_DURABLE_LEASE_REGISTRY","AUTHORITATIVE_INVENTORY_REVISION","SEALED_ARCHIVE_HARDLINK_GRAPH"))
+            setOf("ANDROID_DESCRIPTOR_BINDING_QA","FRONTEND_DURABLE_REFERENCE_ADOPTION","LEGACY_INVENTORY_REGISTRATION","SEALED_ARCHIVE_HARDLINK_GRAPH"))
     }
 }

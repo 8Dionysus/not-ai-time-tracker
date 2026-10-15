@@ -27,14 +27,28 @@ object FocusSignals {
             .setData(android.net.Uri.parse("notai://focus/$id/$index")).putExtra("id",id).putExtra("index",index)
         return PendingIntent.getBroadcast(c,0,intent,PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
     }
-    fun refresh(c: Context,view: TrackerView) {
+    /** Compatibility for existing surfaces. A caller snapshot never authorizes side effects. */
+    @Suppress("UNUSED_PARAMETER")
+    fun refresh(c: Context,view: TrackerView) { TrackerRuntime.refreshExistingFocus(c) }
+    /** Legacy UI callers may run on main. Report only an existing receipt and request a fresh
+     * IO refresh; never open Room or post a notification from the supplied snapshot. */
+    fun deliver(c: Context,focus: FocusSnapshot): Boolean {
+        TrackerRuntime.refreshExistingFocus(c)
+        return focus.mode == FocusMode.DUE && focus.signalKey?.let {
+            it in preferences(c).getStringSet("delivered",emptySet()).orEmpty()
+        } == true
+    }
+    @Synchronized fun refresh(c: Context,tracker: Tracker) {
+        val view = tracker.view() // Capture after serialization, never replay an older caller snapshot.
         val settings = view.data.settings.surfaces;val state = view.snapshot().focus;val prefs = preferences(c)
         val alarm = c.getSystemService(AlarmManager::class.java)
         prefs.getString("scheduledId",null)?.let { id -> alarm.cancel(pending(c,id,prefs.getLong("scheduledIndex",0))) }
         prefs.edit().remove("scheduledId").remove("scheduledIndex").apply()
-        if(!settings.focusSignal || state == null || !allowed(c)) return
+        val permitted = settings.focusSignal && state != null && allowed(c)
+        if(!permitted || state?.mode != FocusMode.DUE) c.getSystemService(NotificationManager::class.java).cancel(NOTICE)
+        if(!permitted) return
         channel(c)
-        if(state.mode == FocusMode.DUE) { deliver(c,state);return }
+        if(state.mode == FocusMode.DUE) { deliverCurrent(c,state);return }
         if(state.mode != FocusMode.RUNNING) return
         val intent = pending(c,state.id,state.phaseIndex)
         // Android/OEM may delay this in idle; the receiver checks the same phase again.
@@ -42,7 +56,14 @@ object FocusSignals {
             android.os.SystemClock.elapsedRealtime()+state.remainingMs,intent)
         prefs.edit().putString("scheduledId",state.id).putLong("scheduledIndex",state.phaseIndex).apply()
     }
-    @Synchronized fun deliver(c: Context,focus: FocusSnapshot): Boolean {
+    @Synchronized fun deliver(c: Context,tracker: Tracker): Boolean {
+        val view = tracker.view();val focus = view.snapshot().focus
+        if(!view.data.settings.surfaces.focusSignal || focus?.mode != FocusMode.DUE || !allowed(c)) {
+            c.getSystemService(NotificationManager::class.java).cancel(NOTICE);return false
+        }
+        return deliverCurrent(c,focus)
+    }
+    private fun deliverCurrent(c: Context,focus: FocusSnapshot): Boolean {
         if(focus.mode != FocusMode.DUE || !allowed(c)) return false
         val key = focus.signalKey ?: return false;val prefs = preferences(c)
         val delivered = prefs.getStringSet("delivered",emptySet()).orEmpty()
@@ -67,7 +88,7 @@ class FocusAlarmReceiver: BroadcastReceiver() {
             try {
                 val runtime = TrackerRuntime.get(context);val view = runtime.tracker.view();val focus = view.snapshot().focus
                 if(!view.data.settings.surfaces.focusSignal || focus?.id != id || focus.phaseIndex != index) return@launch
-                if(focus.mode == FocusMode.DUE) FocusSignals.deliver(context,focus) else FocusSignals.refresh(context,view)
+                if(focus.mode == FocusMode.DUE) FocusSignals.deliver(context,runtime.tracker) else FocusSignals.refresh(context,runtime.tracker)
             } catch(_: Exception) { android.util.Log.w("FocusSignals","Signal unavailable; phase/history unchanged") }
             finally { pending.finish() }
         }

@@ -26,7 +26,7 @@ data class ChoiceHit(val entry: ChoiceEntry,val matches: List<MatchEvidence> = e
 data class ChoicePage(val token: Token,val items: List<ChoiceHit>,val total: Int,val next: ChoiceCursor?)
 class ChoiceCursor internal constructor(internal val owner: ChoiceView,internal val request: Any,
     internal val hits: List<RankedChoice>,internal val offset: Int)
-data class ChoiceIndexStats(val catalogBuilds: Int,val personalBuilds: Int,val historyBuilds: Int)
+data class ChoiceIndexStats(val catalogBuilds: Int,val personalBuilds: Int,val historyBuilds: Int,val historyScans: Int = 0)
 
 private fun normalized(value: String) = Normalizer.normalize(value,Normalizer.Form.NFKC).lowercase(Locale.ROOT).trim().replace(Regex("\\s+")," ")
 internal data class ChoiceText(val field: MatchField,val original: String,val normalized: String = normalized(original))
@@ -35,7 +35,20 @@ internal data class ChoiceRecord(val id: String,val kind: ChoiceKind,val sourceI
     val sortName = normalized(title)
 }
 internal data class Occurrence(val segment: Segment,val sessionId: String)
-internal data class HistoryVariant(val record: ChoiceRecord,val occurrences: List<Occurrence>)
+internal data class HistoryVariant(val record: ChoiceRecord,val occurrences: List<Occurrence>) {
+    private val eligible by lazy { occurrences.filter { !it.segment.uncertain && it.segment.durationMs > 0 && it.segment.end != null }
+        .sortedWith { a,b -> recordedSegmentOrder.compare(a.segment,b.segment) } }
+    fun known(window: HistoryWindow?): List<Occurrence> {
+        if(window == null) return eligible
+        // Certain intervals never overlap: end and start orders agree. Search the
+        // immutable completed index, then visit only occurrences intersecting the window.
+        var lo = 0;var hi = eligible.size
+        while(lo < hi) { val mid = (lo+hi)/2;if(eligible[mid].segment.end!! <= window.start) lo = mid+1 else hi = mid }
+        val first = lo
+        while(lo < eligible.size && eligible[lo].segment.start < window.end) lo++
+        return eligible.subList(first,lo)
+    }
+}
 internal val recordedSegmentOrder = compareBy<Segment>({ it.end ?: it.start },{ it.start },{ it.id })
 internal data class RankedChoice(val record: ChoiceRecord,val score: Int = 0,val matches: List<MatchEvidence> = emptyList(),val suggestion: SuggestionEvidence? = null)
 internal class CatalogChoices(types: List<ActivityType>) {
@@ -65,7 +78,8 @@ internal class ChoiceCache {
     private var sessionSource: List<Session>? = null; private var segmentSource: List<Segment>? = null
     private var completedIds: Set<String>? = null; private var completedSegments: List<Segment>? = null; private var history: List<HistoryVariant>? = null
     private var catalogBuilds = 0; private var personalBuilds = 0; private var historyBuilds = 0
-    @Synchronized fun stats() = ChoiceIndexStats(catalogBuilds,personalBuilds,historyBuilds)
+    private var historyKey: Any? = null;private var historyScans = 0
+    @Synchronized fun stats() = ChoiceIndexStats(catalogBuilds,personalBuilds,historyBuilds,historyScans)
     @Synchronized fun catalog(d: Dataset): CatalogChoices {
         if(catalog == null || (typeSource !== d.types && typeSource != d.types)) { catalog = CatalogChoices(d.types); catalogBuilds++ }
         typeSource = d.types; return catalog!!
@@ -76,8 +90,12 @@ internal class ChoiceCache {
         }
         cardSource = d.cards; favoriteSource = d.favorites; return personal!!
     }
-    @Synchronized fun history(d: Dataset): List<HistoryVariant> {
+    @Synchronized fun history(d: Dataset,key: Any?): List<HistoryVariant> {
+        // Only a core-created checked-state proof may bypass scanning. Raw Dataset callers
+        // retain the old full comparison path; no serialized/trusted flag can grant this proof.
+        if(history != null && key != null && key === historyKey) return history!!
         if(history != null && sessionSource === d.sessions && segmentSource === d.segments) return history!!
+        historyScans++
         val ids = d.sessions.filter { it.status == SessionStatus.STOPPED }.map { it.id }.toSet()
         val segments = d.segments.filter { it.sessionId in ids }
         if(history == null || completedIds != ids || completedSegments != segments) {
@@ -91,17 +109,17 @@ internal class ChoiceCache {
             }
             completedIds = ids; completedSegments = segments; historyBuilds++
         }
-        sessionSource = d.sessions; segmentSource = d.segments
+        sessionSource = d.sessions; segmentSource = d.segments;historyKey = key
         return history!!
     }
 }
 
 /** Keep this snapshot while paging or typing. A cursor belongs to this view and exact request. */
-class ChoiceView internal constructor(private val d: Dataset,private val cache: ChoiceCache,private val state: ()->Snapshot) {
+class ChoiceView internal constructor(private val d: Dataset,private val cache: ChoiceCache,private val historyKey: Any? = null,private val state: ()->Snapshot) {
     val token: Token = token(d)
     private val catalog by lazy { cache.catalog(d) }
     private val personal by lazy { cache.personal(d) }
-    private val history by lazy { cache.history(d) }
+    private val history by lazy { cache.history(d,historyKey) }
     private val sessions by lazy { d.sessions.associateBy { it.id } }
     /** Diagnostic counters, not persisted analytics. Useful for integration/performance verification. */
     fun indexStats() = cache.stats()
@@ -136,10 +154,9 @@ class ChoiceView internal constructor(private val d: Dataset,private val cache: 
         if(cursor != null) return page(query,cursor.hits,cursor,pageSize)
         val ranked = history.mapNotNull { variant ->
             if(availability(variant.record.selection) != ChoiceAvailability.AVAILABLE) return@mapNotNull null
-            val known = variant.occurrences.filter { o -> !o.segment.uncertain && o.segment.durationMs > 0 && o.segment.end != null &&
-                (w == null || o.segment.start < w.end && o.segment.end > w.start) }
+            val known = variant.known(w)
             if(known.isEmpty()) return@mapNotNull null
-            val latest = known.maxWith { a,b -> recordedSegmentOrder.compare(a.segment,b.segment) }
+            val latest = known.last()
             val entry = variant.record.copy(sourceId = latest.segment.id,selection = latest.segment.selection,sourceSessionId = latest.sessionId,sourceSegmentId = latest.segment.id)
             RankedChoice(entry,suggestion = SuggestionEvidence(query.order,w,known.map { it.sessionId }.toSet().size,latest.segment.end!!))
         }.sortedWith(if(query.order == SuggestionOrder.RECENT_RECORDED)

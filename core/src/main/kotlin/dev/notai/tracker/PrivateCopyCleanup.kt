@@ -36,8 +36,12 @@ interface PrivateCopyStorage {
     fun quarantine(item: PrivateCopy,operationId: String)
     fun remaining(item: PrivateCopy,operationId: String): List<CopyMember>
     fun removeMember(item: PrivateCopy,member: CopyMember,operationId: String)
+    /** Explicit execution only: remove an empty quarantine container and sync its parent. */
+    fun finishGroup(item: PrivateCopy,operationId: String) {}
     fun verifyAbsent(item: PrivateCopy,operationId: String): Boolean
     fun restoreWholeGroup(item: PrivateCopy,operationId: String)
+    /** Descriptor adapter can reconcile a rename committed before its progress receipt. */
+    fun isQuarantined(item: PrivateCopy,operationId: String): Boolean? = null
 }
 /** Manual-only cleanup protocol. Constructor and reads never resume deletion after a crash. */
 class PrivateCopyCleanup(private val storage: PrivateCopyStorage) {
@@ -75,9 +79,12 @@ class PrivateCopyCleanup(private val storage: PrivateCopyStorage) {
         ensure(remainingHash(current) == expectedRemainingHash,"Remaining bytes changed",ErrorCode.STALE)
         if(current.phase in setOf(CleanupPhase.DONE,CleanupPhase.RESTORED)) current else execute(current)
     }
-    fun remainingHash(op: CleanupJournal): String = payloadHash(op.items.map { it.item.id to storage.remaining(it.item,op.operationId) })
+    fun remainingHash(op: CleanupJournal): String = storage.maintenance {
+        val saved = storage.operations().single { it.operationId == op.operationId }
+        payloadHash(saved.items.map { it.item.id to storage.remaining(it.item,saved.operationId) })
+    }
     fun restoreSurvivingGroup(operationId: String,itemId: String): CleanupJournal = storage.maintenance {
-        val op = storage.operations().single { it.operationId == operationId };val progress = op.items.single { it.item.id == itemId }
+        val op = reconcile(storage.operations().single { it.operationId == operationId });val progress = op.items.single { it.item.id == itemId }
         ensure(progress.quarantined && !progress.restored && storage.remaining(progress.item,operationId) == progress.item.members,"Only an intact surviving group can be returned")
         storage.restoreWholeGroup(progress.item,operationId)
         val items = op.items.map { if(it.item.id == itemId) it.copy(restored = true) else it }
@@ -86,14 +93,18 @@ class PrivateCopyCleanup(private val storage: PrivateCopyStorage) {
     private fun reconcile(op: CleanupJournal): CleanupJournal {
         if(op.phase in setOf(CleanupPhase.DONE,CleanupPhase.RESTORED)) return op
         // Read-only reconciliation records exact observed missing members. No unlink/rename occurs here.
-        val progress = op.items.map { p ->
+        val progress = op.items.map { saved ->
+            val location = storage.isQuarantined(saved.item,op.operationId)
+            val p = if(location == true) saved.copy(quarantined = true) else if(location == false && saved.quarantined &&
+                storage.remaining(saved.item,op.operationId) == saved.item.members) saved.copy(restored = true) else saved
             if(!p.quarantined || p.restored) p else {
                 val remaining = storage.remaining(p.item,op.operationId).map { it.opaqueId }.toSet()
                 p.copy(deletedMemberIds = p.item.members.map { it.opaqueId }.toSet()-remaining)
             }
         }
-        val done = progress.all { !it.restored && storage.verifyAbsent(it.item,op.operationId) }
-        return op.copy(items = progress,phase = if(done) CleanupPhase.DONE else CleanupPhase.PARTIAL,error = if(done) null else "CLEANUP_INTERRUPTED").also(storage::saveDurably)
+        val done = progress.all { it.restored || storage.verifyAbsent(it.item,op.operationId) }
+        return op.copy(items = progress,phase = if(done) { if(progress.all { it.restored }) CleanupPhase.RESTORED else CleanupPhase.DONE } else CleanupPhase.PARTIAL,
+            error = if(done) null else "CLEANUP_INTERRUPTED").also(storage::saveDurably)
     }
     private fun execute(initial: CleanupJournal): CleanupJournal {
         var op = initial
@@ -111,9 +122,10 @@ class PrivateCopyCleanup(private val storage: PrivateCopyStorage) {
                     p = p.copy(deletedMemberIds = p.deletedMemberIds+member.opaqueId)
                     op = op.copy(items = op.items.mapIndexed { i,x -> if(i == index) p else x });storage.saveDurably(op)
                 }
+                storage.finishGroup(p.item,op.operationId)
                 ensure(storage.verifyAbsent(p.item,op.operationId),"Copy deletion readback failed",ErrorCode.STORAGE)
             }
-            return op.copy(phase = if(op.items.any { it.restored }) CleanupPhase.PARTIAL else CleanupPhase.DONE,error = null).also(storage::saveDurably)
+            return op.copy(phase = if(op.items.all { it.restored }) CleanupPhase.RESTORED else CleanupPhase.DONE,error = null).also(storage::saveDurably)
         } catch(e: Exception) {
             // If journaling itself fails, preserve the last durable journal and propagate storage failure.
             op = op.copy(phase = CleanupPhase.PARTIAL,error = e.javaClass.simpleName)

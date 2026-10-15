@@ -10,6 +10,8 @@ import java.security.MessageDigest
 import java.nio.charset.CodingErrorAction
 import kotlinx.serialization.json.*
 
+internal const val MAX_BACKUP_RECORD_CHARS = 16*1024*1024
+
 /** Portable JSON 9 without a whole-file String/ByteArray/JSON tree. Only one record is decoded
  * at a time; the resulting domain graph has the same size as a loaded store. Total file size
  * is not capped by CSV's text limit. Re-openable inputs permit a bounded metadata first pass.
@@ -25,12 +27,17 @@ object StreamingBackup {
         val writer = OutputStreamWriter(output,Charsets.UTF_8.newEncoder().onMalformedInput(CodingErrorAction.REPORT)
             .onUnmappableCharacter(CodingErrorAction.REPORT)).buffered(64*1024)
         fun field(name: String,value: String,first: Boolean = false) {
+            ensure(value.length <= MAX_BACKUP_RECORD_CHARS,"Single backup record exceeds supported 16 MiB characters",ErrorCode.INVALID_INPUT)
             if(!first) writer.write(",")
             writer.write(codec.encodeToString(name));writer.write(":");writer.write(value)
         }
         fun <T> rows(name: String,values: List<T>,encode: (T)->String) {
             writer.write(",");writer.write(codec.encodeToString(name));writer.write(":[")
-            values.forEachIndexed { i,row -> if(i != 0) writer.write(",");writer.write(encode(row)) }
+            values.forEachIndexed { i,row ->
+                val encoded = encode(row)
+                ensure(encoded.length <= MAX_BACKUP_RECORD_CHARS,"Single backup record exceeds supported 16 MiB characters",ErrorCode.INVALID_INPUT)
+                if(i != 0) writer.write(",");writer.write(encoded)
+            }
             writer.write("]")
         }
         writer.write("{");field("formatVersion","9",true);field("backupId",codec.encodeToString(backup.backupId));field("asOf",backup.asOf.toString())
@@ -174,7 +181,7 @@ private class JsonRecords(private val reader: Reader,private val validateValues:
             if(c < 0) { ensure(started && depth == 0 && !quoted,"Truncated JSON value",ErrorCode.UNSUPPORTED_IMPORT);break }
             if(started && depth == 0 && !quoted && (c in listOf(','.code,'}'.code,']'.code,9,10,13,32))) break
             take();out?.append(c.toChar());started = true
-            ensure(out == null || out.length <= 16*1024*1024,"Single JSON record exceeds 16 MiB characters",ErrorCode.UNSUPPORTED_IMPORT)
+            ensure(out == null || out.length <= MAX_BACKUP_RECORD_CHARS,"Single JSON record exceeds 16 MiB characters",ErrorCode.UNSUPPORTED_IMPORT)
             if(quoted) { if(escaped) escaped = false else if(c == '\\'.code) escaped = true else if(c == '"'.code) quoted = false }
             else when(c) {
                 '"'.code -> quoted = true

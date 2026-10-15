@@ -15,13 +15,14 @@ internal enum class TimerAction { START, PAUSE, RESUME, STOP, SWITCH }
  */
 class CheckedState private constructor(val data: Dataset,private val sessionPosition: Int?,private val segmentPosition: Int?,
     private val ownSegments: List<Segment>,private val lastCertainEnd: Long,private val totalDuration: Long,
-    private val typeIds: Set<String>,private val cardIds: Set<String>) {
+    private val typeIds: Set<String>,private val cardIds: Set<String>,internal val historyKey: Any = Any()) {
     private val reportIndex by lazy { ReportIndex(data) }
     internal fun calendar(now: Moment,first: java.time.LocalDate,days: Int,filter: Filter,zone: String) = Reports.indexedCalendar(data,reportIndex,now,first,days,filter,zone)
     internal fun report(now: Moment,start: Long,end: Long,filter: Filter,zone: String) = Reports.indexed(data,reportIndex,now,start,end,filter,zone)
     fun snapshot(now: Moment): Snapshot = snapshot(data.copy(sessions = listOfNotNull(sessionPosition?.let { data.sessions[it] }),segments = ownSegments),now)
     fun <T> replace(next: Dataset,result: (CheckedState)->T): CheckedCommit<T> {
-        val checked = if(next === data) this else validated(next.frozen(data))
+        val checked = if(next === data) this else validated(next.frozen(data),historyKey =
+            if(next.sessions === data.sessions && next.segments === data.segments) historyKey else Any())
         return CheckedCommit(this,checked,result(checked))
     }
     internal fun <T> timer(expected: Token,action: TimerAction,now: Moment,selection: Classification,note: String?,
@@ -81,7 +82,8 @@ class CheckedState private constructor(val data: Dataset,private val sessionPosi
             for(row in rows) if(row.position == size) add(row.value) else set(row.position,row.value)
         })
         val next = data.copy(revision = Math.addExact(data.revision,1),timerEpoch = Math.addExact(data.timerEpoch,1),sessions = edited(data.sessions,sessionRows),segments = edited(data.segments,segmentRows))
-        val checked = CheckedState(next,nextSession,nextSegment,own,end,total,typeIds,cardIds)
+        val checked = CheckedState(next,nextSession,nextSegment,own,end,total,typeIds,cardIds,
+            if(action in setOf(TimerAction.START,TimerAction.PAUSE,TimerAction.RESUME)) historyKey else Any())
         val changed = sessionRows.map { it.value.id }.toSet()
         return CheckedCommit(this,checked,result(checked,changed),TimerRows(frozenList(sessionRows),frozenList(segmentRows)))
     }
@@ -91,7 +93,7 @@ class CheckedState private constructor(val data: Dataset,private val sessionPosi
         val offer = StoppedAssignment(newId(),data.datasetId,data.controlBarrier,data.timerEpoch,sessionId,recordFingerprint(data,sessionId))
         val next = data.copy(pendingAssignments = frozenList((data.pendingAssignments+offer).takeLast(32)))
         validateAssignments(next)
-        return CheckedState(next,sessionPosition,segmentPosition,ownSegments,lastCertainEnd,totalDuration,typeIds,cardIds) to offer
+        return CheckedState(next,sessionPosition,segmentPosition,ownSegments,lastCertainEnd,totalDuration,typeIds,cardIds,historyKey) to offer
     }
     internal fun <T> addAssignment(commit: CheckedCommit<T>,sessionId: String,result: (CheckedState,StoppedAssignment)->T): CheckedCommit<T> {
         commit.requireBase(this)
@@ -105,7 +107,7 @@ class CheckedState private constructor(val data: Dataset,private val sessionPosi
             onPhase?.invoke("freeze",System.nanoTime()-start)
             return validated(frozen,onPhase)
         }
-        private fun validated(data: Dataset,onPhase: ((String,Long)->Unit)? = null): CheckedState {
+        private fun validated(data: Dataset,onPhase: ((String,Long)->Unit)? = null,historyKey: Any = Any()): CheckedState {
             var start = if(onPhase != null) System.nanoTime() else 0
             dev.notai.tracker.validate(data)
             onPhase?.invoke("validate",System.nanoTime()-start)
@@ -115,7 +117,7 @@ class CheckedState private constructor(val data: Dataset,private val sessionPosi
             val id = session?.let { data.sessions[it].id }
             val checked = CheckedState(data,session,segment,if(id == null) emptyList() else data.segments.filter { it.sessionId == id },
                 data.segments.filter { !it.uncertain && it.end != null }.maxOfOrNull { it.end!! } ?: 0,
-                data.segments.sumExact { it.durationMs },data.types.map { it.id }.toSet(),data.cards.map { it.id }.toSet())
+                data.segments.sumExact { it.durationMs },data.types.map { it.id }.toSet(),data.cards.map { it.id }.toSet(),historyKey)
             onPhase?.invoke("checked-index",System.nanoTime()-start)
             return checked
         }

@@ -142,9 +142,11 @@ class SelectiveTransfer(private val tracker: Tracker) {
     private fun resumeInternal(operationId: String): TransferOperation {
         while(true) {
             val op = tracker.data().transfer.operations.find { it.id == operationId } ?: fail(ErrorCode.INVALID_INPUT,"Operation missing")
-            val pending = op.groups.indexOfFirst { it.state == TransferGroupState.PENDING };if(pending < 0) return op
+            if(op.groups.none { it.state == TransferGroupState.PENDING }) return op
             tracker.store.transaction { d ->
                 val live = d.transfer.operations.single { it.id == operationId }
+                val pending = live.groups.indexOfFirst { it.state == TransferGroupState.PENDING }
+                if(pending < 0) return@transaction d to live
                 ensureReason(live.baseDatasetId == d.datasetId && live.baseControlBarrier == d.controlBarrier && live.nextRevision == d.revision,ErrorReason.TRANSFER_BASE_CHANGED,ErrorCode.STALE,mapOf("expectedRevision" to ErrorArgument.Count(live.nextRevision),"actualRevision" to ErrorArgument.Count(d.revision)))
                 ensure(!live.undone,"Operation was undone",ErrorCode.STALE)
                 val progress = live.groups[pending];var next = d

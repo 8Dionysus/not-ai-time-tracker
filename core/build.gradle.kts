@@ -10,6 +10,7 @@ dependencies {
 }
 
 tasks.test {
+    providers.gradleProperty("trackerCleanupLibrary").orNull?.let { systemProperty("tracker.cleanup.library",it) }
     doFirst { rootProject.layout.buildDirectory.get().asFile.mkdirs() }
     systemProperty("tracker.samples", rootProject.file("samples").absolutePath)
     systemProperty("tracker.artifacts", layout.buildDirectory.dir("test-artifacts").get().asFile.absolutePath)

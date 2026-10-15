@@ -22,6 +22,62 @@ abstract class ScenarioContract {
     abstract fun createStore(): StateStore
     open fun reopen(store: StateStore): StateStore = store
     private fun expect(code: ErrorCode,block: ()->Unit) { assertEquals(code,assertFailsWith<CoreError>(block = block).code) }
+    @Test fun liveTimerKeepsCompletedHistoryIndexProof() {
+        val clock = FakeClock();val t = Tracker(createStore(),clock)
+        repeat(12) { i -> t.manual(t.snapshot().token,clock.wall-30000+i*2000,clock.wall-29000+i*2000,Classification(name = "Saved $i")) }
+        fun recent() = t.view().choices().let { choices -> choices.suggestions(SuggestionQuery(enabled = true)).items to choices.indexStats() }
+        val original = recent();t.start(t.snapshot().token)
+        repeat(8) {
+            clock.advance(1000);t.pause(t.snapshot().token)
+            assertEquals(original.first.map { it.entry.id },recent().first.map { it.entry.id })
+            clock.advance(1000);t.resume(t.snapshot().token)
+            assertEquals(original.second.historyScans,recent().second.historyScans)
+        }
+        clock.advance(1000);t.stop(t.snapshot().token)
+        assertEquals(original.first.size+1,recent().first.size)
+        assertTrue(recent().second.historyScans > original.second.historyScans)
+    }
+
+    @Test fun reviewedDraftSwitchIsOneAtomicCommit() {
+        val base = createStore();var writes = 0;var reject = false
+        val boundary = object: StateStore by base {
+            override fun <T> checkedTransaction(block: (CheckedState)->CheckedCommit<T>): T {
+                writes++;if(reject) throw java.io.IOException("fixture commit refused")
+                return base.checkedTransaction(block)
+            }
+        }
+        val clock = FakeClock();val t = Tracker(boundary,clock);t.start(t.snapshot().token);clock.advance(1000)
+        val before = t.data();val draft = EntryDrafts.selectedText("Reviewed note",Classification(name = "Reviewed activity"))
+        reject = true;expect(ErrorCode.STORAGE) { t.switchDraft(t.snapshot().token,draft) };assertEquals(before,t.data())
+        reject = false;writes = 0
+        val changed = t.switchDraft(t.snapshot().token,draft)
+        assertEquals(1,writes);assertEquals("Reviewed note",changed.state.session!!.note)
+        assertEquals("Reviewed activity",changed.state.session!!.selection.name)
+        assertEquals(SessionStatus.STOPPED,t.data().sessions.first().status)
+        assertEquals(1000L,t.data().segments.first().durationMs)
+        t.undo(changed.state.token);assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
+    }
+
+    @Test fun concurrentSelectiveResumeKeepsAppliedReceipt() {
+        val base = createStore();var interleave = false;var reentered = false
+        val clock = FakeClock();val other = SelectiveTransfer(Tracker(base,clock))
+        val boundary = object: StateStore by base {
+            override fun read(): Dataset = base.read().also { d ->
+                if(!reentered && d.transfer.operations.any { !it.complete }) interleave = true
+            }
+            override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T {
+                if(interleave && !reentered) { reentered = true;other.resume("concurrent-fixture") }
+                return base.transaction(block)
+            }
+        }
+        val t = Tracker(boundary,clock);val transfer = SelectiveTransfer(t)
+        val content = TransferContent(goals = listOf(Goal(id = "concurrent-goal",name = "Fixture",metric = GoalMetric.SESSION_COUNT,target = 1)))
+        val pkg = SelectivePackage(sourceDatasetId = "fixture",groups = listOf(SelectiveTransfer.group("g","origin",0,content)))
+        val result = transfer.apply(transfer.plan(pkg,setOf("g")),"concurrent-fixture")
+        assertTrue(reentered);assertEquals(TransferGroupState.APPLIED,result.groups.single().state)
+        assertEquals(result,other.resume(result.id));assertEquals(2L,t.data().revision)
+        transfer.undo(result.id,t.snapshot().token);assertTrue(t.data().goals.isEmpty())
+    }
 
     @Test fun typedImportIssuesPreserveAtomicityAndProvenance() {
         val clock = FakeClock();var t = Tracker(createStore(),clock)

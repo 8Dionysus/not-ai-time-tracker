@@ -103,7 +103,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun pause(expected: Token) = timer(expected,TimerAction.PAUSE)
     fun resume(expected: Token) = timer(expected,TimerAction.RESUME)
     fun stop(expected: Token) = timer(expected,TimerAction.STOP)
-    fun switch(expected: Token,selection: Classification) = timer(expected,TimerAction.SWITCH,selection)
+    fun switch(expected: Token,selection: Classification,note: String? = null) = timer(expected,TimerAction.SWITCH,selection,note)
     /** Stop commits elapsed time and its durable assignment receipt in the same transaction. */
     fun stopForAssignment(target: TimerTarget,allowed: (Dataset)->Boolean = { true }) =
         timer(null,TimerAction.STOP,target = target,allowed = allowed,assignmentAfterStop = true)
@@ -348,6 +348,11 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun startDraft(expected: Token,draft: EntryDraft): Change {
         draft.validateForApply()
         return start(expected,draft.selection,draft.note)
+    }
+    /** Stop the old session, start the new one and attach reviewed input in one commit. */
+    fun switchDraft(expected: Token,draft: EntryDraft): Change {
+        draft.validateForApply()
+        return switch(expected,draft.selection,draft.note)
     }
     fun recordDraft(expected: Token,draft: EntryDraft): Change {
         draft.validateForApply()

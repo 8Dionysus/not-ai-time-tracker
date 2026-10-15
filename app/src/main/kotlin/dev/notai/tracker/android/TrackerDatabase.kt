@@ -258,17 +258,23 @@ class RoomStore(private val db: TrackerDatabase,private val initial: ()->Dataset
     private fun <T> payloads(table: String,decode: (String)->T): List<T> {
         check(table in setOf("activity_types","cards","favorites","measurements"))
         val result = ArrayList<T>()
+        fun checked(cursor: android.database.Cursor): T {
+            val value = decode(cursor.getString(2))
+            val id = when(value) { is ActivityType -> value.id;is Card -> value.id;is Favorite -> value.id;is Measurement -> value.id;else -> error("Unsupported payload table") }
+            ensure(id == cursor.getString(0),"Stored row ID contradicts its payload; use explicit recovery",ErrorCode.STORAGE)
+            ensure(cursor.getLong(1) in Int.MIN_VALUE.toLong()..Int.MAX_VALUE.toLong(),"Stored position out of range",ErrorCode.STORAGE)
+            return value
+        }
         val start = if(onLoadPhase != null) System.nanoTime() else 0
-        db.openHelper.readableDatabase.query("SELECT payload FROM $table ORDER BY position").use { cursor ->
-            if(onLoadPhase == null) while(cursor.moveToNext()) result += decode(cursor.getString(0))
+        db.openHelper.readableDatabase.query("SELECT id,position,payload FROM $table ORDER BY position,id").use { cursor ->
+            if(onLoadPhase == null) while(cursor.moveToNext()) result += checked(cursor)
             else {
                 var sqlNs = System.nanoTime()-start;var decodeNs = 0L
                 while(true) {
                     var tick = System.nanoTime();val next = cursor.moveToNext()
-                    val payload = if(next) cursor.getString(0) else null
                     sqlNs += System.nanoTime()-tick
                     if(!next) break
-                    tick = System.nanoTime();result += decode(payload!!);decodeNs += System.nanoTime()-tick
+                    tick = System.nanoTime();result += checked(cursor);decodeNs += System.nanoTime()-tick
                 }
                 onLoadPhase.invoke("sql-$table",sqlNs);onLoadPhase.invoke("decode-$table",decodeNs)
             }

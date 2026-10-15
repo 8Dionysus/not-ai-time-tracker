@@ -24,6 +24,20 @@ class RoomScenariosTest: ScenarioContract() {
     }
     @org.junit.After fun restoreDirectoryDurability() { DirectoryDurability.sync = originalDirectorySync;DirectoryDurability.rename = originalRename;DirectoryDurability.link = originalLink }
     private val databases = mutableMapOf<StateStore,Pair<String,TrackerDatabase>>()
+    @org.junit.Test fun coldPayloadIdentityMismatchBlocksWithoutRepair() {
+        val store = createStore();val t = Tracker(store,FakeClock())
+        val card = Card(id = "row-owner",name = "Fixture card")
+        t.saveCard(t.snapshot().token,card)
+        val db = databases.getValue(store).second
+        val changed = codec.encodeToString(card.copy(id = "contradictory-payload"))
+        db.openHelper.writableDatabase.execSQL("UPDATE cards SET payload=? WHERE id=?",arrayOf(changed,card.id))
+        val failure = kotlin.runCatching { RoomStore(db,allowInitialize = false).read() }.exceptionOrNull()
+        org.junit.Assert.assertEquals(ErrorCode.STORAGE,(failure as? CoreError)?.code)
+        db.openHelper.readableDatabase.query("SELECT id,payload FROM cards").use { c ->
+            org.junit.Assert.assertTrue(c.moveToFirst());org.junit.Assert.assertEquals(card.id,c.getString(0))
+            org.junit.Assert.assertEquals(changed,c.getString(1));org.junit.Assert.assertFalse(c.moveToNext())
+        }
+    }
     @org.junit.Test fun transferRetentionLargeMetadataShrinksAndReopens() {
         val clock = FakeClock();val store = createStore();val note = "large private fixture"+"🙂".repeat(8192)
         store.transaction { d ->
@@ -865,20 +879,47 @@ class RoomScenariosTest: ScenarioContract() {
     private fun focusBackgroundSignals() {
         val context = RuntimeEnvironment.getApplication();val clock = FakeClock();val t = Tracker(createStore(),clock)
         t.startFocus(t.snapshot().token,plan = FocusPlan(1000,1000));clock.advance(1000)
+        t.settings(t.snapshot().token,t.data().settings.copy(surfaces = SurfaceSettings(focusSignal = true)))
         val due = t.snapshot().focus!!;val before = t.data()
         org.robolectric.Shadows.shadowOf(context).denyPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
-        org.junit.Assert.assertFalse(FocusSignals.deliver(context,due))
+        org.junit.Assert.assertFalse(FocusSignals.deliver(context,t))
         org.robolectric.Shadows.shadowOf(context).grantPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
-        org.junit.Assert.assertTrue(FocusSignals.deliver(context,due))
-        org.junit.Assert.assertFalse(FocusSignals.deliver(context,due))
+        org.junit.Assert.assertTrue(FocusSignals.deliver(context,t))
+        org.junit.Assert.assertFalse(FocusSignals.deliver(context,t))
+        val manager = context.getSystemService(android.app.NotificationManager::class.java)
+        fun noticeVisible() = manager.activeNotifications.any { it.id == 43 }
+        org.junit.Assert.assertTrue(noticeVisible())
         org.junit.Assert.assertTrue(context.getSharedPreferences("focus-signals",0).getStringSet("delivered",emptySet())!!.contains(due.signalKey))
         org.junit.Assert.assertEquals(before,t.data())
-        t.focusNext(t.snapshot().token);clock.advance(1000)
-        org.junit.Assert.assertTrue(FocusSignals.deliver(context,t.snapshot().focus!!))
+        val oldProjection = t.view()
+        val delayedRefresh = { FocusSignals.refresh(context,t) }
+        t.focusNext(t.snapshot().token)
+        FocusSignals.refresh(context,t)
+        val alarms = org.robolectric.Shadows.shadowOf(context.getSystemService(android.app.AlarmManager::class.java))
+        fun focusAlarmPhase(): Long = alarms.scheduledAlarms.mapNotNull { alarm ->
+            alarm.operation?.let { org.robolectric.Shadows.shadowOf(it).savedIntent }
+        }.single { it.action == "dev.notai.tracker.FOCUS_DUE" }.getLongExtra("index",-1)
+        org.junit.Assert.assertEquals(0L,oldProjection.snapshot().focus!!.phaseIndex)
+        org.junit.Assert.assertEquals(1L,focusAlarmPhase())
+        delayedRefresh() // Callback A was queued before B advanced/scheduled phase 1.
+        org.junit.Assert.assertEquals(1L,focusAlarmPhase())
+        org.junit.Assert.assertFalse(noticeVisible())
+        org.junit.Assert.assertFalse(FocusSignals.deliver(context,t)) // delayed old DUE callback reads the current run
+        clock.advance(1000)
+        org.junit.Assert.assertTrue(FocusSignals.deliver(context,t))
         org.junit.Assert.assertEquals(1000L,t.snapshot().trustedDurationMs)
         org.robolectric.Shadows.shadowOf(context).denyPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
-        FocusSignals.refresh(context,t.view()) // opt-in remains false; no alarm or history transition
+        FocusSignals.refresh(context,t) // permission revoked; no history transition
         org.junit.Assert.assertEquals(FocusMode.DUE,t.snapshot().focus!!.mode)
+        org.junit.Assert.assertFalse(noticeVisible())
+        org.robolectric.Shadows.shadowOf(context).grantPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+        t.focusNext(t.snapshot().token);clock.advance(1000);FocusSignals.deliver(context,t)
+        org.junit.Assert.assertTrue(noticeVisible())
+        t.settings(t.snapshot().token,t.data().settings.copy(surfaces = SurfaceSettings()))
+        FocusSignals.refresh(context,t);org.junit.Assert.assertFalse(noticeVisible())
+        org.junit.Assert.assertFalse(FocusSignals.deliver(context,t))
+        t.stop(t.snapshot().token);FocusSignals.refresh(context,t)
+        org.junit.Assert.assertFalse(noticeVisible())
     }
     private fun privateFilesAndMetadata() {
         val context = RuntimeEnvironment.getApplication()
@@ -1121,12 +1162,29 @@ class RoomScenariosTest: ScenarioContract() {
         }.toString())
     }
     private fun realisticHistoryBenchmark() {
+        fun heap(): Long { System.gc();Thread.sleep(100);return Runtime.getRuntime().let { it.totalMemory()-it.freeMemory() } }
+        val heapBeforeFixture = heap()
         val clock = FakeClock();val input = realisticHistoryInput(clock);val count = input.sessions.size
+        val heapWithInputFixture = heap()
         fun time(block: ()->Unit): Long { val start = System.nanoTime();block();return System.nanoTime()-start }
         val validation = time { validate(input) };var store = createStore()
         val persisted = time { store.transaction { input to Unit } }
         val cold = time { store = reopen(store);store.readChecked() }
         val tracker = Tracker(store,clock)
+        val heapWithColdStore = heap()
+        val window = HistoryWindow(clock.wall-30L*86_400_000,clock.wall+1)
+        tracker.view().choices().quick(window)
+        val scanBefore = tracker.view().choices().indexStats().historyScans
+        val liveChoiceSamples = (0 until 7).map { iteration ->
+            time {
+                tracker.start(tracker.snapshot().token);tracker.view().choices().quick(window)
+                clock.advance(1000);tracker.pause(tracker.snapshot().token);tracker.view().choices().quick(window)
+                tracker.resume(tracker.snapshot().token);tracker.view().choices().quick(window)
+            }.also { _ ->
+                org.junit.Assert.assertEquals(scanBefore+iteration,tracker.view().choices().indexStats().historyScans)
+                clock.advance(1000);tracker.stop(tracker.snapshot().token);tracker.view().choices().quick(window)
+            }
+        }
         val timers = (0 until 7).map {
             time { tracker.start(tracker.snapshot().token);clock.advance(1000);tracker.pause(tracker.snapshot().token)
                 tracker.resume(tracker.snapshot().token);clock.advance(1000);tracker.stop(tracker.snapshot().token) }
@@ -1135,6 +1193,7 @@ class RoomScenariosTest: ScenarioContract() {
         val view = tracker.view()
         val daily = (0 until 7).map { time { val report = view.day(date);org.junit.Assert.assertEquals(20*30*60_000L,report.recordedMs) } }
         val calendar = time { view.calendar(date.minusDays(29),30) }
+        val heapWithIndexesAndFixture = heap()
         val directory = java.io.File(requireNotNull(System.getProperty("tracker.artifacts"))).apply { mkdirs() }
         val result = buildJsonObject {
             put("schema","tracker_scale_benchmark_v1");put("execution","Room/SQLite in Robolectric JVM API35; synthetic, not phone")
@@ -1142,6 +1201,10 @@ class RoomScenariosTest: ScenarioContract() {
             put("fullValidationNs",validation);put("initialRoomWriteNs",persisted);put("coldReopenReadNs",cold)
             put("timerCycleNs",JsonArray(timers.map(::JsonPrimitive)));put("dailyReportNs",JsonArray(daily.map(::JsonPrimitive)))
             put("calendar30DaysNs",calendar);put("maxHeapBytes",Runtime.getRuntime().maxMemory())
+            put("liveTimerWithQuickChoiceNs",JsonArray(liveChoiceSamples.map(::JsonPrimitive)))
+            put("javaHeapBytesBeforeFixture",heapBeforeFixture);put("javaHeapBytesWithInputFixture",heapWithInputFixture)
+            put("javaHeapBytesWithColdStoreAndFixture",heapWithColdStore);put("javaHeapBytesWithIndexesAndFixture",heapWithIndexesAndFixture)
+            put("heapMethod","JVM totalMemory-freeMemory after best-effort explicit GC; includes Robolectric, retained input fixture and graph(s); excludes native PSS. No phone/battery claim.")
         }
         java.io.File(directory,"scale-benchmark.json").writeText(result.toString())
     }

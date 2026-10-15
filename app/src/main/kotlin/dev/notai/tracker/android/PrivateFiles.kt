@@ -39,7 +39,8 @@ data class ExportWriteResult(val bytes: Long,val verified: Boolean)
 class ExportOperations(private val context: Context) {
     private val directory = File(context.noBackupFilesDir,"exports").apply { mkdirs() }
     private fun dir(id: String): File { require(id.matches(Regex("[0-9a-f-]{36}")));return File(directory,id) }
-    fun begin(mime: String,title: String): ExportOperation {
+    fun begin(mime: String,title: String): ExportOperation = PrivateFileMaintenance.writing(context,"export-begin") { beginUnsafe(mime,title) }
+    private fun beginUnsafe(mime: String,title: String): ExportOperation {
         val operation = ExportOperation(newId(),mime,title);save(operation);return operation
     }
     private fun save(operation: ExportOperation) = atomicText(File(dir(operation.id),"operation.json"),codec.encodeToString(operation))
@@ -48,23 +49,31 @@ class ExportOperations(private val context: Context) {
         .sortedByDescending { File(it,"operation.json").lastModified() }.firstNotNullOfOrNull { folder ->
             runCatching { read(folder.name) }.getOrNull()?.takeIf { it.state in setOf("READY","FAILED","PREPARING","CANCELLED") }
         }
-    fun prepare(id: String,write: (OutputStream)->Unit): ExportOperation {
+    fun prepare(id: String,write: (OutputStream)->Unit): ExportOperation = PrivateFileMaintenance.writing(context,"export-prepare:$id",CopyBlocker.EXPORT_WRITING) { prepareUnsafe(id,write) }
+    private fun prepareUnsafe(id: String,write: (OutputStream)->Unit): ExportOperation {
         val op = read(id);val part = File(dir(id),"data.part")
         return try {
             FileOutputStream(part).use { write(it);it.fd.sync() }
             val data = File(dir(id),"data");DirectoryDurability.rename(part,data);syncDirectory(dir(id))
-            op.copy(state = if(read(id).state == "CANCELLED") "CANCELLED" else "READY",bytes = data.length(),sha256 = fileHash(data),error = null).also(::save)
+            val bytes = data.length();val hash = fileHash(data)
+            PrivateFileMaintenance.forContext(context).locked {
+                op.copy(state = if(read(id).state == "CANCELLED") "CANCELLED" else "READY",bytes = bytes,sha256 = hash,error = null).also(::save)
+            }
         } catch(e: Exception) { save(op.copy(state = "FAILED",error = e.javaClass.simpleName));throw e }
     }
-    fun cancel(id: String) { val op = read(id);save(op.copy(state = "CANCELLED")) } // retain staged bytes for explicit retry
+    fun cancel(id: String) = PrivateFileMaintenance.writing(context,"export-cancel:$id") { cancelUnsafe(id) }
+    private fun cancelUnsafe(id: String) = PrivateFileMaintenance.forContext(context).locked { val op = read(id);save(op.copy(state = "CANCELLED")) } // retain staged bytes for explicit retry
     /** Persist consumption of the chooser result before scheduling any destination I/O.
      * No destination URI or grant is retained: an interrupted write needs a fresh chooser. */
-    fun receiveResult(id: String,cancelled: Boolean) {
+    fun receiveResult(id: String,cancelled: Boolean) = PrivateFileMaintenance.writing(context,"export-result:$id") { receiveResultUnsafe(id,cancelled) }
+    private fun receiveResultUnsafe(id: String,cancelled: Boolean) {
         val op = read(id)
         save(op.copy(resultReceived = true,state = if(cancelled) "CANCELLED" else op.state))
     }
-    fun awaitResult(id: String) { val op = read(id);save(op.copy(resultReceived = false)) }
-    fun write(id: String,uri: Uri): ExportWriteResult {
+    fun awaitResult(id: String) = PrivateFileMaintenance.writing(context,"export-await:$id",CopyBlocker.CHOOSER_RESULT_PENDING) { awaitResultUnsafe(id) }
+    private fun awaitResultUnsafe(id: String) { val op = read(id);save(op.copy(resultReceived = false)) }
+    fun write(id: String,uri: Uri): ExportWriteResult = PrivateFileMaintenance.writing(context,"export-write:$id",CopyBlocker.EXPORT_WRITING) { writeUnsafe(id,uri) }
+    private fun writeUnsafe(id: String,uri: Uri): ExportWriteResult {
         val op = read(id);val data = File(dir(id),"data")
         ensure(op.state in setOf("READY","CANCELLED") && data.exists() && data.length() == op.bytes && fileHash(data) == op.sha256,
             "Export is not ready or the private staged file is damaged",ErrorCode.STORAGE)
@@ -82,9 +91,10 @@ class ExportOperations(private val context: Context) {
 @Serializable internal data class FormState(val selectedCardId: String? = null,val name: String = "",val details: String = "",
     val note: String = "",val start: String = "",val end: String = "",val zone: String = "",val source: String? = null,
     val sourceReference: String? = null,val pendingText: String? = null)
-internal class FormFiles(context: Context) {
+internal class FormFiles(private val context: Context) {
     private val directory = File(context.noBackupFilesDir,"forms").apply { mkdirs() }
-    fun save(id: String?,state: FormState): String {
+    fun save(id: String?,state: FormState): String = PrivateFileMaintenance.writing(context,"form-save",CopyBlocker.LIVE_FORM_REFERENCE) { saveUnsafe(id,state) }
+    private fun saveUnsafe(id: String?,state: FormState): String {
         val reference = id ?: newId();require(reference.matches(Regex("[0-9a-f-]{36}")))
         atomicText(File(directory,"$reference.json"),codec.encodeToString(state));return reference
     }
@@ -93,7 +103,8 @@ internal class FormFiles(context: Context) {
     }
 }
 
-internal fun stageRestore(context: Context,input: InputStream): File {
+internal fun stageRestore(context: Context,input: InputStream): File = PrivateFileMaintenance.writing(context,"restore-input-stage",CopyBlocker.RESTORE_SOURCE_IN_USE) { stageRestoreUnsafe(context,input) }
+private fun stageRestoreUnsafe(context: Context,input: InputStream): File {
     val directory = File(context.noBackupFilesDir,"restore-inputs").apply { mkdirs() }
     val file = File(directory,"${newId()}.json")
     FileOutputStream(file).use { out -> input.copyTo(out,64*1024);out.fd.sync() };syncDirectory(directory)

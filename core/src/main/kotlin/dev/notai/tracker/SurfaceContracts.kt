@@ -2,6 +2,9 @@ package dev.notai.tracker
 
 import kotlinx.serialization.Serializable
 
+/** Focus owns its countdown mode: underlying work-session RUNNING can also mean DUE. */
+fun Snapshot.isCounting(): Boolean = focus?.let { it.mode == FocusMode.RUNNING } ?: (mode == Mode.RUNNING)
+
 /** Renderer-independent metadata. Consumers map the first known key and retain the fallback. */
 data class ActivityIcon(val keys: List<String>,val fallback: String)
 object ActivityIcons {

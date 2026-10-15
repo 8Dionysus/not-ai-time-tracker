@@ -18,7 +18,8 @@ internal object DatabaseFiles {
  * SQLite's default corruption handler must never delete this application's files.
  */
 object DatabaseArchives {
-    fun capture(context: Context,name: String = "tracker.db",forceSeparate: Boolean = false): File {
+    fun capture(context: Context,name: String = "tracker.db",forceSeparate: Boolean = false): File = PrivateFileMaintenance.writing(context,"database-archive") { captureUnsafe(context,name,forceSeparate) }
+    private fun captureUnsafe(context: Context,name: String,forceSeparate: Boolean): File {
         val start = System.nanoTime();StartupTrace.mark(context,"archive-start")
         val root = File(context.noBackupFilesDir,"database-archives").apply { mkdirs() }
         // Only sealed, immutable archival copies can be shared. Never link a live
@@ -68,13 +69,19 @@ data class RescueResult(val archive: String,val sessions: Int)
 object DatabaseRecovery {
     private fun pending(context: Context) = File(context.noBackupFilesDir,"recovery-pending.json")
     fun needsAttention(context: Context) = pending(context).exists()
-    fun prepare(source: File): RescuePreview {
+    fun prepare(context: Context,source: File): RescuePreview = PrivateFileMaintenance.forContext(context).let { gate ->
+        gate.locked { PrivateFileMaintenance.legacy(gate);prepareUnsafe(source) }
+    }
+    // Compatibility reader has no Context/lifecycle witness. It never grants cleanup authority.
+    fun prepare(source: File): RescuePreview = prepareUnsafe(source)
+    private fun prepareUnsafe(source: File): RescuePreview {
         val hash = fileHash(source);val backup = StreamingBackup.read { source.inputStream() }
         ensure(fileHash(source) == hash,"Recovery source changed while preparing",ErrorCode.STALE)
         return RescuePreview(source,backup,hash)
     }
     /** Explicit replacement. Source/rollback and raw original files remain available. */
-    fun apply(context: Context,preview: RescuePreview): RescueResult {
+    fun apply(context: Context,preview: RescuePreview): RescueResult = PrivateFileMaintenance.writing(context,"database-recovery",CopyBlocker.REQUIRED_BY_PENDING_RECOVERY) { applyUnsafe(context,preview) }
+    private fun applyUnsafe(context: Context,preview: RescuePreview): RescueResult {
         ensure(fileHash(preview.source) == preview.sourceSha256,"Recovery source changed after preview",ErrorCode.STALE)
         val liveSource = StreamingBackup.read { preview.source.inputStream() }
         ensure(liveSource == preview.backup,"Recovery source changed after preview",ErrorCode.STALE)

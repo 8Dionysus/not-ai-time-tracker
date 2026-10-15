@@ -15,15 +15,19 @@ class ScheduleDeliveryFixturePlatform: ScheduleDeliveryPlatform {
     var pending: ScheduleAlarmBatch? = null
     val postCalls = mutableListOf<ScheduleReminderTicket>()
     val notices = mutableMapOf<String,ScheduleReminderTicket>()
+    var prepareAction: ((ScheduleReminderTicket,ScheduleProjection)->Unit)? = null
     var postAction: ((ScheduleReminderTicket,ScheduleProjection)->Boolean)? = null
     override fun availability() = capability
     override fun schedule(batch: ScheduleAlarmBatch) { pending = batch }
     override fun cancelAlarm() { pending = null }
-    override fun post(ticket: ScheduleReminderTicket,projection: ScheduleProjection): Boolean {
-        postCalls += ticket
-        val accepted = postAction?.invoke(ticket,projection) ?: true
-        if(accepted) notices[ticket.identity] = ticket
-        return accepted
+    override fun prepare(ticket: ScheduleReminderTicket,projection: ScheduleProjection): PreparedScheduleNotice {
+        prepareAction?.invoke(ticket,projection)
+        return PreparedScheduleNotice {
+            postCalls += ticket
+            val accepted = postAction?.invoke(ticket,projection) ?: true
+            if(accepted) notices[ticket.identity] = ticket
+            accepted
+        }
     }
     override fun visible() = notices.values.toList()
     override fun cancelNotice(ticket: ScheduleReminderTicket) { notices.remove(ticket.identity) }

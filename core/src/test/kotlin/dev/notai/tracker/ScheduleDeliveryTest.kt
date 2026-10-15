@@ -66,10 +66,12 @@ class ScheduleDeliveryTest {
     @Test fun postExceptionIsUnknownAndSecondTieRechecksFreshOptIn() {
         val clock = clock();val t = Tracker(MemoryStore(),clock);add(t,"a");add(t,"b")
         val state = ScheduleDeliveryFixtureStore();val platform = ScheduleDeliveryFixturePlatform();val delivery = ScheduleDelivery(t,state,platform) { ZoneId.of("UTC") }
-        platform.postAction = { ticket,_ ->
+        platform.prepareAction = { ticket,_ ->
             assertEquals(ScheduleAttemptStatus.RESERVED,state.persisted.attempts.single { it.ticket.identity == ticket.identity }.status)
             val other = if(ticket.key.seriesId == "a") "b" else "a"
             t.scheduleCommand(ScheduleCommand("archive-other",t.snapshot().token,ScheduleAction.SET_STATE,other,1,state = ScheduleState.ARCHIVED))
+        }
+        platform.postAction = { ticket,_ ->
             platform.notices[ticket.identity] = ticket;throw IOException("fixture: post accepted, result lost")
         }
         val batch = delivery.synchronize().next!!;clock.advance(30*60_000)
@@ -113,7 +115,7 @@ class ScheduleDeliveryTest {
         val state2 = ScheduleDeliveryFixtureStore();val platform2 = ScheduleDeliveryFixturePlatform()
         val delivery2 = ScheduleDelivery(t2,state2,platform2) { ZoneId.of("UTC") };val ties = delivery2.synchronize().next!!;clock2.advance(30*60_000)
         var reentered = false
-        platform2.postAction = { _,_ -> if(!reentered) { reentered = true;delivery2.onAlarm(ties.hash) };true }
+        platform2.prepareAction = { _,_ -> if(!reentered) { reentered = true;delivery2.onAlarm(ties.hash) } }
         delivery2.onAlarm(ties.hash)
         assertEquals(2,platform2.postCalls.size);assertEquals(2,state2.persisted.attempts.size)
         assertTrue(state2.persisted.attempts.all { it.status == ScheduleAttemptStatus.POSTED })

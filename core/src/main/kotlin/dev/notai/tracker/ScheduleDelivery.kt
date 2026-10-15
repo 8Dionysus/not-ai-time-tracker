@@ -40,12 +40,16 @@ interface ScheduleDeliveryStore {
     fun read(): ScheduleDeliveryState
     fun writeDurably(state: ScheduleDeliveryState)
 }
+/** Prepared content only. Terminal post must be short, must not render, mutate Tracker or
+ * reenter delivery, and runs under the StateStore transaction gate after the final match. */
+fun interface PreparedScheduleNotice { fun post(): Boolean }
 interface ScheduleDeliveryPlatform {
     fun availability(): ScheduleDeliveryAvailability
     /** One replaceable platform alarm for the entire next tie batch, no exact-alarm permission. */
     fun schedule(batch: ScheduleAlarmBatch)
     fun cancelAlarm()
-    fun post(ticket: ScheduleReminderTicket,projection: ScheduleProjection): Boolean
+    /** Render outside the domain gate. Returning null is a known refusal, not a post. */
+    fun prepare(ticket: ScheduleReminderTicket,projection: ScheduleProjection): PreparedScheduleNotice?
     fun visible(): List<ScheduleReminderTicket>
     fun cancelNotice(ticket: ScheduleReminderTicket)
     /** Optional platform boot/time-change hooks; enabled only while an opted-in alarm is usable. */
@@ -150,7 +154,20 @@ class ScheduleDelivery(private val tracker: Tracker,private val store: ScheduleD
                 val freshNow = Instant.ofEpochMilli(wallNow())
                 val fresh = matching(tracker.data(),t,freshNow,deviceZone())
                 if(fresh == null || freshNow.toEpochMilli() < t.at || !availability().ready) ScheduleAttemptStatus.NOT_POSTED
-                else if(platform.post(t,fresh)) ScheduleAttemptStatus.POSTED else ScheduleAttemptStatus.NOT_POSTED
+                else {
+                    val prepared = platform.prepare(t,fresh)
+                    if(prepared == null) ScheduleAttemptStatus.NOT_POSTED
+                    else tracker.store.checkedTransaction { checked ->
+                        val finalNow = Instant.ofEpochMilli(wallNow())
+                        val currentProjection = matching(checked.data,t,finalNow,deviceZone())
+                        // Same gate as every domain command. Rendering has finished; only the
+                        // short terminal platform effect occurs here, with no Dataset write.
+                        checked.replace(checked.data) {
+                            if(currentProjection == null || finalNow.toEpochMilli() < t.at || !availability().ready) ScheduleAttemptStatus.NOT_POSTED
+                            else if(prepared.post()) ScheduleAttemptStatus.POSTED else ScheduleAttemptStatus.NOT_POSTED
+                        }
+                    }
+                }
             }
                 catch(e: Exception) { if(e is kotlinx.coroutines.CancellationException) throw e;ScheduleAttemptStatus.UNKNOWN }
             val result = reserved.copy(status = status)

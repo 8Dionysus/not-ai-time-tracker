@@ -37,6 +37,56 @@ abstract class ScenarioContract {
         assertEquals(ScheduleDeliveryOutcome.STALE_CALLBACK,reopened.onAlarm(batch.hash).outcome)
         assertEquals(2,platform.postCalls.size);assertEquals(before,t.data());assertEquals("2026-10-11",platform.pending!!.tickets.first().key.originalDate)
     }
+    @Test fun scheduleRendererCannotPostAfterChangingTheCurrentOccurrence() {
+        for(action in listOf("archive","opt-out","start")) {
+            val clock = FakeClock(wall = Instant.parse("2026-10-10T09:00:00Z").toEpochMilli());val t = Tracker(createStore(),clock)
+            val rule = ScheduleRule(Classification(),"2026-10-10",extraDates = setOf("2026-10-10","2026-10-11"),
+                localTime = "10:00",alertsEnabled = true,reminderTime = "09:30")
+            t.scheduleCommand(ScheduleCommand("create",t.snapshot().token,ScheduleAction.CREATE,"a",rule = rule))
+            val receipts = ScheduleDeliveryFixtureStore();val platform = ScheduleDeliveryFixturePlatform()
+            platform.prepareAction = { _,_ ->
+                val token = t.snapshot().token
+                when(action) {
+                    "archive" -> t.scheduleCommand(ScheduleCommand("render-change",token,ScheduleAction.SET_STATE,"a",1,state = ScheduleState.ARCHIVED))
+                    "opt-out" -> t.scheduleCommand(ScheduleCommand("render-change",token,ScheduleAction.UPDATE_FUTURE,"a",1,
+                        rule = rule.copy(alertsEnabled = false),effectiveFrom = "2026-10-10"))
+                    else -> t.scheduleCommand(ScheduleCommand("render-change",token,ScheduleAction.START,"a",1,occurrence = OccurrenceKey("a","2026-10-10")))
+                }
+            }
+            val delivery = ScheduleDelivery(t,receipts,platform) { java.time.ZoneId.of("UTC") };val batch = delivery.synchronize().next!!
+            clock.advance(30*60_000)
+            assertEquals(ScheduleAttemptStatus.NOT_POSTED,delivery.onAlarm(batch.hash).attempted.single().status,action)
+            assertTrue(platform.postCalls.isEmpty(),action);assertTrue(platform.notices.isEmpty(),action)
+            assertEquals(if(action == "start") 1 else 0,t.data().sessions.size)
+            val fresh = ScheduleDelivery(Tracker(reopen(t.store),clock),receipts,platform) { java.time.ZoneId.of("UTC") }
+            fresh.onAlarm(batch.hash);assertEquals(ScheduleAttemptStatus.NOT_POSTED,fresh.attempts().single().status)
+            assertTrue(platform.postCalls.isEmpty(),action)
+        }
+    }
+    @Test fun scheduleFinalPostSerializesWithConcurrentDomainCommandsWithoutWritingFacts() {
+        val clock = FakeClock(wall = Instant.parse("2026-10-10T09:00:00Z").toEpochMilli());val t = Tracker(createStore(),clock)
+        val rule = ScheduleRule(Classification(),"2026-10-10",extraDates = setOf("2026-10-10"),localTime = "10:00",alertsEnabled = true,reminderTime = "09:30")
+        t.scheduleCommand(ScheduleCommand("create",t.snapshot().token,ScheduleAction.CREATE,"a",rule = rule))
+        val receipts = ScheduleDeliveryFixtureStore();val platform = ScheduleDeliveryFixturePlatform()
+        val delivery = ScheduleDelivery(t,receipts,platform) { java.time.ZoneId.of("UTC") };val batch = delivery.synchronize().next!!
+        val before = t.data();val command = ScheduleCommand("concurrent-opt-out",t.snapshot().token,ScheduleAction.SET_STATE,"a",1,state = ScheduleState.ARCHIVED)
+        clock.advance(30*60_000)
+        val entered = CountDownLatch(1);val finish = CountDownLatch(1);val writerStarted = CountDownLatch(1)
+        platform.postAction = { _,_ -> entered.countDown();check(finish.await(5,java.util.concurrent.TimeUnit.SECONDS));true }
+        val pool = Executors.newFixedThreadPool(2)
+        try {
+            val post = pool.submit<ScheduleDeliveryReport> { delivery.onAlarm(batch.hash) }
+            assertTrue(entered.await(5,java.util.concurrent.TimeUnit.SECONDS))
+            val writer = pool.submit<Unit> { writerStarted.countDown();t.scheduleCommand(command);Unit }
+            assertTrue(writerStarted.await(5,java.util.concurrent.TimeUnit.SECONDS))
+            assertFailsWith<java.util.concurrent.TimeoutException> { writer.get(150,java.util.concurrent.TimeUnit.MILLISECONDS) }
+            finish.countDown();post.get(5,java.util.concurrent.TimeUnit.SECONDS);writer.get(5,java.util.concurrent.TimeUnit.SECONDS)
+            assertEquals(1,platform.postCalls.size);assertEquals(ScheduleAttemptStatus.POSTED,receipts.persisted.attempts.single().status)
+            assertEquals(before.revision+1,t.data().revision) // Only the explicit archive command changed the domain.
+            assertTrue(t.data().sessions.isEmpty());assertTrue(t.data().segments.isEmpty())
+            assertEquals(ScheduleState.ARCHIVED,t.data().schedule.series.single().state)
+        } finally { finish.countDown();pool.shutdownNow();pool.awaitTermination(5,java.util.concurrent.TimeUnit.SECONDS) }
+    }
     @Test fun liveTimerKeepsCompletedHistoryIndexProof() {
         val clock = FakeClock();val t = Tracker(createStore(),clock)
         repeat(12) { i -> t.manual(t.snapshot().token,clock.wall-30000+i*2000,clock.wall-29000+i*2000,Classification(name = "Saved $i")) }

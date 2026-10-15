@@ -86,6 +86,22 @@ class ScheduleDeliveryTest {
         assertEquals(1,t.data().sessions.size);assertEquals(1,t.data().schedule.links.size);assertTrue(platform.visible().isEmpty())
         assertEquals("2026-10-11",delivery.synchronize().next!!.tickets.single().key.originalDate)
     }
+    @Test fun rendererOptOutOfCurrentSeriesIsRejectedBeforeNotifyInsteadOfCancellingAfterPost() = fixture { context,t,clock ->
+        channel(context);shadowOf(context).grantPermissions(Manifest.permission.POST_NOTIFICATIONS)
+        val mutating = ScheduleNoticeFactory { c,ticket,projection ->
+            val rule = t.data().schedule.series.single().revisions.last().rule.copy(alertsEnabled = false)
+            t.scheduleCommand(ScheduleCommand("render-opt-out",t.snapshot().token,ScheduleAction.UPDATE_FUTURE,"a",1,
+                rule = rule,effectiveFrom = "2026-10-10"))
+            renderer.create(c,ticket,projection)
+        }
+        val platform = AndroidScheduleDeliveryPlatform(context) { mutating }
+        val delivery = ScheduleDelivery(t,AndroidScheduleDeliveryStore(context),platform) { ZoneId.of("UTC") }
+        val batch = delivery.synchronize().next!!;clock.advance(30*60_000)
+        assertEquals(ScheduleAttemptStatus.NOT_POSTED,delivery.onAlarm(batch.hash).attempted.single().status)
+        assertEquals(ScheduleAttemptStatus.NOT_POSTED,delivery.attempts().single().status)
+        assertTrue(platform.visible().isEmpty());assertTrue(t.data().sessions.isEmpty())
+        assertFalse(t.data().schedule.series.single().revisions.last().rule.alertsEnabled)
+    }
     @Test fun backgroundWakeCannotInitializeAMissingDataset() = fixture { context,t,_ ->
         channel(context);shadowOf(context).grantPermissions(Manifest.permission.POST_NOTIFICATIONS)
         val delivery = ScheduleDelivery(t,AndroidScheduleDeliveryStore(context),AndroidScheduleDeliveryPlatform(context) { renderer }) { ZoneId.of("UTC") }

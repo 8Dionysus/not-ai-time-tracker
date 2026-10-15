@@ -74,15 +74,19 @@ class AndroidScheduleDeliveryPlatform(context: Context,private val factory: ()->
         val pending = PendingIntent.getBroadcast(context,0,intent(),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_NO_CREATE) ?: return
         context.getSystemService(AlarmManager::class.java).cancel(pending)
     }
-    override fun post(ticket: ScheduleReminderTicket,projection: ScheduleProjection): Boolean {
-        if(!availability().ready) return false
-        val render = factory() ?: return false
+    override fun prepare(ticket: ScheduleReminderTicket,projection: ScheduleProjection): PreparedScheduleNotice? {
+        if(!availability().ready) return null
+        val render = factory() ?: return null
         val notification = render.create(context,ticket,projection)
-        if(notification.channelId != CHANNEL || !availability().ready) return false
+        if(notification.channelId != CHANNEL) return null
         if(notification.extras == null) notification.extras = android.os.Bundle()
         notification.extras.putString(TICKET,codec.encodeToString(ticket))
-        context.getSystemService(NotificationManager::class.java).notify(TAG+ticket.identity,NOTICE,notification)
-        return true // notify returned; not an OS/user visibility acknowledgement.
+        return PreparedScheduleNotice {
+            if(!availability().ready) false else {
+                context.getSystemService(NotificationManager::class.java).notify(TAG+ticket.identity,NOTICE,notification)
+                true // notify returned; not an OS/user visibility acknowledgement.
+            }
+        }
     }
     override fun visible(): List<ScheduleReminderTicket> = context.getSystemService(NotificationManager::class.java).activeNotifications.mapNotNull { n ->
         if(n.id != NOTICE || n.tag?.startsWith(TAG) != true) return@mapNotNull null

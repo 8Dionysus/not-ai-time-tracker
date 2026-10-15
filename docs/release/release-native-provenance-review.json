@@ -1,0 +1,72 @@
+{
+  "reviewed_at": "2026-10-15T06:43:00Z",
+  "target": "androidx.graphics:graphics-path:1.0.1 native payload in Tracker release APK",
+  "previous_review_preserved": "/workspace/shared/tracker-release-preparation-2026-10-15/native-source-license-review.json",
+  "scope": "Read-only primary-source review; no dependency/code changes; no legal conclusion",
+  "artifact_facts_from_previous_verified_review": {
+    "aar_sha256": "8ca4032b6d79b351f0b59ad4b580eddbb9423e1652f7c958830687f1eee2ec03",
+    "native_entries": [
+      "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "lib/armeabi-v7a/libandroidx.graphics.path.so",
+      "lib/x86/libandroidx.graphics.path.so",
+      "lib/x86_64/libandroidx.graphics.path.so"
+    ],
+    "ndk": "r25c / build 9519653",
+    "clang_lld": "14.0.7; LLVM toolchain commit 4c603efb0cca074e9238af8b4106c30add4418f6",
+    "dt_needed": ["libm.so", "libdl.so", "libc.so"],
+    "no_libcxx_shared_needed": true,
+    "caveat": "Dynamic dependency evidence cannot exclude statically linked archive members."
+  },
+  "new_primary_evidence": [
+    {
+      "subject": "AndroidX release-to-source commit range",
+      "source": "Official AndroidX Graphics release notes",
+      "url": "https://developer.android.com/jetpack/androidx/releases/graphics#graphics-path",
+      "observed": {
+        "release": "graphics-path 1.0.1",
+        "release_date": "2024-05-01",
+        "release_note": "Version 1.0.1 contains these commits; bug-fix entry: Improvements to compiler flags.",
+        "official_source_range": "4fcd99eacd92d7c73fb1d3580fd423ed7704a98a..8a05a22af450d589ef911d772a001a49dcb05b71",
+        "scope_path": "graphics/graphics-path"
+      },
+      "range_url_from_release_page": "https://android.googlesource.com/platform/frameworks/support/%2Blog/4fcd99eacd92d7c73fb1d3580fd423ed7704a98a..8a05a22af450d589ef911d772a001a49dcb05b71/graphics/graphics-path",
+      "access_result": "Official release-note link was followed once; Gitiles fetch returned HTTP 403 Forbidden. No retries, mirror substitution, or access-control bypass attempted.",
+      "assessment": "This is authoritative release-specific source-history linkage and supersedes treating commit 794e3806700833665f48f56f7dd3581642a6057f as the only available provenance. It identifies the release's source change range, but does not itself attest that the published AAR's four ELF files are reproducible from that range or expose the release build command/toolchain inputs."
+    },
+    {
+      "subject": "Compiler identity is separate from runtime inclusion",
+      "source": "Official Android Gitiles LLVM project commit",
+      "url": "https://android.googlesource.com/toolchain/llvm-project/%2B/4c603efb0cca074e9238af8b4106c30add4418f6",
+      "observed": "The commit page identifies LLVM source revision 4c603efb0cca074e9238af8b4106c30add4418f6 and describes a merge/update to LLVM r450784. This corroborates the compiler/toolchain revision recorded in the ELF, not the AndroidX native source revision and not which runtime archive members entered the ELF."
+    },
+    {
+      "subject": "C++ runtime defaults and license family",
+      "source": "Official Android NDK C++ library support documentation",
+      "url": "https://developer.android.com/ndk/guides/cpp-support",
+      "observed": "The documentation says CMake defaults to c++_static, libc++ is available as static libc++_static.a or shared libc++_shared.so, and identifies the LLVM Project license as Apache License 2.0 with LLVM Exceptions. It also states that the no-STL option has no linking or licensing requirements.",
+      "scope_limit": "This current guide establishes the documented runtime choices/default and license family, not the exact historical 1.0.1 build configuration or whether any archive object was retained in this stripped release binary."
+    }
+  ],
+  "refined_findings": {
+    "androidx_source_provenance": "PARTIALLY RESOLVED: official release notes now map 1.0.1 to the exact graphics-path commit range above. The previously inspected historical mirror snapshot at 794e3806700833665f48f56f7dd3581642a6057f remains useful source-header context, but it is not an exact substitute for inspecting the 1.0.1 range.",
+    "published_binary_to_source_attestation": "OPEN: no build attestation, native source archive, exact link command, or reproducibility record was present in the already inspected AAR/source metadata. The 1.0.1 source JAR has Kotlin files only, as documented in the preserved review.",
+    "static_runtime_inclusion": "OPEN: libc++_shared.so is not a DT_NEEDED library, but CMake's documented default is c++_static. This makes static C++ runtime inclusion a possibility if that default applied and archive members were needed; neither condition has been established for this release. The existing ELF symbol and DT_NEEDED observations do not prove absence of static libc++, libc++abi, libunwind, or compiler-rt code.",
+    "runtime_license_obligations": "NOT DETERMINED: if LLVM runtime code is incorporated, Android's NDK documentation identifies Apache-2.0 WITH LLVM-exception as the LLVM license family; the actual included component(s), applicable third-party notices, and required notice set cannot be assigned without release build/link evidence or identifiable linked archive members. The POM's Apache-2.0 label is not used to close this question.",
+    "exact_historical_license_text": "The previous review recorded that direct exact-commit LICENSE.TXT retrievals for libc++, libc++abi, libunwind, and compiler-rt returned 403. This review did not retry those URLs or seek a substitute route; exact historical texts and file contents remain unverified."
+  },
+  "release_decision_relevance": "The uncertainty is now narrower: AndroidX publicly identifies the source change range, while the remaining material gap is the source-range contents/binary build binding plus exact linked runtime objects/notices. Do not claim native release-license clearance or no runtime obligations from POM metadata or the absence of libc++_shared.so alone.",
+  "sources": [
+    {
+      "title": "AndroidX Graphics release notes",
+      "url": "https://developer.android.com/jetpack/androidx/releases/graphics#graphics-path"
+    },
+    {
+      "title": "Official Android Gitiles LLVM commit 4c603efb0cca074e9238af8b4106c30add4418f6",
+      "url": "https://android.googlesource.com/toolchain/llvm-project/%2B/4c603efb0cca074e9238af8b4106c30add4418f6"
+    },
+    {
+      "title": "Android NDK C++ library support",
+      "url": "https://developer.android.com/ndk/guides/cpp-support"
+    }
+  ]
+}

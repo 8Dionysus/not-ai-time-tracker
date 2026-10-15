@@ -47,9 +47,9 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
             if(state.copies.none { it.path == path }) items += PrivateCopy(payloadHash(path),kind,"UNREGISTERED",0,"",emptyList(),setOf(CopyBlocker.UNKNOWN_FILE_OR_STATE))
         }
         if(files.stat("recovery-pending.json") != null) items += PrivateCopy("recovery-journal",CopyKind.RECOVERY_JOURNAL,"PENDING",0,"",emptyList(),setOf(CopyBlocker.REQUIRED_BY_PENDING_RECOVERY))
-        val recoveryCopies = items.count { it.kind in setOf(CopyKind.ROLLBACK,CopyKind.DATABASE_ARCHIVE) }
+        val recoveryCopies = items.count { it.kind in setOf(CopyKind.ROLLBACK,CopyKind.DATABASE_ARCHIVE) && it.hardBlockers.isEmpty() }
         CopyInventory(state.revision,System.currentTimeMillis(),items.map {
-            if(recoveryCopies == 1 && it.kind in setOf(CopyKind.ROLLBACK,CopyKind.DATABASE_ARCHIVE)) it.copy(confirmableWarnings = it.confirmableWarnings+CopyWarning.LAST_RECOVERY_COPY) else it
+            if(recoveryCopies == 1 && it.hardBlockers.isEmpty() && it.kind in setOf(CopyKind.ROLLBACK,CopyKind.DATABASE_ARCHIVE)) it.copy(confirmableWarnings = it.confirmableWarnings+CopyWarning.LAST_RECOVERY_COPY) else it
         })
     }
     override fun operations(): List<CleanupJournal> = maintenance { gate.state().journals }

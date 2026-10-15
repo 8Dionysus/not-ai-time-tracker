@@ -40,6 +40,21 @@ class DescriptorCleanupTest {
         assertEquals(setOf(CopyBlocker.UNKNOWN_FILE_OR_STATE),inventory.items.single { it.id != item.id }.hardBlockers)
         assertEquals("unregistered fixture; preserve",unknown.readText())
     }
+    @Test fun referencedRecoveryCopyCannotHideLastUnusedCopyWarning() = fixture { root,_,gate,storage ->
+        fun rollback(name: String): PrivateCopy {
+            val file = File(root,"rollback/$name.json").apply { parentFile.mkdirs();writeText("fixture $name") }
+            val members = listOf(CopyMember("data",file.length(),sha256(file.readBytes())))
+            val item = PrivateCopy(newId(),CopyKind.ROLLBACK,"VERIFIED",file.length(),payloadHash(members),members)
+            storage.seal(item,"rollback/${file.name}",false,mapOf("data" to file.name));return item
+        }
+        val active = rollback("active");val unused = rollback("unused")
+        val ref = gate.acquire("fixture-restore",active.id,CopyBlocker.RESTORE_SOURCE_IN_USE)
+        val inventory = storage.inventory()
+        assertTrue(CopyBlocker.RESTORE_SOURCE_IN_USE in inventory.items.single { it.id == active.id }.hardBlockers)
+        assertTrue(CopyWarning.LAST_RECOVERY_COPY in inventory.items.single { it.id == unused.id }.confirmableWarnings)
+        gate.release(ref)
+        assertTrue(storage.inventory().items.all { CopyWarning.LAST_RECOVERY_COPY !in it.confirmableWarnings })
+    }
     @Test fun explicitChoiceDurableReceiptAndExactGroup() = fixture { root,files,gate,storage ->
         val item = seal(root,storage);val cleanup = PrivateCopyCleanup(storage);val inv = cleanup.inventory()
         val p = cleanup.preview(inv.revision,setOf(item.id));val c = confirmation(p)

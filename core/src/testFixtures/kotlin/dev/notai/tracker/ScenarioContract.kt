@@ -82,6 +82,8 @@ abstract class ScenarioContract {
         assertEquals(1,pack.groups.size);assertTrue(pack.groups.single().content.types.size < source.data().types.size)
         var target = Tracker(createStore(),clock);var importer = SelectiveTransfer(target)
         val plan = importer.plan(pack,pack.groups.map { it.id }.toSet());assertTrue(plan.conflicts.isEmpty())
+        assertFails { (plan.groups as MutableList<TransferGroup>).clear() }
+        assertFails { (plan.groups.single().content.sessions as MutableList<Session>).clear() }
         val done = importer.apply(plan,"op");assertTrue(done.complete);assertFalse(done.partial);assertEquals(session,target.data().sessions.single())
         assertEquals(done,importer.apply(plan,"op"));target = Tracker(reopen(target.store),clock);importer = SelectiveTransfer(target)
         assertEquals(done,importer.resume("op"))

@@ -99,18 +99,19 @@ class SelectiveTransfer(private val tracker: Tracker) {
     fun inspect(text: String): TransferInspection = try { inspect(codec.decodeFromString<SelectivePackage>(text)) }
         catch(e: CoreError) { throw e } catch(_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed selective package") }
     fun inspect(value: SelectivePackage): TransferInspection {
-        ensure(value.formatVersion == 1 && value.minimumReader == 1 && value.sourceDatasetId.isNotBlank() && value.transferId.isNotBlank(),"Unsupported selective package",ErrorCode.UNSUPPORTED_IMPORT)
-        ensure(value.groups.isNotEmpty() && value.groups.map { it.id }.distinct().size == value.groups.size && value.groups.map { it.originId }.distinct().size == value.groups.size,"Duplicate/empty transfer groups")
-        value.groups.forEach { ensure(it.id.isNotBlank() && it.originId.isNotBlank() && it.sourceRevision >= 0 && payloadHash(it.content) == it.hash && it.entities == entityManifest(it.content,it.sourceRevision,it.originId),"Transfer hash/manifest mismatch");validateContent(it.content) }
-        return TransferInspection(value.transferId,value.groups,value.losses,value.groups.flatMap { it.content.sessions }.filter { it.status != SessionStatus.STOPPED }.map { it.id }.toSet())
+        val snapshot = value.frozen()
+        ensure(snapshot.formatVersion == 1 && snapshot.minimumReader == 1 && snapshot.sourceDatasetId.isNotBlank() && snapshot.transferId.isNotBlank(),"Unsupported selective package",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(snapshot.groups.isNotEmpty() && snapshot.groups.map { it.id }.distinct().size == snapshot.groups.size && snapshot.groups.map { it.originId }.distinct().size == snapshot.groups.size,"Duplicate/empty transfer groups")
+        snapshot.groups.forEach { ensure(it.id.isNotBlank() && it.originId.isNotBlank() && it.sourceRevision >= 0 && payloadHash(it.content) == it.hash && it.entities == entityManifest(it.content,it.sourceRevision,it.originId),"Transfer hash/manifest mismatch");validateContent(it.content) }
+        return TransferInspection(snapshot.transferId,snapshot.groups,snapshot.losses,frozenSet(snapshot.groups.flatMap { it.content.sessions }.filter { it.status != SessionStatus.STOPPED }.map { it.id }))
     }
     fun plan(value: SelectivePackage,groupIds: Set<String>,policies: Map<String,TransferConflictPolicy> = emptyMap()): TransferPlan {
         // Deep-copy the inspected source at the trust boundary; subsequent caller edits cannot change preview.
-        val frozen = codec.decodeFromString<SelectivePackage>(codec.encodeToString(value));inspect(frozen)
+        val frozen = codec.decodeFromString<SelectivePackage>(codec.encodeToString(value)).frozen();inspect(frozen)
         ensure(groupIds.isNotEmpty() && groupIds.all { id -> frozen.groups.any { it.id == id } } && policies.keys.all { it in groupIds },"Invalid group selection")
-        val selected = frozen.copy(groups = frozen.groups.filter { it.id in groupIds });val d = tracker.data()
+        val selected = frozen.copy(groups = frozenList(frozen.groups.filter { it.id in groupIds }));val d = tracker.data()
         val conflicts = selected.groups.mapNotNull { group -> conflict(d,group)?.let { TransferConflict(group.id,it) } }
-        return TransferPlan(tracker,selected,token(d),policies.toMap(),conflicts)
+        return TransferPlan(tracker,selected,token(d),frozenMap(policies),frozenList(conflicts))
     }
     fun preview(plan: TransferPlan): TransferPlan { ensure(plan.owner === tracker,"Wrong transfer owner");checkToken(tracker.data(),plan.expected,tracker.clock.now());return plan }
     fun apply(plan: TransferPlan,operationId: String): TransferOperation = storage { applyInternal(plan,operationId) }
@@ -257,3 +258,6 @@ internal fun validateTransfer(d: Dataset) {
     d.transfer.origins.forEach { ensure(it.originId.isNotBlank() && it.hash.matches(Regex("[0-9a-f]{64}")) && payloadHash(it.localGroup) == it.localHash,"Invalid transfer provenance") }
     d.transfer.operations.forEach { op -> op.groups.forEach { ensure(payloadHash(it.group.content) == it.group.hash && it.group.entities == SelectiveTransfer.entityManifest(it.group.content,it.group.sourceRevision,it.group.originId),"Transfer journal hash mismatch");SelectiveTransfer.validateContent(it.group.content) };ensure(op.id.isNotBlank() && op.hash.length == 128 && op.nextRevision >= 0 && op.groups.map { it.group.id }.distinct().size == op.groups.size,"Invalid transfer journal") }
 }
+
+private fun SelectivePackage.frozen(): SelectivePackage = copy(
+    groups = frozenList(groups.map { it.copy(content = it.content.frozen(),entities = frozenList(it.entities)) }),losses = frozenList(losses))

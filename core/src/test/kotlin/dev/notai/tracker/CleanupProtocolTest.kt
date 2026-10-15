@@ -31,6 +31,8 @@ class CleanupProtocolTest {
     @Test fun warningsLastCopyAndIdempotencyAreSeparate() {
         val storage = Storage();storage.live["last"] = item("last",setOf(CopyWarning.LAST_RECOVERY_COPY))
         val cleanup = PrivateCopyCleanup(storage);val preview = cleanup.preview(1,setOf("last"));assertEquals(0,storage.unlinkCount)
+        assertFails { (preview.items as MutableList<PrivateCopy>).clear() }
+        assertFails { (preview.items.single().members as MutableList<CopyMember>).clear() }
         val confirmation = confirmation(preview)
         assertFailsWith<CoreError> { cleanup.confirm(confirmation.copy(lastCopyAcknowledged = emptySet())) }
         assertEquals(0,storage.unlinkCount)

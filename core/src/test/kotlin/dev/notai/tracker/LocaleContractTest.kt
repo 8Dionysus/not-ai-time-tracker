@@ -36,7 +36,10 @@ class LocaleContractTest {
         val key = CatalogLabelKey("catalog","activity",1,"es")
         val reviewed = CatalogTranslation(key,"Actividad",quality = TranslationQuality.REVIEWED,availability = PackAvailability.AVAILABLE_OFFLINE,
             sourceLocale = "ru",release = "fixture",sha256 = "a".repeat(64),license = "Apache-2.0",authority = "test fixture")
-        val labels = CatalogLabels(listOf(reviewed,reviewed.copy(key = key.copy(localeTag = "zh-Hans"),label = "fixture only")))
+        val aliases = mutableListOf("fixture alias")
+        val labels = CatalogLabels(listOf(reviewed.copy(aliases = aliases),reviewed.copy(key = key.copy(localeTag = "zh-Hans"),label = "fixture only")))
+        aliases[0] = "changed outside adapter"
+        assertEquals(listOf("fixture alias"),labels.label("catalog","activity",1,"Original","es").translation!!.aliases)
         assertEquals("Actividad",labels.label("catalog","activity",1,"Original","es-MX").displayLabel)
         assertTrue(labels.label("catalog","activity",2,"Changed meaning","es").missing)
         assertTrue(labels.label("catalog","activity",1,"Original","zh-Hant").missing)

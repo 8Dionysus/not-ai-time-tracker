@@ -32,7 +32,7 @@ fun localeFallbacks(raw: String): List<String> {
     return (listOf(tag) + when(tag) { "es-MX" -> listOf("es-419","es"); else -> listOf(locale.language) }).distinct()
 }
 class CatalogLabels(translations: List<CatalogTranslation>) {
-    private val entries = translations.onEach {
+    private val entries = translations.map { it.copy(aliases = frozenList(it.aliases)) }.onEach {
         ensure(it.key.localeTag == localeTag(it.key.localeTag) && it.key.meaningVersion > 0 && it.label.isNotBlank(),"Invalid translation")
         ensure(it.sha256.matches(Regex("[0-9a-f]{64}")) && it.release.isNotBlank() && it.license.isNotBlank() && it.authority.isNotBlank(),"Missing translation provenance")
     }.associateBy { it.key }.also { ensure(it.size == translations.size,"Duplicate translation key") }

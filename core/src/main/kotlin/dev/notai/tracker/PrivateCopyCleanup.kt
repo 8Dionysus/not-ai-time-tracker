@@ -42,15 +42,17 @@ interface PrivateCopyStorage {
 /** Manual-only cleanup protocol. Constructor and reads never resume deletion after a crash. */
 class PrivateCopyCleanup(private val storage: PrivateCopyStorage) {
     private val previews = mutableMapOf<String,CleanupPreview>()
-    fun inventory(): CopyInventory = storage.maintenance { storage.inventory() }
+    fun inventory(): CopyInventory = storage.maintenance { storage.inventory().let { it.copy(items = frozenList(it.items.map { item -> item.frozenCopy() })) } }
     fun preview(expectedRevision: Long,itemIds: Set<String>): CleanupPreview = storage.maintenance {
+        val ids = itemIds.toSet()
         val live = storage.inventory();ensure(live.revision == expectedRevision,"Cleanup preview stale",ErrorCode.STALE)
-        ensure(itemIds.isNotEmpty() && itemIds.all { id -> live.items.any { it.id == id } },"Unknown/empty cleanup selection")
+        ensure(ids.isNotEmpty() && ids.all { id -> live.items.any { it.id == id } },"Unknown/empty cleanup selection")
         ensure(storage.operations().none { it.phase !in setOf(CleanupPhase.DONE,CleanupPhase.RESTORED) },"Cleanup interrupted; reconcile first",ErrorCode.STORAGE)
-        val selected = live.items.filter { it.id in itemIds };ensure(selected.all { it.selectable },"Selected copy is protected")
-        CleanupPreview(this,newId(),live.revision,selected.toList()).also { previews[it.id] = it }
+        val selected = live.items.filter { it.id in ids };ensure(selected.all { it.selectable },"Selected copy is protected")
+        CleanupPreview(this,newId(),live.revision,frozenList(selected.map { it.frozenCopy() })).also { previews[it.id] = it }
     }
-    fun confirm(c: CleanupConfirmation): CleanupJournal = storage.maintenance {
+    fun confirm(confirmation: CleanupConfirmation): CleanupJournal = storage.maintenance {
+        val c = codec.decodeFromString<CleanupConfirmation>(codec.encodeToString(confirmation))
         val hash = payloadHash(c.copy(itemHashes = c.itemHashes.toSortedMap(),warningsAcknowledged = c.warningsAcknowledged.sortedWith(compareBy<WarningAcknowledgement> { it.itemId }.thenBy { it.warning.name }).toSet(),lastCopyAcknowledged = c.lastCopyAcknowledged.sorted().toSet()))
         storage.operations().find { it.commandKey == c.idempotencyKey }?.let { old ->
             ensureReason(old.payloadHash == hash,ErrorReason.IDEMPOTENCY_CONFLICT,ErrorCode.STALE,mapOf("operationId" to ErrorArgument.Identifier(old.operationId)));return@maintenance reconcile(old)
@@ -119,3 +121,6 @@ class PrivateCopyCleanup(private val storage: PrivateCopyStorage) {
         }
     }
 }
+
+private fun PrivateCopy.frozenCopy(): PrivateCopy = copy(members = frozenList(members),hardBlockers = frozenSet(hardBlockers),
+    confirmableWarnings = frozenSet(confirmableWarnings),missingLiveEntityIds = frozenSet(missingLiveEntityIds))

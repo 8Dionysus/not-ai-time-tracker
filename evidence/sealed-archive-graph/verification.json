@@ -1,0 +1,46 @@
+{
+  "sourceCommit": "23ab7a015e8e89fccfa40efb912c4b94ed018a72",
+  "baseline": "add6312c00296c804fbb707f80b1b94f3a34fe50",
+  "core": {
+    "tests": 51,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "androidMetadata": {
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "execution": "Robolectric API35; host filesystem, not Android device"
+  },
+  "nativeAndroidAbis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "nativeExecutionClaim": "compiled only; host JNI fixtures passed; no Android runtime/filesystem claim",
+  "productionDeletionEnabled": false,
+  "metadataFormat": 2,
+  "roomSchema": 7,
+  "archiveFormat": 9,
+  "commands": [
+    "./gradlew :core:test :app:testDebugUnitTest --tests dev.notai.tracker.android.PrivateCopyMetadataTest -PtrackerCleanupLibrary=<fresh-host-library> -Pkotlin.compiler.execution.strategy=in-process",
+    "./gradlew :app:externalNativeBuildDebug -PtrackerUnsigned=true -Pkotlin.compiler.execution.strategy=in-process"
+  ],
+  "files": {
+    "android-metadata/TEST-dev.notai.tracker.android.PrivateCopyMetadataTest.xml": "711972c6b1de084aa3b6779d73f21e6b98f5adf487adb03f35b08c9d02e89352",
+    "core/TEST-dev.notai.tracker.BackupWriteLimitTest.xml": "a5a7fc2b1e64f1ff21a9723e75036a6dc2dae4056499f84a2e2ae5057e2fdd9b",
+    "core/TEST-dev.notai.tracker.ChoiceWindowTest.xml": "c43bd2734fd3f77e83c5108128d8937194128a94af520670f89212f18ed2a016",
+    "core/TEST-dev.notai.tracker.CleanupProtocolTest.xml": "919a11ee616f15cc4318820346ff113398545bc9bb8dabc073d6b7b98459b491",
+    "core/TEST-dev.notai.tracker.CoreScenariosTest.xml": "cc6b387bae544a529d5a8faab1fb85197893546df17273ef48668f3e8c893dd8",
+    "core/TEST-dev.notai.tracker.CsvSourceLocaleTest.xml": "1369ffae106d02248ec124765888d5444a24437b51d8dbb306fb39ddf7876cde",
+    "core/TEST-dev.notai.tracker.DescriptorCleanupTest.xml": "0c0c8ec71eeb45829d7629ee3295887ef813d96c2cf908d36d8a82a2e76a167e",
+    "core/TEST-dev.notai.tracker.ImportIssuesTest.xml": "395a6fff29497cca998c73d471380f8e8f2b95d230cc2fba52f2fd2a81ee979a",
+    "core/TEST-dev.notai.tracker.LocaleContractTest.xml": "7abdb3659c6343bce6598d5c3f2a05a0a5920c448ecd3839cd42470edf8a24e0",
+    "core/TEST-dev.notai.tracker.SealedArchiveGraphTest.xml": "94f9bcd0daf42e91d15af35535323cb59b1b0999e2d427579a1d2b56a7c8cc4b",
+    "gradle.log": "856ff406b08cfeb51fd5770b5683e06f47db64f86d39a61aa65c8af889d126cc",
+    "native-android-four-abis.log": "c49ef7b54f98d01bef3ecc07af194cee193b871fb61d5ec5eee6357d5d4146bb"
+  }
+}

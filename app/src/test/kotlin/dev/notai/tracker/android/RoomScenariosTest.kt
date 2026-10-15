@@ -214,7 +214,7 @@ class RoomScenariosTest: ScenarioContract() {
             org.junit.Assert.assertEquals(expected,store.read())
             org.junit.Assert.assertEquals(count,store.read().sessions.map { it.id }.toSet().size)
             val migrated = databases.getValue(store).second.openHelper.readableDatabase
-            org.junit.Assert.assertEquals(6,migrated.version)
+            org.junit.Assert.assertEquals(TRACKER_DATABASE_VERSION,migrated.version)
             for(table in listOf("sessions","segments")) {
                 val after = migrated.query("SELECT id,position FROM $table ORDER BY position,id").use { c -> buildList { while(c.moveToNext()) add(c.getString(0) to c.getInt(1)) } }
                 org.junit.Assert.assertEquals(positions[table],after)

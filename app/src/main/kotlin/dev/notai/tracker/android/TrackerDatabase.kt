@@ -64,7 +64,8 @@ data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId
     @Query("DELETE FROM measurements WHERE id IN (:ids)") fun deleteMeasurements(ids: List<String>)
     @Query("SELECT * FROM measurements WHERE id IN (:ids)") fun readMeasurements(ids: List<String>): List<MeasurementRow>
 }
-@Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class,GenerationRow::class,VocabularyRow::class,ClassificationRow::class],version = 7,exportSchema = true)
+const val TRACKER_DATABASE_VERSION = 7
+@Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class,GenerationRow::class,VocabularyRow::class,ClassificationRow::class],version = TRACKER_DATABASE_VERSION,exportSchema = true)
 abstract class TrackerDatabase: RoomDatabase() {
     abstract fun dao(): TrackerDao
     companion object {
@@ -156,7 +157,7 @@ abstract class TrackerDatabase: RoomDatabase() {
                 // SQLite may discard invalid sidecars before its corruption callback. Preserve
                 // them before opening. Clean closed stores without sidecars avoid this copy.
                 val storedVersion = if(validHeader) java.nio.ByteBuffer.wrap(header,60,4).int else null
-                if(!validHeader || storedVersion != 6 || existing.any { it != file })
+                if(!validHeader || storedVersion != TRACKER_DATABASE_VERSION || existing.any { it != file })
                     DatabaseArchives.capture(context,name)
                 ensure(validHeader,"Database header is damaged; originals preserved. Use explicit recovery",ErrorCode.STORAGE)
             }

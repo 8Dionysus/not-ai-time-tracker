@@ -8,7 +8,7 @@ Requested model configuration was gpt-6.1-sol/high; no independent runtime attes
 
 ## API deltas to connect
 
-- Use `Tracker.switchDraft(expected, selection, EntryDraft)` for an incoming text
+- Use `Tracker.switchDraft(expected, draft: EntryDraft)` for an incoming text
   switch. Session close/start and the incoming note commit once. Do not call
   `switch` followed by `label`. `switch(expected,selection,note=null)` also accepts
   an optional note atomically. A failed commit leaves the preceding session intact.
@@ -113,3 +113,11 @@ These remain open in main, even where an isolated unaccepted UI experiment exist
 Current resource facts: no ordinary-timer FGS or per-second DB writes; history graph
 and report/choice indexes grow with stored history. JVM timings/heap observations are
 not phone RAM, PSS, battery or a low-consumption acceptance claim.
+
+Build inputs for the new own-code JNI library: `core/src/main/c/private_copy_io.c`,
+Android.mk/Application.mk, NDK `30.0.16248370` (r30), C11, no selected C++ STL.
+The official Linux NDK archive was checked against its published size/SHA-1 before
+installation. The disabled F-Droid draft pins the same NDK and source code commit;
+fdroidserver is not installed here, so that recipe has not been accepted by its
+validator/build system. New native compilation does not resolve the separate
+AndroidX graphics-path release provenance/static-runtime notice questions.

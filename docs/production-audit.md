@@ -23,6 +23,7 @@ at `e8aa417`; it is not production acceptance or an instruction to merge it.
 | C01 | Durable registry/gate and descriptor-relative JNI storage implemented; four Android ABIs compile. | Host filesystem fault tests. Production deletion still unbound: Android descriptor QA, frontend durable-reference adoption, legacy registration and sealed archive hardlink graph remain required. |
 | C02/C03 | Reconcile interrupted rename/restore; inventory/reconciliation never unlinks. Only explicit resume finalizes empty quarantine. | Actual filesystem crash/failure fixtures. |
 | C04/R02 | Maintenance-before-runtime lock order; acquire durable writer refs under gate, stream ordinary I/O outside it. Rescue remains exclusive. | Long-writer fixture; backend writer wrappers. |
+| C06 | Unknown unsafe/non-ASCII filenames produce non-addressable opaque inventory markers, leaving safe siblings inspectable. They remain blocked and never become paths. | Unicode sibling fixture. |
 | C05 | Reject metadata UTF-8 overflow before replacing the previous readable journal. | Metadata overflow/reopen fixture. |
 | F01 | Focus side effects serialize capture of the current Tracker; cancel obsolete notification 43. | Room test covers Next/Stop/disable/revocation and delayed old callback. Legacy UI overloads queue a fresh runtime-owned IO refresh. |
 | U01 | `Tracker.switchDraft` commits switch and note atomically. | Shared Memory/Room injected-failure fixture. Existing UI caller migration is OPEN for Opus. |
@@ -67,16 +68,16 @@ Initial hashes identify the reviewed starting content; changed files need follow
 | `NOTICE` | `ae46ab41f736` | pending |
 | `README.md` | `88e23be8cc35` | pending |
 | `app/build.gradle.kts` | `762683c0354d` | pending |
-| `app/schemas/dev.notai.tracker.android.TrackerDatabase/1.json` | `d2ce971d7d97` | pending |
-| `app/schemas/dev.notai.tracker.android.TrackerDatabase/2.json` | `f8b482f96bc9` | pending |
-| `app/schemas/dev.notai.tracker.android.TrackerDatabase/3.json` | `aacce33a2aa0` | pending |
-| `app/schemas/dev.notai.tracker.android.TrackerDatabase/4.json` | `227eaa277713` | pending |
-| `app/schemas/dev.notai.tracker.android.TrackerDatabase/5.json` | `b3bd6649eaf1` | pending |
-| `app/schemas/dev.notai.tracker.android.TrackerDatabase/6.json` | `e8d5ad43f09a` | pending |
-| `app/schemas/dev.notai.tracker.android.TrackerDatabase/7.json` | `d2cded285f7c` | pending |
+| `app/schemas/dev.notai.tracker.android.TrackerDatabase/1.json` | `d2ce971d7d97` | structural parse only; semantic/device review not claimed |
+| `app/schemas/dev.notai.tracker.android.TrackerDatabase/2.json` | `f8b482f96bc9` | structural parse only; semantic/device review not claimed |
+| `app/schemas/dev.notai.tracker.android.TrackerDatabase/3.json` | `aacce33a2aa0` | structural parse only; semantic/device review not claimed |
+| `app/schemas/dev.notai.tracker.android.TrackerDatabase/4.json` | `227eaa277713` | structural parse only; semantic/device review not claimed |
+| `app/schemas/dev.notai.tracker.android.TrackerDatabase/5.json` | `b3bd6649eaf1` | structural parse only; semantic/device review not claimed |
+| `app/schemas/dev.notai.tracker.android.TrackerDatabase/6.json` | `e8d5ad43f09a` | structural parse only; semantic/device review not claimed |
+| `app/schemas/dev.notai.tracker.android.TrackerDatabase/7.json` | `d2cded285f7c` | structural parse only; semantic/device review not claimed |
 | `app/src/androidTest/kotlin/dev/notai/tracker/android/ArchiveInstrumentation.kt` | `b64442089e47` | pending |
 | `app/src/androidTest/kotlin/dev/notai/tracker/android/BackendNativeChecks.kt` | `d8cd2a23dfaa` | pending |
-| `app/src/main/AndroidManifest.xml` | `523dc2774dcb` | pending |
+| `app/src/main/AndroidManifest.xml` | `523dc2774dcb` | structural parse only; semantic/device review not claimed |
 | `app/src/main/assets/licenses/onest-OFL.txt` | `1b10b77bbd51` | pending |
 | `app/src/main/assets/licenses/project-Apache-2.0.txt` | `b1d2870f1a00` | pending |
 | `app/src/main/assets/licenses/release-runtime-index.json` | `3ba3773b53ce` | pending |
@@ -114,102 +115,102 @@ Initial hashes identify the reviewed starting content; changed files need follow
 | `app/src/main/kotlin/dev/notai/tracker/android/ui/Theme.kt` | `c95f93a55d10` | source read; follow-up/validation pending |
 | `app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt` | `62ad715b1e66` | source read; follow-up/validation pending |
 | `app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt` | `a425b113ffe6` | source read; follow-up/validation pending |
-| `app/src/main/res/drawable/act_article.xml` | `7326f9e019c4` | pending |
-| `app/src/main/res/drawable/act_bag.xml` | `2131f415e0ff` | pending |
-| `app/src/main/res/drawable/act_ball.xml` | `6a0cd16b5f25` | pending |
-| `app/src/main/res/drawable/act_bike.xml` | `f691522bc861` | pending |
-| `app/src/main/res/drawable/act_bolt.xml` | `0a0cc7d37f86` | pending |
-| `app/src/main/res/drawable/act_book.xml` | `c3a49514cef7` | pending |
-| `app/src/main/res/drawable/act_bus.xml` | `8c08e64e7b9c` | pending |
-| `app/src/main/res/drawable/act_camera.xml` | `55b36ca9b8d0` | pending |
-| `app/src/main/res/drawable/act_candle.xml` | `da68ed6cd750` | pending |
-| `app/src/main/res/drawable/act_card.xml` | `3d410d07c0af` | pending |
-| `app/src/main/res/drawable/act_cardio.xml` | `ec08cde7b661` | pending |
-| `app/src/main/res/drawable/act_cards.xml` | `4229778843eb` | pending |
-| `app/src/main/res/drawable/act_chart.xml` | `b283fb47996d` | pending |
-| `app/src/main/res/drawable/act_clean.xml` | `6e52e91c5f45` | pending |
-| `app/src/main/res/drawable/act_code.xml` | `557f9a2263c4` | pending |
-| `app/src/main/res/drawable/act_columns.xml` | `31a08adb237e` | pending |
-| `app/src/main/res/drawable/act_cook.xml` | `1f4bc23f2cd1` | pending |
-| `app/src/main/res/drawable/act_cube.xml` | `65cb6c66da98` | pending |
-| `app/src/main/res/drawable/act_cup.xml` | `865c200f98a0` | pending |
-| `app/src/main/res/drawable/act_custom.xml` | `e0c69dda6b83` | pending |
-| `app/src/main/res/drawable/act_dice.xml` | `b29bef6a2dff` | pending |
-| `app/src/main/res/drawable/act_drop.xml` | `9619615a4bc2` | pending |
-| `app/src/main/res/drawable/act_family.xml` | `6949764d46b5` | pending |
-| `app/src/main/res/drawable/act_feed.xml` | `afd674342eaa` | pending |
-| `app/src/main/res/drawable/act_flask.xml` | `46e5830ff8a0` | pending |
-| `app/src/main/res/drawable/act_focus.xml` | `42773adae993` | pending |
-| `app/src/main/res/drawable/act_food.xml` | `bdf592bcac5d` | pending |
-| `app/src/main/res/drawable/act_gamepad.xml` | `9aa036255916` | pending |
-| `app/src/main/res/drawable/act_headphones.xml` | `b518174007db` | pending |
-| `app/src/main/res/drawable/act_heart.xml` | `1ab26056ff5c` | pending |
-| `app/src/main/res/drawable/act_home.xml` | `71dee4fd4063` | pending |
-| `app/src/main/res/drawable/act_hourglass.xml` | `e3b66da220f0` | pending |
-| `app/src/main/res/drawable/act_language.xml` | `a41463b03a60` | pending |
-| `app/src/main/res/drawable/act_leaf.xml` | `236cdc5e5dc2` | pending |
-| `app/src/main/res/drawable/act_lotus.xml` | `ba40571320e8` | pending |
-| `app/src/main/res/drawable/act_mail.xml` | `6f0fbd398e73` | pending |
-| `app/src/main/res/drawable/act_medical.xml` | `e65b50f27287` | pending |
-| `app/src/main/res/drawable/act_meeting.xml` | `178f43aaf216` | pending |
-| `app/src/main/res/drawable/act_mic.xml` | `0083f08450a6` | pending |
-| `app/src/main/res/drawable/act_mountain.xml` | `59c7e2cd25cc` | pending |
-| `app/src/main/res/drawable/act_music.xml` | `ae0c16193055` | pending |
-| `app/src/main/res/drawable/act_palette.xml` | `cfa6add7695e` | pending |
-| `app/src/main/res/drawable/act_papers.xml` | `969c08052ff4` | pending |
-| `app/src/main/res/drawable/act_paw.xml` | `c5fd80bace09` | pending |
-| `app/src/main/res/drawable/act_pen.xml` | `7dbca2fcb1f9` | pending |
-| `app/src/main/res/drawable/act_people.xml` | `a7f638b335fc` | pending |
-| `app/src/main/res/drawable/act_phone.xml` | `c4d0b7205d49` | pending |
-| `app/src/main/res/drawable/act_run.xml` | `43c6fe3032b9` | pending |
-| `app/src/main/res/drawable/act_scissors.xml` | `906dfafddf1b` | pending |
-| `app/src/main/res/drawable/act_screen.xml` | `4fd937354955` | pending |
-| `app/src/main/res/drawable/act_server.xml` | `a127604ffafd` | pending |
-| `app/src/main/res/drawable/act_shield.xml` | `29d32bc30736` | pending |
-| `app/src/main/res/drawable/act_shirt.xml` | `440e95301b4b` | pending |
-| `app/src/main/res/drawable/act_sleep.xml` | `e09e808ab563` | pending |
-| `app/src/main/res/drawable/act_snow.xml` | `94ca101cc8ef` | pending |
-| `app/src/main/res/drawable/act_sofa.xml` | `74aaec8d8b85` | pending |
-| `app/src/main/res/drawable/act_steps.xml` | `e32cd2388679` | pending |
-| `app/src/main/res/drawable/act_strength.xml` | `51c927d185e3` | pending |
-| `app/src/main/res/drawable/act_study.xml` | `8a3ff5fd7b6a` | pending |
-| `app/src/main/res/drawable/act_teach.xml` | `521ef1b720a1` | pending |
-| `app/src/main/res/drawable/act_ticket.xml` | `fe6ddf4d6ea5` | pending |
-| `app/src/main/res/drawable/act_tools.xml` | `2fbcd1f5850b` | pending |
-| `app/src/main/res/drawable/act_unclassified.xml` | `ebddd47f87bc` | pending |
-| `app/src/main/res/drawable/act_water.xml` | `60055918efc5` | pending |
-| `app/src/main/res/drawable/act_work.xml` | `71d31f5743d9` | pending |
-| `app/src/main/res/drawable/ic_launcher_foreground.xml` | `5aea1cda053b` | pending |
-| `app/src/main/res/drawable/ic_launcher_monochrome.xml` | `765f8380edbb` | pending |
-| `app/src/main/res/drawable/ic_pause.xml` | `4049293135cc` | pending |
-| `app/src/main/res/drawable/ic_play.xml` | `41ecae89645b` | pending |
-| `app/src/main/res/drawable/ic_shortcut.xml` | `ecb422afdce3` | pending |
-| `app/src/main/res/drawable/ic_stat_notai.xml` | `5d30dc885277` | pending |
-| `app/src/main/res/drawable/ic_stop.xml` | `71e1edf267a5` | pending |
-| `app/src/main/res/drawable/surface_button_primary.xml` | `193636b6b812` | pending |
-| `app/src/main/res/drawable/surface_button_tonal.xml` | `8c270f0fd1bc` | pending |
-| `app/src/main/res/drawable/surface_chip.xml` | `b8ff07ec637e` | pending |
-| `app/src/main/res/drawable/widget_background.xml` | `71d7f8e1093f` | pending |
+| `app/src/main/res/drawable/act_article.xml` | `7326f9e019c4` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_bag.xml` | `2131f415e0ff` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_ball.xml` | `6a0cd16b5f25` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_bike.xml` | `f691522bc861` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_bolt.xml` | `0a0cc7d37f86` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_book.xml` | `c3a49514cef7` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_bus.xml` | `8c08e64e7b9c` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_camera.xml` | `55b36ca9b8d0` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_candle.xml` | `da68ed6cd750` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_card.xml` | `3d410d07c0af` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_cardio.xml` | `ec08cde7b661` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_cards.xml` | `4229778843eb` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_chart.xml` | `b283fb47996d` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_clean.xml` | `6e52e91c5f45` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_code.xml` | `557f9a2263c4` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_columns.xml` | `31a08adb237e` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_cook.xml` | `1f4bc23f2cd1` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_cube.xml` | `65cb6c66da98` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_cup.xml` | `865c200f98a0` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_custom.xml` | `e0c69dda6b83` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_dice.xml` | `b29bef6a2dff` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_drop.xml` | `9619615a4bc2` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_family.xml` | `6949764d46b5` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_feed.xml` | `afd674342eaa` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_flask.xml` | `46e5830ff8a0` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_focus.xml` | `42773adae993` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_food.xml` | `bdf592bcac5d` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_gamepad.xml` | `9aa036255916` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_headphones.xml` | `b518174007db` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_heart.xml` | `1ab26056ff5c` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_home.xml` | `71dee4fd4063` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_hourglass.xml` | `e3b66da220f0` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_language.xml` | `a41463b03a60` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_leaf.xml` | `236cdc5e5dc2` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_lotus.xml` | `ba40571320e8` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_mail.xml` | `6f0fbd398e73` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_medical.xml` | `e65b50f27287` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_meeting.xml` | `178f43aaf216` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_mic.xml` | `0083f08450a6` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_mountain.xml` | `59c7e2cd25cc` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_music.xml` | `ae0c16193055` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_palette.xml` | `cfa6add7695e` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_papers.xml` | `969c08052ff4` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_paw.xml` | `c5fd80bace09` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_pen.xml` | `7dbca2fcb1f9` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_people.xml` | `a7f638b335fc` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_phone.xml` | `c4d0b7205d49` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_run.xml` | `43c6fe3032b9` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_scissors.xml` | `906dfafddf1b` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_screen.xml` | `4fd937354955` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_server.xml` | `a127604ffafd` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_shield.xml` | `29d32bc30736` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_shirt.xml` | `440e95301b4b` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_sleep.xml` | `e09e808ab563` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_snow.xml` | `94ca101cc8ef` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_sofa.xml` | `74aaec8d8b85` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_steps.xml` | `e32cd2388679` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_strength.xml` | `51c927d185e3` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_study.xml` | `8a3ff5fd7b6a` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_teach.xml` | `521ef1b720a1` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_ticket.xml` | `fe6ddf4d6ea5` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_tools.xml` | `2fbcd1f5850b` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_unclassified.xml` | `ebddd47f87bc` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_water.xml` | `60055918efc5` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/act_work.xml` | `71d31f5743d9` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/ic_launcher_foreground.xml` | `5aea1cda053b` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/ic_launcher_monochrome.xml` | `765f8380edbb` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/ic_pause.xml` | `4049293135cc` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/ic_play.xml` | `41ecae89645b` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/ic_shortcut.xml` | `ecb422afdce3` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/ic_stat_notai.xml` | `5d30dc885277` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/ic_stop.xml` | `71e1edf267a5` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/surface_button_primary.xml` | `193636b6b812` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/surface_button_tonal.xml` | `8c270f0fd1bc` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/surface_chip.xml` | `b8ff07ec637e` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/drawable/widget_background.xml` | `71d7f8e1093f` | structural parse only; semantic/device review not claimed |
 | `app/src/main/res/font/onest_200.ttf` | `7b7124f6823e` | pending |
 | `app/src/main/res/font/onest_300.ttf` | `3ccb4ee42d34` | pending |
 | `app/src/main/res/font/onest_400.ttf` | `5d27bd7fe4b7` | pending |
 | `app/src/main/res/font/onest_500.ttf` | `24744bba5ddd` | pending |
 | `app/src/main/res/font/onest_600.ttf` | `030d1bae9b38` | pending |
-| `app/src/main/res/layout/notification_timer.xml` | `f74de1928768` | pending |
-| `app/src/main/res/layout/notification_timer_big.xml` | `3773b6a1f625` | pending |
-| `app/src/main/res/layout/surface_timer_row.xml` | `4bdaeb4a741d` | pending |
-| `app/src/main/res/layout/timer_widget.xml` | `6b14012b780c` | pending |
-| `app/src/main/res/mipmap-anydpi/ic_launcher.xml` | `ae92c429e7ef` | pending |
-| `app/src/main/res/mipmap-anydpi/ic_launcher_round.xml` | `ae92c429e7ef` | pending |
-| `app/src/main/res/values-night/colors.xml` | `98fab277b753` | pending |
-| `app/src/main/res/values-night/themes.xml` | `eee73f8257ec` | pending |
-| `app/src/main/res/values/colors.xml` | `319a0e149764` | pending |
-| `app/src/main/res/values/ids.xml` | `773a1a3bff33` | pending |
-| `app/src/main/res/values/strings.xml` | `2ed2185b3146` | pending |
-| `app/src/main/res/values/themes.xml` | `753f2d6667d0` | pending |
-| `app/src/main/res/xml/data_extraction_rules.xml` | `a0d81ccff94f` | pending |
-| `app/src/main/res/xml/shortcuts.xml` | `90c4d28810de` | pending |
-| `app/src/main/res/xml/timer_widget_info.xml` | `159b6bebd6b4` | pending |
+| `app/src/main/res/layout/notification_timer.xml` | `f74de1928768` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/layout/notification_timer_big.xml` | `3773b6a1f625` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/layout/surface_timer_row.xml` | `4bdaeb4a741d` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/layout/timer_widget.xml` | `6b14012b780c` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/mipmap-anydpi/ic_launcher.xml` | `ae92c429e7ef` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/mipmap-anydpi/ic_launcher_round.xml` | `ae92c429e7ef` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/values-night/colors.xml` | `98fab277b753` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/values-night/themes.xml` | `eee73f8257ec` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/values/colors.xml` | `319a0e149764` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/values/ids.xml` | `773a1a3bff33` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/values/strings.xml` | `2ed2185b3146` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/values/themes.xml` | `753f2d6667d0` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/xml/data_extraction_rules.xml` | `a0d81ccff94f` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/xml/shortcuts.xml` | `90c4d28810de` | structural parse only; semantic/device review not claimed |
+| `app/src/main/res/xml/timer_widget_info.xml` | `159b6bebd6b4` | structural parse only; semantic/device review not claimed |
 | `app/src/test/kotlin/dev/notai/tracker/android/RoomScenariosTest.kt` | `dad20602b12c` | pending |
 | `app/src/test/kotlin/dev/notai/tracker/android/ui/UiExportLifecycleTest.kt` | `e21efe41edf0` | pending |
 | `app/src/test/kotlin/dev/notai/tracker/android/ui/UiScreensTest.kt` | `6591f6a3618e` | pending |
@@ -319,9 +320,9 @@ Initial hashes identify the reviewed starting content; changed files need follow
 | `docs/ui/screens/15-first-picked-dark.png` | `b91efdcc6249` | pending |
 | `docs/ui/screens/15-first-picked-light.png` | `7bef771a69bf` | pending |
 | `evidence/acceptance-followup/verification.json` | `6e6d7da2fd07` | pending |
-| `evidence/acceptance-v11/core-tests.xml` | `fc8ae0764d6f` | pending |
+| `evidence/acceptance-v11/core-tests.xml` | `fc8ae0764d6f` | structural parse only; semantic/device review not claimed |
 | `evidence/acceptance-v11/lint-results-debug.txt` | `7767fda272a0` | pending |
-| `evidence/acceptance-v11/room-tests.xml` | `0f57f8009fa5` | pending |
+| `evidence/acceptance-v11/room-tests.xml` | `0f57f8009fa5` | structural parse only; semantic/device review not claimed |
 | `evidence/acceptance-v11/summary.json` | `0bf0be599205` | pending |
 | `evidence/acceptance-v11/verification.log` | `538a935e51a3` | pending |
 | `evidence/adb-devices.txt` | `66dc3881f2be` | pending |
@@ -334,9 +335,9 @@ Initial hashes identify the reviewed starting content; changed files need follow
 | `evidence/audit-updates/verification.json` | `8c111d9dbfc0` | pending |
 | `evidence/backend-integration/verification.json` | `4614a62e2369` | pending |
 | `evidence/backend-v10/before-verification.log` | `cc22b42073bc` | pending |
-| `evidence/backend-v10/core-tests.xml` | `bd0f4c46ea48` | pending |
+| `evidence/backend-v10/core-tests.xml` | `bd0f4c46ea48` | structural parse only; semantic/device review not claimed |
 | `evidence/backend-v10/lint-results-debug.txt` | `7767fda272a0` | pending |
-| `evidence/backend-v10/room-tests.xml` | `00ff6965a2e8` | pending |
+| `evidence/backend-v10/room-tests.xml` | `00ff6965a2e8` | structural parse only; semantic/device review not claimed |
 | `evidence/backend-v10/storage-after.txt` | `28e0b5e03aa9` | pending |
 | `evidence/backend-v10/storage-before.txt` | `d24c6250e672` | pending |
 | `evidence/backend-v10/summary.json` | `460657b04a9d` | pending |
@@ -344,17 +345,17 @@ Initial hashes identify the reviewed starting content; changed files need follow
 | `evidence/backend-v13/apk-badging.txt` | `0b9fea2fe053` | pending |
 | `evidence/backend-v13/build.log` | `32088681f72d` | pending |
 | `evidence/backend-v13/checked-path-benchmark.txt` | `f36a8b702463` | pending |
-| `evidence/backend-v13/core-tests.xml` | `09c343c8d799` | pending |
+| `evidence/backend-v13/core-tests.xml` | `09c343c8d799` | structural parse only; semantic/device review not claimed |
 | `evidence/backend-v13/lint.txt` | `47e6741b62cf` | pending |
-| `evidence/backend-v13/room-tests.xml` | `66ea32c807ea` | pending |
+| `evidence/backend-v13/room-tests.xml` | `66ea32c807ea` | structural parse only; semantic/device review not claimed |
 | `evidence/backend-v13/storage-workload.txt` | `ce1aa7221f8f` | pending |
 | `evidence/backend-v13/verification.json` | `a91a16405285` | pending |
 | `evidence/choices-v16/apk-badging.txt` | `dc2b064e7463` | pending |
 | `evidence/choices-v16/build.log` | `8ced58dc5534` | pending |
 | `evidence/choices-v16/choices-summary.json` | `77194040e8e0` | pending |
-| `evidence/choices-v16/core-tests.xml` | `b479e03e0b98` | pending |
+| `evidence/choices-v16/core-tests.xml` | `b479e03e0b98` | structural parse only; semantic/device review not claimed |
 | `evidence/choices-v16/lint.txt` | `2ecfb35f20f0` | pending |
-| `evidence/choices-v16/room-tests.xml` | `7f923cb16759` | pending |
+| `evidence/choices-v16/room-tests.xml` | `7f923cb16759` | structural parse only; semantic/device review not claimed |
 | `evidence/choices-v16/verification.json` | `62a084e10130` | pending |
 | `evidence/classification-hash-guard/verification.json` | `5bc44835d76f` | pending |
 | `evidence/cold-start-sql/android-baseline.json` | `666cd172ff5a` | pending |
@@ -367,42 +368,42 @@ Initial hashes identify the reviewed starting content; changed files need follow
 | `evidence/compose-current/android-action-matrix.json` | `79365cff31f0` | pending |
 | `evidence/compose-current/verification.json` | `5673da49bcc3` | pending |
 | `evidence/core-test.log` | `ab1d6ed57fe4` | pending |
-| `evidence/core-tests.xml` | `0df898e76250` | pending |
+| `evidence/core-tests.xml` | `0df898e76250` | structural parse only; semantic/device review not claimed |
 | `evidence/draft-validation-v18/apk-badging.txt` | `cc3682ba6bc7` | pending |
 | `evidence/draft-validation-v18/build.log` | `29f0c68c3c78` | pending |
-| `evidence/draft-validation-v18/core-tests.xml` | `c340956853e8` | pending |
+| `evidence/draft-validation-v18/core-tests.xml` | `c340956853e8` | structural parse only; semantic/device review not claimed |
 | `evidence/draft-validation-v18/lint.txt` | `1adf6df34503` | pending |
-| `evidence/draft-validation-v18/room-tests.xml` | `f76055fcf6c1` | pending |
+| `evidence/draft-validation-v18/room-tests.xml` | `f76055fcf6c1` | structural parse only; semantic/device review not claimed |
 | `evidence/draft-validation-v18/verification.json` | `6a2e195400fc` | pending |
 | `evidence/focus-v15/apk-badging.txt` | `94af95b554cb` | pending |
 | `evidence/focus-v15/build.log` | `8a94e1917173` | pending |
 | `evidence/focus-v15/checked-path-benchmark.txt` | `adfb00353f2f` | pending |
-| `evidence/focus-v15/core-tests.xml` | `376839077eae` | pending |
+| `evidence/focus-v15/core-tests.xml` | `376839077eae` | structural parse only; semantic/device review not claimed |
 | `evidence/focus-v15/focus-example.json` | `afcacfaff783` | pending |
 | `evidence/focus-v15/lint.txt` | `f2c8a44a8c02` | pending |
-| `evidence/focus-v15/room-tests.xml` | `cd9365b296bf` | pending |
+| `evidence/focus-v15/room-tests.xml` | `cd9365b296bf` | structural parse only; semantic/device review not claimed |
 | `evidence/focus-v15/storage-workload.txt` | `20eb79e91703` | pending |
 | `evidence/focus-v15/verification.json` | `b481f25852af` | pending |
-| `evidence/format-import-v12/core-tests.xml` | `7244d54580b8` | pending |
+| `evidence/format-import-v12/core-tests.xml` | `7244d54580b8` | structural parse only; semantic/device review not claimed |
 | `evidence/format-import-v12/lint-results-debug.txt` | `7767fda272a0` | pending |
-| `evidence/format-import-v12/room-tests.xml` | `23afd869caa1` | pending |
+| `evidence/format-import-v12/room-tests.xml` | `23afd869caa1` | structural parse only; semantic/device review not claimed |
 | `evidence/format-import-v12/summary.json` | `a118547038be` | pending |
 | `evidence/format-import-v12/verification.log` | `731b57341ed1` | pending |
 | `evidence/goals-v14/apk-badging.txt` | `4abb49c3c558` | pending |
 | `evidence/goals-v14/build.log` | `1d9dbec43677` | pending |
 | `evidence/goals-v14/checked-path-benchmark.txt` | `fca8c5e63235` | pending |
-| `evidence/goals-v14/core-tests.xml` | `8d77fd90447f` | pending |
+| `evidence/goals-v14/core-tests.xml` | `8d77fd90447f` | structural parse only; semantic/device review not claimed |
 | `evidence/goals-v14/goals-example.json` | `9b27e857cfcc` | pending |
 | `evidence/goals-v14/lint.txt` | `a125e12d95a8` | pending |
-| `evidence/goals-v14/room-tests.xml` | `daa8ea84931b` | pending |
+| `evidence/goals-v14/room-tests.xml` | `daa8ea84931b` | structural parse only; semantic/device review not claimed |
 | `evidence/goals-v14/storage-workload.txt` | `058d73694161` | pending |
 | `evidence/goals-v14/verification.json` | `4d6a3308940f` | pending |
 | `evidence/lint-results-debug.txt` | `0adf6a075adb` | pending |
 | `evidence/local-entries-v17/apk-badging.txt` | `facfe421519e` | pending |
 | `evidence/local-entries-v17/build.log` | `c4a76a4330ec` | pending |
-| `evidence/local-entries-v17/core-tests.xml` | `a1df178e833f` | pending |
+| `evidence/local-entries-v17/core-tests.xml` | `a1df178e833f` | structural parse only; semantic/device review not claimed |
 | `evidence/local-entries-v17/lint.txt` | `642c5e775cdf` | pending |
-| `evidence/local-entries-v17/room-tests.xml` | `1ca805a5204a` | pending |
+| `evidence/local-entries-v17/room-tests.xml` | `1ca805a5204a` | structural parse only; semantic/device review not claimed |
 | `evidence/local-entries-v17/verification.json` | `6c75082b1b97` | pending |
 | `evidence/normalized-history/after-compact.json` | `9d29fa060c50` | pending |
 | `evidence/normalized-history/after-normalized.json` | `d86cfc39cb3c` | pending |
@@ -416,7 +417,7 @@ Initial hashes identify the reviewed starting content; changed files need follow
 | `evidence/normalized-history/compact-experiment.json` | `e1031acc68c7` | pending |
 | `evidence/normalized-history/jvm-normalized.json` | `a2ad892cacab` | pending |
 | `evidence/normalized-history/verification.json` | `ab33ed270a3a` | pending |
-| `evidence/room-tests.xml` | `9faad9c7168a` | pending |
+| `evidence/room-tests.xml` | `9faad9c7168a` | structural parse only; semantic/device review not claimed |
 | `evidence/ui-merge/checkpoint.json` | `0949c80696dd` | pending |
 | `gradle.properties` | `66eb28b6c7a2` | pending |
 | `gradle/wrapper/gradle-wrapper.jar` | `81a82aaea5ab` | pending |
@@ -431,11 +432,11 @@ Initial hashes identify the reviewed starting content; changed files need follow
 | `samples/transfer/schema-a.csv` | `59dbeca4aa0a` | pending |
 | `samples/transfer/schema-b.csv` | `8a3b5ab48440` | pending |
 | `samples/transfer/toggl-supported.csv` | `a67e57ca297c` | pending |
-| `scripts/activity_icons.py` | `aba5363a1102` | pending |
-| `scripts/android_startup_samples.py` | `56b76d9875c4` | pending |
-| `scripts/android_store_fingerprint.py` | `135fbe486887` | pending |
-| `scripts/android_ui.py` | `6fafd280837f` | pending |
-| `scripts/app_icon.py` | `59c4723452dd` | pending |
+| `scripts/activity_icons.py` | `aba5363a1102` | structural parse only; semantic/device review not claimed |
+| `scripts/android_startup_samples.py` | `56b76d9875c4` | structural parse only; semantic/device review not claimed |
+| `scripts/android_store_fingerprint.py` | `135fbe486887` | structural parse only; semantic/device review not claimed |
+| `scripts/android_ui.py` | `6fafd280837f` | structural parse only; semantic/device review not claimed |
+| `scripts/app_icon.py` | `59c4723452dd` | structural parse only; semantic/device review not claimed |
 | `scripts/build-cleanup-host.sh` | `26f8ad7cd94d` | pending |
-| `scripts/dependency_license_inventory.py` | `0266baac0859` | pending |
+| `scripts/dependency_license_inventory.py` | `0266baac0859` | structural parse only; semantic/device review not claimed |
 | `settings.gradle.kts` | `95ab85802c94` | pending |

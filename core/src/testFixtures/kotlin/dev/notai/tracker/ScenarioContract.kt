@@ -1944,6 +1944,18 @@ abstract class ScenarioContract {
         val restoredQuantities = Reports.report(historical.data(),clock.now().copy(wall = historySample.asOf),
             historySample.data.segments.single().start,historySample.asOf).quantityTotals()
         assertEquals(Decimal("20"),restoredQuantities[QuantityKey("pages",1,"page",Scope.SESSION)])
+        var rollbackHeld = false;var sourceClosed = false
+        val ownedDisk = object: RollbackStore by disk {
+            override fun <T> protecting(block: () -> T): T {
+                rollbackHeld = true;try { return block() } finally { rollbackHeld = false }
+            }
+        }
+        val lifecycle = object: RestoreLifecycle {
+            override fun acquire(sourceSha256: String) = object: RestoreLease {
+                override fun close() { assertFalse(rollbackHeld,"Source lifetime closes after releasing the maintenance/rollback gate");sourceClosed = true }
+            }
+        }
+        val owned = Backups(clean,ownedDisk,lifecycle);owned.apply(owned.prepare(json));assertTrue(sourceClosed)
     }
 
     private fun streamingBackupFormats() {

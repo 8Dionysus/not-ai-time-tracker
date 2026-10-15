@@ -85,8 +85,8 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore,p
             val imported = restoredData(preview.backup,Math.addExact(live.revision,1))
             imported to snapshot(imported,tracker.clock.now())
         }
-        preview.close();RestoreResult(state,reference)
-    } } }
+        RestoreResult(state,reference)
+    } } }.also { preview.close() }
     companion object {
         fun restoredData(backup: Backup,revision: Long): Dataset {
             StreamingBackup.validateBackup(backup)

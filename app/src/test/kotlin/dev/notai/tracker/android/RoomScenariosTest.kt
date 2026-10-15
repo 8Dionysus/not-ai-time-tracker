@@ -68,6 +68,13 @@ class RoomScenariosTest: ScenarioContract() {
         val refusal = org.junit.Assert.assertThrows(CoreError::class.java) { documents.undo(draft.id,target.snapshot().token) }
         org.junit.Assert.assertEquals(ErrorCode.STALE,refusal.code)
         org.junit.Assert.assertEquals(after,target.data()) // later schedule use keeps imported dependencies intact
+        val ownersBefore = gate.state().lifetimes.map { it.id }.toSet()
+        val full = Backups(source,MemoryRollback()).export()
+        val staged = stageRestore(context,full.byteInputStream())
+        val retained = Backups(source,MemoryRollback(),CopyLifetimes.get(context)).prepare { staged.inputStream() }
+        org.junit.Assert.assertTrue(gate.state().lifetimes.map { it.id }.toSet().size > ownersBefore.size)
+        retained.close()
+        org.junit.Assert.assertEquals(ownersBefore,gate.state().lifetimes.map { it.id }.toSet())
     }
     @org.junit.Test fun shortcutPreferenceMigrationFromV8PreservesAllTimerStatesAndRejectsFutureMeaning() {
         val context = RuntimeEnvironment.getApplication()

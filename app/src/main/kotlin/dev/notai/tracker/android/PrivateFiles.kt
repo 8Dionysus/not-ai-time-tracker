@@ -118,9 +118,9 @@ class ExportOperations(private val context: Context) {
     val sourceReference: String? = null,val pendingText: String? = null,
     val csvMapping: CsvMapping? = null,val csvSourceSha256: String? = null,val csvUseCard: Boolean = false,
     val backendRevision: Long = 0,val scheduleCommand: ScheduleCommandDraft? = null,val selectiveDocument: SelectiveDocumentDraft? = null)
-internal class FormFiles(private val context: Context) {
+internal class FormFiles(private val context: Context,captureActivityOwner: Boolean = true) {
     private val lifecycle = CopyLifetimes.get(context)
-    private val actor = lifecycle.callingOwner() // captured when the Activity creates its backend form handle
+    private val actor = if(captureActivityOwner) lifecycle.callingOwner() else null // captured when the Activity creates its backend form handle
     private val directory = privateCopyDirectory(context,"forms")
     fun save(id: String?,state: FormState): String {
         val reference = id ?: newId();lifecycle.unclaimedForm(reference,actor)

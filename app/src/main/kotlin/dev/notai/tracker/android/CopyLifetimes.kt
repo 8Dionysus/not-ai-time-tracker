@@ -44,7 +44,7 @@ class CopyLifetimes private constructor(context: Context): RestoreLifecycle,Appl
         }
         return owned
     }
-    internal fun callingOwner(): String? = synchronized(lock) { callingActor.get()?.takeIf { it in owners.values || it in handoff } }
+    internal fun callingOwner(): String? = callingActor.get() // capture only; unclaimedForm validates active ownership outside the maintenance gate
     fun unclaimedForm(id: String,ownerId: String? = null) {
         if(ownerId != null) synchronized(lock) {
             if(ownerId in owners.values || ownerId in handoff) { claimForm(ownerId,id,null);return }
@@ -120,14 +120,17 @@ class CopyLifetimes private constructor(context: Context): RestoreLifecycle,Appl
                 else ids.map { gate.retainLifetime(it,"read:${newId()}",null,CopyBlocker.RESTORE_SOURCE_IN_USE,scope) }
             activeTokens += refs.map { it.token };refs
         }
-        try { return block() } finally { synchronized(lock) { activeTokens -= refs.map { it.token }.toSet();release(refs) } }
+        try { return block() } finally { synchronized(lock) {
+            val complete = gate().state().lifetimes.filter { it.id in closing && it.referenceTokens.any { token -> refs.any { it.token == token } } }.map { it.id }
+            activeTokens -= refs.map { it.token }.toSet();release(refs);complete.forEach(::finish)
+        } }
     }
     override fun acquire(sourceSha256: String): RestoreLease? = synchronized(lock) {
         val gate = gate();val before = gate.state()
         val stages = before.stagedInputs.filter { it.state == "READY" && it.sha256 == sourceSha256 }
         val groups = stages.map { it.itemId }.toSet()+before.copies.filter { c -> c.item.members.size == 1 && c.item.members.single().sha256 == sourceSha256 }.map { it.item.id }
         if(groups.isEmpty()) return@synchronized null // External originals are never cleanup candidates.
-        val actorIds = ownerIds().ifEmpty { setOf(newId()) };val preview = newId()
+        val knownActors = ownerIds();val standalone = knownActors.isEmpty();val actorIds = knownActors.ifEmpty { setOf(newId()) };val preview = newId()
         val refs = actorIds.flatMap { owner -> groups.map { gate.retainLifetime(owner,"restore:$preview:$it",it,CopyBlocker.RESTORE_SOURCE_IN_USE) } }
         for(stage in stages) stage.pendingToken?.let { token -> gate.state().references.singleOrNull { it.token == token }?.let { pending ->
             ensure(pending.owner == "restore-stage:${stage.id}" && pending.itemId == stage.itemId,"Staging ownership changed",ErrorCode.STORAGE);gate.release(pending)
@@ -147,7 +150,7 @@ class CopyLifetimes private constructor(context: Context): RestoreLifecycle,Appl
                 } }
             }
             override fun close() = synchronized(lock) {
-                if(!closed) { if(using) closePending = true else { release(refs);closed = true;actorIds.filter { it in closing }.forEach(::finish) } };Unit
+                if(!closed) { if(using) closePending = true else { release(refs);closed = true;actorIds.filter { standalone || it in closing }.forEach(::finish) } };Unit
             }
         }
     }

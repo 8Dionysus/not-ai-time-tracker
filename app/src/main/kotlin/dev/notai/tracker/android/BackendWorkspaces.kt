@@ -30,7 +30,7 @@ typealias ScheduleSurfaceState = ScheduleViewState
 /** Home/shade/widget share this immutable data boundary. Views do not authorize Start;
  * prepare→execute persists the exact caller key/payload, then uses Tracker's receipt. */
 class ScheduleWorkspace(private val context: Context,private val tracker: Tracker,private val deviceZone: () -> ZoneId = { ZoneId.systemDefault() }) {
-    private val forms = FormFiles(context)
+    private val forms = FormFiles(context,false)
     private val ownership = CopyLifetimes.get(context)
     private val gate get() = PrivateFileMaintenance.forContext(context)
     private val published = MutableStateFlow<ScheduleSurfaceState?>(null)
@@ -86,7 +86,7 @@ data class SelectiveDocumentPreview(val draft: BackendDraft,val operationId: Str
  * CSV are untouched. No startup auto-apply/resume; terminal group results stay in Dataset. */
 @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 class SelectiveDocuments(private val context: Context,private val tracker: Tracker,private val engine: SelectiveTransfer = SelectiveTransfer(tracker)) {
-    private val forms = FormFiles(context)
+    private val forms = FormFiles(context,false)
     private val ownership = CopyLifetimes.get(context)
     private val gate get() = PrivateFileMaintenance.forContext(context)
     fun stage(input: InputStream): BackendDraft {
@@ -100,7 +100,7 @@ class SelectiveDocuments(private val context: Context,private val tracker: Track
     fun read(id: String): SelectiveDocumentDraft = (forms.read(id,false).selectiveDocument ?: fail(ErrorCode.INVALID_INPUT,"Not a selective draft")).also {
         ensure(it.state in setOf("STAGED","REVIEWED","APPLYING","COMPLETE","ABANDONED") && it.sourceBytes >= 0 &&
             it.sourceSha256.matches(Regex("[0-9a-f]{64}")) && it.sourceId.matches(Regex("[0-9a-f-]{36}")),"Unknown selective draft state",ErrorCode.STORAGE)
-        ensure(it.review == null || it.review.operationId.matches(Regex("[0-9a-f-]{36}")) && it.review.operationHash.matches(Regex("[0-9a-f]{64}")),"Invalid selective review",ErrorCode.STORAGE)
+        ensure(it.review == null || it.review.operationId.matches(Regex("[0-9a-f-]{36}")) && it.review.operationHash.matches(Regex("[0-9a-f]{128}")),"Invalid selective review",ErrorCode.STORAGE)
     }
     fun inventory(): WorkspaceInventory {
         val (rows,unreadable) = workspaceForms(forms)

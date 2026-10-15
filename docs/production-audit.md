@@ -23,6 +23,7 @@ at `e8aa417`; it is not production acceptance or an instruction to merge it.
 | C01 | Durable registry/gate and descriptor-relative JNI storage implemented; four Android ABIs compile. | Host filesystem fault tests. Production deletion still unbound: Android descriptor QA, frontend durable-reference adoption, legacy registration and sealed archive hardlink graph remain required. |
 | C02/C03 | Reconcile interrupted rename/restore; inventory/reconciliation never unlinks. Only explicit resume finalizes empty quarantine. | Actual filesystem crash/failure fixtures. |
 | C04/R02 | Maintenance-before-runtime lock order; acquire durable writer refs under gate, stream ordinary I/O outside it. Rescue remains exclusive. | Long-writer fixture; backend writer wrappers. |
+| C07 | Count only selectable, unreferenced recovery copies for the separate last-unused-copy warning; an active recovery source cannot mask it. | Real-filesystem two-copy reference fixture. |
 | C06 | Unknown unsafe/non-ASCII filenames produce non-addressable opaque inventory markers, leaving safe siblings inspectable. They remain blocked and never become paths. | Unicode sibling fixture. |
 | C05 | Reject metadata UTF-8 overflow before replacing the previous readable journal. | Metadata overflow/reopen fixture. |
 | F01 | Focus side effects serialize capture of the current Tracker; cancel obsolete notification 43. | Room test covers Next/Stop/disable/revocation and delayed old callback. Legacy UI overloads queue a fresh runtime-owned IO refresh. |

@@ -1,0 +1,20 @@
+{
+  "base": "435c3be86f7597223addbcf15a1d2f2cb7ec94b8",
+  "invalidHarnessAttempts": "Initial test omitted the existing Robolectric rename adapter; those failures are not accepted defect reproductions. Preserved separately.",
+  "actualBeforeFix": "Corrected fixture verifies exact bad journal bytes before wake; original onWake throws but leaves its armed alarm/receiver active. actual-before-fix.xml fails the cancel-alarm assertion.",
+  "target": "Android API36 Robolectric projection wake failure path, no real user data and no new emulator boot",
+  "bWorktree": "/workspace/tracker-b-validation",
+  "bBase": "435c3be86f7597223addbcf15a1d2f2cb7ec94b8",
+  "afterFix": {
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "execution": "Robolectric API36; no new Android boot or phone/OEM claim",
+    "scope": "one new projection journal-failure scenario (two malformed/future cases) plus seven existing reminder scenarios"
+  },
+  "sourceFiles": {
+    "app/src/main/kotlin/dev/notai/tracker/android/ScheduleProjectionRefresh.kt": "f32efb5f362c7438eec17c3bc92e72843ec009d078865ebbb28d52720a323b7a",
+    "app/src/test/kotlin/dev/notai/tracker/android/ScheduleProjectionRefreshTest.kt": "a096a937899aacdc4f147e4b45123ed395abcac4fc0632314df2cad2d83fe2c1"
+  }
+}

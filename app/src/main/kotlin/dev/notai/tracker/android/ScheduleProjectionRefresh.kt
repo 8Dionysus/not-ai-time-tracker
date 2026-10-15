@@ -67,12 +67,18 @@ class ScheduleProjectionRefresh(context: Context,private val tracker: Tracker,pr
         val failures = mutableSetOf<String>()
         for(consumer in consumers) try { consumer.invalidate(value,ticket.hash) } catch(_: RuntimeException) { failures += consumer.id }
         ProjectionRefreshResult(value,ticket.hash,consumers.map { it.id }.toSet(),next?.at,failures)
-        } catch(e: Exception) { disarm(context);throw e }
+        } catch(e: Exception) { failClosed(e) }
     }
     fun onWake(hash: String): ProjectionRefreshResult? = synchronized(lock) {
-        val pending = saved().pending ?: return@synchronized null
-        if(pending.hash != hash || tracker.clock.now().wall < pending.at) return@synchronized null
-        synchronize()
+        try {
+            val pending = saved().pending ?: return@synchronized null
+            if(pending.hash != hash || tracker.clock.now().wall < pending.at) return@synchronized null
+            synchronize()
+        } catch(e: Exception) { failClosed(e) }
+    }
+    private fun failClosed(error: Exception): Nothing {
+        try { disarm(context) } catch(cleanup: Exception) { error.addSuppressed(cleanup) }
+        throw error // Keep the original journal/platform failure; never replace unreadable authority.
     }
     private fun configure(ticket: ProjectionTicket?) {
         val alarm = context.getSystemService(AlarmManager::class.java)
@@ -86,11 +92,15 @@ class ScheduleProjectionRefresh(context: Context,private val tracker: Tracker,pr
     companion object {
         /** Fail closed without overwriting an unreadable/future journal. */
         internal fun disarm(context: Context) {
-            val intent = Intent(context,ScheduleProjectionReceiver::class.java).setAction(ACTION).setData(android.net.Uri.parse("notai://schedule/projection"))
-            PendingIntent.getBroadcast(context,0,intent,PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_NO_CREATE)?.let {
-                context.getSystemService(AlarmManager::class.java).cancel(it)
+            try {
+                val intent = Intent(context,ScheduleProjectionReceiver::class.java).setAction(ACTION).setData(android.net.Uri.parse("notai://schedule/projection"))
+                PendingIntent.getBroadcast(context,0,intent,PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_NO_CREATE)?.let {
+                    context.getSystemService(AlarmManager::class.java).cancel(it)
+                }
+            } finally {
+                // A failed alarm cancellation must not suppress disabling future platform wakes.
+                context.packageManager.setComponentEnabledSetting(ComponentName(context,ScheduleProjectionReceiver::class.java),PackageManager.COMPONENT_ENABLED_STATE_DISABLED,PackageManager.DONT_KILL_APP)
             }
-            context.packageManager.setComponentEnabledSetting(ComponentName(context,ScheduleProjectionReceiver::class.java),PackageManager.COMPONENT_ENABLED_STATE_DISABLED,PackageManager.DONT_KILL_APP)
         }
         internal const val ACTION = "dev.notai.tracker.SCHEDULE_PROJECTION";internal const val HASH = "projectionHash" }
 }

@@ -76,6 +76,8 @@ class SelectiveTransfer(private val tracker: Tracker) {
             ensureReason(missing == null,ErrorReason.CATALOG_ROOT_INVALID,arguments = mapOf("rootId" to ErrorArgument.Identifier(missing ?: ""),"rule" to ErrorArgument.Text("MISSING_SELECTION")),fieldPath = "transfer.selection.$field")
         }
         ensure(wanted.measurementIds.all { id -> d.measurements.any { it.id == id } },"Missing selected measurement")
+        ensure(wanted.excludedOverrides.all { key -> key.seriesId in wanted.seriesIds && d.schedule.overrides.any { it.key == key } },
+            "Excluded override must exist in a selected series")
         val segmentIds = d.segments.filter { it.sessionId in wanted.sessionIds }.map { it.id }.toSet()
         ensure(d.measurements.filter { it.id in wanted.measurementIds }.all { if(it.scope == Scope.SESSION) it.targetId in wanted.sessionIds else it.targetId in segmentIds },"Measurement requires complete target session")
         val relevant = d.schedule.links.filter { it.key.seriesId in wanted.seriesIds || it.sessionId in wanted.sessionIds }

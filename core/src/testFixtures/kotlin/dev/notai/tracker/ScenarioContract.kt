@@ -566,6 +566,8 @@ abstract class ScenarioContract {
         assertTrue(t.data().sessions.isEmpty());assertTrue(t.data().segments.isEmpty())
     }
 
+    @Test fun selectiveExclusionsMustBelongToSelectedSeries() = selectiveExclusionsScenario(createStore())
+
     @Test fun selectiveGroupsRepeatConflictAndStale() {
         val clock = FakeClock();val source = Tracker(createStore(),clock)
         source.manual(source.snapshot().token,clock.wall-3000,clock.wall-2000,source.typeSelection("language"),"private")

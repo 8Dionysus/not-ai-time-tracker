@@ -21,17 +21,17 @@
 
 Неизвестное время остаётся неопределённым до явного решения пользователя. Переименование или перемещение типа не переклассифицирует прошлые записи. Количества сохраняются точными десятичными значениями; величина всей сессии не распределяется по дням автоматически. Пересекающиеся классификации не добавляют время к общему итогу.
 
-Системный Android backup и device transfer отключены в manifest/rules. Это настройка приложения, а не результат проверки всех OEM-механизмов. Ручной restore полностью заменяет данные; merge истории и синхронизация отсутствуют. Полные JSON-копии и восстановление читаются и пишутся потоково без общего лимита 10 MiB. CSV ограничен 10 MiB, 50 000 строк и 128 колонками. Полный граф данных всё ещё хранится в памяти; свободное место и память устройства ограничивают практический объём.
+Системный Android backup и device transfer отключены в manifest/rules. Это настройка приложения, а не результат проверки всех OEM-механизмов. Ручной restore полностью заменяет данные; синхронизации нет. Отдельный backend API выборочного переноса описан в [контракте нового прохода](docs/BACKEND_PASS_2026_10.md); его интерфейс ещё требует интеграции. Полные JSON-копии и восстановление читаются и пишутся потоково без общего лимита 10 MiB. CSV ограничен 10 MiB, 50 000 строк и 128 колонками. Полный граф данных всё ещё хранится в памяти; свободное место и память устройства ограничивают практический объём.
 
 ## Сборка
 
-Нужны JDK 17 или 21, Android SDK Platform 35 и Build Tools 35.0.0. Укажите `ANDROID_HOME` либо `sdk.dir` в локальном `local.properties`. Gradle Wrapper 8.13 включён; SHA‑256 дистрибутива закреплён. Kotlin 2.1.20, AGP 8.11.1 и Room 2.7.2 заданы в Gradle-файлах. Минимальная версия Android — 8.0 / API 26, target SDK — 35.
+Нужны JDK 21 для тестов API36, Android SDK Platform 36 и Build Tools 35.0.0. Укажите `ANDROID_HOME` либо `sdk.dir` в локальном `local.properties`. Gradle Wrapper 8.13 включён; SHA‑256 дистрибутива закреплён. Kotlin 2.1.20, AGP 8.11.1 и Room 2.7.2 заданы в Gradle-файлах. Минимальная версия Android — 8.0 / API 26, target SDK — 36.
 
 ```sh
-./gradlew :core:test :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
+./gradlew :core:test :app:testDebugUnitTest :app:assembleDebug :app:assembleRelease :app:lintRelease -PtrackerUnsigned=true
 ```
 
-Debug APK создаётся в `app/build/outputs/apk/debug/app-debug.apk`. Для отдельной проверки на подключённом устройстве:
+С указанным флагом получаются неподписанные debug/release APK; ключи не создаются. Обычная debug-сборка без флага создаёт `app/build/outputs/apk/debug/app-debug.apk`. Для отдельной проверки такой подписанной debug-сборки на подключённом устройстве:
 
 ```sh
 adb install -r app/build/outputs/apk/debug/app-debug.apk
@@ -67,3 +67,5 @@ adb shell am start -n dev.notai.tracker/dev.notai.tracker.android.MainActivity
 ## License
 
 Project-owned code is licensed under [Apache-2.0](LICENSE). The [NOTICE](NOTICE) preserves the separate Onest OFL and third-party/content boundaries. Catalog research and assets do not acquire new rights through this source-code license.
+
+Текущая backend-схема — Room 6, полный архив — JSON 8 (read 1–8). [BACKEND_PASS_2026_10](docs/BACKEND_PASS_2026_10.md) фиксирует новые API и незакрытые границы; production-удаление private copies и полноценная локализация не объявлены готовыми.

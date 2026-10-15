@@ -50,3 +50,32 @@ Preservation — production механизм Android-приложения. До 
 [Регрессия валидного изменённого payload под прежним SHA ID](../evidence/classification-hash-guard/verification.json): fresh read и invalidated generation отвергают STORAGE, без переписывания источника. Core3+Room11, ошибок нет; raw XML сохранены отдельно. Полная validation не ослаблена. Тёплый cache связан с owner generation, не обещает опрашивать каждый байт при внешнем SQL.
 
 [Настоящее Android instrumentation comparison](../evidence/normalized-history/android-archive-comparison.json), один неизменённый набор файлов56 012 800bytes: четыре блока ABBA, пять samples каждый, без отброшенных прогревов/очистки OS page cache. Durable copy reference перезаписывает один собственный measurement target, чтобы не оставить10 больших копий; основной DB и старые архивы не изменены. Pooled medians:copy322,560ms/reuse348,265ms. Ускорение этой операции **не подтверждено**; доказанный результат — отсутствие новой полной копии при reuse и сохранение fresh hash checks. Эти данные не подменяют старый open→initialized composite1,49s.
+
+## Backend history-index follow-up, 15 October 2026
+
+Synthetic Room/SQLite Robolectric API35 measurement at code `12fea29` (runtime
+source matches `2c38ed3`), JDK21, 1 GiB test heap. One fixture, 73,000 initial
+sessions/segments, ten years × twenty entries/day; no phone measurement or OS
+page-cache eviction. Fourteen timer cycles append fourteen sessions before the
+last heap sample. Seven samples are retained, without discarding a warm-up.
+
+- Cold reopen/read: 593.468 ms; initial Room write: 2,151.306 ms; full validation:
+  104.886 ms. These are separate single observations, not Android startup medians.
+- Ordinary Start/Pause/Resume/Stop median: 16.082 ms. Start/Pause/Resume with quick
+  suggestions after each command: 31.827 ms. STOP and rebuilding the next completed
+  index occur outside that latter timed interval. No before/after speedup is claimed.
+- Seven live-cycle assertions show no completed-history scan during START/PAUSE/
+  RESUME; STOP invalidates it. Shared Memory/Room scenarios verify the same boundary.
+- Java heap observations (`totalMemory-freeMemory` after best-effort explicit GC):
+  104,685,848 bytes before fixture, 139,026,848 with retained input fixture,
+  179,914,736 with reopened store, 196,528,432 with report/choice indexes and fixture.
+  These include Robolectric, retained inputs and potentially multiple graph versions;
+  differences do not isolate a component or establish native PSS, leak or phone RAM.
+
+The binary range query has a full-scan result oracle, including reordered input and
+window boundaries. Core-created immutable history identity allows cache reuse;
+external data/cold loads cannot supply a trusted flag. The full graph, list copies
+on timer transitions, and report/choice indexes still scale with history. No data
+cap, truncation, weaker validation, timer FGS or per-second DB writes were introduced.
+Android PSS/battery and OEM behavior remain unmeasured: this environment's adb
+cannot create its read-only home state directory, and no HOME override was used.

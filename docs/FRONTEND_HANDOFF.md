@@ -1,5 +1,7 @@
 # Tracker backend handoff for Claude
 
+Current backend audit deltas, remaining UI findings and cleanup prerequisites: [BACKEND_AUDIT_HANDOFF.md](BACKEND_AUDIT_HANDOFF.md). This supersedes earlier readiness statements where explicitly noted.
+
 Current 2026-10-15 follow-up: [explicit SQLite retention](TRANSFER_RETENTION.md), [typed CSV/inspection issue contract](IMPORT_ISSUES.md), [full A–F backend pass](BACKEND_PASS_2026_10.md). The dated code commit below records the earlier handoff.
 
 Code commit: **`9a6cffb3c44916fe8100db23f11e7c01b02f791d`** (2026-10-14).

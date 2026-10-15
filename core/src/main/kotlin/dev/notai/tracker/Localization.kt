@@ -11,8 +11,9 @@ import java.util.Locale
     @Serializable data class Identifier(val value: String): ErrorArgument()
     @Serializable data class Date(val iso: String): ErrorArgument()
 }
-@Serializable data class LocalizedError(val code: ErrorCode, val arguments: Map<String,ErrorArgument> = emptyMap(), val fieldPath: String? = null) {
-    val resourceKey get() = "tracker.error.${code.name.lowercase(Locale.ROOT)}"
+@Serializable enum class ErrorReason { IDEMPOTENCY_CONFLICT, SERIES_NOT_FOUND, OCCURRENCE_NOT_FOUND, OCCURRENCE_COLLISION, LOCALE_UNAVAILABLE, TRANSFER_BASE_CHANGED }
+@Serializable data class LocalizedError(val code: ErrorCode, val arguments: Map<String,ErrorArgument> = emptyMap(), val fieldPath: String? = null,val reason: ErrorReason? = null) {
+    val resourceKey get() = "tracker.error.${(reason?.name ?: code.name).lowercase(Locale.ROOT)}"
 }
 @Serializable enum class TranslationQuality { SOURCE_ONLY, DRAFT, REVIEWED }
 @Serializable enum class PackAvailability { AVAILABLE_OFFLINE, NOT_INSTALLED, UNAVAILABLE }
@@ -62,7 +63,7 @@ class AppLocales(private val store: AppLocaleStore,supportedTags: Set<String>,pr
     fun set(tag: String?,expectedRevision: Long,source: LocaleChangeSource): AppLocalePreference {
         ensure(source != LocaleChangeSource.SYSTEM_CHANGE,"System-language changes resolve presentation without changing explicit preference")
         val canonical = tag?.let(::localeTag)
-        ensure(canonical == null || canonical in supported,"UI locale unavailable",ErrorCode.INVALID_INPUT)
+        ensureReason(canonical == null || canonical in supported,ErrorReason.LOCALE_UNAVAILABLE,arguments = mapOf("localeTag" to ErrorArgument.Text(canonical ?: "")),fieldPath = "appLocale.explicitTag")
         return store.update(expectedRevision) { it.copy(revision = Math.addExact(it.revision,1),explicitTag = canonical,source = source) }
     }
 }
@@ -74,3 +75,8 @@ internal fun canonicalJson(value: JsonElement): JsonElement = when(value) {
     else -> value
 }
 internal inline fun <reified T> payloadHash(value: T): String = sha256(canonicalJson(codec.encodeToJsonElement(value)).toString().toByteArray(Charsets.UTF_8))
+
+internal fun ensureReason(ok: Boolean,reason: ErrorReason,code: ErrorCode = ErrorCode.INVALID_INPUT,
+    arguments: Map<String,ErrorArgument> = emptyMap(),fieldPath: String? = null) {
+    if(!ok) throw CoreError(code,reason.name,arguments = arguments,fieldPath = fieldPath,reason = reason)
+}

@@ -118,7 +118,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
         val hash = payloadHash(plan.packageValue)+payloadHash<Map<String,TransferConflictPolicy>>(plan.policies)
         tracker.store.transaction { d ->
             val existing = d.transfer.operations.find { it.id == operationId }
-            if(existing != null) { ensure(existing.hash == hash,"IDEMPOTENCY_CONFLICT",ErrorCode.STALE);return@transaction d to existing }
+            if(existing != null) { ensureReason(existing.hash == hash,ErrorReason.IDEMPOTENCY_CONFLICT,ErrorCode.STALE,mapOf("operationId" to ErrorArgument.Identifier(operationId)));return@transaction d to existing }
             checkToken(d,plan.expected,tracker.clock.now())
             val revision = Math.addExact(d.revision,1)
             val operation = TransferOperation(operationId,hash,d.datasetId,d.controlBarrier,revision,plan.groups.map { TransferGroupProgress(it,plan.policies[it.id] ?: TransferConflictPolicy.BLOCK) })
@@ -133,7 +133,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
             val pending = op.groups.indexOfFirst { it.state == TransferGroupState.PENDING };if(pending < 0) return op
             tracker.store.transaction { d ->
                 val live = d.transfer.operations.single { it.id == operationId }
-                ensure(live.baseDatasetId == d.datasetId && live.baseControlBarrier == d.controlBarrier && live.nextRevision == d.revision,"Transfer base changed; replan",ErrorCode.STALE)
+                ensureReason(live.baseDatasetId == d.datasetId && live.baseControlBarrier == d.controlBarrier && live.nextRevision == d.revision,ErrorReason.TRANSFER_BASE_CHANGED,ErrorCode.STALE,mapOf("expectedRevision" to ErrorArgument.Count(live.nextRevision),"actualRevision" to ErrorArgument.Count(d.revision)))
                 ensure(!live.undone,"Operation was undone",ErrorCode.STALE)
                 val progress = live.groups[pending];var next = d
                 val origin = d.transfer.origins.find { it.originId == progress.group.originId }

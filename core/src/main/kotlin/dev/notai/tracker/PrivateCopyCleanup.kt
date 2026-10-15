@@ -53,7 +53,7 @@ class PrivateCopyCleanup(private val storage: PrivateCopyStorage) {
     fun confirm(c: CleanupConfirmation): CleanupJournal = storage.maintenance {
         val hash = payloadHash(c.copy(itemHashes = c.itemHashes.toSortedMap(),warningsAcknowledged = c.warningsAcknowledged.sortedWith(compareBy<WarningAcknowledgement> { it.itemId }.thenBy { it.warning.name }).toSet(),lastCopyAcknowledged = c.lastCopyAcknowledged.sorted().toSet()))
         storage.operations().find { it.commandKey == c.idempotencyKey }?.let { old ->
-            ensure(old.payloadHash == hash,"IDEMPOTENCY_CONFLICT",ErrorCode.STALE);return@maintenance reconcile(old)
+            ensureReason(old.payloadHash == hash,ErrorReason.IDEMPOTENCY_CONFLICT,ErrorCode.STALE,mapOf("operationId" to ErrorArgument.Identifier(old.operationId)));return@maintenance reconcile(old)
         }
         ensure(c.idempotencyKey.isNotBlank(),"Missing cleanup idempotency key")
         val p = previews[c.previewId] ?: fail(ErrorCode.STALE,"Preview expired after process restart")

@@ -132,14 +132,14 @@ fun Tracker.scheduleCommand(command: ScheduleCommand): ScheduleCommandResult = s
         ensure(c.key.isNotBlank() && c.key.length <= 200,"Invalid command key")
         val receipt = s.receipts.find { it.key == c.key }
         if(receipt != null) {
-            ensure(receipt.hash == hash,"IDEMPOTENCY_CONFLICT",ErrorCode.STALE)
+            ensureReason(receipt.hash == hash,ErrorReason.IDEMPOTENCY_CONFLICT,ErrorCode.STALE,mapOf("commandKey" to ErrorArgument.Identifier(c.key)))
             return@checkedTransaction checked.replace(d) { receipt.result }
         }
         val now = clock.now();checkToken(d,c.expected,now);val zone = scheduleZone(c.deviceZone)
         var next = d;var resultSession: String? = null
         val series = s.series.find { it.id == c.seriesId }
         if(c.action != ScheduleAction.CREATE) {
-            ensure(series != null,"SERIES_NOT_FOUND")
+            ensureReason(series != null,ErrorReason.SERIES_NOT_FOUND,arguments = mapOf("seriesId" to ErrorArgument.Identifier(c.seriesId)))
             ensure(series!!.revision == c.expectedSeriesRevision,"Series revision changed",ErrorCode.STALE)
         }
         when(c.action) {
@@ -166,7 +166,7 @@ fun Tracker.scheduleCommand(command: ScheduleCommand): ScheduleCommandResult = s
                 ensure(key.seriesId == series!!.id && series.state == ScheduleState.ACTIVE,"Series unavailable")
                 val date = scheduleDate(key.originalDate);val rule = series.rule(date) ?: fail(ErrorCode.INVALID_INPUT,"OCCURRENCE_NOT_FOUND")
                 val old = s.overrides.find { it.key == key }
-                ensure(rule.includes(date) || old != null,"OCCURRENCE_NOT_FOUND")
+                ensureReason(rule.includes(date) || old != null,ErrorReason.OCCURRENCE_NOT_FOUND,arguments = mapOf("originalDate" to ErrorArgument.Date(key.originalDate)))
                 ensure(old?.revision == c.expectedOverrideRevision,"Occurrence revision changed",ErrorCode.STALE)
                 if(c.action == ScheduleAction.OVERRIDE) {
                     val o = c.override ?: fail(ErrorCode.INVALID_INPUT,"Missing override")
@@ -176,7 +176,7 @@ fun Tracker.scheduleCommand(command: ScheduleCommand): ScheduleCommandResult = s
                     validateSchedule(next)
                     if(row.operation == OverrideOperation.MOVE && !row.allowCollision) {
                         val target = scheduleDate(row.date!!)
-                        ensure(Schedules.project(next,target,target,Instant.ofEpochMilli(now.wall),zone).none { it.key != key && it.key.seriesId == key.seriesId && it.state != OccurrenceState.SKIPPED },"OCCURRENCE_COLLISION")
+                        ensureReason(Schedules.project(next,target,target,Instant.ofEpochMilli(now.wall),zone).none { it.key != key && it.key.seriesId == key.seriesId && it.state != OccurrenceState.SKIPPED },ErrorReason.OCCURRENCE_COLLISION,arguments = mapOf("targetDate" to ErrorArgument.Date(target.toString())))
                     }
                 } else {
                     ensure(old?.operation != OverrideOperation.SKIP && s.links.none { it.key == key },"Occurrence skipped or already started")

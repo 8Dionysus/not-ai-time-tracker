@@ -1,3 +1,5 @@
+import java.security.MessageDigest
+
 plugins { id("com.android.application"); kotlin("android"); kotlin("plugin.serialization"); kotlin("plugin.compose"); id("com.google.devtools.ksp") }
 // Package the prepared vocabulary, never source research or preparation readers.
 val bundledCatalogAssets = tasks.register<Sync>("bundleCatalogAssets") {
@@ -18,6 +20,8 @@ android {
         unitTests.all { test ->
             // Full catalog/history scenarios plus Robolectric need more than Gradle's 512 MiB default.
             test.maxHeapSize = "1g"
+            // Robolectric Android 16/API36 requires a Java 21 runtime. Bytecode target stays 17.
+            test.javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
             test.systemProperty("tracker.samples", rootProject.file("samples").absolutePath)
             test.systemProperty("tracker.artifacts", layout.buildDirectory.dir("test-artifacts").get().asFile.absolutePath)
             test.systemProperty("tracker.scale", providers.gradleProperty("trackerScale").getOrElse("false"))
@@ -61,7 +65,25 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     testImplementation("junit:junit:4.13.2")
     testImplementation(testFixtures(project(":core")))
-    testImplementation("org.robolectric:robolectric:4.14.1")
+    testImplementation("org.robolectric:robolectric:4.17")
     testImplementation(composeBom)
     testImplementation("androidx.compose.ui:ui-test-junit4")
+}
+
+// Read-only release evidence. Project artifacts are built before their hashes are captured.
+tasks.register("releaseInventory") {
+    dependsOn(":core:jar")
+    doLast {
+        val rows = configurations.getByName("releaseRuntimeClasspath").resolvedConfiguration.resolvedArtifacts.map { artifact ->
+            val digest = MessageDigest.getInstance("SHA-256")
+            artifact.file.inputStream().use { input ->
+                val buffer = ByteArray(65536)
+                while(true) { val count = input.read(buffer);if(count < 0) break;if(count > 0) digest.update(buffer,0,count) }
+            }
+            listOf(artifact.moduleVersion.id.toString(),artifact.file.name,digest.digest().joinToString("") { "%02x".format(it) },artifact.file.absolutePath).joinToString("\t")
+        }.sorted()
+        val output = rootProject.layout.buildDirectory.file("release-inventory.tsv").get().asFile
+        output.parentFile.mkdirs();output.writeText("coordinate\tartifact\tsha256\tlocal_path\n"+rows.joinToString("\n")+"\n")
+        logger.lifecycle("Recorded ${rows.size} release runtime artifacts")
+    }
 }

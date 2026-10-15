@@ -6,7 +6,7 @@ Requirements read in full: Tracker next-pass package seq169 and complete Tracker
 
 ## A — localization boundary
 
-`CoreError.localized` exposes stable `ErrorCode`, typed `ErrorArgument` values, `fieldPath`, and a stable resource key. Diagnostic exception messages remain for existing logs/compatibility; frontend must stop displaying or parsing them. Current core errors may have empty argument maps; consumers must handle that case.
+`CoreError.localized` exposes stable `ErrorCode`, typed `ErrorArgument` values, optional stable `ErrorReason`, `fieldPath`, and a stable resource key. Diagnostic exception messages remain for existing logs/compatibility; frontend must stop displaying or parsing them. Current core errors may have empty argument maps; consumers must handle that case.
 
 `CatalogLabels` resolves sidecars keyed by catalog ID + stable ID + meaningVersion + BCP-47 locale. Personal override wins, then reviewed/offline content along explicit same-language fallback chains, then canonical original with `missing=true`. Draft quality and installed availability are independent. Catalog/history/IDs/JSON/CSV are never rewritten by display lookup. No reviewed multilingual packs are supplied: `catalog/locales/manifest.json` explicitly records missing/planned coverage, including Spanish and separate Hans/Hant. This manifest is not Android LocaleConfig or a claim of UI support.
 
@@ -66,3 +66,6 @@ Physical/OEM/reboot/background/permission/TalkBack/RTL/large-font checks remain 
 - Selective preview must show dependency definitions, excluded groups/losses, conflict policies, uncertainty and per-group results. COPY can still be rejected by factual overlap/single-active-session invariants. Undo is unavailable after unrelated edits or full restore.
 
 No Compose screen, ViewModel, TechnicalActivity or RemoteViews drawing file was modified in this pass.
+
+
+Release tooling additions: Robolectric 4.17 supports API36 (its SDK provider requires Java21 for that SDK); app unit tests therefore use a Java21 launcher while production JVM bytecode remains target17. Gradle wrapper 8.13 distribution SHA256 was matched to the official distribution checksum and pinned. Run `./gradlew :app:releaseInventory`, then `python3 scripts/dependency_license_inventory.py build/release-inventory.tsv --gradle-cache "$GRADLE_USER_HOME" --output docs/backend/release-runtime-licenses.json --notice-output app/src/main/assets/licenses/third-party-notices.txt`. Copy the generated JSON to the packaged release-runtime-index when updating dependencies. The current graph has 65 external runtime artifacts, all declaring Apache-2.0 in POM metadata; the project core is recorded separately. Twenty-seven supplied dependency license/notice members are retained verbatim in the packaged notice file; Onest OFL remains separate. This does not establish rights to catalog research/generated visual assets or verify native-source sublicenses beyond the supplied declarations/notices.

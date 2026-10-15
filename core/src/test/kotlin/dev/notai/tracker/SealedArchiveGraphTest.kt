@@ -160,14 +160,18 @@ class SealedArchiveGraphTest {
         val fault = object: PrivateCopyStorage by storage {
             override fun removeMember(item: PrivateCopy,member: CopyMember,operationId: String) {
                 val target = "cleanup-quarantine/"+files.names("cleanup-quarantine").single()
-                Files.createLink(external.toPath(),File(root,"$target/data").toPath())
+                if(!external.exists()) Files.createLink(external.toPath(),File(root,"$target/data").toPath())
                 storage.removeMember(item,member,operationId)
             }
         }
         val cleanup = PrivateCopyCleanup(fault);val partial = cleanup.confirm(confirmation(preview(cleanup,setOf("a"))))
         assertEquals(CleanupPhase.PARTIAL,partial.phase);assertTrue(partial.items.single().deletedMemberIds.isEmpty())
         assertEquals("immutable fixture bytes",external.readText());assertEquals(4L,files.stat("database-archives/b/data")!!.links)
-        assertFailsWith<CoreError> { cleanup.operations() } // Cannot certify an incomplete graph as an exact safe resume.
+        val blocked = cleanup.operations().single();assertEquals(CleanupPhase.PARTIAL,blocked.phase)
+        assertEquals(3,storage.remaining(blocked.items.single().item,blocked.operationId).size)
+        assertEquals(CleanupPhase.PARTIAL,cleanup.resume(blocked.operationId,cleanup.remainingHash(blocked)).phase)
+        assertTrue(cleanup.operations().single().items.single().deletedMemberIds.isEmpty())
+        assertEquals(4L,files.stat("database-archives/b/data")!!.links)
         Files.delete(external.toPath()) // Only the explicitly created external fixture alias.
         val fresh = PrivateCopyCleanup(RegisteredCopyStorage(files,CopyMaintenance(files.metadata())))
         val seen = fresh.operations().single();assertTrue(seen.items.single().deletedMemberIds.isEmpty())

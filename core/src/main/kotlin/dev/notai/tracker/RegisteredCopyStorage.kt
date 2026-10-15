@@ -115,12 +115,14 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
     }
     override fun remaining(item: PrivateCopy,operationId: String): List<CopyMember> = maintenance {
         val r = operation(item,operationId);val target = quarantinePath(item,operationId)
-        if(files.stat(target) != null) { ensure(files.stat(r.path) == null,"Ambiguous group locations");validate(r,target,true).members }
-        else if(files.stat(r.path) != null) validate(r,r.path,false).members else emptyList()
+        // Observe exact selected members independently of whether all external owners are safe.
+        // Every destructive step separately proves the complete graph and its references.
+        if(files.stat(target) != null) { ensure(files.stat(r.path) == null,"Ambiguous group locations");manifests.read(r,CopyLocation(target,true)).members }
+        else if(files.stat(r.path) != null) manifests.read(r,CopyLocation(r.path,false)).members else emptyList()
     }
     override fun isQuarantined(item: PrivateCopy,operationId: String): Boolean = maintenance {
         val r = operation(item,operationId);val target = quarantinePath(item,operationId)
-        if(files.stat(target) != null) { ensure(files.stat(r.path) == null,"Ambiguous group locations");validate(r,target,true);true } else false
+        if(files.stat(target) != null) { ensure(files.stat(r.path) == null,"Ambiguous group locations");manifests.read(r,CopyLocation(target,true));true } else false
     }
     override fun removeMember(item: PrivateCopy,member: CopyMember,operationId: String) = maintenance {
         val r = operation(item,operationId);val target = quarantinePath(item,operationId)
@@ -133,7 +135,7 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
         val r = operation(item,operationId);val target = quarantinePath(item,operationId)
         if(files.stat(r.path) != null) false else {
             if(files.stat(target) != null) {
-                validate(r,target,true)
+                manifests.read(r,CopyLocation(target,true))
                 // Finalizing an empty directory is a mutation: only explicit execute may remove it.
                 return@maintenance false
             }

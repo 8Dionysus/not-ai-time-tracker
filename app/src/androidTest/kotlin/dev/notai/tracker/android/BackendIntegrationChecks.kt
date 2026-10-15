@@ -63,13 +63,18 @@ object BackendIntegrationChecks {
                 tracker.scheduleCommand(ScheduleCommand("qa-create",tracker.snapshot().token,ScheduleAction.CREATE,"qa-date-only",rule = rule))
                 val transfer = SelectiveTransfer(tracker)
                 val pkg = transfer.export(TransferSelection(cardIds = setOf(card.id)))
-                val destination = Tracker(MemoryStore(),Clock { Moment(wall,elapsed,"qa-integration-boot") })
-                val importer = SelectiveTransfer(destination);val plan = importer.plan(pkg,pkg.groups.map { it.id }.toSet())
-                val applied = importer.apply(plan,"qa-catalog")
-                check(applied.groups.all { it.state == TransferGroupState.APPLIED })
-                check(importer.apply(plan,"qa-catalog") == applied)
-                check(destination.data().types == tracker.data().types && destination.data().cards == tracker.data().cards)
-                check(destination.data().sessions.isEmpty())
+                val destinationName = "qa-backend-target-$tag.db"
+                check(!context.getDatabasePath(destinationName).exists())
+                val destinationDb = TrackerDatabase.open(context,destinationName)
+                try {
+                    val destination = Tracker(RoomStore(destinationDb),Clock { Moment(wall,elapsed,"qa-integration-boot") })
+                    val importer = SelectiveTransfer(destination);val plan = importer.plan(pkg,pkg.groups.map { it.id }.toSet())
+                    val applied = importer.apply(plan,"qa-catalog")
+                    check(applied.groups.all { it.state == TransferGroupState.APPLIED })
+                    check(importer.apply(plan,"qa-catalog") == applied)
+                    check(destination.data().types == tracker.data().types && destination.data().cards == tracker.data().cards)
+                    check(destination.data().sessions.isEmpty())
+                } finally { destinationDb.close() }
                 val backup = Backups(tracker,PrivateRollbackStore(context))
                 val output = File(root,"full-archive.json")
                 output.outputStream().use { backup.write(it) }

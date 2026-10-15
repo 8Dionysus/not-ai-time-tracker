@@ -6,7 +6,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.io.ByteArrayOutputStream
 
-@Serializable data class Backup(@Required val formatVersion: Int = 9,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
+@Serializable data class Backup(@Required val formatVersion: Int = 10,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
 /** Bounded whole-String convenience API only; streaming full backups have no total-file cap. */
 const val MAX_BACKUP_BYTES = 10*1024*1024
 
@@ -22,6 +22,9 @@ interface RollbackStore {
     fun readSnapshot(reference: String): Backup = StreamingBackup.read { read(reference).byteInputStream(Charsets.UTF_8) }
 }
 class RestorePreview internal constructor(internal val backup: Backup,internal val expected: Token) {
+    val settings get() = backup.data.settings
+    /** Inspect incoming reminder choices without a second parse or authority to edit the restore. */
+    val schedule: ScheduleData = backup.data.schedule.frozen()
     val datasetId get() = backup.data.datasetId
     val backupId get() = backup.backupId
     val asOf get() = backup.asOf
@@ -90,7 +93,7 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore) 
         fun decode(json: String): Backup {
             ensure(json.toByteArray(Charsets.UTF_8).size <= MAX_BACKUP_BYTES,"Backup exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
             val b = try { decodeBackupVersion(json) } catch (_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed or unsupported JSON") }
-            ensure(b.formatVersion == 9,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
+            ensure(b.formatVersion == 10,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
             ensure(b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
             try {
                 validate(b.data)

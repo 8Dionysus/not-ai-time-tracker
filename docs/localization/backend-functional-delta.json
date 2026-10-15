@@ -1,0 +1,29 @@
+{
+  "format": 1,
+  "scope": "Functional settings/catalog roots; these are CoreError reasons, not additional CSV ImportIssue codes",
+  "currentImportIssueCount": 65,
+  "entries": [
+    {
+      "reason": "SCHEDULE_DAY_INVALID",
+      "resourceKey": "tracker.error.schedule_day_invalid",
+      "errorCode": "INVALID_INPUT",
+      "fieldPaths": ["settings.schedule.day.boundary", "settings.schedule.day.zoneId"],
+      "arguments": {"value": "ErrorArgument.Text (original value, empty for missing zone)", "rule": "ErrorArgument.Text (stable machine token)"},
+      "rules": ["INVALID_LOCAL_TIME", "FIXED_ZONE_REQUIRED", "INVALID_IANA_ZONE", "DEVICE_ZONE_NOT_ALLOWED"],
+      "sourceCopy": {"ru": "Проверьте настройку границы дня или часового пояса расписания.", "en": "Check the schedule day boundary or time zone setting."},
+      "quality": "SOURCE_DRAFT_REQUIRES_EDITORIAL_REVIEW",
+      "uiAction": "Preserve all fields and the running timer; localize the setting/rule from stable identifiers, then let the user correct the value."
+    },
+    {
+      "reason": "CATALOG_ROOT_INVALID",
+      "resourceKey": "tracker.error.catalog_root_invalid",
+      "errorCode": "INVALID_INPUT",
+      "fieldPaths": ["transfer.catalogRoots", "transfer.catalogRoots.cardIds", "transfer.catalogRoots.typeIds", "transfer.selection.cardIds", "transfer.selection.typeIds"],
+      "arguments": {"rootId": "ErrorArgument.Identifier", "rule": "ErrorArgument.Text (stable machine token)"},
+      "rules": ["DUPLICATE_ROOT", "MISSING_REFERENCE", "MISSING_SELECTION"],
+      "sourceCopy": {"ru": "Проверьте выбранные карточки и категории для переноса.", "en": "Check the cards and categories selected for transfer."},
+      "quality": "SOURCE_DRAFT_REQUIRES_EDITORIAL_REVIEW",
+      "uiAction": "Keep the selection and source; refresh missing references and obtain a new preview. Do not match objects by translated/display names."
+    }
+  ]
+}

@@ -64,7 +64,7 @@ data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId
     @Query("DELETE FROM measurements WHERE id IN (:ids)") fun deleteMeasurements(ids: List<String>)
     @Query("SELECT * FROM measurements WHERE id IN (:ids)") fun readMeasurements(ids: List<String>): List<MeasurementRow>
 }
-const val TRACKER_DATABASE_VERSION = 7
+const val TRACKER_DATABASE_VERSION = 8
 @Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class,GenerationRow::class,VocabularyRow::class,ClassificationRow::class],version = TRACKER_DATABASE_VERSION,exportSchema = true)
 abstract class TrackerDatabase: RoomDatabase() {
     abstract fun dao(): TrackerDao
@@ -140,6 +140,20 @@ abstract class TrackerDatabase: RoomDatabase() {
             }
         }
 
+        val MIGRATION_7_8 = object: androidx.room.migration.Migration(7,8) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                readMetadataPayload(db)?.let { payload ->
+                    val old = codec.parseToJsonElement(payload).jsonObject
+                    val settings = codec.decodeFromJsonElement<Settings>(old["settings"] ?: fail(ErrorCode.STORAGE,"Missing legacy settings"))
+                    val transfer = codec.decodeFromJsonElement<TransferState>(old["transfer"] ?: fail(ErrorCode.STORAGE,"Missing legacy transfer state"))
+                    ensure(settings.schedule == ScheduleSettings() && !transfer.hasCatalogRoots(),"Functional additions in v7 metadata",ErrorCode.STORAGE)
+                    // Only metadata defaults; facts, IDs, active anchors and journals are preserved.
+                    val next = JsonObject(old + ("settings" to codec.encodeToJsonElement(settings)))
+                    db.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(next.toString()))
+                }
+            }
+        }
+
         fun open(context: Context,name: String = "tracker.db"): TrackerDatabase {
             val file = context.getDatabasePath(name)
             val existing = DatabaseFiles.paths(context,name).filter { it.exists() }
@@ -162,7 +176,7 @@ abstract class TrackerDatabase: RoomDatabase() {
                 ensure(validHeader,"Database header is damaged; originals preserved. Use explicit recovery",ErrorCode.STORAGE)
             }
             return Room.databaseBuilder(context,TrackerDatabase::class.java,name)
-            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5,MIGRATION_5_6,MIGRATION_6_7).openHelperFactory { configuration ->
+            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5,MIGRATION_5_6,MIGRATION_6_7,MIGRATION_7_8).openHelperFactory { configuration ->
                 val original = configuration.callback
                 val guarded = object: androidx.sqlite.db.SupportSQLiteOpenHelper.Callback(original.version) {
                     override fun onConfigure(db: androidx.sqlite.db.SupportSQLiteDatabase) = original.onConfigure(db)

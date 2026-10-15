@@ -163,7 +163,7 @@ class ScheduleDelivery(private val tracker: Tracker,private val store: ScheduleD
                         // Same gate as every domain command. Rendering has finished; only the
                         // short terminal platform effect occurs here, with no Dataset write.
                         checked.replace(checked.data) {
-                            if(currentProjection == null || finalNow.toEpochMilli() < t.at || !availability().ready) ScheduleAttemptStatus.NOT_POSTED
+                            if(currentProjection != fresh || finalNow.toEpochMilli() < t.at || !availability().ready) ScheduleAttemptStatus.NOT_POSTED
                             else if(prepared.post()) ScheduleAttemptStatus.POSTED else ScheduleAttemptStatus.NOT_POSTED
                         }
                     }

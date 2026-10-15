@@ -294,6 +294,9 @@ class Tracker(val store: StateStore, val clock: Clock) {
     }
     fun goalProgress(id: String,date: java.time.LocalDate? = null): GoalProgress = view().goalProgress(id,date)
     fun settings(expected: Token, settings: Settings) = mutate(expected) { d,_ -> d.copy(settings = settings) }
+    fun configureSchedule(expected: Token,value: ScheduleSettings) = mutate(expected) { d,_ ->
+        d.copy(settings = d.settings.copy(schedule = value.canonical()))
+    }
     fun measure(expected: Token, measurement: Measurement) = mutate(expected, true) { d,_ ->
         d.copy(measurements = d.measurements.filterNot { it.id == measurement.id } + measurement)
     }

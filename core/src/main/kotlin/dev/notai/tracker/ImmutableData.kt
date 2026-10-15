@@ -26,6 +26,10 @@ internal class SelectionFreezer {
         selections[frozen] = frozen;return frozen
     }
 }
+internal fun ScheduleData.frozen(capture: (Classification)->Classification = { it.frozen() }): ScheduleData = copy(
+    series = frozenList(series.map { it.copy(revisions = frozenList(it.revisions.map { v -> v.copy(rule = v.rule.copy(selection = capture(v.rule.selection),weekdays = frozenSet(v.rule.weekdays),extraDates = frozenSet(v.rule.extraDates))) })) }),
+    overrides = frozenList(overrides.map { it.copy(selection = it.selection?.let(capture)) }),
+    links = frozenList(links),receipts = frozenList(receipts))
 internal fun Dataset.frozen(base: Dataset? = null): Dataset {
     val selections = SelectionFreezer()
     fun capture(value: Classification) = selections.capture(value)
@@ -34,10 +38,7 @@ internal fun Dataset.frozen(base: Dataset? = null): Dataset {
         origins = frozenList(transfer.origins.map { it.frozenOrigin() }),
         compactions = frozenList(transfer.compactions.map { it.copy(targets = frozenList(it.targets),acknowledgements = frozenList(it.acknowledgements)) }),
         operations = frozenList(transfer.operations.map { it.copy(groups = frozenList(it.groups.map { g -> g.copy(group = g.group.copy(content = g.group.content.frozen(),entities = frozenList(g.group.entities)),inserted = g.inserted?.frozen(),previousOrigin = g.previousOrigin?.let { o -> o.frozenOrigin() }) })) })),
-    schedule = if(schedule === base?.schedule) schedule else schedule.copy(
-        series = frozenList(schedule.series.map { it.copy(revisions = frozenList(it.revisions.map { v -> v.copy(rule = v.rule.copy(selection = capture(v.rule.selection),weekdays = frozenSet(v.rule.weekdays),extraDates = frozenSet(v.rule.extraDates))) })) }),
-        overrides = frozenList(schedule.overrides.map { it.copy(selection = it.selection?.let { c -> capture(c) }) }),
-        links = frozenList(schedule.links),receipts = frozenList(schedule.receipts)),
+    schedule = if(schedule === base?.schedule) schedule else schedule.frozen(::capture),
     pendingAssignments = if(pendingAssignments === base?.pendingAssignments) pendingAssignments else frozenList(pendingAssignments),
     focus = if(focus === base?.focus) focus else focus?.copy(segmentIds = frozenList(focus.segmentIds)),
     goals = if(goals === base?.goals) goals else frozenList(goals.map { it.copy(filter = it.filter.copy(details = frozenMap(it.filter.details),tags = frozenSet(it.filter.tags),facets = frozenList(it.filter.facets))) }),
@@ -59,9 +60,11 @@ internal fun TransferContent.frozen(): TransferContent {
     val d = Dataset(types = types,cards = cards,axes = axes,metrics = metrics,units = units,sessions = sessions,segments = segments,measurements = measurements,
         schedule = ScheduleData(series,overrides,links),focus = focus,goals = goals,favorites = favorites).frozen()
     return copy(types = d.types,cards = d.cards,axes = d.axes,metrics = d.metrics,units = d.units,sessions = d.sessions,segments = d.segments,measurements = d.measurements,
-        series = d.schedule.series,overrides = d.schedule.overrides,links = d.schedule.links,focus = d.focus,goals = d.goals,favorites = d.favorites)
+        series = d.schedule.series,overrides = d.schedule.overrides,links = d.schedule.links,focus = d.focus,goals = d.goals,favorites = d.favorites,
+        catalogRoots = catalogRoots.copy(cardIds = frozenSet(catalogRoots.cardIds),typeIds = frozenSet(catalogRoots.typeIds)))
 }
 
 internal fun TransferOrigin.frozenOrigin() = copy(localGroup = localGroup.frozen(),compaction = compaction?.let { c ->
-    c.copy(localEntities = frozenList(c.localEntities),source = c.source?.copy(entities = frozenList(c.source.entities)),identities = frozenList(c.identities))
+    c.copy(localEntities = frozenList(c.localEntities),source = c.source?.copy(entities = frozenList(c.source.entities)),identities = frozenList(c.identities),
+        catalogRoots = c.catalogRoots.copy(cardIds = frozenSet(c.catalogRoots.cardIds),typeIds = frozenSet(c.catalogRoots.typeIds)))
 })

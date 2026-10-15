@@ -8,7 +8,9 @@ import kotlinx.serialization.Serializable
 }
 @Serializable data class TransferIdentityLink(val kind: String,val sourceId: String,val localId: String)
 /** Enough to compare live data and reconstruct unchanged source IDs, including COPY, without saved values. */
-@Serializable data class TransferOriginCompaction(val localEntities: List<TransferEntityOrigin>,val source: TransferGroupHeader?,val identities: List<TransferIdentityLink>)
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+@Serializable data class TransferOriginCompaction(val localEntities: List<TransferEntityOrigin>,val source: TransferGroupHeader?,val identities: List<TransferIdentityLink>,
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val catalogRoots: TransferCatalogRoots = TransferCatalogRoots())
 internal fun TransferGroup.header() = TransferGroupHeader(id,originId,sourceRevision,hash,frozenList(entities))
 internal fun List<TransferIdentityLink>.associateByKind(inverse: Boolean = false): Map<String,Map<String,String>> = groupBy { it.kind }.mapValues { (_,links) ->
     links.associate { if(inverse) it.localId to it.sourceId else it.sourceId to it.localId }
@@ -32,8 +34,10 @@ internal fun rewriteTransferIds(c: TransferContent,maps: Map<String,Map<String,S
         overrides = c.overrides.map { it.copy(key = key(it.key),selection = it.selection?.let(::sel)) },links = c.links.map { it.copy(key = key(it.key),sessionId = id("session",it.sessionId)) },
         goals = c.goals.map { g -> val f = g.filter;g.copy(id = id("goal",g.id),filter = f.copy(cardId = f.cardId?.let { id("card",it) },activityTypeId = f.activityTypeId?.let { id("type",it) },facets = f.facets.map { it.copy(axisId = id("axis",it.axisId)) })) },
         favorites = c.favorites.map { it.copy(id = id("favorite",it.id),selection = sel(it.selection)) },
-        focus = c.focus?.let { it.copy(id = id("focus",it.id),sessionId = id("session",it.sessionId),segmentIds = it.segmentIds.map { seg -> id("segment",seg) }) })
+        focus = c.focus?.let { it.copy(id = id("focus",it.id),sessionId = id("session",it.sessionId),segmentIds = it.segmentIds.map { seg -> id("segment",seg) }) },
+        catalogRoots = TransferCatalogRoots(c.catalogRoots.cardIds.map { id("card",it) }.toSet(),c.catalogRoots.typeIds.map { id("type",it) }.toSet()))
 }
+internal fun originCatalogRoots(origin: TransferOrigin) = origin.compaction?.catalogRoots ?: origin.localGroup.catalogRoots
 internal fun originMemberIds(origin: TransferOrigin,kind: String): Set<String> = origin.compaction?.localEntities?.filter { it.kind == kind }?.map { it.sourceEntityId }?.toSet()
     ?: transferIdentityIds(origin.localGroup).getValue(kind).toSet()
 internal fun currentOriginContent(d: Dataset,origin: TransferOrigin): TransferContent {
@@ -48,7 +52,7 @@ internal fun currentOriginContent(d: Dataset,origin: TransferOrigin): TransferCo
         segments = segments+d.segments.filter { it.sessionId in sessions && segments.none { old -> old.id == it.id } },measurements = pick("measurement",d.measurements) { it.id },
         series = pick("series",d.schedule.series) { it.id },overrides = pick("override",d.schedule.overrides) { "${it.key.seriesId}:${it.key.originalDate}" },
         links = pick("link",d.schedule.links) { "${it.key.seriesId}:${it.key.originalDate}" },focus = d.focus?.takeIf { f -> capsule.localEntities.any { it.kind == "focus" && it.sourceEntityId == f.id } },
-        goals = pick("goal",d.goals) { it.id },favorites = pick("favorite",d.favorites) { it.id })
+        goals = pick("goal",d.goals) { it.id },favorites = pick("favorite",d.favorites) { it.id },catalogRoots = capsule.catalogRoots)
 }
 internal fun originUnchanged(d: Dataset,origin: TransferOrigin): Boolean {
     val current = currentOriginContent(d,origin)
@@ -72,7 +76,7 @@ internal fun compactTransferOrigin(d: Dataset,origin: TransferOrigin): TransferO
     ensure(identities.map { it.kind to it.sourceId }.distinct().size == identities.size && identities.map { it.kind to it.localId }.distinct().size == identities.size,"Ambiguous source/local identity mapping")
     ensure(rewriteTransferIds(origin.localGroup,identities.associateByKind(inverse = true)) == original,"Original COPY payload is not reversibly reconstructable")
     header?.let { ensure(payloadHash(original) == it.hash && SelectiveTransfer.entityManifest(original,it.sourceRevision,it.originId) == it.entities,"Original source receipt manifest differs") }
-    val capsule = TransferOriginCompaction(SelectiveTransfer.entityManifest(origin.localGroup,header?.sourceRevision ?: 0,origin.originId),header,identities)
+    val capsule = TransferOriginCompaction(SelectiveTransfer.entityManifest(origin.localGroup,header?.sourceRevision ?: 0,origin.originId),header,identities,origin.localGroup.catalogRoots)
     return origin.copy(localGroup = TransferContent(),compaction = capsule)
 }
 private val transferKinds = setOf("type","card","axis","metric","unit","session","segment","measurement","series","override","link","focus","goal","favorite")
@@ -90,6 +94,8 @@ internal fun validateTransferOrigin(origin: TransferOrigin) {
     val c = origin.compaction
     if(c == null) ensure(payloadHash(origin.localGroup) == origin.localHash,"Invalid transfer provenance") else {
         ensure(origin.localGroup == TransferContent(),"Compacted origin retains values");validateTransferManifest(c.localEntities)
+        ensure(c.catalogRoots.cardIds.all { id -> c.localEntities.any { it.kind == "card" && it.sourceEntityId == id } } &&
+            c.catalogRoots.typeIds.all { id -> c.localEntities.any { it.kind == "type" && it.sourceEntityId == id } },"Compacted catalog root missing")
         c.source?.let { validateTransferHeader(it);ensure(it.originId == origin.originId && it.hash == origin.hash,"Compacted source identity mismatch") }
         ensure(c.source != null || (c.identities.isEmpty() && origin.hash == origin.localHash),"Missing original COPY identity")
         c.source?.let { source ->

@@ -1,12 +1,36 @@
 package dev.notai.tracker
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 @Serializable data class TransferSelection(val sessionIds: Set<String> = emptySet(),val seriesIds: Set<String> = emptySet(),
-    val measurementIds: Set<String> = emptySet(),val excludedOverrides: Set<OccurrenceKey> = emptySet(),val discardLinks: Set<OccurrenceKey> = emptySet(),val includeFocus: Boolean = false,val goalIds: Set<String> = emptySet(),val favoriteIds: Set<String> = emptySet())
+    val measurementIds: Set<String> = emptySet(),val excludedOverrides: Set<OccurrenceKey> = emptySet(),val discardLinks: Set<OccurrenceKey> = emptySet(),val includeFocus: Boolean = false,val goalIds: Set<String> = emptySet(),val favoriteIds: Set<String> = emptySet(),
+    val cardIds: Set<String> = emptySet(),val typeIds: Set<String> = emptySet())
+/** Canonical selection roots, unlike ordered hierarchy paths. Never lose duplicate input IDs. */
+internal object CatalogRootIdsSerializer: KSerializer<Set<String>> {
+    private val list = ListSerializer(String.serializer())
+    override val descriptor = list.descriptor
+    override fun serialize(encoder: Encoder,value: Set<String>) = list.serialize(encoder,value.sorted())
+    override fun deserialize(decoder: Decoder): Set<String> {
+        val values = list.deserialize(decoder);val duplicate = values.groupingBy { it }.eachCount().entries.firstOrNull { it.value > 1 }?.key
+        ensureReason(duplicate == null,ErrorReason.CATALOG_ROOT_INVALID,arguments = mapOf("rootId" to ErrorArgument.Identifier(duplicate ?: ""),"rule" to ErrorArgument.Text("DUPLICATE_ROOT")),fieldPath = "transfer.catalogRoots")
+        return frozenSet(values.sorted())
+    }
+}
+@Serializable data class TransferCatalogRoots(
+    @Serializable(with = CatalogRootIdsSerializer::class) val cardIds: Set<String> = emptySet(),
+    @Serializable(with = CatalogRootIdsSerializer::class) val typeIds: Set<String> = emptySet()) {
+    val empty get() = cardIds.isEmpty() && typeIds.isEmpty()
+}
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 @Serializable data class TransferContent(val types: List<ActivityType> = emptyList(),val cards: List<Card> = emptyList(),val axes: List<Axis> = emptyList(),
     val metrics: List<Metric> = emptyList(),val units: List<UnitDefinition> = emptyList(),val sessions: List<Session> = emptyList(),val segments: List<Segment> = emptyList(),
-    val measurements: List<Measurement> = emptyList(),val series: List<ScheduleSeries> = emptyList(),val overrides: List<OccurrenceOverride> = emptyList(),val links: List<ScheduleStartLink> = emptyList(),val focus: FocusRun? = null,val goals: List<Goal> = emptyList(),val favorites: List<Favorite> = emptyList())
+    val measurements: List<Measurement> = emptyList(),val series: List<ScheduleSeries> = emptyList(),val overrides: List<OccurrenceOverride> = emptyList(),val links: List<ScheduleStartLink> = emptyList(),val focus: FocusRun? = null,val goals: List<Goal> = emptyList(),val favorites: List<Favorite> = emptyList(),
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val catalogRoots: TransferCatalogRoots = TransferCatalogRoots())
 @Serializable data class TransferEntityOrigin(val kind: String,val sourceEntityId: String,val sourceRevision: Long,val hash: String,val originId: String)
 @Serializable data class TransferGroup(val id: String,val originId: String,val sourceRevision: Long,val hash: String,val content: TransferContent,val entities: List<TransferEntityOrigin>)
 @Serializable data class SelectivePackage(val formatVersion: Int = 1,val minimumReader: Int = 1,val transferId: String = newId(),val sourceDatasetId: String,
@@ -32,14 +56,23 @@ class TransferPlan internal constructor(internal val owner: Tracker,internal val
 class SelectiveTransfer(private val tracker: Tracker) {
     fun export(selection: TransferSelection): SelectivePackage {
         val d = tracker.data()
-        val wanted = if(selection.includeFocus) {
+        val typeRows = d.types.withIndex().associate { it.value.id to it }
+        val cardRows = d.cards.withIndex().associate { it.value.id to it }
+        val captured = selection.copy(sessionIds = frozenSet(selection.sessionIds),seriesIds = frozenSet(selection.seriesIds),
+            measurementIds = frozenSet(selection.measurementIds),excludedOverrides = frozenSet(selection.excludedOverrides),discardLinks = frozenSet(selection.discardLinks),
+            goalIds = frozenSet(selection.goalIds),favoriteIds = frozenSet(selection.favoriteIds),cardIds = frozenSet(selection.cardIds),typeIds = frozenSet(selection.typeIds))
+        val wanted = if(captured.includeFocus) {
             val focus = d.focus ?: fail(ErrorCode.INVALID_INPUT,"No focus selected")
-            selection.copy(sessionIds = selection.sessionIds+focus.sessionId)
-        } else selection
+            captured.copy(sessionIds = frozenSet(captured.sessionIds+focus.sessionId))
+        } else captured
         ensure(d.focus == null || d.focus.sessionId !in wanted.sessionIds || wanted.includeFocus,"Active Focus is a required explicit dependency")
-        ensure(wanted.sessionIds.isNotEmpty() || wanted.seriesIds.isNotEmpty() || wanted.goalIds.isNotEmpty() || wanted.favoriteIds.isNotEmpty(),"Empty selection")
+        ensure(wanted.sessionIds.isNotEmpty() || wanted.seriesIds.isNotEmpty() || wanted.goalIds.isNotEmpty() || wanted.favoriteIds.isNotEmpty() || wanted.cardIds.isNotEmpty() || wanted.typeIds.isNotEmpty(),"Empty selection")
         ensure(wanted.sessionIds.all { id -> d.sessions.any { it.id == id } } && wanted.seriesIds.all { id -> d.schedule.series.any { it.id == id } },"Missing selection")
         ensure(wanted.goalIds.all { id -> d.goals.any { it.id == id } } && wanted.favoriteIds.all { id -> d.favorites.any { it.id == id } },"Missing goal/favorite selection")
+        for((field,ids,present) in listOf(Triple("cardIds",wanted.cardIds,d.cards.map { it.id }.toSet()),Triple("typeIds",wanted.typeIds,d.types.map { it.id }.toSet()))) {
+            val missing = (ids-present).sorted().firstOrNull()
+            ensureReason(missing == null,ErrorReason.CATALOG_ROOT_INVALID,arguments = mapOf("rootId" to ErrorArgument.Identifier(missing ?: ""),"rule" to ErrorArgument.Text("MISSING_SELECTION")),fieldPath = "transfer.selection.$field")
+        }
         ensure(wanted.measurementIds.all { id -> d.measurements.any { it.id == id } },"Missing selected measurement")
         val segmentIds = d.segments.filter { it.sessionId in wanted.sessionIds }.map { it.id }.toSet()
         ensure(d.measurements.filter { it.id in wanted.measurementIds }.all { if(it.scope == Scope.SESSION) it.targetId in wanted.sessionIds else it.targetId in segmentIds },"Measurement requires complete target session")
@@ -47,13 +80,23 @@ class SelectiveTransfer(private val tracker: Tracker) {
         ensure(relevant.all { it.key in wanted.discardLinks || (it.key.seriesId in wanted.seriesIds && it.sessionId in wanted.sessionIds) },"Link dependency unresolved; include both sides or explicitly discard link")
         ensure(wanted.discardLinks.all { key -> relevant.any { it.key == key } },"Unknown discarded link")
         val links = relevant.filterNot { it.key in wanted.discardLinks }
-        val nodes = (wanted.sessionIds.map { "session:$it" }+wanted.seriesIds.map { "series:$it" }+wanted.goalIds.map { "goal:$it" }+wanted.favoriteIds.map { "favorite:$it" }).sorted()
-        val components = mutableListOf<MutableSet<String>>()
-        nodes.forEach { components += mutableSetOf(it) }
-        for(l in links) {
-            val a = components.single { "session:${l.sessionId}" in it };val b = components.single { "series:${l.key.seriesId}" in it }
-            if(a !== b) { a += b;components.remove(b) }
+        val nodes = (wanted.sessionIds.map { "session:$it" }+wanted.seriesIds.map { "series:$it" }+wanted.goalIds.map { "goal:$it" }+wanted.favoriteIds.map { "favorite:$it" }+
+            wanted.cardIds.map { "card:$it" }+wanted.typeIds.map { "type:$it" }).sorted()
+        val parents = nodes.associateWith { it }.toMutableMap()
+        fun leader(node: String): String {
+            var root = node;while(parents.getValue(root) != root) root = parents.getValue(root)
+            var current = node;while(current != root) { val next = parents.getValue(current);parents[current] = root;current = next }
+            return root
         }
+        fun join(first: String,second: String) {
+            val a = leader(first);val b = leader(second);if(a != b) parents[b] = a
+        }
+        for(l in links) join("session:${l.sessionId}","series:${l.key.seriesId}")
+        for(c in d.cards.filter { it.id in wanted.cardIds }) c.activityTypeId?.takeIf { it in wanted.typeIds }?.let { join("card:${c.id}","type:$it") }
+        for(t in d.types.filter { it.id in wanted.typeIds }) t.parentId?.takeIf { it in wanted.typeIds }?.let { join("type:${t.id}","type:$it") }
+        val byLeader = nodes.groupBy(::leader)
+        // Retain the original keep-first-component ordering, including legacy linked facts.
+        val components = nodes.filter { leader(it) == it }.map { byLeader.getValue(it).toSet() }
         val now = tracker.clock.now()
         val portable = StreamingBackup.portable(d,now).data
         val groups = components.map { component ->
@@ -64,21 +107,23 @@ class SelectiveTransfer(private val tracker: Tracker) {
             val overrides = d.schedule.overrides.filter { it.key.seriesId in ps && it.key !in wanted.excludedOverrides }
             val measurements = d.measurements.filter { it.id in wanted.measurementIds && (it.targetId in ss || it.targetId in segments.map { seg -> seg.id }) }
             val goals = d.goals.filter { "goal:${it.id}" in component };val favorites = d.favorites.filter { "favorite:${it.id}" in component }
+            val roots = TransferCatalogRoots(frozenSet(wanted.cardIds.filter { "card:$it" in component }.sorted()),frozenSet(wanted.typeIds.filter { "type:$it" in component }.sorted()))
             val goalSelections = goals.map { goal -> val f = goal.filter;Classification(cardId = f.cardId,name = f.cardId?.let { id -> d.cards.single { it.id == id }.name },activityTypeId = f.activityTypeId,details = f.details,tags = f.tags,facets = f.facets) }
             val ownLinks = links.filter { it.key.seriesId in ps }
             val selections = goalSelections+favorites.map { it.selection }+sessions.map { it.selection }+segments.map { it.selection }+series.flatMap { it.revisions.map { v -> v.rule.selection } }+overrides.mapNotNull { it.selection }
-            val cards = d.cards.filter { c -> selections.any { it.cardId == c.id } }
+            val cards = (roots.cardIds+selections.mapNotNull { it.cardId }).map { cardRows.getValue(it) }.sortedBy { it.index }.map { it.value }
             val allSelections = selections+cards.map { it.classification() }
-            val typeIds = allSelections.flatMap { it.ancestorPathAtWrite+listOfNotNull(it.activityTypeId) }.toMutableSet()
-            typeIds.toList().forEach { typeIds += d.ancestorPath(it) }
-            val types = d.types.filter { it.id in typeIds }
+            val typeIds = (allSelections.flatMap { it.ancestorPathAtWrite+listOfNotNull(it.activityTypeId) }+roots.typeIds).toMutableSet()
+            val queue = ArrayDeque(typeIds)
+            while(queue.isNotEmpty()) typeRows.getValue(queue.removeFirst()).value.parentId?.let { if(typeIds.add(it)) queue.addLast(it) }
+            val types = typeIds.map { typeRows.getValue(it) }.sortedBy { it.index }.map { it.value }
             val axisIds = allSelections.flatMap { it.facets.map { f -> f.axisId } }.toSet()+types.flatMap { it.suggestedAxisIds }
             val metricIds = measurements.map { it.fieldId }.toSet()+types.flatMap { it.suggestedMetricIds }
             val metrics = d.metrics.filter { it.id in metricIds };val units = d.units.filter { it.id in (metrics.map { m -> m.canonicalUnitId }+measurements.map { m -> m.unit }) }
-            val content = TransferContent(types,cards,d.axes.filter { it.id in axisIds },metrics,units,sessions,segments,measurements,series,overrides,ownLinks,portable.focus?.takeIf { wanted.includeFocus && it.sessionId in ss },goals,favorites)
+            val content = TransferContent(types,cards,d.axes.filter { it.id in axisIds },metrics,units,sessions,segments,measurements,series,overrides,ownLinks,portable.focus?.takeIf { wanted.includeFocus && it.sessionId in ss },goals,favorites,roots)
             validateContent(content)
-            val id = component.sorted().joinToString("|")
-            val previous = d.transfer.origins.find { o -> originMemberIds(o,"session") == ss && originMemberIds(o,"series") == ps && originMemberIds(o,"goal") == goals.map { it.id }.toSet() && originMemberIds(o,"favorite") == favorites.map { it.id }.toSet() }
+            val id = if(roots.empty) component.sorted().joinToString("|") else "catalog:"+payloadHash(component.sorted())
+            val previous = d.transfer.origins.find { o -> originMemberIds(o,"session") == ss && originMemberIds(o,"series") == ps && originMemberIds(o,"goal") == goals.map { it.id }.toSet() && originMemberIds(o,"favorite") == favorites.map { it.id }.toSet() && originCatalogRoots(o) == roots }
             val original = previous?.takeIf { originUnchanged(d,it) && currentOriginContent(d,it) == content }?.let { o ->
                 val earliest = d.transfer.operations.flatMap { op -> op.groups.map { op.payloadsPruned to it.group } }
                     .firstOrNull { it.second.originId == o.originId && it.second.hash == o.hash }
@@ -103,13 +148,15 @@ class SelectiveTransfer(private val tracker: Tracker) {
             if(wanted.discardLinks.isNotEmpty()) add("LINKS_EXPLICITLY_DISCARDED:${wanted.discardLinks.size}")
             if(wanted.excludedOverrides.isNotEmpty()) add("OVERRIDES_EXCLUDED:${wanted.excludedOverrides.size}")
         }
-        return SelectivePackage(sourceDatasetId = d.datasetId,groups = groups,losses = losses)
+        val format = if(wanted.cardIds.isEmpty() && wanted.typeIds.isEmpty()) 1 else 2
+        return SelectivePackage(formatVersion = format,minimumReader = format,sourceDatasetId = d.datasetId,groups = groups,losses = losses)
     }
     fun inspect(text: String): TransferInspection = try { inspect(codec.decodeFromString<SelectivePackage>(text)) }
         catch(e: CoreError) { throw e } catch(_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed selective package") }
     fun inspect(value: SelectivePackage): TransferInspection {
         val snapshot = value.frozen()
-        ensure(snapshot.formatVersion == 1 && snapshot.minimumReader == 1 && snapshot.sourceDatasetId.isNotBlank() && snapshot.transferId.isNotBlank(),"Unsupported selective package",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(snapshot.formatVersion in 1..2 && snapshot.minimumReader == snapshot.formatVersion && snapshot.sourceDatasetId.isNotBlank() && snapshot.transferId.isNotBlank(),"Unsupported selective package",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(snapshot.formatVersion >= 2 || snapshot.groups.all { it.content.catalogRoots.empty },"Catalog roots require selective format2",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(snapshot.groups.isNotEmpty() && snapshot.groups.map { it.id }.distinct().size == snapshot.groups.size && snapshot.groups.map { it.originId }.distinct().size == snapshot.groups.size,"Duplicate/empty transfer groups")
         snapshot.groups.forEach { ensure(it.id.isNotBlank() && it.originId.isNotBlank() && it.sourceRevision >= 0 && payloadHash(it.content) == it.hash && it.entities == entityManifest(it.content,it.sourceRevision,it.originId),"Transfer hash/manifest mismatch");validateContent(it.content) }
         return TransferInspection(snapshot.transferId,snapshot.groups,snapshot.losses,frozenSet(snapshot.groups.flatMap { it.content.sessions }.filter { it.status != SessionStatus.STOPPED }.map { it.id }))
@@ -166,7 +213,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
                             types = imported.types.filter { x -> d.types.none { it.id == x.id } },cards = imported.cards.filter { x -> d.cards.none { it.id == x.id } },
                             axes = imported.axes.filter { x -> d.axes.none { it.id == x.id && it.meaningVersion == x.meaningVersion } },
                             metrics = imported.metrics.filter { x -> d.metrics.none { it.id == x.id && it.meaningVersion == x.meaningVersion } },
-                            units = imported.units.filter { x -> d.units.none { it.id == x.id } }))
+                            units = imported.units.filter { x -> d.units.none { it.id == x.id } },catalogRoots = TransferCatalogRoots()))
                     } catch(e: CoreError) { next = d;progress.copy(state = TransferGroupState.REJECTED,reason = e.code.name) }
                 }
                 val revision = Math.addExact(d.revision,1)
@@ -211,6 +258,10 @@ class SelectiveTransfer(private val tracker: Tracker) {
         }
         fun contentHash(content: TransferContent): String = payloadHash(content)
         internal fun validateContent(c: TransferContent) {
+            for((field,ids,present) in listOf(Triple("cardIds",c.catalogRoots.cardIds,c.cards.map { it.id }.toSet()),Triple("typeIds",c.catalogRoots.typeIds,c.types.map { it.id }.toSet()))) {
+                val missing = (ids-present).sorted().firstOrNull()
+                ensureReason(missing == null,ErrorReason.CATALOG_ROOT_INVALID,arguments = mapOf("rootId" to ErrorArgument.Identifier(missing ?: ""),"rule" to ErrorArgument.Text("MISSING_REFERENCE")),fieldPath = "transfer.catalogRoots.$field")
+            }
             ensure(c.sessions.none { it.status == SessionStatus.RUNNING } && c.segments.all { it.anchor == null && (it.end != null || it.uncertain) } && c.focus?.breakAnchor == null,"Transfer cannot contain live device anchors")
             validate(Dataset(types = c.types,cards = c.cards,sessions = c.sessions,segments = c.segments,measurements = c.measurements,
             axes = c.axes,metrics = c.metrics,units = c.units,schedule = ScheduleData(c.series,c.overrides,c.links),focus = c.focus,goals = c.goals,favorites = c.favorites)) }
@@ -268,3 +319,11 @@ internal fun validateTransfer(d: Dataset) {
 
 private fun SelectivePackage.frozen(): SelectivePackage = copy(
     groups = frozenList(groups.map { it.copy(content = it.content.frozen(),entities = frozenList(it.entities)) }),losses = frozenList(losses))
+
+/** Persisted format10 additions, including minimal receipts after explicit retention. */
+fun TransferState.hasCatalogRoots(): Boolean {
+    fun rooted(origin: TransferOrigin) = !originCatalogRoots(origin).empty
+    return origins.any(::rooted) || operations.any { op -> op.groups.any {
+        !it.group.content.catalogRoots.empty || it.inserted?.catalogRoots?.empty == false || it.previousOrigin?.let(::rooted) == true
+    } }
+}

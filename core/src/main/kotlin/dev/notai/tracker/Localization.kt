@@ -12,7 +12,7 @@ import java.util.Locale
     @Serializable data class Identifier(val value: String): ErrorArgument()
     @Serializable data class Date(val iso: String): ErrorArgument()
 }
-@Serializable enum class ErrorReason { IDEMPOTENCY_CONFLICT, SERIES_NOT_FOUND, OCCURRENCE_NOT_FOUND, OCCURRENCE_COLLISION, LOCALE_UNAVAILABLE, TRANSFER_BASE_CHANGED, TRANSFER_PAYLOAD_PRUNED, RETENTION_BLOCKED, RETENTION_CONFIRMATION_REQUIRED, RETENTION_PREVIEW_CHANGED }
+@Serializable enum class ErrorReason { IDEMPOTENCY_CONFLICT, SERIES_NOT_FOUND, OCCURRENCE_NOT_FOUND, OCCURRENCE_COLLISION, LOCALE_UNAVAILABLE, TRANSFER_BASE_CHANGED, TRANSFER_PAYLOAD_PRUNED, RETENTION_BLOCKED, RETENTION_CONFIRMATION_REQUIRED, RETENTION_PREVIEW_CHANGED, SCHEDULE_DAY_INVALID, CATALOG_ROOT_INVALID }
 @Serializable data class LocalizedError(val code: ErrorCode, val arguments: Map<String,ErrorArgument> = emptyMap(), val fieldPath: String? = null,val reason: ErrorReason? = null) {
     val resourceKey get() = "tracker.error.${(reason?.name ?: code.name).lowercase(Locale.ROOT)}"
 }

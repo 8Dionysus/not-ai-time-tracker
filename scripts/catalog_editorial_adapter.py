@@ -48,8 +48,14 @@ def adapt(catalog_dir, parts_dir, expected_manifest_sha256, expected_candidate_s
     sources = source_records(vocabulary)
     raw_manifest, manifest = pack.read_json(parts_dir / f"{locale}-input-parts-manifest.json", 64 * 1024)
     pack.require(pack.digest(raw_manifest) == expected_manifest_sha256, "Editorial parts manifest hash mismatch")
-    pack.require(set(manifest) == {"parts", "entries", "sourceCandidateSha256"} and
-                 manifest["sourceCandidateSha256"] == expected_candidate_sha256, "Unexpected editorial candidate")
+    legacy_fields = {"parts", "entries", "sourceCandidateSha256"}
+    bound_fields = {"sourceCatalogSha256", "candidateSha256", "locale", "rightsStatus", "nativeSpeakerQA", "entries", "parts"}
+    if set(manifest) == bound_fields:
+        pack.require(manifest["sourceCatalogSha256"] == source_manifest["sha256"] and manifest["candidateSha256"] == expected_candidate_sha256 and
+                     manifest["locale"] == locale and manifest["rightsStatus"] == "source_rights_review_pending" and manifest["nativeSpeakerQA"] is False,
+                     "Incompatible editorial manifest binding")
+    else:
+        pack.require(set(manifest) == legacy_fields and manifest["sourceCandidateSha256"] == expected_candidate_sha256, "Unexpected editorial candidate")
     pack.require(isinstance(manifest["parts"], list) and 1 <= len(manifest["parts"]) <= 128, "Invalid editorial parts")
     paths = set()
     rows = []
@@ -92,6 +98,7 @@ def adapt(catalog_dir, parts_dir, expected_manifest_sha256, expected_candidate_s
     payload = {"schemaVersion": 1, "entries": [converted[pack.identity(row["key"])] for row in originals["entries"]]}
     counts = pack.validate_payload(payload, originals)
     report = {**counts, "localeTag": locale, "sourceCatalogSha256": source_manifest["sha256"], "sourceRecordsVerified": len(found),
+              "manifestBinding": "source_bound" if set(manifest) == bound_fields else "legacy_minimal",
               "inputManifestSha256": expected_manifest_sha256, "parts": verified_parts,
               "producerCandidateSha256": expected_candidate_sha256, "canonicalCandidateBytesVerified": False,
               "canonicalCandidateReconstructionRequired": False,

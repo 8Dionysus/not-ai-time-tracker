@@ -1,0 +1,21 @@
+{
+  "transport": "existing emulator-5580 / TCP5581",
+  "officialAdbClient": "blocked by read-only home; no HOME/security changes",
+  "readOnlyCommands": "getprop sys.boot_completed; dalvikvm64 -version; exit status",
+  "authenticatedByProbe": false,
+  "packets": [
+    "CNXN",
+    "OKAY",
+    "WRTE",
+    "WRTE",
+    "WRTE",
+    "WRTE",
+    "WRTE",
+    "WRTE",
+    "CLSE"
+  ],
+  "greeting": "CNXN",
+  "result": "read-only guest ADB channel completed",
+  "artExit0": false,
+  "bootCompleted": false
+}

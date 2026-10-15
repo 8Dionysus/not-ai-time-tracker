@@ -60,4 +60,40 @@ class PrivateCopyMetadataTest {
         } finally { pool.shutdownNow();pool.awaitTermination(5,java.util.concurrent.TimeUnit.SECONDS) }
         assertFalse(Files.readAttributes(file.toPath(),java.nio.file.attribute.BasicFileAttributes::class.java).isRegularFile)
     }
+    @Test fun chooserReferenceSurvivesReopenUntilTheExistingResultCallbackConfirmsCompletion() = fixture { _ ->
+        val app = org.robolectric.RuntimeEnvironment.getApplication()
+        val exports = ExportOperations(app);val op = exports.begin("text/plain","fixture only")
+        exports.prepare(op.id) { it.write("fixture export".toByteArray()) }
+        exports.awaitResult(op.id);exports.awaitResult(op.id)
+        val gate = PrivateFileMaintenance.forContext(app)
+        val held = gate.state().references.single { it.owner == "export-chooser:${op.id}" }
+        val reopened = CopyMaintenance(PrivateFileMaintenance.metadata(java.io.File(app.noBackupFilesDir,"private-copy-maintenance.json")))
+        assertTrue(held in reopened.state().references);assertEquals(CopyBlocker.CHOOSER_RESULT_PENDING,held.blocker)
+        exports.cancel(op.id);assertTrue(held in gate.state().references)
+        exports.receiveResult(op.id,true);exports.receiveResult(op.id,true)
+        assertFalse(gate.state().references.any { it.owner == held.owner })
+        assertTrue(gate.state().references.any { it.owner == "legacy-ui-lifecycle" })
+        assertEquals("CANCELLED",exports.read(op.id).state);assertTrue(exports.read(op.id).resultReceived)
+        assertEquals("fixture export",java.io.File(app.noBackupFilesDir,"exports/${op.id}/data").readText())
+    }
+    @Test fun failedRollbackConsumerKeepsItsDurableReferenceForExplicitRecovery() = fixture { _ ->
+        val app = org.robolectric.RuntimeEnvironment.getApplication();val rollback = PrivateRollbackStore(app)
+        assertThrows(java.io.IOException::class.java) { rollback.protecting<Unit> { throw java.io.IOException("fixture uncertain domain commit") } }
+        val gate = CopyMaintenance(PrivateFileMaintenance.metadata(java.io.File(app.noBackupFilesDir,"private-copy-maintenance.json")))
+        val held = gate.state().references.single { it.owner == "rollback-consumer" }
+        assertEquals(CopyBlocker.REQUIRED_BY_PENDING_RECOVERY,held.blocker)
+        gate.release(held) // Test owner's explicit review/release; never age-based or automatic.
+        assertTrue(gate.state().references.any { it.owner == "legacy-ui-lifecycle" })
+    }
+    @Test fun unavailableNativeBindingRetainsAReadyArchiveReferenceWithoutLosingRawBytes() = fixture { _ ->
+        val app = org.robolectric.RuntimeEnvironment.getApplication()
+        app.getDatabasePath("tracker.db").apply { parentFile!!.mkdirs();writeText("isolated raw fixture") }
+        val archive = DatabaseArchives.capture(app)
+        val gate = PrivateFileMaintenance.forContext(app)
+        assertFalse(gate.state().references.any { it.owner == "archive-draft:${archive.name}" })
+        assertTrue(gate.state().references.any { it.owner == "archive-ready:${archive.name}" })
+        assertEquals("isolated raw fixture",java.io.File(archive,"tracker.db").readText())
+        assertFalse(PrivateCopyBackend.inspect(app).unavailableCapabilities.isEmpty())
+        assertTrue(gate.state().references.any { it.owner == "legacy-ui-lifecycle" })
+    }
 }

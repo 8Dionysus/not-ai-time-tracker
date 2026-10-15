@@ -31,10 +31,12 @@ object PrivateFileMaintenance {
             gate.acquire("legacy-ui-lifecycle",null,CopyBlocker.UNKNOWN_FILE_OR_STATE)
         Unit
     }
-    internal fun <T> writing(context: Context,owner: String,blocker: CopyBlocker = CopyBlocker.IN_PROGRESS,block: ()->T): T {
+    internal fun <T> writing(context: Context,owner: String,blocker: CopyBlocker = CopyBlocker.IN_PROGRESS,block: ()->T): T =
+        writingWithReference(context,owner,blocker) { block() }
+    internal fun <T> writingWithReference(context: Context,owner: String,blocker: CopyBlocker = CopyBlocker.IN_PROGRESS,block: (CopyReference)->T): T {
         val gate = forContext(context)
         gate.locked { legacy(gate) }
-        return if(blocker == CopyBlocker.REQUIRED_BY_PENDING_RECOVERY) gate.locked { gate.writing(owner,blocker = blocker,block = block) }
-            else gate.writing(owner,blocker = blocker,block = block)
+        return if(blocker == CopyBlocker.REQUIRED_BY_PENDING_RECOVERY) gate.locked { gate.writingWithReference(owner,blocker = blocker,block = block) }
+            else gate.writingWithReference(owner,blocker = blocker,block = block)
     }
 }

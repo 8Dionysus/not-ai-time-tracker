@@ -1,0 +1,14 @@
+{
+  "adb": {
+    "bytes": 10642368,
+    "sha256": "a902be8f45c6c62e76c9efaf6947a0fa747c9cabd89a2ac8e0d16ecb30b3ed01"
+  },
+  "classes.dex": {
+    "bytes": 1272,
+    "sha256": "5d29216e98a7e7fa32829d834c64fa537aa5497718d1f6e30bdb3d82899f41cb"
+  },
+  "emulator": {
+    "bytes": 10144264,
+    "sha256": "27e9a8cbd545529ba2c1aca973e5bc060f50b36a68d2c03296b0162291a16b83"
+  }
+}

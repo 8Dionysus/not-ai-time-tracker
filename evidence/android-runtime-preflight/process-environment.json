@@ -1,0 +1,14 @@
+{
+  "ANDROID_HOME": "/workspace/tracker-runtime-preflight/sdk",
+  "ANDROID_SDK_ROOT": "/workspace/tracker-runtime-preflight/sdk",
+  "ANDROID_EMULATOR_HOME": "/workspace/tracker-runtime-preflight/service/emulator",
+  "ANDROID_AVD_HOME": "/workspace/tracker-runtime-preflight/avd",
+  "ANDROID_USER_HOME": "/workspace/tracker-runtime-preflight/service",
+  "ANDROID_SDK_HOME": "/workspace/tracker-runtime-preflight/service",
+  "ANDROID_PREFS_ROOT": "/workspace/tracker-runtime-preflight/service",
+  "ANDROID_ADB_LOG_PATH": "/workspace/tracker-runtime-preflight/service/adb.log",
+  "XDG_CACHE_HOME": "/workspace/tracker-runtime-preflight/service/cache",
+  "TMPDIR": "/workspace/tracker-runtime-preflight/tmp",
+  "ANDROID_I_WANT_MY_TCG": "yes",
+  "QT_QPA_PLATFORM": "offscreen"
+}

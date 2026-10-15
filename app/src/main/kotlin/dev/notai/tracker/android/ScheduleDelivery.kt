@@ -108,8 +108,9 @@ class AndroidScheduleDelivery(context: Context,tracker: Tracker) {
     fun onAlarm(hash: String) = coordinator.onAlarm(hash)
 }
 internal fun hasScheduleWakeSource(context: Context): Boolean {
+    if(!DatabaseFiles.exists(context)) return false
     val store = AndroidScheduleDeliveryStore(context)
-    return store.locked { store.control().pending != null } && DatabaseFiles.exists(context)
+    return store.locked { store.control().pending != null }
 }
 class ScheduleAlarmReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context,intent: Intent) {

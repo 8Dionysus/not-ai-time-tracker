@@ -1,0 +1,111 @@
+{
+  "sourceCheckpoint": "1d37545586268e594d90f317b007a117be5b06ff",
+  "attempts": 1,
+  "limitSeconds": 600,
+  "status": {
+    "pid": 22509,
+    "phase": "deadline",
+    "bootCompleted": false,
+    "artExecuted": false,
+    "adbAvailable": false,
+    "elapsedSeconds": 601.03,
+    "exitCode": -6,
+    "stoppedAfterBoundedPreflight": true
+  },
+  "packages": {
+    "emulator": {
+      "package": "emulator",
+      "revision": "37.2.12",
+      "channel": "stable",
+      "url": "https://dl.google.com/android/repository/emulator-linux_x64-16428233.zip",
+      "bytes": 349654171,
+      "repositorySha1": "cd7362ea55dfb86a418958138dc396e74165dd01",
+      "sha256": "b08fc43d8608d2955f607f1b287beb525041e730086bdca3af152accac3af9c1",
+      "license": "android-sdk-license",
+      "licenseSha256": "1f8729233617b193fd619213792ae16a41b95d2bbbf525dfe66998252ba68b16",
+      "authorization": "Explicit user authorization, 15 October2026; one official Emulator+AOSP test under Android SDK terms",
+      "sdk": "/workspace/tracker-runtime-preflight/sdk"
+    },
+    "image": {
+      "package": "system-images;android-36;default;x86_64",
+      "revision": "2",
+      "channel": "stable",
+      "url": "https://dl.google.com/android/repository/sys-img/android/x86_64-36_r02.zip",
+      "bytes": 844217077,
+      "repositorySha1": "829c076e8ff448a336097ae25a355b495ba36e2c",
+      "sha256": "e1b9d9fb665001ef27b16e57d8762a2d54aec6bff617e17506edb8676667b9da",
+      "license": "android-sdk-license",
+      "licenseSha256": "1f8729233617b193fd619213792ae16a41b95d2bbbf525dfe66998252ba68b16",
+      "authorization": "Explicit user authorization, 15 October2026; one official Emulator+AOSP test under Android SDK terms",
+      "sdk": "/workspace/tracker-runtime-preflight/sdk"
+    }
+  },
+  "kernelAndInitObserved": true,
+  "guestAdbProtocolCNXN": true,
+  "guestAuthenticationByProbe": false,
+  "artVersionBinary": "ART version 2.1.0 x86_64; -showversion exit0, exits before main",
+  "ownJavaMainExecuted": false,
+  "bootCompletedWithinLimit": false,
+  "officialAdbClientUsable": false,
+  "exactBlockers": [
+    "Official adb37.0.0 aborts trying mkdir /home/agent/.android on read-only filesystem despite Android service-directory variables; HOME/security/permissions unchanged",
+    "TCG kernel/init/system_server and guest ADB reached, but sys.boot_completed remained empty through600s; bounded attempt stopped",
+    "Own Dex fixture transferred only into empty test guest; -showversion did not execute its main, final main-only probe was after shutdown and got connection refused"
+  ],
+  "notClaimed": [
+    "phone or OEM acceptance",
+    "application/JNI/UI scenarios",
+    "Java fixture main pass",
+    "impossibility of software emulation"
+  ],
+  "evidence": {
+    "TrackerArtProbe.java": {
+      "bytes": 265,
+      "sha256": "ca1e2e51e5af2ddb19c20833d45184d9ff21d029f53501672065d03d97c2de16"
+    },
+    "TrackerArtProbe.class": {
+      "bytes": 779,
+      "sha256": "e36a1e760269791f608b167fba7bf7e856f7b4599bdd6f7eec1d80abda967f84"
+    },
+    "dex/classes.dex": {
+      "bytes": 1272,
+      "sha256": "5d29216e98a7e7fa32829d834c64fa537aa5497718d1f6e30bdb3d82899f41cb"
+    },
+    "command.json": {
+      "bytes": 1296,
+      "sha256": "a3ff4ba75e1ae2493f61b6f346a574e38bba42d36a948d256bf60408233a6965"
+    },
+    "emulator.log": {
+      "bytes": 430392,
+      "sha256": "16817c1309b162879ceb8e28e40eac7f3efcdb5a4c1a89ed2b1ac10bcde6d5df"
+    },
+    "adb-version.log": {
+      "bytes": 120,
+      "sha256": "9887fa1e63dc21c475982c121c5274cef73ee909a47907d09c32c8be3df5ace6"
+    },
+    "guest-adb-readonly.log": {
+      "bytes": 8877,
+      "sha256": "64cb7554ea3e2c98b321e81f60d1e2667d523994f0ded58099b2e282c92b5ffd"
+    },
+    "guest-art-fixture.log": {
+      "bytes": 74,
+      "sha256": "29b2fb0b2c130a3cd4c9738d2e2e72e37b897c2c829ac029c80c3c3022cb4117"
+    },
+    "guest-art-main.json": {
+      "bytes": 410,
+      "sha256": "7d747dcda8d744cc31a1b61afaf37b1c942e5a7a95f71b8804b38b6fee52bf23"
+    }
+  },
+  "officialDocs": [
+    "https://developer.android.com/studio/terms",
+    "https://developer.android.com/studio/run/emulator-commandline"
+  ],
+  "furtherLaunches": 0,
+  "terminationInitiatedByProbe": "SIGTERM at600s deadline; exit-6 is after probe-initiated shutdown, not an independently diagnosed boot crash",
+  "ownedLiveVmProcessesAfterStop": 0,
+  "ownedDefunctProcessesAfterStop": [
+    22492,
+    22865
+  ],
+  "artVersionCommandSucceeded": true
+}

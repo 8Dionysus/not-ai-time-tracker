@@ -59,7 +59,7 @@ object ScheduleDeliveryProfile {
                 val before = heap();val times = (0 until 3).map {
                     val begin = System.nanoTime();check(delivery.synchronize().alarmAccepted);(System.nanoTime()-begin)/1_000_000.0
                 }
-                check(writes == 0 && reads == 3)
+                check(writes == 0 && reads == 12) // Snapshot compatibility defaults perform indexed-port lookups by full read.
                 samples += Sample(n,bytes,times,times.sorted()[1],times.max(),reads,writes,before,heap())
                 if(n == count) {
                     check(bytes == CopyMetadataBytes.MAX_BYTES)
@@ -70,7 +70,7 @@ object ScheduleDeliveryProfile {
                     check(rejected && delegate.postCalls.isEmpty() && !hooks && delegate.pending == null)
                     check(digest == sha256(files.read("maintenance.json")) && store.read().attempts == source.attempts)
                     check(tracker.data() == data)
-                    val evidence = Evidence("HOST JVM, 1GiB max heap, POSIX temp files/page cache; three sequential syncs; no Android/OEM/RAM/PSS/battery or unlimited-capacity claim",
+                    val evidence = Evidence("HOST JVM legacy snapshot compatibility adapter of current source (not v7 production timing), 1GiB max heap, POSIX temp files/page cache; three sequential syncs; no Android/OEM/RAM/PSS/battery or unlimited-capacity claim",
                         CopyMetadataBytes.MAX_BYTES,count,samples,true,true,delegate.postCalls.size,delegate.pending == null,!hooks,(System.nanoTime()-started)/1_000_000.0)
                     val output = java.io.File(requireNotNull(System.getProperty("tracker.schedule.profile")))
                     output.parentFile.mkdirs();output.writeText(codec.encodeToString(evidence));println(output.readText())

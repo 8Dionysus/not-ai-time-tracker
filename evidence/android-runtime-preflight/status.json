@@ -1,0 +1,10 @@
+{
+  "pid": 22509,
+  "phase": "deadline",
+  "bootCompleted": false,
+  "artExecuted": false,
+  "adbAvailable": false,
+  "elapsedSeconds": 601.03,
+  "exitCode": -6,
+  "stoppedAfterBoundedPreflight": true
+}

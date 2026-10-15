@@ -1045,6 +1045,11 @@ class RoomScenariosTest: ScenarioContract() {
             runBlocking { withContext(Dispatchers.IO) { DatabaseRecovery.apply(context,DatabaseRecovery.prepare(source)) } }
         } } finally { DirectoryDurability.rename = rename }
         org.junit.Assert.assertTrue(DatabaseRecovery.needsAttention(context))
+        val pendingJob = kotlinx.serialization.json.Json.parseToJsonElement(java.io.File(context.noBackupFilesDir,"recovery-pending.json").readText()).jsonObject
+        org.junit.Assert.assertEquals(2,pendingJob.getValue("format").jsonPrimitive.content.toInt())
+        val recoveryRefs = PrivateFileMaintenance.forContext(context).state().references.filter { it.owner == "database-recovery" }
+        org.junit.Assert.assertEquals(1,recoveryRefs.size)
+        org.junit.Assert.assertTrue(pendingJob.getValue("referenceTokens").jsonArray.any { it.jsonPrimitive.content == recoveryRefs.single().token })
         org.junit.Assert.assertThrows(CoreError::class.java) { TrackerRuntime.get(context) }
         val archives = java.io.File(context.noBackupFilesDir,"database-archives").listFiles().orEmpty()
         val preserved = archives.first { java.io.File(it,"tracker.db").exists() && java.io.File(it,"tracker.db-wal").exists() && java.io.File(it,"tracker.db-shm").exists() }
@@ -1057,6 +1062,8 @@ class RoomScenariosTest: ScenarioContract() {
         val archive = java.io.File(context.noBackupFilesDir,"database-archives/${result.archive}")
         org.junit.Assert.assertTrue(java.io.File(archive,"manifest.json").exists())
         org.junit.Assert.assertFalse(DatabaseRecovery.needsAttention(context))
+        org.junit.Assert.assertFalse(PrivateFileMaintenance.forContext(context).state().references.any { it.owner == "database-recovery" })
+        org.junit.Assert.assertTrue(PrivateFileMaintenance.forContext(context).state().references.any { it.owner == "legacy-ui-lifecycle" })
         val db = TrackerDatabase.open(context)
         try {
             val data = runBlocking { withContext(Dispatchers.IO) { RoomStore(db).read() } }

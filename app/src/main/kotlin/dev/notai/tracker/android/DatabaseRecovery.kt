@@ -60,7 +60,8 @@ object DatabaseArchives {
         StartupTrace.mark(context,"archive-created",System.nanoTime()-start);return directory
     }
 }
-@Serializable private data class RecoveryJob(val id: String,val source: String,val archive: String,val candidate: String,val sourceSha256: String)
+@Serializable private data class RecoveryJob(val id: String,val source: String,val archive: String? = null,val candidate: String? = null,val sourceSha256: String,
+    val format: Int = 1,val referenceTokens: Set<String> = emptySet(),val archiveIds: Set<String> = emptySet())
 class RescuePreview internal constructor(internal val source: File,internal val backup: Backup,internal val sourceSha256: String) {
     val sessions get() = backup.data.sessions.size
     val segments get() = backup.data.segments.size
@@ -71,13 +72,19 @@ data class RescueResult(val archive: String,val sessions: Int)
 object DatabaseRecovery {
     private fun pending(context: Context) = File(context.noBackupFilesDir,"recovery-pending.json")
     fun needsAttention(context: Context) = pending(context).exists()
-    internal fun protectedArchiveIds(context: Context): Set<String> {
-        val text = PrivateFileMaintenance.metadata(pending(context)).read() ?: return emptySet()
-        val job = codec.decodeFromString<RecoveryJob>(text);val archive = File(job.archive)
-        ensure(archive.parentFile == File(context.noBackupFilesDir,"database-archives") && archive.name.matches(Regex("[0-9a-f-]{36}")),
-            "Recovery archive reference is not trusted",ErrorCode.STORAGE)
-        return setOf(archive.name)
+    private fun job(context: Context): RecoveryJob? = PrivateFileMaintenance.metadata(pending(context)).read()?.let { text ->
+        codec.decodeFromString<RecoveryJob>(text).also { j ->
+            ensure(j.format in 1..2 && (j.format != 1 || j.referenceTokens.isEmpty() && j.archiveIds.isEmpty() && j.archive != null && j.candidate != null) &&
+                (j.format != 2 || j.referenceTokens.isNotEmpty()),"Unknown recovery journal version",ErrorCode.STORAGE)
+            ensure(j.id.matches(Regex("[0-9a-f-]{36}")) && File(j.source).isAbsolute && (j.candidate == null || j.candidate.matches(Regex("rescue-[0-9a-f-]{36}\\.db"))),"Invalid recovery job paths",ErrorCode.STORAGE)
+            ensure(j.sourceSha256.matches(Regex("[0-9a-f]{64}")) && j.referenceTokens.all { it.matches(Regex("[0-9a-f-]{36}")) } &&
+                j.archiveIds.all { it.matches(Regex("[0-9a-f-]{36}")) },"Invalid recovery journal identity",ErrorCode.STORAGE)
+            j.archive?.let { path -> val a = File(path)
+                ensure(a.parentFile == File(context.noBackupFilesDir,"database-archives") && a.name.matches(Regex("[0-9a-f-]{36}")),"Recovery archive reference is not trusted",ErrorCode.STORAGE)
+            }
+        }
     }
+    internal fun protectedArchiveIds(context: Context): Set<String> = job(context)?.let { j -> j.archiveIds+j.archive?.let { setOf(File(it).name) }.orEmpty() }.orEmpty()
     fun prepare(context: Context,source: File): RescuePreview = PrivateFileMaintenance.forContext(context).let { gate ->
         gate.locked { PrivateFileMaintenance.legacy(gate);prepareUnsafe(source) }
     }
@@ -89,15 +96,29 @@ object DatabaseRecovery {
         return RescuePreview(source,backup,hash)
     }
     /** Explicit replacement. Source/rollback and raw original files remain available. */
-    fun apply(context: Context,preview: RescuePreview): RescueResult = PrivateFileMaintenance.writing(context,"database-recovery",CopyBlocker.REQUIRED_BY_PENDING_RECOVERY) { applyUnsafe(context,preview) }
-    private fun applyUnsafe(context: Context,preview: RescuePreview): RescueResult {
+    fun apply(context: Context,preview: RescuePreview): RescueResult = PrivateFileMaintenance.forContext(context).locked {
+        // A known stale preview refuses before acquiring a durable writer or changing a journal.
+        ensure(fileHash(preview.source) == preview.sourceSha256,"Recovery source changed after preview",ErrorCode.STALE)
+        PrivateFileMaintenance.writingWithReference(context,"database-recovery",CopyBlocker.REQUIRED_BY_PENDING_RECOVERY) { reference -> applyUnsafe(context,preview,reference) }
+    }
+    private fun applyUnsafe(context: Context,preview: RescuePreview,reference: CopyReference): RescueResult {
         ensure(fileHash(preview.source) == preview.sourceSha256,"Recovery source changed after preview",ErrorCode.STALE)
         val liveSource = StreamingBackup.read { preview.source.inputStream() }
         ensure(liveSource == preview.backup,"Recovery source changed after preview",ErrorCode.STALE)
+        val previous = job(context)?.takeIf { it.source == preview.source.absolutePath && it.sourceSha256 == preview.sourceSha256 }
+        val gate = PrivateFileMaintenance.forContext(context)
+        val priorTokens = previous?.referenceTokens.orEmpty()
+        ensure(priorTokens.all { token -> gate.state().references.any { it.token == token && it.owner == "database-recovery" && it.blocker == CopyBlocker.REQUIRED_BY_PENDING_RECOVERY } },"Recovery reference registry changed",ErrorCode.STORAGE)
         TrackerRuntime.beginRecovery()
         try {
+            var current = RecoveryJob(newId(),preview.source.absolutePath,sourceSha256 = preview.sourceSha256,format = 2,
+                referenceTokens = priorTokens+reference.token,archiveIds = previous?.let { it.archiveIds+it.archive?.let { a -> setOf(File(a).name) }.orEmpty() }.orEmpty())
+            // Durable source/reference relationship precedes archive/candidate preparation too.
+            atomicText(pending(context),codec.encodeToString(current))
             val archive = DatabaseArchives.capture(context,forceSeparate = true)
             val candidateName = "rescue-${newId()}.db"
+            current = current.copy(archive = archive.absolutePath,candidate = candidateName,archiveIds = current.archiveIds+archive.name)
+            atomicText(pending(context),codec.encodeToString(current))
             val restored = Backups.restoredData(liveSource,Math.addExact(liveSource.data.revision,1))
             val candidate = TrackerDatabase.open(context,candidateName)
             try {
@@ -108,8 +129,6 @@ object DatabaseRecovery {
                 }
             } finally { candidate.close() }
             ensure(fileHash(preview.source) == preview.sourceSha256,"Recovery source changed before replacement",ErrorCode.STALE)
-            val job = RecoveryJob(newId(),preview.source.absolutePath,archive.absolutePath,candidateName,preview.sourceSha256)
-            atomicText(pending(context),codec.encodeToString(job))
             val retired = File(archive,"retired").apply { mkdirs() }
             for(name in listOf("tracker.db","tracker.db-wal","tracker.db-shm","tracker.db-journal")) {
                 val original = context.getDatabasePath(name)
@@ -122,15 +141,18 @@ object DatabaseRecovery {
             val db = TrackerDatabase.open(context)
             try { ensure(RoomStore(db,{ restored }).read() == restored,"Installed recovery readback failed",ErrorCode.STORAGE) }
             finally { db.close() }
-            PrivateCopyBackend.completeArchive(context,archive.name)
+            current.archiveIds.forEach { PrivateCopyBackend.completeArchive(context,it) }
             ensure(pending(context).delete(),"Recovery journal could not be completed",ErrorCode.STORAGE)
             syncDirectory(context.noBackupFilesDir)
+            // Only exact backend refs carried by this verified source/job chain are completed.
+            // The current writer is released by its outer scope; legacy/UI/other-source refs stay.
+            gate.state().references.filter { it.token in priorTokens && it.owner == "database-recovery" }.forEach(gate::release)
             return RescueResult(archive.name,restored.sessions.size)
         } finally { TrackerRuntime.endRecovery() }
     }
     /** Retry from the retained verified source after a crash; no automatic empty initialization. */
     fun resume(context: Context): RescueResult {
-        val job = codec.decodeFromString<RecoveryJob>(pending(context).readText())
+        val job = job(context) ?: fail(ErrorCode.STORAGE,"Recovery journal missing")
         ensure(fileHash(File(job.source)) == job.sourceSha256,"Retained recovery source changed; select a copy and review it again",ErrorCode.STALE)
         return apply(context,prepare(File(job.source)))
     }

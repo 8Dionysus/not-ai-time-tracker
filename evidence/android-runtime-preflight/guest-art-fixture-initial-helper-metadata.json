@@ -1,0 +1,24 @@
+{
+  "transport": "existing emulator-5580 / TCP5581",
+  "officialAdbClient": "blocked by read-only home; no HOME/security changes",
+  "readOnlyCommands": "getprop sys.boot_completed; dalvikvm64 -version; exit status",
+  "authenticatedByProbe": false,
+  "packets": [
+    "CNXN",
+    "OKAY",
+    "OKAY",
+    "WRTE",
+    "CNXN",
+    "OKAY",
+    "WRTE",
+    "WRTE",
+    "WRTE",
+    "WRTE",
+    "CLSE"
+  ],
+  "result": "own synthetic Dex fixture executed through existing guest ADB transport",
+  "fixtureOnlyWrite": "/data/local/tmp/tracker-art-preflight.dex",
+  "artExit0": true,
+  "javaMainRan": false,
+  "bootCompleted": false
+}

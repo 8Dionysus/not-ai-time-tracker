@@ -1,0 +1,24 @@
+{
+  "transport": "existing emulator-5580 / TCP5581",
+  "officialAdbClient": "blocked by read-only home; no HOME/security changes",
+  "readOnlyCommands": "push own Dex fixture to empty AOSP guest, then getprop and dalvikvm64 -showversion TrackerArtProbe",
+  "authenticatedByProbe": false,
+  "packets": [
+    "CNXN",
+    "OKAY",
+    "OKAY",
+    "WRTE",
+    "CNXN",
+    "OKAY",
+    "WRTE",
+    "WRTE",
+    "WRTE",
+    "WRTE",
+    "CLSE"
+  ],
+  "result": "ART -showversion returned version and exit0; it exits before Java main. No Java main execution claim.",
+  "fixtureOnlyWrite": "/data/local/tmp/tracker-art-preflight.dex",
+  "artExit0": true,
+  "javaMainRan": false,
+  "bootCompleted": false
+}

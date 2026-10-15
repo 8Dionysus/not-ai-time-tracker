@@ -116,7 +116,10 @@ class ScheduleDelivery(private val tracker: Tracker,private val store: ScheduleD
         do { val page = attemptsPageLocked(cursor,1024);result += page.attempts;cursor = page.nextAfterSequence ?: break } while(true)
         frozenList(result)
     }
-    fun attemptsPage(afterSequence: Long = 0,limit: Int = 100): ScheduleAttemptPage = operational { attemptsPageLocked(afterSequence,limit) }
+    fun attemptsPage(afterSequence: Long = 0,limit: Int = 100): ScheduleAttemptPage {
+        ensure(afterSequence >= 0 && limit in 1..1024,"Invalid reminder receipt page")
+        return operational { attemptsPageLocked(afterSequence,limit) }
+    }
     private fun attemptsPageLocked(after: Long,limit: Int): ScheduleAttemptPage = store.page(after,limit).let { page ->
         page.copy(attempts = frozenList(page.attempts.map { if(it.status == ScheduleAttemptStatus.RESERVED) it.copy(status = ScheduleAttemptStatus.UNKNOWN) else it }))
     }

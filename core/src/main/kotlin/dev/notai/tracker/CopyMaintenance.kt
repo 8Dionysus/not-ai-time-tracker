@@ -46,12 +46,14 @@ class CopyMaintenance(private val metadata: CopyMetadata,private val maxMetadata
         update { it.copy(references = it.references-reference) };Unit
     }
     /** Failed/interrupted operations keep their durable reference. Recovery is explicit. */
-    fun <T> writing(owner: String,itemId: String? = null,blocker: CopyBlocker = CopyBlocker.IN_PROGRESS,block: ()->T): T {
+    fun <T> writing(owner: String,itemId: String? = null,blocker: CopyBlocker = CopyBlocker.IN_PROGRESS,block: ()->T): T =
+        writingWithReference(owner,itemId,blocker) { block() }
+    fun <T> writingWithReference(owner: String,itemId: String? = null,blocker: CopyBlocker = CopyBlocker.IN_PROGRESS,block: (CopyReference)->T): T {
         val ref = locked {
             ensure(state().journals.none { it.phase !in setOf(CleanupPhase.DONE,CleanupPhase.RESTORED) },"Cleanup requires explicit completion",ErrorCode.STORAGE)
             acquire(owner,itemId,blocker)
         }
-        val result = block();release(ref);return result
+        val result = block(ref);release(ref);return result
     }
     fun blockers(itemId: String): Set<CopyBlocker> = locked { state().references.filter { it.itemId == null || it.itemId == itemId }.map { it.blocker }.toSet() }
     /** A backend writer invalidates the old immutable registration BEFORE altering its bytes.

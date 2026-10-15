@@ -1,0 +1,10 @@
+{
+  "transport": "existing emulator-5580 / TCP5581",
+  "officialAdbClient": "blocked by read-only home; no HOME/security changes",
+  "readOnlyCommands": "execute already staged own Dex main, without -showversion (version flag exits before main)",
+  "authenticatedByProbe": false,
+  "packets": [],
+  "result": "ConnectionRefusedError: [Errno 111] Connection refused",
+  "javaMainRan": false,
+  "exit0": false
+}

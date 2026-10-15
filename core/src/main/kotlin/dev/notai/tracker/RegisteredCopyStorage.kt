@@ -38,7 +38,9 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
     fun registerValidated(item: PrivateCopy,path: String,directory: Boolean,memberNames: Map<String,String>) = maintenance {
         mayRegister();ensure(path.substringBefore('/') == roots[item.kind],"Invalid copy root")
         val captured = manifests.capture(item,path,directory,memberNames,emptySet(),false)
-        val before = gate.state();val old = before.copies.singleOrNull { it.item.id == item.id || it.path == path }
+        val before = gate.state();val matches = before.copies.filter { it.item.id == item.id || it.path == path }
+        ensure(matches.size <= 1,"Conflicting registered copy identity",ErrorCode.STALE)
+        val old = matches.singleOrNull()
         if(old == null) gate.update { it.copy(copies = it.copies+captured) }
         else ensure(sameRegistration(old,captured),"Registered copy changed",ErrorCode.STALE)
         Unit
@@ -52,11 +54,14 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
         }
         ensure(captured.map { it.item.id }.distinct().size == captured.size && captured.map { it.path }.distinct().size == captured.size,"Duplicate archive registration")
         val additions = captured.filter { c ->
-            val old = before.copies.singleOrNull { it.item.id == c.item.id || it.path == c.path }
+            val matches = before.copies.filter { it.item.id == c.item.id || it.path == c.path }
+            ensure(matches.size <= 1,"Conflicting registered archive identity",ErrorCode.STALE)
+            val old = matches.singleOrNull()
             if(old != null) ensure(sameRegistration(old,c),"Sealed archive changed",ErrorCode.STALE)
             old == null
         }
         val all = before.copies+additions
+        ensure(all.map { it.item.id }.distinct().size == all.size && all.map { it.path }.distinct().size == all.size,"Duplicate registered archive")
         // References prevent deletion, not non-destructive registration of a complete manifest.
         captured.forEach { r -> manifests.prove(all,r,emptyList()) { locate(it,before) } }
         if(additions.isNotEmpty()) gate.update { it.copy(copies = all) }

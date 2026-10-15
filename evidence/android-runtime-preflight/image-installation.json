@@ -1,0 +1,13 @@
+{
+  "package": "system-images;android-36;default;x86_64",
+  "revision": "2",
+  "channel": "stable",
+  "url": "https://dl.google.com/android/repository/sys-img/android/x86_64-36_r02.zip",
+  "bytes": 844217077,
+  "repositorySha1": "829c076e8ff448a336097ae25a355b495ba36e2c",
+  "sha256": "e1b9d9fb665001ef27b16e57d8762a2d54aec6bff617e17506edb8676667b9da",
+  "license": "android-sdk-license",
+  "licenseSha256": "1f8729233617b193fd619213792ae16a41b95d2bbbf525dfe66998252ba68b16",
+  "authorization": "Explicit user authorization, 15 October2026; one official Emulator+AOSP test under Android SDK terms",
+  "sdk": "/workspace/tracker-runtime-preflight/sdk"
+}

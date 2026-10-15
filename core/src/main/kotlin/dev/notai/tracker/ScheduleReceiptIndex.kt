@@ -46,6 +46,8 @@ interface ScheduleReceiptSql: AutoCloseable {
  */
 class IndexedScheduleDeliveryStore(private val gate: Any,private val manifest: CopyMetadata,
     private val legacySource: CopyMetadata,private val open: (allowCreate: Boolean)->ScheduleReceiptSql): ScheduleDeliveryStore {
+    private val controlSchema = "CREATE TABLE control (id INTEGER PRIMARY KEY CHECK(id=1), database_id TEXT NOT NULL, revision INTEGER NOT NULL CHECK(revision>=0), pending TEXT, source_hash TEXT)"
+    private val attemptSchema = "CREATE TABLE attempts (sequence INTEGER PRIMARY KEY, identity TEXT NOT NULL UNIQUE, dataset_id TEXT NOT NULL, series_id TEXT NOT NULL, original_date TEXT NOT NULL, payload TEXT NOT NULL, UNIQUE(dataset_id,series_id,original_date))"
     private var connection: ScheduleReceiptSql? = null
     private val json = Json(codec) { prettyPrint = false }
     private val db get() = connection ?: error("Reminder index outside its gate")
@@ -53,6 +55,7 @@ class IndexedScheduleDeliveryStore(private val gate: Any,private val manifest: C
         if(connection != null) block() else {
             val text = manifest.read()
             val format = text?.let { json.parseToJsonElement(it).jsonObject["format"]?.jsonPrimitive?.content?.toInt() }
+            ensure(text != null || legacySource.read() == null,"Reminder migration source is missing; retained source preserved",ErrorCode.STORAGE)
             ensure(text == null || format in 1..2,"Unknown reminder storage format",ErrorCode.STORAGE)
             open(format != 2).use { sql ->
                 connection = sql
@@ -65,11 +68,16 @@ class IndexedScheduleDeliveryStore(private val gate: Any,private val manifest: C
         ensure(schema in 0..1 && (format != 2 || schema == 1),"Unknown/missing reminder index schema",ErrorCode.STORAGE)
         if(schema == 0) db.transaction {
             ensure(db.query("SELECT name FROM sqlite_master WHERE type='table' AND name!='android_metadata'").isEmpty(),"Unrecognized reminder index",ErrorCode.STORAGE)
-            db.execute("CREATE TABLE control (id INTEGER PRIMARY KEY CHECK(id=1), database_id TEXT NOT NULL, revision INTEGER NOT NULL CHECK(revision>=0), pending TEXT, source_hash TEXT)")
-            db.execute("CREATE TABLE attempts (sequence INTEGER PRIMARY KEY, identity TEXT NOT NULL UNIQUE, dataset_id TEXT NOT NULL, series_id TEXT NOT NULL, original_date TEXT NOT NULL, payload TEXT NOT NULL, UNIQUE(dataset_id,series_id,original_date))")
+            db.execute(controlSchema)
+            db.execute(attemptSchema)
             db.execute("PRAGMA user_version=1")
         }
-        var row = db.query("SELECT database_id,source_hash FROM control WHERE id=1").singleOrNull()
+        val schemaRows = db.query("SELECT name,sql FROM sqlite_master WHERE type='table' AND name IN ('control','attempts')")
+        ensure(schemaRows.size == 2 && schemaRows.associate { it[0] to it[1] } == mapOf("control" to controlSchema,"attempts" to attemptSchema),
+            "Reminder index schema differs",ErrorCode.STORAGE)
+        val controls = db.query("SELECT database_id,source_hash FROM control WHERE id=1")
+        ensure(controls.size <= 1,"Duplicate reminder control",ErrorCode.STORAGE)
+        var row = controls.singleOrNull()
         if(row == null) {
             ensure(format != 2,"Reminder authority has no indexed control",ErrorCode.STORAGE)
             val legacy = text?.let(ScheduleDeliveryJson::decode) ?: ScheduleDeliveryState()
@@ -113,7 +121,9 @@ class IndexedScheduleDeliveryStore(private val gate: Any,private val manifest: C
     private val columns = "sequence,payload,identity,dataset_id,series_id,original_date"
     override fun find(datasetId: String,key: OccurrenceKey): ScheduleReminderAttempt? {
         val identity = payloadHash(datasetId to key)
-        return db.query("SELECT $columns FROM attempts WHERE identity=?",listOf(identity)).singleOrNull()?.let(::decode)?.second?.also {
+        val rows = db.query("SELECT $columns FROM attempts WHERE identity=?",listOf(identity))
+        ensure(rows.size <= 1,"Duplicate reminder identity",ErrorCode.STORAGE)
+        return rows.singleOrNull()?.let(::decode)?.second?.also {
             ensure(it.ticket.datasetId == datasetId && it.ticket.key == key,"Reminder identity collision",ErrorCode.STORAGE)
         }
     }

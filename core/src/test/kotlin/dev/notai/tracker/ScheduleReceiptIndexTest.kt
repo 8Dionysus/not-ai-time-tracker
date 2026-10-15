@@ -23,6 +23,15 @@ class ScheduleReceiptIndexTest {
             assertEquals(before,s.read())
             assertFailsWith<CoreError> { s.writeDurably(ScheduleDeliveryState()) }
         }
+        val platform = ScheduleDeliveryFixturePlatform().apply { pending = before.pending }
+        val delivery = ScheduleDelivery(Tracker(MemoryStore(),FakeClock()),s,platform) { ZoneId.of("UTC") }
+        val page = delivery.attemptsPage(1024,3)
+        assertEquals(1027L,page.nextAfterSequence)
+        assertEquals(rows.drop(1024).take(3).map { if(it.status == ScheduleAttemptStatus.RESERVED) it.copy(status = ScheduleAttemptStatus.UNKNOWN) else it },page.attempts)
+        for((after,limit) in listOf(-1L to 3,0L to 0,0L to 1025)) {
+            assertEquals(ErrorCode.INVALID_INPUT,assertFailsWith<CoreError> { delivery.attemptsPage(after,limit) }.code)
+            assertEquals(before.pending,platform.pending)
+        }
         assertEquals(legacy,f.source.read())
     }
     @Test fun interruptedImportRollsBackAndCommittedImportCompletesOnlyTheSameMarker() {
@@ -49,6 +58,8 @@ class ScheduleReceiptIndexTest {
             assertFails { f.store().let { it.locked { it.find("dataset",row(1).ticket.key) } } }
             f.sql(false).use { db -> db.execute("UPDATE attempts SET series_id='series-1' WHERE sequence=1");db.execute("PRAGMA user_version=2") }
             assertFails { f.store().locked {} }
+            f.sql(false).use { db -> db.execute("PRAGMA user_version=1");db.execute("ALTER TABLE attempts ADD COLUMN unversioned TEXT") }
+            assertFails { f.store().locked {} }
             assertEquals(marker,f.manifest.read())
         }
         ScheduleIndexFixture().use { f ->
@@ -59,6 +70,15 @@ class ScheduleReceiptIndexTest {
             f.manifest.writeDurably(changed);assertFails { f.store().locked {} }
             assertEquals(changed,f.manifest.read());assertEquals(legacy,f.source.read())
         }
+    }
+    @Test fun missingLegacyManifestAfterSourcePreservationCannotInitializeEmptyAuthority() = ScheduleIndexFixture().use { f ->
+        val text = ScheduleDeliveryJson.encode(ScheduleDeliveryState(attempts = listOf(row(1))))
+        f.manifest.writeDurably(text)
+        f.beforeExecute = { if(it.startsWith("INSERT INTO control")) throw IOException("fixture before import commit") }
+        assertFails { f.store().locked {} };f.beforeExecute = null
+        assertEquals(text,f.source.read());check(java.io.File(f.root,"delivery.json").delete())
+        assertFailsWith<CoreError> { f.store().locked {} };assertNull(f.manifest.read());assertEquals(text,f.source.read())
+        f.manifest.writeDurably(text);val s = f.store();s.locked { assertEquals(listOf(row(1)),s.read().attempts) }
     }
     private class FileHolder(val file: java.io.File) {
         val held = java.io.File(file.parentFile,"held-index")

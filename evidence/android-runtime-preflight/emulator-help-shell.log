@@ -1,0 +1,11 @@
+
+  use '-shell' to create a root shell console on the current terminal.
+  this is unlike the 'adb shell' command for the following reasons:
+
+  * this is a *root* shell that allows you to modify many parts of the system
+  * this works even if the ADB daemon in the emulated system is broken
+  * pressing Ctrl-C will stop the emulator, instead of the shell.
+
+  See also '-shell-serial'.
+
+

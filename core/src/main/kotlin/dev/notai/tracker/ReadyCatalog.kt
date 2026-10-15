@@ -76,7 +76,15 @@ private fun InputStream.boundedBytes(limit: Int): ByteArray {
     }
     return output.toByteArray()
 }
-fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
+fun sha256(bytes: ByteArray): String {
+    val digest = MessageDigest.getInstance("SHA-256").digest(bytes)
+    val digits = "0123456789abcdef";val hex = CharArray(digest.size*2)
+    for(i in digest.indices) {
+        val value = digest[i].toInt() and 255
+        hex[i*2] = digits[value ushr 4];hex[i*2+1] = digits[value and 15]
+    }
+    return hex.concatToString()
+}
 
 class CatalogPreview internal constructor(internal val owner: CatalogImports,internal val catalog: ReadyCatalog,
     val token: Token,val report: CatalogImportReport) {

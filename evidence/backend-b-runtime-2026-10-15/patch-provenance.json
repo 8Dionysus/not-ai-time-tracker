@@ -1,0 +1,37 @@
+{
+  "base": "435c3be86f7597223addbcf15a1d2f2cb7ec94b8",
+  "sourceCommit": "eb16ca1587882a7e35b92c7c1c7ef8260b763d73",
+  "patchBytes": 10135,
+  "patchSha256": "3b1d1bea557b226eb9d7c4b7b5f4d1df17941f47b3a9271d9d7266d3e95dcd35",
+  "source": "Exact coordinator-transmitted Library patch text; LF ending verified, no independent download claim",
+  "coreTargeted": [
+    {
+      "name": "dev.notai.tracker.CoreScenariosTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "dev.notai.tracker.LocaleContractTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "roomTargeted": {
+    "name": "dev.notai.tracker.android.RoomScenariosTest",
+    "tests": "1",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0"
+  },
+  "targetBlobsVerified": {
+    "core/src/main/kotlin/dev/notai/tracker/CatalogContentPacks.kt": "7aa0858",
+    "core/src/main/kotlin/dev/notai/tracker/SelectiveTransfer.kt": "3c2d131",
+    "core/src/test/kotlin/dev/notai/tracker/LocaleContractTest.kt": "ef62e2f",
+    "core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt": "d97288f",
+    "core/src/testFixtures/kotlin/dev/notai/tracker/SelectiveExclusionsScenario.kt": "c1956a6"
+  }
+}

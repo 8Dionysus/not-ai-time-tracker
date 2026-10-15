@@ -1,0 +1,120 @@
+From eb16ca1587882a7e35b92c7c1c7ef8260b763d73 Mon Sep 17 00:00:00 2001
+From: Tracker Backend B <tracker-backend-b@users.noreply.github.com>
+Date: Thu, 15 Oct 2026 23:12:58 +0000
+Subject: [PATCH] fix: preserve complete catalog aliases and validate transfer
+ exclusions
+
+---
+ .../dev/notai/tracker/CatalogContentPacks.kt  |  2 +-
+ .../dev/notai/tracker/SelectiveTransfer.kt    |  2 ++
+ .../dev/notai/tracker/LocaleContractTest.kt   |  7 ++++--
+ .../dev/notai/tracker/ScenarioContract.kt     |  2 ++
+ .../tracker/SelectiveExclusionsScenario.kt    | 25 +++++++++++++++++++
+ 5 files changed, 35 insertions(+), 3 deletions(-)
+ create mode 100644 core/src/testFixtures/kotlin/dev/notai/tracker/SelectiveExclusionsScenario.kt
+
+diff --git a/core/src/main/kotlin/dev/notai/tracker/CatalogContentPacks.kt b/core/src/main/kotlin/dev/notai/tracker/CatalogContentPacks.kt
+index 4930bd5..7aa0858 100644
+--- a/core/src/main/kotlin/dev/notai/tracker/CatalogContentPacks.kt
++++ b/core/src/main/kotlin/dev/notai/tracker/CatalogContentPacks.kt
+@@ -61,7 +61,7 @@ class CatalogContentPacks(private val catalogId: String,private val catalog: Rea
+         val payload = decode<CatalogContentPayload>(bytes)
+         ensure(payload.schemaVersion == 1 && payload.entries.map { it.key }.distinct().size == payload.entries.size,
+             "Duplicate or unsupported catalog translation identity",ErrorCode.UNSUPPORTED_IMPORT)
+-        ensure(payload.entries.all { row -> originals[row.key]?.let { original -> row.text.label.isNotBlank() && row.text.aliases.all(String::isNotBlank) && (!m.complete || (original.aliases.isEmpty() || row.text.aliases.isNotEmpty()) && (original.description.isBlank() || row.text.description.isNotBlank())) } == true },
++        ensure(payload.entries.all { row -> originals[row.key]?.let { original -> row.text.label.isNotBlank() && row.text.aliases.all(String::isNotBlank) && (!m.complete || row.text.aliases.size >= original.aliases.size && (original.description.isBlank() || row.text.description.isNotBlank())) } == true },
+             "Unknown or invalid catalog translation entry",ErrorCode.UNSUPPORTED_IMPORT)
+         val all = payload.entries.map { it.key }.toSet() == originals.keys
+         ensure(!m.complete || all,"Catalog translation coverage is incomplete",ErrorCode.UNSUPPORTED_IMPORT)
+diff --git a/core/src/main/kotlin/dev/notai/tracker/SelectiveTransfer.kt b/core/src/main/kotlin/dev/notai/tracker/SelectiveTransfer.kt
+index ef20e03..3c2d131 100644
+--- a/core/src/main/kotlin/dev/notai/tracker/SelectiveTransfer.kt
++++ b/core/src/main/kotlin/dev/notai/tracker/SelectiveTransfer.kt
+@@ -76,6 +76,8 @@ class SelectiveTransfer(private val tracker: Tracker) {
+             ensureReason(missing == null,ErrorReason.CATALOG_ROOT_INVALID,arguments = mapOf("rootId" to ErrorArgument.Identifier(missing ?: ""),"rule" to ErrorArgument.Text("MISSING_SELECTION")),fieldPath = "transfer.selection.$field")
+         }
+         ensure(wanted.measurementIds.all { id -> d.measurements.any { it.id == id } },"Missing selected measurement")
++        ensure(wanted.excludedOverrides.all { key -> key.seriesId in wanted.seriesIds && d.schedule.overrides.any { it.key == key } },
++            "Excluded override must exist in a selected series")
+         val segmentIds = d.segments.filter { it.sessionId in wanted.sessionIds }.map { it.id }.toSet()
+         ensure(d.measurements.filter { it.id in wanted.measurementIds }.all { if(it.scope == Scope.SESSION) it.targetId in wanted.sessionIds else it.targetId in segmentIds },"Measurement requires complete target session")
+         val relevant = d.schedule.links.filter { it.key.seriesId in wanted.seriesIds || it.sessionId in wanted.sessionIds }
+diff --git a/core/src/test/kotlin/dev/notai/tracker/LocaleContractTest.kt b/core/src/test/kotlin/dev/notai/tracker/LocaleContractTest.kt
+index 0497d88..ef62e2f 100644
+--- a/core/src/test/kotlin/dev/notai/tracker/LocaleContractTest.kt
++++ b/core/src/test/kotlin/dev/notai/tracker/LocaleContractTest.kt
+@@ -33,7 +33,7 @@ class LocaleContractTest {
+         assertEquals(Backups.decode(archive).data,Backups.decode(Backups(tracker,MemoryRollback()).export()).data)
+     }
+     @Test fun sidecarCoverageParentIdentityAndBatchFallbackPreserveOriginals() {
+-        val vocabulary = VocabularyData(types = listOf(ActivityType("preset","Оригинал",aliases = listOf("Исходный alias"),definition = "Исходное описание")),
++        val vocabulary = VocabularyData(types = listOf(ActivityType("preset","Оригинал",aliases = listOf("Исходный alias","Другой alias"),definition = "Исходное описание")),
+             axes = listOf(Axis("first-axis","Первая",valueKind = ValueKind.LOCAL_CHOICE,values = listOf(AxisValue("same","Один"))),
+                 Axis("second-axis","Вторая",valueKind = ValueKind.LOCAL_CHOICE,values = listOf(AxisValue("same","Другой")))),metrics = emptyList(),units = emptyList())
+         val source = codec.encodeToString(vocabulary).toByteArray()
+@@ -43,7 +43,7 @@ class LocaleContractTest {
+         val values = original.filter { it.key.kind == CatalogContentKind.VALUE }
+         assertEquals(2,values.size);assertEquals(1,values.map { it.key.stableId }.distinct().size)
+         assertEquals(2,values.map { it.key.parentId }.distinct().size)
+-        val translated = original.mapIndexed { i,row -> row.copy(text = CatalogPresentation("Fixture $i",if(row.text.aliases.isEmpty()) emptyList() else listOf("Fixture alias"),if(row.text.description.isEmpty()) "" else "Fixture description")) }
++        val translated = original.mapIndexed { i,row -> row.copy(text = CatalogPresentation("Fixture $i",row.text.aliases.mapIndexed { j,_ -> "Fixture alias $j" },if(row.text.description.isEmpty()) "" else "Fixture description")) }
+         fun install(rows: List<CatalogContentRow>,quality: TranslationQuality,complete: Boolean = true,tag: String = "es",rights: CatalogRightsStatus = CatalogRightsStatus.CLEARED,license: String? = "Apache-2.0") {
+             val payload = codec.encodeToString(CatalogContentPayload(entries = rows)).toByteArray()
+             val m = CatalogContentManifest(catalogId = "fixture",catalogRevision = "fixture",catalogSha256 = manifest.sha256,
+@@ -61,6 +61,9 @@ class LocaleContractTest {
+         val rightsPending = packs.getLocalizedCatalogEntries("fixture",values.map { it.key },"es")
+         assertTrue(rightsPending.all { it.missing && it.provenance!!.license == null && it.quality == TranslationQuality.REVIEWED && it.availability == PackAvailability.AVAILABLE_OFFLINE })
+         install(translated,TranslationQuality.REVIEWED)
++        val completeBeforeRefusal = packs.getLocalizedCatalogEntries("fixture",original.map { it.key },"es")
++        assertFailsWith<CoreError> { install(translated.map { row -> if(row.key.kind == CatalogContentKind.TYPE) row.copy(text = row.text.copy(aliases = row.text.aliases.take(1))) else row },TranslationQuality.REVIEWED) }
++        assertEquals(completeBeforeRefusal,packs.getLocalizedCatalogEntries("fixture",original.map { it.key },"es"))
+         val found = packs.getLocalizedCatalogEntries("fixture",values.map { it.key },"es-MX")
+         assertEquals(2,found.map { it.display.label }.distinct().size);assertTrue(found.all { it.resolvedLocaleTag == "es" && !it.missing })
+         val own = CatalogPresentation("Personal original",listOf("Personal alias"),"Personal definition")
+diff --git a/core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt b/core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt
+index 5cb9fae..d97288f 100644
+--- a/core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt
++++ b/core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt
+@@ -566,6 +566,8 @@ abstract class ScenarioContract {
+         assertTrue(t.data().sessions.isEmpty());assertTrue(t.data().segments.isEmpty())
+     }
+ 
++    @Test fun selectiveExclusionsMustBelongToSelectedSeries() = selectiveExclusionsScenario(createStore())
++
+     @Test fun selectiveGroupsRepeatConflictAndStale() {
+         val clock = FakeClock();val source = Tracker(createStore(),clock)
+         source.manual(source.snapshot().token,clock.wall-3000,clock.wall-2000,source.typeSelection("language"),"private")
+diff --git a/core/src/testFixtures/kotlin/dev/notai/tracker/SelectiveExclusionsScenario.kt b/core/src/testFixtures/kotlin/dev/notai/tracker/SelectiveExclusionsScenario.kt
+new file mode 100644
+index 0000000..c1956a6
+--- /dev/null
++++ b/core/src/testFixtures/kotlin/dev/notai/tracker/SelectiveExclusionsScenario.kt
+@@ -0,0 +1,25 @@
++package dev.notai.tracker
++
++import kotlin.test.*
++
++fun selectiveExclusionsScenario(store: StateStore) {
++    val clock = FakeClock();val tracker = Tracker(store,clock)
++    val rule = ScheduleRule(Classification(name = "Original"),"2026-10-10",extraDates = setOf("2026-10-10"))
++    for(id in listOf("selected","unselected")) {
++        tracker.scheduleCommand(ScheduleCommand("create-$id",tracker.snapshot().token,ScheduleAction.CREATE,id,rule = rule))
++        val key = OccurrenceKey(id,"2026-10-10")
++        tracker.scheduleCommand(ScheduleCommand("skip-$id",tracker.snapshot().token,ScheduleAction.OVERRIDE,id,1,occurrence = key,
++            override = OccurrenceOverride(key,OverrideOperation.SKIP)))
++    }
++    val engine = SelectiveTransfer(tracker);val before = tracker.data()
++    for(key in listOf(OccurrenceKey("selected","2026-10-11"),OccurrenceKey("unselected","2026-10-10"))) {
++        val error = assertFailsWith<CoreError> {
++            engine.export(TransferSelection(seriesIds = setOf("selected"),excludedOverrides = setOf(key)))
++        }
++        assertEquals(ErrorCode.INVALID_INPUT,error.code);assertEquals(before,tracker.data())
++    }
++    val exported = engine.export(TransferSelection(seriesIds = setOf("selected"),excludedOverrides = setOf(OccurrenceKey("selected","2026-10-10"))))
++    assertTrue(exported.groups.single().content.overrides.isEmpty())
++    assertTrue("OVERRIDES_EXCLUDED:1" in exported.losses)
++    assertEquals(before,tracker.data())
++}
+-- 
+2.52.0
+

@@ -8,6 +8,13 @@ import java.io.File
 
 data class PrivateCopyBackendInspection(val inventory: CopyInventory?,val registration: CopyRegistrationReport?,val unavailableCapabilities: Set<String>)
 
+/** Android Context creates no_backup as0771. Its own app group is trusted; another
+ * group must have no access. Others may search but cannot list/write the root.
+ * This checks authority, not a substitute for pinned no-follow descriptor identity. */
+internal fun trustedPrivateCopyRoot(uid: Int,gid: Int,mode: Int,appUid: Int): Boolean =
+    uid == appUid && mode and 0xf000 == 0x4000 && mode and 0x1c0 == 0x1c0 &&
+        mode and 6 == 0 && (gid == appUid || mode and 0x38 == 0)
+
 /** Backend-only Context binding. Callers supply opaque operation IDs, never roots or chooser paths.
  * Canonicalization is limited to Android's own application directories; the opened no-follow root
  * descriptor must match the checked private UID/device/inode. This wires the implementation;
@@ -30,11 +37,14 @@ object PrivateCopyBackend {
         val root = app.noBackupFilesDir.canonicalFile
         check(root.parentFile == data && root.name == "no_backup") { "Unexpected Android private root" }
         val parent = Os.lstat(data.path);val before = Os.lstat(root.path)
-        check(parent.st_uid == Process.myUid() && before.st_uid == Process.myUid() && before.st_dev == parent.st_dev && before.st_mode and 63 == 0) { "Untrusted Android private root" }
+        check(parent.st_uid == Process.myUid() && before.st_dev == parent.st_dev &&
+            trustedPrivateCopyRoot(before.st_uid,before.st_gid,before.st_mode,Process.myUid())) { "Untrusted Android private root" }
         val files = DescriptorCopyFiles(root.path)
         try {
             val actual = files.rootIdentity();val after = Os.lstat(root.path)
-            check(actual.directory && actual.device == before.st_dev && actual.inode == before.st_ino && before.st_dev == after.st_dev && before.st_ino == after.st_ino && after.st_uid == Process.myUid()) { "Android private root changed" }
+            check(actual.directory && actual.device == before.st_dev && actual.inode == before.st_ino && before.st_dev == after.st_dev && before.st_ino == after.st_ino &&
+                before.st_uid == after.st_uid && before.st_gid == after.st_gid && before.st_mode == after.st_mode &&
+                trustedPrivateCopyRoot(after.st_uid,after.st_gid,after.st_mode,Process.myUid())) { "Android private root changed" }
             return files
         } catch(e: Throwable) { files.close();throw e }
     }

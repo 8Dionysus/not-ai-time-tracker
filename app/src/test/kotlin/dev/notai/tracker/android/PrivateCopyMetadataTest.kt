@@ -12,6 +12,20 @@ import org.junit.Assert.*
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class PrivateCopyMetadataTest {
+    @Test fun contextRootAcceptsAndroid0771OnlyWithPrivateAppAuthority() {
+        val appUid = 10150
+        fun mode(value: String) = 0x4000 or value.toInt(8)
+        assertTrue(trustedPrivateCopyRoot(appUid,appUid,mode("0771"),appUid))
+        assertTrue(trustedPrivateCopyRoot(appUid,appUid,mode("0700"),appUid))
+        assertTrue(trustedPrivateCopyRoot(appUid,20000,mode("0700"),appUid))
+        assertFalse(trustedPrivateCopyRoot(appUid,20000,mode("0771"),appUid))
+        assertFalse(trustedPrivateCopyRoot(appUid,20000,mode("0750"),appUid))
+        assertFalse(trustedPrivateCopyRoot(appUid,appUid,mode("0777"),appUid))
+        assertFalse(trustedPrivateCopyRoot(appUid,appUid,mode("0775"),appUid))
+        assertFalse(trustedPrivateCopyRoot(0,appUid,mode("0700"),appUid))
+        assertFalse(trustedPrivateCopyRoot(appUid,appUid,mode("0600"),appUid))
+        assertFalse(trustedPrivateCopyRoot(appUid,appUid,0x8000 or "0700".toInt(8),appUid))
+    }
     private fun fixture(block: (java.io.File)->Unit) {
         val root = Files.createTempDirectory("tracker-android-metadata-").toFile()
         val sync = DirectoryDurability.sync;val rename = DirectoryDurability.rename

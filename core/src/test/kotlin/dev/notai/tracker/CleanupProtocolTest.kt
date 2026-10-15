@@ -14,7 +14,7 @@ class CleanupProtocolTest {
         override fun saveDurably(journal: CleanupJournal) { this.journal[journal.operationId] = journal }
         override fun quarantine(item: PrivateCopy,operationId: String) {
             // Idempotent reconciliation of rename committed before its journal update.
-            if(item.id !in quarantine) { assertEquals(item,live.remove(item.id));quarantine[item.id] = item.members.toMutableList();revision++ }
+            if(item.id !in quarantine) { assertEquals(item,live.remove(item.id)?.copy(confirmableWarnings = item.confirmableWarnings));quarantine[item.id] = item.members.toMutableList();revision++ }
         }
         override fun remaining(item: PrivateCopy,operationId: String) = quarantine[item.id]?.toList() ?: live[item.id]?.members.orEmpty()
         override fun removeMember(item: PrivateCopy,member: CopyMember,operationId: String) {
@@ -39,6 +39,19 @@ class CleanupProtocolTest {
         val done = cleanup.confirm(confirmation);assertEquals(CleanupPhase.DONE,done.phase);assertEquals(2,storage.unlinkCount)
         assertEquals(done,cleanup.confirm(confirmation));assertEquals(2,storage.unlinkCount)
         assertFailsWith<CoreError> { cleanup.confirm(confirmation.copy(itemHashes = emptyMap())) }
+    }
+    @Test fun selectingAllUnusedRecoveryCopiesRequiresSeparateAcknowledgementForTheWholeSelection() {
+        val storage = Storage();storage.live["a"] = item("a");storage.live["b"] = item("b")
+        storage.live["active"] = item("active",blockers = setOf(CopyBlocker.RESTORE_SOURCE_IN_USE))
+        val cleanup = PrivateCopyCleanup(storage)
+        assertTrue(cleanup.preview(1,setOf("a")).items.single().confirmableWarnings.isEmpty())
+        val preview = cleanup.preview(1,setOf("a","b"));assertTrue(preview.items.all { CopyWarning.LAST_RECOVERY_COPY in it.confirmableWarnings })
+        val c = confirmation(preview)
+        assertFailsWith<CoreError> { cleanup.confirm(c.copy(lastCopyAcknowledged = setOf("a"))) }
+        assertTrue(storage.quarantine.isEmpty());assertEquals(0,storage.unlinkCount)
+        assertEquals(CleanupPhase.DONE,cleanup.confirm(c).phase)
+        assertEquals(setOf("active"),storage.live.keys);assertEquals(4,storage.unlinkCount)
+        assertEquals(CleanupPhase.DONE,cleanup.confirm(c).phase);assertEquals(4,storage.unlinkCount)
     }
     @Test fun interruptionIsVisibleAndNeverAutomaticallyDeletes() {
         val storage = Storage();storage.live["copy"] = item("copy");storage.failAfterUnlink = true

@@ -46,13 +46,21 @@ interface PrivateCopyStorage {
 /** Manual-only cleanup protocol. Constructor and reads never resume deletion after a crash. */
 class PrivateCopyCleanup(private val storage: PrivateCopyStorage) {
     private val previews = mutableMapOf<String,CleanupPreview>()
+    private fun selection(inventory: CopyInventory,ids: Set<String>): List<PrivateCopy> {
+        val recovery = inventory.items.filter { it.selectable && it.kind in setOf(CopyKind.ROLLBACK,CopyKind.DATABASE_ARCHIVE) }
+        val removesLast = recovery.isNotEmpty() && recovery.all { it.id in ids }
+        return inventory.items.filter { it.id in ids }.map { item ->
+            if(removesLast && recovery.any { it.id == item.id })
+                item.copy(confirmableWarnings = item.confirmableWarnings+CopyWarning.LAST_RECOVERY_COPY) else item
+        }
+    }
     fun inventory(): CopyInventory = storage.maintenance { storage.inventory().let { it.copy(items = frozenList(it.items.map { item -> item.frozenCopy() })) } }
     fun preview(expectedRevision: Long,itemIds: Set<String>): CleanupPreview = storage.maintenance {
         val ids = itemIds.toSet()
         val live = storage.inventory();ensure(live.revision == expectedRevision,"Cleanup preview stale",ErrorCode.STALE)
         ensure(ids.isNotEmpty() && ids.all { id -> live.items.any { it.id == id } },"Unknown/empty cleanup selection")
         ensure(storage.operations().none { it.phase !in setOf(CleanupPhase.DONE,CleanupPhase.RESTORED) },"Cleanup interrupted; reconcile first",ErrorCode.STORAGE)
-        val selected = live.items.filter { it.id in ids };ensure(selected.all { it.selectable },"Selected copy is protected")
+        val selected = selection(live,ids);ensure(selected.all { it.selectable },"Selected copy is protected")
         CleanupPreview(this,newId(),live.revision,frozenList(selected.map { it.frozenCopy() })).also { previews[it.id] = it }
     }
     fun confirm(confirmation: CleanupConfirmation): CleanupJournal = storage.maintenance {
@@ -64,7 +72,8 @@ class PrivateCopyCleanup(private val storage: PrivateCopyStorage) {
         ensure(c.idempotencyKey.isNotBlank(),"Missing cleanup idempotency key")
         val p = previews[c.previewId] ?: fail(ErrorCode.STALE,"Preview expired after process restart")
         ensure(p.owner === this && p.revision == c.revision && c.itemHashes == p.items.associate { it.id to it.sha256 },"Cleanup confirmation differs from preview",ErrorCode.STALE)
-        val live = storage.inventory();ensure(live.revision == p.revision && p.items.all { i -> live.items.singleOrNull { it.id == i.id } == i && i.selectable },"Copy changed or in use",ErrorCode.STALE)
+        val live = storage.inventory();val selected = selection(live,p.items.map { it.id }.toSet())
+        ensure(live.revision == p.revision && selected == p.items && selected.all { it.selectable },"Copy changed or in use",ErrorCode.STALE)
         ensure(p.items.all { i -> i.confirmableWarnings.all { WarningAcknowledgement(i.id,it) in c.warningsAcknowledged } },"Warning acknowledgement missing")
         ensure(p.items.filter { CopyWarning.LAST_RECOVERY_COPY in it.confirmableWarnings }.all { it.id in c.lastCopyAcknowledged },"Separate last-copy acknowledgement required")
         val journal = CleanupJournal(newId(),c.idempotencyKey,hash,CleanupPhase.PREPARED,p.items.map(::CleanupItemProgress))

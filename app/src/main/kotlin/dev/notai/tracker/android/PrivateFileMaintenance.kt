@@ -14,6 +14,10 @@ object PrivateFileMaintenance {
     }
     internal fun metadata(file: File,maxBytes: Int = CopyMetadataBytes.MAX_BYTES): CopyMetadata = object: CopyMetadata {
         override fun read(): String? = try {
+            val attributes = java.nio.file.Files.readAttributes(file.toPath(),java.nio.file.attribute.BasicFileAttributes::class.java,
+                java.nio.file.LinkOption.NOFOLLOW_LINKS)
+            check(attributes.isRegularFile) { "Maintenance metadata is not a regular file" }
+            check(attributes.size() <= maxBytes) { "Maintenance metadata exceeds reader capacity" }
             java.nio.file.Files.newInputStream(file.toPath(),java.nio.file.StandardOpenOption.READ,java.nio.file.LinkOption.NOFOLLOW_LINKS)
                 .use { CopyMetadataBytes.read(it,maxBytes) }
         } catch(_: java.nio.file.NoSuchFileException) { null }

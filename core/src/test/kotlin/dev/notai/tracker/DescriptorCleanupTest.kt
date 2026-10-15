@@ -146,6 +146,58 @@ class DescriptorCleanupTest {
         assertFailsWith<IOException> { reopenedGate.writing("interrupted-writer",blocker = CopyBlocker.EXPORT_WRITING) { throw IOException("crash") } }
         assertEquals(CopyBlocker.EXPORT_WRITING,CopyMaintenance(files.metadata()).state().references.single().blocker)
     }
+    @Test fun preparedButMissingOriginalCannotBeCertifiedDeletedOrRestored() = fixture { root,files,gate,storage ->
+        val item = seal(root,storage);val path = gate.state().copies.single().path
+        val fault = object: PrivateCopyStorage by storage {
+            override fun saveDurably(journal: CleanupJournal) {
+                storage.saveDurably(journal)
+                if(journal.phase == CleanupPhase.PREPARED) throw IOException("fixture before any quarantine")
+            }
+        }
+        val cleanup = PrivateCopyCleanup(fault);val p = cleanup.preview(gate.state().revision,setOf(item.id))
+        assertFailsWith<IOException> { cleanup.confirm(confirmation(p)) }
+        val held = File(root,"owned-fixture-held");Files.move(File(root,path).toPath(),held.toPath())
+        val freshStorage = RegisteredCopyStorage(files,CopyMaintenance(files.metadata()));val fresh = PrivateCopyCleanup(freshStorage)
+        val seen = fresh.operations().single()
+        assertEquals(CleanupPhase.PARTIAL,seen.phase);assertFalse(seen.items.single().quarantined)
+        assertFalse(seen.items.single().restored);assertTrue(seen.items.single().deletedMemberIds.isEmpty())
+        assertFalse(freshStorage.verifyAbsent(item,seen.operationId));assertFalse(File(root,"cleanup-quarantine").exists())
+        assertEquals(CleanupPhase.PARTIAL,fresh.resume(seen.operationId,fresh.remainingHash(seen)).phase)
+        assertEquals("fixture bytes",File(held,"data").readText())
+        assertEquals(CleanupPhase.PARTIAL,fresh.operations().single().phase)
+    }
+    @Test fun lastUnlinkBeforeReceiptStillHasDurableQuarantineProof() = fixture { root,files,gate,storage ->
+        val file = File(root,"rollback/one.json").apply { parentFile.mkdirs();writeText("isolated last unlink") }
+        val member = CopyMember("data",file.length(),sha256(file.readBytes()))
+        val item = PrivateCopy("single",CopyKind.ROLLBACK,"VERIFIED",member.bytes,payloadHash(listOf(member)),listOf(member))
+        storage.seal(item,"rollback/one.json",false,mapOf("data" to "one.json"))
+        val fault = object: PrivateCopyStorage by storage {
+            override fun removeMember(item: PrivateCopy,member: CopyMember,operationId: String) {
+                storage.removeMember(item,member,operationId);throw IOException("fixture after last unlink before receipt")
+            }
+        }
+        val cleanup = PrivateCopyCleanup(fault);val partial = cleanup.confirm(confirmation(cleanup.preview(gate.state().revision,setOf(item.id))))
+        assertEquals(CleanupPhase.PARTIAL,partial.phase);assertTrue(partial.items.single().quarantined)
+        assertTrue(partial.items.single().deletedMemberIds.isEmpty())
+        val fresh = PrivateCopyCleanup(RegisteredCopyStorage(files,CopyMaintenance(files.metadata())));val seen = fresh.operations().single()
+        assertEquals(CleanupPhase.DONE,seen.phase);assertEquals(setOf("data"),seen.items.single().deletedMemberIds)
+        assertFalse(seen.items.single().restored);assertFalse(file.exists())
+    }
+    @Test fun emptyContainerFinalizationBeforeReceiptIsDoneAndNeverAnInventedRestore() = fixture { root,files,gate,storage ->
+        File(root,"exports/empty").mkdirs()
+        val item = PrivateCopy("empty",CopyKind.EXPORT,"COMPLETE",0,payloadHash(emptyList<CopyMember>()),emptyList())
+        storage.seal(item,"exports/empty",true,emptyMap())
+        val fault = object: PrivateCopyStorage by storage {
+            override fun finishGroup(item: PrivateCopy,operationId: String) {
+                storage.finishGroup(item,operationId);throw IOException("fixture after final rmdir before DONE")
+            }
+        }
+        val cleanup = PrivateCopyCleanup(fault);val partial = cleanup.confirm(confirmation(cleanup.preview(gate.state().revision,setOf(item.id))))
+        assertEquals(CleanupPhase.PARTIAL,partial.phase);assertTrue(partial.items.single().quarantined)
+        val fresh = PrivateCopyCleanup(RegisteredCopyStorage(files,CopyMaintenance(files.metadata())));val seen = fresh.operations().single()
+        assertEquals(CleanupPhase.DONE,seen.phase);assertFalse(seen.items.single().restored)
+        assertFalse(File(root,"exports/empty").exists())
+    }
     @Test fun longWriterIsDurablyProtectedWithoutBlockingInspection() = fixture { root,_,gate,storage ->
         val item = seal(root,storage);val cleanup = PrivateCopyCleanup(storage)
         val p = cleanup.preview(gate.state().revision,setOf(item.id))

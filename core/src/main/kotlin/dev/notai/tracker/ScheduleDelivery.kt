@@ -4,10 +4,14 @@ import java.time.Instant
 import java.time.ZoneId
 import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 @Serializable data class ScheduleReminderTicket(val datasetId: String,val controlBarrier: String,val key: OccurrenceKey,
     val seriesRevision: Long,val overrideRevision: Long?,val zone: String,val at: Long) {
-    val identity get() = payloadHash(datasetId to key)
+    // Derived only from immutable constructor values. Not a supplied/stored authority; copies
+    // and cold decode compute their own value. Avoid hashing the same receipt on every scan.
+    @kotlinx.serialization.Transient @Volatile private var cachedIdentity: String? = null
+    val identity get() = cachedIdentity ?: payloadHash(datasetId to key).also { cachedIdentity = it }
 }
 @Serializable data class ScheduleAlarmBatch(val at: Long,val tickets: List<ScheduleReminderTicket>) {
     val hash get() = payloadHash(this)
@@ -18,6 +22,13 @@ import kotlinx.serialization.Serializable
 @Serializable data class ScheduleReminderAttempt(val ticket: ScheduleReminderTicket,val attemptedAt: Long,val status: ScheduleAttemptStatus)
 @Serializable data class ScheduleDeliveryState(@Required val format: Int = 1,val revision: Long = 0,
     val pending: ScheduleAlarmBatch? = null,val attempts: List<ScheduleReminderAttempt> = emptyList())
+/** Operational file representation only. Reads old pretty JSON; no receipt/field is removed and
+ * ticket/batch canonical hashes continue to use payloadHash's existing codec. No startup rewrite. */
+object ScheduleDeliveryJson {
+    private val json = Json(codec) { prettyPrint = false }
+    fun encode(state: ScheduleDeliveryState): String = json.encodeToString(state)
+    fun decode(text: String): ScheduleDeliveryState = json.decodeFromString(text)
+}
 enum class ScheduleDeliveryBlocker { PERMISSION, CHANNEL, RENDERER_UNAVAILABLE, PLATFORM_UNAVAILABLE }
 enum class ScheduleQuietMode { UNKNOWN, ALL, PRIORITY, ALARMS_ONLY, NONE }
 data class ScheduleDeliveryAvailability(val blockers: Set<ScheduleDeliveryBlocker> = emptySet(),val quietMode: ScheduleQuietMode = ScheduleQuietMode.UNKNOWN) {
@@ -49,6 +60,11 @@ data class ScheduleDeliveryReport(val sourceDatasetId: String,val sourceBarrier:
  * delivery gate. No starts, completion facts, second timer, polling loop or history backfill. */
 class ScheduleDelivery(private val tracker: Tracker,private val store: ScheduleDeliveryStore,
     private val platform: ScheduleDeliveryPlatform,private val deviceZone: ()->ZoneId) {
+    private fun availability(): ScheduleDeliveryAvailability = try { platform.availability() }
+    catch(e: Exception) {
+        if(e is kotlinx.coroutines.CancellationException) throw e
+        ScheduleDeliveryAvailability(setOf(ScheduleDeliveryBlocker.PLATFORM_UNAVAILABLE))
+    }
     private fun wallNow() = tracker.clock.now().also(::validateMoment).wall
     private fun state(): ScheduleDeliveryState = store.read().also { s ->
         ensure(s.format == 1 && s.revision >= 0,"Invalid schedule delivery state",ErrorCode.STORAGE)
@@ -64,7 +80,14 @@ class ScheduleDelivery(private val tracker: Tracker,private val store: ScheduleD
     }
     private fun write(old: ScheduleDeliveryState,next: ScheduleDeliveryState): ScheduleDeliveryState {
         if(old == next) return old
-        return next.copy(revision = Math.addExact(old.revision,1)).also(store::writeDurably)
+        return try { next.copy(revision = Math.addExact(old.revision,1)).also(store::writeDurably) }
+        catch(e: Exception) {
+            // No post may follow an uncertain reservation/capacity refusal. Also stop stale
+            // wake-ups best-effort; one platform failure must not skip the other cleanup call.
+            runCatching { platform.cancelAlarm() }
+            runCatching { platform.configureWakeups(false) }
+            throw e
+        }
     }
     private fun ticket(data: Dataset,p: ScheduleProjection) = ScheduleReminderTicket(data.datasetId,data.controlBarrier,p.key,
         p.seriesRevision,p.overrideRevision,p.zone,p.reminderInstant!!.toEpochMilli())
@@ -87,21 +110,22 @@ class ScheduleDelivery(private val tracker: Tracker,private val store: ScheduleD
             val at = tickets.minOfOrNull { it.at } ?: return null
             return ScheduleAlarmBatch(at,frozenList(tickets.filter { it.at == at }.distinctBy { it.identity }.sortedBy { it.identity }))
         }
-        val next = batch(retained+future);var available = platform.availability()
+        val next = batch(retained+future);var available = availability()
         // A never-armed historical occurrence is not manufactured on startup. Preserve only a
         // previously durable pending intent while delivery is unavailable; plan/preferences stay.
         val durable = if(available.ready) next else batch(retained)
         write(current,current.copy(pending = durable))
-        var accepted = false
-        try {
-            platform.visible().filter { !available.ready || matching(data,it,now,zone) == null }.forEach(platform::cancelNotice)
-            platform.configureWakeups(available.ready && next != null)
-            platform.cancelAlarm()
-            if(available.ready && next != null) { platform.schedule(next);accepted = true }
-        } catch(e: Exception) {
+        fun effect(block: ()->Unit): Boolean = try { block();true } catch(e: Exception) {
             if(e is kotlinx.coroutines.CancellationException) throw e
-            available = available.copy(blockers = available.blockers+ScheduleDeliveryBlocker.PLATFORM_UNAVAILABLE)
+            available = available.copy(blockers = available.blockers+ScheduleDeliveryBlocker.PLATFORM_UNAVAILABLE);false
         }
+        var visible = emptyList<ScheduleReminderTicket>()
+        effect { visible = platform.visible() }
+        visible.filter { !available.ready || matching(data,it,now,zone) == null }.forEach { t -> effect { platform.cancelNotice(t) } }
+        // Notice inspection/cancellation failure must not skip alarm cancellation or hook disable.
+        effect { platform.cancelAlarm() }
+        val accepted = available.ready && next != null && effect { platform.schedule(next) }
+        effect { platform.configureWakeups(accepted) }
         return ScheduleDeliveryReport(data.datasetId,data.controlBarrier,data.schedule,zone.id,available,next,accepted,outcome,frozenList(attempted))
     }
     /** A callback hash is a wake-up, not authorization. Each item rechecks current opt-in, rule,
@@ -119,13 +143,13 @@ class ScheduleDelivery(private val tracker: Tracker,private val store: ScheduleD
             if(current.attempts.any { it.ticket.identity == t.identity }) continue
             val data = tracker.data();val now = Instant.ofEpochMilli(wallNow());val zone = deviceZone()
             matching(data,t,now,zone) ?: continue
-            if(now.toEpochMilli() < t.at || !platform.availability().ready) continue
+            if(now.toEpochMilli() < t.at || !availability().ready) continue
             val reserved = ScheduleReminderAttempt(t,now.toEpochMilli(),ScheduleAttemptStatus.RESERVED)
             current = write(current,current.copy(attempts = current.attempts+reserved)) // Must be durable BEFORE any external post.
             val status = try {
                 val freshNow = Instant.ofEpochMilli(wallNow())
                 val fresh = matching(tracker.data(),t,freshNow,deviceZone())
-                if(fresh == null || freshNow.toEpochMilli() < t.at || !platform.availability().ready) ScheduleAttemptStatus.NOT_POSTED
+                if(fresh == null || freshNow.toEpochMilli() < t.at || !availability().ready) ScheduleAttemptStatus.NOT_POSTED
                 else if(platform.post(t,fresh)) ScheduleAttemptStatus.POSTED else ScheduleAttemptStatus.NOT_POSTED
             }
                 catch(e: Exception) { if(e is kotlinx.coroutines.CancellationException) throw e;ScheduleAttemptStatus.UNKNOWN }

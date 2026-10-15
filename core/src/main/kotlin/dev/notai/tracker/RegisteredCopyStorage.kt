@@ -129,9 +129,11 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
         if(files.stat(target) != null) { ensure(files.stat(r.path) == null,"Ambiguous group locations");manifests.read(r,CopyLocation(target,true)).members }
         else if(files.stat(r.path) != null) manifests.read(r,CopyLocation(r.path,false)).members else emptyList()
     }
-    override fun isQuarantined(item: PrivateCopy,operationId: String): Boolean = maintenance {
+    override fun isQuarantined(item: PrivateCopy,operationId: String): Boolean? = maintenance {
         val r = operation(item,operationId);val target = quarantinePath(item,operationId)
-        if(files.stat(target) != null) { ensure(files.stat(r.path) == null,"Ambiguous group locations");manifests.read(r,CopyLocation(target,true));true } else false
+        if(files.stat(target) != null) { ensure(files.stat(r.path) == null,"Ambiguous group locations");manifests.read(r,CopyLocation(target,true));true }
+        else if(files.stat(r.path) != null) { manifests.read(r,CopyLocation(r.path,false));false }
+        else null // Absence alone proves neither quarantine nor an intact restore (even for an empty group).
     }
     override fun removeMember(item: PrivateCopy,member: CopyMember,operationId: String) = maintenance {
         val r = operation(item,operationId);val target = quarantinePath(item,operationId)
@@ -148,6 +150,11 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
                 // Finalizing an empty directory is a mutation: only explicit execute may remove it.
                 return@maintenance false
             }
+            // The exact operation must have durably observed quarantine before unlink was
+            // authorized. PREPARED + missing paths is unknown loss, never successful cleanup.
+            // This still accepts the last unlink/rmdir interrupted before its progress receipt.
+            val progress = gate.state().journals.single { it.operationId == operationId }.items.single { it.item.id == item.id }
+            if(!progress.quarantined || progress.restored) return@maintenance false
             files.sync(r.path.substringBeforeLast('/'));files.sync("cleanup-quarantine");true
         }
     }

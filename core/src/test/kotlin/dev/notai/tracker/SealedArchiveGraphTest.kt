@@ -66,6 +66,18 @@ class SealedArchiveGraphTest {
         assertFailsWith<CoreError> { cleanup.confirm(confirmation(p)) };assertFalse(File(root,"cleanup-quarantine").exists())
         assertEquals("immutable fixture bytes",external.readText())
     }
+    @Test fun deletingEverySealedOwnerNeedsLastUnusedCopyAcknowledgementBeforeAnyRename() = fixture { root,_,_,storage ->
+        storage.sealArchiveGraph(archives(root));val cleanup = PrivateCopyCleanup(storage)
+        assertTrue(cleanup.inventory().items.all { CopyWarning.LAST_RECOVERY_COPY !in it.confirmableWarnings })
+        val p = preview(cleanup,setOf("a","b"));assertTrue(p.items.all { CopyWarning.LAST_RECOVERY_COPY in it.confirmableWarnings })
+        val c = confirmation(p)
+        assertFailsWith<CoreError> { cleanup.confirm(c.copy(lastCopyAcknowledged = setOf("a"))) }
+        assertTrue(storage.operations().isEmpty());assertFalse(File(root,"cleanup-quarantine").exists())
+        assertEquals("immutable fixture bytes",File(root,"database-archives/b/data").readText())
+        assertEquals(CleanupPhase.DONE,cleanup.confirm(c).phase)
+        assertFalse(File(root,"database-archives/a").exists());assertFalse(File(root,"database-archives/b").exists())
+        assertEquals(CleanupPhase.DONE,cleanup.confirm(c).phase)
+    }
     @Test fun activeGraphOwnerAndRecoveryProtectAllSharedCopies() = fixture { root,files,gate,storage ->
         storage.sealArchiveGraph(archives(root))
         for(blocker in listOf(CopyBlocker.RESTORE_SOURCE_IN_USE,CopyBlocker.LIVE_FORM_REFERENCE,CopyBlocker.UNKNOWN_FILE_OR_STATE,CopyBlocker.EXPORT_WRITING)) {

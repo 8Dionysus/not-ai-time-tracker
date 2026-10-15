@@ -42,4 +42,22 @@ class PrivateCopyMetadataTest {
         file.writeBytes(byteArrayOf(0xc3.toByte(),0x28));val malformed = file.readBytes()
         assertThrows(java.nio.charset.CharacterCodingException::class.java) { metadata.read() };assertArrayEquals(malformed,file.readBytes())
     }
+    @Test fun specialMetadataFileRefusesBeforeOpeningABlockingStream() = fixture { file ->
+        val p = ProcessBuilder("mkfifo",file.absolutePath).redirectErrorStream(true).start()
+        val output = p.inputStream.bufferedReader().use { it.readText() };assertEquals(output,0,p.waitFor())
+        assertFalse(Files.readAttributes(file.toPath(),java.nio.file.attribute.BasicFileAttributes::class.java).isRegularFile)
+        val pool = java.util.concurrent.Executors.newSingleThreadExecutor()
+        try {
+            val read = pool.submit<Boolean> {
+                try { PrivateFileMaintenance.metadata(file).read();false } catch(_: IllegalStateException) { true }
+            }
+            try { assertTrue(read.get(2,java.util.concurrent.TimeUnit.SECONDS)) }
+            catch(e: java.util.concurrent.TimeoutException) {
+                // Unblock only this fixture FIFO if the regression reopens it as a stream.
+                java.io.FileOutputStream(file).use { it.write(32) }
+                throw e
+            }
+        } finally { pool.shutdownNow();pool.awaitTermination(5,java.util.concurrent.TimeUnit.SECONDS) }
+        assertFalse(Files.readAttributes(file.toPath(),java.nio.file.attribute.BasicFileAttributes::class.java).isRegularFile)
+    }
 }

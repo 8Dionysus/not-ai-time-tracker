@@ -15,3 +15,13 @@ tasks.test {
     systemProperty("tracker.samples", rootProject.file("samples").absolutePath)
     systemProperty("tracker.artifacts", layout.buildDirectory.dir("test-artifacts").get().asFile.absolutePath)
 }
+
+// Opt-in isolated host capacity/profile fixture; not a JUnit pass or Android measurement.
+tasks.register<JavaExec>("scheduleDeliveryProfile") {
+    dependsOn(tasks.testClasses)
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("dev.notai.tracker.ScheduleDeliveryProfile")
+    maxHeapSize = "1024m"
+    providers.gradleProperty("trackerCleanupLibrary").orNull?.let { systemProperty("tracker.cleanup.library",it) }
+    systemProperty("tracker.schedule.profile",layout.buildDirectory.file("schedule-delivery-profile.json").get().asFile.absolutePath)
+}

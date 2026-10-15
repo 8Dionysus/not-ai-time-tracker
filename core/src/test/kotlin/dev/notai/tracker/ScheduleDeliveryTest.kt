@@ -118,4 +118,96 @@ class ScheduleDeliveryTest {
         assertEquals(2,platform2.postCalls.size);assertEquals(2,state2.persisted.attempts.size)
         assertTrue(state2.persisted.attempts.all { it.status == ScheduleAttemptStatus.POSTED })
     }
+    @Test fun independentPlatformFailuresStillCancelAlarmAndDisableWakeupsWithoutConsumingReceipts() {
+        for(point in listOf("availability","visible","cancel-notice","cancel-alarm","schedule","wakeups")) {
+            val clock = clock();val t = Tracker(MemoryStore(),clock);add(t)
+            val state = ScheduleDeliveryFixtureStore();val delegate = ScheduleDeliveryFixturePlatform()
+            var fail = false;var cancellations = 0;val wakeups = mutableListOf<Boolean>()
+            val platform = object: ScheduleDeliveryPlatform by delegate {
+                override fun availability(): ScheduleDeliveryAvailability {
+                    if(fail && point == "availability") throw IOException("fixture availability")
+                    return delegate.availability()
+                }
+                override fun visible(): List<ScheduleReminderTicket> {
+                    if(fail && point == "visible") throw IOException("fixture visible")
+                    return delegate.visible()
+                }
+                override fun cancelNotice(ticket: ScheduleReminderTicket) {
+                    if(fail && point == "cancel-notice") throw IOException("fixture notice cancellation")
+                    delegate.cancelNotice(ticket)
+                }
+                override fun cancelAlarm() {
+                    cancellations++
+                    if(fail && point == "cancel-alarm") throw IOException("fixture alarm cancellation")
+                    delegate.cancelAlarm()
+                }
+                override fun schedule(batch: ScheduleAlarmBatch) {
+                    if(fail && point == "schedule") throw IOException("fixture scheduling")
+                    delegate.schedule(batch)
+                }
+                override fun configureWakeups(enabled: Boolean) {
+                    wakeups += enabled
+                    if(fail && point == "wakeups") throw IOException("fixture hook update")
+                }
+            }
+            val delivery = ScheduleDelivery(t,state,platform) { ZoneId.of("UTC") };val armed = delivery.synchronize().next!!
+            // An obsolete notice requires cancellation while tomorrow's valid alarm remains.
+            delegate.notices["old"] = armed.tickets.single().copy(seriesRevision = 99)
+            fail = true;cancellations = 0;wakeups.clear()
+            val result = delivery.synchronize()
+            assertTrue(ScheduleDeliveryBlocker.PLATFORM_UNAVAILABLE in result.availability.blockers,point)
+            assertEquals(1,cancellations,point);assertEquals(listOf(point == "wakeups"),wakeups,point)
+            assertEquals(point == "wakeups",result.alarmAccepted,point)
+            assertTrue(state.persisted.attempts.isEmpty(),point);assertTrue(t.data().sessions.isEmpty(),point)
+            if(point == "availability") {
+                clock.advance(30*60_000);assertTrue(delivery.onAlarm(armed.hash).attempted.isEmpty())
+                assertTrue(delegate.postCalls.isEmpty())
+            }
+            fail = false;val restored = delivery.synchronize();assertTrue(restored.alarmAccepted,point)
+        }
+    }
+    @Test fun receiptCapacityRefusalPreservesEveryReceiptDisarmsAndNeverPosts() {
+        val clock = clock();val t = Tracker(MemoryStore(),clock);add(t)
+        val delegate = ScheduleDeliveryFixturePlatform();val state = ScheduleDeliveryFixtureStore()
+        var limit = CopyMetadataBytes.MAX_BYTES;var disabled = 0
+        val bounded = object: ScheduleDeliveryStore by state {
+            override fun writeDurably(value: ScheduleDeliveryState) {
+                CopyMetadataBytes.check(codec.encodeToString(value),limit);state.writeDurably(value)
+            }
+        }
+        val platform = object: ScheduleDeliveryPlatform by delegate {
+            override fun configureWakeups(enabled: Boolean) { if(!enabled) disabled++ }
+        }
+        val delivery = ScheduleDelivery(t,bounded,platform) { ZoneId.of("UTC") };val armed = delivery.synchronize().next!!
+        val template = armed.tickets.single()
+        val old = (1..128).map { n -> ScheduleReminderAttempt(template.copy(key = OccurrenceKey("retired-$n","2026-10-09")),clock.wall,
+            ScheduleAttemptStatus.entries[n%ScheduleAttemptStatus.entries.size]) }
+        state.persisted = state.persisted.copy(attempts = old)
+        val saved = state.read();limit = CopyMetadataBytes.encode(codec.encodeToString(saved)).size
+        clock.advance(30*60_000)
+        repeat(2) {
+            assertEquals(ErrorCode.STORAGE,assertFailsWith<CoreError> { delivery.onAlarm(armed.hash) }.code)
+            assertEquals(saved,state.persisted);assertTrue(delegate.postCalls.isEmpty());assertNull(delegate.pending)
+        }
+        assertEquals(2,disabled);assertEquals(128,delivery.attempts().size)
+        limit = CopyMetadataBytes.MAX_BYTES // Explicitly provisioned test-store capacity; no receipt removal.
+        assertEquals(ScheduleAttemptStatus.POSTED,delivery.onAlarm(armed.hash).attempted.single().status)
+        assertEquals(old,state.persisted.attempts.take(old.size));assertEquals(1,delegate.postCalls.size)
+        delivery.onAlarm(armed.hash);assertEquals(1,delegate.postCalls.size)
+        assertTrue(t.data().sessions.isEmpty())
+    }
+    @Test fun compactOperationalJsonReadsLegacyWithoutChangingReceiptsOrCallbackHashes() {
+        val clock = clock();val tracker = Tracker(MemoryStore(),clock);add(tracker)
+        val state = ScheduleDeliveryFixtureStore();val platform = ScheduleDeliveryFixturePlatform()
+        val batch = ScheduleDelivery(tracker,state,platform) { ZoneId.of("UTC") }.synchronize().next!!
+        val before = state.persisted.copy(attempts = ScheduleAttemptStatus.entries.mapIndexed { n,status ->
+            ScheduleReminderAttempt(batch.tickets.single().copy(key = OccurrenceKey("old-$n","2026-10-09")),clock.wall,status)
+        })
+        val legacy = codec.encodeToString(before);val compact = ScheduleDeliveryJson.encode(before)
+        assertTrue(compact.length < legacy.length)
+        assertEquals(before,ScheduleDeliveryJson.decode(legacy));assertEquals(before,ScheduleDeliveryJson.decode(compact))
+        assertEquals(batch.hash,ScheduleDeliveryJson.decode(compact).pending!!.hash)
+        assertEquals(before.attempts.map { it.ticket.identity },ScheduleDeliveryJson.decode(compact).attempts.map { it.ticket.identity })
+        assertEquals(before,codec.decodeFromString<ScheduleDeliveryState>(compact))
+    }
 }

@@ -28,10 +28,10 @@ class AndroidScheduleDeliveryStore(context: Context): ScheduleDeliveryStore {
     private val metadata = PrivateFileMaintenance.metadata(file)
     override fun <T> locked(block: ()->T): T = synchronized(gate,block)
     override fun read(): ScheduleDeliveryState {
-        check(Thread.holdsLock(gate));return metadata.read()?.let { codec.decodeFromString<ScheduleDeliveryState>(it) } ?: ScheduleDeliveryState()
+        check(Thread.holdsLock(gate));return metadata.read()?.let(ScheduleDeliveryJson::decode) ?: ScheduleDeliveryState()
     }
     override fun writeDurably(state: ScheduleDeliveryState) {
-        check(Thread.holdsLock(gate));metadata.writeDurably(codec.encodeToString(state))
+        check(Thread.holdsLock(gate));metadata.writeDurably(ScheduleDeliveryJson.encode(state))
     }
     companion object { private val gates = mutableMapOf<String,Any>() }
 }

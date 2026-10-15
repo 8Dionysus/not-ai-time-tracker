@@ -15,8 +15,9 @@
 
 #define JNI(name) Java_dev_notai_tracker_NativeCopyIo_##name
 static void error(JNIEnv *e,const char *op) {
-    char message[256];snprintf(message,sizeof message,"%s: %s",op,strerror(errno));
+    int saved=errno;char message[256];snprintf(message,sizeof message,"%s: %s",op,strerror(saved));
     (*e)->ThrowNew(e,(*e)->FindClass(e,"java/io/IOException"),message);
+    errno=saved;
 }
 static int safe(const char *s) {
     if(!*s || !strcmp(s,".") || !strcmp(s,"..")) return 0;
@@ -26,17 +27,18 @@ static int safe(const char *s) {
 /* Return the pinned parent and one validated leaf, never follow any ancestor symlink. */
 static int parent(JNIEnv *e,int root,const char *path,char **leaf) {
     if(!*path || *path=='/' || path[strlen(path)-1]=='/' || strstr(path,"//")) { errno=EINVAL;error(e,"relative path");return -1; }
-    char *copy=strdup(path),*save=NULL,*part=strtok_r(copy,"/",&save);int fd=dup(root);
+    char *copy=strdup(path);if(!copy) { errno=ENOMEM;error(e,"path allocation");return -1; }
+    char *save=NULL,*part=strtok_r(copy,"/",&save);int fd=dup(root);
     while(part && fd>=0) {
         if(!safe(part)) { errno=EINVAL;break; }
         char *next=strtok_r(NULL,"/",&save);
-        if(!next) { *leaf=strdup(part);free(copy);return fd; }
+        if(!next) { *leaf=strdup(part);free(copy);if(!*leaf) { close(fd);errno=ENOMEM;error(e,"leaf allocation");return -1; }return fd; }
         int child=openat(fd,part,O_RDONLY|O_CLOEXEC|O_DIRECTORY|O_NOFOLLOW);close(fd);fd=child;part=next;
     }
     if(fd>=0) close(fd);free(copy);error(e,"open parent");return -1;
 }
 static int directory(JNIEnv *e,int root,const char *path) {
-    if(!*path) return dup(root);
+    if(!*path) { int fd=dup(root);if(fd<0) error(e,"duplicate directory");return fd; }
     char *leaf=NULL;int p=parent(e,root,path,&leaf);if(p<0) return -1;
     int fd=openat(p,leaf,O_RDONLY|O_CLOEXEC|O_DIRECTORY|O_NOFOLLOW);int saved=errno;free(leaf);close(p);errno=saved;
     if(fd<0) error(e,"open directory");return fd;
@@ -112,7 +114,8 @@ JNIEXPORT void JNICALL JNI(put)(JNIEnv *e,jobject self,jlong root,jstring path,j
     (*e)->ReleaseStringUTFChars(e,path,s);
 }
 JNIEXPORT void JNICALL JNI(move)(JNIEnv *e,jobject self,jlong root,jstring source,jstring target,jboolean replace) {
-    (void)self;const char *s=(*e)->GetStringUTFChars(e,source,NULL),*t=(*e)->GetStringUTFChars(e,target,NULL);if(!s||!t) return;
+    (void)self;const char *s=(*e)->GetStringUTFChars(e,source,NULL);if(!s) return;
+    const char *t=(*e)->GetStringUTFChars(e,target,NULL);if(!t) { (*e)->ReleaseStringUTFChars(e,source,s);return; }
     char *sl=NULL,*tl=NULL;int sp=parent(e,(int)root,s,&sl),tp=-1;if(sp>=0) tp=parent(e,(int)root,t,&tl);
     if(sp>=0 && tp>=0) { int result;
         if(replace) result=renameat(sp,sl,tp,tl);

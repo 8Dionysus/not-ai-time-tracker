@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #define JNI(name) Java_dev_notai_tracker_NativeCopyIo_##name
 static void error(JNIEnv *e,const char *op) {
@@ -45,7 +46,13 @@ static int directory(JNIEnv *e,int root,const char *path) {
     if(fd<0) error(e,"open directory");return fd;
 }
 static jlongArray attributes(JNIEnv *e,const struct stat *s) {
-    jlong values[]={s->st_dev,s->st_ino,s->st_nlink,s->st_mode,s->st_size,(jlong)s->st_mtim.tv_sec*1000000000+s->st_mtim.tv_nsec};
+    int64_t sec=(int64_t)s->st_mtim.tv_sec,nsec=(int64_t)s->st_mtim.tv_nsec;
+    if(sec>INT64_MAX/1000000000 || sec<INT64_MIN/1000000000 || nsec<0 || nsec>=1000000000) {
+        errno=EOVERFLOW;error(e,"unsupported file timestamp");return NULL;
+    }
+    int64_t modified=sec*1000000000;
+    if(modified>INT64_MAX-nsec) { errno=EOVERFLOW;error(e,"unsupported file timestamp");return NULL; }
+    jlong values[]={s->st_dev,s->st_ino,s->st_nlink,s->st_mode,s->st_size,modified+nsec};
     jlongArray a=(*e)->NewLongArray(e,6);if(a) (*e)->SetLongArrayRegion(e,a,0,6,values);return a;
 }
 JNIEXPORT jlong JNICALL JNI(root)(JNIEnv *e,jobject self,jstring path) {

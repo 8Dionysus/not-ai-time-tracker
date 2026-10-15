@@ -54,11 +54,16 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
     }
     override fun inventory(): CopyInventory = maintenance {
         val state = gate.state();val interrupted = state.journals.any { it.phase !in setOf(CleanupPhase.DONE,CleanupPhase.RESTORED) }
+        val recovery = try { files.stat("recovery-pending.json") != null } catch(_: Exception) { null }
+        val recoveryBlockers = if(recovery != false) setOf(CopyBlocker.REQUIRED_BY_PENDING_RECOVERY)+
+            (if(recovery == null) setOf(CopyBlocker.UNKNOWN_FILE_OR_STATE) else emptySet()) else emptySet()
         val items = state.copies.mapNotNull { record ->
-            val identity = files.stat(record.path) ?: return@mapNotNull null
             val blockers = record.item.hardBlockers+gate.blockers(record.item.id)+
                 (if(interrupted) setOf(CopyBlocker.CLEANUP_INTERRUPTED) else emptySet())+
-                (if(files.stat("recovery-pending.json") != null) setOf(CopyBlocker.REQUIRED_BY_PENDING_RECOVERY) else emptySet())
+                recoveryBlockers
+            val identity = try { files.stat(record.path) } catch(_: Exception) {
+                return@mapNotNull record.item.copy(hardBlockers = blockers+setOf(CopyBlocker.PATH_NOT_SAFE,CopyBlocker.UNKNOWN_FILE_OR_STATE))
+            } ?: return@mapNotNull null
             val checked = try { validate(record,record.path,false,true);emptySet() } catch(e: ArchiveGraphRefusal) { e.blockers } catch(_: Exception) {
                 if(record.sealedArchive) setOf(CopyBlocker.HARDLINK_GRAPH_INCOMPLETE,CopyBlocker.PATH_NOT_SAFE,CopyBlocker.UNKNOWN_FILE_OR_STATE)
                 else if(identity.regular && identity.links != 1L || record.item.members.any { m ->
@@ -67,11 +72,15 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
             }
             record.item.copy(hardBlockers = blockers+checked)
         }.toMutableList()
-        for((kind,root) in roots) if(files.stat(root) != null) for(name in files.names(root)) {
-            val path = "$root/$name"
-            if(state.copies.none { it.path == path }) items += PrivateCopy(payloadHash(path),kind,"UNREGISTERED",0,"",emptyList(),setOf(CopyBlocker.UNKNOWN_FILE_OR_STATE))
+        for((kind,root) in roots) try {
+            if(files.stat(root) != null) for(name in files.names(root)) {
+                val path = "$root/$name"
+                if(state.copies.none { it.path == path }) items += PrivateCopy(payloadHash(path),kind,"UNREGISTERED",0,"",emptyList(),setOf(CopyBlocker.UNKNOWN_FILE_OR_STATE)+recoveryBlockers)
+            }
+        } catch(_: Exception) {
+            items += PrivateCopy(payloadHash("unreadable-root:$root"),kind,"UNREADABLE_ROOT",0,"",emptyList(),setOf(CopyBlocker.PATH_NOT_SAFE,CopyBlocker.UNKNOWN_FILE_OR_STATE)+recoveryBlockers)
         }
-        if(files.stat("recovery-pending.json") != null) items += PrivateCopy("recovery-journal",CopyKind.RECOVERY_JOURNAL,"PENDING",0,"",emptyList(),setOf(CopyBlocker.REQUIRED_BY_PENDING_RECOVERY))
+        if(recovery != false) items += PrivateCopy("recovery-journal",CopyKind.RECOVERY_JOURNAL,"PENDING_OR_UNREADABLE",0,"",emptyList(),recoveryBlockers)
         val recoveryCopies = items.count { it.kind in setOf(CopyKind.ROLLBACK,CopyKind.DATABASE_ARCHIVE) && it.hardBlockers.isEmpty() }
         CopyInventory(state.revision,System.currentTimeMillis(),items.map {
             if(recoveryCopies == 1 && it.hardBlockers.isEmpty() && it.kind in setOf(CopyKind.ROLLBACK,CopyKind.DATABASE_ARCHIVE)) it.copy(confirmableWarnings = it.confirmableWarnings+CopyWarning.LAST_RECOVERY_COPY) else it

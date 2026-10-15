@@ -40,6 +40,20 @@ class DescriptorCleanupTest {
         assertEquals(setOf(CopyBlocker.UNKNOWN_FILE_OR_STATE),inventory.items.single { it.id != item.id }.hardBlockers)
         assertEquals("unregistered fixture; preserve",unknown.readText())
     }
+    @Test fun unrepresentableTimestampBlocksOnlyThatCopyWithoutSignedOverflow() = fixture { root,files,gate,storage ->
+        val safe = seal(root,storage);val unsupported = seal(root,storage)
+        val path = gate.state().copies.single { it.item.id == unsupported.id }.path
+        val future = java.time.Instant.parse("2400-01-01T00:00:00Z")
+        Files.setLastModifiedTime(File(root,path).toPath(),java.nio.file.attribute.FileTime.from(future))
+        assertTrue(Files.getLastModifiedTime(File(root,path).toPath()).toInstant().isAfter(java.time.Instant.parse("2300-01-01T00:00:00Z")))
+        assertFailsWith<IOException> { files.stat(path) }
+        val inventory = storage.inventory()
+        assertTrue(inventory.items.single { it.id == safe.id }.selectable)
+        assertTrue(CopyBlocker.PATH_NOT_SAFE in inventory.items.single { it.id == unsupported.id }.hardBlockers)
+        val cleanup = PrivateCopyCleanup(storage);val p = cleanup.preview(inventory.revision,setOf(safe.id))
+        assertEquals(CleanupPhase.DONE,cleanup.confirm(confirmation(p)).phase)
+        assertEquals("fixture bytes",File(root,"$path/data").readText())
+    }
     @Test fun referencedRecoveryCopyCannotHideLastUnusedCopyWarning() = fixture { root,_,gate,storage ->
         fun rollback(name: String): PrivateCopy {
             val file = File(root,"rollback/$name.json").apply { parentFile.mkdirs();writeText("fixture $name") }

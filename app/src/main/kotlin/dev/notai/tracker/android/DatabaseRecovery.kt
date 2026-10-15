@@ -183,11 +183,14 @@ object DatabaseRecovery {
     }
     private fun completeReferences(context: Context,job: RecoveryJob): RescueResult {
         ensure(job.completedDatasetSha256 != null && job.completedSessions != null,"Recovery is not complete",ErrorCode.STORAGE)
+        val installedFile = context.getDatabasePath("tracker.db").toPath()
+        ensure(java.nio.file.Files.isRegularFile(installedFile,java.nio.file.LinkOption.NOFOLLOW_LINKS) && java.nio.file.Files.size(installedFile) > 0,
+            "Completed recovery database is missing; keep the journal and source references",ErrorCode.STORAGE)
         TrackerRuntime.beginRecovery()
         try {
             val db = TrackerDatabase.open(context)
             try {
-                val installed = RoomStore(db).read()
+                val installed = RoomStore(db,allowInitialize = false).read()
                 ensure(sha256(codec.encodeToString(installed).toByteArray()) == job.completedDatasetSha256,"Installed recovery changed before completion",ErrorCode.STALE)
             } finally { db.close() }
             val gate = PrivateFileMaintenance.forContext(context)

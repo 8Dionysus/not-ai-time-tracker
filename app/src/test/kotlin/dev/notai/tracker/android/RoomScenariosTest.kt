@@ -1175,6 +1175,20 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertTrue(completed.getValue("completedDatasetSha256").jsonPrimitive.content.matches(Regex("[0-9a-f]{64}")))
         org.junit.Assert.assertTrue(DatabaseRecovery.needsAttention(context))
         org.junit.Assert.assertTrue(PrivateFileMaintenance.forContext(context).state().references.any { it.owner == "database-recovery" })
+        // Missing installed bytes must refuse before opening SQLite or creating an empty Dataset.
+        val journalFile = java.io.File(context.noBackupFilesDir,"recovery-pending.json")
+        val completedText = journalFile.readText();val refsBeforeMissing = PrivateFileMaintenance.forContext(context).state().references
+        val holding = java.io.File(context.noBackupFilesDir,"qa-missing-installed-${newId()}").apply { mkdir() }
+        val heldFiles = DatabaseFiles.paths(context).filter { it.exists() }.map { original ->
+            val held = java.io.File(holding,original.name);java.nio.file.Files.move(original.toPath(),held.toPath());original to held
+        }
+        try {
+            val missing = org.junit.Assert.assertThrows(CoreError::class.java) { DatabaseRecovery.resume(context) }
+            org.junit.Assert.assertEquals(ErrorCode.STORAGE,missing.code)
+            org.junit.Assert.assertFalse(context.getDatabasePath("tracker.db").exists())
+            org.junit.Assert.assertEquals(completedText,journalFile.readText())
+            org.junit.Assert.assertEquals(refsBeforeMissing,PrivateFileMaintenance.forContext(context).state().references)
+        } finally { heldFiles.forEach { (original,held) -> java.nio.file.Files.move(held.toPath(),original.toPath()) } }
         var replacementRenames = 0
         DirectoryDurability.rename = { old,new -> if(old.name.startsWith("rescue-") && new.name == "tracker.db") replacementRenames++;rename(old,new) }
         val result = try { runBlocking { withContext(Dispatchers.IO) { DatabaseRecovery.resume(context) } } } finally { DirectoryDurability.rename = rename }

@@ -11,10 +11,19 @@ data class PrivateCopyBackendInspection(val inventory: CopyInventory?,val regist
 /** Backend-only Context binding. Callers supply opaque operation IDs, never roots or chooser paths.
  * Canonicalization is limited to Android's own application directories; the opened no-follow root
  * descriptor must match the checked private UID/device/inode. This wires the implementation;
- * real Android JNI/OEM validation and frontend lifecycle adoption remain separate acceptance.
- * No destructive entrypoint is exposed by this binding before those checks.
+ * Android validation is scoped to recorded devices; frontend lifecycle adoption stays explicit.
+ * Opening a session never clears protective references or continues interrupted deletion.
  */
 object PrivateCopyBackend {
+    /** Concrete backend binding, without a blanket feature switch. Every file/root/reference
+     * check still applies; the legacy UI witness is preserved until its actual owner adopts it. */
+    fun openSession(context: Context): PrivateCopySession {
+        val gate = PrivateFileMaintenance.forContext(context)
+        return try { gate.locked { PrivateFileMaintenance.legacy(gate);PrivateCopySession(root(context),gate) } }
+        catch(_: LinkageError) { throw CoreError(ErrorCode.STORAGE,"Private-copy descriptor binding unavailable") }
+        catch(e: CoreError) { throw e }
+        catch(_: Exception) { throw CoreError(ErrorCode.STORAGE,"Private-copy root or registry unavailable") }
+    }
     private fun root(context: Context): DescriptorCopyFiles {
         val app = context.applicationContext
         val data = File(app.applicationInfo.dataDir).canonicalFile

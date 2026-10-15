@@ -21,6 +21,10 @@ class ArchiveInstrumentation: Instrumentation() {
     override fun onStart() {
         try {
             val context = targetContext
+            if(mode.startsWith("backend-integration-")) {
+                val report = BackendIntegrationChecks.run(context,mode,requireNotNull(backendName))
+                finish(Activity.RESULT_OK,Bundle().apply { putString("report",report.toString()) });return
+            }
             if(mode.startsWith("backend-")) {
                 val report = BackendNativeChecks.run(context,mode,requireNotNull(backendName))
                 finish(Activity.RESULT_OK,Bundle().apply { putString("report",report.toString()) });return

@@ -9,6 +9,23 @@ import kotlin.test.*
 
 /** Real isolated files and JNI syscalls, not an Android/OEM acceptance claim. */
 class DescriptorCleanupTest {
+    @Test fun rootPinsSearchOnlyAncestorsWithoutRequiringTheirDirectoryListing() {
+        val library = System.getProperty("tracker.cleanup.library");assumeNotNull(library)
+        val ancestor = Files.createTempDirectory("tracker-search-only-")
+        val owned = Files.createDirectory(ancestor.resolve("owned-private-root"))
+        try {
+            // Only this test's own ancestor changes mode. No host/system permissions change.
+            Files.setPosixFilePermissions(ancestor,java.nio.file.attribute.PosixFilePermissions.fromString("--x--x--x"))
+            DescriptorCopyFiles(owned.toString(),library).use { files ->
+                assertTrue(files.rootIdentity().directory)
+                files.metadata().writeDurably("owned fixture")
+                assertEquals("owned fixture",files.metadata().read())
+            }
+        } finally {
+            Files.setPosixFilePermissions(ancestor,java.nio.file.attribute.PosixFilePermissions.fromString("rwx------"))
+            ancestor.toFile().deleteRecursively()
+        }
+    }
     private fun fixture(block: (File,DescriptorCopyFiles,CopyMaintenance,RegisteredCopyStorage)->Unit) {
         val library = System.getProperty("tracker.cleanup.library");assumeNotNull(library)
         val root = Files.createTempDirectory("tracker-copy-").toFile()

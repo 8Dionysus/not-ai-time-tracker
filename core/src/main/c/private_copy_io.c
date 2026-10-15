@@ -27,7 +27,7 @@ static int safe(const char *s) {
     return 1;
 }
 /* Return the pinned parent and one validated leaf, never follow any ancestor symlink. */
-static int parent(JNIEnv *e,int root,const char *path,char **leaf) {
+static int parent_mode(JNIEnv *e,int root,const char *path,char **leaf,int traversal_flags) {
     if(!*path || *path=='/' || path[strlen(path)-1]=='/' || strstr(path,"//")) { errno=EINVAL;error(e,"relative path");return -1; }
     char *copy=strdup(path);if(!copy) { errno=ENOMEM;error(e,"path allocation");return -1; }
     char *save=NULL,*part=strtok_r(copy,"/",&save);int fd=dup(root);
@@ -35,9 +35,12 @@ static int parent(JNIEnv *e,int root,const char *path,char **leaf) {
         if(!safe(part)) { errno=EINVAL;break; }
         char *next=strtok_r(NULL,"/",&save);
         if(!next) { *leaf=strdup(part);free(copy);if(!*leaf) { close(fd);errno=ENOMEM;error(e,"leaf allocation");return -1; }return fd; }
-        int child=openat(fd,part,O_RDONLY|O_CLOEXEC|O_DIRECTORY|O_NOFOLLOW);close(fd);fd=child;part=next;
+        int child=openat(fd,part,traversal_flags|O_CLOEXEC|O_DIRECTORY|O_NOFOLLOW);close(fd);fd=child;part=next;
     }
     if(fd>=0) close(fd);free(copy);error(e,"open parent");return -1;
+}
+static int parent(JNIEnv *e,int root,const char *path,char **leaf) {
+    return parent_mode(e,root,path,leaf,O_RDONLY);
 }
 static int directory(JNIEnv *e,int root,const char *path) {
     if(!*path) { int fd=dup(root);if(fd<0) error(e,"duplicate directory");return fd; }
@@ -57,9 +60,21 @@ static jlongArray attributes(JNIEnv *e,const struct stat *s) {
 }
 JNIEXPORT jlong JNICALL JNI(root)(JNIEnv *e,jobject self,jstring path) {
     (void)self;const char *s=(*e)->GetStringUTFChars(e,path,NULL);if(!s) return -1;
-    int root=open("/",O_RDONLY|O_CLOEXEC|O_DIRECTORY);int fd=-1;
-    if(*s=='/' && s[1]) fd=directory(e,root,s+1);else { errno=EINVAL;error(e,"absolute root"); }
-    close(root);(*e)->ReleaseStringUTFChars(e,path,s);return fd;
+    /* Android grants apps search, not directory-listing permission on /data ancestors.
+     * O_PATH pins those ancestors without requiring read permission or following links.
+     * Only the final owned private root is opened readably for inventory/fsync. Relative
+     * mutation parents below it retain their existing readable/fsync-able descriptors. */
+    int root=open("/",O_PATH|O_CLOEXEC|O_DIRECTORY);int fd=-1;
+    if(root<0) error(e,"root anchor");
+    else if(*s=='/' && s[1]) {
+        char *leaf=NULL;int p=parent_mode(e,root,s+1,&leaf,O_PATH);
+        if(p>=0) {
+            fd=openat(p,leaf,O_RDONLY|O_CLOEXEC|O_DIRECTORY|O_NOFOLLOW);
+            int saved=errno;free(leaf);close(p);errno=saved;
+            if(fd<0) error(e,"open private root");
+        }
+    } else { errno=EINVAL;error(e,"absolute root"); }
+    if(root>=0) close(root);(*e)->ReleaseStringUTFChars(e,path,s);return fd;
 }
 JNIEXPORT void JNICALL JNI(close)(JNIEnv *e,jobject self,jlong fd) { (void)self;if(close((int)fd)<0) error(e,"close"); }
 JNIEXPORT jlongArray JNICALL JNI(fstat)(JNIEnv *e,jobject self,jlong fd) {

@@ -5,7 +5,7 @@ import dev.notai.tracker.*
 import java.io.File
 
 /** Shared backend gate. No thread/process expiry can turn an abandoned reference into an orphan.
- * Production deletion remains unbound until frontend lifecycle adoption and Android JNI QA. */
+ * Context-bound sessions preserve the durable legacy witness until frontend lifecycle adoption. */
 object PrivateFileMaintenance {
     private val roots = mutableMapOf<String,CopyMaintenance>()
     @Synchronized fun forContext(context: Context): CopyMaintenance = forRoot(context.noBackupFilesDir)

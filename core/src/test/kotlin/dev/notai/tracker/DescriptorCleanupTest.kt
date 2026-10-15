@@ -43,9 +43,13 @@ class DescriptorCleanupTest {
     @Test fun unrepresentableTimestampBlocksOnlyThatCopyWithoutSignedOverflow() = fixture { root,files,gate,storage ->
         val safe = seal(root,storage);val unsupported = seal(root,storage)
         val path = gate.state().copies.single { it.item.id == unsupported.id }.path
-        val future = java.time.Instant.parse("2400-01-01T00:00:00Z")
-        Files.setLastModifiedTime(File(root,path).toPath(),java.nio.file.attribute.FileTime.from(future))
-        assertTrue(Files.getLastModifiedTime(File(root,path).toPath()).toInstant().isAfter(java.time.Instant.parse("2300-01-01T00:00:00Z")))
+        // This JDK's FileTime conversion clamps beyond signed nanoseconds. Set and verify the
+        // actual POSIX fixture timestamp with the same Python3 required by the catalog build.
+        val process = ProcessBuilder("python3","-c",
+            "import os,sys; ns=13569465600000000000; os.utime(sys.argv[1],ns=(ns,ns)); assert os.stat(sys.argv[1]).st_mtime_ns == ns",
+            File(root,path).absolutePath).redirectErrorStream(true).start()
+        val output = process.inputStream.bufferedReader().use { it.readText() }
+        assertEquals(0,process.waitFor(),output)
         assertFailsWith<IOException> { files.stat(path) }
         val inventory = storage.inventory()
         assertTrue(inventory.items.single { it.id == safe.id }.selectable)

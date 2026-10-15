@@ -1,0 +1,7 @@
+{
+  "originalHostBuildAndAnalysisSource": "0fcecd94b5a75d9a0f62c3d3e696d550055890e9",
+  "currentRuntimeSource": "a4d31eedd66fdcb2254f19eac5c4c8796431353f",
+  "privateCopyCBlob": "9d0a1e2a1c557191941aa358eb73d892db7b1a2d",
+  "identical": true,
+  "scope": "Unchanged C evidence reused; four ABI packaging and host tests remain separately attributed."
+}

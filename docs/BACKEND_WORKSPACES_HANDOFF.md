@@ -41,3 +41,11 @@ Full restore previews and rescue previews are AutoCloseable. Cancel/replace a re
 - Catalog sidecar and batch contract: CATALOG_CONTENT_PACKS.md. User originals and historical JSON/CSV do not pass through translation. Candidate license may be null with source_rights_review_pending; no Apache inheritance. The loader reads only index metadata initially and requested locale/fallback payloads on demand. Translation quality, actual offline availability and rights status stay separate.
 
 The separate unaccepted UI caller patch has SHA256 59a054f5fcbef3a7fcfb5d243308d61eab5034a5118e7e56211a7c7a9849d798; it is not part of main/source runtime and does not close any UI integration item.
+
+## Sequential integration refinements
+
+Selective selection.excludedOverrides must name existing override keys in selection.seriesIds. A missing override or an override of an unselected series refuses before any domain mutation and cannot produce a false OVERRIDES_EXCLUDED loss. Valid exclusions retain the original occurrence identity; exclusions still belong to explicit selective planning, not full JSON replacement or CSV. Shared Memory/Room fixture coverage is in SelectiveExclusionsScenario.
+
+Projection wake reads now share synchronize's fail-closed boundary: malformed/future authority disarms the existing alarm/receiver, preserves the original exception and journal bytes, and creates no facts or replacement authority.
+
+Legacy inventory cutover does not prove old owners finished. A new exact owner releases only its own tokens; an overlapping legacy witness stays protected. See [LEGACY_OWNER_MIGRATION_REVIEW.md](LEGACY_OWNER_MIGRATION_REVIEW.md) for the exact missing historical origin/census prerequisite and the safe explicit handoff contract. Opus must not turn an UNKNOWN ownership blocker into an unused-copy warning. No automatic legacy token purge was added.

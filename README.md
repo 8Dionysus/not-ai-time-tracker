@@ -15,7 +15,7 @@
 
 Эти возможности доступны через API ядра. Основной интерфейс покрывает таймер, выбор и поиск занятий, избранное и повтор, исправление, удаление и ручные записи, переключение задним числом, неизвестное время, Focus, обзор с целями, копию, восстановление и CSV-выгрузку, уведомление, виджет, плавающую кнопку и тему. Техническая оболочка (`TechnicalActivity`, «Настройки → Техническая оболочка») остаётся для CSV mapping, измерений, календарных вхождений, восстановления недоступной базы и правки целей.
 
-Новый backend-контракт сохраняет свои категории/подкатегории и именованные карточки отдельно от заметок. Карточки и категории теперь можно выборочно переносить без записанного времени, с зависимостями и проверкой конфликтов. Добавлены настройки границы дня/домашней зоны расписания и отдельный флаг тихой шторки: Room8, полный JSON10, selective1/2. Подключение этих API к UI остаётся у Opus; цвета и темы также оставлены ему и пользователю. Фактическое покрытие и ограничения: [матрица](docs/CUSTOMIZATION_REQUIREMENTS_MATRIX.md), [контракт](docs/FUNCTIONAL_CUSTOMIZATION_HANDOFF.md).
+Новый backend-контракт сохраняет свои категории/подкатегории и именованные карточки отдельно от заметок. Карточки и категории теперь можно выборочно переносить без записанного времени, с зависимостями и проверкой конфликтов. Добавлены настройки границы дня/домашней зоны расписания и отдельный флаг тихой шторки: Room9, полный JSON11 (read1–11), selective1/2. Подключение этих API к UI остаётся у Opus; цвета и темы также оставлены ему и пользователю. Фактическое покрытие и ограничения: [матрица](docs/CUSTOMIZATION_REQUIREMENTS_MATRIX.md), [контракт](docs/FUNCTIONAL_CUSTOMIZATION_HANDOFF.md).
 
 Журнал попыток напоминаний теперь хранится в индексированном SQLite sidecar с сохранением всех identities/outcomes и миграцией прежнего JSON: [контракт](docs/INDEXED_SCHEDULE_RECEIPTS.md). Backend очистки связан с финальными seals архивов, legacy registration и writer/reference registry: [границы интеграции](docs/PRIVATE_COPY_BACKEND_BINDING.md). Один разрешённый AOSP software preflight дал частичный результат, без boot_completed и без приёмки устройства: [доказательства](docs/ANDROID_RUNTIME_PREFLIGHT.md).
 
@@ -35,7 +35,7 @@
 ./gradlew :core:test :app:testDebugUnitTest :app:assembleDebug :app:assembleRelease :app:lintRelease -PtrackerUnsigned=true
 ```
 
-Собственная private-copy JNI использует закреплённый NDK r30 (`30.0.16248370`). Для host-файловых regression fixtures соберите отдельную библиотеку через `scripts/build-cleanup-host.sh JDK_DIRECTORY OUTPUT.so` и передайте `-PtrackerCleanupLibrary=/absolute/path/to/OUTPUT.so`; без этого параметра соответствующие JNI-тесты пропускаются. Host fixtures и компиляция четырёх ABI не являются Android device QA. Production-удаление копий пока выключено; границы — в [контракте очистки](docs/SEALED_ARCHIVE_CONTRACT.md).
+Собственная private-copy JNI использует закреплённый NDK r30 (`30.0.16248370`). Для host-файловых regression fixtures соберите отдельную библиотеку через `scripts/build-cleanup-host.sh JDK_DIRECTORY OUTPUT.so` и передайте `-PtrackerCleanupLibrary=/absolute/path/to/OUTPUT.so`; без этого параметра соответствующие JNI-тесты пропускаются. Host fixtures и компиляция четырёх ABI не являются Android device QA. Очистка имеет Context-bound backend session, descriptor/JNI-защиту и явные операции; UI-подключение и Android/device-приёмка остаются открыты. Границы — в [контракте очистки](docs/SEALED_ARCHIVE_CONTRACT.md).
 
 С указанным флагом получаются неподписанные debug/release APK; ключи не создаются. Обычная debug-сборка без флага создаёт `app/build/outputs/apk/debug/app-debug.apk`. Для отдельной проверки такой подписанной debug-сборки на подключённом устройстве:
 
@@ -74,7 +74,7 @@ adb shell am start -n dev.notai.tracker/dev.notai.tracker.android.MainActivity
 
 Project-owned code is licensed under [Apache-2.0](LICENSE). The [NOTICE](NOTICE) preserves the separate Onest OFL and third-party/content boundaries. Catalog research and assets do not acquire new rights through this source-code license.
 
-Текущая backend-схема — Room 7, полный архив — JSON 9 (read 1–9). [BACKEND_PASS_2026_10](docs/BACKEND_PASS_2026_10.md) фиксирует новые API и незакрытые границы; production-удаление private copies и полноценная локализация не объявлены готовыми.
+Текущая backend-схема — Room9, полный архив — JSON11 (read1–11), operational maintenance/recovery journal3. [BACKEND_PASS_2026_10](docs/BACKEND_PASS_2026_10.md) фиксирует новые API и незакрытые границы; пользовательское подключение private-copy cleanup и полноценная локализация не объявлены готовыми.
 
 Явная compaction текущих SQLite operational snapshots: [TRANSFER_RETENTION](docs/TRANSFER_RETENTION.md). Typed CSV issue contract: [IMPORT_ISSUES](docs/IMPORT_ISSUES.md). Нативные dependency/source ограничения: [NATIVE_LICENSE_EVIDENCE](docs/NATIVE_LICENSE_EVIDENCE.md).
 
@@ -82,3 +82,5 @@ Project-owned code is licensed under [Apache-2.0](LICENSE). The [NOTICE](NOTICE)
 ## Локализация для подключения фронтенда
 
 [Проверенный редакционный пакет RU и 11 переводных языков](docs/localization/README.md) находится в main вместе с точными хешами и инструкцией для Опуса. Он включает составные сообщения и 64 typed CSV issue codes; подключение ресурсов к Android UI и проверка на устройстве ещё предстоят.
+
+Сохранённые невизуальные контроллеры расписания и выборочного файла, lifecycle/recovery и тихая проекция: [handoff для Opus](docs/BACKEND_WORKSPACES_HANDOFF.md). Каталогные sidecar manifest/loader и batch resolver описаны в [контракте content packs](docs/CATALOG_CONTENT_PACKS.md); установленные DRAFT или отсутствующие пакеты не считаются поддержанными переводами. Сверка всех 21 направлений и A–F: [покрытие](docs/FUNCTIONAL_COVERAGE_2026_10_15.md).

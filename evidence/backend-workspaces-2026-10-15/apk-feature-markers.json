@@ -1,0 +1,35 @@
+{
+  "scope": "Presence of final classes/literals only; not runtime feature acceptance",
+  "apk": [
+    {
+      "variant": "debug",
+      "dexEntries": [
+        "classes.dex",
+        "classes3.dex",
+        "classes4.dex",
+        "classes6.dex",
+        "classes2.dex",
+        "classes5.dex"
+      ],
+      "markers": {
+        "CatalogRightsStatus": true,
+        "source_rights_review_pending": true,
+        "BackendWorkspaces": true,
+        "Completed recovery database is missing": true
+      }
+    },
+    {
+      "variant": "release",
+      "dexEntries": [
+        "classes.dex",
+        "classes2.dex"
+      ],
+      "markers": {
+        "CatalogRightsStatus": true,
+        "source_rights_review_pending": true,
+        "BackendWorkspaces": true,
+        "Completed recovery database is missing": true
+      }
+    }
+  ]
+}

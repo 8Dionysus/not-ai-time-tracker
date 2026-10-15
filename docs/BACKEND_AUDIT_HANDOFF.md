@@ -1,5 +1,6 @@
 # Backend audit follow-up and Opus handoff
 
+Current follow-up: [saved controllers/lifetimes](BACKEND_WORKSPACES_HANDOFF.md), [catalog sidecars](CATALOG_CONTENT_PACKS.md), [21-family coverage](FUNCTIONAL_COVERAGE_2026_10_15.md). Current persistence is Room9/full JSON11; maintenance/recovery operational format3. The baseline-specific text and evidence below remain historical unless superseded by these follow-ups.
 15 October 2026. Follow-up details: [sealed archive contract](SEALED_ARCHIVE_CONTRACT.md), [schedule delivery and mandatory caller migration](SCHEDULE_DELIVERY_HANDOFF.md), [functional customization](FUNCTIONAL_CUSTOMIZATION_HANDOFF.md), [exact functional verification](FUNCTIONAL_CUSTOMIZATION_VERIFICATION.md). Based on main `f14fa3c`; current Room8 / portable JSON10 / Android
 0.11.0 (12), compile/target API36. Static fixes through `9d115df` used Room7/JSON9;
 the functional follow-up adds validated schedule preferences and catalog selection roots with migration7→8 and archive10/read1–10. The user restored backend-only

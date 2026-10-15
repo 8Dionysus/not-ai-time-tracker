@@ -1,0 +1,9 @@
+{
+  "explicitStopRequested": true,
+  "fixturePassedBeforeRequest": true,
+  "emulatorPid": 29338,
+  "supervisorResumedAfterTaskLocalExtension": true,
+  "supervisorFinalPhase": "maximum-runtime-deadline",
+  "qemuExitCodeAfterRequestedStop": -11,
+  "scope": "QEMU process exit during requested shutdown; not a Tracker Java/JNI crash attribution"
+}

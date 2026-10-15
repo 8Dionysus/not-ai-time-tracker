@@ -1,0 +1,13 @@
+{
+  "runtimeSource": "2d620140d411b2856da4bed81502b17b93f68cf8",
+  "appTestSource": "dff31cf850807bde85e26eaca3703d8ffbf889f9",
+  "coreTestSource": "2d620140d411b2856da4bed81502b17b93f68cf8",
+  "androidFixtureSource": "1ecd9a84238e44c06487a8eac4eae924a86eced6",
+  "changedSinceAppTests": [
+    "app/src/main/kotlin/dev/notai/tracker/android/CatalogContentAdapter.kt",
+    "core/src/main/kotlin/dev/notai/tracker/CatalogContentPacks.kt",
+    "core/src/test/kotlin/dev/notai/tracker/LocaleContractTest.kt",
+    "docs/CATALOG_CONTENT_PACKS.md"
+  ],
+  "scope": "Content manifest/rights and lazy offline loader are verified by updated core contract tests and app build/lint. Unchanged app domain/UI/Room scenarios retain78 results at dff31cf; no repeated load profile."
+}

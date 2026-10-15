@@ -1,5 +1,6 @@
 # Schedule delivery coordination: backend and caller contract
 
+Current follow-up: [saved controllers/lifetimes](BACKEND_WORKSPACES_HANDOFF.md), [catalog sidecars](CATALOG_CONTENT_PACKS.md), [21-family coverage](FUNCTIONAL_COVERAGE_2026_10_15.md). Current persistence is Room9/full JSON11; maintenance/recovery operational format3. The baseline-specific text and evidence below remain historical unless superseded by these follow-ups.
 15 October 2026. Initial delivery coordination used Room7/portable JSON9; the current
 [functional extension](FUNCTIONAL_CUSTOMIZATION_HANDOFF.md) uses Room8/JSON10. Delivery state
 is separate operational state, not a fact/completion mark. The current

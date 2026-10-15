@@ -1,0 +1,10 @@
+{
+  "source": "Exact coordinator message text, same delegated task; not ZIP download",
+  "path": "docs/localization/backend-delta-editorial-2026-10-15.json",
+  "bytes": 24331,
+  "sha256": "2e44813f4db7a6579a08453e23d029d244f749ab426bd76a8efe501a660de04f",
+  "keys": 4,
+  "locales": 12,
+  "rows": 48,
+  "fullZipV2ByteVerification": false
+}

@@ -1,0 +1,367 @@
+{
+  "schemaVersion": "1.0.0",
+  "catalogId": "tracker-backend-delta-2026-10-15",
+  "catalogStatus": "editorial_draft_requires_review_and_integration",
+  "scope": {
+    "purpose": "Additive editorial delta for four new backend message resources. Does not replace, patch, or re-review any existing import-issue translations.",
+    "baseEditorialPackageSha256": "eca102490bb89f163141813043e59e351d6bad8d1c0b659027371d25a52cc310",
+    "baseImportIssueCount": 64,
+    "sourceImportIssueCountAfterDelta": 65,
+    "sourceMessageResourceCount": 4,
+    "locales": [
+      "ru",
+      "en",
+      "es",
+      "fr",
+      "pt-BR",
+      "de",
+      "it",
+      "ar",
+      "zh-Hans",
+      "ja",
+      "ko",
+      "hi"
+    ],
+    "ruleHintResourcesAdded": 0
+  },
+  "source": {
+    "repository": "8Dionysus/not-ai-time-tracker",
+    "commit": "e1cb1961e656e794adc4a39269ec964705eb7ce6",
+    "commitUrl": "https://github.com/8Dionysus/not-ai-time-tracker/commit/e1cb1961e656e794adc4a39269ec964705eb7ce6",
+    "retrieval": "GitHub connector fetch_file at the exact commit ref; the typed delta was also present locally and matched the connector content.",
+    "files": [
+      {
+        "path": "docs/localization/backend-typed-delta.json",
+        "blobSha": "03988a68f726941e17d2f19c598f2f789517f695",
+        "url": "https://github.com/8Dionysus/not-ai-time-tracker/blob/e1cb1961e656e794adc4a39269ec964705eb7ce6/docs/localization/backend-typed-delta.json"
+      },
+      {
+        "path": "docs/localization/backend-functional-delta.json",
+        "blobSha": "2c31339a893809da72e3d1c79ad77cd2bd785bca",
+        "url": "https://github.com/8Dionysus/not-ai-time-tracker/blob/e1cb1961e656e794adc4a39269ec964705eb7ce6/docs/localization/backend-functional-delta.json"
+      },
+      {
+        "path": "docs/localization/backend-cleanup-delta.json",
+        "blobSha": "8f99cd96a79c9ed9b9b059ca6199dc5abe1a92d6",
+        "url": "https://github.com/8Dionysus/not-ai-time-tracker/blob/e1cb1961e656e794adc4a39269ec964705eb7ce6/docs/localization/backend-cleanup-delta.json"
+      }
+    ]
+  },
+  "entries": [
+    {
+      "kind": "csv_import_issue",
+      "sourceIdentifier": "SOURCE_LOCALE_INVALID",
+      "resourceKey": "tracker.import.source_locale_invalid",
+      "localized": {
+        "ru": "Укажите допустимый языковой тег для дат в исходном файле, например en-US.",
+        "en": "Enter a valid language tag for dates in the source file, for example en-US.",
+        "es": "Introduce una etiqueta de idioma válida para las fechas del archivo de origen, por ejemplo, en-US.",
+        "fr": "Saisissez une étiquette de langue valide pour les dates du fichier source, par exemple en-US.",
+        "pt-BR": "Informe uma etiqueta de idioma válida para as datas do arquivo de origem, por exemplo, en-US.",
+        "de": "Geben Sie ein gültiges Sprach-Tag für Datumsangaben in der Quelldatei ein, zum Beispiel en-US.",
+        "it": "Inserisci un tag di lingua valido per le date nel file di origine, ad esempio en-US.",
+        "ar": "أدخِل وسم لغة صالحًا لتواريخ الملف المصدر، مثل en-US.",
+        "zh-Hans": "请输入源文件日期的有效语言标签，例如 en-US。",
+        "ja": "元ファイルの日付に有効な言語タグを入力してください（例: en-US）。",
+        "ko": "원본 파일 날짜에 사용할 올바른 언어 태그를 입력하세요. 예: en-US.",
+        "hi": "स्रोत फ़ाइल की तारीखों के लिए मान्य भाषा टैग दर्ज करें, जैसे en-US।"
+      },
+      "sourceContract": {
+        "code": "SOURCE_LOCALE_INVALID",
+        "resourceKey": "tracker.import.source_locale_invalid",
+        "errorCode": "INVALID_INPUT",
+        "severity": "ERROR",
+        "stage": "PARSE",
+        "fieldPath": "csvMapping.sourceLocale",
+        "rowNumber": null,
+        "field": null,
+        "arguments": {
+          "localeTag": {
+            "type": "ErrorArgument.Text",
+            "meaning": "Original source date language tag; display as a value, never translate"
+          }
+        },
+        "meaning": "The explicit language tag for parsing source dates is malformed or does not identify a language. Null uses Locale.ROOT. This is independent of UI language and supported UI locales.",
+        "sourceCopy": {
+          "en": "Enter a valid language tag for dates in the source file, for example en-US.",
+          "ru": "Укажите корректный языковой тег для дат исходного файла, например en-US."
+        },
+        "quality": "SOURCE_DRAFT_REQUIRES_EDITORIAL_REVIEW",
+        "reviewedTranslations": [],
+        "uiAction": "Keep every mapping field; let the user correct sourceLocale or explicitly clear it to ROOT, then obtain a new preview. Do not change application language or apply data."
+      },
+      "translationNotes": "The example en-US is an invariant literal copied without translation. The localeTag argument remains unmodified data; it is not a template placeholder in this copy."
+    },
+    {
+      "kind": "core_error_reason",
+      "sourceIdentifier": "SCHEDULE_DAY_INVALID",
+      "resourceKey": "tracker.error.schedule_day_invalid",
+      "localized": {
+        "ru": "Проверьте настройку границы дня или часового пояса в расписании.",
+        "en": "Check the day start time or time zone setting for the schedule.",
+        "es": "Revisa la hora de inicio del día o la zona horaria de la programación.",
+        "fr": "Vérifiez l’heure de début de journée ou le fuseau horaire du planning.",
+        "pt-BR": "Verifique o horário de início do dia ou o fuso horário da programação.",
+        "de": "Prüfen Sie den Tagesbeginn oder die Zeitzone des Zeitplans.",
+        "it": "Controlla l’orario di inizio della giornata o il fuso orario della pianificazione.",
+        "ar": "تحقّق من وقت بداية اليوم أو المنطقة الزمنية للجدول.",
+        "zh-Hans": "请检查日程中的每日开始时间或时区设置。",
+        "ja": "日付の切り替わり時刻またはスケジュールのタイムゾーン設定を確認してください。",
+        "ko": "일정의 하루 시작 시각 또는 시간대 설정을 확인하세요.",
+        "hi": "शेड्यूल में दिन शुरू होने के समय या समय क्षेत्र की सेटिंग जाँचें।"
+      },
+      "sourceContract": {
+        "reason": "SCHEDULE_DAY_INVALID",
+        "resourceKey": "tracker.error.schedule_day_invalid",
+        "errorCode": "INVALID_INPUT",
+        "fieldPaths": [
+          "settings.schedule.day.boundary",
+          "settings.schedule.day.zoneId"
+        ],
+        "arguments": {
+          "value": "ErrorArgument.Text (original value, empty for missing zone)",
+          "rule": "ErrorArgument.Text (stable machine token)"
+        },
+        "rules": [
+          "INVALID_LOCAL_TIME",
+          "FIXED_ZONE_REQUIRED",
+          "INVALID_IANA_ZONE",
+          "DEVICE_ZONE_NOT_ALLOWED"
+        ],
+        "sourceCopy": {
+          "ru": "Проверьте настройку границы дня или часового пояса расписания.",
+          "en": "Check the schedule day boundary or time zone setting."
+        },
+        "quality": "SOURCE_DRAFT_REQUIRES_EDITORIAL_REVIEW",
+        "uiAction": "Preserve all fields and the running timer; localize the setting/rule from stable identifiers, then let the user correct the value.",
+        "scope": "Functional settings/catalog roots; these are CoreError reasons, not additional CSV ImportIssue codes"
+      },
+      "translationNotes": "The value argument and rule token remain available unchanged as typed data; this generic message does not embed either one. The rule token is not translated or dispatched by a substring."
+    },
+    {
+      "kind": "core_error_reason",
+      "sourceIdentifier": "CATALOG_ROOT_INVALID",
+      "resourceKey": "tracker.error.catalog_root_invalid",
+      "localized": {
+        "ru": "Проверьте выбранные карточки и категории для переноса.",
+        "en": "Check the cards and categories selected for transfer.",
+        "es": "Revisa las tarjetas y categorías seleccionadas para transferir.",
+        "fr": "Vérifiez les cartes et les catégories sélectionnées pour le transfert.",
+        "pt-BR": "Confira os cartões e as categorias selecionados para transferência.",
+        "de": "Prüfen Sie die für die Übertragung ausgewählten Karten und Kategorien.",
+        "it": "Controlla le schede e le categorie selezionate per il trasferimento.",
+        "ar": "تحقّق من البطاقات والفئات المحددة للنقل.",
+        "zh-Hans": "请检查选中用于传输的卡片和类别。",
+        "ja": "転送対象として選択したカードとカテゴリを確認してください。",
+        "ko": "전송하도록 선택한 카드와 카테고리를 확인하세요.",
+        "hi": "स्थानांतरण के लिए चुने गए कार्ड और श्रेणियाँ जाँचें।"
+      },
+      "sourceContract": {
+        "reason": "CATALOG_ROOT_INVALID",
+        "resourceKey": "tracker.error.catalog_root_invalid",
+        "errorCode": "INVALID_INPUT",
+        "fieldPaths": [
+          "transfer.catalogRoots",
+          "transfer.catalogRoots.cardIds",
+          "transfer.catalogRoots.typeIds",
+          "transfer.selection.cardIds",
+          "transfer.selection.typeIds"
+        ],
+        "arguments": {
+          "rootId": "ErrorArgument.Identifier",
+          "rule": "ErrorArgument.Text (stable machine token)"
+        },
+        "rules": [
+          "DUPLICATE_ROOT",
+          "MISSING_REFERENCE",
+          "MISSING_SELECTION"
+        ],
+        "sourceCopy": {
+          "ru": "Проверьте выбранные карточки и категории для переноса.",
+          "en": "Check the cards and categories selected for transfer."
+        },
+        "quality": "SOURCE_DRAFT_REQUIRES_EDITORIAL_REVIEW",
+        "uiAction": "Keep the selection and source; refresh missing references and obtain a new preview. Do not match objects by translated/display names."
+      },
+      "translationNotes": "rootId and rule remain unchanged typed arguments. No ID or object is matched using translated/display names; the generic copy does not embed either argument."
+    },
+    {
+      "kind": "cleanup_warning",
+      "sourceIdentifier": "INCOMPLETE_EXPORT_STAGING",
+      "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+      "localized": {
+        "ru": "Если продолжить, сохранённые данные этого отменённого экспорта будут удалены. Наличие полной копии не подтверждено.",
+        "en": "If you continue, the retained data of this cancelled export will be deleted. A complete export has not been verified.",
+        "es": "Si continúas, se eliminarán los datos conservados de esta exportación cancelada. No se ha verificado que la exportación esté completa.",
+        "fr": "Si vous continuez, les données conservées de cet export annulé seront supprimées. Il n’a pas été vérifié que l’export soit complet.",
+        "pt-BR": "Se você continuar, os dados mantidos desta exportação cancelada serão excluídos. Não foi verificado se a exportação está completa.",
+        "de": "Wenn Sie fortfahren, werden die gespeicherten Daten dieses abgebrochenen Exports gelöscht. Es wurde nicht verifiziert, dass der Export vollständig ist.",
+        "it": "Se continui, i dati conservati di questa esportazione annullata verranno eliminati. Non è stato verificato che l’esportazione sia completa.",
+        "ar": "إذا تابعت، فستُحذف البيانات المحتفَظ بها من هذا التصدير الملغى. لم يتم التحقق من اكتمال التصدير.",
+        "zh-Hans": "如果继续，将删除此次已取消导出的暂存数据。尚未验证导出是否完整。",
+        "ja": "続行すると、このキャンセル済みエクスポートの保存データが削除されます。エクスポートが完全であることは確認されていません。",
+        "ko": "계속하면 취소된 내보내기의 보관된 데이터가 삭제됩니다. 내보내기가 완전한지 확인되지 않았습니다.",
+        "hi": "यदि आप आगे बढ़ते हैं, तो इस रद्द किए गए निर्यात का सहेजा गया डेटा मिटा दिया जाएगा। पूर्ण निर्यात सत्यापित नहीं हुआ है।"
+      },
+      "sourceContract": {
+        "warning": "INCOMPLETE_EXPORT_STAGING",
+        "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+        "arguments": {},
+        "sourceCopy": {
+          "ru": "Будут удалены сохранённые байты отменённого экспорта. Готовая копия не подтверждена.",
+          "en": "Delete the retained bytes of this cancelled export. A complete export has not been verified."
+        },
+        "quality": "SOURCE_DRAFT_REQUIRES_EDITORIAL_REVIEW",
+        "uiAction": "Show exact staged members/bytes and obtain this separate warning acknowledgement; never imply that partial data can be retried as a verified export. Active writer/chooser references remain hard blockers.",
+        "scope": "Private-copy confirmable warning, not a new CSV ImportIssue"
+      },
+      "translationNotes": "The consequence is conditional/future tense; the copy does not say deletion has already happened. It states only that completeness has not been verified and makes no promise of a complete-copy retry."
+    }
+  ],
+  "implementationBoundary": {
+    "resourceKeyLookup": "Use each exact resourceKey/reason/code. Do not use diagnostic substring dispatch.",
+    "typedArguments": "Retain exact source argument names, types, and machine field paths. Pass user values, identifiers, en-US, and stable rule tokens through unchanged; do not translate or normalize them.",
+    "runtimeStatus": "Editorial handoff only. No app resources, UI, runtime locale support, or native-speaker acceptance is claimed."
+  },
+  "editorialRevisions": [
+    {
+      "dateUtc": "2026-10-15T21:42:00Z",
+      "review": "Coordinator meaning/wording review; not native-speaker or runtime QA.",
+      "reason": "Use day-start wording, avoid Chinese international-date-line ambiguity; use retained data rather than literal bytes. Exact sourceContract unchanged.",
+      "changes": [
+        {
+          "resourceKey": "tracker.error.schedule_day_invalid",
+          "locale": "en",
+          "previous": "Check the schedule day boundary or time zone setting.",
+          "replacement": "Check the day start time or time zone setting for the schedule."
+        },
+        {
+          "resourceKey": "tracker.error.schedule_day_invalid",
+          "locale": "es",
+          "previous": "Revisa el límite del día o la zona horaria de la programación.",
+          "replacement": "Revisa la hora de inicio del día o la zona horaria de la programación."
+        },
+        {
+          "resourceKey": "tracker.error.schedule_day_invalid",
+          "locale": "fr",
+          "previous": "Vérifiez le réglage de la limite du jour ou du fuseau horaire du planning.",
+          "replacement": "Vérifiez l’heure de début de journée ou le fuseau horaire du planning."
+        },
+        {
+          "resourceKey": "tracker.error.schedule_day_invalid",
+          "locale": "pt-BR",
+          "previous": "Verifique a configuração do limite do dia ou do fuso horário da programação.",
+          "replacement": "Verifique o horário de início do dia ou o fuso horário da programação."
+        },
+        {
+          "resourceKey": "tracker.error.schedule_day_invalid",
+          "locale": "de",
+          "previous": "Prüfen Sie die Einstellung für Tagesgrenze oder Zeitzone des Zeitplans.",
+          "replacement": "Prüfen Sie den Tagesbeginn oder die Zeitzone des Zeitplans."
+        },
+        {
+          "resourceKey": "tracker.error.schedule_day_invalid",
+          "locale": "it",
+          "previous": "Controlla l’impostazione del confine del giorno o del fuso orario della pianificazione.",
+          "replacement": "Controlla l’orario di inizio della giornata o il fuso orario della pianificazione."
+        },
+        {
+          "resourceKey": "tracker.error.schedule_day_invalid",
+          "locale": "ar",
+          "previous": "تحقّق من إعداد حدّ اليوم أو المنطقة الزمنية للجدول.",
+          "replacement": "تحقّق من وقت بداية اليوم أو المنطقة الزمنية للجدول."
+        },
+        {
+          "resourceKey": "tracker.error.schedule_day_invalid",
+          "locale": "zh-Hans",
+          "previous": "请检查日界线或日程时区设置。",
+          "replacement": "请检查日程中的每日开始时间或时区设置。"
+        },
+        {
+          "resourceKey": "tracker.error.schedule_day_invalid",
+          "locale": "ko",
+          "previous": "일정의 하루 경계 또는 시간대 설정을 확인하세요.",
+          "replacement": "일정의 하루 시작 시각 또는 시간대 설정을 확인하세요."
+        },
+        {
+          "resourceKey": "tracker.error.schedule_day_invalid",
+          "locale": "hi",
+          "previous": "शेड्यूल की दिन-सीमा या समय क्षेत्र की सेटिंग जाँचें।",
+          "replacement": "शेड्यूल में दिन शुरू होने के समय या समय क्षेत्र की सेटिंग जाँचें।"
+        },
+        {
+          "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+          "locale": "ru",
+          "previous": "Если продолжить, сохранённые байты этого отменённого экспорта будут удалены. Наличие полной копии не подтверждено.",
+          "replacement": "Если продолжить, сохранённые данные этого отменённого экспорта будут удалены. Наличие полной копии не подтверждено."
+        },
+        {
+          "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+          "locale": "en",
+          "previous": "If you continue, the retained bytes of this cancelled export will be deleted. A complete export has not been verified.",
+          "replacement": "If you continue, the retained data of this cancelled export will be deleted. A complete export has not been verified."
+        },
+        {
+          "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+          "locale": "es",
+          "previous": "Si continúas, se eliminarán los bytes conservados de esta exportación cancelada. No se ha verificado que la exportación esté completa.",
+          "replacement": "Si continúas, se eliminarán los datos conservados de esta exportación cancelada. No se ha verificado que la exportación esté completa."
+        },
+        {
+          "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+          "locale": "fr",
+          "previous": "Si vous continuez, les octets conservés de cet export annulé seront supprimés. Il n’a pas été vérifié que l’export soit complet.",
+          "replacement": "Si vous continuez, les données conservées de cet export annulé seront supprimées. Il n’a pas été vérifié que l’export soit complet."
+        },
+        {
+          "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+          "locale": "pt-BR",
+          "previous": "Se você continuar, os bytes mantidos desta exportação cancelada serão excluídos. Não foi verificado se a exportação está completa.",
+          "replacement": "Se você continuar, os dados mantidos desta exportação cancelada serão excluídos. Não foi verificado se a exportação está completa."
+        },
+        {
+          "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+          "locale": "de",
+          "previous": "Wenn Sie fortfahren, werden die aufbewahrten Bytes dieses abgebrochenen Exports gelöscht. Es wurde nicht verifiziert, dass der Export vollständig ist.",
+          "replacement": "Wenn Sie fortfahren, werden die gespeicherten Daten dieses abgebrochenen Exports gelöscht. Es wurde nicht verifiziert, dass der Export vollständig ist."
+        },
+        {
+          "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+          "locale": "it",
+          "previous": "Se continui, i byte conservati di questa esportazione annullata verranno eliminati. Non è stato verificato che l’esportazione sia completa.",
+          "replacement": "Se continui, i dati conservati di questa esportazione annullata verranno eliminati. Non è stato verificato che l’esportazione sia completa."
+        },
+        {
+          "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+          "locale": "ar",
+          "previous": "إذا تابعت، فستُحذف البايتات المحتفَظ بها من هذا التصدير الملغى. لم يتم التحقق من اكتمال التصدير.",
+          "replacement": "إذا تابعت، فستُحذف البيانات المحتفَظ بها من هذا التصدير الملغى. لم يتم التحقق من اكتمال التصدير."
+        },
+        {
+          "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+          "locale": "zh-Hans",
+          "previous": "如果继续，将删除此次已取消导出的暂存字节。尚未验证导出是否完整。",
+          "replacement": "如果继续，将删除此次已取消导出的暂存数据。尚未验证导出是否完整。"
+        },
+        {
+          "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+          "locale": "ja",
+          "previous": "続行すると、このキャンセル済みエクスポートの保持バイトが削除されます。エクスポートが完全であることは確認されていません。",
+          "replacement": "続行すると、このキャンセル済みエクスポートの保存データが削除されます。エクスポートが完全であることは確認されていません。"
+        },
+        {
+          "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+          "locale": "ko",
+          "previous": "계속하면 취소된 내보내기의 보관된 바이트가 삭제됩니다. 내보내기가 완전한지 확인되지 않았습니다.",
+          "replacement": "계속하면 취소된 내보내기의 보관된 데이터가 삭제됩니다. 내보내기가 완전한지 확인되지 않았습니다."
+        },
+        {
+          "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+          "locale": "hi",
+          "previous": "यदि आप आगे बढ़ते हैं, तो इस रद्द किए गए निर्यात के सुरक्षित रखे गए बाइट मिटा दिए जाएँगे। पूर्ण निर्यात सत्यापित नहीं हुआ है।",
+          "replacement": "यदि आप आगे बढ़ते हैं, तो इस रद्द किए गए निर्यात का सहेजा गया डेटा मिटा दिया जाएगा। पूर्ण निर्यात सत्यापित नहीं हुआ है।"
+        }
+      ]
+    }
+  ]
+}

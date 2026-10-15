@@ -83,7 +83,7 @@ before replacing the previous readable journal. It is not an unlimited journal.
 | C | Memory/Room scenarios, migration 5→6→7, JSON 1–9 replacement/rollback and recovery coverage continue. Cold contradictory identity rejects without repair. Oversized individual streaming records now refuse export instead of making unreadable archives. Full graph still resides in memory. |
 | D | Real durable/gated descriptor storage and host fault tests added. Production cleanup remains blocked by the explicit prerequisites above. |
 | E | Full selective inspect/plan/preview/apply/resume, dependency groups, provenance/dedupe, explicit losses and Undo remain separate from JSON replacement and CSV. Concurrent resume fixed. OPEN/RECOVERY and active Focus portability remain explicitly restricted; not silently converted to facts. |
-| F | Apache-2.0 own code / Onest OFL / existing notices retained, API36, NDK r30 pinned, unsigned builds available. Disabled F-Droid draft now pins NDK, but no fdroidserver end-to-end build or independent reproducibility claim. Existing AndroidX native source/static-runtime provenance findings remain open. No store publication or release signing key. |
+| F | Apache-2.0 own code / Onest OFL / existing notices retained, API36, NDK r30 pinned, unsigned builds available. Disabled F-Droid draft now pins NDK, and passed metadata lint; no fdroidserver end-to-end build or independent reproducibility claim. Existing AndroidX native source/static-runtime provenance findings remain open. No store publication or release signing key. |
 
 ## Opus findings to address and verify
 
@@ -118,6 +118,10 @@ Build inputs for the new own-code JNI library: `core/src/main/c/private_copy_io.
 Android.mk/Application.mk, NDK `30.0.16248370` (r30), C11, no selected C++ STL.
 The official Linux NDK archive was checked against its published size/SHA-1 before
 installation. The disabled F-Droid draft pins the same NDK and source code commit;
-fdroidserver is not installed here, so that recipe has not been accepted by its
-validator/build system. New native compilation does not resolve the separate
+Metadata lint was run with fdroidserver 2.4.5 in an isolated directory and the
+current official Time Tracker category supplied as context. The first context-free
+run reported a category error because no category catalog was loaded; the recipe
+category itself was correct. The contextual run exited 0. An enabled-build metadata fixture also exited 0;
+its only change was removing disable in the isolated copy. No fdroidserver build,
+store submission or signing initialization ran. New native compilation does not resolve the separate
 AndroidX graphics-path release provenance/static-runtime notice questions.

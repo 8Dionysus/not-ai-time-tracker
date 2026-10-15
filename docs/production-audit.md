@@ -47,7 +47,15 @@ No UI-owned issue is marked fixed by this backend branch.
 The earlier mixed backend/UI checkpoint `c83dc29` passed core 35/35 and app 55/55.
 It is historical only. The later mixed checkpoint `e8aa417` had one failing new UI
 fixture and is explicitly unaccepted. Neither result accepts this backend-only tree.
-Current commands, exact source SHA, counts and artifacts are in delivery evidence.
+Final follow-up runtime source `5111df4` (build started at documentation/config
+commit `eefbecd`) passed core 41/41 and app 52/52, with zero failures/errors/skips.
+Unsigned debug/release APKs and release lint completed successfully; lint has
+0 errors, 60 warnings, 1 hint. Both APKs pass zipalign with 16 KiB page alignment.
+The corrected scale command ran RoomScenariosTest.timerPath at `12fea29`; the
+first storageWorkload filter matched no standalone JUnit test and is not evidence
+of a measured workload. fdroidserver 2.4.5 metadata lint passed with official
+category context, including an enabled isolated fixture. No full F-Droid build.
+Current commands, artifact hashes, raw logs and exact source SHA are in delivery evidence.
 
 No Android device/resource measurement is claimed. `adb devices -l` failed trying
 to create read-only `/home/agent/.android`; this adb binary does not recognize

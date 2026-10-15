@@ -30,6 +30,12 @@ at `e8aa417`; it is not production acceptance or an instruction to merge it.
 | C09 | Native timestamp conversion rejects signed-nanosecond overflow before arithmetic; a bad copy/root does not abort safe siblings or mistake unreadable recovery state for absence. | Host POSIX year2400 fixture verifies EOVERFLOW without mutating source; production deletion stays disabled. |
 | F01 | Focus side effects serialize capture of the current Tracker; cancel obsolete notification 43. Typed deliverResult separates receipt, accepted post and uncertainty. | Room regression passes. Legacy ViewModel/TechnicalActivity Boolean interpretation remains OPEN; mandatory caller migration is in SCHEDULE_DELIVERY_HANDOFF.md. |
 | B02 | One inexact schedule alarm, durable at-most-once attempt receipts, fresh rechecks, conditional boot/time hooks and common next-occurrence projection. | Core, shared Memory/Room and actual Robolectric API36 fixtures. No production notice factory/renderers or device/OEM delivery acceptance. |
+| C10/C11 | Missing paths require exact-operation durable quarantine proof; neither missing location means unknown, including empty manifests. | PREPARED disappearance stays PARTIAL; last unlink and final rmdir before receipt remain reconcilable. Same-UID bypass of the common writer gate is a separate, explicitly unproven concurrency boundary. |
+| C12 | Last-unused-copy warning is computed for the entire selected recovery group and rechecked at confirm. | Selecting both remaining sealed owners requires separate acknowledgements before any journal/rename. |
+| M02 | Android metadata refuses preexisting special files before opening a stream. | Isolated FIFO and prior bounds/UTF-8/ref recovery tests; not an atomic defense against a same-UID replacement. |
+| B03 | Platform failures no longer skip independent disarm operations; failed durable writes never proceed to post. | Platform failure matrix and actual16MiB host ceiling fixture retain every receipt. Compact whitespace/transient identity cache reduce overhead; O(n)/finite lifetime remain open. |
+| P02 | SHA-256 hex encoding uses direct ASCII nibbles, preserving canonical text without per-byte Formatter allocation. | Independent vectors/all256 input bytes under five locales, existing catalog/backup/receipt tests and the host sync profile. |
+| B04 | Renderer runs before the final StateStore-gated match and terminal notify; current-series changes cannot be fixed merely by post-and-cancel. | Shared Memory/Room renderer archive/opt-out/start and concurrent command ordering; API36 adapter NOT_POSTED regression. Android submission is not an OS sound/display transaction. |
 | U01 | `Tracker.switchDraft` commits switch and note atomically. | Shared Memory/Room injected-failure fixture. Existing UI caller migration is OPEN for Opus. |
 | T01 | Selective resume chooses the next pending group inside its transaction. | Deterministic concurrent resume fixture preserves APPLIED receipt and Undo. |
 | B01 | Streaming export enforces its reader's 16 MiB character limit per record. | Oversized-record regression; total file still streams. Large individual metadata records remain a declared capacity limit. |
@@ -61,7 +67,7 @@ category context, including an enabled isolated fixture. No full F-Droid build.
 Current commands, artifact hashes, raw logs and exact source SHA are in delivery evidence.
 
 The subsequent sealed-graph/schedule checkpoint `f7d8323` passed core62/app59.
-Current runtime/build source `5e43515e8e92c02f42ff6965d1eb9472c1130cf1`
+Library v5 runtime/build source `5e43515e8e92c02f42ff6965d1eb9472c1130cf1`
 passed core63/63 and app59/59, zero failures/errors/skips. Full command:
 `:core:test :app:testDebugUnitTest :app:assembleDebug :app:assembleRelease
 :app:lintRelease :app:releaseInventory -PtrackerUnsigned=true
@@ -87,6 +93,14 @@ No HOME override, new emulator image, device authorization or sandbox workaround
 Synthetic JVM timings/heap samples do not establish phone PSS/mAh. Full history,
 report and choice indexes still scale with history; that is not automatically a leak.
 Idle overlay FGS remains available for the user's requested always-available button.
+
+## Latest addressed checkpoint
+
+Runtime `d0888a53c0d5446ac201b26933a061a110618be1` passed core74/app63,
+zero failures/errors/skips; unsigned debug/release and lint0errors/60warnings/1hint.
+Full run6m9s; a separate profile-only command19s measures the16MiB receipt ceiling.
+See [addressed findings and exact resource limits](BACKEND_STATIC_FOLLOWUP.md).
+No palette/theme model was added; the user deferred that model to Opus.
 
 ## File coverage
 

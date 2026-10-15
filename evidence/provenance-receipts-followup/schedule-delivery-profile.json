@@ -1,0 +1,73 @@
+{
+    "scope": "HOST JVM, 1GiB max heap, POSIX temp files/page cache; three sequential syncs; no Android/OEM/RAM/PSS/battery or unlimited-capacity claim",
+    "limitBytes": 16777216,
+    "maxFixtureReceipts": 47392,
+    "samples": [
+        {
+            "receipts": 0,
+            "utf8Bytes": 284,
+            "syncMillis": [
+                3.375888,
+                0.931813,
+                0.978364
+            ],
+            "medianMillis": 0.978364,
+            "maxMillis": 3.375888,
+            "stateReads": 3,
+            "stateWrites": 0,
+            "sampledJvmHeapBefore": 105860328,
+            "sampledJvmHeapAfter": 106233960
+        },
+        {
+            "receipts": 1000,
+            "utf8Bytes": 354448,
+            "syncMillis": [
+                154.255788,
+                114.701525,
+                75.821539
+            ],
+            "medianMillis": 114.701525,
+            "maxMillis": 154.255788,
+            "stateReads": 3,
+            "stateWrites": 0,
+            "sampledJvmHeapBefore": 108880712,
+            "sampledJvmHeapAfter": 126244000
+        },
+        {
+            "receipts": 10000,
+            "utf8Bytes": 3540448,
+            "syncMillis": [
+                340.804311,
+                236.168562,
+                213.68784
+            ],
+            "medianMillis": 236.168562,
+            "maxMillis": 340.804311,
+            "stateReads": 3,
+            "stateWrites": 0,
+            "sampledJvmHeapBefore": 162940080,
+            "sampledJvmHeapAfter": 188774312
+        },
+        {
+            "receipts": 47392,
+            "utf8Bytes": 16777216,
+            "syncMillis": [
+                818.136348,
+                1163.952975,
+                893.03944
+            ],
+            "medianMillis": 893.03944,
+            "maxMillis": 1163.952975,
+            "stateReads": 3,
+            "stateWrites": 0,
+            "sampledJvmHeapBefore": 52690608,
+            "sampledJvmHeapAfter": 297697648
+        }
+    ],
+    "ceilingReserveRejected": true,
+    "receiptsUnchanged": true,
+    "postCalls": 0,
+    "alarmCancelled": true,
+    "hooksDisabled": true,
+    "elapsedMillis": 7186.290127
+}

@@ -45,6 +45,78 @@ history. A failed post/scheduling operation cannot be interpreted as successful 
 acknowledgement. Domain data remains untouched even when an external post outcome
 is uncertain.
 
+## Storage ceiling and failure coordination (`df10261`)
+
+The format1 operational file now writes compact JSON whitespace. Its strict reader
+accepts prior pretty JSON without rewriting on read; no receipt, field, outcome,
+identity or canonical callback hash is pruned or changed. Each immutable ticket
+caches only its derived identity in a transient field; cold decode and copy compute
+their own identity. The cache is not accepted from stored JSON.
+
+The bound is 16,777,216 UTF-8 bytes for the entire operational state, including
+pending batch and all attempts. It is not a guaranteed number of reminders or
+years: opaque IDs, zones, numeric widths and other fields change record size.
+Reservation overflow refuses before post and preserves the prior readable file and
+every receipt. Storage failures independently attempt alarm cancellation and wake
+hook disable before propagating STORAGE. Platform refusal of either cleanup action
+remains possible; no new reminder post follows the failed reservation.
+
+Notice inspection/cancellation failure no longer skips alarm cancellation or hook
+disable. These platform operations are attempted independently. Failure is reported
+as PLATFORM_UNAVAILABLE, scheduling is not acknowledged when it did not succeed,
+and no receipt is consumed by a failed synchronization. Capability-query failure
+also blocks a post before reserve instead of masquerading as successful availability.
+
+The bounded host experiment is `:core:scheduleDeliveryProfile` with
+`-PtrackerCleanupLibrary=<host JNI library>`. It records three sequential syncs for
+0,1000,10000 and a state filled to the byte ceiling, checks zero writes for unchanged
+synchronizations, then proves that a new reservation at the ceiling posts nothing,
+retains all existing receipts/bytes and disarms best-effort. Raw evidence is delivered
+with the exact runtime SHA. JVM heap samples include transient garbage and the
+fixture; they are not retained heap, phone PSS or battery measurements.
+
+**Remaining long-lived capacity/resource limit:** compact whitespace and a transient
+hash cache reduce bytes/repeated hashing; they do not bound receipt count or make
+the store indexed. Each cold synchronization still decodes/validates all attempts
+and builds sets in O(n) time/memory. A changed state serializes and atomically
+replaces the whole file. Successful delivery normally writes reserve, outcome and
+the next pending batch (two writes per tied item plus a batch update). Near the
+ceiling this can mean tens of MiB of logical writes per occurrence, before filesystem
+amplification. There is no unlimited lifetime, low-RAM or battery acceptance claim.
+At the ceiling delivery stops safely; it does not silently forget receipts. Any
+future indexed journal/explicit retention must preserve exact dataset+original-key
+tombstones across old callbacks, MOVE/edit and restore, disclose loss of detailed
+attempt outcomes, and get its own migration/crash verification. This pass does not
+invent that retention policy or silently evict history.
+
+## Rendering and final post gate (`d0888a5`)
+
+The backend platform contract is now `prepare(ticket, projection): PreparedScheduleNotice?`.
+Preparation invokes the renderer outside the domain transaction. After it returns,
+core enters the same StateStore checked-transaction gate used by commands, rechecks
+current occurrence/revisions/opt-in/link/barrier/zone/time/capability, and invokes
+only the prepared terminal post. Memory/Room reuse the unchanged CheckedState;
+no Dataset revision, session, link or Room generation is written by the post guard.
+Delivery receipts are persisted before and after this domain gate, not while it is held.
+
+A renderer that archives/opts out/starts the current occurrence can therefore cause
+NOT_POSTED before notify; cancellation in the trailing synchronize is not used as
+evidence that no stale sound was submitted. A concurrent cooperating domain command
+commits either before the final match (post refused) or after terminal notify returns.
+The shared Memory/Room tests exercise both orders. The Android API36 adapter test
+checks NOT_POSTED for current-series opt-out during render, rather than merely an
+empty notification list after possible post-and-cancel.
+
+PreparedScheduleNotice is an internal backend protocol, not an independently usable
+UI capability. Terminal post must be short and must not render, mutate Tracker,
+read delivery state or reenter the coordinator. Only OS submission runs under the
+domain gate; a slow Binder can delay concurrent commands and needs device QA.
+ScheduleNoticeFactory and its Opus-owned rendering signature are unchanged.
+Factories must still avoid side effects; the guard handles the reviewed regression.
+This serializes submission against domain commits. It cannot retract sound already
+accepted by Android before a later opt-out, nor make OS display/permission/clock
+changes part of the application transaction. POSTED remains submission acceptance.
+
 ## Required Opus integration
 
 1. At **every process startup**, install an application-scoped

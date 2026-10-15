@@ -6,6 +6,14 @@ follow-up, so no schema/archive version bump. The user restored backend-only
 scope at 15:10 UTC. UI code and UI fixes are intentionally absent from this change.
 Requested model configuration was gpt-6.1-sol/high; no independent runtime attestation.
 
+The [addressed static follow-up](BACKEND_STATIC_FOLLOWUP.md), runtime `df10261`,
+fixes missing-path provenance, selection-wide last-copy acknowledgement, independent
+schedule disarm failures and metadata FIFO preflight. Schedule receipt bytes/hashing
+are reduced without eviction; finite16MiB/O(n) lifetime/resource limits remain explicit.
+The `d0888a5` follow-up splits rendering from terminal notify and serializes the final
+current-occurrence check/post with StateStore commands. Opus's factory signature is
+unchanged; custom backend platform adapters must use the new prepare/terminal contract.
+
 ## API deltas to connect
 
 - Use `Tracker.switchDraft(expected, draft: EntryDraft)` for an incoming text

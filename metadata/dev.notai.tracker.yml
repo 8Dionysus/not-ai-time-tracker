@@ -14,7 +14,7 @@ Builds:
   - versionName: 0.11.0
     versionCode: 12
     disable: Unreleased backend branch; integration, rights and device checks pending
-    commit: 5e43515e8e92c02f42ff6965d1eb9472c1130cf1
+    commit: d0888a53c0d5446ac201b26933a061a110618be1
     ndk: 30.0.16248370
     subdir: app
     gradle:

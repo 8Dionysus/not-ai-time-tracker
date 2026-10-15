@@ -22,3 +22,35 @@ an isolated filesystem fixture with verified year2400 POSIX time. Inventory erro
 remain scoped to the affected copy/root. Unreadable recovery-journal state protects
 possible recovery sources instead of being treated as a missing journal. No production
 cleanup enablement follows from these host checks.
+
+## Provenance and concurrency follow-up (`df10261`)
+
+`verifyAbsent(item, operationId)` requires the exact operation's durable quarantined
+progress before certifying absent original and quarantine paths. PREPARED followed
+by an unexplained missing original stays PARTIAL with no inferred deleted members.
+It cannot become DONE or an invented restore. A rename observed in quarantine can
+still be reconciled before its receipt. Once quarantine was durably recorded, the
+last unlink or final directory removal interrupted before its receipt can reconcile
+to DONE. `isQuarantined` returns unknown when neither location exists; this also
+prevents an empty manifest from being misidentified as an intact restored group.
+
+When a selection includes every currently selectable, unused rollback/archive,
+preview adds LAST_RECOVERY_COPY to each selected recovery owner. Confirmation
+recomputes this selection-wide warning and requires the separate acknowledgements
+before journaling or renaming. Selecting two remaining copies cannot bypass the
+last-copy acknowledgement. Active/unknown copies do not mask the warning.
+
+The filesystem guarantee assumes all legitimate same-UID writers use the common
+gate and durable references. Native rename does not take an expected source inode;
+validation before and after rename can detect, but cannot atomically prevent,
+moving a replacement installed by a noncooperating writer between those calls.
+Likewise fstatat identity/link check followed by unlinkat is not an atomic
+compare-and-unlink against such a writer. Descriptor anchoring/no-follow prevent
+symlink traversal; they do not create a sandbox against code with the same UID.
+This is separate from the fixed durable-provenance defect. Complete writer adoption,
+trusted root binding and Android QA remain production prerequisites; deletion is off.
+
+Android metadata additionally checks no-follow regular-file attributes and size
+before opening its bounded stream, rejecting a preexisting FIFO instead of blocking
+startup on it. That preflight is not an atomic defense against a same-UID replacement
+after the check. Descriptor metadata already opens nonblocking and checks file type.

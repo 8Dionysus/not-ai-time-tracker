@@ -139,7 +139,7 @@ class ArchiveInstrumentation: Instrumentation() {
             atomicText(File(directory,"report.json"),report.toString())
             finish(Activity.RESULT_OK,Bundle().apply { putString("report",report.toString()) })
         } catch(e: Throwable) {
-            finish(Activity.RESULT_CANCELED,Bundle().apply { putString("error",e.javaClass.name+": "+e.message) })
+            finish(Activity.RESULT_CANCELED,Bundle().apply { putString("error",e.javaClass.name+": "+e.message);putString("stack",e.stackTraceToString()) })
         }
     }
 }

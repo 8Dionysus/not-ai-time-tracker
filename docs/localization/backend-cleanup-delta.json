@@ -1,0 +1,18 @@
+{
+  "format": 1,
+  "scope": "Private-copy confirmable warning, not a new CSV ImportIssue",
+  "currentImportIssueCount": 65,
+  "entries": [
+    {
+      "warning": "INCOMPLETE_EXPORT_STAGING",
+      "resourceKey": "tracker.cleanup.warning.incomplete_export_staging",
+      "arguments": {},
+      "sourceCopy": {
+        "ru": "Будут удалены сохранённые байты отменённого экспорта. Готовая копия не подтверждена.",
+        "en": "Delete the retained bytes of this cancelled export. A complete export has not been verified."
+      },
+      "quality": "SOURCE_DRAFT_REQUIRES_EDITORIAL_REVIEW",
+      "uiAction": "Show exact staged members/bytes and obtain this separate warning acknowledgement; never imply that partial data can be retried as a verified export. Active writer/chooser references remain hard blockers."
+    }
+  ]
+}

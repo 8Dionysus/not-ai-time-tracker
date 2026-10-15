@@ -9,7 +9,9 @@ Requested model configuration was gpt-6.1-sol/high; no independent runtime attes
 The [addressed static follow-up](BACKEND_STATIC_FOLLOWUP.md), runtime `df10261`,
 fixes missing-path provenance, selection-wide last-copy acknowledgement, independent
 schedule disarm failures and metadata FIFO preflight. Schedule receipt bytes/hashing
-are reduced without eviction; finite16MiB/O(n) lifetime/resource limits remain explicit.
+were reduced without eviction. The current [indexed attempt journal](INDEXED_SCHEDULE_RECEIPTS.md)
+removes that16MiB lifetime/full-file runtime limit while preserving every receipt;
+explicit snapshot diagnostics and the domain graph still have proportional costs.
 The `d0888a5` follow-up splits rendering from terminal notify and serializes the final
 current-occurrence check/post with StateStore commands. Opus's factory signature is
 unchanged; custom backend platform adapters must use the new prepare/terminal contract.
@@ -17,6 +19,10 @@ The functional pass uses existing ActivityType/Card models for personal hierarch
 and named objects. Standalone card/type selective selection now works without facts;
 COPY/retention/re-export preserves root provenance. Schedule day/home-zone/quiet-shade
 preferences are persisted. Colors/themes and their model remain with the user and Opus.
+The [copy backend binding](PRIVATE_COPY_BACKEND_BINDING.md) now connects trusted-root
+software binding, final sealing, explicit legacy registration, chooser/writer refs
+and exact recovery-job ownership. [One Android preflight](ANDROID_RUNTIME_PREFLIGHT.md)
+reached kernel/guest ADB/ART version, but not boot_completed within600s; no device acceptance.
 
 ## API deltas to connect
 
@@ -66,35 +72,42 @@ persistent `legacy-ui-lifecycle` reference records that existing frontend APIs
 cannot prove which form/chooser/restore references remain live. Do not clear it
 by age, process death or blanket reset.
 
-**Production deletion remains disabled.** Remaining prerequisites:
+**Production destructive entrypoint remains unbound on unverified paths.** The
+independent backend pieces are now implemented: Context/UID/device/inode descriptor
+binding; final retired-file seals; legacy validation and independent complete
+hardlink components; chooser result ownership, writer invalidation and rollback
+consumer scope; exact source/job-scoped recovery refs. Existing raw archive labels
+alone still grant no authority. See PRIVATE_COPY_BACKEND_BINDING.md for the APIs.
 
-1. Bind the descriptor root to a trusted Android private directory and verify the
-   actual Android path/ABI/filesystem behavior; OS-managed ancestor symlinks must
-   not be worked around with canonical-path-only checks. No device JNI test ran.
-2. Connect each frontend form, chooser, restore preview and recovery source to an
-   explicit durable owner/token and release only on a confirmed lifecycle action.
-   Review legacy references individually; never infer that a file is orphaned.
-3. Register existing candidates only after exact state/manifest/hash validation, including final sealing after recovery writes.
-   PREPARING/READY/FAILED staging and unknown files stay blocked. Recovery journal
-   is never selectable. Active/unknown ownership is a hard blocker.
-4. The complete sealed archive graph and nested member manifest are implemented and host-tested. Existing archive validation/final-sealing integration remains; do not turn an old DatabaseArchive manifest into authority by setting a label.
-5. Add Android interruption/filesystem QA before wiring confirmation to deletion.
+Remaining prerequisites are narrower:
+
+1. Actual Android path/ABI/filesystem/interruption QA before wiring confirmation to
+   deletion. The one authorized software preflight did not reach full boot; no JNI
+   cleanup scenario or APK installation was performed.
+2. Opus form/restore-preview/source lifecycle adoption and explicit review of the
+   unknown legacy UI witness. Existing chooser callbacks now own their backend ref;
+   do not discard other refs or infer orphanhood from age/process death.
+3. Present explicit legacy registration results and protected/unreadable candidates;
+   PREPARING/READY/FAILED exports and unknown groups remain blocked. Keep separate
+   last-copy acknowledgement and exact PARTIAL/explicit-resume protocol. Recovery
+   journals, operational metadata and external SAF originals are never selections.
 
 The host tests operate only on newly created temporary fixtures. Four Android
 ABIs compile, which proves compilation/packaging and does not prove device safety.
 Both Android and descriptor metadata ports enforce the same 16 MiB UTF-8 bound
 before replacing old state. Known preflight refusal preserves references and keeps
 explicit owner recovery usable; uncertain I/O still requires reopen/inspection.
-The operational sidecar migrates format1 to format2 without writing on read.
+CopyMaintenance format1→2 interpretation remains read-only until an explicit update.
+The independent scheduler index has its own durable migration/authority marker.
 
 ## A–F status
 
 | Package | Backend evidence / remaining boundary |
 |---|---|
 | A | Stable typed errors, catalog sidecars, SYSTEM/EXPLICIT preference authority and locale-independent CSV parsing. Editorial UI package exists. Catalog translation packs and UI resource/LocaleManager migration remain unaccepted; do not label planned/unreviewed content complete. |
-| B | Series revisions, date-only/zone/DST projection, exceptions, receipts, atomic explicit start/link and archive/restore exist. The common projection API is ready. Schedule delivery coordination, one inexact alarm, durable attempt receipts and conditional boot/time-change hooks are implemented. The notice factory and three renderer integrations remain Opus-owned; no production reminder rendering is bound. |
+| B | Series revisions, date-only/zone/DST projection, exceptions, receipts, atomic explicit start/link and archive/restore exist. The common projection API is ready. Schedule delivery coordination, one inexact alarm, indexed durable attempt receipts with v1 migration and conditional boot/time-change hooks are implemented. The notice factory and three renderer integrations remain Opus-owned; no production reminder rendering is bound. |
 | C | Memory/Room scenarios, migration5→6→7→8, JSON1–10 replacement/rollback and recovery coverage continue. Room8 adds metadata only. Cold contradictory identity rejects without repair; future functional fields mislabeled as legacy reject. Oversized individual streaming records refuse export. Full graph still resides in memory. |
-| D | Real durable/gated descriptor storage and host fault tests added. Sealed graphs/nested manifests and bounded Android metadata are added. Production cleanup remains blocked by Android QA, final-sealing/legacy integration and frontend reference prerequisites above. |
+| D | Real durable/gated descriptor storage and host fault tests added. Sealed graphs/nested manifests and bounded Android metadata are added. Final-sealing/legacy catalog/root software binding and backend writer/recovery ownership are connected. Actual Android QA, frontend lifetime adoption and destructive UI binding remain open as specified above. |
 | E | Selective1/2 inspect/plan/preview/apply/resume now includes standalone card/type roots, dependency closure, COPY/retention reconstruction and explicit losses/Undo. Existing format1 hashes are preserved. Global settings/control assignments remain disclosed selective exclusions; full JSON carries them. OPEN/RECOVERY and active Focus restrictions remain explicit. |
 | F | Apache-2.0 own code / Onest OFL / existing notices retained, API36, NDK r30 pinned, unsigned builds available. Disabled F-Droid draft now pins NDK, and passed metadata lint; no fdroidserver end-to-end build or independent reproducibility claim. Existing AndroidX native source/static-runtime provenance findings remain open. No store publication or release signing key. |
 

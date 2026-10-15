@@ -14,7 +14,7 @@ Reopen resolves each component member at its original location or at the unique 
 
 The private sidecar is format2, independent of domain Room/portable JSON versions (currently Room8/JSON10). Format1 flat ownership/refs/journals migrate on read without writing or granting shared-link authority. Both Android and descriptor metadata ports enforce the same 16MiB UTF-8 bound before replacing old state, reject malformed UTF-8 and never truncate leases. A known capacity refusal occurs before the write and keeps existing references and explicit owner recovery usable. Uncertain write/fsync failure still requires reopen/inspection. There is no age expiry or automatic lease pruning.
 
-Remaining production prerequisites: trusted Android descriptor-root binding and device QA; backend validation/final sealing of existing archive manifests after all recovery writes; legacy inventory registration; complete frontend form/chooser/restore durable-reference adoption. Current DatabaseArchive manifest alone is not a certificate for nested retired files. recovery-pending.json remains protected; operational metadata is not a cleanup candidate. No external SAF original is a target.
+Current [backend integration](PRIVATE_COPY_BACKEND_BINDING.md) implements Context/UID/device/inode root binding, final seals after retirement, explicit legacy registration, chooser/backend writer ownership and source-scoped recovery completion. Remaining production acceptance: actual Android descriptor/filesystem QA and Opus form/restore-preview lifetime adoption/destructive UI binding. Current DatabaseArchive manifest alone is not a certificate for nested retired files. recovery-pending.json remains protected; operational metadata is not a cleanup candidate. No external SAF original is a target.
 
 Follow-up runtime `5e43515`: the full suite passes core63/app59. Native timestamps
 outside signed nanosecond range reject with EOVERFLOW before arithmetic, including
@@ -47,8 +47,8 @@ moving a replacement installed by a noncooperating writer between those calls.
 Likewise fstatat identity/link check followed by unlinkat is not an atomic
 compare-and-unlink against such a writer. Descriptor anchoring/no-follow prevent
 symlink traversal; they do not create a sandbox against code with the same UID.
-This is separate from the fixed durable-provenance defect. Complete writer adoption,
-trusted root binding and Android QA remain production prerequisites; deletion is off.
+This is separate from the fixed durable-provenance defect. The backend root/writer/catalog binding is implemented; complete frontend lifetime
+adoption and actual Android QA remain prerequisites for destructive integration.
 
 Android metadata additionally checks no-follow regular-file attributes and size
 before opening its bounded stream, rejecting a preexisting FIFO instead of blocking

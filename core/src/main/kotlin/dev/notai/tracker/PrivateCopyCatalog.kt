@@ -40,8 +40,11 @@ class PrivateCopyCatalog(private val files: DescriptorCopyFiles,private val gate
     }
     fun registerRestoreInput(name: String): String = gate.locked {
         ensure(name.endsWith(".json"),"Invalid restore input name");uuid(name.removeSuffix(".json"))
-        val path = "restore-inputs/$name";backup(path)
-        val m = member(path);val i = item(path,CopyKind.RESTORE_INPUT,"VALIDATED",listOf(m),setOf(CopyWarning.RESTORE_SOURCE_WILL_BE_DISCARDED))
+        // Staging intentionally accepts arbitrary source bytes, including a refused/malformed
+        // import. Discarding an orphan copy does not require treating it as a valid backup.
+        // Known root/name + descriptor manifest + durable ownership registry grant authority.
+        val path = "restore-inputs/$name"
+        val m = member(path);val i = item(path,CopyKind.RESTORE_INPUT,"STAGED_INPUT",listOf(m),setOf(CopyWarning.RESTORE_SOURCE_WILL_BE_DISCARDED))
         storage.registerValidated(i,path,false,mapOf(m.opaqueId to name));i.id
     }
     fun registerForm(name: String,validate: (String)->Unit): String = gate.locked {
@@ -52,12 +55,19 @@ class PrivateCopyCatalog(private val files: DescriptorCopyFiles,private val gate
     }
     fun registerExport(operationId: String): String = gate.locked {
         uuid(operationId);val path = "exports/$operationId"
-        ensure(files.children(path) == listOf("data","operation.json"),"Unfinished/unknown export group")
+        val names = files.children(path)
+        ensure("operation.json" in names && names.all { it in setOf("data","data.part","operation.json") },"Unknown export group member")
         val op = codec.decodeFromString<StagedExportRecord>(text("$path/operation.json"))
         ensure(op.id == operationId && op.state in setOf("COMPLETE","CANCELLED") && op.resultReceived,"Export or chooser is still active")
-        val names = listOf("data","operation.json");val members = names.map { member("$path/$it") }
-        ensure(members.first().bytes == op.bytes && members.first().sha256 == op.sha256,"Export data differs from receipt",ErrorCode.STALE)
-        val warnings = if(op.state == "CANCELLED") setOf(CopyWarning.EXPORT_RETRY_AVAILABLE) else emptySet()
+        val members = names.map { member("$path/$it") }
+        val data = members.zip(names).singleOrNull { it.second == "data" }?.first
+        val prepared = data != null && data.bytes == op.bytes && data.sha256 == op.sha256 && "data.part" !in names
+        if(op.state == "COMPLETE") ensure(prepared && names == listOf("data","operation.json"),"Completed export differs from receipt",ErrorCode.STALE)
+        val warnings = when {
+            op.state == "COMPLETE" -> emptySet()
+            prepared -> setOf(CopyWarning.EXPORT_RETRY_AVAILABLE)
+            else -> setOf(CopyWarning.INCOMPLETE_EXPORT_STAGING)
+        }
         val i = item(path,CopyKind.EXPORT,op.state,members,warnings)
         storage.registerValidated(i,path,true,members.zip(names).associate { it.first.opaqueId to it.second });i.id
     }

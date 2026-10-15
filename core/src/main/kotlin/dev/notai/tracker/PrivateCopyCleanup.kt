@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable enum class CopyBlocker { IN_PROGRESS, CHOOSER_RESULT_PENDING, EXPORT_WRITING, LIVE_FORM_REFERENCE, RESTORE_SOURCE_IN_USE,
     REQUIRED_BY_PENDING_RECOVERY, UNKNOWN_FILE_OR_STATE, PATH_NOT_SAFE, HARDLINK_GRAPH_INCOMPLETE, PREVIEW_STALE, CLEANUP_INTERRUPTED }
 @Serializable enum class CopyWarning { EXPORT_RETRY_AVAILABLE, SNAPSHOT_MAY_CONTAIN_REMOVED_RECORDS, LAST_RECOVERY_COPY,
-    RESTORE_SOURCE_WILL_BE_DISCARDED, FORM_DRAFT_WILL_BE_DISCARDED, ARCHIVE_MAY_CONTAIN_REMOVED_RECORDS }
+    RESTORE_SOURCE_WILL_BE_DISCARDED, FORM_DRAFT_WILL_BE_DISCARDED, ARCHIVE_MAY_CONTAIN_REMOVED_RECORDS, INCOMPLETE_EXPORT_STAGING }
 @Serializable data class CopyMember(val opaqueId: String,val bytes: Long,val sha256: String)
 @Serializable data class PrivateCopy(val id: String,val kind: CopyKind,val state: String,val bytes: Long,val sha256: String,val members: List<CopyMember>,
     val hardBlockers: Set<CopyBlocker> = emptySet(),val confirmableWarnings: Set<CopyWarning> = emptySet(),val missingLiveEntityIds: Set<String> = emptySet()) {

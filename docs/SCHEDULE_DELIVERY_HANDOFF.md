@@ -2,7 +2,10 @@
 
 15 October 2026. Initial delivery coordination used Room7/portable JSON9; the current
 [functional extension](FUNCTIONAL_CUSTOMIZATION_HANDOFF.md) uses Room8/JSON10. Delivery state
-is a separate bounded operational sidecar (format1), not a fact or a completion mark.
+is separate operational state, not a fact/completion mark. The current
+[indexed journal](INDEXED_SCHEDULE_RECEIPTS.md) uses SQLite schema1 and a format2
+authority marker, with crash-safe import of the old format1 JSON. The v6 ceiling
+section below is historical; normal Android sync no longer scans all receipts.
 
 ## Core and platform boundary
 
@@ -30,7 +33,7 @@ Before each post, a RESERVED receipt is durably written. After that write, the
 current plan and capability are checked again. POSTED means NotificationManager
 accepted notify, not that Android/user displayed it. NOT_POSTED is a known refusal;
 UNKNOWN includes an ambiguous platform outcome. A RESERVED receipt surviving an
-interruption is exposed as UNKNOWN by `attempts()` and is never automatically
+interruption is exposed as UNKNOWN by `attempts()`/`attemptsPage()` and is never automatically
 replayed. The identity is datasetId + original occurrence key, so MOVE/edit/Undo
 cannot cause another attempt for the same occurrence. A post-result write failure
 leaves the previous durable reservation protecting against replay. Receipts are
@@ -40,13 +43,17 @@ the control barrier and does not roll back local attempt history.
 New startup planning does not backfill historical occurrences. A previously durable
 pending reminder can be delivered late after interruption/capability recovery; its
 original time stays explicit. There is no wall-clock punctuality or OEM guarantee.
-No age purge or silent receipt eviction exists. Metadata refuses overflow at16MiB
-UTF-8; a capacity/storage failure is a delivery failure, not a reason to discard
-history. A failed post/scheduling operation cannot be interpreted as successful UI
+No age purge or silent receipt eviction exists. Indexed storage removes the old
+16MiB lifetime snapshot ceiling; per-row/control and finite disk bounds still
+refuse before unsafe posts. Legacy snapshot adapters keep their bound. A capacity/
+storage failure is a delivery failure, not a reason to discard history. A failed post/scheduling operation cannot be interpreted as successful UI
 acknowledgement. Domain data remains untouched even when an external post outcome
 is uncertain.
 
-## Storage ceiling and failure coordination (`df10261`)
+## Historical v6 snapshot ceiling and failure coordination (`df10261`)
+
+This records the prior full-file implementation, retained as baseline evidence.
+The current Android index/migration/paged contract is in INDEXED_SCHEDULE_RECEIPTS.md.
 
 The format1 operational file now writes compact JSON whitespace. Its strict reader
 accepts prior pretty JSON without rewriting on read; no receipt, field, outcome,
@@ -76,7 +83,7 @@ retains all existing receipts/bytes and disarms best-effort. Raw evidence is del
 with the exact runtime SHA. JVM heap samples include transient garbage and the
 fixture; they are not retained heap, phone PSS or battery measurements.
 
-**Remaining long-lived capacity/resource limit:** compact whitespace and a transient
+**Historical pre-index long-lived limit (superseded for Android indexed storage):** compact whitespace and a transient
 hash cache reduce bytes/repeated hashing; they do not bound receipt count or make
 the store indexed. Each cold synchronization still decodes/validates all attempts
 and builds sets in O(n) time/memory. A changed state serializes and atomically
@@ -135,7 +142,8 @@ changes part of the application transaction. POSTED remains submission acceptanc
    ticket extras, unique notification tags and notify/cancel calls. DND is reported
    as a system capability and remains Android-controlled.
 3. Call `runtime.scheduleDelivery.synchronize()` on IO after foreground return,
-   permission/channel changes and binding changes. Runtime observation already
+   permission/channel changes and binding changes. Runtime observation compares
+   persisted schedule day/quiet preferences too. Runtime observation already
    refreshes committed schedule/barrier changes; ordinary timer commits with the
    same schedule do not resynchronize. UI can show the typed availability and
    attempt result. `alarmAccepted` acknowledges the scheduling call only.

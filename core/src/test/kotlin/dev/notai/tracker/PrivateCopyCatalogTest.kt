@@ -92,4 +92,26 @@ class PrivateCopyCatalogTest {
         Files.createSymbolicLink(File(root,"forms/$a.json").toPath(),outside.toPath())
         assertFails { catalog.registerForm("$a.json") { } };assertEquals("preserved",outside.readText())
     }
+    @Test fun confirmedCancelledStagingAndUnparsedRestoreInputsRemainManuallyDiscardableWhileLeasedBytesStayProtected() = fixture { root,files,gate,catalog ->
+        val directory = File(root,"exports/$a").apply { mkdirs() }
+        File(directory,"operation.json").writeText("""{"id":"$a","mime":"text/plain","title":"fixture","state":"CANCELLED","bytes":0,"sha256":null,"error":null,"resultReceived":true}""")
+        val exportId = catalog.registerExport(a)
+        assertTrue(CopyWarning.INCOMPLETE_EXPORT_STAGING in catalog.inventory().items.single().confirmableWarnings)
+        gate.writing("fixture-partial-export",exportId) {
+            gate.invalidateRegistration(exportId);File(directory,"data.part").writeText("unfinished private fixture")
+            catalog.registerExport(a)
+            assertFalse(catalog.inventory().items.single().selectable)
+        }
+        val source = File(root,"restore-inputs/$b.json").apply { parentFile.mkdirs();writeText("not JSON: retained refused source") }
+        val restoreId = catalog.registerRestoreInput(source.name)
+        val reference = gate.acquire("fixture-restore-preview",restoreId,CopyBlocker.RESTORE_SOURCE_IN_USE)
+        assertFalse(catalog.inventory().items.single { it.id == restoreId }.selectable)
+        gate.release(reference)
+        val cleanup = PrivateCopyCleanup(RegisteredCopyStorage(files,gate));val inventory = cleanup.inventory()
+        val p = cleanup.preview(inventory.revision,setOf(exportId,restoreId))
+        val confirmed = CleanupConfirmation(p.id,p.revision,p.items.associate { it.id to it.sha256 },
+            p.items.flatMap { i -> i.confirmableWarnings.map { WarningAcknowledgement(i.id,it) } }.toSet(),emptySet(),"fixture-discard-refused-staging")
+        assertEquals(CleanupPhase.DONE,cleanup.confirm(confirmed).phase)
+        assertFalse(directory.exists());assertFalse(source.exists())
+    }
 }

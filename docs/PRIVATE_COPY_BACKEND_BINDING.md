@@ -15,8 +15,11 @@ paths. This is implemented software binding, not completed Android/OEM JNI QA.
 
 PrivateCopyCatalog validates known roots through descriptor reads. Rollback/restore
 inputs pass the existing streaming backup reader; forms use their existing codec;
-exports require COMPLETE/CANCELLED, consumed chooser result, exact bytes/hash and
-the two-file group. No original user name/ID is inferred from display translation.
+exports require COMPLETE/CANCELLED and a consumed chooser result. COMPLETE requires
+the exact verified two-file group; CANCELLED may retain only its receipt or known
+data/data.part staging members, with INCOMPLETE_EXPORT_STAGING acknowledgement.
+Restore-input staging may contain refused/unparsed bytes: its known private owner,
+exact descriptor manifest and durable reference state govern discard, not backup validity. No original user name/ID is inferred from display translation.
 Recovery journals and scheduler authority files are never catalog selections.
 
 DatabaseArchives produces the same raw source manifest. A durable archive-draft

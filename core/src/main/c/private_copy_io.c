@@ -96,12 +96,12 @@ JNIEXPORT void JNICALL JNI(mkdir)(JNIEnv *e,jobject self,jlong root,jstring path
         free(leaf);close(p); }
     (*e)->ReleaseStringUTFChars(e,path,s);
 }
-JNIEXPORT jlong JNICALL JNI(open)(JNIEnv *e,jobject self,jlong root,jstring path) {
+JNIEXPORT jlong JNICALL JNI(open)(JNIEnv *e,jobject self,jlong root,jstring path,jlong links) {
     (void)self;const char *s=(*e)->GetStringUTFChars(e,path,NULL);if(!s) return -1;
     char *leaf=NULL;int p=parent(e,(int)root,s,&leaf);int fd=-1;
     if(p>=0) { fd=openat(p,leaf,O_RDONLY|O_CLOEXEC|O_NOFOLLOW|O_NONBLOCK);struct stat st;
-        if(fd>=0 && (fstat(fd,&st)<0 || !S_ISREG(st.st_mode) || st.st_nlink!=1)) { close(fd);fd=-1;errno=EINVAL; }
-        if(fd<0) error(e,"open regular single-link file");free(leaf);close(p); }
+        if(fd>=0 && (fstat(fd,&st)<0 || !S_ISREG(st.st_mode) || links<1 || (jlong)st.st_nlink!=links)) { close(fd);fd=-1;errno=EINVAL; }
+        if(fd<0) error(e,"open regular file with expected links");free(leaf);close(p); }
     (*e)->ReleaseStringUTFChars(e,path,s);return fd;
 }
 JNIEXPORT jbyteArray JNICALL JNI(chunk)(JNIEnv *e,jobject self,jlong fd) {
@@ -135,12 +135,12 @@ JNIEXPORT void JNICALL JNI(move)(JNIEnv *e,jobject self,jlong root,jstring sourc
     if(sp>=0) close(sp);if(tp>=0) close(tp);free(sl);free(tl);
     (*e)->ReleaseStringUTFChars(e,source,s);(*e)->ReleaseStringUTFChars(e,target,t);
 }
-JNIEXPORT void JNICALL JNI(remove)(JNIEnv *e,jobject self,jlong root,jstring path,jboolean directoryFlag,jlong device,jlong inode) {
+JNIEXPORT void JNICALL JNI(remove)(JNIEnv *e,jobject self,jlong root,jstring path,jboolean directoryFlag,jlong device,jlong inode,jlong links) {
     (void)self;const char *s=(*e)->GetStringUTFChars(e,path,NULL);if(!s) return;
     char *leaf=NULL;int p=parent(e,(int)root,s,&leaf);
     if(p>=0) { struct stat st;
         if(fstatat(p,leaf,&st,AT_SYMLINK_NOFOLLOW)<0) error(e,"unlink stat");
-        else if((jlong)st.st_dev!=device || (jlong)st.st_ino!=inode || (directoryFlag && !S_ISDIR(st.st_mode)) || (!directoryFlag && (!S_ISREG(st.st_mode)||st.st_nlink!=1))) { errno=EINVAL;error(e,"unlink identity/kind/link"); }
+        else if((jlong)st.st_dev!=device || (jlong)st.st_ino!=inode || (directoryFlag && !S_ISDIR(st.st_mode)) || (!directoryFlag && (!S_ISREG(st.st_mode)||links<1||(jlong)st.st_nlink!=links))) { errno=EINVAL;error(e,"unlink identity/kind/link"); }
         else if(unlinkat(p,leaf,directoryFlag?AT_REMOVEDIR:0)<0) error(e,"unlinkat");else if(fsync(p)<0) error(e,"unlink parent fsync");
         free(leaf);close(p); }
     (*e)->ReleaseStringUTFChars(e,path,s);

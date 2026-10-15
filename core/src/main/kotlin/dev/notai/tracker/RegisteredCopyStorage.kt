@@ -2,31 +2,55 @@ package dev.notai.tracker
 
 /** Backend-only binding of validated manifests to opaque IDs. This class never accepts UI paths.
  * Sealing is deliberately internal: platform catalog/backup validators supply the exact group.
- * Shared hardlinks are conservatively blocked until a complete sealed graph can be proven. */
+ * Shared hardlinks require a complete sealed archive graph; other copies stay single-link. */
 class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val gate: CopyMaintenance): PrivateCopyStorage {
     override fun <T> maintenance(block: ()->T): T = gate.locked(block)
     private val roots = mapOf(CopyKind.EXPORT to "exports",CopyKind.ROLLBACK to "rollback",CopyKind.DATABASE_ARCHIVE to "database-archives",
         CopyKind.RESTORE_INPUT to "restore-inputs",CopyKind.FORM to "forms")
+    private val manifests = CopyManifestFiles(files)
+    private fun mayRegister() = ensure(gate.state().journals.none { it.phase !in setOf(CleanupPhase.DONE,CleanupPhase.RESTORED) },"Cleanup interrupted")
     internal fun seal(item: PrivateCopy,path: String,directory: Boolean,memberNames: Map<String,String>) = maintenance {
-        ensure(item.selectable && item.id.isNotBlank() && path.substringBefore('/') == roots[item.kind],"Invalid sealed copy")
-        ensure(path.split('/').size == 2 && memberNames.keys == item.members.map { it.opaqueId }.toSet(),"Invalid group mapping")
-        ensure(memberNames.values.distinct().size == memberNames.size && memberNames.values.all { '/' !in it && it !in setOf(".","..","") },"Invalid member mapping")
+        mayRegister();ensure(path.substringBefore('/') == roots[item.kind],"Invalid copy root")
         ensure(gate.blockers(item.id).isEmpty(),"Copy referenced")
-        ensure(gate.state().journals.none { it.phase !in setOf(CleanupPhase.DONE,CleanupPhase.RESTORED) },"Cleanup interrupted")
-        val rootIdentity = files.stat(path) ?: fail(ErrorCode.STORAGE,"Copy missing")
-        ensure(if(directory) rootIdentity.directory else rootIdentity.regular,"Group kind changed")
-        ensure(!directory || files.names(path) == memberNames.values.sorted(),"Unknown group member")
-        ensure(directory || (memberNames.size == 1 && memberNames.values.single() == path.substringAfterLast('/')),"Invalid single-file group")
-        val identities = item.members.associate { member ->
-            val (read,identity) = files.member(if(directory) "$path/${memberNames.getValue(member.opaqueId)}" else path,member.opaqueId)
-            ensure(read == member,"Validated manifest differs",ErrorCode.STALE);member.opaqueId to identity
-        }+ ("@group" to rootIdentity)
-        ensure(item.bytes == item.members.sumOf { it.bytes } && item.sha256 == payloadHash(item.members),"Invalid group digest")
-        val registered = RegisteredCopy(item,path,directory,memberNames,identities)
+        val registered = manifests.capture(item,path,directory,memberNames,emptySet(),false)
         gate.update { state ->
             ensure(state.copies.none { it.path == path || it.item.id == item.id },"Copy already registered")
             state.copy(copies = state.copies+registered)
         };Unit
+    }
+    /** Atomic registration of all new sealed aliases. Incomplete graphs grant no authority. */
+    internal fun sealArchiveGraph(batch: List<ArchiveCopyManifest>) = maintenance {
+        mayRegister();ensure(batch.isNotEmpty(),"Empty archive registration")
+        val before = gate.state()
+        val captured = batch.map { m ->
+            ensure(m.path.substringBefore('/') == roots[CopyKind.DATABASE_ARCHIVE],"Invalid archive root")
+            manifests.capture(m.item,m.path,true,m.memberPaths,m.directories,true)
+        }
+        val all = before.copies+captured
+        ensure(all.map { it.item.id }.distinct().size == all.size && all.map { it.path }.distinct().size == all.size,"Duplicate registered copy")
+        captured.forEach { r -> manifests.prove(all,r,before.references) { locate(it,before) } }
+        gate.update { it.copy(copies = all) };Unit
+    }
+    fun archiveGraph(selectedIds: Set<String>): ArchiveLinkGraph = maintenance {
+        val ids = selectedIds.toSet();val state = gate.state()
+        ensure(ids.isNotEmpty() && ids.all { id -> state.copies.any { it.item.id == id && it.sealedArchive } },"Unknown sealed archive")
+        val selected = state.copies.filter { it.item.id in ids }
+        ensure(selected.all { locate(it,state).path != null },"Selected archive no longer exists",ErrorCode.STALE)
+        val component = selected.flatMap { manifests.component(state.copies,it) }.distinctBy { it.item.id }.filter { locate(it,state).path != null }
+        val reads = mutableMapOf<String,ManifestRead>()
+        selected.forEach { r -> if(r.item.id !in reads) reads.putAll(manifests.prove(state.copies,r,emptyList()) { locate(it,state) }) }
+        val nodes = component.flatMap { r -> reads.getValue(r.item.id).members.map { m ->
+            Triple(reads.getValue(r.item.id).identities.getValue(m.opaqueId),m,ArchiveAlias(r.item.id,m.opaqueId))
+        } }.groupBy { it.first.node() }.map { (node,rows) ->
+            ArchiveLinkNode(payloadHash(node),rows.first().second.bytes,rows.first().second.sha256,
+                rows.map { it.third }.sortedWith(compareBy<ArchiveAlias> { it.copyId }.thenBy { it.memberId }))
+        }.sortedBy { it.opaqueId }
+        val blockers = state.references.filter { it.itemId == null || it.itemId in component.map { c -> c.item.id } }.map { it.blocker }.toSet()+
+            (if(state.journals.any { it.phase !in setOf(CleanupPhase.DONE,CleanupPhase.RESTORED) }) setOf(CopyBlocker.CLEANUP_INTERRUPTED) else emptySet())+
+            (if(files.stat("recovery-pending.json") != null) setOf(CopyBlocker.REQUIRED_BY_PENDING_RECOVERY) else emptySet())
+        ArchiveLinkGraph(state.revision,ids,component.map { it.item.id }.toSet(),nodes,
+            nodes.fold(0L) { n,node -> Math.addExact(n,Math.multiplyExact(node.bytes,node.aliases.count { it.copyId in ids }.toLong())) },
+            nodes.filter { n -> n.aliases.all { it.copyId in ids } }.fold(0L) { n,node -> Math.addExact(n,node.bytes) },blockers)
     }
     override fun inventory(): CopyInventory = maintenance {
         val state = gate.state();val interrupted = state.journals.any { it.phase !in setOf(CleanupPhase.DONE,CleanupPhase.RESTORED) }
@@ -35,8 +59,9 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
             val blockers = record.item.hardBlockers+gate.blockers(record.item.id)+
                 (if(interrupted) setOf(CopyBlocker.CLEANUP_INTERRUPTED) else emptySet())+
                 (if(files.stat("recovery-pending.json") != null) setOf(CopyBlocker.REQUIRED_BY_PENDING_RECOVERY) else emptySet())
-            val checked = try { validate(record,record.path,false);emptySet() } catch(_: Exception) {
-                if(identity.regular && identity.links != 1L || record.item.members.any { m ->
+            val checked = try { validate(record,record.path,false,true);emptySet() } catch(e: ArchiveGraphRefusal) { e.blockers } catch(_: Exception) {
+                if(record.sealedArchive) setOf(CopyBlocker.HARDLINK_GRAPH_INCOMPLETE,CopyBlocker.PATH_NOT_SAFE,CopyBlocker.UNKNOWN_FILE_OR_STATE)
+                else if(identity.regular && identity.links != 1L || record.item.members.any { m ->
                     runCatching { files.stat(memberPath(record,record.path,m))?.links != 1L }.getOrDefault(true)
                 }) setOf(CopyBlocker.HARDLINK_GRAPH_INCOMPLETE) else setOf(CopyBlocker.PATH_NOT_SAFE,CopyBlocker.UNKNOWN_FILE_OR_STATE)
             }
@@ -64,29 +89,34 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
     }
     private fun quarantinePath(item: PrivateCopy,id: String) = "cleanup-quarantine/$id-${payloadHash(item.id).take(32)}"
     private fun memberPath(r: RegisteredCopy,path: String,m: CopyMember) = if(r.directory) "$path/${r.memberNames.getValue(m.opaqueId)}" else path
-    private fun validate(r: RegisteredCopy,path: String,partial: Boolean): List<CopyMember> {
-        val identity = files.stat(path) ?: return if(partial) emptyList() else fail(ErrorCode.STORAGE,"Copy missing")
-        val expectedGroup = r.identities.getValue("@group")
-        ensure(identity.device == expectedGroup.device && identity.inode == expectedGroup.inode && identity.mode == expectedGroup.mode,"Group identity changed",ErrorCode.STALE)
-        val names = if(r.directory) files.names(path) else listOf(r.memberNames.values.single())
-        ensure(names.all { it in r.memberNames.values } && (partial || names == r.memberNames.values.sorted()),"Unknown/missing group member",ErrorCode.STALE)
-        return r.item.members.filter { r.memberNames.getValue(it.opaqueId) in names }.map { expected ->
-            val (member,identityNow) = files.member(memberPath(r,path,expected),expected.opaqueId)
-            ensure(member == expected && identityNow == r.identities.getValue(expected.opaqueId),"Member changed",ErrorCode.STALE);member
-        }
+    private fun locate(r: RegisteredCopy,state: CopyMaintenanceState = gate.state()): CopyLocation {
+        val journals = state.journals.filter { op -> op.items.any { it.item.id == r.item.id } }
+        val targets = journals.map { quarantinePath(r.item,it.operationId) }.filter { files.stat(it) != null }
+        ensure(targets.size <= 1 && (targets.isEmpty() || files.stat(r.path) == null),"Ambiguous group locations",ErrorCode.STALE)
+        if(targets.isNotEmpty()) return CopyLocation(targets.single(),true)
+        if(files.stat(r.path) != null) return CopyLocation(r.path,false)
+        ensure(journals.any { op -> op.items.any { it.item.id == r.item.id && it.quarantined && !it.restored } },"Sealed archive disappeared without cleanup proof",ErrorCode.STALE)
+        return CopyLocation(null,true)
+    }
+    private fun validate(r: RegisteredCopy,path: String,partial: Boolean,protect: Boolean = false): ManifestRead {
+        if(!r.sealedArchive) return manifests.read(r,CopyLocation(path,partial))
+        val state = gate.state()
+        return manifests.prove(state.copies,r,if(protect) state.references else emptyList()) { row ->
+            if(row.item.id == r.item.id) CopyLocation(path,partial) else locate(row,state)
+        }.getValue(r.item.id)
     }
     override fun quarantine(item: PrivateCopy,operationId: String) = maintenance {
         val r = operation(item,operationId);val target = quarantinePath(item,operationId)
         ensure(gate.blockers(item.id).isEmpty() && files.stat("recovery-pending.json") == null,"Copy became referenced",ErrorCode.STALE)
         files.mkdir("cleanup-quarantine")
-        if(files.stat(target) != null) { ensure(files.stat(r.path) == null,"Both group locations exist");validate(r,target,true) }
-        else { validate(r,r.path,false);files.move(r.path,target);validate(r,target,false) }
+        if(files.stat(target) != null) { ensure(files.stat(r.path) == null,"Both group locations exist");validate(r,target,true,true) }
+        else { validate(r,r.path,false,true);files.move(r.path,target);validate(r,target,false,true) }
         Unit
     }
     override fun remaining(item: PrivateCopy,operationId: String): List<CopyMember> = maintenance {
         val r = operation(item,operationId);val target = quarantinePath(item,operationId)
-        if(files.stat(target) != null) { ensure(files.stat(r.path) == null,"Ambiguous group locations");validate(r,target,true) }
-        else if(files.stat(r.path) != null) validate(r,r.path,false) else emptyList()
+        if(files.stat(target) != null) { ensure(files.stat(r.path) == null,"Ambiguous group locations");validate(r,target,true).members }
+        else if(files.stat(r.path) != null) validate(r,r.path,false).members else emptyList()
     }
     override fun isQuarantined(item: PrivateCopy,operationId: String): Boolean = maintenance {
         val r = operation(item,operationId);val target = quarantinePath(item,operationId)
@@ -95,8 +125,9 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
     override fun removeMember(item: PrivateCopy,member: CopyMember,operationId: String) = maintenance {
         val r = operation(item,operationId);val target = quarantinePath(item,operationId)
         ensure(gate.blockers(item.id).isEmpty() && files.stat("recovery-pending.json") == null,"Copy became referenced",ErrorCode.STALE)
-        ensure(member in validate(r,target,true),"Unknown member")
-        files.remove(memberPath(r,target,member),expected = r.identities.getValue(member.opaqueId));Unit
+        val checked = validate(r,target,true,true);ensure(member in checked.members,"Unknown member")
+        files.remove(memberPath(r,target,member),expected = checked.identities.getValue(member.opaqueId),
+            expectedLinks = if(r.sealedArchive) checked.identities.getValue(member.opaqueId).links else 1);Unit
     }
     override fun verifyAbsent(item: PrivateCopy,operationId: String): Boolean = maintenance {
         val r = operation(item,operationId);val target = quarantinePath(item,operationId)
@@ -113,13 +144,18 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
         val r = operation(item,operationId);val target = quarantinePath(item,operationId)
         ensure(files.stat(r.path) == null,"Original group reappeared")
         if(files.stat(target) != null) {
-            ensure(r.directory && validate(r,target,true).isEmpty(),"Surviving group bytes")
-            files.remove(target,true)
+            ensure(gate.blockers(item.id).isEmpty() && files.stat("recovery-pending.json") == null,"Copy became referenced",ErrorCode.STALE)
+            ensure(r.directory && validate(r,target,true,true).members.isEmpty(),"Surviving group bytes")
+            for((name,identity) in r.directories.entries.sortedWith(compareByDescending<Map.Entry<String,FileIdentity>> { it.key.count { c -> c == '/' } }.thenByDescending { it.key })) {
+                if(files.stat("$target/$name") != null) files.remove("$target/$name",true,identity)
+            }
+            files.remove(target,true,r.identities.getValue("@group"))
         };Unit
     }
     override fun restoreWholeGroup(item: PrivateCopy,operationId: String) = maintenance {
         val r = operation(item,operationId);val target = quarantinePath(item,operationId)
-        if(files.stat(r.path) != null) { ensure(files.stat(target) == null,"Ambiguous group locations");validate(r,r.path,false) }
-        else { ensure(validate(r,target,false) == item.members,"Only an intact whole group can return");files.move(target,r.path);validate(r,r.path,false) };Unit
+        ensure(gate.blockers(item.id).isEmpty() && files.stat("recovery-pending.json") == null,"Copy became referenced",ErrorCode.STALE)
+        if(files.stat(r.path) != null) { ensure(files.stat(target) == null,"Ambiguous group locations");validate(r,r.path,false,true) }
+        else { ensure(validate(r,target,false,true).members == item.members,"Only an intact whole group can return");files.move(target,r.path);validate(r,r.path,false,true) };Unit
     }
 }

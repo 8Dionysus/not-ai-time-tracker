@@ -12,3 +12,10 @@ The reviewed editorial package is stored in this branch so Opus can start from m
 Extract into a new working directory and begin with LOCALIZATION-README.md, localization-package-manifest.json and localization-integration-handoff.md. Verify member hashes before using the package. Frozen historical CSV-blocked records are superseded only by the reviewed csv-composition-resolution-overlay.json; do not silently delete their history.
 
 These are reviewed editorial data, not wired Android resources or a claim of runtime locale support. Opus still needs to integrate locale preference, typed rendering, all UI surfaces, RTL/formatters and accessibility, then build and check on devices. Source-copy claims about local-only storage must reflect explicit SAF export. New Schedule/Retention/CopyCleanup surfaces need their own typed UI mapping. Do not translate user values, headers, IDs or technical diagnostics by substring matching.
+
+The 65th typed import issue, SOURCE_LOCALE_INVALID, is specified separately in
+[backend-typed-delta.json](backend-typed-delta.json): exact resource key, typed
+arguments, stage, field path, source drafts and required caller action. It is not
+silently added to the reviewed 64-issue package, whose bytes/hash stay unchanged.
+The new RU/EN source copy still needs editorial review; no additional reviewed
+translations or wired UI resources are claimed.

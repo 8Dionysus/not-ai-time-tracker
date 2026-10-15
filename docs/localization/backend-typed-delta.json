@@ -1,0 +1,27 @@
+{
+  "format": 1,
+  "baseEditorialPackageSha256": "eca102490bb89f163141813043e59e351d6bad8d1c0b659027371d25a52cc310",
+  "baseImportIssueCount": 64,
+  "currentImportIssueCount": 65,
+  "entries": [
+    {
+      "code": "SOURCE_LOCALE_INVALID",
+      "resourceKey": "tracker.import.source_locale_invalid",
+      "errorCode": "INVALID_INPUT",
+      "severity": "ERROR",
+      "stage": "PARSE",
+      "fieldPath": "csvMapping.sourceLocale",
+      "rowNumber": null,
+      "field": null,
+      "arguments": {"localeTag": {"type": "ErrorArgument.Text", "meaning": "Original source date language tag; display as a value, never translate"}},
+      "meaning": "The explicit language tag for parsing source dates is malformed or does not identify a language. Null uses Locale.ROOT. This is independent of UI language and supported UI locales.",
+      "sourceCopy": {
+        "en": "Enter a valid language tag for dates in the source file, for example en-US.",
+        "ru": "Укажите корректный языковой тег для дат исходного файла, например en-US."
+      },
+      "quality": "SOURCE_DRAFT_REQUIRES_EDITORIAL_REVIEW",
+      "reviewedTranslations": [],
+      "uiAction": "Keep every mapping field; let the user correct sourceLocale or explicitly clear it to ROOT, then obtain a new preview. Do not change application language or apply data."
+    }
+  ]
+}

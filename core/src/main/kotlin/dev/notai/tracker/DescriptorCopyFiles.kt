@@ -18,21 +18,22 @@ class DescriptorCopyFiles(root: String,library: String? = null): Closeable {
     @Synchronized internal fun names(path: String): List<String> = NativeCopyIo.names(descriptor,path).sorted()
     @Synchronized internal fun mkdir(path: String) = NativeCopyIo.mkdir(descriptor,path)
     @Synchronized internal fun move(source: String,target: String) = NativeCopyIo.move(descriptor,source,target,false)
-    @Synchronized internal fun remove(path: String,directory: Boolean = false,expected: FileIdentity? = stat(path)) {
-        check(expected != null);NativeCopyIo.remove(descriptor,path,directory,expected.device,expected.inode)
+    @Synchronized internal fun remove(path: String,directory: Boolean = false,expected: FileIdentity? = stat(path),expectedLinks: Long = 1) {
+        check(expected != null);NativeCopyIo.remove(descriptor,path,directory,expected.device,expected.inode,expectedLinks)
     }
     @Synchronized internal fun sync(path: String) = NativeCopyIo.sync(descriptor,path)
     @Synchronized internal fun read(path: String,maxBytes: Int = 16*1024*1024): ByteArray {
-        val fd = NativeCopyIo.open(descriptor,path)
+        val fd = NativeCopyIo.open(descriptor,path,1)
         return try {
             val out = java.io.ByteArrayOutputStream()
             while(true) { val b = NativeCopyIo.chunk(fd);if(b.isEmpty()) break;check(out.size().toLong()+b.size <= maxBytes);out.write(b) };out.toByteArray()
         } finally { NativeCopyIo.close(fd) }
     }
-    @Synchronized internal fun member(path: String,id: String): Pair<CopyMember,FileIdentity> {
-        val fd = NativeCopyIo.open(descriptor,path)
+    @Synchronized internal fun member(path: String,id: String,expectedLinks: Long = 1): Pair<CopyMember,FileIdentity> {
+        require(expectedLinks > 0)
+        val fd = NativeCopyIo.open(descriptor,path,expectedLinks)
         return try {
-            val before = NativeCopyIo.fstat(fd).identity();check(before.regular && before.links == 1L) { "HARDLINK_GRAPH_INCOMPLETE" }
+            val before = NativeCopyIo.fstat(fd).identity();check(before.regular && before.links == expectedLinks) { "HARDLINK_GRAPH_INCOMPLETE" }
             val digest = MessageDigest.getInstance("SHA-256");var bytes = 0L
             while(true) { val b = NativeCopyIo.chunk(fd);if(b.isEmpty()) break;digest.update(b);bytes = Math.addExact(bytes,b.size.toLong()) }
             val after = NativeCopyIo.fstat(fd).identity()
@@ -44,13 +45,11 @@ class DescriptorCopyFiles(root: String,library: String? = null): Closeable {
         val parent = path.substringBeforeLast('/',"");val temp = (if(parent.isEmpty()) "" else "$parent/")+".${newId()}.part"
         NativeCopyIo.put(descriptor,temp,bytes);NativeCopyIo.move(descriptor,temp,path,true);sync(parent)
     }
-    fun metadata(path: String = "maintenance.json",maxBytes: Int = 16*1024*1024): CopyMetadata = object: CopyMetadata {
-        init { require(maxBytes > 0) }
-        override fun read(): String? = if(stat(path) == null) null else read(path,maxBytes).toString(Charsets.UTF_8)
+    fun metadata(path: String = "maintenance.json",maxBytes: Int = CopyMetadataBytes.MAX_BYTES): CopyMetadata = object: CopyMetadata {
+        init { require(maxBytes in 1..CopyMetadataBytes.MAX_BYTES) }
+        override fun read(): String? = if(stat(path) == null) null else CopyMetadataBytes.decode(read(path,maxBytes))
         override fun writeDurably(value: String) {
-            val bytes = value.toByteArray(Charsets.UTF_8)
-            check(bytes.size <= maxBytes) { "Maintenance metadata exceeds reader capacity" }
-            writeAtomic(path,bytes)
+            writeAtomic(path,CopyMetadataBytes.encode(value,maxBytes))
         }
     }
 }
@@ -62,10 +61,10 @@ internal object NativeCopyIo {
     external fun fstat(fd: Long): LongArray
     external fun names(root: Long,path: String): Array<String>
     external fun mkdir(root: Long,path: String)
-    external fun open(root: Long,path: String): Long
+    external fun open(root: Long,path: String,expectedLinks: Long): Long
     external fun chunk(fd: Long): ByteArray
     external fun put(root: Long,path: String,bytes: ByteArray)
     external fun move(root: Long,source: String,target: String,replace: Boolean)
-    external fun remove(root: Long,path: String,directory: Boolean,device: Long,inode: Long)
+    external fun remove(root: Long,path: String,directory: Boolean,device: Long,inode: Long,expectedLinks: Long)
     external fun sync(root: Long,path: String)
 }

@@ -27,8 +27,11 @@ internal object DirectoryDurability {
 }
 internal fun syncDirectory(directory: File) = DirectoryDurability.sync(directory)
 internal fun atomicText(file: File,text: String) {
+    atomicBytes(file,text.toByteArray(Charsets.UTF_8))
+}
+internal fun atomicBytes(file: File,bytes: ByteArray) {
     file.parentFile!!.mkdirs();val part = File(file.parentFile,"${file.name}.${newId()}.part")
-    FileOutputStream(part).use { it.write(text.toByteArray(Charsets.UTF_8));it.fd.sync() }
+    FileOutputStream(part).use { it.write(bytes);it.fd.sync() }
     DirectoryDurability.rename(part,file);syncDirectory(file.parentFile!!);file.parentFile?.parentFile?.let(::syncDirectory)
 }
 

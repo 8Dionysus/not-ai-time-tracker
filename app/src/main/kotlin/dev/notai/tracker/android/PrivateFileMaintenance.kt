@@ -10,11 +10,14 @@ object PrivateFileMaintenance {
     private val roots = mutableMapOf<String,CopyMaintenance>()
     @Synchronized fun forContext(context: Context): CopyMaintenance = forRoot(context.noBackupFilesDir)
     @Synchronized internal fun forRoot(root: File): CopyMaintenance = roots.getOrPut(root.absolutePath) {
-        val file = File(root,"private-copy-maintenance.json")
-        CopyMaintenance(object: CopyMetadata {
-            override fun read(): String? = if(file.exists()) file.readText() else null
-            override fun writeDurably(value: String) = atomicText(file,value)
-        })
+        CopyMaintenance(metadata(File(root,"private-copy-maintenance.json")))
+    }
+    internal fun metadata(file: File,maxBytes: Int = CopyMetadataBytes.MAX_BYTES): CopyMetadata = object: CopyMetadata {
+        override fun read(): String? = try {
+            java.nio.file.Files.newInputStream(file.toPath(),java.nio.file.StandardOpenOption.READ,java.nio.file.LinkOption.NOFOLLOW_LINKS)
+                .use { CopyMetadataBytes.read(it,maxBytes) }
+        } catch(_: java.nio.file.NoSuchFileException) { null }
+        override fun writeDurably(value: String) = atomicBytes(file,CopyMetadataBytes.encode(value,maxBytes))
     }
     /** Existing File/preview APIs cannot prove Activity/ViewModel reference release. One durable
      * migration witness blocks cleanup until Opus connects every lifecycle and reviews its removal. */

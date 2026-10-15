@@ -61,7 +61,7 @@ class CatalogContentPacks(private val catalogId: String,private val catalog: Rea
         val payload = decode<CatalogContentPayload>(bytes)
         ensure(payload.schemaVersion == 1 && payload.entries.map { it.key }.distinct().size == payload.entries.size,
             "Duplicate or unsupported catalog translation identity",ErrorCode.UNSUPPORTED_IMPORT)
-        ensure(payload.entries.all { row -> originals[row.key]?.let { original -> row.text.label.isNotBlank() && row.text.aliases.all(String::isNotBlank) && (!m.complete || (original.aliases.isEmpty() || row.text.aliases.isNotEmpty()) && (original.description.isBlank() || row.text.description.isNotBlank())) } == true },
+        ensure(payload.entries.all { row -> originals[row.key]?.let { original -> row.text.label.isNotBlank() && row.text.aliases.all(String::isNotBlank) && (!m.complete || row.text.aliases.size >= original.aliases.size && (original.description.isBlank() || row.text.description.isNotBlank())) } == true },
             "Unknown or invalid catalog translation entry",ErrorCode.UNSUPPORTED_IMPORT)
         val all = payload.entries.map { it.key }.toSet() == originals.keys
         ensure(!m.complete || all,"Catalog translation coverage is incomplete",ErrorCode.UNSUPPORTED_IMPORT)

@@ -33,7 +33,7 @@ class LocaleContractTest {
         assertEquals(Backups.decode(archive).data,Backups.decode(Backups(tracker,MemoryRollback()).export()).data)
     }
     @Test fun sidecarCoverageParentIdentityAndBatchFallbackPreserveOriginals() {
-        val vocabulary = VocabularyData(types = listOf(ActivityType("preset","Оригинал",aliases = listOf("Исходный alias"),definition = "Исходное описание")),
+        val vocabulary = VocabularyData(types = listOf(ActivityType("preset","Оригинал",aliases = listOf("Исходный alias","Другой alias"),definition = "Исходное описание")),
             axes = listOf(Axis("first-axis","Первая",valueKind = ValueKind.LOCAL_CHOICE,values = listOf(AxisValue("same","Один"))),
                 Axis("second-axis","Вторая",valueKind = ValueKind.LOCAL_CHOICE,values = listOf(AxisValue("same","Другой")))),metrics = emptyList(),units = emptyList())
         val source = codec.encodeToString(vocabulary).toByteArray()
@@ -43,7 +43,7 @@ class LocaleContractTest {
         val values = original.filter { it.key.kind == CatalogContentKind.VALUE }
         assertEquals(2,values.size);assertEquals(1,values.map { it.key.stableId }.distinct().size)
         assertEquals(2,values.map { it.key.parentId }.distinct().size)
-        val translated = original.mapIndexed { i,row -> row.copy(text = CatalogPresentation("Fixture $i",if(row.text.aliases.isEmpty()) emptyList() else listOf("Fixture alias"),if(row.text.description.isEmpty()) "" else "Fixture description")) }
+        val translated = original.mapIndexed { i,row -> row.copy(text = CatalogPresentation("Fixture $i",row.text.aliases.mapIndexed { j,_ -> "Fixture alias $j" },if(row.text.description.isEmpty()) "" else "Fixture description")) }
         fun install(rows: List<CatalogContentRow>,quality: TranslationQuality,complete: Boolean = true,tag: String = "es",rights: CatalogRightsStatus = CatalogRightsStatus.CLEARED,license: String? = "Apache-2.0") {
             val payload = codec.encodeToString(CatalogContentPayload(entries = rows)).toByteArray()
             val m = CatalogContentManifest(catalogId = "fixture",catalogRevision = "fixture",catalogSha256 = manifest.sha256,
@@ -61,6 +61,9 @@ class LocaleContractTest {
         val rightsPending = packs.getLocalizedCatalogEntries("fixture",values.map { it.key },"es")
         assertTrue(rightsPending.all { it.missing && it.provenance!!.license == null && it.quality == TranslationQuality.REVIEWED && it.availability == PackAvailability.AVAILABLE_OFFLINE })
         install(translated,TranslationQuality.REVIEWED)
+        val completeBeforeRefusal = packs.getLocalizedCatalogEntries("fixture",original.map { it.key },"es")
+        assertFailsWith<CoreError> { install(translated.map { row -> if(row.key.kind == CatalogContentKind.TYPE) row.copy(text = row.text.copy(aliases = row.text.aliases.take(1))) else row },TranslationQuality.REVIEWED) }
+        assertEquals(completeBeforeRefusal,packs.getLocalizedCatalogEntries("fixture",original.map { it.key },"es"))
         val found = packs.getLocalizedCatalogEntries("fixture",values.map { it.key },"es-MX")
         assertEquals(2,found.map { it.display.label }.distinct().size);assertTrue(found.all { it.resolvedLocaleTag == "es" && !it.missing })
         val own = CatalogPresentation("Personal original",listOf("Personal alias"),"Personal definition")

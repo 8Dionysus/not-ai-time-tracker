@@ -98,7 +98,7 @@ internal class CopyManifestFiles(private val files: DescriptorCopyFiles) {
         val component = component(all,r)
         val locations = component.associate { it.item.id to locate(it) }
         val live = component.filter { locations.getValue(it.item.id).path != null }
-        val blockers = references.filter { it.itemId == null || it.itemId in live.map { c -> c.item.id } }.map { it.blocker }.toSet()+live.flatMap { it.item.hardBlockers }
+        val blockers = references.filter { r -> live.any { r.protects(it.item.id) } }.map { it.blocker }.toSet()+live.flatMap { it.item.hardBlockers }
         if(blockers.isNotEmpty()) throw ArchiveGraphRefusal(blockers)
         val reads = component.associate { it.item.id to read(it,locations.getValue(it.item.id)) }
         val aliases = reads.values.flatMap { it.identities.values }.groupBy { it.node() }

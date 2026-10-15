@@ -172,13 +172,17 @@ internal fun validateSchedule(data: Dataset) {
 @Serializable data class ScheduleCommand(val key: String,val expected: Token,val action: ScheduleAction,val seriesId: String,
     val expectedSeriesRevision: Long? = null,val rule: ScheduleRule? = null,val effectiveFrom: String? = null,val state: ScheduleState? = null,
     val occurrence: OccurrenceKey? = null,val override: OccurrenceOverride? = null,val expectedOverrideRevision: Long? = null,val deviceZone: String = "UTC")
+fun ScheduleCommand.canonicalCapture(): ScheduleCommand {
+    val captured = codec.decodeFromString<ScheduleCommand>(codec.encodeToString(this))
+    fun time(value: String?) = value?.let { scheduleTime(it).toString() }
+    return captured.copy(rule = captured.rule?.let { r -> r.copy(localTime = time(r.localTime),reminderTime = time(r.reminderTime)) },
+        override = captured.override?.let { o -> o.copy(localTime = time(o.localTime),reminderTime = time(o.reminderTime)) })
+}
+fun ScheduleCommand.canonicalPayloadHash(): String = payloadHash(canonicalCapture())
 /** One transaction and receipt, including the existing timer transition. No second timer. */
 fun Tracker.scheduleCommand(command: ScheduleCommand): ScheduleCommandResult = storage {
     // Capture caller-owned nested collections before hashing and applying one immutable request.
-    val captured = codec.decodeFromString<ScheduleCommand>(codec.encodeToString(command))
-    fun time(value: String?) = value?.let { scheduleTime(it).toString() }
-    val prepared = captured.copy(rule = captured.rule?.let { r -> r.copy(localTime = time(r.localTime),reminderTime = time(r.reminderTime)) },
-        override = captured.override?.let { o -> o.copy(localTime = time(o.localTime),reminderTime = time(o.reminderTime)) })
+    val prepared = command.canonicalCapture()
     val hash = payloadHash(prepared)
     store.checkedTransaction { checked ->
         val d = checked.data;val c = prepared;val s = d.schedule

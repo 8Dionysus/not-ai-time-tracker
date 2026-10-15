@@ -10,6 +10,8 @@ import kotlinx.serialization.Serializable
     val zoneId: String? = null,val boundary: String = "00:00")
 @Serializable data class ScheduleSettings(val day: ScheduleDayPolicy = ScheduleDayPolicy(),val quietShadeEnabled: Boolean = false)
 data class ScheduleDayView(val date: LocalDate,val zone: String,val boundary: String)
+data class ScheduleViewState(val token: Token,val controlBarrier: String,val asOf: Long,val day: ScheduleDayView,
+    val settings: ScheduleSettings,val surfaces: SurfaceSettings,val deviceZone: String,val occurrences: List<ScheduleProjection>,val nextDayBoundary: Long)
 
 internal fun ScheduleSettings.canonical(): ScheduleSettings {
     validateScheduleSettings(this)
@@ -32,3 +34,8 @@ internal fun ScheduleSettings.resolveDay(now: Instant,deviceZone: ZoneId): Sched
     return ScheduleDayView(ScheduleDayResolver.date(now,zone,scheduleTime(day.boundary)),zone.id,scheduleTime(day.boundary).toString())
 }
 fun Tracker.scheduleDay(deviceZone: ZoneId): ScheduleDayView = data().settings.schedule.resolveDay(Instant.ofEpochMilli(clock.now().also(::validateMoment).wall),deviceZone)
+/** Civil boundary, never now+24h; same gap/fold policy as day grouping. */
+fun ScheduleSettings.nextDayBoundary(now: Instant,deviceZone: ZoneId): Instant {
+    val day = resolveDay(now,deviceZone)
+    return resolveScheduleTime(day.date.plusDays(1),scheduleTime(day.boundary),scheduleZone(day.zone)).first
+}

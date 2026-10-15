@@ -34,7 +34,15 @@ abstract class ScenarioContract {
         val disabled = tracker.data()
         assertEquals(before.sessions,disabled.sessions);assertEquals(before.segments,disabled.segments)
         assertEquals(timer,tracker.snapshot().timerTarget)
-        tracker = Tracker(reopen(tracker.store),clock);assertEquals(disabled,tracker.data())
+        val stalePreference = tracker.snapshot().token
+        tracker.settings(stalePreference,tracker.data().settings.copy(reportZone = "Europe/Berlin"))
+        expect(ErrorCode.STALE) { tracker.configureFocusSignal(stalePreference,true) }
+        val freshPreferences = tracker.data()
+        tracker.configureFocusSignal(tracker.snapshot().token,true)
+        assertEquals(freshPreferences.settings.copy(surfaces = freshPreferences.settings.surfaces.copy(focusSignal = true)),tracker.data().settings)
+        assertEquals(timer,tracker.snapshot().timerTarget)
+        val persisted = tracker.data()
+        tracker = Tracker(reopen(tracker.store),clock);assertEquals(persisted,tracker.data())
         val rollback = MemoryRollback();val backups = Backups(tracker,rollback);val text = backups.export()
         val bytes = java.io.ByteArrayOutputStream();backups.write(bytes)
         assertFalse(Backups.decode(text).data.settings.surfaces.shortcut)
@@ -605,6 +613,11 @@ abstract class ScenarioContract {
         assertEquals(TransferGroupState.APPLIED,result.groups.single().state)
         assertEquals(1,destination.data().schedule.links.size);assertEquals(1,destination.data().measurements.size)
         assertEquals(destination.data().sessions.single().id,destination.data().schedule.links.single().sessionId)
+        val linkedBefore = destination.data()
+        val linkedError = assertFailsWith<CoreError> { destination.previewDeleteSession(destination.data().sessions.single().id) }
+        assertEquals(ErrorReason.SCHEDULE_LINKED_SESSION,linkedError.reason)
+        assertEquals(ErrorArgument.Identifier("linked"),linkedError.arguments["seriesId"])
+        assertEquals(linkedBefore,destination.data())
 
         // Two independent atomic groups: fail before the second group's commit, then reopen/resume.
         val plain = Tracker(createStore(),clock)
@@ -1642,6 +1655,21 @@ abstract class ScenarioContract {
             assertEquals(streamed.toString(),Csv.export(csvRows,mode))
             assertTrue(streamed.contains("\"unresolved\",\"csv-unresolved\""))
         }
+        val uncertainSegment = d.segments.last().copy(end = null,anchor = null,uncertain = true,observedUntil = clock.wall)
+        val contextual = d.copy(sessions = d.sessions.map { it.copy(status = SessionStatus.RECOVERY,note = "=context,\n\"unchanged\"") },
+            segments = d.segments.dropLast(1)+uncertainSegment)
+        validate(contextual)
+        val uncertainReport = Reports.report(contextual,clock.now(),windowStart,clock.wall)
+        assertEquals(all.recordedMs-uncertainSegment.durationMs,uncertainReport.recordedMs)
+        for(mode in CsvMode.entries) {
+            val table = CsvTable.parse(Csv.export(uncertainReport,mode),',')
+            val row = table.drop(1).single { it[0] == "unresolved" };val columns = table.first().zip(row).toMap()
+            assertEquals(card.id,columns["card_id"]);assertEquals("language",columns["activity_type_id"])
+            assertEquals(card.details,codec.decodeFromString<Map<String,String>>(columns.getValue("details")))
+            assertEquals(card.tags,codec.decodeFromString<Set<String>>(columns.getValue("tags")))
+            assertEquals((if(mode == CsvMode.SPREADSHEET_SAFE) "'" else "")+"=context,\n\"unchanged\"",columns["note"])
+            assertTrue(listOf("start_ms","end_ms","duration_ms").all { columns[it].isNullOrEmpty() })
+        }
         assertTrue(csv.contains("' =Language").not()); assertTrue(csv.contains("'=Language"))
         assertEquals(20,csv.lineSequence().filter { it.startsWith("\"measurement\"") }.sumOf { it.split(',')[15].trim('"').toLong() })
         assertEquals(1,csv.lineSequence().count { it.startsWith("\"measurement\"") })
@@ -2198,7 +2226,9 @@ private object MaterializedCsvReference {
             codec.encodeToString(r.selection.tags),r.note ?: "","","","","","",report.zone,codec.encodeToString(r.selection.ancestorPathAtWrite),codec.encodeToString(r.selection.facets)) }
         report.measurements.forEach { m -> rows += listOf("measurement",m.id,m.targetId,"","","","","","","","","",m.fieldId,m.meaningVersion.toString(),m.unit,m.value.toString(),m.scope.name,report.zone,"","") }
         // Explicitly expose excluded uncertain data without inventing period attribution or adding it to totals.
-        report.unresolved.forEach { s -> rows += listOf("unresolved",s.id,s.sessionId,"","","","",s.selection.name ?: "","","","","","","","","","",report.zone,codec.encodeToString(s.selection.ancestorPathAtWrite),codec.encodeToString(s.selection.facets)) }
+        report.unresolved.forEach { s -> rows += listOf("unresolved",s.id,s.sessionId,"","","",s.selection.cardId ?: "",s.selection.name ?: "",s.selection.activityTypeId ?: "",
+            codec.encodeToString(s.selection.details),codec.encodeToString(s.selection.tags),report.unresolvedSessionNotes[s.sessionId] ?: "","","","","","",report.zone,
+            codec.encodeToString(s.selection.ancestorPathAtWrite),codec.encodeToString(s.selection.facets)) }
         return rows.joinToString("\r\n",postfix = "\r\n") { row -> row.joinToString(",") { cell(it) } }
     }
 }

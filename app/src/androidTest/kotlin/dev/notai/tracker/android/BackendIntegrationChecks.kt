@@ -73,10 +73,14 @@ object BackendIntegrationChecks {
                 val destinationDb = TrackerDatabase.open(context,destinationName)
                 try {
                     val destination = Tracker(RoomStore(destinationDb),Clock { Moment(wall,elapsed,"qa-integration-boot") })
-                    val importer = SelectiveTransfer(destination);val plan = importer.plan(pkg,pkg.groups.map { it.id }.toSet())
-                    val applied = importer.apply(plan,"qa-catalog")
+                    var documents = SelectiveDocuments(context,destination)
+                    val input = documents.stage(codec.encodeToString(pkg).byteInputStream())
+                    val reviewed = documents.plan(input.id,input.revision,pkg.groups.map { it.id }.toSet())
+                    documents = SelectiveDocuments(context,destination) // saved file/review, no new engine or operation ID
+                    val applied = documents.apply(input.id,reviewed.draft.revision,reviewed.operationId)
                     check(applied.groups.all { it.state == TransferGroupState.APPLIED })
-                    check(importer.apply(plan,"qa-catalog") == applied)
+                    check(documents.apply(input.id,0,reviewed.operationId) == applied)
+                    check(PrivateFileMaintenance.forContext(context).state().lifetimes.none { it.id == input.id })
                     check(destination.data().types == tracker.data().types && destination.data().cards == tracker.data().cards)
                     check(destination.data().sessions.isEmpty())
                 } finally { destinationDb.close() }

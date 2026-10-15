@@ -9,6 +9,17 @@ class TrackerView internal constructor(private val checked: CheckedState,private
     fun choices(): ChoiceView = choiceView
     val data get() = checked.data
     fun snapshot(): Snapshot = checked.snapshot(clock.now())
+    fun scheduleOccurrences(first: java.time.LocalDate,last: java.time.LocalDate,deviceZone: java.time.ZoneId): List<ScheduleProjection> =
+        Schedules.project(data,first,last,java.time.Instant.ofEpochMilli(clock.now().wall),deviceZone)
+    fun scheduleDay(deviceZone: java.time.ZoneId): ScheduleDayView =
+        data.settings.schedule.resolveDay(java.time.Instant.ofEpochMilli(clock.now().wall),deviceZone)
+    /** One revision and ONE captured moment even when a civil boundary is crossed. */
+    fun scheduleState(deviceZone: java.time.ZoneId): ScheduleViewState {
+        val now = clock.now();validateMoment(now);val instant = java.time.Instant.ofEpochMilli(now.wall)
+        val day = data.settings.schedule.resolveDay(instant,deviceZone)
+        return ScheduleViewState(checked.snapshot(now).token,data.controlBarrier,now.wall,day,data.settings.schedule,data.settings.surfaces,deviceZone.id,
+            frozenList(Schedules.project(data,day.date.minusDays(7),day.date.plusDays(14),instant,deviceZone)),data.settings.schedule.nextDayBoundary(instant,deviceZone).toEpochMilli())
+    }
     fun goalProgress(id: String,date: java.time.LocalDate? = null): GoalProgress = Goals.progress(data,clock.now(),id,date)
     fun report(start: Long,end: Long,filter: Filter = Filter()): Report = checked.report(clock.now(),start,end,filter,data.settings.reportZone)
     fun calendar(first: java.time.LocalDate,days: Int,filter: Filter = Filter(),zone: String = data.settings.reportZone): CalendarHistory =

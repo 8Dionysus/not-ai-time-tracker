@@ -19,6 +19,17 @@ data class CopyRegistrationReport(val registeredIds: List<String>,val refused: L
  * A complete hardlink component is registered in one existing storage transaction.
  */
 class PrivateCopyCatalog(private val files: DescriptorCopyFiles,private val gate: CopyMaintenance) {
+    /** Read-only cutover witness. Includes refused/unregistered names; never seals,
+     * registers, releases a reference or resumes deletion. Unknown roots fail closed. */
+    fun candidateIds(): Set<String> = gate.locked {
+        val ids = gate.state().copies.map { it.item.id }.toMutableSet()
+        for(root in listOf("exports","rollback","database-archives","restore-inputs","forms")) {
+            val stat = files.inspect(root) ?: continue
+            ensure(stat.directory,"Legacy copy root is unsafe",ErrorCode.STORAGE)
+            files.children(root).forEach { ids += id("$root/$it") }
+        }
+        frozenSet(ids)
+    }
     private val storage = RegisteredCopyStorage(files,gate)
     private fun uuid(value: String) = ensure(value.matches(Regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")),"Invalid private operation ID")
     private fun id(path: String) = sha256(path.toByteArray(Charsets.UTF_8))

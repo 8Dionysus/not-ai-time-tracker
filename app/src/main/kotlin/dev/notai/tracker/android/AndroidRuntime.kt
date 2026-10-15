@@ -52,8 +52,13 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
         newInstallData(catalog)
     },allowInitialize = newStore,onLoadPhase = StartupTrace.loadObserver(context)),AndroidClock(context))
     private val rollback = PrivateRollbackStore(context)
-    val backups = Backups(tracker,rollback)
+    val backups = Backups(tracker,rollback,CopyLifetimes.get(context))
     val historyTransfer = HistoryTransfer(tracker,rollback)
+    val selectiveTransfer = SelectiveTransfer(tracker)
+    val selectiveDocuments = SelectiveDocuments(context.applicationContext,tracker,selectiveTransfer)
+    val schedule = ScheduleWorkspace(context.applicationContext,tracker)
+    val scheduleProjection = ScheduleProjectionRefresh(context.applicationContext,tracker,schedule)
+    val catalogContent by lazy { CatalogContentAdapter(context.applicationContext,readyCatalog) }
     val catalogImports = CatalogImports(tracker) { readyCatalog }
     /** Prepared vocabulary preview: no source parsing or research archiving on the phone. */
     fun prepareBundledCatalog(): CatalogPreview = catalogImports.prepare()
@@ -62,10 +67,27 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
     val scheduleDelivery = AndroidScheduleDelivery(context.applicationContext,tracker)
     private val surfaceScope = CoroutineScope(SupervisorJob()+Dispatchers.IO)
     internal val shortcuts = ShortcutCommands(tracker,surfaceScope)
+    private val platformContext = context.applicationContext
+    private val platformReceiver = object: android.content.BroadcastReceiver() {
+        override fun onReceive(context: Context,intent: android.content.Intent) { refreshExistingPlatform(context) }
+    }
+    private var platformRegistered = false
+    private fun platformChanges() {
+        val filter = android.content.IntentFilter().apply {
+            addAction(android.content.Intent.ACTION_DATE_CHANGED);addAction(android.content.Intent.ACTION_TIME_CHANGED);addAction(android.content.Intent.ACTION_TIMEZONE_CHANGED)
+            addAction(android.app.NotificationManager.ACTION_APP_BLOCK_STATE_CHANGED)
+            addAction(android.app.NotificationManager.ACTION_NOTIFICATION_CHANNEL_BLOCK_STATE_CHANGED)
+            addAction(android.app.NotificationManager.ACTION_NOTIFICATION_CHANNEL_GROUP_BLOCK_STATE_CHANGED)
+        }
+        if(android.os.Build.VERSION.SDK_INT >= 33) platformContext.registerReceiver(platformReceiver,filter,Context.RECEIVER_NOT_EXPORTED)
+        else platformContext.registerReceiver(platformReceiver,filter)
+        platformRegistered = true
+    }
+    private fun detachPlatform() { if(platformRegistered) { platformContext.unregisterReceiver(platformReceiver);platformRegistered = false } }
     init {
         StartupTrace.mark(context,"store-initialized")
         tracker.store.readChecked() // fail before publishing a runtime or starting observers
-        StartupTrace.mark(context,"history-graph-ready")
+        StartupTrace.mark(context,"history-graph-ready");platformChanges()
         surfaceScope.launch {
             var previous: SurfaceSettings? = null
             var previousSchedule: ScheduleDeliveryReport? = null
@@ -73,6 +95,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
                 if(e is CancellationException) throw e
                 android.util.Log.w("TimerSurfaces","Store observation unavailable; open recovery controls")
             }.collect { view ->
+                try { scheduleProjection.synchronize() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("ScheduleProjection","Projection refresh pending") }
                 try { TimerSurfaces.refresh(context,view,previous);FocusSignals.refresh(context,tracker) }
                 catch(e: Exception) { if(e is CancellationException) throw e; android.util.Log.w("TimerSurfaces","Surface refresh unavailable") }
                 previous = view.data.settings.surfaces
@@ -84,14 +107,23 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
             }
         }
     }
+    private fun refreshPlatform(focusContext: Context?) {
+        val actions = listOf<() -> Unit>({ if(focusContext != null) FocusSignals.refresh(focusContext,tracker) },{ scheduleProjection.synchronize();Unit },{ scheduleDelivery.synchronize();Unit })
+        for(action in actions) try { action() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("TrackerPlatform","Independent refresh pending; no facts changed") }
+    }
     companion object {
         @Volatile private var instance: TrackerRuntime? = null
         @Volatile private var recovering = false
+        internal fun refreshExistingPlatform(context: Context) {
+            val runtime = instance ?: return
+            runtime.surfaceScope.launch {
+                runtime.refreshPlatform(context.applicationContext)
+            }
+        }
         internal fun refreshExistingSchedule() {
             val runtime = instance ?: return
             runtime.surfaceScope.launch {
-                try { runtime.scheduleDelivery.synchronize() }
-                catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("ScheduleDelivery","Current schedule refresh unavailable") }
+                runtime.refreshPlatform(null)
             }
         }
         internal fun refreshExistingFocus(context: Context) {
@@ -117,7 +149,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
         } }
         internal fun beginRecovery() = synchronized(this) {
             ensure(!recovering,"Recovery already in progress",ErrorCode.STORAGE)
-            recovering = true;instance?.surfaceScope?.cancel();(instance?.tracker?.store as? RoomStore)?.retire();instance?.database?.close();instance = null
+            recovering = true;instance?.detachPlatform();instance?.surfaceScope?.cancel();(instance?.tracker?.store as? RoomStore)?.retire();instance?.database?.close();instance = null
         }
         internal fun endRecovery() = synchronized(this) { recovering = false }
     }

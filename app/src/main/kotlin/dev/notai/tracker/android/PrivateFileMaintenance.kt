@@ -8,7 +8,14 @@ import java.io.File
  * Context-bound sessions preserve the durable legacy witness until frontend lifecycle adoption. */
 object PrivateFileMaintenance {
     private val roots = mutableMapOf<String,CopyMaintenance>()
-    @Synchronized fun forContext(context: Context): CopyMaintenance = forRoot(context.noBackupFilesDir)
+    fun forContext(context: Context): CopyMaintenance = forRoot(context.noBackupFilesDir).also { gate ->
+        // Do not hold the roots-map monitor while acquiring the maintenance gate.
+        gate.locked {
+            if(gate.state().lifecycleVersion == 0) try { gate.adoptLifecycle(PrivateCopyBackend.legacyScope(context,gate)) }
+            catch(_: LinkageError) { legacy(gate) }
+            catch(_: Exception) { legacy(gate) }
+        }
+    }
     @Synchronized internal fun forRoot(root: File): CopyMaintenance = roots.getOrPut(root.absolutePath) {
         CopyMaintenance(metadata(File(root,"private-copy-maintenance.json")))
     }
@@ -27,6 +34,7 @@ object PrivateFileMaintenance {
     /** Existing File/preview APIs cannot prove Activity/ViewModel reference release. One durable
      * migration witness blocks cleanup until Opus connects every lifecycle and reviews its removal. */
     internal fun legacy(gate: CopyMaintenance) = gate.locked {
+        if(gate.state().lifecycleVersion == 1) return@locked
         if(gate.state().references.none { it.owner == "legacy-ui-lifecycle" })
             gate.acquire("legacy-ui-lifecycle",null,CopyBlocker.UNKNOWN_FILE_OR_STATE)
         Unit

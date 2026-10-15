@@ -22,6 +22,7 @@ internal fun trustedPrivateCopyRoot(uid: Int,gid: Int,mode: Int,appUid: Int): Bo
  * Opening a session never clears protective references or continues interrupted deletion.
  */
 object PrivateCopyBackend {
+    internal fun legacyScope(context: Context,gate: CopyMaintenance): Set<String> = root(context).use { PrivateCopyCatalog(it,gate).candidateIds() }
     /** Concrete backend binding, without a blanket feature switch. Every file/root/reference
      * check still applies; the legacy UI witness is preserved until its actual owner adopts it. */
     fun openSession(context: Context): PrivateCopySession {
@@ -63,7 +64,8 @@ object PrivateCopyBackend {
         catalog(context) { c ->
             val registered = if(register) c.registerLegacy(pending) { codec.decodeFromString<FormState>(it) } else null
             if(registered != null) releaseReady(gate,registered.registeredIds.toSet())
-            PrivateCopyBackendInspection(c.inventory(),registered,setOf("ANDROID_DESCRIPTOR_DEVICE_QA","FRONTEND_DURABLE_REFERENCE_ADOPTION"))
+            PrivateCopyBackendInspection(c.inventory(),registered,setOf("ANDROID_DESCRIPTOR_DEVICE_QA")+
+                if(gate.state().lifecycleVersion == 0) setOf("DURABLE_LIFECYCLE_CUTOVER_UNAVAILABLE") else emptySet())
         }
     } catch(_: LinkageError) { PrivateCopyBackendInspection(null,null,setOf("ANDROID_DESCRIPTOR_BINDING_UNAVAILABLE")) }
       catch(_: Exception) { PrivateCopyBackendInspection(null,null,setOf("PRIVATE_ROOT_OR_REGISTRY_UNAVAILABLE")) }

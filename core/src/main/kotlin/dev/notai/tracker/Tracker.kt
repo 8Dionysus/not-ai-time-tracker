@@ -172,7 +172,11 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun deleteSession(expected: Token,id: String) = mutate(expected,true) { d,_ -> deletedSession(d,id) }
     private fun deletedSession(d: Dataset,id: String): Dataset {
         ensure(d.sessions.any { it.id == id && it.status == SessionStatus.STOPPED } && d.focus?.sessionId != id,"Only completed sessions can be deleted")
-        ensure(d.schedule.links.none { it.sessionId == id },"Session is linked to a schedule occurrence")
+        d.schedule.links.firstOrNull { it.sessionId == id }?.let { link ->
+            throw CoreError(ErrorCode.INVALID_INPUT,"Session is linked to a schedule occurrence",reason = ErrorReason.SCHEDULE_LINKED_SESSION,
+                fieldPath = "session.id",arguments = mapOf("sessionId" to ErrorArgument.Identifier(id),
+                    "seriesId" to ErrorArgument.Identifier(link.key.seriesId),"originalDate" to ErrorArgument.Text(link.key.originalDate)))
+        }
         val segmentIds = d.segments.filter { it.sessionId == id }.map { it.id }.toSet()
         return d.copy(sessions = d.sessions.filterNot { it.id == id },segments = d.segments.filterNot { it.sessionId == id },
             measurements = d.measurements.filterNot { (it.scope == Scope.SESSION && it.targetId == id) || (it.scope == Scope.SEGMENT && it.targetId in segmentIds) },
@@ -296,6 +300,11 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun settings(expected: Token, settings: Settings) = mutate(expected) { d,_ -> d.copy(settings = settings) }
     fun configureSchedule(expected: Token,value: ScheduleSettings) = mutate(expected) { d,_ ->
         d.copy(settings = d.settings.copy(schedule = value.canonical()))
+    }
+    /** Apply only the requested preference against the checked live settings. No
+     * stale full Settings snapshot can be paired with a freshly read token. */
+    fun configureFocusSignal(expected: Token,enabled: Boolean) = mutate(expected) { d,_ ->
+        d.copy(settings = d.settings.copy(surfaces = d.settings.surfaces.copy(focusSignal = enabled)))
     }
     fun measure(expected: Token, measurement: Measurement) = mutate(expected, true) { d,_ ->
         d.copy(measurements = d.measurements.filterNot { it.id == measurement.id } + measurement)

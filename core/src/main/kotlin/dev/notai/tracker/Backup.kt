@@ -23,7 +23,18 @@ interface RollbackStore {
     }
     fun readSnapshot(reference: String): Backup = StreamingBackup.read { read(reference).byteInputStream(Charsets.UTF_8) }
 }
-class RestorePreview internal constructor(internal val backup: Backup,internal val expected: Token) {
+interface RestoreLease: AutoCloseable { fun <T> protecting(block: () -> T): T = block() }
+fun interface RestoreLifecycle {
+    fun acquire(sourceSha256: String): RestoreLease?
+    fun <T> reading(block: () -> T): T = block()
+}
+class RestorePreview internal constructor(internal val backup: Backup,internal val expected: Token,private val lease: RestoreLease? = null): AutoCloseable {
+    private var closed = false
+    @Synchronized internal fun <T> protecting(block: () -> T): T {
+        ensure(!closed,"Restore preview was closed",ErrorCode.STALE)
+        return lease?.protecting(block) ?: block()
+    }
+    @Synchronized override fun close() { if(!closed) { lease?.close();closed = true } }
     val settings get() = backup.data.settings
     /** Inspect incoming reminder choices without a second parse or authority to edit the restore. */
     val schedule: ScheduleData = backup.data.schedule.frozen()
@@ -44,7 +55,7 @@ class RestorePreview internal constructor(internal val backup: Backup,internal v
     val consequence = "Полная замена локальных записей, карточек, избранного, целей и настроек. Новые локальные данные будут удалены."
 }
 data class RestoreResult(val state: Snapshot,val rollbackReference: String)
-class Backups(private val tracker: Tracker,private val rollback: RollbackStore) {
+class Backups(private val tracker: Tracker,private val rollback: RollbackStore,private val lifecycle: RestoreLifecycle? = null) {
     /** Capture is fast and consistent. The caller writes returned bytes outside the DB transaction. */
     fun export(): String = storage {
         val captured = tracker.store.transaction { d -> d to (d to tracker.clock.now()) }
@@ -55,10 +66,15 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore) 
         val captured = tracker.store.transaction { d -> d to (d to tracker.clock.now()) }
         StreamingBackup.write(StreamingBackup.portable(captured.first,captured.second),output)
     }
-    fun prepare(json: String): RestorePreview = RestorePreview(decode(json),tracker.snapshot().token)
-    fun prepare(open: ()->InputStream): RestorePreview = RestorePreview(StreamingBackup.read(open),tracker.snapshot().token)
+    private fun <T> reading(block: () -> T): T = lifecycle?.reading(block) ?: block()
+    fun prepare(json: String): RestorePreview = reading { RestorePreview(decode(json),tracker.snapshot().token,lifecycle?.acquire(sha256(json.toByteArray(Charsets.UTF_8)))) }
+    fun prepare(open: ()->InputStream): RestorePreview = reading {
+        var hash: String? = null
+        val backup = StreamingBackup.readWithSource(open) { hash = it }
+        RestorePreview(backup,tracker.snapshot().token,lifecycle?.acquire(requireNotNull(hash)))
+    }
     /** Calling apply is explicit confirmation of a preview. Abandoning the preview has no effects. */
-    fun apply(preview: RestorePreview): RestoreResult = storage { rollback.protecting {
+    fun apply(preview: RestorePreview): RestoreResult = preview.protecting { storage { rollback.protecting {
         val old = tracker.data(); checkToken(old,preview.expected,tracker.clock.now())
         val rollbackBackup = StreamingBackup.portable(old,tracker.clock.now())
         val reference = rollback.saveSnapshot(rollbackBackup)
@@ -69,8 +85,8 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore) 
             val imported = restoredData(preview.backup,Math.addExact(live.revision,1))
             imported to snapshot(imported,tracker.clock.now())
         }
-        RestoreResult(state,reference)
-    } }
+        preview.close();RestoreResult(state,reference)
+    } } }
     companion object {
         fun restoredData(backup: Backup,revision: Long): Dataset {
             StreamingBackup.validateBackup(backup)

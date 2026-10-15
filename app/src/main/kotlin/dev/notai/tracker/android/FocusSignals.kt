@@ -68,11 +68,13 @@ object FocusSignals {
         if(focus?.mode != FocusMode.DUE) {
             c.getSystemService(NotificationManager::class.java).cancel(NOTICE);return FocusDeliveryResult(FocusDeliveryStatus.NOT_DUE,focus)
         }
-        if(!view.data.settings.surfaces.focusSignal || !allowed(c)) {
-            c.getSystemService(NotificationManager::class.java).cancel(NOTICE);return FocusDeliveryResult(FocusDeliveryStatus.BLOCKED_BEFORE_POST,focus)
-        }
+        val permitted = view.data.settings.surfaces.focusSignal && allowed(c)
+        if(!permitted) c.getSystemService(NotificationManager::class.java).cancel(NOTICE)
         if(focus.signalKey?.let { it in preferences(c).getStringSet("delivered",emptySet()).orEmpty() } == true)
             return FocusDeliveryResult(FocusDeliveryStatus.PREVIOUS_RECEIPT,focus)
+        if(!permitted) {
+            c.getSystemService(NotificationManager::class.java).cancel(NOTICE);return FocusDeliveryResult(FocusDeliveryStatus.BLOCKED_BEFORE_POST,focus)
+        }
         return FocusDeliveryResult(if(deliverCurrent(c,focus)) FocusDeliveryStatus.POST_ACCEPTED else FocusDeliveryStatus.OUTCOME_UNKNOWN,focus)
     }
     private fun deliverCurrent(c: Context,focus: FocusSnapshot): Boolean {
@@ -89,7 +91,7 @@ object FocusSignals {
                 .setContentIntent(TimerSurfaces.open(c)).setAutoCancel(true).setVisibility(Notification.VISIBILITY_PRIVATE).build()
             c.getSystemService(NotificationManager::class.java).notify(NOTICE,notification)
             return true
-        } catch(_: RuntimeException) { prefs.edit().putStringSet("delivered",delivered).commit();return false }
+        } catch(_: RuntimeException) { return false } // Keep the durable attempt: notify may already have had an effect.
     }
 }
 class FocusAlarmReceiver: BroadcastReceiver() {
@@ -100,7 +102,7 @@ class FocusAlarmReceiver: BroadcastReceiver() {
             try {
                 val runtime = TrackerRuntime.get(context);val view = runtime.tracker.view();val focus = view.snapshot().focus
                 if(!view.data.settings.surfaces.focusSignal || focus?.id != id || focus.phaseIndex != index) return@launch
-                if(focus.mode == FocusMode.DUE) FocusSignals.deliver(context,runtime.tracker) else FocusSignals.refresh(context,runtime.tracker)
+                if(focus.mode == FocusMode.DUE) FocusSignals.deliverResult(context,runtime.tracker) else FocusSignals.refresh(context,runtime.tracker)
             } catch(_: Exception) { android.util.Log.w("FocusSignals","Signal unavailable; phase/history unchanged") }
             finally { pending.finish() }
         }

@@ -25,6 +25,14 @@ internal object DirectoryDurability {
     try { android.system.Os.fsync(fd) } finally { android.system.Os.close(fd) }
     }
 }
+/** Known private child only; never follow a pre-existing symlink directory. */
+internal fun privateCopyDirectory(context: Context,name: String): File {
+    require(name.matches(Regex("[a-z-]+")))
+    val directory = File(context.noBackupFilesDir,name)
+    try { java.nio.file.Files.createDirectory(directory.toPath()) } catch(_: java.nio.file.FileAlreadyExistsException) { /* Validate the winning directory below. */ }
+    ensure(java.nio.file.Files.isDirectory(directory.toPath(),java.nio.file.LinkOption.NOFOLLOW_LINKS),"Private copy directory is unsafe",ErrorCode.STORAGE)
+    return directory
+}
 internal fun syncDirectory(directory: File) = DirectoryDurability.sync(directory)
 internal fun atomicText(file: File,text: String) {
     atomicBytes(file,text.toByteArray(Charsets.UTF_8))
@@ -107,26 +115,38 @@ class ExportOperations(private val context: Context) {
 
 @Serializable internal data class FormState(val selectedCardId: String? = null,val name: String = "",val details: String = "",
     val note: String = "",val start: String = "",val end: String = "",val zone: String = "",val source: String? = null,
-    val sourceReference: String? = null,val pendingText: String? = null)
+    val sourceReference: String? = null,val pendingText: String? = null,
+    val csvMapping: CsvMapping? = null,val csvSourceSha256: String? = null,val csvUseCard: Boolean = false,
+    val backendRevision: Long = 0,val scheduleCommand: ScheduleCommandDraft? = null,val selectiveDocument: SelectiveDocumentDraft? = null)
 internal class FormFiles(private val context: Context) {
-    private val directory = File(context.noBackupFilesDir,"forms").apply { mkdirs() }
-    fun save(id: String?,state: FormState): String = PrivateFileMaintenance.writing(context,"form-save",CopyBlocker.LIVE_FORM_REFERENCE) { saveUnsafe(id,state) }
+    private val lifecycle = CopyLifetimes.get(context)
+    private val actor = lifecycle.callingOwner() // captured when the Activity creates its backend form handle
+    private val directory = privateCopyDirectory(context,"forms")
+    fun save(id: String?,state: FormState): String {
+        val reference = id ?: newId();lifecycle.unclaimedForm(reference,actor)
+        val gate = PrivateFileMaintenance.forContext(context);val item = PrivateCopyBackend.itemId("forms/$reference.json")
+        return gate.locked {
+            val prior = gate.state().references.filter { it.owner == "form-save:$reference" && it.itemId == item && it.blocker == CopyBlocker.LIVE_FORM_REFERENCE }
+            gate.writing("form-save:$reference",item,CopyBlocker.LIVE_FORM_REFERENCE) {
+                saveUnsafe(reference,state).also { prior.forEach(gate::release) }
+            }
+        }
+    }
     private fun saveUnsafe(id: String?,state: FormState): String {
         val reference = id ?: newId();require(reference.matches(Regex("[0-9a-f-]{36}")))
+        val text = codec.encodeToString(state);CopyMetadataBytes.check(text)
         PrivateFileMaintenance.invalidate(context,"forms/$reference.json")
-        atomicText(File(directory,"$reference.json"),codec.encodeToString(state))
+        atomicText(File(directory,"$reference.json"),text)
+        ensure(PrivateFileMaintenance.metadata(File(directory,"$reference.json")).read() == text,"Form readback failed",ErrorCode.STORAGE)
         PrivateCopyBackend.registerForm(context,reference);return reference
     }
-    fun read(id: String): FormState {
-        require(id.matches(Regex("[0-9a-f-]{36}")));return codec.decodeFromString(File(directory,"$id.json").readText())
+    fun read(id: String,claimUnowned: Boolean = true): FormState {
+        require(id.matches(Regex("[0-9a-f-]{36}")))
+        if(claimUnowned) lifecycle.unclaimedForm(id,actor)
+        return codec.decodeFromString(PrivateFileMaintenance.metadata(File(directory,"$id.json")).read() ?: fail(ErrorCode.STORAGE,"Form missing"))
     }
+    fun ids(): List<String> = directory.listFiles().orEmpty().filter { it.name.matches(Regex("[0-9a-f-]{36}\\.json")) &&
+        java.nio.file.Files.isRegularFile(it.toPath(),java.nio.file.LinkOption.NOFOLLOW_LINKS) }.map { it.name.removeSuffix(".json") }
 }
 
-internal fun stageRestore(context: Context,input: InputStream): File = PrivateFileMaintenance.writing(context,"restore-input-stage",CopyBlocker.RESTORE_SOURCE_IN_USE) { stageRestoreUnsafe(context,input) }
-private fun stageRestoreUnsafe(context: Context,input: InputStream): File {
-    val directory = File(context.noBackupFilesDir,"restore-inputs").apply { mkdirs() }
-    val file = File(directory,"${newId()}.json")
-    FileOutputStream(file).use { out -> input.copyTo(out,64*1024);out.fd.sync() };syncDirectory(directory)
-    PrivateCopyBackend.registerRestoreInput(context,file.name)
-    return file // keep source even after a refusal; never overwrite a user's original
-}
+internal fun stageRestore(context: Context,input: InputStream): File = CopyLifetimes.get(context).stage(input)

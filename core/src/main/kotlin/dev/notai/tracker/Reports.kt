@@ -19,7 +19,8 @@ data class ReportRow(val segmentId: String, val sessionId: String, val start: Lo
 data class QuantityKey(val fieldId: String,val meaningVersion: Int,val unit: String,val scope: Scope)
 data class Report(val start: Long, val end: Long, val asOf: Long, val zone: String,
     val rows: List<ReportRow>, val unresolved: List<Segment>, val measurements: List<Measurement>,
-    val recordedMs: Long, val calendarDays: Long, val recordedDays: Set<LocalDate>, val incomplete: Boolean, val metricDefinitions: List<Metric> = emptyList()) {
+    val recordedMs: Long, val calendarDays: Long, val recordedDays: Set<LocalDate>, val incomplete: Boolean, val metricDefinitions: List<Metric> = emptyList(),
+    val unresolvedSessionNotes: Map<String,String?> = emptyMap()) {
     /** Whole-target quantities, not apportioned to this report window. Scope stays separate. */
     fun quantityTotals(): Map<QuantityKey,Decimal> = measurements.distinctBy { it.id }.filter { m ->
         metricDefinitions.find { it.id == m.fieldId && it.meaningVersion == m.meaningVersion }?.aggregation != Aggregation.BY_TARGET
@@ -68,7 +69,8 @@ object Reports {
         return Report(start,end,now.wall,zone,frozenList(rows.map { it.copy(selection = it.selection.frozen()) }),
             frozenList(observed.filter { it.uncertain }.map { it.copy(selection = it.selection.frozen()) }),frozenList(measurements),
             rows.sumExact { it.durationMs },java.time.temporal.ChronoUnit.DAYS.between(first,last)+1,frozenSet(days),end > now.wall,
-            frozenList(d.metrics.map { it.copy(scopes = frozenSet(it.scopes),researchOrigins = frozenList(it.researchOrigins)) }))
+            frozenList(d.metrics.map { it.copy(scopes = frozenSet(it.scopes),researchOrigins = frozenList(it.researchOrigins)) }),
+            frozenMap(observed.filter { it.uncertain }.associate { it.sessionId to notes[it.sessionId] }))
     }
     private fun windowRows(observed: List<Segment>,now: Moment,start: Long,end: Long,notes: Map<String,String?>): List<ReportRow> =
         observed.filterNot { it.uncertain }.mapNotNull { s ->
@@ -189,6 +191,8 @@ object Csv {
             codec.encodeToString(r.selection.tags),r.note ?: "","","","","","",report.zone,codec.encodeToString(r.selection.ancestorPathAtWrite),codec.encodeToString(r.selection.facets))) }
         report.measurements.forEach { m -> row(listOf("measurement",m.id,m.targetId,"","","","","","","","","",m.fieldId,m.meaningVersion.toString(),m.unit,m.value.toString(),m.scope.name,report.zone,"","")) }
         // Explicitly expose excluded uncertain data without inventing period attribution or adding it to totals.
-        report.unresolved.forEach { s -> row(listOf("unresolved",s.id,s.sessionId,"","","","",s.selection.name ?: "","","","","","","","","","",report.zone,codec.encodeToString(s.selection.ancestorPathAtWrite),codec.encodeToString(s.selection.facets))) }
+        report.unresolved.forEach { s -> row(listOf("unresolved",s.id,s.sessionId,"","","",s.selection.cardId ?: "",s.selection.name ?: "",s.selection.activityTypeId ?: "",
+            codec.encodeToString(s.selection.details),codec.encodeToString(s.selection.tags),report.unresolvedSessionNotes[s.sessionId] ?: "","","","","","",report.zone,
+            codec.encodeToString(s.selection.ancestorPathAtWrite),codec.encodeToString(s.selection.facets))) }
     }
 }

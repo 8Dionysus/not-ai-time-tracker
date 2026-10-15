@@ -3,7 +3,7 @@ import java.security.MessageDigest
 plugins { id("com.android.application"); kotlin("android"); kotlin("plugin.serialization"); kotlin("plugin.compose"); id("com.google.devtools.ksp") }
 // Package the prepared vocabulary, never source research or preparation readers.
 val bundledCatalogAssets = tasks.register<Sync>("bundleCatalogAssets") {
-    from(rootProject.file("catalog")) { include("manifest.json", "runtime-catalog.json", "compatibility.json"); into("catalog") }
+    from(rootProject.file("catalog")) { include("manifest.json", "runtime-catalog.json", "compatibility.json", "locales/**"); into("catalog") }
     into(layout.buildDirectory.dir("generated/catalogAssets"))
 }
 android {

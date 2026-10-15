@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "quality": "DRAFT",
+  "editorialStatus": "source wording only; not native-speaker QA or Android resources",
+  "resourceKey": "tracker.error.schedule_linked_session",
+  "code": "INVALID_INPUT",
+  "reason": "SCHEDULE_LINKED_SESSION",
+  "fieldPath": "session.id",
+  "arguments": {"sessionId": "Identifier", "seriesId": "Identifier", "originalDate": "Text"},
+  "ru": "Запись связана с запланированным занятием на {originalDate}. Удаление пока недоступно: связь и подтверждение запуска должны сохраниться.",
+  "en": "This entry is linked to a planned occurrence on {originalDate}. Deletion is unavailable while its link and start receipt must be preserved."
+}

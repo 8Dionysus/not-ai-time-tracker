@@ -11,8 +11,8 @@ const val MAX_CSV_BYTES = 10*1024*1024
 @Serializable data class ImportOrigin(val namespace: String,val recordKey: String,val rowHash: String,
     val fileHash: String,val zone: String,val fields: Map<String,String>)
 data class SourceActivity(val activity: String,val category: String)
-enum class DurationFormat { HMS, DECIMAL_HOURS, SECONDS, MILLISECONDS }
-data class CsvMapping(val namespace: String,val activity: String,val start: String,
+@Serializable enum class DurationFormat { HMS, DECIMAL_HOURS, SECONDS, MILLISECONDS }
+@Serializable data class CsvMapping(val namespace: String,val activity: String,val start: String,
     val end: String? = null,val duration: String? = null,val durationFormat: DurationFormat = DurationFormat.HMS,
     val category: String? = null,val note: String? = null,val id: String? = null,
     val startTime: String? = null,val endTime: String? = null,

@@ -32,6 +32,41 @@ class LocaleContractTest {
         assertEquals(before,tracker.data());assertEquals(token,tracker.snapshot().token)
         assertEquals(Backups.decode(archive).data,Backups.decode(Backups(tracker,MemoryRollback()).export()).data)
     }
+    @Test fun sidecarCoverageParentIdentityAndBatchFallbackPreserveOriginals() {
+        val vocabulary = VocabularyData(types = listOf(ActivityType("preset","Оригинал",aliases = listOf("Исходный alias"),definition = "Исходное описание")),
+            axes = listOf(Axis("first-axis","Первая",valueKind = ValueKind.LOCAL_CHOICE,values = listOf(AxisValue("same","Один"))),
+                Axis("second-axis","Вторая",valueKind = ValueKind.LOCAL_CHOICE,values = listOf(AxisValue("same","Другой")))),metrics = emptyList(),units = emptyList())
+        val source = codec.encodeToString(vocabulary).toByteArray()
+        val manifest = CatalogPackageManifest(1,"fixture","runtime-catalog.json",source.size,sha256(source))
+        val catalog = ReadyCatalog.read { name -> if(name == "manifest.json") codec.encodeToString(manifest).byteInputStream() else source.inputStream() }
+        val packs = CatalogContentPacks("fixture",catalog);val original = packs.sourceEntries()
+        val values = original.filter { it.key.kind == CatalogContentKind.VALUE }
+        assertEquals(2,values.size);assertEquals(1,values.map { it.key.stableId }.distinct().size)
+        assertEquals(2,values.map { it.key.parentId }.distinct().size)
+        val translated = original.mapIndexed { i,row -> row.copy(text = CatalogPresentation("Fixture $i",if(row.text.aliases.isEmpty()) emptyList() else listOf("Fixture alias"),if(row.text.description.isEmpty()) "" else "Fixture description")) }
+        fun install(rows: List<CatalogContentRow>,quality: TranslationQuality,complete: Boolean = true,tag: String = "es") {
+            val payload = codec.encodeToString(CatalogContentPayload(entries = rows)).toByteArray()
+            val m = CatalogContentManifest(catalogId = "fixture",catalogRevision = "fixture",catalogSha256 = manifest.sha256,
+                localeTag = tag,sourceLocaleTag = "ru",release = "synthetic fixture only",quality = quality,complete = complete,
+                fallbackTags = localeFallbacks(tag).drop(1),authority = "fixture",license = "Apache-2.0",translator = "fixture",editor = "fixture",
+                payload = CatalogContentFile("labels.json",payload.size,sha256(payload)))
+            packs.load { name -> if(name == "manifest.json") codec.encodeToString(m).byteInputStream() else payload.inputStream() }
+        }
+        install(translated,TranslationQuality.DRAFT)
+        assertTrue(packs.installedReviewedLocales().isEmpty())
+        assertTrue(packs.getLocalizedCatalogEntries("fixture",original.map { it.key },"es-MX").all { it.missing && it.quality == TranslationQuality.DRAFT && it.availability == PackAvailability.AVAILABLE_OFFLINE })
+        assertFailsWith<CoreError> { install(translated.dropLast(1),TranslationQuality.REVIEWED) }
+        install(translated,TranslationQuality.REVIEWED)
+        val found = packs.getLocalizedCatalogEntries("fixture",values.map { it.key },"es-MX")
+        assertEquals(2,found.map { it.display.label }.distinct().size);assertTrue(found.all { it.resolvedLocaleTag == "es" && !it.missing })
+        val own = CatalogPresentation("Personal original",listOf("Personal alias"),"Personal definition")
+        val shown = packs.getLocalizedCatalogEntries("fixture",listOf(original.first().key),"es",mapOf(original.first().key to own)).single()
+        assertTrue(shown.userOverride);assertEquals(own,shown.display);assertEquals(original.first().text,shown.original)
+        assertTrue(packs.getLocalizedCatalogEntries("fixture",values.map { it.key },"zh-Hant").all { it.missing && it.resolvedLocaleTag == "ru" })
+        assertEquals(original,packs.sourceEntries())
+        assertFailsWith<CoreError> { packs.getLocalizedCatalogEntries("fixture",listOf(values.first().key.copy(parentId = null)),"es") }
+        assertEquals(setOf("es"),packs.installedReviewedLocales())
+    }
     @Test fun qualityAvailabilityScriptsAndOverridesStayIndependent() {
         val key = CatalogLabelKey("catalog","activity",1,"es")
         val reviewed = CatalogTranslation(key,"Actividad",quality = TranslationQuality.REVIEWED,availability = PackAvailability.AVAILABLE_OFFLINE,

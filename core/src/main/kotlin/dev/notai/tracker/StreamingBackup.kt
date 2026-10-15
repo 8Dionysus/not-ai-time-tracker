@@ -53,7 +53,8 @@ object StreamingBackup {
         rows("measurements",d.measurements) { codec.encodeToString(it) };rows("goals",d.goals) { codec.encodeToString(it) }
         writer.write("}}");writer.flush() // caller owns the stream and durability
     }
-    fun read(open: ()->InputStream): Backup = try {
+    fun read(open: ()->InputStream): Backup = readWithSource(open) { }
+    fun readWithSource(open: ()->InputStream,onVerifiedSource: (String)->Unit): Backup = try {
         var version: Int? = null;var id: String? = null;var asOf: Long? = null;var hasData = false
         val firstDigest = MessageDigest.getInstance("SHA-256")
         reader(DigestInputStream(open(),firstDigest)).use { input ->
@@ -109,7 +110,8 @@ object StreamingBackup {
                 }
             } };json.finish()
         }
-        ensure(firstDigest.digest().contentEquals(secondDigest.digest()),"Backup changed while reading",ErrorCode.UNSUPPORTED_IMPORT)
+        val sourceHash = firstDigest.digest()
+        ensure(sourceHash.contentEquals(secondDigest.digest()),"Backup changed while reading",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(seen.containsAll(listOf("datasetId","revision","settings","types","cards","favorites","sessions","segments","measurements")),"Missing dataset fields",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(if(format == 1) seen.none { it in setOf("axes","metrics","units") } else seen.containsAll(listOf("axes","metrics","units")),"Missing or incompatible dictionary fields",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format < 6 || "goals" in seen,"Missing goals",ErrorCode.UNSUPPORTED_IMPORT)
@@ -121,7 +123,9 @@ object StreamingBackup {
         ensure(format >= 9 || !data.transfer.hasCompactionState(),"Compaction in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format >= 10 || (data.settings.schedule == ScheduleSettings() && !data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format >= 11 || data.settings.surfaces.shortcut,"Shortcut preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
-        Backup(formatVersion = 11,backupId = id!!,asOf = asOf!!,data = data.frozen()).also(::validateBackup)
+        Backup(formatVersion = 11,backupId = id!!,asOf = asOf!!,data = data.frozen()).also {
+            validateBackup(it);onVerifiedSource(sourceHash.joinToString("") { byte -> (byte.toInt() and 255).toString(16).padStart(2,'0') })
+        }
     } catch(e: CoreError) { if(e.code == ErrorCode.UNSUPPORTED_IMPORT) throw e else fail(ErrorCode.UNSUPPORTED_IMPORT,"Invalid backup: ${e.message}") }
       catch(_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed or unreadable backup") }
     private fun reader(input: InputStream): Reader = InputStreamReader(input,Charsets.UTF_8.newDecoder()

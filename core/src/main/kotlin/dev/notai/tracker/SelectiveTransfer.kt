@@ -51,6 +51,8 @@ class TransferPlan internal constructor(internal val owner: Tracker,internal val
     val groups get() = packageValue.groups
     val losses get() = packageValue.losses
     val baseRevision get() = expected.revision
+    val baseToken get() = expected
+    val operationHash get() = payloadHash(packageValue)+payloadHash<Map<String,TransferConflictPolicy>>(policies)
 }
 /** Tracker-specific transfer, alongside explicit replacement JSON and the existing CSV append. */
 class SelectiveTransfer(private val tracker: Tracker) {
@@ -170,10 +172,13 @@ class SelectiveTransfer(private val tracker: Tracker) {
         return TransferPlan(tracker,selected,token(d),frozenMap(policies),frozenList(conflicts))
     }
     fun preview(plan: TransferPlan): TransferPlan { ensure(plan.owner === tracker,"Wrong transfer owner");checkToken(tracker.data(),plan.expected,tracker.clock.now());return plan }
+    /** Recreate the exact reviewed base after process death, never silently rebase it. */
+    fun reopenPlan(value: SelectivePackage,groupIds: Set<String>,policies: Map<String,TransferConflictPolicy>,expected: Token): TransferPlan =
+        plan(value,groupIds,policies).also { ensure(it.baseToken == expected,"Reviewed transfer base changed",ErrorCode.STALE) }
     fun apply(plan: TransferPlan,operationId: String): TransferOperation = storage { applyInternal(plan,operationId) }
     private fun applyInternal(plan: TransferPlan,operationId: String): TransferOperation {
         ensure(plan.owner === tracker && operationId.isNotBlank(),"Invalid transfer plan")
-        val hash = payloadHash(plan.packageValue)+payloadHash<Map<String,TransferConflictPolicy>>(plan.policies)
+        val hash = plan.operationHash
         tracker.store.transaction { d ->
             val existing = d.transfer.operations.find { it.id == operationId }
             if(existing != null) { ensureReason(existing.hash == hash,ErrorReason.IDEMPOTENCY_CONFLICT,ErrorCode.STALE,mapOf("operationId" to ErrorArgument.Identifier(operationId)));return@transaction d to existing }

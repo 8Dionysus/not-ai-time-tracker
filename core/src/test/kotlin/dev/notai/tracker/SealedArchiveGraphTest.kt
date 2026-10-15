@@ -38,7 +38,7 @@ class SealedArchiveGraphTest {
     @Test fun nestedGraphReopensAndUnlinksOnlySelectedAliases() = fixture { root,files,gate,storage ->
         val batch = archives(root);storage.sealArchiveGraph(batch)
         val fresh = RegisteredCopyStorage(files,CopyMaintenance(files.metadata()))
-        assertEquals(2,gate.state().format);assertTrue(fresh.inventory().items.all { it.selectable })
+        assertEquals(3,gate.state().format);assertTrue(fresh.inventory().items.all { it.selectable })
         val one = fresh.archiveGraph(setOf("a"));val both = fresh.archiveGraph(setOf("a","b"))
         assertEquals(setOf("a","b"),one.componentIds);assertEquals(3,both.nodes.single { it.aliases.size > 1 }.aliases.size)
         assertEquals(batch.first().item.bytes,one.logicalSelectedBytes)
@@ -153,9 +153,19 @@ class SealedArchiveGraphTest {
     @Test fun v1MetadataMigratesWithoutChangingFlatOwnershipOrWritingOnRead() = fixture { _,files,_,_ ->
         val metadata = files.metadata();val legacy = """{"format":1,"revision":7,"references":[],"copies":[],"journals":[]}"""
         metadata.writeDurably(legacy);val gate = CopyMaintenance(metadata)
-        assertEquals(2,gate.state().format);assertEquals(7,gate.state().revision);assertEquals(legacy,metadata.read())
+        assertEquals(3,gate.state().format);assertEquals(7,gate.state().revision);assertEquals(legacy,metadata.read())
         gate.acquire("fixture",null,CopyBlocker.UNKNOWN_FILE_OR_STATE)
-        assertEquals(8,gate.state().revision);assertEquals(2,codec.decodeFromString<CopyMaintenanceState>(metadata.read()!!).format)
+        assertEquals(8,gate.state().revision);assertEquals(3,codec.decodeFromString<CopyMaintenanceState>(metadata.read()!!).format)
+        val old = gate.state().references.single()
+        gate.adoptLifecycle(setOf("legacy-copy"))
+        val preserved = gate.state().references.single()
+        assertEquals(old.token,preserved.token);assertEquals(old.owner,preserved.owner)
+        assertEquals(setOf("legacy-copy"),preserved.scopeItemIds)
+        assertTrue(preserved.protects("legacy-copy"));assertFalse(preserved.protects("new-copy"))
+        val owner = newId();val own = gate.retainLifetime(owner,"form","new-copy",CopyBlocker.LIVE_FORM_REFERENCE)
+        gate.finishLifetime(owner,setOf(own.token));assertTrue(own in gate.state().references)
+        gate.release(own);gate.finishLifetime(owner)
+        assertEquals(listOf(preserved),gate.state().references)
     }
     @Test fun duplicateMemberIdentityOrPathRejectsBeforeAuthority() = fixture { root,_,gate,storage ->
         val dir = File(root,"exports/duplicate").apply { mkdirs() };val file = File(dir,"data").apply { writeText("fixture") }

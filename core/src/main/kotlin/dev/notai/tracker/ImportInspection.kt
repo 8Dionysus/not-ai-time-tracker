@@ -12,6 +12,7 @@ data class CsvTimeChoice(val localPattern: String?,val zone: String)
 
 class ImportInspection internal constructor(private val text: String,val format: ImportFormat,
     candidates: List<ColumnInspection>,warnings: List<String>,problems: List<String>,issues: List<ImportIssue> = emptyList()) {
+    val sourceSha256: String = sha256(text.toByteArray(Charsets.UTF_8))
     val issues = frozenList(issues.map { it.frozenIssue() })
     val errorIssues get() = frozenList(issues.filter { it.severity == ImportIssueSeverity.ERROR })
     val warningIssues get() = frozenList(issues.filter { it.severity == ImportIssueSeverity.WARNING })

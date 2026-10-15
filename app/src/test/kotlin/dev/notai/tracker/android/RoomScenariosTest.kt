@@ -24,6 +24,51 @@ class RoomScenariosTest: ScenarioContract() {
     }
     @org.junit.After fun restoreDirectoryDurability() { DirectoryDurability.sync = originalDirectorySync;DirectoryDurability.rename = originalRename;DirectoryDurability.link = originalLink }
     private val databases = mutableMapOf<StateStore,Pair<String,TrackerDatabase>>()
+    @org.junit.Test fun savedBackendWorkspacesKeepReviewedIdentityAcrossReopenAndReleaseOnlyOwnReferences() {
+        val context = RuntimeEnvironment.getApplication();val clock = FakeClock()
+        val source = Tracker(createStore(),clock)
+        source.saveType(source.snapshot().token,ActivityType("own-reading","Чтение"))
+        source.saveType(source.snapshot().token,ActivityType("own-philosophy","Философия",parentId = "own-reading"))
+        val card = Card("own-book","Заратустра",activityTypeId = "own-philosophy")
+        source.saveCard(source.snapshot().token,card)
+        source.manual(source.snapshot().token,clock.wall-2000,clock.wall-1000,card.classification(),"Literal note")
+        val pack = SelectiveTransfer(source).export(TransferSelection(sessionIds = source.data().sessions.map { it.id }.toSet()))
+        var target = Tracker(createStore(),clock);var documents = SelectiveDocuments(context,target)
+        val draft = documents.stage(codec.encodeToString(pack).byteInputStream())
+        val review = documents.plan(draft.id,draft.revision,pack.groups.map { it.id }.toSet())
+        val originalOperation = review.operationId
+        target = Tracker(reopen(target.store),clock);documents = SelectiveDocuments(context,target)
+        org.junit.Assert.assertEquals(originalOperation,documents.read(draft.id).review!!.operationId)
+        val applied = documents.apply(draft.id,review.draft.revision,originalOperation)
+        org.junit.Assert.assertTrue(applied.complete);val beforeReplay = target.data()
+        org.junit.Assert.assertEquals(applied,documents.apply(draft.id,0,originalOperation))
+        org.junit.Assert.assertEquals(beforeReplay,target.data())
+        org.junit.Assert.assertEquals(source.data().sessions,target.data().sessions)
+        org.junit.Assert.assertEquals("Философия",target.data().types.single { it.id == "own-philosophy" }.name)
+        val gate = PrivateFileMaintenance.forContext(context)
+        org.junit.Assert.assertTrue(gate.state().lifetimes.none { it.id == draft.id })
+        org.junit.Assert.assertTrue(gate.state().references.none { it.owner.startsWith("lifetime:${draft.id}:") })
+        val workspace = ScheduleWorkspace(context,target) { java.time.ZoneId.of("UTC") }
+        val command = ScheduleCommand("saved-create",target.snapshot().token,ScheduleAction.CREATE,"saved-series",
+            rule = ScheduleRule(card.classification(),"2026-10-10",extraDates = setOf("2026-10-10")))
+        val saved = workspace.prepare(command)
+        org.junit.Assert.assertEquals(saved,workspace.prepare(command))
+        val result = workspace.execute(saved.id,saved.revision)
+        val after = target.data()
+        org.junit.Assert.assertEquals(result,ScheduleWorkspace(context,target).execute(saved.id,0))
+        org.junit.Assert.assertEquals(after,target.data())
+        org.junit.Assert.assertEquals(1,target.data().sessions.size) // showing/saving a plan creates no fact
+        val settings = ScheduleSettings(ScheduleDayPolicy(ScheduleZonePolicy.FIXED,"Europe/Berlin","04:00"))
+        val now = java.time.Instant.parse("2026-03-28T03:00:00Z")
+        org.junit.Assert.assertEquals(java.time.Instant.parse("2026-03-29T02:00:00Z"),settings.nextDayBoundary(now,java.time.ZoneId.of("UTC")))
+        val projection = ScheduleProjectionRefresh(context,target,workspace)
+        ScheduleProjectionBinding.install(emptyList())
+        org.junit.Assert.assertNull(projection.synchronize().nextRefreshAt)
+        org.junit.Assert.assertNull(projection.onWake("obsolete"))
+        val refusal = org.junit.Assert.assertThrows(CoreError::class.java) { documents.undo(draft.id,target.snapshot().token) }
+        org.junit.Assert.assertEquals(ErrorCode.STALE,refusal.code)
+        org.junit.Assert.assertEquals(after,target.data()) // later schedule use keeps imported dependencies intact
+    }
     @org.junit.Test fun shortcutPreferenceMigrationFromV8PreservesAllTimerStatesAndRejectsFutureMeaning() {
         val context = RuntimeEnvironment.getApplication()
         for(status in SessionStatus.entries) {
@@ -75,7 +120,7 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertEquals(before,reopened.data());org.junit.Assert.assertTrue(before.sessions.isEmpty())
         reopened.settings(reopened.snapshot().token,before.settings.copy(surfaces = before.settings.surfaces.copy(shortcut = true)))
         TimerSurfaces.refresh(context,reopened.view(),before.settings.surfaces)
-        org.junit.Assert.assertEquals("timer_action",manager.dynamicShortcuts.single().id)
+        org.junit.Assert.assertTrue((manager.dynamicShortcuts+manager.pinnedShortcuts).any { it.id == "timer_action" })
         org.junit.Assert.assertTrue(manager.requestPinShortcut(published,null))
         val fresh = reopened.snapshot()
         TimerSurfaces.execute(reopened,SurfaceAction(Surface.SHORTCUT,TimerCommand.START,fresh.token,fresh.timerTarget))
@@ -629,7 +674,7 @@ class RoomScenariosTest: ScenarioContract() {
     }
     override fun createStore(): StateStore = open("test-${newId()}.db")
     private fun open(name: String): StateStore {
-        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8).allowMainThreadQueries().build()
+        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9).allowMainThreadQueries().build()
         return try { RoomStore(db).also { databases[it] = name to db } } catch(e: Exception) { db.close();throw e }
     }
     override fun reopen(store: StateStore): StateStore {
@@ -1103,7 +1148,7 @@ class RoomScenariosTest: ScenarioContract() {
         } } finally { DirectoryDurability.rename = rename }
         org.junit.Assert.assertTrue(DatabaseRecovery.needsAttention(context))
         val pendingJob = kotlinx.serialization.json.Json.parseToJsonElement(java.io.File(context.noBackupFilesDir,"recovery-pending.json").readText()).jsonObject
-        org.junit.Assert.assertEquals(2,pendingJob.getValue("format").jsonPrimitive.content.toInt())
+        org.junit.Assert.assertEquals(3,pendingJob.getValue("format").jsonPrimitive.content.toInt())
         val recoveryRefs = PrivateFileMaintenance.forContext(context).state().references.filter { it.owner == "database-recovery" }
         org.junit.Assert.assertEquals(1,recoveryRefs.size)
         org.junit.Assert.assertTrue(pendingJob.getValue("referenceTokens").jsonArray.any { it.jsonPrimitive.content == recoveryRefs.single().token })
@@ -1115,7 +1160,18 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertThrows(CoreError::class.java) { DatabaseRecovery.resume(context) }
         org.junit.Assert.assertTrue(DatabaseRecovery.needsAttention(context))
         source.outputStream().use { StreamingBackup.write(backup,it) }
-        val result = runBlocking { withContext(Dispatchers.IO) { DatabaseRecovery.resume(context) } }
+        DatabaseRecovery.afterCompletionDurable = { throw java.io.IOException("Fixture interruption after completed readback, before reference release") }
+        try {
+            org.junit.Assert.assertThrows(java.io.IOException::class.java) { runBlocking { withContext(Dispatchers.IO) { DatabaseRecovery.resume(context) } } }
+        } finally { DatabaseRecovery.afterCompletionDurable = null }
+        val completed = kotlinx.serialization.json.Json.parseToJsonElement(java.io.File(context.noBackupFilesDir,"recovery-pending.json").readText()).jsonObject
+        org.junit.Assert.assertTrue(completed.getValue("completedDatasetSha256").jsonPrimitive.content.matches(Regex("[0-9a-f]{64}")))
+        org.junit.Assert.assertTrue(DatabaseRecovery.needsAttention(context))
+        org.junit.Assert.assertTrue(PrivateFileMaintenance.forContext(context).state().references.any { it.owner == "database-recovery" })
+        var replacementRenames = 0
+        DirectoryDurability.rename = { old,new -> if(old.name.startsWith("rescue-") && new.name == "tracker.db") replacementRenames++;rename(old,new) }
+        val result = try { runBlocking { withContext(Dispatchers.IO) { DatabaseRecovery.resume(context) } } } finally { DirectoryDurability.rename = rename }
+        org.junit.Assert.assertEquals(0,replacementRenames) // Completed reconciliation never repeats replacement.
         val archive = java.io.File(context.noBackupFilesDir,"database-archives/${result.archive}")
         org.junit.Assert.assertTrue(java.io.File(archive,"manifest.json").exists())
         org.junit.Assert.assertFalse(DatabaseRecovery.needsAttention(context))

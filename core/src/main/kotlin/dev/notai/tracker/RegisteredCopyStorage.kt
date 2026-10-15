@@ -85,7 +85,7 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
             ArchiveLinkNode(payloadHash(node),rows.first().second.bytes,rows.first().second.sha256,
                 rows.map { it.third }.sortedWith(compareBy<ArchiveAlias> { it.copyId }.thenBy { it.memberId }))
         }.sortedBy { it.opaqueId }
-        val blockers = state.references.filter { it.itemId == null || it.itemId in component.map { c -> c.item.id } }.map { it.blocker }.toSet()+
+        val blockers = state.references.filter { r -> component.any { r.protects(it.item.id) } }.map { it.blocker }.toSet()+
             (if(state.journals.any { it.phase !in setOf(CleanupPhase.DONE,CleanupPhase.RESTORED) }) setOf(CopyBlocker.CLEANUP_INTERRUPTED) else emptySet())+
             (if(files.stat("recovery-pending.json") != null) setOf(CopyBlocker.REQUIRED_BY_PENDING_RECOVERY) else emptySet())
         ArchiveLinkGraph(state.revision,ids,component.map { it.item.id }.toSet(),nodes,

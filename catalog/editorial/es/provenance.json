@@ -1,0 +1,66 @@
+{
+  "entries": 2385,
+  "kinds": {
+    "AXIS": 337,
+    "TYPE": 1918,
+    "VALUE": 130
+  },
+  "aliases": 2490,
+  "descriptions": 1918,
+  "textFields": 6793,
+  "localeTag": "es",
+  "sourceCatalogSha256": "9efaea5313b40ed2ae762437450f1a69759bfdd1e5fe1bb28e7ca2f8f5dc36b3",
+  "sourceRecordsVerified": 2385,
+  "manifestBinding": "source_bound",
+  "inputManifestSha256": "a0fa6b91ecabc3fc91dd87061d2d241bc6aa604205234b076f27ab9f79af6ef5",
+  "parts": [
+    {
+      "path": "es-reviewed-part-1.json",
+      "bytes": 323886,
+      "sha256": "77770b0a3acd476d8578cbae774a57ed0e16650c84736f97d19eaefac272b4b7"
+    },
+    {
+      "path": "es-reviewed-part-2.json",
+      "bytes": 349431,
+      "sha256": "234b482b546d7d6d59bc529c50200f4a4fde2f981248c1b52a75af8a0d528835"
+    },
+    {
+      "path": "es-reviewed-part-3.json",
+      "bytes": 303339,
+      "sha256": "9e90bc5b45b30e59847f0d5d85f2cdcbd1228e4741cc2947b6df4b20416a8828"
+    },
+    {
+      "path": "es-reviewed-part-4.json",
+      "bytes": 231218,
+      "sha256": "c1cfa0ddf3089ed6059e1739ed8724d948c6706307ec199d98771cbbdd71fa05"
+    }
+  ],
+  "producerCandidateSha256": "2db9965c2aed877151ed3c84b864832c83ddd70101c4a862cc23b500e7f03093",
+  "canonicalCandidateBytesVerified": false,
+  "canonicalCandidateReconstructionRequired": false,
+  "rightsStatus": "source_rights_review_pending",
+  "nativeSpeakerQA": false,
+  "installed": false,
+  "schemaVersion": 1,
+  "status": "SOURCE_BOUND_EDITORIAL_DRAFT_CANDIDATE_NOT_INSTALLED",
+  "inputGit": {
+    "repository": "8Dionysus/not-ai-time-tracker",
+    "branch": "delivery/tracker-catalog-en-20261015-865e5f94",
+    "commit": "c3b4bd70bf83de6db7f9e73efecb710295fd6b1e",
+    "manifestPath": "editorial-input/es-input-parts-manifest.json"
+  },
+  "payload": {
+    "file": "labels.json",
+    "bytes": 1265051,
+    "sha256": "bc11a626cd9850170d225f9169db728066ebc787f0d08612eaf481de277be35d"
+  },
+  "translationQuality": "DRAFT",
+  "draftProvenanceRetained": true,
+  "semanticReviewReportedComplete": true,
+  "openMaterialReported": 0,
+  "editorialReviewEvidence": "Coordinator reports independent semantic review of 2385 IDs and 6793 fields. Preparation verifies bytes, identities and literal projection fields; original draft provenance and nativeSpeakerQA=false are retained.",
+  "runtimeIndexChanged": false,
+  "androidUiLocaleAdded": false,
+  "literalProjectionRowsVerified": 2385,
+  "canonicalCandidateHashScope": "Provenance of the coordinator-reviewed original JSONL set. Exact input parts and all source-bound projection fields are verified; different runtime serialization does not reproduce the original canonical JSONL bytes."
+}

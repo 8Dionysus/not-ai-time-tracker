@@ -36,19 +36,46 @@ class EditorialAdapterTest(unittest.TestCase):
                               "localizedAliases": ["Synthetic " + str(i) for i in range(len(source.get("aliases", [])))],
                               "localizedDescription": "Synthetic definition" if source.get("definition") else None})
 
-    def write_parts(self, rows=None, change_part=None):
-        part = {"sourceCatalogSha256": self.catalog_sha, "candidateSha256": "a" * 64, "locale": "en",
+    def write_parts(self, rows=None, change_part=None, locale="en", bound_manifest=False):
+        part = {"sourceCatalogSha256": self.catalog_sha, "candidateSha256": "a" * 64, "locale": locale,
                 "rightsStatus": "source_rights_review_pending", "nativeSpeakerQA": False,
                 "part": 1, "startIndex": 0, "entries": copy.deepcopy(self.rows if rows is None else rows)}
         if change_part:
             change_part(part)
         raw = pack.encoded(part)
-        (self.parts / "en-reviewed-part-1.json").write_bytes(raw)
-        manifest = {"parts": [{"path": "en-reviewed-part-1.json", "bytes": len(raw), "sha256": pack.digest(raw)}],
+        (self.parts / f"{locale}-reviewed-part-1.json").write_bytes(raw)
+        manifest = {"parts": [{"path": f"{locale}-reviewed-part-1.json", "bytes": len(raw), "sha256": pack.digest(raw)}],
                     "entries": len(self.rows), "sourceCandidateSha256": "a" * 64}
+        if bound_manifest:
+            manifest.pop("sourceCandidateSha256")
+            manifest.update({"sourceCatalogSha256": self.catalog_sha, "candidateSha256": "a" * 64,
+                             "locale": locale, "rightsStatus": "source_rights_review_pending", "nativeSpeakerQA": False})
         raw_manifest = pack.encoded(manifest)
-        (self.parts / "en-input-parts-manifest.json").write_bytes(raw_manifest)
+        (self.parts / f"{locale}-input-parts-manifest.json").write_bytes(raw_manifest)
         return pack.digest(raw_manifest)
+
+    def test_explicit_locale_reuses_identity_contract_and_refuses_mismatched_header(self):
+        sha = self.write_parts(locale="es", bound_manifest=True)
+        payload, report = adapter.adapt(self.catalog, self.parts, sha, "a" * 64, locale="es")
+        self.assertEqual("es", report["localeTag"])
+        self.assertEqual("source_bound", report["manifestBinding"])
+        self.assertEqual(6, len(payload["entries"]))
+        sha = self.write_parts(locale="es", bound_manifest=True, change_part=lambda part: part.update({"locale": "en"}))
+        with self.assertRaises(ValueError):
+            adapter.adapt(self.catalog, self.parts, sha, "a" * 64, locale="es")
+
+    def test_source_bound_manifest_refuses_wrong_binding_even_with_valid_parts(self):
+        for field, replacement in (("sourceCatalogSha256", "0" * 64), ("candidateSha256", "b" * 64),
+                                   ("locale", "fr"), ("rightsStatus", "cleared"), ("nativeSpeakerQA", True)):
+            with self.subTest(field=field):
+                self.write_parts(locale="es", bound_manifest=True)
+                path = self.parts / "es-input-parts-manifest.json"
+                manifest = json.loads(path.read_bytes())
+                manifest[field] = replacement
+                raw = pack.encoded(manifest)
+                path.write_bytes(raw)
+                with self.assertRaises(ValueError):
+                    adapter.adapt(self.catalog, self.parts, pack.digest(raw), "a" * 64, locale="es")
 
     def test_preserves_literal_text_and_parent_qualified_identity(self):
         sha = self.write_parts()

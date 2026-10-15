@@ -40,29 +40,36 @@ def source_records(vocabulary):
     return records
 
 
-def adapt(catalog_dir, parts_dir, expected_manifest_sha256, expected_candidate_sha256):
+def adapt(catalog_dir, parts_dir, expected_manifest_sha256, expected_candidate_sha256, locale="en"):
+    pack.locale_fallbacks(locale)  # Explicit canonical content locale; never infer it from text.
     source_manifest, originals = pack.source(catalog_dir)
     source_bytes, vocabulary = pack.read_json(catalog_dir / source_manifest["file"])
     pack.require(pack.digest(source_bytes) == source_manifest["sha256"], "Source changed during adaptation")
     sources = source_records(vocabulary)
-    raw_manifest, manifest = pack.read_json(parts_dir / "en-input-parts-manifest.json", 64 * 1024)
+    raw_manifest, manifest = pack.read_json(parts_dir / f"{locale}-input-parts-manifest.json", 64 * 1024)
     pack.require(pack.digest(raw_manifest) == expected_manifest_sha256, "Editorial parts manifest hash mismatch")
-    pack.require(set(manifest) == {"parts", "entries", "sourceCandidateSha256"} and
-                 manifest["sourceCandidateSha256"] == expected_candidate_sha256, "Unexpected editorial candidate")
+    legacy_fields = {"parts", "entries", "sourceCandidateSha256"}
+    bound_fields = {"sourceCatalogSha256", "candidateSha256", "locale", "rightsStatus", "nativeSpeakerQA", "entries", "parts"}
+    if set(manifest) == bound_fields:
+        pack.require(manifest["sourceCatalogSha256"] == source_manifest["sha256"] and manifest["candidateSha256"] == expected_candidate_sha256 and
+                     manifest["locale"] == locale and manifest["rightsStatus"] == "source_rights_review_pending" and manifest["nativeSpeakerQA"] is False,
+                     "Incompatible editorial manifest binding")
+    else:
+        pack.require(set(manifest) == legacy_fields and manifest["sourceCandidateSha256"] == expected_candidate_sha256, "Unexpected editorial candidate")
     pack.require(isinstance(manifest["parts"], list) and 1 <= len(manifest["parts"]) <= 128, "Invalid editorial parts")
     paths = set()
     rows = []
     verified_parts = []
     for index, member in enumerate(manifest["parts"], 1):
         pack.require(set(member) == {"path", "bytes", "sha256"} and
-                     re.fullmatch(r"en-reviewed-part-[1-9][0-9]*\.json", member["path"]) and member["path"] not in paths,
+                     re.fullmatch(re.escape(locale) + r"-reviewed-part-[1-9][0-9]*\.json", member["path"]) and member["path"] not in paths,
                      "Invalid or duplicate editorial member")
         paths.add(member["path"])
         raw, part = pack.read_json(parts_dir / member["path"])
         pack.require(type(member["bytes"]) is int and len(raw) == member["bytes"] and pack.digest(raw) == member["sha256"], "Editorial part bytes/hash mismatch")
         pack.require(set(part) == {"sourceCatalogSha256", "candidateSha256", "locale", "rightsStatus", "nativeSpeakerQA", "part", "startIndex", "entries"}, "Unknown editorial part fields")
         pack.require(part["sourceCatalogSha256"] == source_manifest["sha256"] and part["candidateSha256"] == expected_candidate_sha256 and
-                     part["locale"] == "en" and part["rightsStatus"] == "source_rights_review_pending" and part["nativeSpeakerQA"] is False,
+                     part["locale"] == locale and part["rightsStatus"] == "source_rights_review_pending" and part["nativeSpeakerQA"] is False,
                      "Incompatible editorial source, locale, rights or QA metadata")
         pack.require(type(part["part"]) is int and part["part"] == index and type(part["startIndex"]) is int and part["startIndex"] == len(rows) and isinstance(part["entries"], list), "Editorial part sequence changed")
         rows.extend(part["entries"])
@@ -90,7 +97,8 @@ def adapt(catalog_dir, parts_dir, expected_manifest_sha256, expected_candidate_s
     pack.require(found == sources.keys(), "Missing editorial source identities")
     payload = {"schemaVersion": 1, "entries": [converted[pack.identity(row["key"])] for row in originals["entries"]]}
     counts = pack.validate_payload(payload, originals)
-    report = {**counts, "sourceCatalogSha256": source_manifest["sha256"], "sourceRecordsVerified": len(found),
+    report = {**counts, "localeTag": locale, "sourceCatalogSha256": source_manifest["sha256"], "sourceRecordsVerified": len(found),
+              "manifestBinding": "source_bound" if set(manifest) == bound_fields else "legacy_minimal",
               "inputManifestSha256": expected_manifest_sha256, "parts": verified_parts,
               "producerCandidateSha256": expected_candidate_sha256, "canonicalCandidateBytesVerified": False,
               "canonicalCandidateReconstructionRequired": False,
@@ -102,12 +110,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--catalog-dir", type=Path, default=Path(__file__).resolve().parents[1] / "catalog")
     parser.add_argument("--parts-dir", type=Path, required=True)
+    parser.add_argument("--locale", default="en", help="Explicit canonical locale; defaults to en for existing deliveries")
     parser.add_argument("--expected-manifest-sha256", required=True)
     parser.add_argument("--expected-candidate-sha256", required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     try:
-        payload, report = adapt(args.catalog_dir, args.parts_dir, args.expected_manifest_sha256, args.expected_candidate_sha256)
+        payload, report = adapt(args.catalog_dir, args.parts_dir, args.expected_manifest_sha256, args.expected_candidate_sha256, args.locale)
         raw = pack.encoded(payload)
         with args.output.open("xb") as stream:
             stream.write(raw)

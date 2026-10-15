@@ -4,22 +4,26 @@ import org.junit.Test
 import kotlin.test.*
 
 class LocaleContractTest {
-    @Test fun englishEditorialCandidateLoadsWithoutClaimingRightsOrReplacingOriginals() {
+    @Test fun englishEditorialCandidateLoadsWithoutClaimingRightsOrReplacingOriginals() =
+        editorialCandidateLoads("en","en-US",TranslationQuality.REVIEWED)
+    @Test fun spanishEditorialDraftLoadsWithoutReplacingOriginals() =
+        editorialCandidateLoads("es","es-MX",TranslationQuality.DRAFT)
+    private fun editorialCandidateLoads(locale: String,requested: String,quality: TranslationQuality) {
         val root = java.io.File(requireNotNull(System.getProperty("tracker.samples"))).parentFile
         val catalog = ReadyCatalog.read { root.resolve("catalog/$it").inputStream() }
         val packs = CatalogContentPacks("tracker.catalog",catalog)
         val originals = packs.sourceEntries()
-        val status = packs.load("en") { root.resolve("catalog/editorial/en/$it").inputStream() }
+        val status = packs.load(locale) { root.resolve("catalog/editorial/$locale/$it").inputStream() }
         assertEquals(2385,status.entries);assertTrue(status.complete)
-        assertEquals(TranslationQuality.REVIEWED,status.quality)
+        assertEquals(quality,status.quality)
         assertEquals(CatalogRightsStatus.SOURCE_RIGHTS_REVIEW_PENDING,status.manifest!!.rightsStatus)
         assertNull(status.manifest!!.license);assertTrue(packs.installedReviewedLocales().isEmpty())
-        val shown = packs.getLocalizedCatalogEntries("tracker.catalog",originals.map { it.key },"en-US")
+        val shown = packs.getLocalizedCatalogEntries("tracker.catalog",originals.map { it.key },requested)
         assertEquals(originals.map { it.text },shown.map { it.display })
         assertTrue(shown.all { it.missing && it.resolvedLocaleTag == "ru" && it.provenance == status.manifest })
         val custom = catalog.vocabulary.types.first().copy(name = "Personal original",aliases = listOf("Personal alias"),definition = "Personal definition")
         val data = Dataset(types = listOf(custom))
-        val overridden = packs.getLocalizedCatalogEntries("tracker.catalog",listOf(originals.first().key),"en",packs.userOverrides(data)).single()
+        val overridden = packs.getLocalizedCatalogEntries("tracker.catalog",listOf(originals.first().key),locale,packs.userOverrides(data)).single()
         assertTrue(overridden.userOverride);assertFalse(overridden.missing)
         assertEquals(CatalogPresentation(custom.name,custom.aliases,custom.definition),overridden.display)
         assertEquals(originals,packs.sourceEntries())

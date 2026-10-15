@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "tracker.catalog",
+  "catalogRevision": "0.9.1.3",
+  "catalogSha256": "9efaea5313b40ed2ae762437450f1a69759bfdd1e5fe1bb28e7ca2f8f5dc36b3",
+  "localeTag": "es",
+  "sourceLocaleTag": "ru",
+  "release": "es-editorial-draft-2db9965c",
+  "quality": "DRAFT",
+  "complete": true,
+  "fallbackTags": [],
+  "authority": "Tracker editorial coordination",
+  "license": null,
+  "rightsStatus": "source_rights_review_pending",
+  "translator": "Spanish editorial candidate 2db9965c2aed877151ed3c84b864832c83ddd70101c4a862cc23b500e7f03093",
+  "editor": "Coordinator-reported independent semantic review; draft provenance retained",
+  "payload": {
+    "file": "labels.json",
+    "bytes": 1265051,
+    "sha256": "bc11a626cd9850170d225f9169db728066ebc787f0d08612eaf481de277be35d"
+  }
+}

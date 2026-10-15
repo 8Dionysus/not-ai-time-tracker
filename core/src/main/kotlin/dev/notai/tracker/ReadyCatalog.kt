@@ -2,6 +2,8 @@ package dev.notai.tracker
 
 import java.io.InputStream
 import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
+import java.nio.charset.CodingErrorAction
 import java.security.MessageDigest
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
@@ -18,14 +20,12 @@ class ReadyCatalog private constructor(val manifest: CatalogPackageManifest,val 
         fun read(open: (String)->InputStream): ReadyCatalog {
             val metadata = open("manifest.json").use { it.boundedBytes(16*1024) }
             ensure(metadata.size <= 16*1024,"Catalog manifest too large",ErrorCode.UNSUPPORTED_IMPORT)
-            val m = try { codec.decodeFromString<CatalogPackageManifest>(metadata.toString(Charsets.UTF_8)) }
-                catch(_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed catalog manifest") }
+            val m = decodeCatalogJson<CatalogPackageManifest>(metadata,"Malformed catalog manifest")
             ensure(m.formatVersion == 1 && m.catalogVersion.isNotBlank() && m.file == "runtime-catalog.json" &&
                 m.bytes in 1..16*1024*1024 && m.sha256.matches(Regex("[0-9a-f]{64}")),"Unsupported catalog package",ErrorCode.UNSUPPORTED_IMPORT)
             val bytes = open(m.file).use { it.boundedBytes(m.bytes) }
             ensure(bytes.size == m.bytes && sha256(bytes) == m.sha256,"Catalog package hash/size mismatch",ErrorCode.UNSUPPORTED_IMPORT)
-            val v = try { codec.decodeFromString<VocabularyData>(bytes.toString(Charsets.UTF_8)) }
-                catch(_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed catalog definitions") }
+            val v = decodeCatalogJson<VocabularyData>(bytes,"Malformed catalog definitions")
             val d = Dataset(types = v.types,axes = v.axes,metrics = v.metrics,units = v.units)
             validate(d)
             val frozen = d.frozen()
@@ -33,7 +33,7 @@ class ReadyCatalog private constructor(val manifest: CatalogPackageManifest,val 
                 ensure(c.file == "compatibility.json" && c.bytes in 1..2*1024*1024 && c.sha256.matches(Regex("[0-9a-f]{64}")),"Unsupported catalog compatibility",ErrorCode.UNSUPPORTED_IMPORT)
                 val data = open(c.file).use { it.boundedBytes(c.bytes) }
                 ensure(data.size == c.bytes && sha256(data) == c.sha256,"Compatibility hash/size mismatch",ErrorCode.UNSUPPORTED_IMPORT)
-                codec.decodeFromString<List<CatalogEditorialRevision>>(data.toString(Charsets.UTF_8))
+                decodeCatalogJson<List<CatalogEditorialRevision>>(data,"Malformed catalog compatibility")
             }.orEmpty()
             ensure(revisions.map { it.kind to it.id }.distinct().size == revisions.size,"Duplicate editorial revision",ErrorCode.UNSUPPORTED_IMPORT)
             for(r in revisions) {
@@ -49,6 +49,12 @@ class ReadyCatalog private constructor(val manifest: CatalogPackageManifest,val 
         }
     }
 }
+/** Reject broken source bytes rather than installing replacement characters under their hash. */
+private inline fun <reified T> decodeCatalogJson(bytes: ByteArray,diagnostic: String): T = try {
+    val text = Charsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
+        .onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(bytes)).toString()
+    codec.decodeFromString<T>(text)
+} catch(_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,diagnostic) }
 /** A generic definition fingerprint excludes local presentation and technical source metadata. */
 fun catalogMeaningFingerprint(type: ActivityType): String {
     val fields = sortedMapOf<String,JsonElement>("kind" to JsonPrimitive("type"),"id" to JsonPrimitive(type.id),

@@ -27,3 +27,9 @@ The [official LLVM source commit](https://android.googlesource.com/toolchain/llv
 - The previous direct requests for the exact LLVM `LICENSE.TXT` files returned 403. They were not retried here and were not replaced with a newer license snapshot. The actual runtime obligations therefore remain undetermined.
 
 This is a provenance narrowing, not a legal opinion or release clearance. In particular, neither the POM's Apache-2.0 label nor the absence of a shared STL dependency demonstrates that no additional native notice is needed.
+
+## Release-era source corroboration, 15 October 2026 follow-up
+
+The official [AndroidX mirror commit 94d93d1](https://github.com/androidx/androidx/commit/94d93d113d20483317b9b8ef83e113d6a400459d) removes redundant stack-protector flags from graphics-path while retaining `-nostdlib++`. Its diff was read in this follow-up. The parent additionally reports reading the exact CMake, three cpp files and headers at that commit, with Apache-2.0 headers; those file contents were not independently reread here.
+
+This corroborates release-era source configuration. It does not establish that the commit belongs to the release-notes range or produced the published AAR. The parent reports Gitiles403 and GitHub404 for that range/endpoints; this pass did not retry them. Exact source/build/link/runtime notice binding stays open, including compiler-rt. Historical artifact hashes and the earlier source review remain unchanged.

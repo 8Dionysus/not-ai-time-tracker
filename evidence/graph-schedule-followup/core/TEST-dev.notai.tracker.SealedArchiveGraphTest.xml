@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.SealedArchiveGraphTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-10-15T17:08:24.666Z" hostname="69b2b5b46001" time="0.28">
+  <properties/>
+  <testcase name="activeGraphOwnerAndRecoveryProtectAllSharedCopies" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.042"/>
+  <testcase name="v1MetadataMigratesWithoutChangingFlatOwnershipOrWritingOnRead" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.003"/>
+  <testcase name="expandingGraphDoesNotTrustStaleLinkCountsOrUnregisteredNewOwner" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.011"/>
+  <testcase name="duplicateMemberIdentityOrPathRejectsBeforeAuthority" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.001"/>
+  <testcase name="partialAliasUnlinkReconcilesAcrossRestartAndActiveOwnerBlocksResume" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.045"/>
+  <testcase name="nestedUnknownChildAndAncestorReplacementBlockConnectedGraph" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.015"/>
+  <testcase name="externalAliasInsertedImmediatelyBeforeUnlinkStopsWithoutDeletingIt" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.046"/>
+  <testcase name="uncertainRegistrationIsAtomicAndDoesNotMutateArchiveBytes" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.007"/>
+  <testcase name="renameCrashCanReturnWholeNestedGraphWithoutDeletingAnything" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.022"/>
+  <testcase name="nestedGraphReopensAndUnlinksOnlySelectedAliases" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.042"/>
+  <testcase name="incompleteOrExternalGraphCannotGainAuthority" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.014"/>
+  <testcase name="interruptedDirectoryFinalizationIsReadOnlyUntilExplicitResume" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.031"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

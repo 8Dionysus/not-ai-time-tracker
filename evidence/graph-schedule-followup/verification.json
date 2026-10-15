@@ -1,0 +1,115 @@
+{
+  "runtimeSource": "5e43515e8e92c02f42ff6965d1eb9472c1130cf1",
+  "apks": {
+    "debug": {
+      "bytes": 13045387,
+      "sha256": "fdea4eddb863ead801d624e898b7f8b030c70b55788fbaf24ff439a4f26abafd",
+      "zipalign-16kExit": 0,
+      "signatureExit": 1,
+      "aapt-badgingExit": 0
+    },
+    "release": {
+      "bytes": 8834176,
+      "sha256": "f28a3e90cf9f522f794f050bc23eb5b7673e038e3c1efdafda1958cd60040cba",
+      "zipalign-16kExit": 0,
+      "signatureExit": 1,
+      "aapt-badgingExit": 0
+    }
+  },
+  "native": [
+    {
+      "entry": "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "bytes": 10096,
+      "sha256": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6",
+      "readelf": "release-native/lib/arm64-v8a/libandroidx.graphics.path.readelf.txt"
+    },
+    {
+      "entry": "lib/arm64-v8a/libtracker_copy_io.so",
+      "bytes": 17504,
+      "sha256": "a1962b7bac90a779f6375f1e126326df9247cd76c53d146559e725716df35508",
+      "readelf": "release-native/lib/arm64-v8a/libtracker_copy_io.readelf.txt"
+    },
+    {
+      "entry": "lib/armeabi-v7a/libandroidx.graphics.path.so",
+      "bytes": 7252,
+      "sha256": "41399eba6fc2a60f6f14642375c1824f3cf25eb8fec7397d753730a3ceda3e2b",
+      "readelf": "release-native/lib/armeabi-v7a/libandroidx.graphics.path.readelf.txt"
+    },
+    {
+      "entry": "lib/armeabi-v7a/libtracker_copy_io.so",
+      "bytes": 9760,
+      "sha256": "c4c04e5d5404b8a96a732c05729cf45627e7a54517c5c25a68bf576b8f40ed68",
+      "readelf": "release-native/lib/armeabi-v7a/libtracker_copy_io.readelf.txt"
+    },
+    {
+      "entry": "lib/x86/libandroidx.graphics.path.so",
+      "bytes": 9284,
+      "sha256": "eb0570b41fd3bff25d8204a967c03bd7550719e768b791f680cc40cbe35f29af",
+      "readelf": "release-native/lib/x86/libandroidx.graphics.path.readelf.txt"
+    },
+    {
+      "entry": "lib/x86/libtracker_copy_io.so",
+      "bytes": 16188,
+      "sha256": "fa94895fa908b36de75fe42d025c06f8972ff6355cb4e62ef4468e7ec43f3440",
+      "readelf": "release-native/lib/x86/libtracker_copy_io.readelf.txt"
+    },
+    {
+      "entry": "lib/x86_64/libandroidx.graphics.path.so",
+      "bytes": 10760,
+      "sha256": "4e56c996f13670e70082658de7880c4020eabf4f25e43387f88ed78a713fc9f0",
+      "readelf": "release-native/lib/x86_64/libandroidx.graphics.path.readelf.txt"
+    },
+    {
+      "entry": "lib/x86_64/libtracker_copy_io.so",
+      "bytes": 17376,
+      "sha256": "1d19dbcaf6e8e0ecf5af9362cedfeee40d857b2591e302a5164c3ae2455f9622",
+      "readelf": "release-native/lib/x86_64/libtracker_copy_io.readelf.txt"
+    }
+  ],
+  "manifestPermissions": [
+    "android.permission.FOREGROUND_SERVICE",
+    "android.permission.FOREGROUND_SERVICE_SPECIAL_USE",
+    "android.permission.POST_NOTIFICATIONS",
+    "android.permission.READ_CALENDAR",
+    "android.permission.RECEIVE_BOOT_COMPLETED",
+    "android.permission.SYSTEM_ALERT_WINDOW",
+    "dev.notai.tracker.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+  ],
+  "usesSdk": {
+    "{http://schemas.android.com/apk/res/android}minSdkVersion": "26",
+    "{http://schemas.android.com/apk/res/android}targetSdkVersion": "36"
+  },
+  "nativeExecution": "host JNI only; four Android ABIs compile/package; no device JNI acceptance",
+  "checkpoint": "Full suite at runtime source; later commits documentation/evidence/config only",
+  "tests": {
+    "core": {
+      "tests": 63,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "app": {
+      "tests": 59,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 60,
+    "hints": 1
+  },
+  "build": "BUILD SUCCESSFUL in 4m 9s",
+  "command": ":core:test :app:testDebugUnitTest :app:assembleDebug :app:assembleRelease :app:lintRelease :app:releaseInventory -PtrackerUnsigned=true -PtrackerCleanupLibrary=<fresh host JNI library> -Pkotlin.compiler.execution.strategy=in-process",
+  "productionCleanupEnabled": false,
+  "sourceAndUiBoundary": "UI/TechnicalActivity/FloatingTimerService/RemoteViews unchanged from backend audit base f14fa3c",
+  "model": "requested gpt-6.1-sol/high; no independent runtime attestation",
+  "deviceChecks": "Not performed; writable SDK service paths did not fix adb home-state failure; no usable agreed AVD/emulator/system image discovered; root-owned AVD directory inaccessible and not bypassed",
+  "fdroid": "2.4.5 contextual metadata lint disabled recipe and isolated enabled fixture exit0; no independent build/reproducibility",
+  "licenses": "65 external runtime artifacts, 0 unknown POM declarations, 27 notice members; native static-runtime binding remains open",
+  "nativeStaticAnalyzer": {
+    "diagnostics": 0,
+    "scope": "own JNI C only, host analysis; not Android filesystem QA"
+  }
+}

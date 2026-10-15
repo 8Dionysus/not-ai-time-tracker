@@ -15,3 +15,10 @@ Reopen resolves each component member at its original location or at the unique 
 The private sidecar is format2, independent of Room7 and portable JSON9. Format1 flat ownership/refs/journals migrate on read without writing or granting shared-link authority. Both Android and descriptor metadata ports enforce the same 16MiB UTF-8 bound before replacing old state, reject malformed UTF-8 and never truncate leases. A known capacity refusal occurs before the write and keeps existing references and explicit owner recovery usable. Uncertain write/fsync failure still requires reopen/inspection. There is no age expiry or automatic lease pruning.
 
 Remaining production prerequisites: trusted Android descriptor-root binding and device QA; backend validation/final sealing of existing archive manifests after all recovery writes; legacy inventory registration; complete frontend form/chooser/restore durable-reference adoption. Current DatabaseArchive manifest alone is not a certificate for nested retired files. recovery-pending.json remains protected; operational metadata is not a cleanup candidate. No external SAF original is a target.
+
+Follow-up runtime `5e43515`: the full suite passes core63/app59. Native timestamps
+outside signed nanosecond range reject with EOVERFLOW before arithmetic, including
+an isolated filesystem fixture with verified year2400 POSIX time. Inventory errors
+remain scoped to the affected copy/root. Unreadable recovery-journal state protects
+possible recovery sources instead of being treated as a missing journal. No production
+cleanup enablement follows from these host checks.

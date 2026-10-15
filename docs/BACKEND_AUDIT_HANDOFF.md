@@ -127,4 +127,4 @@ its only change was removing disable in the isolated copy. No fdroidserver build
 store submission or signing initialization ran. New native compilation does not resolve the separate
 AndroidX graphics-path release provenance/static-runtime notice questions.
 
-The first-pass native inventory is now dated in NATIVE_LICENSE_EVIDENCE.md: accepted v4 contains both AndroidX graphics-path and own tracker_copy_io in four ABIs. Existing LICENSE/NOTICE are present; AndroidX provenance/static-runtime clearance stays open.
+The first-pass native inventory is now dated in NATIVE_LICENSE_EVIDENCE.md: Library v4 contains both AndroidX graphics-path and own tracker_copy_io in four ABIs. Existing LICENSE/NOTICE are present; AndroidX provenance/static-runtime clearance stays open.

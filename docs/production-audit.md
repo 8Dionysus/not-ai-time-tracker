@@ -1,6 +1,6 @@
 # Production audit ledger
 
-Baseline: `f14fa3c` (2026-10-15). Current branch: `backend/production-audit`.
+Baseline: `f14fa3c` (2026-10-15). Current branch: `backend/sealed-archive-graph`.
 Scope: all tracked source, tests, resources, build/release configuration, schemas,
 catalog adapters and bundled data. Prior APK evidence at `0980c50` is historical.
 No new model executor, store publication or signing key. Actual runtime model/effort
@@ -12,7 +12,8 @@ translation, TalkBack or OEM correctness. Device/store/signing boundaries stay s
 
 ## Findings and current boundary
 
-Backend-only branch: `backend/production-audit`, based on `f14fa3c`. The user
+Backend-only follow-up branch: `backend/sealed-archive-graph`, based on the
+published `backend/production-audit` checkpoint and ultimately `f14fa3c`. The user
 withdrew UI work on 15 October at 15:10 UTC. UI source/layout, TechnicalActivity,
 FloatingTimerService and RemoteViews changes are absent from this branch.
 Unaccepted work is preserved locally on `archive/unaccepted-ui-production-audit`
@@ -20,13 +21,15 @@ at `e8aa417`; it is not production acceptance or an instruction to merge it.
 
 | ID | Backend disposition | Evidence / remaining work |
 |---|---|---|
-| C01 | Durable registry/gate and descriptor-relative JNI storage implemented; four Android ABIs compile. | Host filesystem fault tests. Production deletion still unbound: Android descriptor QA, frontend durable-reference adoption, legacy registration and sealed archive hardlink graph remain required. |
+| C01 | Durable registry/gate, descriptor-relative JNI storage, complete sealed hardlink graph and nested manifests implemented; four Android ABIs compile. | Host filesystem fault tests. Production deletion still unbound: Android descriptor QA, frontend durable-reference adoption and legacy/final-sealing integration remain required. |
 | C02/C03 | Reconcile interrupted rename/restore; inventory/reconciliation never unlinks. Only explicit resume finalizes empty quarantine. | Actual filesystem crash/failure fixtures. |
 | C04/R02 | Maintenance-before-runtime lock order; acquire durable writer refs under gate, stream ordinary I/O outside it. Rescue remains exclusive. | Long-writer fixture; backend writer wrappers. |
 | C07 | Count only selectable, unreferenced recovery copies for the separate last-unused-copy warning; an active recovery source cannot mask it. | Real-filesystem two-copy reference fixture. |
 | C06 | Unknown unsafe/non-ASCII filenames produce non-addressable opaque inventory markers, leaving safe siblings inspectable. They remain blocked and never become paths. | Unicode sibling fixture. |
-| C05 | Reject metadata UTF-8 overflow before replacing the previous readable journal. | Metadata overflow/reopen fixture. |
-| F01 | Focus side effects serialize capture of the current Tracker; cancel obsolete notification 43. | Room test covers Next/Stop/disable/revocation and delayed old callback. Legacy UI overloads queue a fresh runtime-owned IO refresh. |
+| C05/C08 | Both metadata ports bound reads and writes to 16MiB UTF-8 before replacement; invalid UTF-8 refuses. Reject duplicate member IDs/paths before granting sealing authority. | Android API35 metadata fixtures preserve prior refs and explicit recovery; host duplicate/overflow/reopen fixtures. |
+| C09 | Native timestamp conversion rejects signed-nanosecond overflow before arithmetic; a bad copy/root does not abort safe siblings or mistake unreadable recovery state for absence. | Host POSIX year2400 fixture verifies EOVERFLOW without mutating source; production deletion stays disabled. |
+| F01 | Focus side effects serialize capture of the current Tracker; cancel obsolete notification 43. Typed deliverResult separates receipt, accepted post and uncertainty. | Room regression passes. Legacy ViewModel/TechnicalActivity Boolean interpretation remains OPEN; mandatory caller migration is in SCHEDULE_DELIVERY_HANDOFF.md. |
+| B02 | One inexact schedule alarm, durable at-most-once attempt receipts, fresh rechecks, conditional boot/time hooks and common next-occurrence projection. | Core, shared Memory/Room and actual Robolectric API36 fixtures. No production notice factory/renderers or device/OEM delivery acceptance. |
 | U01 | `Tracker.switchDraft` commits switch and note atomically. | Shared Memory/Room injected-failure fixture. Existing UI caller migration is OPEN for Opus. |
 | T01 | Selective resume chooses the next pending group inside its transaction. | Deterministic concurrent resume fixture preserves APPLIED receipt and Undo. |
 | B01 | Streaming export enforces its reader's 16 MiB character limit per record. | Oversized-record regression; total file still streams. Large individual metadata records remain a declared capacity limit. |
@@ -47,7 +50,7 @@ No UI-owned issue is marked fixed by this backend branch.
 The earlier mixed backend/UI checkpoint `c83dc29` passed core 35/35 and app 55/55.
 It is historical only. The later mixed checkpoint `e8aa417` had one failing new UI
 fixture and is explicitly unaccepted. Neither result accepts this backend-only tree.
-Final follow-up runtime source `5111df4` (build started at documentation/config
+Historical Library v4 runtime source `5111df4` (build started at documentation/config
 commit `eefbecd`) passed core 41/41 and app 52/52, with zero failures/errors/skips.
 Unsigned debug/release APKs and release lint completed successfully; lint has
 0 errors, 60 warnings, 1 hint. Both APKs pass zipalign with 16 KiB page alignment.
@@ -57,9 +60,30 @@ of a measured workload. fdroidserver 2.4.5 metadata lint passed with official
 category context, including an enabled isolated fixture. No full F-Droid build.
 Current commands, artifact hashes, raw logs and exact source SHA are in delivery evidence.
 
+The subsequent sealed-graph/schedule checkpoint `f7d8323` passed core62/app59.
+Current runtime/build source `5e43515e8e92c02f42ff6965d1eb9472c1130cf1`
+passed core63/63 and app59/59, zero failures/errors/skips. Full command:
+`:core:test :app:testDebugUnitTest :app:assembleDebug :app:assembleRelease
+:app:lintRelease :app:releaseInventory -PtrackerUnsigned=true
+-PtrackerCleanupLibrary=<fresh host JNI library>
+-Pkotlin.compiler.execution.strategy=in-process`.
+Build succeeded in4m9s; lint0errors/60warnings/1hint. The first year2400
+fixture attempt failed because Java FileTime clamped the setup value; the corrected
+fixture sets and verifies POSIX nanoseconds before checking native rejection.
+The failed setup is historical evidence, not an accepted result. APK VCS metadata
+and hashes belong to this exact runtime SHA; later documentation changes are separate.
+The prior first-pass file table below is a starting ledger, not completed whole-repo
+review coverage. New exact contracts are SEALED_ARCHIVE_CONTRACT.md and
+SCHEDULE_DELIVERY_HANDOFF.md.
+
 No Android device/resource measurement is claimed. `adb devices -l` failed trying
 to create read-only `/home/agent/.android`; this adb binary does not recognize
-ANDROID_USER_HOME. No HOME override, device or sandbox workaround was used.
+ANDROID_USER_HOME. A follow-up also supplied writable ANDROID_AVD_HOME,
+ANDROID_PREFS_ROOT and ANDROID_SDK_HOME; even adb version still failed at the same
+read-only home path. SDK/workspace inspection found no emulator binary, system
+image or agreed user AVD; /dev/kvm and local emulator/ADB listeners were absent.
+The inaccessible root-owned AVD directory was not inspected or bypassed.
+No HOME override, new emulator image, device authorization or sandbox workaround was used.
 Synthetic JVM timings/heap samples do not establish phone PSS/mAh. Full history,
 report and choice indexes still scale with history; that is not automatically a leak.
 Idle overlay FGS remains available for the user's requested always-available button.

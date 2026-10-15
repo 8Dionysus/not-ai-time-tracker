@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.CoreScenariosTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-10-15T17:08:02.638Z" hostname="69b2b5b46001" time="21.748">
+  <properties/>
+  <testcase name="transferRetentionConfirmationClosureAndArchive" classname="dev.notai.tracker.CoreScenariosTest" time="0.647"/>
+  <testcase name="typedImportIssuesPreserveAtomicityAndProvenance" classname="dev.notai.tracker.CoreScenariosTest" time="0.046"/>
+  <testcase name="selectiveGoalsFavoritesFocusAndUndo" classname="dev.notai.tracker.CoreScenariosTest" time="0.094"/>
+  <testcase name="selectiveScheduleMeasurementClosureAndResume" classname="dev.notai.tracker.CoreScenariosTest" time="0.125"/>
+  <testcase name="smallHistoryAndExport" classname="dev.notai.tracker.CoreScenariosTest" time="2.932"/>
+  <testcase name="transferRetentionCrashRaceAndStale" classname="dev.notai.tracker.CoreScenariosTest" time="0.042"/>
+  <testcase name="scheduleDstFutureAndNoAutomaticFacts" classname="dev.notai.tracker.CoreScenariosTest" time="0.01"/>
+  <testcase name="transferRetentionProtectsPendingAndPreservesLeases" classname="dev.notai.tracker.CoreScenariosTest" time="0.091"/>
+  <testcase name="scheduleLocalizationAndArchiveContract" classname="dev.notai.tracker.CoreScenariosTest" time="0.024"/>
+  <testcase name="backupReplacementAndFailure" classname="dev.notai.tracker.CoreScenariosTest" time="15.54"/>
+  <testcase name="transferRetentionCopyPreservesSourceIdentityAndDetectsEdits" classname="dev.notai.tracker.CoreScenariosTest" time="0.36"/>
+  <testcase name="timerPath" classname="dev.notai.tracker.CoreScenariosTest" time="1.764"/>
+  <testcase name="scheduleDeliveryUsesOneAlarmAndDurableReceiptsWithoutFacts" classname="dev.notai.tracker.CoreScenariosTest" time="0.026"/>
+  <testcase name="concurrentSelectiveResumeKeepsAppliedReceipt" classname="dev.notai.tracker.CoreScenariosTest" time="0.004"/>
+  <testcase name="liveTimerKeepsCompletedHistoryIndexProof" classname="dev.notai.tracker.CoreScenariosTest" time="0.007"/>
+  <testcase name="selectiveGroupsRepeatConflictAndStale" classname="dev.notai.tracker.CoreScenariosTest" time="0.027"/>
+  <testcase name="reviewedDraftSwitchIsOneAtomicCommit" classname="dev.notai.tracker.CoreScenariosTest" time="0.002"/>
+  <testcase name="scheduleCanonicalReceiptsAndSameDayRuleEdits" classname="dev.notai.tracker.CoreScenariosTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

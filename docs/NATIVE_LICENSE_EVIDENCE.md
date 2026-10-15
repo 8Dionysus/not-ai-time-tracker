@@ -4,7 +4,7 @@ Historical AndroidX-only inventory, before the own-code cleanup JNI was added: o
 
 ## Dated inventory update — 15 October 2026, Library v4
 
-The accepted backend snapshot `add6312` delivered release APK SHA-256 `1ee93268d556e30d424850aa91b494c0278807f45465f89fbb8bdaa78e3203ed`, built at `eefbecd`. It contains **eight** native entries: `libandroidx.graphics.path.so` and own-code `libtracker_copy_io.so`, each for arm64-v8a, armeabi-v7a, x86 and x86_64. The earlier “only this library” statement is historical, not the inventory of v4 or the current native-enabled source.
+The Library v4 backend snapshot `add6312` delivered release APK SHA-256 `1ee93268d556e30d424850aa91b494c0278807f45465f89fbb8bdaa78e3203ed`, built at `eefbecd`. It contains **eight** native entries: `libandroidx.graphics.path.so` and own-code `libtracker_copy_io.so`, each for arm64-v8a, armeabi-v7a, x86 and x86_64. The earlier “only this library” statement is historical, not the inventory of v4 or the current native-enabled source.
 
 The own JNI source is `core/src/main/c/private_copy_io.c`, with Android.mk/Application.mk and pinned NDK r30 (`30.0.16248370`), C11 and no selected C++ STL. It is covered by the existing project Apache-2.0 LICENSE/NOTICE and carries an Apache-2.0 SPDX header. No third-party source was relicensed. Current graph changes extend this same own-code library; final APK entry hashes belong to their exact build evidence, not this historical v4 hash.
 

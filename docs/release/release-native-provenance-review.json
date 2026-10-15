@@ -13,7 +13,11 @@
     ],
     "ndk": "r25c / build 9519653",
     "clang_lld": "14.0.7; LLVM toolchain commit 4c603efb0cca074e9238af8b4106c30add4418f6",
-    "dt_needed": ["libm.so", "libdl.so", "libc.so"],
+    "dt_needed": [
+      "libm.so",
+      "libdl.so",
+      "libc.so"
+    ],
     "no_libcxx_shared_needed": true,
     "caveat": "Dynamic dependency evidence cannot exclude statically linked archive members."
   },
@@ -68,5 +72,19 @@
       "title": "Android NDK C++ library support",
       "url": "https://developer.android.com/ndk/guides/cpp-support"
     }
-  ]
+  ],
+  "followup_source_corroboration": {
+    "reviewed_on": "2026-10-15",
+    "commit": "94d93d113d20483317b9b8ef83e113d6a400459d",
+    "url": "https://github.com/androidx/androidx/commit/94d93d113d20483317b9b8ef83e113d6a400459d",
+    "commit_date_reported_by_parent": "2024-04-24",
+    "independently_read_here": "Commit diff: redundant stack-protector flags removed; -nostdlib++ retained.",
+    "parent_reported_read_scope": "Exact CMake, three cpp files and headers at that commit; Apache-2.0 headers. File contents not independently reread in this follow-up.",
+    "range_membership_proven": false,
+    "published_aar_binding_proven": false,
+    "static_runtime_exclusion_proven": false,
+    "compiler_rt_excluded": false,
+    "denied_endpoints": "Parent reports Gitiles403 and GitHub404 for release range/endpoints. No retry in this follow-up.",
+    "assessment": "Corroboration only; source/build/link/runtime notice binding remains open."
+  }
 }

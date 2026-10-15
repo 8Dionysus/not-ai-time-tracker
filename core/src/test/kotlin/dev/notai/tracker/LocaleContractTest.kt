@@ -44,11 +44,11 @@ class LocaleContractTest {
         assertEquals(2,values.size);assertEquals(1,values.map { it.key.stableId }.distinct().size)
         assertEquals(2,values.map { it.key.parentId }.distinct().size)
         val translated = original.mapIndexed { i,row -> row.copy(text = CatalogPresentation("Fixture $i",if(row.text.aliases.isEmpty()) emptyList() else listOf("Fixture alias"),if(row.text.description.isEmpty()) "" else "Fixture description")) }
-        fun install(rows: List<CatalogContentRow>,quality: TranslationQuality,complete: Boolean = true,tag: String = "es") {
+        fun install(rows: List<CatalogContentRow>,quality: TranslationQuality,complete: Boolean = true,tag: String = "es",rights: CatalogRightsStatus = CatalogRightsStatus.CLEARED,license: String? = "Apache-2.0") {
             val payload = codec.encodeToString(CatalogContentPayload(entries = rows)).toByteArray()
             val m = CatalogContentManifest(catalogId = "fixture",catalogRevision = "fixture",catalogSha256 = manifest.sha256,
                 localeTag = tag,sourceLocaleTag = "ru",release = "synthetic fixture only",quality = quality,complete = complete,
-                fallbackTags = localeFallbacks(tag).drop(1),authority = "fixture",license = "Apache-2.0",translator = "fixture",editor = "fixture",
+                fallbackTags = localeFallbacks(tag).drop(1),authority = "fixture",license = license,translator = "fixture",editor = "fixture",rightsStatus = rights,
                 payload = CatalogContentFile("labels.json",payload.size,sha256(payload)))
             packs.load { name -> if(name == "manifest.json") codec.encodeToString(m).byteInputStream() else payload.inputStream() }
         }
@@ -56,6 +56,10 @@ class LocaleContractTest {
         assertTrue(packs.installedReviewedLocales().isEmpty())
         assertTrue(packs.getLocalizedCatalogEntries("fixture",original.map { it.key },"es-MX").all { it.missing && it.quality == TranslationQuality.DRAFT && it.availability == PackAvailability.AVAILABLE_OFFLINE })
         assertFailsWith<CoreError> { install(translated.dropLast(1),TranslationQuality.REVIEWED) }
+        install(translated,TranslationQuality.REVIEWED,rights = CatalogRightsStatus.SOURCE_RIGHTS_REVIEW_PENDING,license = null)
+        assertTrue(packs.installedReviewedLocales().isEmpty())
+        val rightsPending = packs.getLocalizedCatalogEntries("fixture",values.map { it.key },"es")
+        assertTrue(rightsPending.all { it.missing && it.provenance!!.license == null && it.quality == TranslationQuality.REVIEWED && it.availability == PackAvailability.AVAILABLE_OFFLINE })
         install(translated,TranslationQuality.REVIEWED)
         val found = packs.getLocalizedCatalogEntries("fixture",values.map { it.key },"es-MX")
         assertEquals(2,found.map { it.display.label }.distinct().size);assertTrue(found.all { it.resolvedLocaleTag == "es" && !it.missing })

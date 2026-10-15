@@ -4,6 +4,7 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.charset.CodingErrorAction
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
 
 /** VALUE identity is qualified by its axis AND both meaning versions. Raw value ID is never a key. */
 @Serializable enum class CatalogContentKind { TYPE, AXIS, VALUE, METRIC, UNIT }
@@ -13,10 +14,15 @@ import kotlinx.serialization.Serializable
 @Serializable data class CatalogContentRow(val key: CatalogContentKey,val text: CatalogPresentation)
 @Serializable data class CatalogContentPayload(val schemaVersion: Int = 1,val entries: List<CatalogContentRow>)
 @Serializable data class CatalogContentFile(val file: String,val bytes: Int,val sha256: String)
+@Serializable enum class CatalogRightsStatus {
+    @SerialName("source_rights_review_pending") SOURCE_RIGHTS_REVIEW_PENDING,
+    @SerialName("cleared") CLEARED
+}
 @Serializable data class CatalogContentManifest(val schemaVersion: Int = 1,val catalogId: String,val catalogRevision: String,
     val catalogSha256: String,val localeTag: String,val sourceLocaleTag: String,val release: String,
     val quality: TranslationQuality,val complete: Boolean,val fallbackTags: List<String>,
-    val authority: String,val license: String,val translator: String,val editor: String?,val payload: CatalogContentFile)
+    val authority: String,val license: String?,val translator: String,val editor: String?,val payload: CatalogContentFile,
+    val rightsStatus: CatalogRightsStatus = CatalogRightsStatus.SOURCE_RIGHTS_REVIEW_PENDING)
 data class CatalogPackStatus(val localeTag: String,val quality: TranslationQuality,val availability: PackAvailability,
     val complete: Boolean,val entries: Int,val manifest: CatalogContentManifest?)
 data class CatalogDisplayEntry(val catalogId: String,val key: CatalogContentKey,val requestedLocaleTag: String,
@@ -46,7 +52,7 @@ class CatalogContentPacks(private val catalogId: String,private val catalog: Rea
         ensure((expectedLocaleTag == null || m.localeTag == expectedLocaleTag) && m.schemaVersion == 1 && m.catalogId == catalogId && m.catalogRevision == catalog.manifest.catalogVersion &&
             m.catalogSha256 == catalog.manifest.sha256 && m.sourceLocaleTag == sourceLocale && m.localeTag == localeTag(m.localeTag) &&
             m.fallbackTags == localeFallbacks(m.localeTag).drop(1) && m.release.isNotBlank() && m.authority.isNotBlank() &&
-            m.license.isNotBlank() && m.translator.isNotBlank() && (m.quality != TranslationQuality.REVIEWED || !m.editor.isNullOrBlank()),
+            (m.license == null || m.license.isNotBlank()) && (m.rightsStatus != CatalogRightsStatus.CLEARED || m.license != null) && m.translator.isNotBlank() && (m.quality != TranslationQuality.REVIEWED || !m.editor.isNullOrBlank()),
             "Incompatible catalog translation manifest",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(m.payload.file == "labels.json" && m.payload.bytes in 1..16*1024*1024 && m.payload.sha256.matches(Regex("[0-9a-f]{64}")),
             "Unsupported catalog translation payload",ErrorCode.UNSUPPORTED_IMPORT)
@@ -69,7 +75,8 @@ class CatalogContentPacks(private val catalogId: String,private val catalog: Rea
         return if(p == null) CatalogPackStatus(canonical,TranslationQuality.SOURCE_ONLY,PackAvailability.NOT_INSTALLED,false,0,null)
         else CatalogPackStatus(canonical,p.manifest.quality,PackAvailability.AVAILABLE_OFFLINE,p.manifest.complete,p.entries.size,p.manifest)
     }
-    fun installedReviewedLocales(): Set<String> = packs.filterValues { it.manifest.complete && it.manifest.quality == TranslationQuality.REVIEWED }.keys.toSet()
+    private fun ready(m: CatalogContentManifest) = m.complete && m.quality == TranslationQuality.REVIEWED && m.rightsStatus == CatalogRightsStatus.CLEARED && !m.license.isNullOrBlank()
+    fun installedReviewedLocales(): Set<String> = packs.filterValues { ready(it.manifest) }.keys.toSet()
     /** Stable order/cardinality, one requested locale and one immutable installed-pack snapshot.
      * Overrides are literal presentation, including aliases/description; user names never enter a translator. */
     fun getLocalizedCatalogEntries(catalogId: String,stableIds: List<CatalogContentKey>,displayLocaleTag: String,
@@ -77,7 +84,7 @@ class CatalogContentPacks(private val catalogId: String,private val catalog: Rea
         ensure(catalogId == this.catalogId,"Unknown catalog",ErrorCode.INVALID_INPUT)
         val requested = localeTag(displayLocaleTag);val snapshot = packs
         val chain = localeFallbacks(requested)
-        val pack = chain.firstNotNullOfOrNull { snapshot[it]?.takeIf { p -> p.manifest.complete && p.manifest.quality == TranslationQuality.REVIEWED } }
+        val pack = chain.firstNotNullOfOrNull { snapshot[it]?.takeIf { p -> ready(p.manifest) } }
         return frozenList(stableIds.map { key ->
             val original = originals[key] ?: fail(ErrorCode.INVALID_INPUT,"Unknown parent-qualified catalog identity")
             val override = overrides[key]?.also { ensure(it.label.isNotBlank(),"Blank user catalog override") }

@@ -5,13 +5,15 @@ import dev.notai.tracker.*
 import kotlinx.serialization.Serializable
 
 @Serializable private data class CatalogPackIndex(val schemaVersion: Int = 1,val locales: List<String> = emptyList())
-data class CatalogContentHealth(val installedReviewedPacks: Set<String>,val refusedPacks: Set<String>)
+data class CatalogContentHealth(val installedReviewedPacks: Set<String>,val refusedPacks: Set<String>,val unverifiedBundledPacks: Set<String>)
 /** Bundled offline data only; no network/download/background work and no Dataset mutation.
  * A bad locale refuses independently; it cannot suppress other valid installed packs. */
 class CatalogContentAdapter(context: Context,catalog: ReadyCatalog) {
     private val assets = context.applicationContext.assets
     private val packs = CatalogContentPacks("tracker.catalog",catalog)
     private val refused = mutableSetOf<String>()
+    private val attempted = mutableSetOf<String>()
+    private var bundled = emptySet<String>()
     init {
         val folders = assets.list("catalog/locales").orEmpty().toSet()
         if("index.json" in folders) {
@@ -28,14 +30,19 @@ class CatalogContentAdapter(context: Context,catalog: ReadyCatalog) {
                         it.locales.all { tag -> tag == localeTag(tag) && tag.matches(Regex("[A-Za-z0-9-]+")) },"Invalid catalog locale index",ErrorCode.STORAGE)
                 }
             } catch(_: Exception) { refused += "index.json";null }
-            index?.locales?.forEach { tag ->
-                try { packs.load(tag) { assets.open("catalog/locales/$tag/$it") } }
-                catch(_: Exception) { refused += tag }
-            }
+            bundled = index?.locales?.toSet().orEmpty()
         }
     }
-    fun health() = CatalogContentHealth(packs.installedReviewedLocales(),refused.toSet())
-    fun status(locale: String) = packs.status(locale)
-    fun getLocalizedCatalogEntries(keys: List<CatalogContentKey>,displayLocaleTag: String,data: Dataset): List<CatalogDisplayEntry> =
-        packs.getLocalizedCatalogEntries("tracker.catalog",keys,displayLocaleTag,packs.userOverrides(data))
+    @Synchronized private fun ensureLocale(tag: String) {
+        if(tag !in bundled || !attempted.add(tag)) return
+        try { packs.load(tag) { assets.open("catalog/locales/$tag/$it") } }
+        catch(_: Exception) { refused += tag }
+    }
+    /** Headers/index do not prove payload integrity or review. Never eagerly read eleven payloads. */
+    @Synchronized fun health() = CatalogContentHealth(packs.installedReviewedLocales(),refused.toSet(),bundled-attempted)
+    fun status(locale: String): CatalogPackStatus { val tag = localeTag(locale);ensureLocale(tag);return packs.status(tag) }
+    fun getLocalizedCatalogEntries(keys: List<CatalogContentKey>,displayLocaleTag: String,data: Dataset): List<CatalogDisplayEntry> {
+        for(tag in localeFallbacks(displayLocaleTag)) { ensureLocale(tag);if(tag in packs.installedReviewedLocales()) break }
+        return packs.getLocalizedCatalogEntries("tracker.catalog",keys,displayLocaleTag,packs.userOverrides(data))
+    }
 }

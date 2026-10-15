@@ -89,7 +89,7 @@ class CatalogPackPreparationTest(unittest.TestCase):
         for tag, expected in (("es-MX", ["es-419", "es"]), ("es-419", ["es"]), ("pt-BR", ["pt"]),
                               ("zh-Hans", []), ("zh-Hant", []), ("zh-Hans-CN", ["zh-Hans"]), ("en", [])):
             self.assertEqual(expected, pack.locale_fallbacks(tag))
-        for tag in ("../en", "en_US", "en-us", "zh-hans", "und"):
+        for tag in ("../en", "en_US", "en-us", "zh-hans", "und", "und-US", "iw", "iw-IL", "in", "in-ID", "ji", "ji-001"):
             with self.assertRaises(ValueError):
                 pack.locale_fallbacks(tag)
 

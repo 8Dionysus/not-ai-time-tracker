@@ -122,7 +122,8 @@ def validate_payload(value, original):
 def locale_fallbacks(tag):
     # Preparation intentionally supports canonical language[-Script][-REGION] only.
     # Runtime supports broader BCP-47 tags. No platform-dependent locale inference here.
-    require(tag != "und" and re.fullmatch(r"[a-z]{2,3}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}|[0-9]{3}))?", tag) is not None,
+    require(tag.split("-")[0] not in {"und", "iw", "in", "ji"} and
+            re.fullmatch(r"[a-z]{2,3}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}|[0-9]{3}))?", tag) is not None,
             "Preparation requires canonical language[-Script][-REGION] locale")
     parts = tag.split("-")
     if parts[0] == "zh":

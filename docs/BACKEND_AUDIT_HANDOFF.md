@@ -1,8 +1,8 @@
 # Backend audit follow-up and Opus handoff
 
-15 October 2026. Follow-up details: [sealed archive contract](SEALED_ARCHIVE_CONTRACT.md), [schedule delivery and mandatory caller migration](SCHEDULE_DELIVERY_HANDOFF.md). Based on main `f14fa3c`; Room 7 / portable JSON 9 / Android
-0.11.0 (12), compile/target API36. No new persistent Dataset fields in this
-follow-up, so no schema/archive version bump. The user restored backend-only
+15 October 2026. Follow-up details: [sealed archive contract](SEALED_ARCHIVE_CONTRACT.md), [schedule delivery and mandatory caller migration](SCHEDULE_DELIVERY_HANDOFF.md), [functional customization](FUNCTIONAL_CUSTOMIZATION_HANDOFF.md), [exact functional verification](FUNCTIONAL_CUSTOMIZATION_VERIFICATION.md). Based on main `f14fa3c`; current Room8 / portable JSON10 / Android
+0.11.0 (12), compile/target API36. Static fixes through `9d115df` used Room7/JSON9;
+the functional follow-up adds validated schedule preferences and catalog selection roots with migration7→8 and archive10/read1–10. The user restored backend-only
 scope at 15:10 UTC. UI code and UI fixes are intentionally absent from this change.
 Requested model configuration was gpt-6.1-sol/high; no independent runtime attestation.
 
@@ -13,6 +13,10 @@ are reduced without eviction; finite16MiB/O(n) lifetime/resource limits remain e
 The `d0888a5` follow-up splits rendering from terminal notify and serializes the final
 current-occurrence check/post with StateStore commands. Opus's factory signature is
 unchanged; custom backend platform adapters must use the new prepare/terminal contract.
+The functional pass uses existing ActivityType/Card models for personal hierarchies
+and named objects. Standalone card/type selective selection now works without facts;
+COPY/retention/re-export preserves root provenance. Schedule day/home-zone/quiet-shade
+preferences are persisted. Colors/themes and their model remain with the user and Opus.
 
 ## API deltas to connect
 
@@ -89,9 +93,9 @@ The operational sidecar migrates format1 to format2 without writing on read.
 |---|---|
 | A | Stable typed errors, catalog sidecars, SYSTEM/EXPLICIT preference authority and locale-independent CSV parsing. Editorial UI package exists. Catalog translation packs and UI resource/LocaleManager migration remain unaccepted; do not label planned/unreviewed content complete. |
 | B | Series revisions, date-only/zone/DST projection, exceptions, receipts, atomic explicit start/link and archive/restore exist. The common projection API is ready. Schedule delivery coordination, one inexact alarm, durable attempt receipts and conditional boot/time-change hooks are implemented. The notice factory and three renderer integrations remain Opus-owned; no production reminder rendering is bound. |
-| C | Memory/Room scenarios, migration 5→6→7, JSON 1–9 replacement/rollback and recovery coverage continue. Cold contradictory identity rejects without repair. Oversized individual streaming records now refuse export instead of making unreadable archives. Full graph still resides in memory. |
+| C | Memory/Room scenarios, migration5→6→7→8, JSON1–10 replacement/rollback and recovery coverage continue. Room8 adds metadata only. Cold contradictory identity rejects without repair; future functional fields mislabeled as legacy reject. Oversized individual streaming records refuse export. Full graph still resides in memory. |
 | D | Real durable/gated descriptor storage and host fault tests added. Sealed graphs/nested manifests and bounded Android metadata are added. Production cleanup remains blocked by Android QA, final-sealing/legacy integration and frontend reference prerequisites above. |
-| E | Full selective inspect/plan/preview/apply/resume, dependency groups, provenance/dedupe, explicit losses and Undo remain separate from JSON replacement and CSV. Concurrent resume fixed. OPEN/RECOVERY and active Focus portability remain explicitly restricted; not silently converted to facts. |
+| E | Selective1/2 inspect/plan/preview/apply/resume now includes standalone card/type roots, dependency closure, COPY/retention reconstruction and explicit losses/Undo. Existing format1 hashes are preserved. Global settings/control assignments remain disclosed selective exclusions; full JSON carries them. OPEN/RECOVERY and active Focus restrictions remain explicit. |
 | F | Apache-2.0 own code / Onest OFL / existing notices retained, API36, NDK r30 pinned, unsigned builds available. Disabled F-Droid draft now pins NDK, and passed metadata lint; no fdroidserver end-to-end build or independent reproducibility claim. Existing AndroidX native source/static-runtime provenance findings remain open. No store publication or release signing key. |
 
 ## Opus findings to address and verify

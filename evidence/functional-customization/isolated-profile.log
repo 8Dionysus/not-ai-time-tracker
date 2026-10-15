@@ -1,0 +1,101 @@
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.13/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :app
+Unable to initialize metrics, ensure /home/agent/.android is writable, details: /home/agent/.android/analytics.settings (No such file or directory)
+
+> Task :core:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :core:compileKotlin UP-TO-DATE
+> Task :core:compileJava NO-SOURCE
+> Task :core:processResources UP-TO-DATE
+> Task :core:classes UP-TO-DATE
+> Task :core:jar UP-TO-DATE
+> Task :core:compileTestFixturesKotlin UP-TO-DATE
+> Task :core:compileTestFixturesJava NO-SOURCE
+> Task :core:compileTestKotlin UP-TO-DATE
+> Task :core:compileTestJava NO-SOURCE
+> Task :core:processTestResources NO-SOURCE
+> Task :core:testClasses UP-TO-DATE
+> Task :core:processTestFixturesResources UP-TO-DATE
+> Task :core:testFixturesClasses UP-TO-DATE
+> Task :core:testFixturesJar UP-TO-DATE
+
+> Task :core:scheduleDeliveryProfile
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
+{
+    "scope": "HOST JVM, 1GiB max heap, POSIX temp files/page cache; three sequential syncs; no Android/OEM/RAM/PSS/battery or unlimited-capacity claim",
+    "limitBytes": 16777216,
+    "maxFixtureReceipts": 47392,
+    "samples": [
+        {
+            "receipts": 0,
+            "utf8Bytes": 284,
+            "syncMillis": [
+                4.270772,
+                1.898301,
+                2.250526
+            ],
+            "medianMillis": 2.250526,
+            "maxMillis": 4.270772,
+            "stateReads": 3,
+            "stateWrites": 0,
+            "sampledJvmHeapBefore": 105851720,
+            "sampledJvmHeapAfter": 106229784
+        },
+        {
+            "receipts": 1000,
+            "utf8Bytes": 354448,
+            "syncMillis": [
+                177.439684,
+                120.286203,
+                74.802239
+            ],
+            "medianMillis": 120.286203,
+            "maxMillis": 177.439684,
+            "stateReads": 3,
+            "stateWrites": 0,
+            "sampledJvmHeapBefore": 109035864,
+            "sampledJvmHeapAfter": 126097144
+        },
+        {
+            "receipts": 10000,
+            "utf8Bytes": 3540448,
+            "syncMillis": [
+                395.858141,
+                301.977696,
+                223.062051
+            ],
+            "medianMillis": 301.977696,
+            "maxMillis": 395.858141,
+            "stateReads": 3,
+            "stateWrites": 0,
+            "sampledJvmHeapBefore": 163591560,
+            "sampledJvmHeapAfter": 33761792
+        },
+        {
+            "receipts": 47392,
+            "utf8Bytes": 16777216,
+            "syncMillis": [
+                1074.15908,
+                935.252205,
+                1042.418764
+            ],
+            "medianMillis": 1042.418764,
+            "maxMillis": 1074.15908,
+            "stateReads": 3,
+            "stateWrites": 0,
+            "sampledJvmHeapBefore": 70664384,
+            "sampledJvmHeapAfter": 415696288
+        }
+    ],
+    "ceilingReserveRejected": true,
+    "receiptsUnchanged": true,
+    "postCalls": 0,
+    "alarmCancelled": true,
+    "hooksDisabled": true,
+    "elapsedMillis": 7653.623534
+}
+
+BUILD SUCCESSFUL in 20s
+8 actionable tasks: 1 executed, 7 up-to-date

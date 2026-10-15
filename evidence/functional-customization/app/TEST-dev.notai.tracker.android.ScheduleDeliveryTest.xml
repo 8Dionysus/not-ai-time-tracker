@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.ScheduleDeliveryTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-15T18:52:37.953Z" hostname="69b2b5b46001" time="3.463">
+  <properties/>
+  <testcase name="rendererOptOutOfCurrentSeriesIsRejectedBeforeNotifyInsteadOfCancellingAfterPost" classname="dev.notai.tracker.android.ScheduleDeliveryTest" time="3.352"/>
+  <testcase name="oneAlarmPostsOnceAndReopenKeepsReceiptAndRevocationCancelsNotice" classname="dev.notai.tracker.android.ScheduleDeliveryTest" time="0.044"/>
+  <testcase name="unboundRendererAndPermissionNeverArmOrConsumeAnOccurrence" classname="dev.notai.tracker.android.ScheduleDeliveryTest" time="0.021"/>
+  <testcase name="startedOccurrenceCancelsPendingWithoutInventingAnotherSession" classname="dev.notai.tracker.android.ScheduleDeliveryTest" time="0.028"/>
+  <testcase name="backgroundWakeCannotInitializeAMissingDataset" classname="dev.notai.tracker.android.ScheduleDeliveryTest" time="0.017"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

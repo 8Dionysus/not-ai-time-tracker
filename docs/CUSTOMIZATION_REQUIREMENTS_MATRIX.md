@@ -29,3 +29,7 @@ stable snapshots through edit/archive, independent catalog transfer without fact
 dependency closure and updated-origin conflicts, COPY/retention/re-export, stale
 previews, settings validation and legacy→migration→export→restore comparison.
 UI callers/rendering and real-device acceptance remain separate.
+
+Exact runtime `fe0e490a932f3a789e1a7b78de575634ec6fbbef`: core83/app67,
+zero failures/errors/skips, full unsigned build and release lint0errors. Commands,
+artifact hashes and raw evidence: [functional verification](FUNCTIONAL_CUSTOMIZATION_VERIFICATION.md).

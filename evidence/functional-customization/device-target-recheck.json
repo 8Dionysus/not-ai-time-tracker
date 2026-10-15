@@ -1,0 +1,10 @@
+{
+  "afterEnvironmentReady": true,
+  "sdkEmulator": false,
+  "systemImages": false,
+  "kvm": false,
+  "agentAvd": false,
+  "configuredAvd": false,
+  "workspaceAvd": false,
+  "localProcesses": ""
+}

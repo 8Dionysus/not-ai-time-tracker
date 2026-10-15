@@ -1,6 +1,7 @@
 # Schedule delivery coordination: backend and caller contract
 
-15 October 2026. Domain persistence remains Room7 / portable JSON9. Delivery state
+15 October 2026. Initial delivery coordination used Room7/portable JSON9; the current
+[functional extension](FUNCTIONAL_CUSTOMIZATION_HANDOFF.md) uses Room8/JSON10. Delivery state
 is a separate bounded operational sidecar (format1), not a fact or a completion mark.
 
 ## Core and platform boundary
@@ -112,6 +113,8 @@ UI capability. Terminal post must be short and must not render, mutate Tracker,
 read delivery state or reenter the coordinator. Only OS submission runs under the
 domain gate; a slow Binder can delay concurrent commands and needs device QA.
 ScheduleNoticeFactory and its Opus-owned rendering signature are unchanged.
+The complete fresh projection must still equal the rendered projection. A changed
+day policy/relative-day caption therefore refuses post even without a series revision change.
 Factories must still avoid side effects; the guard handles the reviewed regression.
 This serializes submission against domain commits. It cannot retract sound already
 accepted by Android before a later opt-out, nor make OS display/permission/clock

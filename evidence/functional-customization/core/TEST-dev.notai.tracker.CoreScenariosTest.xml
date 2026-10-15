@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.CoreScenariosTest" tests="23" skipped="0" failures="0" errors="0" timestamp="2026-10-15T18:50:24.252Z" hostname="69b2b5b46001" time="22.945">
+  <properties/>
+  <testcase name="transferRetentionConfirmationClosureAndArchive" classname="dev.notai.tracker.CoreScenariosTest" time="1.042"/>
+  <testcase name="typedImportIssuesPreserveAtomicityAndProvenance" classname="dev.notai.tracker.CoreScenariosTest" time="0.091"/>
+  <testcase name="selectiveGoalsFavoritesFocusAndUndo" classname="dev.notai.tracker.CoreScenariosTest" time="0.196"/>
+  <testcase name="selectiveScheduleMeasurementClosureAndResume" classname="dev.notai.tracker.CoreScenariosTest" time="0.212"/>
+  <testcase name="smallHistoryAndExport" classname="dev.notai.tracker.CoreScenariosTest" time="2.99"/>
+  <testcase name="transferRetentionCrashRaceAndStale" classname="dev.notai.tracker.CoreScenariosTest" time="0.048"/>
+  <testcase name="functionalScheduleSettingsPersistAndResolveCivilDays" classname="dev.notai.tracker.CoreScenariosTest" time="0.054"/>
+  <testcase name="scheduleDstFutureAndNoAutomaticFacts" classname="dev.notai.tracker.CoreScenariosTest" time="0.012"/>
+  <testcase name="transferRetentionProtectsPendingAndPreservesLeases" classname="dev.notai.tracker.CoreScenariosTest" time="0.191"/>
+  <testcase name="scheduleLocalizationAndArchiveContract" classname="dev.notai.tracker.CoreScenariosTest" time="0.036"/>
+  <testcase name="backupReplacementAndFailure" classname="dev.notai.tracker.CoreScenariosTest" time="15.349"/>
+  <testcase name="transferRetentionCopyPreservesSourceIdentityAndDetectsEdits" classname="dev.notai.tracker.CoreScenariosTest" time="0.235"/>
+  <testcase name="timerPath" classname="dev.notai.tracker.CoreScenariosTest" time="2.078"/>
+  <testcase name="scheduleDeliveryUsesOneAlarmAndDurableReceiptsWithoutFacts" classname="dev.notai.tracker.CoreScenariosTest" time="0.018"/>
+  <testcase name="scheduleFinalPostSerializesWithConcurrentDomainCommandsWithoutWritingFacts" classname="dev.notai.tracker.CoreScenariosTest" time="0.167"/>
+  <testcase name="concurrentSelectiveResumeKeepsAppliedReceipt" classname="dev.notai.tracker.CoreScenariosTest" time="0.01"/>
+  <testcase name="liveTimerKeepsCompletedHistoryIndexProof" classname="dev.notai.tracker.CoreScenariosTest" time="0.01"/>
+  <testcase name="standalonePersonalCatalogTransferUsesExistingImportEngine" classname="dev.notai.tracker.CoreScenariosTest" time="0.101"/>
+  <testcase name="selectiveGroupsRepeatConflictAndStale" classname="dev.notai.tracker.CoreScenariosTest" time="0.042"/>
+  <testcase name="reviewedDraftSwitchIsOneAtomicCommit" classname="dev.notai.tracker.CoreScenariosTest" time="0.001"/>
+  <testcase name="namedPersonalObjectsPreserveClassificationAndHistory" classname="dev.notai.tracker.CoreScenariosTest" time="0.006"/>
+  <testcase name="scheduleRendererCannotPostAfterChangingTheCurrentOccurrence" classname="dev.notai.tracker.CoreScenariosTest" time="0.02"/>
+  <testcase name="scheduleCanonicalReceiptsAndSameDayRuleEdits" classname="dev.notai.tracker.CoreScenariosTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

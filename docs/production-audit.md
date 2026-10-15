@@ -94,13 +94,25 @@ Synthetic JVM timings/heap samples do not establish phone PSS/mAh. Full history,
 report and choice indexes still scale with history; that is not automatically a leak.
 Idle overlay FGS remains available for the user's requested always-available button.
 
-## Latest addressed checkpoint
+## Prior static checkpoint
 
 Runtime `d0888a53c0d5446ac201b26933a061a110618be1` passed core74/app63,
 zero failures/errors/skips; unsigned debug/release and lint0errors/60warnings/1hint.
 Full run6m9s; a separate profile-only command19s measures the16MiB receipt ceiling.
 See [addressed findings and exact resource limits](BACKEND_STATIC_FOLLOWUP.md).
 No palette/theme model was added; the user deferred that model to Opus.
+
+## Latest functional checkpoint
+
+Runtime `fe0e490a932f3a789e1a7b78de575634ec6fbbef` passed core83/app67,
+zero failures/errors/skips; unsigned debug/release and lint0errors/60warnings/1hint.
+Full run6m58s; the separate receipt profile command20s. Current persistent versions
+are Room8/fullJSON10, selective reader1/2. Own catalog roots can transfer without
+facts; schedule day/home-zone/quiet-shade preferences persist without rewriting
+history/reportZone/timer anchors. The final post guard includes the full rendered
+projection. See [functional verification](FUNCTIONAL_CUSTOMIZATION_VERIFICATION.md)
+and the [requirements/API matrix](CUSTOMIZATION_REQUIREMENTS_MATRIX.md).
+No indexed receipt journal, palette/theme model or UI implementation is claimed.
 
 ## File coverage
 

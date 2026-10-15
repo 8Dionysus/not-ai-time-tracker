@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.PrivateCopyMetadataTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-15T18:51:37.523Z" hostname="69b2b5b46001" time="8.166">
+  <properties/>
+  <testcase name="rawOversizeAndMalformedUtf8RefuseReadWithoutChangingSource" classname="dev.notai.tracker.android.PrivateCopyMetadataTest" time="7.894"/>
+  <testcase name="writerCapacityRefusalPreservesReferencesAndAllowsExplicitRecoveryRelease" classname="dev.notai.tracker.android.PrivateCopyMetadataTest" time="0.197"/>
+  <testcase name="specialMetadataFileRefusesBeforeOpeningABlockingStream" classname="dev.notai.tracker.android.PrivateCopyMetadataTest" time="0.075"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

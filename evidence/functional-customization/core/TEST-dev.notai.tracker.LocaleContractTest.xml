@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.LocaleContractTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-15T18:50:49.516Z" hostname="69b2b5b46001" time="0.014">
+  <properties/>
+  <testcase name="onePreferenceFollowsSystemOrLastConfirmedExplicitChange" classname="dev.notai.tracker.LocaleContractTest" time="0.01"/>
+  <testcase name="qualityAvailabilityScriptsAndOverridesStayIndependent" classname="dev.notai.tracker.LocaleContractTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.SealedArchiveGraphTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-10-15T18:50:49.917Z" hostname="69b2b5b46001" time="0.431">
+  <properties/>
+  <testcase name="activeGraphOwnerAndRecoveryProtectAllSharedCopies" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.07"/>
+  <testcase name="v1MetadataMigratesWithoutChangingFlatOwnershipOrWritingOnRead" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.004"/>
+  <testcase name="expandingGraphDoesNotTrustStaleLinkCountsOrUnregisteredNewOwner" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.022"/>
+  <testcase name="duplicateMemberIdentityOrPathRejectsBeforeAuthority" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.002"/>
+  <testcase name="partialAliasUnlinkReconcilesAcrossRestartAndActiveOwnerBlocksResume" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.069"/>
+  <testcase name="nestedUnknownChildAndAncestorReplacementBlockConnectedGraph" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.017"/>
+  <testcase name="externalAliasInsertedImmediatelyBeforeUnlinkStopsWithoutDeletingIt" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.071"/>
+  <testcase name="uncertainRegistrationIsAtomicAndDoesNotMutateArchiveBytes" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.01"/>
+  <testcase name="renameCrashCanReturnWholeNestedGraphWithoutDeletingAnything" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.024"/>
+  <testcase name="nestedGraphReopensAndUnlinksOnlySelectedAliases" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.043"/>
+  <testcase name="incompleteOrExternalGraphCannotGainAuthority" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.035"/>
+  <testcase name="interruptedDirectoryFinalizationIsReadOnlyUntilExplicitResume" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.028"/>
+  <testcase name="deletingEverySealedOwnerNeedsLastUnusedCopyAcknowledgementBeforeAnyRename" classname="dev.notai.tracker.SealedArchiveGraphTest" time="0.032"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

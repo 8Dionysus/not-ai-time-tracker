@@ -50,40 +50,81 @@ internal fun resolveScheduleTime(date: LocalDate,time: LocalTime,zone: ZoneId): 
     }
 }
 object Schedules {
+    private fun occurrence(series: ScheduleSeries,original: LocalDate,o: OccurrenceOverride?,link: ScheduleStartLink?,now: Instant,deviceZone: ZoneId): ScheduleProjection? {
+        val key = OccurrenceKey(series.id,original.toString())
+        val rule = series.rule(original) ?: return null
+        if(!rule.includes(original) && o == null && link == null) return null
+        val date = o?.date?.let(::scheduleDate) ?: original
+        val time = (if(o?.replaceTime == true) o.localTime else rule.localTime)?.let(::scheduleTime)
+        val zone = if(rule.zonePolicy == ScheduleZonePolicy.FIXED) scheduleZone(rule.zoneId!!) else deviceZone
+        val resolved = time?.let { resolveScheduleTime(date,it,zone) }
+        val reminder = (if(o?.replaceReminder == true) o.reminderTime else rule.reminderTime)?.let(::scheduleTime)
+        val today = ScheduleDayResolver.date(now,deviceZone)
+        val state = when {
+            link != null -> OccurrenceState.STARTED
+            o?.operation == OverrideOperation.SKIP -> OccurrenceState.SKIPPED
+            o?.operation == OverrideOperation.MOVE -> OccurrenceState.MOVED
+            date < today -> OccurrenceState.OVERDUE
+            date == today -> OccurrenceState.TODAY
+            else -> OccurrenceState.SCHEDULED
+        }
+        return ScheduleProjection(key,series.revision,o?.revision,original,date,time,o?.selection ?: rule.selection,zone.id,resolved?.first,resolved?.second,
+            if(rule.alertsEnabled && time != null && reminder != null && state !in setOf(OccurrenceState.SKIPPED,OccurrenceState.STARTED)) resolveScheduleTime(date,reminder,zone).first else null,
+            link?.sessionId,state)
+    }
+    fun occurrence(data: Dataset,key: OccurrenceKey,now: Instant,deviceZone: ZoneId): ScheduleProjection? {
+        val series = data.schedule.series.singleOrNull { it.id == key.seriesId && it.state == ScheduleState.ACTIVE } ?: return null
+        return occurrence(series,scheduleDate(key.originalDate),data.schedule.overrides.singleOrNull { it.key == key },data.schedule.links.singleOrNull { it.key == key },now,deviceZone)
+    }
     fun project(data: Dataset,first: LocalDate,last: LocalDate,now: Instant,deviceZone: ZoneId,includeInactive: Boolean = false): List<ScheduleProjection> {
         ensure(!last.isBefore(first) && ChronoUnit.DAYS.between(first,last) <= 3660,"Projection range exceeds 3661 days")
-        val schedule = data.schedule;val today = ScheduleDayResolver.date(now,deviceZone)
+        val schedule = data.schedule
         val overrides = schedule.overrides.associateBy { it.key };val links = schedule.links.associateBy { it.key }
         return schedule.series.filter { includeInactive || it.state == ScheduleState.ACTIVE }.flatMap { series ->
-            // Moved-in occurrences are included even when their original date is outside the range.
             val dates = generateSequence(first) { if(it < last) it.plusDays(1) else null }.toMutableSet()
             schedule.overrides.filter { it.key.seriesId == series.id && it.date?.let(::scheduleDate)?.let { d -> d in first..last } == true }.forEach { dates += scheduleDate(it.key.originalDate) }
             dates.mapNotNull { original ->
-                val key = OccurrenceKey(series.id,original.toString());val o = overrides[key]
-                val rule = series.rule(original) ?: return@mapNotNull null
-                if(!rule.includes(original) && o == null && links[key] == null) return@mapNotNull null
-                val date = o?.date?.let(::scheduleDate) ?: original
-                if(date !in first..last) return@mapNotNull null
-                val time = (if(o?.replaceTime == true) o.localTime else rule.localTime)?.let(::scheduleTime)
-                val zone = if(rule.zonePolicy == ScheduleZonePolicy.FIXED) scheduleZone(rule.zoneId!!) else deviceZone
-                val resolved = time?.let { resolveScheduleTime(date,it,zone) }
-                val reminder = (if(o?.replaceReminder == true) o.reminderTime else rule.reminderTime)?.let(::scheduleTime)
-                val link = links[key]
-                val state = when {
-                    link != null -> OccurrenceState.STARTED
-                    o?.operation == OverrideOperation.SKIP -> OccurrenceState.SKIPPED
-                    o?.operation == OverrideOperation.MOVE -> OccurrenceState.MOVED
-                    date < today -> OccurrenceState.OVERDUE
-                    date == today -> OccurrenceState.TODAY
-                    else -> OccurrenceState.SCHEDULED
-                }
-                ScheduleProjection(key,series.revision,o?.revision,original,date,time,o?.selection ?: rule.selection,zone.id,resolved?.first,resolved?.second,
-                    if(rule.alertsEnabled && time != null && reminder != null && state !in setOf(OccurrenceState.SKIPPED,OccurrenceState.STARTED)) resolveScheduleTime(date,reminder,zone).first else null,
-                    link?.sessionId,state)
+                val key = OccurrenceKey(series.id,original.toString())
+                occurrence(series,original,overrides[key],links[key],now,deviceZone)?.takeIf { it.date in first..last }
             }
         }.sortedWith(compareBy<ScheduleProjection> { it.date }.thenBy { it.localTime ?: LocalTime.MAX }.thenBy { it.key.seriesId }.thenBy { it.key.originalDate })
     }
+    /** Closest future reminder(s), including distant explicit dates and moved occurrences.
+     * Weekly candidates jump by weeks; no expanding years of recurrence or arbitrary horizon. */
+    fun nextReminders(data: Dataset,now: Instant,deviceZone: ZoneId,excluded: Set<OccurrenceKey> = emptySet()): List<ScheduleProjection> {
+        val schedule = data.schedule;val overrides = schedule.overrides.associateBy { it.key };val links = schedule.links.associateBy { it.key }
+        val blocked = overrides.keys+links.keys+excluded
+        val candidates = mutableMapOf<OccurrenceKey,ScheduleProjection>()
+        fun add(series: ScheduleSeries,date: LocalDate) {
+            val key = OccurrenceKey(series.id,date.toString());if(key in excluded) return
+            occurrence(series,date,overrides[key],links[key],now,deviceZone)?.takeIf { it.reminderInstant?.isAfter(now) == true }?.let { candidates[key] = it }
+        }
+        for(series in schedule.series.filter { it.state == ScheduleState.ACTIVE }) {
+            schedule.overrides.filter { it.key.seriesId == series.id }.forEach { add(series,scheduleDate(it.key.originalDate)) }
+            series.revisions.forEachIndexed { index,version ->
+                val rule = version.rule
+                if(!rule.alertsEnabled || rule.localTime == null || rule.reminderTime == null) return@forEachIndexed
+                val zone = if(rule.zonePolicy == ScheduleZonePolicy.FIXED) scheduleZone(rule.zoneId!!) else deviceZone
+                val first = maxOf(scheduleDate(rule.startDate),scheduleDate(version.effectiveFrom),now.atZone(zone).toLocalDate())
+                val until = rule.until?.let(::scheduleDate)
+                val endExclusive = series.revisions.getOrNull(index+1)?.effectiveFrom?.let(::scheduleDate)
+                fun within(date: LocalDate) = date.year in 1..9999 && (until == null || date <= until) && (endExclusive == null || date < endExclusive)
+                rule.extraDates.map(::scheduleDate).filter { it >= first && within(it) && OccurrenceKey(series.id,it.toString()) !in blocked }.forEach { add(series,it) }
+                for(day in rule.weekdays) {
+                    var date = first.plusDays(((day-first.dayOfWeek.value+7)%7).toLong())
+                    while(within(date)) {
+                        val key = OccurrenceKey(series.id,date.toString())
+                        if(key !in blocked) { add(series,date);if(key in candidates) break }
+                        date = date.plusWeeks(1)
+                    }
+                }
+            }
+        }
+        val next = candidates.values.minOfOrNull { it.reminderInstant!! } ?: return emptyList()
+        return candidates.values.filter { it.reminderInstant == next }.sortedWith(compareBy<ScheduleProjection> { it.key.seriesId }.thenBy { it.key.originalDate })
+    }
 }
+
 internal fun validateSchedule(data: Dataset) {
     val s = data.schedule
     ensure(s.series.map { it.id }.distinct().size == s.series.size && s.series.all { it.id.isNotBlank() && it.revision > 0 },"Invalid/duplicate series")

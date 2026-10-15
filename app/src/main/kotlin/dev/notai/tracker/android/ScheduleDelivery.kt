@@ -1,0 +1,141 @@
+package dev.notai.tracker.android
+
+import android.Manifest
+import android.app.*
+import android.content.*
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import dev.notai.tracker.*
+import java.io.File
+import java.time.ZoneId
+import kotlinx.coroutines.*
+
+/** Rendering/channel creation belongs to Opus. Install an application-scoped factory at process
+ * startup, before receivers/runtime initialize; never retain an Activity in this binding. */
+fun interface ScheduleNoticeFactory {
+    fun create(context: Context,ticket: ScheduleReminderTicket,projection: ScheduleProjection): Notification
+}
+object ScheduleNoticeBinding {
+    @Volatile internal var factory: ScheduleNoticeFactory? = null
+    fun install(value: ScheduleNoticeFactory?) {
+        factory = value;TrackerRuntime.refreshExistingSchedule()
+    }
+}
+class AndroidScheduleDeliveryStore(context: Context): ScheduleDeliveryStore {
+    private val file = File(context.applicationContext.noBackupFilesDir,"schedule-delivery.json")
+    private val gate = synchronized(gates) { gates.getOrPut(file.absolutePath) { Any() } }
+    private val metadata = PrivateFileMaintenance.metadata(file)
+    override fun <T> locked(block: ()->T): T = synchronized(gate,block)
+    override fun read(): ScheduleDeliveryState {
+        check(Thread.holdsLock(gate));return metadata.read()?.let { codec.decodeFromString<ScheduleDeliveryState>(it) } ?: ScheduleDeliveryState()
+    }
+    override fun writeDurably(state: ScheduleDeliveryState) {
+        check(Thread.holdsLock(gate));metadata.writeDurably(codec.encodeToString(state))
+    }
+    companion object { private val gates = mutableMapOf<String,Any>() }
+}
+class AndroidScheduleDeliveryPlatform(context: Context,private val factory: ()->ScheduleNoticeFactory? = { ScheduleNoticeBinding.factory }): ScheduleDeliveryPlatform {
+    private val context = context.applicationContext
+    companion object {
+        const val CHANNEL = "schedule_reminders"
+        internal const val ACTION = "dev.notai.tracker.SCHEDULE_REMINDER"
+        internal const val HASH = "scheduleBatchHash"
+        private const val TICKET = "scheduleReminderTicket"
+        private const val TAG = "schedule:"
+        private const val NOTICE = 84
+    }
+    private fun intent() = Intent(context,ScheduleAlarmReceiver::class.java).setAction(ACTION).setData(Uri.parse("notai://schedule/reminder"))
+    override fun availability(): ScheduleDeliveryAvailability = try {
+        val manager = context.getSystemService(NotificationManager::class.java)
+        val alarm = context.getSystemService(AlarmManager::class.java)
+        val blockers = mutableSetOf<ScheduleDeliveryBlocker>()
+        if(factory() == null) blockers += ScheduleDeliveryBlocker.RENDERER_UNAVAILABLE
+        if(manager == null || alarm == null) blockers += ScheduleDeliveryBlocker.PLATFORM_UNAVAILABLE
+        if(Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED || manager?.areNotificationsEnabled() == false)
+            blockers += ScheduleDeliveryBlocker.PERMISSION
+        if(manager?.getNotificationChannel(CHANNEL)?.importance.let { it == null || it == NotificationManager.IMPORTANCE_NONE }) blockers += ScheduleDeliveryBlocker.CHANNEL
+        val quiet = when(manager?.currentInterruptionFilter) {
+            NotificationManager.INTERRUPTION_FILTER_ALL -> ScheduleQuietMode.ALL
+            NotificationManager.INTERRUPTION_FILTER_PRIORITY -> ScheduleQuietMode.PRIORITY
+            NotificationManager.INTERRUPTION_FILTER_ALARMS -> ScheduleQuietMode.ALARMS_ONLY
+            NotificationManager.INTERRUPTION_FILTER_NONE -> ScheduleQuietMode.NONE
+            else -> ScheduleQuietMode.UNKNOWN
+        }
+        ScheduleDeliveryAvailability(blockers,quiet)
+    } catch(_: RuntimeException) { ScheduleDeliveryAvailability(setOf(ScheduleDeliveryBlocker.PLATFORM_UNAVAILABLE)) }
+    override fun schedule(batch: ScheduleAlarmBatch) {
+        check(availability().ready)
+        val pending = PendingIntent.getBroadcast(context,0,intent().putExtra(HASH,batch.hash),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        context.getSystemService(AlarmManager::class.java).setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,batch.at,pending)
+    }
+    override fun cancelAlarm() {
+        val pending = PendingIntent.getBroadcast(context,0,intent(),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_NO_CREATE) ?: return
+        context.getSystemService(AlarmManager::class.java).cancel(pending)
+    }
+    override fun post(ticket: ScheduleReminderTicket,projection: ScheduleProjection): Boolean {
+        if(!availability().ready) return false
+        val render = factory() ?: return false
+        val notification = render.create(context,ticket,projection)
+        if(notification.channelId != CHANNEL || !availability().ready) return false
+        if(notification.extras == null) notification.extras = android.os.Bundle()
+        notification.extras.putString(TICKET,codec.encodeToString(ticket))
+        context.getSystemService(NotificationManager::class.java).notify(TAG+ticket.identity,NOTICE,notification)
+        return true // notify returned; not an OS/user visibility acknowledgement.
+    }
+    override fun visible(): List<ScheduleReminderTicket> = context.getSystemService(NotificationManager::class.java).activeNotifications.mapNotNull { n ->
+        if(n.id != NOTICE || n.tag?.startsWith(TAG) != true) return@mapNotNull null
+        val raw = n.notification.extras.getString(TICKET) ?: return@mapNotNull null
+        if(raw.length > 65536) return@mapNotNull null
+        runCatching { codec.decodeFromString<ScheduleReminderTicket>(raw) }.getOrNull()?.takeIf { n.tag == TAG+it.identity }
+    }
+    override fun cancelNotice(ticket: ScheduleReminderTicket) = context.getSystemService(NotificationManager::class.java).cancel(TAG+ticket.identity,NOTICE)
+    override fun configureWakeups(enabled: Boolean) {
+        val component = ComponentName(context,SchedulePlatformReceiver::class.java);val manager = context.packageManager
+        val current = manager.getComponentEnabledSetting(component)
+        val desired = if(enabled) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+        if(current != desired && !(current == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT && !enabled))
+            manager.setComponentEnabledSetting(component,desired,PackageManager.DONT_KILL_APP)
+    }
+}
+class AndroidScheduleDelivery(context: Context,tracker: Tracker) {
+    private val platform = AndroidScheduleDeliveryPlatform(context)
+    val coordinator = ScheduleDelivery(tracker,AndroidScheduleDeliveryStore(context),platform) { ZoneId.systemDefault() }
+    /** Call on foreground/platform changes too; unchanged Dataset revision is not a clock/permission witness. */
+    fun synchronize() = coordinator.synchronize()
+    fun onAlarm(hash: String) = coordinator.onAlarm(hash)
+}
+internal fun hasScheduleWakeSource(context: Context): Boolean {
+    val store = AndroidScheduleDeliveryStore(context)
+    return store.locked { store.read().pending != null } && DatabaseFiles.exists(context)
+}
+class ScheduleAlarmReceiver: BroadcastReceiver() {
+    override fun onReceive(context: Context,intent: Intent) {
+        if(intent.action != AndroidScheduleDeliveryPlatform.ACTION) return
+        val hash = intent.getStringExtra(AndroidScheduleDeliveryPlatform.HASH)?.takeIf { it.matches(Regex("[0-9a-f]{64}")) } ?: return
+        val result = goAsync()
+        CoroutineScope(SupervisorJob()+Dispatchers.IO).launch {
+            try {
+                if(!DatabaseFiles.exists(context)) return@launch // A background wake-up must not initialize an empty replacement store.
+                TrackerRuntime.get(context).scheduleDelivery.onAlarm(hash)
+            }
+            catch(e: Exception) { if(e !is CancellationException) android.util.Log.w("ScheduleDelivery","Reminder unavailable; plan/facts unchanged") }
+            finally { result.finish() }
+        }
+    }
+}
+/** Disabled in the manifest. A usable, explicitly opted-in reminder enables it; ordinary timer
+ * use does not add a boot worker. Cold delivery still requires factory binding in Application. */
+class SchedulePlatformReceiver: BroadcastReceiver() {
+    override fun onReceive(context: Context,intent: Intent) {
+        if(intent.action !in setOf(Intent.ACTION_BOOT_COMPLETED,Intent.ACTION_TIME_CHANGED,Intent.ACTION_TIMEZONE_CHANGED,Intent.ACTION_MY_PACKAGE_REPLACED)) return
+        val result = goAsync()
+        CoroutineScope(SupervisorJob()+Dispatchers.IO).launch {
+            try {
+                if(!hasScheduleWakeSource(context)) return@launch
+                TrackerRuntime.get(context).scheduleDelivery.synchronize()
+            } catch(e: Exception) { if(e !is CancellationException) android.util.Log.w("ScheduleDelivery","Reminder reschedule unavailable; foreground review required") }
+            finally { result.finish() }
+        }
+    }
+}

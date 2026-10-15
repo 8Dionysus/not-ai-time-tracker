@@ -22,6 +22,21 @@ abstract class ScenarioContract {
     abstract fun createStore(): StateStore
     open fun reopen(store: StateStore): StateStore = store
     private fun expect(code: ErrorCode,block: ()->Unit) { assertEquals(code,assertFailsWith<CoreError>(block = block).code) }
+    @Test fun scheduleDeliveryUsesOneAlarmAndDurableReceiptsWithoutFacts() {
+        val clock = FakeClock(wall = Instant.parse("2026-10-10T09:00:00Z").toEpochMilli());var t = Tracker(createStore(),clock)
+        val rule = ScheduleRule(Classification(),"2026-10-10",extraDates = setOf("2026-10-10","2026-10-11"),localTime = "10:00",alertsEnabled = true,reminderTime = "09:30")
+        for(id in listOf("a","b")) t.scheduleCommand(ScheduleCommand("create-$id",t.snapshot().token,ScheduleAction.CREATE,id,rule = rule))
+        val before = t.data();val receipts = ScheduleDeliveryFixtureStore();val platform = ScheduleDeliveryFixturePlatform()
+        val delivery = ScheduleDelivery(t,receipts,platform) { java.time.ZoneId.of("UTC") }
+        val batch = delivery.synchronize().next!!;assertEquals(2,batch.tickets.size);assertEquals(batch,platform.pending)
+        clock.advance(30*60_000);val posted = delivery.onAlarm(batch.hash)
+        assertEquals(listOf(ScheduleAttemptStatus.POSTED,ScheduleAttemptStatus.POSTED),posted.attempted.map { it.status })
+        assertEquals(2,platform.postCalls.size);assertEquals(before,t.data());assertTrue(t.data().sessions.isEmpty())
+        t = Tracker(reopen(t.store),clock)
+        val reopened = ScheduleDelivery(t,receipts,platform) { java.time.ZoneId.of("UTC") }
+        assertEquals(ScheduleDeliveryOutcome.STALE_CALLBACK,reopened.onAlarm(batch.hash).outcome)
+        assertEquals(2,platform.postCalls.size);assertEquals(before,t.data());assertEquals("2026-10-11",platform.pending!!.tickets.first().key.originalDate)
+    }
     @Test fun liveTimerKeepsCompletedHistoryIndexProof() {
         val clock = FakeClock();val t = Tracker(createStore(),clock)
         repeat(12) { i -> t.manual(t.snapshot().token,clock.wall-30000+i*2000,clock.wall-29000+i*2000,Classification(name = "Saved $i")) }

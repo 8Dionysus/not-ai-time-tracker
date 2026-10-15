@@ -883,9 +883,11 @@ class RoomScenariosTest: ScenarioContract() {
         val due = t.snapshot().focus!!;val before = t.data()
         org.robolectric.Shadows.shadowOf(context).denyPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
         org.junit.Assert.assertFalse(FocusSignals.deliver(context,t))
+        org.junit.Assert.assertEquals(FocusDeliveryStatus.BLOCKED_BEFORE_POST,FocusSignals.deliverResult(context,t).status)
         org.robolectric.Shadows.shadowOf(context).grantPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
         org.junit.Assert.assertTrue(FocusSignals.deliver(context,t))
         org.junit.Assert.assertFalse(FocusSignals.deliver(context,t))
+        org.junit.Assert.assertEquals(FocusDeliveryStatus.PREVIOUS_RECEIPT,FocusSignals.deliverResult(context,t).status)
         val manager = context.getSystemService(android.app.NotificationManager::class.java)
         fun noticeVisible() = manager.activeNotifications.any { it.id == 43 }
         org.junit.Assert.assertTrue(noticeVisible())
@@ -895,6 +897,7 @@ class RoomScenariosTest: ScenarioContract() {
         val delayedRefresh = { FocusSignals.refresh(context,t) }
         t.focusNext(t.snapshot().token)
         FocusSignals.refresh(context,t)
+        org.junit.Assert.assertEquals(FocusDeliveryStatus.NOT_DUE,FocusSignals.deliverResult(context,t).status)
         val alarms = org.robolectric.Shadows.shadowOf(context.getSystemService(android.app.AlarmManager::class.java))
         fun focusAlarmPhase(): Long = alarms.scheduledAlarms.mapNotNull { alarm ->
             alarm.operation?.let { org.robolectric.Shadows.shadowOf(it).savedIntent }

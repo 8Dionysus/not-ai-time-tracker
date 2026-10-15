@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <application android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/Theme.NotAi"
         android:allowBackup="false" android:fullBackupContent="false" android:dataExtractionRules="@xml/data_extraction_rules" android:supportsRtl="true">
@@ -21,6 +22,15 @@
         <activity android:name=".TechnicalActivity" android:exported="false" android:label="@string/technical_name"
             android:theme="@android:style/Theme.Material.Light.NoActionBar" />
         <receiver android:name=".FocusAlarmReceiver" android:exported="false" />
+        <receiver android:name=".ScheduleAlarmReceiver" android:exported="false" />
+        <receiver android:name=".SchedulePlatformReceiver" android:exported="false" android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
         <receiver android:name=".WidgetPinReceiver" android:exported="false" />
         <receiver android:name=".TimerActionReceiver" android:exported="false" />
         <receiver android:name=".QuickChoiceReceiver" android:exported="false" />

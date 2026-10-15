@@ -1,6 +1,16 @@
 # Native dependency evidence and remaining binding
 
-Observed release dependency: `androidx.graphics:graphics-path:1.0.1`. Its cached AAR is 39,380 bytes, SHA-256 `8ca4032b6d79b351f0b59ad4b580eddbb9423e1652f7c958830687f1eee2ec03`. The resolved module metadata records the same hash. The release APK contains only this library's four ABI variants of `libandroidx.graphics.path.so`; their bytes match that AAR and the saved native alignment evidence. POM metadata declares Apache-2.0; this is not full native license clearance.
+Historical AndroidX-only inventory, before the own-code cleanup JNI was added: observed release dependency `androidx.graphics:graphics-path:1.0.1`. Its cached AAR is 39,380 bytes, SHA-256 `8ca4032b6d79b351f0b59ad4b580eddbb9423e1652f7c958830687f1eee2ec03`. The resolved module metadata records the same hash. That earlier release APK contained only this library's four ABI variants of `libandroidx.graphics.path.so`; their bytes matched that AAR and the saved native alignment evidence. POM metadata declares Apache-2.0; this is not full native license clearance.
+
+## Dated inventory update — 15 October 2026, Library v4
+
+The accepted backend snapshot `add6312` delivered release APK SHA-256 `1ee93268d556e30d424850aa91b494c0278807f45465f89fbb8bdaa78e3203ed`, built at `eefbecd`. It contains **eight** native entries: `libandroidx.graphics.path.so` and own-code `libtracker_copy_io.so`, each for arm64-v8a, armeabi-v7a, x86 and x86_64. The earlier “only this library” statement is historical, not the inventory of v4 or the current native-enabled source.
+
+The own JNI source is `core/src/main/c/private_copy_io.c`, with Android.mk/Application.mk and pinned NDK r30 (`30.0.16248370`), C11 and no selected C++ STL. It is covered by the existing project Apache-2.0 LICENSE/NOTICE and carries an Apache-2.0 SPDX header. No third-party source was relicensed. Current graph changes extend this same own-code library; final APK entry hashes belong to their exact build evidence, not this historical v4 hash.
+
+The AndroidX analysis below remains preserved as its own dependency-specific evidence. The new own JNI and its build do **not** supply the missing AndroidX release-source/build binding or establish which static runtime objects/notices apply. The later [release-specific provenance review](release/release-native-provenance-review.md) narrows that question without clearing it.
+
+## Preserved AndroidX dependency analysis
 
 The module's [published version metadata](https://dl.google.com/dl/android/maven2/androidx/graphics/graphics-path/1.0.1/graphics-path-1.0.1-versionMetadata.json) was downloaded and checked against module SHA-256 `6f54e010c759a56cfe1a2eeb1a0edfd494184791e7b5f370b3ce064e293c2ce1`. It describes API introduction versions, with no VCS revision. The [published source JAR](https://dl.google.com/dl/android/maven2/androidx/graphics/graphics-path/1.0.1/graphics-path-1.0.1-sources.jar) matches module SHA-256 `9f1b5995b9577a8876525c3411ebb2a49f9ef0e875f6aec3059e807596dc6ca6`. It contains four Kotlin sources, each with an AOSP Apache-2.0 header; no C/C++ subtree, link map, runtime notice bundle or release VCS identity is present. The AAR has no license/notice or native source subtree; its classes.jar META-INF carries version `1.0.1` and Kotlin module data, not a commit reference.
 

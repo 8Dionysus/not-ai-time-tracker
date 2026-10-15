@@ -56,6 +56,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
     fun prepareBundledCatalog(): CatalogPreview = catalogImports.prepare()
     val calendarOccurrences = CalendarOccurrences(context.applicationContext)
     val focusDueSignals = FocusDueSignals()
+    val scheduleDelivery = AndroidScheduleDelivery(context.applicationContext,tracker)
     private val surfaceScope = CoroutineScope(SupervisorJob()+Dispatchers.IO)
     internal val shortcuts = ShortcutCommands(tracker,surfaceScope)
     init {
@@ -64,6 +65,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
         StartupTrace.mark(context,"history-graph-ready")
         surfaceScope.launch {
             var previous: SurfaceSettings? = null
+            var previousSchedule: ScheduleDeliveryReport? = null
             tracker.views.catch { e ->
                 if(e is CancellationException) throw e
                 android.util.Log.w("TimerSurfaces","Store observation unavailable; open recovery controls")
@@ -71,12 +73,24 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
                 try { TimerSurfaces.refresh(context,view,previous);FocusSignals.refresh(context,tracker) }
                 catch(e: Exception) { if(e is CancellationException) throw e; android.util.Log.w("TimerSurfaces","Surface refresh unavailable") }
                 previous = view.data.settings.surfaces
+                val delivered = previousSchedule
+                if(delivered == null || delivered.sourceDatasetId != view.data.datasetId || delivered.sourceBarrier != view.data.controlBarrier || delivered.sourceSchedule != view.data.schedule) {
+                    try { previousSchedule = scheduleDelivery.synchronize() }
+                    catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("ScheduleDelivery","Schedule delivery refresh unavailable") }
+                }
             }
         }
     }
     companion object {
         @Volatile private var instance: TrackerRuntime? = null
         @Volatile private var recovering = false
+        internal fun refreshExistingSchedule() {
+            val runtime = instance ?: return
+            runtime.surfaceScope.launch {
+                try { runtime.scheduleDelivery.synchronize() }
+                catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("ScheduleDelivery","Current schedule refresh unavailable") }
+            }
+        }
         internal fun refreshExistingFocus(context: Context) {
             val runtime = instance ?: return
             runtime.surfaceScope.launch {

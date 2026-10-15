@@ -8,6 +8,9 @@ import android.os.Build
 import dev.notai.tracker.*
 import kotlinx.coroutines.*
 
+enum class FocusDeliveryStatus { POST_ACCEPTED, PREVIOUS_RECEIPT, BLOCKED_BEFORE_POST, NOT_DUE, OUTCOME_UNKNOWN }
+data class FocusDeliveryResult(val status: FocusDeliveryStatus,val focus: FocusSnapshot?)
+
 /** Opt-in, best-effort inexact delivery. No exact-alarm permission, foreground timer service,
  * automatic phase advance, DND or music. Boot/wall-clock uncertainty is still core-owned.
  */
@@ -32,6 +35,7 @@ object FocusSignals {
     fun refresh(c: Context,view: TrackerView) { TrackerRuntime.refreshExistingFocus(c) }
     /** Legacy UI callers may run on main. Report only an existing receipt and request a fresh
      * IO refresh; never open Room or post a notification from the supplied snapshot. */
+    @Deprecated("Receipt-only asynchronous compatibility; migrate to deliverResult(context, tracker) on IO and handle the typed outcome")
     fun deliver(c: Context,focus: FocusSnapshot): Boolean {
         TrackerRuntime.refreshExistingFocus(c)
         return focus.mode == FocusMode.DUE && focus.signalKey?.let {
@@ -56,12 +60,20 @@ object FocusSignals {
             android.os.SystemClock.elapsedRealtime()+state.remainingMs,intent)
         prefs.edit().putString("scheduledId",state.id).putLong("scheduledIndex",state.phaseIndex).apply()
     }
-    @Synchronized fun deliver(c: Context,tracker: Tracker): Boolean {
+    @Synchronized fun deliver(c: Context,tracker: Tracker): Boolean = deliverResult(c,tracker).status == FocusDeliveryStatus.POST_ACCEPTED
+    /** Fresh, serialized IO result. PREVIOUS_RECEIPT/OUTCOME_UNKNOWN are not delivery success and
+     * must not be converted into an automatic duplicate fallback cue. */
+    @Synchronized fun deliverResult(c: Context,tracker: Tracker): FocusDeliveryResult {
         val view = tracker.view();val focus = view.snapshot().focus
-        if(!view.data.settings.surfaces.focusSignal || focus?.mode != FocusMode.DUE || !allowed(c)) {
-            c.getSystemService(NotificationManager::class.java).cancel(NOTICE);return false
+        if(focus?.mode != FocusMode.DUE) {
+            c.getSystemService(NotificationManager::class.java).cancel(NOTICE);return FocusDeliveryResult(FocusDeliveryStatus.NOT_DUE,focus)
         }
-        return deliverCurrent(c,focus)
+        if(!view.data.settings.surfaces.focusSignal || !allowed(c)) {
+            c.getSystemService(NotificationManager::class.java).cancel(NOTICE);return FocusDeliveryResult(FocusDeliveryStatus.BLOCKED_BEFORE_POST,focus)
+        }
+        if(focus.signalKey?.let { it in preferences(c).getStringSet("delivered",emptySet()).orEmpty() } == true)
+            return FocusDeliveryResult(FocusDeliveryStatus.PREVIOUS_RECEIPT,focus)
+        return FocusDeliveryResult(if(deliverCurrent(c,focus)) FocusDeliveryStatus.POST_ACCEPTED else FocusDeliveryStatus.OUTCOME_UNKNOWN,focus)
     }
     private fun deliverCurrent(c: Context,focus: FocusSnapshot): Boolean {
         if(focus.mode != FocusMode.DUE || !allowed(c)) return false

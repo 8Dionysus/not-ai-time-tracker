@@ -155,4 +155,49 @@ class SealedArchiveGraphTest {
         assertFailsWith<CoreError> { storage.seal(item.copy(members = duplicatePaths,sha256 = payloadHash(duplicatePaths)),"exports/duplicate",true,mapOf("data" to "data","other" to "data")) }
         assertTrue(gate.state().copies.isEmpty());assertEquals("fixture",file.readText())
     }
+    @Test fun externalAliasInsertedImmediatelyBeforeUnlinkStopsWithoutDeletingIt() = fixture { root,files,_,storage ->
+        storage.sealArchiveGraph(archives(root));val external = File(root,"unregistered-live-fixture")
+        val fault = object: PrivateCopyStorage by storage {
+            override fun removeMember(item: PrivateCopy,member: CopyMember,operationId: String) {
+                val target = "cleanup-quarantine/"+files.names("cleanup-quarantine").single()
+                Files.createLink(external.toPath(),File(root,"$target/data").toPath())
+                storage.removeMember(item,member,operationId)
+            }
+        }
+        val cleanup = PrivateCopyCleanup(fault);val partial = cleanup.confirm(confirmation(preview(cleanup,setOf("a"))))
+        assertEquals(CleanupPhase.PARTIAL,partial.phase);assertTrue(partial.items.single().deletedMemberIds.isEmpty())
+        assertEquals("immutable fixture bytes",external.readText());assertEquals(4L,files.stat("database-archives/b/data")!!.links)
+        assertFailsWith<CoreError> { cleanup.operations() } // Cannot certify an incomplete graph as an exact safe resume.
+        Files.delete(external.toPath()) // Only the explicitly created external fixture alias.
+        val fresh = PrivateCopyCleanup(RegisteredCopyStorage(files,CopyMaintenance(files.metadata())))
+        val seen = fresh.operations().single();assertTrue(seen.items.single().deletedMemberIds.isEmpty())
+        assertEquals(CleanupPhase.DONE,fresh.resume(seen.operationId,fresh.remainingHash(seen)).phase)
+        assertEquals("immutable fixture bytes",File(root,"database-archives/b/data").readText())
+    }
+    @Test fun uncertainRegistrationIsAtomicAndDoesNotMutateArchiveBytes() = fixture { root,files,_,_ ->
+        val batch = archives(root);val metadata = files.metadata()
+        val gate = CopyMaintenance(object: CopyMetadata {
+            override fun read() = metadata.read()
+            override fun writeDurably(value: String) { metadata.writeDurably(value);throw IOException("fixture after registration fsync") }
+        })
+        assertFailsWith<IOException> { RegisteredCopyStorage(files,gate).sealArchiveGraph(batch) }
+        val fresh = RegisteredCopyStorage(files,CopyMaintenance(metadata))
+        assertEquals(2,fresh.inventory().items.size);assertTrue(fresh.inventory().items.all { it.selectable })
+        assertTrue(fresh.operations().isEmpty());assertFalse(File(root,"cleanup-quarantine").exists())
+        assertEquals("immutable fixture bytes",File(root,"database-archives/a/data").readText())
+    }
+    @Test fun expandingGraphDoesNotTrustStaleLinkCountsOrUnregisteredNewOwner() = fixture { root,_,gate,storage ->
+        val batch = archives(root)
+        // Remove only this fixture's B paths, so A's internal two aliases initially form a closed graph.
+        Files.delete(File(root,"database-archives/b/data").toPath());Files.delete(File(root,"database-archives/b/manifest.json").toPath());Files.delete(File(root,"database-archives/b").toPath())
+        storage.sealArchiveGraph(batch.take(1));assertTrue(storage.inventory().items.single().selectable)
+        gate.writing("fixture-create-b","b") {
+            File(root,"database-archives/b").mkdirs();Files.createLink(File(root,"database-archives/b/data").toPath(),File(root,"database-archives/a/data").toPath())
+            File(root,"database-archives/b/manifest.json").writeText("sealed fixture b")
+            assertFailsWith<ArchiveGraphRefusal> { storage.sealArchiveGraph(batch.drop(1)) }
+        }
+        assertTrue(CopyBlocker.HARDLINK_GRAPH_INCOMPLETE in storage.inventory().items.single { it.id == "a" }.hardBlockers)
+        storage.sealArchiveGraph(batch.drop(1));assertTrue(storage.inventory().items.all { it.selectable })
+        assertEquals(3,storage.archiveGraph(setOf("a")).nodes.single { it.aliases.size > 1 }.aliases.size)
+    }
 }

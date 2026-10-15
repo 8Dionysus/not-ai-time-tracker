@@ -46,7 +46,11 @@ class ExportOperations(private val context: Context) {
     private fun beginUnsafe(mime: String,title: String): ExportOperation {
         val operation = ExportOperation(newId(),mime,title);save(operation);return operation
     }
-    private fun save(operation: ExportOperation) = atomicText(File(dir(operation.id),"operation.json"),codec.encodeToString(operation))
+    private fun save(operation: ExportOperation) {
+        PrivateFileMaintenance.invalidate(context,"exports/${operation.id}")
+        atomicText(File(dir(operation.id),"operation.json"),codec.encodeToString(operation))
+        if(operation.state in setOf("COMPLETE","CANCELLED") && operation.resultReceived) PrivateCopyBackend.registerExport(context,operation.id)
+    }
     fun read(id: String): ExportOperation = codec.decodeFromString(File(dir(id),"operation.json").readText())
     fun latestPending(): ExportOperation? = directory.listFiles().orEmpty().filter { it.isDirectory }
         .sortedByDescending { File(it,"operation.json").lastModified() }.firstNotNullOfOrNull { folder ->
@@ -54,6 +58,7 @@ class ExportOperations(private val context: Context) {
         }
     fun prepare(id: String,write: (OutputStream)->Unit): ExportOperation = PrivateFileMaintenance.writing(context,"export-prepare:$id",CopyBlocker.EXPORT_WRITING) { prepareUnsafe(id,write) }
     private fun prepareUnsafe(id: String,write: (OutputStream)->Unit): ExportOperation {
+        PrivateFileMaintenance.invalidate(context,"exports/$id")
         val op = read(id);val part = File(dir(id),"data.part")
         return try {
             FileOutputStream(part).use { write(it);it.fd.sync() }
@@ -72,9 +77,18 @@ class ExportOperations(private val context: Context) {
     private fun receiveResultUnsafe(id: String,cancelled: Boolean) {
         val op = read(id)
         save(op.copy(resultReceived = true,state = if(cancelled) "CANCELLED" else op.state))
+        val gate = PrivateFileMaintenance.forContext(context)
+        gate.locked { gate.state().references.filter { it.owner == "export-chooser:$id" }.forEach(gate::release) }
     }
     fun awaitResult(id: String) = PrivateFileMaintenance.writing(context,"export-await:$id",CopyBlocker.CHOOSER_RESULT_PENDING) { awaitResultUnsafe(id) }
-    private fun awaitResultUnsafe(id: String) { val op = read(id);save(op.copy(resultReceived = false)) }
+    private fun awaitResultUnsafe(id: String) {
+        val gate = PrivateFileMaintenance.forContext(context)
+        gate.locked {
+            if(gate.state().references.none { it.owner == "export-chooser:$id" })
+                gate.acquire("export-chooser:$id",PrivateCopyBackend.itemId("exports/$id"),CopyBlocker.CHOOSER_RESULT_PENDING)
+            val op = read(id);save(op.copy(resultReceived = false))
+        }
+    }
     fun write(id: String,uri: Uri): ExportWriteResult = PrivateFileMaintenance.writing(context,"export-write:$id",CopyBlocker.EXPORT_WRITING) { writeUnsafe(id,uri) }
     private fun writeUnsafe(id: String,uri: Uri): ExportWriteResult {
         val op = read(id);val data = File(dir(id),"data")
@@ -99,7 +113,9 @@ internal class FormFiles(private val context: Context) {
     fun save(id: String?,state: FormState): String = PrivateFileMaintenance.writing(context,"form-save",CopyBlocker.LIVE_FORM_REFERENCE) { saveUnsafe(id,state) }
     private fun saveUnsafe(id: String?,state: FormState): String {
         val reference = id ?: newId();require(reference.matches(Regex("[0-9a-f-]{36}")))
-        atomicText(File(directory,"$reference.json"),codec.encodeToString(state));return reference
+        PrivateFileMaintenance.invalidate(context,"forms/$reference.json")
+        atomicText(File(directory,"$reference.json"),codec.encodeToString(state))
+        PrivateCopyBackend.registerForm(context,reference);return reference
     }
     fun read(id: String): FormState {
         require(id.matches(Regex("[0-9a-f-]{36}")));return codec.decodeFromString(File(directory,"$id.json").readText())
@@ -111,5 +127,6 @@ private fun stageRestoreUnsafe(context: Context,input: InputStream): File {
     val directory = File(context.noBackupFilesDir,"restore-inputs").apply { mkdirs() }
     val file = File(directory,"${newId()}.json")
     FileOutputStream(file).use { out -> input.copyTo(out,64*1024);out.fd.sync() };syncDirectory(directory)
+    PrivateCopyBackend.registerRestoreInput(context,file.name)
     return file // keep source even after a refusal; never overwrite a user's original
 }

@@ -11,6 +11,8 @@ import java.io.ByteArrayOutputStream
 const val MAX_BACKUP_BYTES = 10*1024*1024
 
 interface RollbackStore {
+    /** Persistent adapters hold a durable protective reference across save→verify→domain commit. */
+    fun <T> protecting(block: ()->T): T = block()
     /** Persist durably and return a reference. Do not overwrite the user's existing copies. */
     fun save(json: String): String
     fun read(reference: String): String
@@ -56,7 +58,7 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore) 
     fun prepare(json: String): RestorePreview = RestorePreview(decode(json),tracker.snapshot().token)
     fun prepare(open: ()->InputStream): RestorePreview = RestorePreview(StreamingBackup.read(open),tracker.snapshot().token)
     /** Calling apply is explicit confirmation of a preview. Abandoning the preview has no effects. */
-    fun apply(preview: RestorePreview): RestoreResult = storage {
+    fun apply(preview: RestorePreview): RestoreResult = storage { rollback.protecting {
         val old = tracker.data(); checkToken(old,preview.expected,tracker.clock.now())
         val rollbackBackup = StreamingBackup.portable(old,tracker.clock.now())
         val reference = rollback.saveSnapshot(rollbackBackup)
@@ -68,7 +70,7 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore) 
             imported to snapshot(imported,tracker.clock.now())
         }
         RestoreResult(state,reference)
-    }
+    } }
     companion object {
         fun restoredData(backup: Backup,revision: Long): Dataset {
             StreamingBackup.validateBackup(backup)

@@ -17,11 +17,13 @@ class AndroidClock(context: Context): Clock {
 }
 class PrivateRollbackStore(private val context: Context): RollbackStore {
     private val directory = File(context.noBackupFilesDir,"rollback").apply { mkdirs() }
+    override fun <T> protecting(block: ()->T): T = PrivateFileMaintenance.writing(context,"rollback-consumer",CopyBlocker.REQUIRED_BY_PENDING_RECOVERY,block)
     override fun save(json: String): String = PrivateFileMaintenance.writing(context,"rollback-save") { saveUnsafe(json) }
     private fun saveUnsafe(json: String): String {
         val file = File(directory,"rollback-${newId()}.json")
         FileOutputStream(file).use { it.write(json.toByteArray(Charsets.UTF_8)); it.fd.sync() }
         syncDirectory(directory)
+        PrivateCopyBackend.registerRollback(context,file.name)
         return file.name
     }
     override fun read(reference: String): String {
@@ -34,6 +36,7 @@ class PrivateRollbackStore(private val context: Context): RollbackStore {
         val file = File(directory,"rollback-${newId()}.json")
         FileOutputStream(file).use { StreamingBackup.write(backup,it);it.fd.sync() }
         syncDirectory(directory)
+        PrivateCopyBackend.registerRollback(context,file.name)
         return file.name
     }
     override fun readSnapshot(reference: String): Backup {
@@ -74,7 +77,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
                 catch(e: Exception) { if(e is CancellationException) throw e; android.util.Log.w("TimerSurfaces","Surface refresh unavailable") }
                 previous = view.data.settings.surfaces
                 val delivered = previousSchedule
-                if(delivered == null || delivered.sourceDatasetId != view.data.datasetId || delivered.sourceBarrier != view.data.controlBarrier || delivered.sourceSchedule != view.data.schedule) {
+                if(delivered == null || delivered.sourceDatasetId != view.data.datasetId || delivered.sourceBarrier != view.data.controlBarrier || delivered.sourceSchedule != view.data.schedule || delivered.sourcePreferences != view.data.settings.schedule) {
                     try { previousSchedule = scheduleDelivery.synchronize() }
                     catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("ScheduleDelivery","Schedule delivery refresh unavailable") }
                 }

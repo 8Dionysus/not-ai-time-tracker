@@ -54,4 +54,14 @@ class CopyMaintenance(private val metadata: CopyMetadata,private val maxMetadata
         val result = block();release(ref);return result
     }
     fun blockers(itemId: String): Set<CopyBlocker> = locked { state().references.filter { it.itemId == null || it.itemId == itemId }.map { it.blocker }.toSet() }
+    /** A backend writer invalidates the old immutable registration BEFORE altering its bytes.
+     * A durable protective reference must already be held; stale previews then fail by revision.
+     * Receipts/journals and references are never pruned by this operation. */
+    fun invalidateRegistration(itemId: String) = locked {
+        val before = state()
+        ensure(before.references.any { it.itemId == null || it.itemId == itemId },"Writer reference required")
+        ensure(before.journals.none { it.phase !in setOf(CleanupPhase.DONE,CleanupPhase.RESTORED) },"Cleanup requires explicit completion",ErrorCode.STORAGE)
+        if(before.copies.any { it.item.id == itemId }) update { it.copy(copies = it.copies.filterNot { c -> c.item.id == itemId }) }
+        Unit
+    }
 }

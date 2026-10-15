@@ -14,6 +14,30 @@ class DescriptorCopyFiles(root: String,library: String? = null): Closeable {
     private var descriptor: Long
     init { if(library == null) System.loadLibrary("tracker_copy_io") else System.load(library);descriptor = NativeCopyIo.root(root) }
     @Synchronized override fun close() { val fd = descriptor;descriptor = -1;if(fd >= 0) NativeCopyIo.close(fd) }
+    /** Read-only platform binding: compare the opened descriptor with the trusted Context root. */
+    @Synchronized fun rootIdentity(): FileIdentity = NativeCopyIo.fstat(descriptor).identity()
+    @Synchronized fun inspect(relative: String): FileIdentity? = stat(relative)
+    @Synchronized fun children(relative: String): List<String> = names(relative)
+    @Synchronized fun inspectMember(relative: String,id: String): Pair<CopyMember,FileIdentity> {
+        val identity = stat(relative) ?: error("Member missing")
+        return member(relative,id,identity.links)
+    }
+    /** Descriptor-relative streaming reader; never follows a symlink or opens a special file.
+     * The caller owns/ closes the stream. No deletion or path-derived cleanup authority. */
+    @Synchronized fun input(relative: String,expectedLinks: Long = 1): java.io.InputStream {
+        val fd = NativeCopyIo.open(descriptor,relative,expectedLinks)
+        return object: java.io.InputStream() {
+            private var open = true;private var chunk = byteArrayOf();private var offset = 0
+            override fun read(): Int { val b = ByteArray(1);return if(read(b,0,1) < 0) -1 else b[0].toInt() and 255 }
+            override fun read(b: ByteArray,off: Int,len: Int): Int {
+                check(open);if(off < 0 || len < 0 || off > b.size-len) throw IndexOutOfBoundsException()
+                if(len == 0) return 0
+                if(offset == chunk.size) { chunk = NativeCopyIo.chunk(fd);offset = 0;if(chunk.isEmpty()) return -1 }
+                val n = minOf(len,chunk.size-offset);chunk.copyInto(b,off,offset,offset+n);offset += n;return n
+            }
+            override fun close() { if(open) { open = false;NativeCopyIo.close(fd) } }
+        }
+    }
     @Synchronized internal fun stat(path: String): FileIdentity? = NativeCopyIo.stat(descriptor,path)?.identity()
     @Synchronized internal fun names(path: String): List<String> = NativeCopyIo.names(descriptor,path).sorted()
     @Synchronized internal fun mkdir(path: String) = NativeCopyIo.mkdir(descriptor,path)

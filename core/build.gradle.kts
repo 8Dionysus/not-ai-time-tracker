@@ -5,6 +5,8 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     testImplementation(kotlin("test-junit"))
+    // Already used by the existing build toolchain; host fixture only, not shipped.
+    testImplementation("org.xerial:sqlite-jdbc:3.41.2.2")
     testFixturesImplementation(kotlin("test-junit"))
     testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 }
@@ -24,4 +26,12 @@ tasks.register<JavaExec>("scheduleDeliveryProfile") {
     maxHeapSize = "1024m"
     providers.gradleProperty("trackerCleanupLibrary").orNull?.let { systemProperty("tracker.cleanup.library",it) }
     systemProperty("tracker.schedule.profile",layout.buildDirectory.file("schedule-delivery-profile.json").get().asFile.absolutePath)
+}
+
+tasks.register<JavaExec>("indexedScheduleDeliveryProfile") {
+    dependsOn(tasks.testClasses)
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("dev.notai.tracker.IndexedScheduleDeliveryProfile")
+    maxHeapSize = "1024m"
+    systemProperty("tracker.schedule.index.profile",layout.buildDirectory.file("indexed-schedule-delivery-profile.json").get().asFile.absolutePath)
 }

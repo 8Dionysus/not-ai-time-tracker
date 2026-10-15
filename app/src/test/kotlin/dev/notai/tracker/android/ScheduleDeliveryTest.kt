@@ -108,4 +108,40 @@ class ScheduleDeliveryTest {
         delivery.synchronize()
         assertFalse(DatabaseFiles.exists(context));assertFalse(hasScheduleWakeSource(context));assertFalse(DatabaseFiles.exists(context))
     }
+    @Test fun legacyReceiptsMigrateThroughAndroidSqlAndMissingIndexNeverFallsBackToEmpty() = fixture { context,t,clock ->
+        channel(context);shadowOf(context).grantPermissions(Manifest.permission.POST_NOTIFICATIONS)
+        val pending = ScheduleAlarmBatch(clock.wall+30*60_000,listOf(ScheduleReminderTicket(t.data().datasetId,t.data().controlBarrier,
+            OccurrenceKey("a","2026-10-10"),1,null,"UTC",clock.wall+30*60_000)))
+        val rows = ScheduleAttemptStatus.entries.mapIndexed { n,status -> ScheduleReminderAttempt(pending.tickets.single().copy(
+            key = OccurrenceKey("retired-$n","2026-10-09")),clock.wall,status) }
+        val legacy = codec.encodeToString(ScheduleDeliveryState(revision = 12,pending = pending,attempts = rows))
+        val root = context.noBackupFilesDir
+        atomicText(java.io.File(root,"schedule-delivery.json"),legacy)
+        val platform = AndroidScheduleDeliveryPlatform(context) { renderer };val store = AndroidScheduleDeliveryStore(context)
+        store.locked { assertEquals(rows,store.read().attempts);assertEquals(12L,store.control().revision) }
+        assertEquals(legacy,java.io.File(root,"schedule-delivery.v1-source.json").readText())
+        val delivery = ScheduleDelivery(t,AndroidScheduleDeliveryStore(context),platform) { ZoneId.of("UTC") }
+        assertEquals(ScheduleAttemptStatus.UNKNOWN,delivery.attemptsPage(limit = 2).attempts.first().status)
+        assertEquals(pending,delivery.synchronize().next)
+        val file = java.io.File(root,"schedule-delivery.sqlite");val held = java.io.File(root,"fixture-held-index")
+        assertTrue(file.renameTo(held))
+        try {
+            try { delivery.synchronize();fail("Missing authority must refuse") } catch(e: CoreError) { assertEquals(ErrorCode.STORAGE,e.code) }
+            assertFalse(file.exists());assertTrue(shadowOf(context.getSystemService(AlarmManager::class.java)).scheduledAlarms.isEmpty())
+        } finally { assertTrue(held.renameTo(file)) }
+        val reopened = AndroidScheduleDeliveryStore(context)
+        reopened.locked { assertEquals(rows,reopened.read().attempts) }
+        clock.advance(30*60_000)
+        assertEquals(ScheduleAttemptStatus.POSTED,ScheduleDelivery(t,reopened,platform) { ZoneId.of("UTC") }.onAlarm(pending.hash).attempted.single().status)
+        assertEquals(1,platform.visible().size)
+    }
+    @Test fun unsafeIndexedFileRefusesBeforeOpeningWithoutMutatingItsTarget() = fixture { context,t,_ ->
+        val root = context.noBackupFilesDir;val target = java.io.File(root,"fixture-target").apply { writeText("preserve") }
+        val path = java.io.File(root,"schedule-delivery.sqlite").toPath()
+        java.nio.file.Files.createSymbolicLink(path,target.toPath())
+        val delivery = ScheduleDelivery(t,AndroidScheduleDeliveryStore(context),AndroidScheduleDeliveryPlatform(context) { renderer }) { ZoneId.of("UTC") }
+        try { delivery.synchronize();fail("Symlink index must refuse") } catch(e: CoreError) { assertEquals(ErrorCode.STORAGE,e.code) }
+        assertEquals("preserve",target.readText());assertTrue(java.nio.file.Files.isSymbolicLink(path))
+        assertFalse(java.io.File(root,"schedule-delivery.json").exists())
+    }
 }

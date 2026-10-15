@@ -97,13 +97,13 @@ object Schedules {
     }
     /** Closest future reminder(s), including distant explicit dates and moved occurrences.
      * Weekly candidates jump by weeks; no expanding years of recurrence or arbitrary horizon. */
-    fun nextReminders(data: Dataset,now: Instant,deviceZone: ZoneId,excluded: Set<OccurrenceKey> = emptySet()): List<ScheduleProjection> {
+    fun nextReminders(data: Dataset,now: Instant,deviceZone: ZoneId,excluded: Set<OccurrenceKey> = emptySet(),isExcluded: (OccurrenceKey)->Boolean = { false }): List<ScheduleProjection> {
         val schedule = data.schedule;val overrides = schedule.overrides.associateBy { it.key };val links = schedule.links.associateBy { it.key }
         val today = data.settings.schedule.resolveDay(now,deviceZone).date
         val blocked = overrides.keys+links.keys+excluded
         val candidates = mutableMapOf<OccurrenceKey,ScheduleProjection>()
         fun add(series: ScheduleSeries,date: LocalDate) {
-            val key = OccurrenceKey(series.id,date.toString());if(key in excluded) return
+            val key = OccurrenceKey(series.id,date.toString());if(key in excluded || isExcluded(key)) return
             occurrence(series,date,overrides[key],links[key],deviceZone,today)?.takeIf { it.reminderInstant?.isAfter(now) == true }?.let { candidates[key] = it }
         }
         for(series in schedule.series.filter { it.state == ScheduleState.ACTIVE }) {

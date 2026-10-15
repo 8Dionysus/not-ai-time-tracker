@@ -172,7 +172,9 @@ class ScheduleDeliveryTest {
         val clock = clock();val t = Tracker(MemoryStore(),clock);add(t)
         val delegate = ScheduleDeliveryFixturePlatform();val state = ScheduleDeliveryFixtureStore()
         var limit = CopyMetadataBytes.MAX_BYTES;var disabled = 0
-        val bounded = object: ScheduleDeliveryStore by state {
+        val bounded = object: ScheduleDeliveryStore {
+            override fun <T> locked(block: ()->T): T = state.locked(block)
+            override fun read() = state.read()
             override fun writeDurably(value: ScheduleDeliveryState) {
                 CopyMetadataBytes.check(codec.encodeToString(value),limit);state.writeDurably(value)
             }

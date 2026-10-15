@@ -12,6 +12,7 @@ import java.nio.file.LinkOption
  */
 data class PrivateCopyAuditSnapshot(val items: List<PrivateCopy>,val unavailableCapabilities: Set<String>)
 class PrivateCopyAudit(context: Context) {
+    private val application = context.applicationContext
     private val root = context.noBackupFilesDir
     private val maintenance = PrivateFileMaintenance.forContext(context)
     fun inspect(live: Dataset): PrivateCopyAuditSnapshot {
@@ -83,7 +84,10 @@ class PrivateCopyAudit(context: Context) {
         }
         File(root,"recovery-pending.json").takeIf { it.exists() }?.let { add(it,CopyKind.RECOVERY_JOURNAL) }
         val copies = items.count { it.kind in setOf(CopyKind.ROLLBACK,CopyKind.DATABASE_ARCHIVE) }
-        return PrivateCopyAuditSnapshot(items.map { if(copies == 1 && it.kind in setOf(CopyKind.ROLLBACK,CopyKind.DATABASE_ARCHIVE)) it.copy(confirmableWarnings = it.confirmableWarnings+CopyWarning.LAST_RECOVERY_COPY) else it },
-            setOf("ANDROID_DESCRIPTOR_BINDING_QA","FRONTEND_DURABLE_REFERENCE_ADOPTION","LEGACY_INVENTORY_REGISTRATION","SEALED_ARCHIVE_HARDLINK_GRAPH"))
+        val backend = PrivateCopyBackend.inspect(application)
+        val registered = backend.inventory?.items.orEmpty().associateBy { it.id }
+        val combined = items.map { registered[it.id] ?: it }+registered.values.filter { known -> items.none { it.id == known.id } }
+        return PrivateCopyAuditSnapshot(combined.map { if(copies == 1 && it.kind in setOf(CopyKind.ROLLBACK,CopyKind.DATABASE_ARCHIVE)) it.copy(confirmableWarnings = it.confirmableWarnings+CopyWarning.LAST_RECOVERY_COPY) else it },
+            backend.unavailableCapabilities+(if(items.any { it.kind != CopyKind.RECOVERY_JOURNAL && it.id !in registered }) setOf("UNREGISTERED_LEGACY_GROUPS") else emptySet()))
     }
 }

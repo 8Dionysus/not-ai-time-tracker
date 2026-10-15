@@ -1,7 +1,7 @@
 package dev.notai.tracker
 
 /** All names originate in a backend-validated manifest, never a chooser/UI path. */
-internal data class ArchiveCopyManifest(val item: PrivateCopy,val path: String,
+data class ArchiveCopyManifest(val item: PrivateCopy,val path: String,
     val memberPaths: Map<String,String>,val directories: Set<String>)
 internal data class CopyLocation(val path: String?,val partial: Boolean)
 internal data class ManifestRead(val members: List<CopyMember>,val identities: Map<String,FileIdentity>)

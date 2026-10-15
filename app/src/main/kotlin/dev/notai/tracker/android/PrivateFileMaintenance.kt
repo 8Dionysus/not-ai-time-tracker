@@ -23,6 +23,7 @@ object PrivateFileMaintenance {
         } catch(_: java.nio.file.NoSuchFileException) { null }
         override fun writeDurably(value: String) = atomicBytes(file,CopyMetadataBytes.encode(value,maxBytes))
     }
+    internal fun invalidate(context: Context,relative: String) = forContext(context).invalidateRegistration(PrivateCopyBackend.itemId(relative))
     /** Existing File/preview APIs cannot prove Activity/ViewModel reference release. One durable
      * migration witness blocks cleanup until Opus connects every lifecycle and reviews its removal. */
     internal fun legacy(gate: CopyMaintenance) = gate.locked {

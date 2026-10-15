@@ -22,19 +22,16 @@ object ScheduleNoticeBinding {
         factory = value;TrackerRuntime.refreshExistingSchedule()
     }
 }
-class AndroidScheduleDeliveryStore(context: Context): ScheduleDeliveryStore {
-    private val file = File(context.applicationContext.noBackupFilesDir,"schedule-delivery.json")
-    private val gate = synchronized(gates) { gates.getOrPut(file.absolutePath) { Any() } }
-    private val metadata = PrivateFileMaintenance.metadata(file)
-    override fun <T> locked(block: ()->T): T = synchronized(gate,block)
-    override fun read(): ScheduleDeliveryState {
-        check(Thread.holdsLock(gate));return metadata.read()?.let(ScheduleDeliveryJson::decode) ?: ScheduleDeliveryState()
-    }
-    override fun writeDurably(state: ScheduleDeliveryState) {
-        check(Thread.holdsLock(gate));metadata.writeDurably(ScheduleDeliveryJson.encode(state))
-    }
-    companion object { private val gates = mutableMapOf<String,Any>() }
+/** Same public backend port; the sidecar now uses an indexed SQLite journal. */
+class AndroidScheduleDeliveryStore(context: Context): ScheduleDeliveryStore by scheduleIndex(context)
+private fun scheduleIndex(context: Context): IndexedScheduleDeliveryStore {
+    val root = context.applicationContext.noBackupFilesDir
+    val file = File(root,"schedule-delivery.sqlite")
+    val gate = synchronized(scheduleIndexGates) { scheduleIndexGates.getOrPut(file.absolutePath) { Any() } }
+    return IndexedScheduleDeliveryStore(gate,PrivateFileMaintenance.metadata(File(root,"schedule-delivery.json")),
+        PrivateFileMaintenance.metadata(File(root,"schedule-delivery.v1-source.json"))) { allowCreate -> AndroidScheduleReceiptSql(file,allowCreate) }
 }
+private val scheduleIndexGates = mutableMapOf<String,Any>()
 class AndroidScheduleDeliveryPlatform(context: Context,private val factory: ()->ScheduleNoticeFactory? = { ScheduleNoticeBinding.factory }): ScheduleDeliveryPlatform {
     private val context = context.applicationContext
     companion object {
@@ -112,7 +109,7 @@ class AndroidScheduleDelivery(context: Context,tracker: Tracker) {
 }
 internal fun hasScheduleWakeSource(context: Context): Boolean {
     val store = AndroidScheduleDeliveryStore(context)
-    return store.locked { store.read().pending != null } && DatabaseFiles.exists(context)
+    return store.locked { store.control().pending != null } && DatabaseFiles.exists(context)
 }
 class ScheduleAlarmReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context,intent: Intent) {

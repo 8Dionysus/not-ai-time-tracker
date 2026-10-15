@@ -98,7 +98,7 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
             arguments = mapOf("candidateCount" to ErrorArgument.Count(sessions.size.toLong())),cause = e.localized)) }
         return HistoryPreview(token(d),file,sessions.toList(),segments.toList(),duplicates,errors.toList(),issues)
     }
-    fun apply(preview: HistoryPreview): HistoryImportResult = importApplyBoundary {
+    fun apply(preview: HistoryPreview): HistoryImportResult = importApplyBoundary { rollback.protecting {
         importEnsure(preview.canApply,ImportIssueCode.PREVIEW_HAS_ERRORS,"Resolve preview errors before applying",ErrorCode.UNSUPPORTED_IMPORT,
             arguments = mapOf("errorCount" to ErrorArgument.Count(preview.errors.size.toLong())),stage = ImportIssueStage.APPLY)
         val before = tracker.data(); checkToken(before,preview.expected,tracker.clock.now())
@@ -109,7 +109,7 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
             val change = tracker.importHistory(preview.expected,preview.sessions,preview.segments)
             HistoryImportResult(change.state,preview.added,preview.duplicates,reference)
         }
-    }
+    } }
     companion object {
         fun parseToggl(text: String,namespace: String,zone: String,datePattern: String = "uuuu-MM-dd"): TransferFile {
             val bytes = checkedCsvBytes(text)

@@ -31,6 +31,41 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
         captured.forEach { r -> manifests.prove(all,r,before.references) { locate(it,before) } }
         gate.update { it.copy(copies = all) };Unit
     }
+    /** Platform backend validators only. Registration reads/verifies bytes, grants no deletion
+     * bypass, and may run while a durable writer/legacy reference still protects the owner.
+     * Inventory/quarantine always recheck those references. Existing sealed bytes are immutable.
+     */
+    fun registerValidated(item: PrivateCopy,path: String,directory: Boolean,memberNames: Map<String,String>) = maintenance {
+        mayRegister();ensure(path.substringBefore('/') == roots[item.kind],"Invalid copy root")
+        val captured = manifests.capture(item,path,directory,memberNames,emptySet(),false)
+        val before = gate.state();val old = before.copies.singleOrNull { it.item.id == item.id || it.path == path }
+        if(old == null) gate.update { it.copy(copies = it.copies+captured) }
+        else ensure(sameRegistration(old,captured),"Registered copy changed",ErrorCode.STALE)
+        Unit
+    }
+    fun registerValidatedArchiveGraph(batch: List<ArchiveCopyManifest>) = maintenance {
+        mayRegister();ensure(batch.isNotEmpty(),"Empty archive registration")
+        val before = gate.state()
+        val captured = batch.map { m ->
+            ensure(m.path.substringBefore('/') == roots[CopyKind.DATABASE_ARCHIVE],"Invalid archive root")
+            manifests.capture(m.item,m.path,true,m.memberPaths,m.directories,true)
+        }
+        ensure(captured.map { it.item.id }.distinct().size == captured.size && captured.map { it.path }.distinct().size == captured.size,"Duplicate archive registration")
+        val additions = captured.filter { c ->
+            val old = before.copies.singleOrNull { it.item.id == c.item.id || it.path == c.path }
+            if(old != null) ensure(sameRegistration(old,c),"Sealed archive changed",ErrorCode.STALE)
+            old == null
+        }
+        val all = before.copies+additions
+        // References prevent deletion, not non-destructive registration of a complete manifest.
+        captured.forEach { r -> manifests.prove(all,r,emptyList()) { locate(it,before) } }
+        if(additions.isNotEmpty()) gate.update { it.copy(copies = all) }
+        Unit
+    }
+    private fun sameRegistration(a: RegisteredCopy,b: RegisteredCopy): Boolean =
+        a.item == b.item && a.path == b.path && a.directory == b.directory && a.memberNames == b.memberNames &&
+            a.sealedArchive == b.sealedArchive && a.identities.keys == b.identities.keys && a.directories.keys == b.directories.keys &&
+            a.identities.all { (id,v) -> v.sameFile(b.identities.getValue(id)) } && a.directories.all { (id,v) -> v.sameFile(b.directories.getValue(id)) }
     fun archiveGraph(selectedIds: Set<String>): ArchiveLinkGraph = maintenance {
         val ids = selectedIds.toSet();val state = gate.state()
         ensure(ids.isNotEmpty() && ids.all { id -> state.copies.any { it.item.id == id && it.sealedArchive } },"Unknown sealed archive")

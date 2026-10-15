@@ -25,6 +25,27 @@ abstract class ScenarioContract {
     @Test fun namedPersonalObjectsPreserveClassificationAndHistory() = personalObjectLifecycle(::createStore,::reopen)
     @Test fun functionalScheduleSettingsPersistAndResolveCivilDays() = functionalSchedulePreferences(::createStore,::reopen)
     @Test fun standalonePersonalCatalogTransferUsesExistingImportEngine() = standaloneCatalogTransfer(::createStore,::reopen)
+    @Test fun rollbackReferenceSpansSaveVerificationAndDomainCommit() {
+        val base = createStore();var protected = false;var requireProtection = false
+        val guarded = object: StateStore by base {
+            override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T { if(requireProtection) assertTrue(protected);return base.transaction(block) }
+            override fun <T> checkedTransaction(block: (CheckedState)->CheckedCommit<T>): T { if(requireProtection) assertTrue(protected);return base.checkedTransaction(block) }
+        }
+        val memory = MemoryRollback();var entries = 0
+        val rollback = object: RollbackStore by memory {
+            override fun <T> protecting(block: ()->T): T { assertFalse(protected);protected = true;entries++;return try { block() } finally { protected = false } }
+            override fun saveSnapshot(backup: Backup): String { assertTrue(protected);return memory.saveSnapshot(backup) }
+            override fun readSnapshot(reference: String): Backup { assertTrue(protected);return memory.readSnapshot(reference) }
+        }
+        val clock = FakeClock();val t = Tracker(guarded,clock);val backups = Backups(t,rollback)
+        val preview = backups.prepare(backups.export());requireProtection = true
+        backups.apply(preview);assertFalse(protected);assertEquals(1,entries)
+        val transfer = HistoryTransfer(t,rollback)
+        val file = HistoryTransfer.parseCsv("activity,category,note,id,start,end,duration_ms\nown,,,row,2026-10-09T10:00:00Z,2026-10-09T10:00:01Z,1000",CsvMapping.portable("lease-fixture"))
+        val csv = transfer.preview(file,mapOf(file.activities.single() to Classification()))
+        assertEquals(1,transfer.apply(csv).added);assertFalse(protected);assertEquals(2,entries)
+        assertEquals(1,Tracker(reopen(base),clock).data().sessions.size)
+    }
     @Test fun scheduleDeliveryUsesOneAlarmAndDurableReceiptsWithoutFacts() {
         val clock = FakeClock(wall = Instant.parse("2026-10-10T09:00:00Z").toEpochMilli());var t = Tracker(createStore(),clock)
         val rule = ScheduleRule(Classification(),"2026-10-10",extraDates = setOf("2026-10-10","2026-10-11"),localTime = "10:00",alertsEnabled = true,reminderTime = "09:30")

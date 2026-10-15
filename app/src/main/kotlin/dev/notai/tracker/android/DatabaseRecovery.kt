@@ -6,8 +6,8 @@ import java.io.File
 import java.io.FileOutputStream
 import kotlinx.serialization.Serializable
 
-@Serializable data class PreservedDatabaseFile(val name: String,val bytes: Long,val sha256: String)
-@Serializable data class DatabaseArchive(val id: String,val database: String,val files: List<PreservedDatabaseFile>)
+typealias PreservedDatabaseFile = PreservedDatabaseMember
+typealias DatabaseArchive = StoredDatabaseArchive
 /** Main file and sidecars form one store, including when the main file is missing. */
 internal object DatabaseFiles {
     fun paths(context: Context,name: String = "tracker.db"): List<File> =
@@ -35,7 +35,8 @@ object DatabaseArchives {
                 file.isFile && file.length() == entry.bytes && fileHash(file) == entry.sha256
             } && sources.all { source -> val entry = snapshot.getValue(source.name);source.length() == entry.bytes && fileHash(source) == entry.sha256 }
         }?.let { StartupTrace.mark(context,"archive-reused",System.nanoTime()-start);return it.first }
-        val id = newId();val directory = File(root,id).apply { mkdirs() }
+        val id = newId();PrivateCopyBackend.archiveDraft(context,id)
+        val directory = File(root,id).apply { mkdirs() }
         val files = sources.map { source ->
             val filename = source.name
             val target = File(directory,filename)
@@ -55,6 +56,7 @@ object DatabaseArchives {
         }
         atomicText(File(directory,"manifest.json"),codec.encodeToString(DatabaseArchive(id,name,files)))
         syncDirectory(directory);syncDirectory(root);syncDirectory(context.noBackupFilesDir)
+        if(!forceSeparate) PrivateCopyBackend.completeArchive(context,id)
         StartupTrace.mark(context,"archive-created",System.nanoTime()-start);return directory
     }
 }
@@ -69,6 +71,13 @@ data class RescueResult(val archive: String,val sessions: Int)
 object DatabaseRecovery {
     private fun pending(context: Context) = File(context.noBackupFilesDir,"recovery-pending.json")
     fun needsAttention(context: Context) = pending(context).exists()
+    internal fun protectedArchiveIds(context: Context): Set<String> {
+        val text = PrivateFileMaintenance.metadata(pending(context)).read() ?: return emptySet()
+        val job = codec.decodeFromString<RecoveryJob>(text);val archive = File(job.archive)
+        ensure(archive.parentFile == File(context.noBackupFilesDir,"database-archives") && archive.name.matches(Regex("[0-9a-f-]{36}")),
+            "Recovery archive reference is not trusted",ErrorCode.STORAGE)
+        return setOf(archive.name)
+    }
     fun prepare(context: Context,source: File): RescuePreview = PrivateFileMaintenance.forContext(context).let { gate ->
         gate.locked { PrivateFileMaintenance.legacy(gate);prepareUnsafe(source) }
     }
@@ -113,6 +122,7 @@ object DatabaseRecovery {
             val db = TrackerDatabase.open(context)
             try { ensure(RoomStore(db,{ restored }).read() == restored,"Installed recovery readback failed",ErrorCode.STORAGE) }
             finally { db.close() }
+            PrivateCopyBackend.completeArchive(context,archive.name)
             ensure(pending(context).delete(),"Recovery journal could not be completed",ErrorCode.STORAGE)
             syncDirectory(context.noBackupFilesDir)
             return RescueResult(archive.name,restored.sessions.size)

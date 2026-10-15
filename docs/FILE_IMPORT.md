@@ -6,7 +6,7 @@
 
 - `format`: DELIMITED_TEXT, BACKUP_JSON либо UNSUPPORTED.
 - `candidates`: подходящие разделители, точные имена колонок, до пяти полных строк-примеров, `suggestions: Map<ImportField, List<String>>`.
-- `warnings` и `problems`: неоднозначность, границы проверки и причины отказа.
+- `issues/errorIssues/warningIssues`: коды, typed arguments, неоднозначность и причины отказа; `warnings` и `problems` сохраняют старые diagnostic strings для совместимости.
 
 Для табличного текста инспектор пробует comma, semicolon, tab и pipe на заголовке и первых пяти записях. Это bounded sample, а не обещание пригодности всех последующих строк. Кавычки и многострочные поля разбираются тем же CSV parser. Если вариантов несколько, возвращаются все; автоматического «победителя» нет. Для другого/неоднозначного разделителя UI может повторить inspect с явно выбранным delimiter. Явно заданный delimiter выбирает табличную ветку, в том числе если имя первой колонки начинается со скобки.
 
@@ -16,7 +16,7 @@
 
 Полученный TransferFile показывает `activities`, `errors`, `warnings`. UI отдельно сопоставляет пары занятие/категория с Classification и передаёт их в `HistoryTransfer.preview`. После показа интервалов, ошибок, повторов и последствий пользователь подтверждает `apply`. Это прежнее атомарное добавление с token, дедупликацией, provenance, Undo и проверенной откатной копией; инспекция не меняет эту семантику.
 
-Для BACKUP_JSON используется `inspection.prepareRestore(backups)`, далее существующий `backups.apply(preview)`: это полная замена, а не добавление CSV. Поддержаны собственные форматы backup 1–7 с полной валидацией; экспорт использует формат 7. Произвольный JSON, XLSX, другие бинарные форматы, не-UTF-8 кодировки и таблицы без заголовка не поддержаны. Неподтверждённая структура файла требует явного сопоставления/исправления или отдельной реализации формата, а не ожидания адаптера по названию приложения.
+Для BACKUP_JSON используется `inspection.prepareRestore(backups)`, далее существующий `backups.apply(preview)`: это полная замена, а не добавление CSV. Поддержаны собственные форматы backup 1–8 с полной валидацией; экспорт использует формат 8. Произвольный JSON, XLSX, другие бинарные форматы, не-UTF-8 кодировки и таблицы без заголовка не поддержаны. Неподтверждённая структура файла требует явного сопоставления/исправления или отдельной реализации формата, а не ожидания адаптера по названию приложения.
 
 Старые CsvMapping/parseCsv и именованный профиль колонок остаются совместимыми низкоуровневыми входами. Основной пользовательский путь их брендовых имён не требует. Полный SAF restore использует staged file и потоковый Backups.prepare без общего 10 MiB cap; техническая CSV-форма позволяет явно выбрать все перечисленные параметры.
 
@@ -48,7 +48,7 @@ for (file in listOf(aRows, bRows)) {
     // Здесь пользователь явно выбрал учитывать исходные названия без личных карточек.
     val chosen = file.activities.associateWith { Classification(name = it.activity) }
     val preview = runtime.historyTransfer.preview(file, chosen)
-    require(preview.canApply) { preview.errors.joinToString() }
+    require(preview.canApply) // Render preview.errorIssues with reviewed resources before confirmation.
     // В UI Apply вызывается только после показа preview и подтверждения.
     runtime.historyTransfer.apply(preview)
 }
@@ -59,3 +59,7 @@ for (file in listOf(aRows, bRows)) {
 ## Полная замена и отказы
 
 Preview не пишет данные и не создаёт rollback. Полный SAF JSON читает потоковый reader: BOM принимается, повреждённый UTF-8 и усечённый файл отклоняются. Общего 10 MiB cap для этой ветки нет; convenience inspector остаётся bounded. Apply требует подтверждения и проверенной откатной копии. [Полные копии и recovery](PORTABILITY.md) описывают сохранение исходников и восстановление недоступной базы.
+
+## Локализуемый контракт результатов
+
+Структурированные `issues/errorIssues/warningIssues` и `CoreError.importIssue` теперь сопровождают все создаваемые этой CSV/inspection веткой errors/warnings. Старые строки сохраняются для совместимости. UI должен перейти на stable keys и typed arguments; номера относятся к CSV-записям, а пользовательские значения не переводятся. Полная таблица кодов, аргументов и точные места интеграции: [IMPORT_ISSUES.md](IMPORT_ISSUES.md).

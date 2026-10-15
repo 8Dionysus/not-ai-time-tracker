@@ -589,6 +589,7 @@ class RoomScenariosTest: ScenarioContract() {
         try {
             val e = org.junit.Assert.assertThrows(CoreError::class.java) { transfer.apply(preview) }
             org.junit.Assert.assertEquals(ErrorCode.STORAGE,e.code)
+            org.junit.Assert.assertEquals(ImportIssueCode.APPLY_STORAGE_FAILED,e.importIssue!!.code)
         } finally { db.execSQL("DROP TRIGGER fail_transfer") }
         org.junit.Assert.assertEquals(before,tracker.data())
     }

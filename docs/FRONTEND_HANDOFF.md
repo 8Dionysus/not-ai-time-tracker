@@ -1,5 +1,7 @@
 # Tracker backend handoff for Claude
 
+Current 2026-10-15 follow-up: [typed CSV/inspection issue contract](IMPORT_ISSUES.md), [full A–F backend pass](BACKEND_PASS_2026_10.md). The dated code commit below records the earlier handoff.
+
 Code commit: **`9a6cffb3c44916fe8100db23f11e7c01b02f791d`** (2026-10-14).
 
 Backend contracts are implemented and checked. The visible screens, notification layout, floating panel, graphics, fonts, catalog assets and app icon are unchanged in this stage. Claude owns their design and wiring. The APK is a debug build, not a store release.

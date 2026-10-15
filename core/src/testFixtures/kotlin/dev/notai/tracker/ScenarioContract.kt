@@ -23,6 +23,63 @@ abstract class ScenarioContract {
     open fun reopen(store: StateStore): StateStore = store
     private fun expect(code: ErrorCode,block: ()->Unit) { assertEquals(code,assertFailsWith<CoreError>(block = block).code) }
 
+    @Test fun typedImportIssuesPreserveAtomicityAndProvenance() {
+        val clock = FakeClock();var t = Tracker(createStore(),clock)
+        val transfer = HistoryTransfer(t,MemoryRollback())
+        val csv = "id,activity,category,note,start,end\nentry,=Исходное,Категория,Пользовательское,2026-10-08T08:00:00Z,2026-10-08T08:01:00Z\n"
+        val mapping = CsvMapping("original-space","activity","start",end = "end",category = "category",note = "note",id = "id")
+        val file = HistoryTransfer.parseCsv(csv,mapping);val before = t.data()
+        fun issue(preview: HistoryPreview,code: ImportIssueCode): ImportIssue {
+            assertEquals(preview.errors,preview.errorIssues.map { it.diagnostic })
+            assertEquals(preview.warnings,preview.warningIssues.map { it.diagnostic })
+            assertFalse(preview.canApply);assertEquals(before,t.data())
+            return preview.errorIssues.single().also { assertEquals(code,it.code) }
+        }
+        val unmapped = transfer.preview(file,emptyMap())
+        val missing = issue(unmapped,ImportIssueCode.MAPPING_REQUIRED)
+        assertEquals(2,missing.rowNumber);assertEquals(ErrorArgument.Text("=Исходное"),missing.arguments["activity"])
+        val rejected = assertFailsWith<CoreError> { transfer.apply(unmapped) }
+        assertEquals(ImportIssueCode.PREVIEW_HAS_ERRORS,rejected.importIssue!!.code);assertEquals(before,t.data())
+        val invalid = transfer.preview(file,file.activities.associateWith { Classification(activityTypeId = "missing-fixture") })
+        assertEquals(ErrorCode.INVALID_INPUT,issue(invalid,ImportIssueCode.MAPPING_INVALID).cause!!.code)
+        val future = HistoryTransfer.parseCsv(csv.replace("2026-10-08","2027-10-08"),mapping)
+        issue(transfer.preview(future,emptyMap()),ImportIssueCode.FUTURE_INTERVAL)
+        val selections = file.activities.associateWith { Classification(name = it.activity,details = mapOf("category" to it.category)) }
+        val preview = transfer.preview(file,selections);assertTrue(preview.canApply)
+        val broken = object: RollbackStore {
+            private var saved = ""
+            override fun save(json: String): String {
+                saved = codec.encodeToString(codec.decodeFromString<Backup>(json).copy(backupId = "different-fixture-backup"))
+                return "synthetic"
+            }
+            override fun read(reference: String): String = saved // streaming reader reopens the same bytes twice
+        }
+        val rollbackError = assertFailsWith<CoreError> { HistoryTransfer(t,broken).apply(preview) }
+        assertEquals(ImportIssueCode.ROLLBACK_VERIFICATION_FAILED,rollbackError.importIssue!!.code);assertEquals(before,t.data())
+        val unreadable = object: RollbackStore { override fun save(json: String): String = "synthetic";override fun read(reference: String): String = "damaged synthetic bytes" }
+        val invalidRollback = assertFailsWith<CoreError> { HistoryTransfer(t,unreadable).apply(preview) }
+        assertEquals(ImportIssueCode.APPLY_FAILED,invalidRollback.importIssue!!.code);assertEquals(before,t.data())
+        val ioFailure = object: RollbackStore { override fun save(json: String): String = throw java.io.IOException("fixture");override fun read(reference: String): String = error("unreachable") }
+        val ioError = assertFailsWith<CoreError> { HistoryTransfer(t,ioFailure).apply(preview) }
+        assertEquals(ImportIssueCode.APPLY_STORAGE_FAILED,ioError.importIssue!!.code);assertEquals(before,t.data())
+        transfer.apply(preview);val imported = t.data()
+        assertEquals(file.rows.single().origin,imported.sessions.single().importOrigin)
+        assertEquals("=Исходное",imported.sessions.single().selection.name)
+        assertEquals("Пользовательское",imported.sessions.single().note)
+        val conflict = transfer.preview(HistoryTransfer.parseCsv(csv.replace("Пользовательское","Другой оригинал"),mapping),selections)
+        assertEquals(ImportIssueCode.SOURCE_ID_CONFLICT,conflict.errorIssues.single().code)
+        assertEquals(ErrorArgument.Identifier("entry"),conflict.errorIssues.single().arguments["recordKey"])
+        val overlap = transfer.preview(HistoryTransfer.parseCsv(csv,mapping.copy(namespace = "another-space")),selections)
+        assertEquals(ImportIssueCode.BATCH_VALIDATION_FAILED,overlap.errorIssues.single().code)
+        assertEquals(ErrorCode.OVERLAP,overlap.errorIssues.single().cause!!.code)
+        val stale = assertFailsWith<CoreError> { transfer.apply(preview) }
+        assertEquals(ImportIssueCode.APPLY_STALE,stale.importIssue!!.code);assertEquals(imported,t.data())
+        t = Tracker(reopen(t.store),clock);assertEquals(imported,t.data())
+        val replay = HistoryTransfer(t,MemoryRollback());val dedupe = replay.preview(file,emptyMap())
+        assertTrue(dedupe.canApply);assertEquals(1,dedupe.duplicates);assertEquals(0,replay.apply(dedupe).added)
+        assertEquals(imported,t.data())
+    }
+
     @Test fun scheduleLocalizationAndArchiveContract() {
         val clock = FakeClock();var t = Tracker(createStore(),clock)
         val beforeLocale = t.data();val labels = CatalogLabels(emptyList())

@@ -74,7 +74,7 @@ data class Snapshot(val token: Token, val mode: Mode, val session: Session?, val
     val actions: Set<String>,val focus: FocusSnapshot? = null,val timerTarget: TimerTarget? = null)
 @Serializable enum class ErrorCode { STALE, INVALID_INTERVAL, OVERLAP, INVALID_INPUT, STORAGE, UNSUPPORTED_IMPORT, RECOVERY_REQUIRED }
 class CoreError(val code: ErrorCode, message: String, val currentState: Snapshot? = null,
-    val arguments: Map<String,ErrorArgument> = emptyMap(), val fieldPath: String? = null,val reason: ErrorReason? = null) : RuntimeException(message) {
+    val arguments: Map<String,ErrorArgument> = emptyMap(), val fieldPath: String? = null,val reason: ErrorReason? = null,val importIssue: ImportIssue? = null) : RuntimeException(message) {
     val localized get() = LocalizedError(code,arguments,fieldPath,reason)
 }
 fun fail(code: ErrorCode, message: String): Nothing = throw CoreError(code, message)

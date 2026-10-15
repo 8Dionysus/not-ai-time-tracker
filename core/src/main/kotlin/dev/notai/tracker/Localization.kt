@@ -8,6 +8,7 @@ import java.util.Locale
 @Serializable sealed class ErrorArgument {
     @Serializable data class Text(val value: String): ErrorArgument()
     @Serializable data class Count(val value: Long): ErrorArgument()
+    @Serializable data class Texts(val values: List<String>): ErrorArgument()
     @Serializable data class Identifier(val value: String): ErrorArgument()
     @Serializable data class Date(val iso: String): ErrorArgument()
 }

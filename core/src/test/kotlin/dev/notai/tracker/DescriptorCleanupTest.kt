@@ -32,6 +32,14 @@ class DescriptorCleanupTest {
         assertEquals("existing receipt",files.metadata("bounded.json",16).read())
         assertFalse(files.names("").any { it.endsWith(".part") })
     }
+    @Test fun unknownUnicodeSiblingBlocksOnlyItself() = fixture { root,_,_,storage ->
+        val item = seal(root,storage)
+        val unknown = File(root,"exports/личное").apply { writeText("unregistered fixture; preserve") }
+        val inventory = storage.inventory()
+        assertTrue(inventory.items.single { it.id == item.id }.selectable)
+        assertEquals(setOf(CopyBlocker.UNKNOWN_FILE_OR_STATE),inventory.items.single { it.id != item.id }.hardBlockers)
+        assertEquals("unregistered fixture; preserve",unknown.readText())
+    }
     @Test fun explicitChoiceDurableReceiptAndExactGroup() = fixture { root,files,gate,storage ->
         val item = seal(root,storage);val cleanup = PrivateCopyCleanup(storage);val inv = cleanup.inventory()
         val p = cleanup.preview(inv.revision,setOf(item.id));val c = confirmation(p)

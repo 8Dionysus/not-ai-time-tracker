@@ -72,9 +72,13 @@ JNIEXPORT jobjectArray JNICALL JNI(names)(JNIEnv *e,jobject self,jlong root,jstr
     char **names=NULL;size_t n=0;struct dirent *entry;int bad=0;errno=0;
     while((entry=readdir(d))) {
         if(!strcmp(entry->d_name,".")||!strcmp(entry->d_name,"..")) continue;
-        if(!safe(entry->d_name) || n>=100000) { errno=EINVAL;bad=1;break; }
+        if(n>=100000) { errno=EINVAL;bad=1;break; }
         char **next=realloc(names,(n+1)*sizeof *names);if(!next) { errno=ENOMEM;bad=1;break; }names=next;
-        names[n]=strdup(entry->d_name);if(!names[n]) { bad=1;break; }n++;
+        /* Unknown/non-ASCII filesystem bytes must block that item, not hide all safe siblings.
+         * This non-addressable ASCII marker cannot collide with a safe path component and is
+         * never passed to an operation: parent() rejects '!'. No raw bytes enter NewStringUTF. */
+        char marker[80];snprintf(marker,sizeof marker,"!unsafe-%llu-%zu",(unsigned long long)entry->d_ino,n);
+        names[n]=strdup(safe(entry->d_name)?entry->d_name:marker);if(!names[n]) { bad=1;break; }n++;
     }
     if(errno) bad=1;int saved=errno;closedir(d);
     jobjectArray a=NULL;

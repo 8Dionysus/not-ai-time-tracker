@@ -1,6 +1,6 @@
 # Backend audit follow-up and Opus handoff
 
-15 October 2026. Based on main `f14fa3c`; Room 7 / portable JSON 9 / Android
+15 October 2026. Follow-up details: [sealed archive contract](SEALED_ARCHIVE_CONTRACT.md), [schedule delivery and mandatory caller migration](SCHEDULE_DELIVERY_HANDOFF.md). Based on main `f14fa3c`; Room 7 / portable JSON 9 / Android
 0.11.0 (12), compile/target API36. No new persistent Dataset fields in this
 follow-up, so no schema/archive version bump. The user restored backend-only
 scope at 15:10 UTC. UI code and UI fixes are intentionally absent from this change.
@@ -9,7 +9,7 @@ Requested model configuration was gpt-6.1-sol/high; no independent runtime attes
 ## API deltas to connect
 
 - Use `Tracker.switchDraft(expected, draft: EntryDraft)` for an incoming text
-  switch. Session close/start and the incoming note commit once. Do not call
+  switch. Session close/start and the incoming note commit once. TrackerViewModel.applyChoice still uses switch then labelCurrent; that app chain remains OPEN until caller migration. Do not call
   `switch` followed by `label`. `switch(expected,selection,note=null)` also accepts
   an optional note atomically. A failed commit leaves the preceding session intact.
 - Use `Snapshot.isCounting()` for a visible countdown predicate: Focus RUNNING
@@ -26,7 +26,7 @@ Requested model configuration was gpt-6.1-sol/high; no independent runtime attes
 - `CsvMapping.sourceLocale: String? = null`: null means ROOT, explicit BCP-47
   controls source month/day text. UI language never determines source parsing.
   Typed `ImportIssueCode.SOURCE_LOCALE_INVALID` is the 65th issue; the reviewed
-  editorial package has 64 issue mappings and needs this additional content.
+  editorial package has 64 issue mappings. The new issue has its exact typed contract/source drafts in localization/backend-typed-delta.json; editorial review and UI mapping remain.
 - Selective-transfer public APIs are unchanged. Concurrent resume now preserves
   the originally applied result instead of rewriting it as UNCHANGED. Keep the
   original operation ID after an ambiguous response; present per-group outcomes.
@@ -41,7 +41,7 @@ The existing `PrivateCopyCleanup` protocol now has real `DescriptorCopyFiles`
 `CopyMaintenance` references, registry, monotonic revision and journals. Internal
 sealing binds a validated manifest to exact members and inode identities; UI
 paths cannot create deletion authority. The JNI code anchors directories, opens
-ancestors without following symlinks, refuses unknown members and multiple links,
+ancestors without following symlinks, refuses unknown members and incomplete hardlink graphs,
 uses same-filesystem no-replace rename, validates identities before unlink and
 fsyncs directories. Reads/reconciliation do not resume deletion. Explicit resume
 checks remaining hash; only intact surviving groups can be returned. Deleted bytes
@@ -62,26 +62,27 @@ by age, process death or blanket reset.
 2. Connect each frontend form, chooser, restore preview and recovery source to an
    explicit durable owner/token and release only on a confirmed lifecycle action.
    Review legacy references individually; never infer that a file is orphaned.
-3. Register existing candidates only after exact state/manifest/hash validation.
+3. Register existing candidates only after exact state/manifest/hash validation, including final sealing after recovery writes.
    PREPARING/READY/FAILED staging and unknown files stay blocked. Recovery journal
    is never selectable. Active/unknown ownership is a hard blocker.
-4. Implement a complete sealed archive hardlink graph and nested member manifest.
-   This adapter supports flat groups and conservatively blocks all nlink > 1.
+4. The complete sealed archive graph and nested member manifest are implemented and host-tested. Existing archive validation/final-sealing integration remains; do not turn an old DatabaseArchive manifest into authority by setting a label.
 5. Add Android interruption/filesystem QA before wiring confirmation to deletion.
 
 The host tests operate only on newly created temporary fixtures. Four Android
 ABIs compile, which proves compilation/packaging and does not prove device safety.
-The native metadata port refuses writes above its own 16 MiB UTF-8 reader bound
-before replacing the previous readable journal. It is not an unlimited journal.
+Both Android and descriptor metadata ports enforce the same 16 MiB UTF-8 bound
+before replacing old state. Known preflight refusal preserves references and keeps
+explicit owner recovery usable; uncertain I/O still requires reopen/inspection.
+The operational sidecar migrates format1 to format2 without writing on read.
 
 ## A–F status
 
 | Package | Backend evidence / remaining boundary |
 |---|---|
 | A | Stable typed errors, catalog sidecars, SYSTEM/EXPLICIT preference authority and locale-independent CSV parsing. Editorial UI package exists. Catalog translation packs and UI resource/LocaleManager migration remain unaccepted; do not label planned/unreviewed content complete. |
-| B | Series revisions, date-only/zone/DST projection, exceptions, receipts, atomic explicit start/link and archive/restore exist. The common projection API is ready. Schedule alarm delivery coordination and the three platform renderers are not implemented; one projected reminder instant is not delivered-reminder evidence. |
+| B | Series revisions, date-only/zone/DST projection, exceptions, receipts, atomic explicit start/link and archive/restore exist. The common projection API is ready. Schedule delivery coordination, one inexact alarm, durable attempt receipts and conditional boot/time-change hooks are implemented. The notice factory and three renderer integrations remain Opus-owned; no production reminder rendering is bound. |
 | C | Memory/Room scenarios, migration 5→6→7, JSON 1–9 replacement/rollback and recovery coverage continue. Cold contradictory identity rejects without repair. Oversized individual streaming records now refuse export instead of making unreadable archives. Full graph still resides in memory. |
-| D | Real durable/gated descriptor storage and host fault tests added. Production cleanup remains blocked by the explicit prerequisites above. |
+| D | Real durable/gated descriptor storage and host fault tests added. Sealed graphs/nested manifests and bounded Android metadata are added. Production cleanup remains blocked by Android QA, final-sealing/legacy integration and frontend reference prerequisites above. |
 | E | Full selective inspect/plan/preview/apply/resume, dependency groups, provenance/dedupe, explicit losses and Undo remain separate from JSON replacement and CSV. Concurrent resume fixed. OPEN/RECOVERY and active Focus portability remain explicitly restricted; not silently converted to facts. |
 | F | Apache-2.0 own code / Onest OFL / existing notices retained, API36, NDK r30 pinned, unsigned builds available. Disabled F-Droid draft now pins NDK, and passed metadata lint; no fdroidserver end-to-end build or independent reproducibility claim. Existing AndroidX native source/static-runtime provenance findings remain open. No store publication or release signing key. |
 
@@ -125,3 +126,5 @@ category itself was correct. The contextual run exited 0. An enabled-build metad
 its only change was removing disable in the isolated copy. No fdroidserver build,
 store submission or signing initialization ran. New native compilation does not resolve the separate
 AndroidX graphics-path release provenance/static-runtime notice questions.
+
+The first-pass native inventory is now dated in NATIVE_LICENSE_EVIDENCE.md: accepted v4 contains both AndroidX graphics-path and own tracker_copy_io in four ABIs. Existing LICENSE/NOTICE are present; AndroidX provenance/static-runtime clearance stays open.

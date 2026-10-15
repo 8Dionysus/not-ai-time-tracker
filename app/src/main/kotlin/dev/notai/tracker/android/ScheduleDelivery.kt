@@ -45,7 +45,8 @@ class AndroidScheduleDeliveryPlatform(context: Context,private val factory: ()->
         private const val TAG = "schedule:"
         private const val NOTICE = 84
     }
-    private fun intent() = Intent(context,ScheduleAlarmReceiver::class.java).setAction(ACTION).setData(Uri.parse("notai://schedule/reminder"))
+    private fun intent() = Intent(context,ScheduleAlarmReceiver::class.java).setAction(ACTION)
+        .setData(Uri.Builder().scheme("notai").authority("schedule").appendPath("reminder").build())
     override fun availability(): ScheduleDeliveryAvailability = try {
         val manager = context.getSystemService(NotificationManager::class.java)
         val alarm = context.getSystemService(AlarmManager::class.java)

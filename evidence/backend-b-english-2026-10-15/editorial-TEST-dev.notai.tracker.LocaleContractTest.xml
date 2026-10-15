@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.LocaleContractTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-15T23:44:39.984Z" hostname="69b2b5b46001" time="0.642">
+  <properties/>
+  <testcase name="onePreferenceFollowsSystemOrLastConfirmedExplicitChange" classname="dev.notai.tracker.LocaleContractTest" time="0.212"/>
+  <testcase name="englishEditorialCandidateLoadsWithoutClaimingRightsOrReplacingOriginals" classname="dev.notai.tracker.LocaleContractTest" time="0.405"/>
+  <testcase name="sidecarCoverageParentIdentityAndBatchFallbackPreserveOriginals" classname="dev.notai.tracker.LocaleContractTest" time="0.017"/>
+  <testcase name="qualityAvailabilityScriptsAndOverridesStayIndependent" classname="dev.notai.tracker.LocaleContractTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

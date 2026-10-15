@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "scope": "catalog sidecars only; not Android UI LocaleConfig",
-  "key": ["catalogId", "stableId", "meaningVersion", "localeTag"],
+  "key": ["catalogId", "kind", "stableId", "meaningVersion", "parentId", "parentMeaningVersion", "localeTag"],
   "installedReviewedPacks": [],
   "plannedLocales": ["ru", "ru-RU", "en", "en-US", "es", "es-419", "es-MX", "pt", "pt-BR", "pt-PT", "fr-FR", "de-DE", "it-IT", "zh-Hans", "zh-Hant", "ja-JP", "ko-KR", "ar", "hi-IN"],
   "plannedStatus": "missing; no translation support claimed",

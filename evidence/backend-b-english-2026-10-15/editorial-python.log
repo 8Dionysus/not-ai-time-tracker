@@ -1,0 +1,13 @@
+test_explicit_fallback_chains_never_cross_chinese_scripts (test_catalog_content_pack.CatalogPackPreparationTest.test_explicit_fallback_chains_never_cross_chinese_scripts) ... ok
+test_hash_utf8_and_review_fail_before_creating_destination (test_catalog_content_pack.CatalogPackPreparationTest.test_hash_utf8_and_review_fail_before_creating_destination) ... ok
+test_partial_aliases_and_unknown_or_duplicate_identities_refuse (test_catalog_content_pack.CatalogPackPreparationTest.test_partial_aliases_and_unknown_or_duplicate_identities_refuse) ... ok
+test_pinned_source_counts_and_parent_qualified_values (test_catalog_content_pack.CatalogPackPreparationTest.test_pinned_source_counts_and_parent_qualified_values) ... ok
+test_preparation_does_not_normalize_or_install_candidate (test_catalog_content_pack.CatalogPackPreparationTest.test_preparation_does_not_normalize_or_install_candidate) ... ok
+test_preserves_literal_text_and_parent_qualified_identity (test_catalog_editorial_adapter.EditorialAdapterTest.test_preserves_literal_text_and_parent_qualified_identity) ... ok
+test_refuses_identity_source_hash_and_field_loss (test_catalog_editorial_adapter.EditorialAdapterTest.test_refuses_identity_source_hash_and_field_loss) ... ok
+test_refuses_parts_hash_sequence_rights_and_qa_changes (test_catalog_editorial_adapter.EditorialAdapterTest.test_refuses_parts_hash_sequence_rights_and_qa_changes) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.870s
+
+OK

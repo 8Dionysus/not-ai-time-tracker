@@ -25,13 +25,13 @@ python3 -B scripts/catalog_editorial_adapter.py --locale es \
 
 The same adapter explicitly handles the first EN manifest's minimal `{parts,entries,sourceCandidateSha256}` shape and the new source-bound `{sourceCatalogSha256,candidateSha256,locale,rightsStatus,nativeSpeakerQA,entries,parts}` shape. Unknown/mixed fields refuse. Source-bound manifest metadata is checked in addition to every part's matching header and hash; no permissive ignore-unknown reader is added.
 
-## Runtime acceptance remains separate
+## Runtime verification and remaining acceptance
 
-Ten host preparation tests passed, including source-bound manifest metadata refusal and wrong-part locale refusal. Re-adapting EN reproduces its previous payload unchanged. Owner A reported the original runtime guard checks as four JVM + one Room passed without errors/skips. The two real-candidate fixtures remain pending on A's existing toolchain:
+Ten host preparation tests passed, including source-bound manifest metadata refusal and wrong-part locale refusal. Re-adapting EN reproduces its previous payload unchanged. Owner A reported the original runtime guard checks as four JVM + one Room passed without errors/skips. Both real-candidate fixtures passed on A's existing toolchain at B head3ae129e414ce5903b3c998724faf62f9a27a9f94 (all five LocaleContractTest cases in1m01s):
 
 - `LocaleContractTest.englishEditorialCandidateLoadsWithoutClaimingRightsOrReplacingOriginals`
 - `LocaleContractTest.spanishEditorialDraftLoadsWithoutReplacingOriginals`
 
-They share one helper and load the full real files, checking quality, pending-rights source fallback, regional requested locales and literal local overrides. Host tests do not substitute for them. APK/device/UI/RTL/native-language acceptance remains outside these source checks. The existing Russian runtime catalog, Dataset, IDs/meaningVersions, user strings and JSON/CSV history are unchanged.
+They share one helper and load the full real files, checking quality, pending-rights source fallback, regional requested locales and literal local overrides. The final merged core suite passes101 tests; raw source-bound reproduction,10host tests and5targeted JVM cases are in evidence/backend-b-spanish-2026-10-15. APK/device/UI/RTL/native-language acceptance remains outside these source checks. The existing Russian runtime catalog, Dataset, IDs/meaningVersions, user strings and JSON/CSV history are unchanged.
 
 English-specific source provenance and its corrected consumer/capital goods description are in [CATALOG_EN_CANDIDATE.md](CATALOG_EN_CANDIDATE.md). Opus's unchanged backend API is in [CATALOG_CONTENT_PACKS.md](CATALOG_CONTENT_PACKS.md).

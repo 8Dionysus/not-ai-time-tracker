@@ -6,7 +6,7 @@ Investigated after baseline435c3be and the checked A projection fix. Operational
 
 adoptLifecycle is an inventory cutover: it scopes previously global legacy references to all byte groups present at that trusted descriptor inventory. It does not record that any historical owner completed. finishLifetime releases only the new lifetime's exact recorded tokens. Consequently an old group's legacy-ui-lifecycle/UNKNOWN_FILE_OR_STATE witness remains after a new exact owner finishes the same group. The new owner did not own the old token. This is protective retention/blocked cleanup eligibility, not data loss.
 
-A metadata-only Java probe against the built current core exercised that exact overlap: old witness→cutover(old-copy,other-old-copy)→new exact form owner(old-copy)→finish(new owner). The exact old token/scope remain, the new token is gone, old-copy remains UNKNOWN-protected, a future independent group is unblocked and synthetic bytes have the same SHA256. No cleanup/deletion API was called. See evidence/legacy-owner-migration-2026-10-15. The probe is not Android or fsync/crash-durability acceptance.
+A metadata-only Java probe against the built2d62014 core, whose CopyMaintenance source remains identical at the final6d2e466 build exercised that exact overlap: old witness→cutover(old-copy,other-old-copy)→new exact form owner(old-copy)→finish(new owner). The exact old token/scope remain, the new token is gone, old-copy remains UNKNOWN-protected, a future independent group is unblocked and synthetic bytes have the same SHA256. No cleanup/deletion API was called. See evidence/legacy-owner-migration-2026-10-15. The probe is not Android or fsync/crash-durability acceptance.
 
 ## Existing safe explicit handoffs
 

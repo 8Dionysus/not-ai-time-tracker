@@ -1,0 +1,21 @@
+{
+  "actualFullAppTestSource": "7f14d7820317b86be9a0c1ade5a389ab949ae598",
+  "finalBuildSource": "6d2e466bf286477911d340d2ae65ebff44ac7d67",
+  "checkedInputs": [
+    "app/src",
+    "core/src/main",
+    "core/src/testFixtures",
+    "app/build.gradle.kts",
+    "core/build.gradle.kts",
+    "catalog/manifest.json",
+    "catalog/runtime-catalog.json",
+    "catalog/compatibility.json",
+    "catalog/locales"
+  ],
+  "changedPaths": [],
+  "excludedEditorialCandidates": [
+    "catalog/editorial/en",
+    "catalog/editorial/es"
+  ],
+  "gradleTask": "UP-TO-DATE; not a new execution"
+}

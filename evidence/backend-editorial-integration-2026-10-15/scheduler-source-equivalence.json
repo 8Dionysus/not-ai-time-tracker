@@ -1,0 +1,49 @@
+{
+  "profileSource": "69d926fc7b1262a55f1ea35cf079a4b6db86e8af",
+  "runtimeSource": "6d2e466bf286477911d340d2ae65ebff44ac7d67",
+  "scope": "Historical isolated profile is exact69d. Indexed receipt engine/SQL/delivery/profile unchanged. Schedule canonical capture extraction and day-boundary readmodel helpers changed; not a fresh full-scheduler or Android performance run.",
+  "files": [
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ScheduleSettings.kt",
+      "profileBlob": "dd8b7a7a6ef342219a304eea44d9320dce422d35",
+      "currentBlob": "06a087400d14532f82ab55f1a2521ae1ef37317d",
+      "identical": false
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/Schedule.kt",
+      "profileBlob": "93195470b6f91038f14e9ca42186aca2bf85fdf2",
+      "currentBlob": "7548171b5ef6a4594d477b3a6181776a60d4b45e",
+      "identical": false
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ScheduleDelivery.kt",
+      "profileBlob": "fe771bd2355dbe3458563a6b1b1d64b4166c3101",
+      "currentBlob": "fe771bd2355dbe3458563a6b1b1d64b4166c3101",
+      "identical": true
+    },
+    {
+      "path": "core/src/main/kotlin/dev/notai/tracker/ScheduleReceiptIndex.kt",
+      "profileBlob": "4672af3d212c5dacb740fb3243d8a92c5901f2ef",
+      "currentBlob": "4672af3d212c5dacb740fb3243d8a92c5901f2ef",
+      "identical": true
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ScheduleReceiptSql.kt",
+      "profileBlob": "1f53c56d73d5b848ede8bf830f3dafacec0fab58",
+      "currentBlob": "1f53c56d73d5b848ede8bf830f3dafacec0fab58",
+      "identical": true
+    },
+    {
+      "path": "app/src/main/kotlin/dev/notai/tracker/android/ScheduleDelivery.kt",
+      "profileBlob": "b8fea42386de7be917ba986ce358f91c7774179e",
+      "currentBlob": "b8fea42386de7be917ba986ce358f91c7774179e",
+      "identical": true
+    },
+    {
+      "path": "core/src/test/kotlin/dev/notai/tracker/IndexedScheduleDeliveryProfile.kt",
+      "profileBlob": "c92e45b19bbad98da66d3247302f78dcedd8b2d8",
+      "currentBlob": "c92e45b19bbad98da66d3247302f78dcedd8b2d8",
+      "identical": true
+    }
+  ]
+}

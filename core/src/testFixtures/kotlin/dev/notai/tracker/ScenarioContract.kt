@@ -167,6 +167,23 @@ abstract class ScenarioContract {
         assertTrue(focusImporter.undo("focus",focusTarget.snapshot().token).undone);assertEquals(Mode.IDLE,focusTarget.snapshot().mode)
     }
 
+    @Test fun scheduleCanonicalReceiptsAndSameDayRuleEdits() {
+        val clock = FakeClock();var t = Tracker(createStore(),clock)
+        t.start(t.snapshot().token);val facts = t.data().sessions;val epoch = t.data().timerEpoch
+        val date = "2026-10-10";val days = linkedSetOf(1,2)
+        val rule = ScheduleRule(Classification(),date,weekdays = days,extraDates = setOf(date),localTime = "19:00:00")
+        val command = ScheduleCommand("canonical",t.snapshot().token,ScheduleAction.CREATE,"canonical",rule = rule)
+        val receipt = t.scheduleCommand(command);days.clear()
+        assertEquals(setOf(1,2),t.data().schedule.series.single().revisions.single().rule.weekdays)
+        assertEquals(receipt,t.scheduleCommand(command.copy(rule = rule.copy(weekdays = setOf(2,1),localTime = "19:00"))))
+        t.scheduleCommand(ScheduleCommand("same-day",t.snapshot().token,ScheduleAction.UPDATE_FUTURE,"canonical",1,
+            rule = rule.copy(weekdays = setOf(1,2),localTime = "20:00"),effectiveFrom = date))
+        val before = t.data();t = Tracker(reopen(t.store),clock);assertEquals(before,t.data())
+        assertEquals(java.time.LocalTime.of(20,0),t.listOccurrences(LocalDate.parse(date),LocalDate.parse(date),java.time.ZoneId.of("UTC")).single().localTime)
+        assertEquals(facts,t.data().sessions);assertEquals(epoch,t.data().timerEpoch)
+        assertEquals(2,t.data().schedule.series.single().revisions.size)
+    }
+
     open fun storageWorkload() {}
     open fun surfaceActions() {}
     open fun assertTransferFailure(transfer: HistoryTransfer,preview: HistoryPreview,tracker: Tracker) {}

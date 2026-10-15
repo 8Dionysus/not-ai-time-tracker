@@ -90,7 +90,7 @@ internal fun validateSchedule(data: Dataset) {
     fun selection(c: Classification) = validateSelection(data,c,data.types.map { it.id }.toSet(),data.cards.map { it.id }.toSet())
     for(series in s.series) {
         ensure(series.revisions.isNotEmpty(),"Empty series revisions")
-        val dates = series.revisions.map { scheduleDate(it.effectiveFrom) };ensure(dates == dates.sorted() && dates.distinct().size == dates.size,"Invalid schedule revision dates")
+        val dates = series.revisions.map { scheduleDate(it.effectiveFrom) };ensure(dates == dates.sorted(),"Invalid schedule revision dates")
         series.revisions.forEach { version ->
             val r = version.rule;selection(r.selection)
             val start = scheduleDate(r.startDate)
@@ -126,9 +126,14 @@ internal fun validateSchedule(data: Dataset) {
     val occurrence: OccurrenceKey? = null,val override: OccurrenceOverride? = null,val expectedOverrideRevision: Long? = null,val deviceZone: String = "UTC")
 /** One transaction and receipt, including the existing timer transition. No second timer. */
 fun Tracker.scheduleCommand(command: ScheduleCommand): ScheduleCommandResult = storage {
-    val hash = payloadHash(command.copy(rule = command.rule?.copy(weekdays = command.rule.weekdays.sorted().toSet(),extraDates = command.rule.extraDates.sorted().toSet())))
+    // Capture caller-owned nested collections before hashing and applying one immutable request.
+    val captured = codec.decodeFromString<ScheduleCommand>(codec.encodeToString(command))
+    fun time(value: String?) = value?.let { scheduleTime(it).toString() }
+    val prepared = captured.copy(rule = captured.rule?.let { r -> r.copy(localTime = time(r.localTime),reminderTime = time(r.reminderTime)) },
+        override = captured.override?.let { o -> o.copy(localTime = time(o.localTime),reminderTime = time(o.reminderTime)) })
+    val hash = payloadHash(prepared)
     store.checkedTransaction { checked ->
-        val d = checked.data;val c = command;val s = d.schedule
+        val d = checked.data;val c = prepared;val s = d.schedule
         ensure(c.key.isNotBlank() && c.key.length <= 200,"Invalid command key")
         val receipt = s.receipts.find { it.key == c.key }
         if(receipt != null) {
@@ -152,7 +157,7 @@ fun Tracker.scheduleCommand(command: ScheduleCommand): ScheduleCommandResult = s
             ScheduleAction.UPDATE_FUTURE -> {
                 val from = scheduleDate(c.effectiveFrom ?: fail(ErrorCode.INVALID_INPUT,"Effective date required"))
                 ensure(from >= ScheduleDayResolver.date(Instant.ofEpochMilli(now.wall),zone),"Cannot rewrite past schedule")
-                ensure(from > scheduleDate(series!!.revisions.last().effectiveFrom),"Effective date must follow prior revision")
+                ensure(from >= scheduleDate(series!!.revisions.last().effectiveFrom),"Effective date cannot precede prior revision")
                 val rule = c.rule ?: fail(ErrorCode.INVALID_INPUT,"Missing rule");checkStartable(d,rule.selection)
                 val row = series.copy(revision = Math.addExact(series.revision,1),revisions = series.revisions+ScheduleRevision(from.toString(),rule.copy(selection = d.classify(rule.selection))))
                 next = d.copy(schedule = s.copy(series = s.series.map { if(it.id == row.id) row else it }))

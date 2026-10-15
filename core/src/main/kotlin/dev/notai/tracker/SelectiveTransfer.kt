@@ -113,7 +113,8 @@ class SelectiveTransfer(private val tracker: Tracker) {
         return TransferPlan(tracker,selected,token(d),policies.toMap(),conflicts)
     }
     fun preview(plan: TransferPlan): TransferPlan { ensure(plan.owner === tracker,"Wrong transfer owner");checkToken(tracker.data(),plan.expected,tracker.clock.now());return plan }
-    fun apply(plan: TransferPlan,operationId: String): TransferOperation {
+    fun apply(plan: TransferPlan,operationId: String): TransferOperation = storage { applyInternal(plan,operationId) }
+    private fun applyInternal(plan: TransferPlan,operationId: String): TransferOperation {
         ensure(plan.owner === tracker && operationId.isNotBlank(),"Invalid transfer plan")
         val hash = payloadHash(plan.packageValue)+payloadHash<Map<String,TransferConflictPolicy>>(plan.policies)
         tracker.store.transaction { d ->
@@ -127,7 +128,8 @@ class SelectiveTransfer(private val tracker: Tracker) {
         return resume(operationId)
     }
     /** Explicit resume only. Own commits advance expected revision; unrelated edits require a new plan. */
-    fun resume(operationId: String): TransferOperation {
+    fun resume(operationId: String): TransferOperation = storage { resumeInternal(operationId) }
+    private fun resumeInternal(operationId: String): TransferOperation {
         while(true) {
             val op = tracker.data().transfer.operations.find { it.id == operationId } ?: fail(ErrorCode.INVALID_INPUT,"Operation missing")
             val pending = op.groups.indexOfFirst { it.state == TransferGroupState.PENDING };if(pending < 0) return op
@@ -162,7 +164,8 @@ class SelectiveTransfer(private val tracker: Tracker) {
         }
     }
     /** Explicit compensating removal, only while no later mutation has occurred. */
-    fun undo(operationId: String,expected: Token): TransferOperation = tracker.store.transaction { d ->
+    fun undo(operationId: String,expected: Token): TransferOperation = storage { undoInternal(operationId,expected) }
+    private fun undoInternal(operationId: String,expected: Token): TransferOperation = tracker.store.transaction { d ->
         val op = d.transfer.operations.singleOrNull { it.id == operationId } ?: fail(ErrorCode.INVALID_INPUT,"Operation missing")
         checkToken(d,expected,tracker.clock.now())
         ensure(op.complete && !op.undone && op.baseDatasetId == d.datasetId && op.baseControlBarrier == d.controlBarrier && op.nextRevision == d.revision,"Transfer undo base changed",ErrorCode.STALE)

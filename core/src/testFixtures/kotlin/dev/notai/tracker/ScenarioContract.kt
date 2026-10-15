@@ -128,7 +128,7 @@ abstract class ScenarioContract {
         var backing = createStore();var calls = 0
         val faulty = object: StateStore by backing {
             override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T {
-                calls++;if(calls == 3) throw CoreError(ErrorCode.STORAGE,"injected interruption between groups")
+                calls++;if(calls == 3) throw java.io.IOException("injected interruption between groups")
                 return backing.transaction(block)
             }
         }

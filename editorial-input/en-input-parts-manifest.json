@@ -1,0 +1,26 @@
+{
+  "parts": [
+    {
+      "path": "en-reviewed-part-1.json",
+      "bytes": 301402,
+      "sha256": "8a6be08cc38205755a724caa73eae2597e14e83818f4f851b6f46f48c68348c0"
+    },
+    {
+      "path": "en-reviewed-part-2.json",
+      "bytes": 325871,
+      "sha256": "9a63184071c6229767a9d2a47945b2f5af26da7b10755c97c6491855071b191f"
+    },
+    {
+      "path": "en-reviewed-part-3.json",
+      "bytes": 278033,
+      "sha256": "7df690eaf5414f1173b8eb254452429e9cbb1506f77a7f81744597bc8af15879"
+    },
+    {
+      "path": "en-reviewed-part-4.json",
+      "bytes": 222451,
+      "sha256": "c1b8ef37099b1e23794a4696c5f2ca445aed7732fff4d4361faa9bd235c0a36e"
+    }
+  ],
+  "entries": 2385,
+  "sourceCandidateSha256": "695cb73d1f9c6f78b448a229a36a35e0d52d9a6a512f7e91638a33b26234e371"
+}

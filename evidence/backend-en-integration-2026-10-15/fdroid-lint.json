@@ -1,0 +1,24 @@
+{
+  "source": "7f14d7820317b86be9a0c1ade5a389ab949ae598",
+  "scope": "isolated metadata lint only; no server build",
+  "runs": [
+    {
+      "fixture": "disabled",
+      "argv": [
+        "/workspace/tracker-tools/fdroid-venv/bin/fdroid",
+        "lint",
+        "dev.notai.tracker"
+      ],
+      "exitCode": 0
+    },
+    {
+      "fixture": "enabled-fixture",
+      "argv": [
+        "/workspace/tracker-tools/fdroid-venv/bin/fdroid",
+        "lint",
+        "dev.notai.tracker"
+      ],
+      "exitCode": 0
+    }
+  ]
+}

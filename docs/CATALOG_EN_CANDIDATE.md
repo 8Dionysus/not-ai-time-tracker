@@ -19,7 +19,7 @@ Source-record hashing is UTF-8 compact JSON with sorted object keys. TYPE and AX
 
 Editorial TYPE `parentStableId` is the taxonomy parent, checked against the original object. It is not copied into `CatalogContentKey.parentId`, which is null for TYPE/AXIS. Editorial VALUE `stableId` is `axisId/rawValueId`; it maps through the exact original catalog to raw value ID, value meaningVersion, separate parent axis ID and parent meaningVersion. The adapter never guesses identity from labels or splits an arbitrary string to infer a value ID. Null AXIS/VALUE description becomes the runtime contract's empty string; TYPE descriptions and aliases must retain full source coverage.
 
-## Reproduction and remaining runtime check
+## Reproduction and runtime verification
 
 Obtain the pinned delivery branch into a separate source checkout. Then:
 
@@ -32,6 +32,6 @@ python3 -B scripts/catalog_editorial_adapter.py \
 python3 -B -m unittest discover -s scripts -p 'test_catalog_*py' -v
 ```
 
-Eight host tests passed, including duplicate raw value IDs under different axes, taxonomy/content-key parent separation, Unicode preservation, source-hash/alias/description/version refusals and part-integrity/sequence/rights/QA refusal. They do not replace Kotlin execution. The added `LocaleContractTest.englishEditorialCandidateLoadsWithoutClaimingRightsOrReplacingOriginals` is ready for owner A's existing toolchain; it has not run in this environment. It loads the complete real candidate and verifies pending-rights source fallback and literal user overrides. Existing runtime guard verification remains with A and is not duplicated here.
+Eight host tests passed, including duplicate raw value IDs under different axes, taxonomy/content-key parent separation, Unicode preservation, source-hash/alias/description/version refusals and part-integrity/sequence/rights/QA refusal. They do not replace Kotlin execution. The added `LocaleContractTest.englishEditorialCandidateLoadsWithoutClaimingRightsOrReplacingOriginals` passed on owner A's established toolchain at B head51b2ec55422c04cf57db451aef3873d5e7bf97fd, together with all four LocaleContractTest cases (46s). Its original preparation checkout had no Kotlin toolchain. It loads the complete real candidate and verifies pending-rights source fallback and literal user overrides. Raw host/JVM proof and independent exact payload reproduction are in evidence/backend-b-english-2026-10-15. APK/device acceptance remains separately scoped; this fixture does not install or clear the candidate.
 
 Opus can use the unchanged [display API contract](CATALOG_CONTENT_PACKS.md). Product asset/index binding, rights clearance and actual localized UI support are separate pending steps. User Cards/Favorites/free values, Dataset IDs/meaningVersions, historical classifications, JSON and CSV are unchanged by preparation.

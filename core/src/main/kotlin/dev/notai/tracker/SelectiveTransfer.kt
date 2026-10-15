@@ -11,15 +11,15 @@ import kotlinx.serialization.Serializable
 @Serializable data class TransferGroup(val id: String,val originId: String,val sourceRevision: Long,val hash: String,val content: TransferContent,val entities: List<TransferEntityOrigin>)
 @Serializable data class SelectivePackage(val formatVersion: Int = 1,val minimumReader: Int = 1,val transferId: String = newId(),val sourceDatasetId: String,
     val groups: List<TransferGroup>,val losses: List<String> = emptyList())
-@Serializable data class TransferOrigin(val originId: String,val hash: String,val localGroup: TransferContent,val localHash: String)
+@Serializable data class TransferOrigin(val originId: String,val hash: String,val localGroup: TransferContent,val localHash: String,val compaction: TransferOriginCompaction? = null)
 @Serializable enum class TransferConflictPolicy { BLOCK, COPY }
 @Serializable enum class TransferGroupState { PENDING, APPLIED, UNCHANGED, REJECTED }
 @Serializable data class TransferGroupProgress(val group: TransferGroup,val policy: TransferConflictPolicy,val state: TransferGroupState = TransferGroupState.PENDING,val reason: String? = null,val inserted: TransferContent? = null,val previousOrigin: TransferOrigin? = null)
-@Serializable data class TransferOperation(val id: String,val hash: String,val baseDatasetId: String,val baseControlBarrier: String,val nextRevision: Long,val groups: List<TransferGroupProgress>,val undone: Boolean = false) {
+@Serializable data class TransferOperation(val id: String,val hash: String,val baseDatasetId: String,val baseControlBarrier: String,val nextRevision: Long,val groups: List<TransferGroupProgress>,val undone: Boolean = false,val payloadsPruned: Boolean = false) {
     val complete get() = groups.none { it.state == TransferGroupState.PENDING }
     val partial get() = groups.any { it.state == TransferGroupState.REJECTED } || !complete
 }
-@Serializable data class TransferState(val origins: List<TransferOrigin> = emptyList(),val operations: List<TransferOperation> = emptyList())
+@Serializable data class TransferState(val origins: List<TransferOrigin> = emptyList(),val operations: List<TransferOperation> = emptyList(),val compactions: List<TransferCompactionReceipt> = emptyList())
 data class TransferInspection(val packageId: String,val groups: List<TransferGroup>,val losses: List<String>,val uncertainSessionIds: Set<String>)
 data class TransferConflict(val groupId: String,val reason: String)
 class TransferPlan internal constructor(internal val owner: Tracker,internal val packageValue: SelectivePackage,internal val expected: Token,
@@ -78,9 +78,18 @@ class SelectiveTransfer(private val tracker: Tracker) {
             val content = TransferContent(types,cards,d.axes.filter { it.id in axisIds },metrics,units,sessions,segments,measurements,series,overrides,ownLinks,portable.focus?.takeIf { wanted.includeFocus && it.sessionId in ss },goals,favorites)
             validateContent(content)
             val id = component.sorted().joinToString("|")
-            val previous = d.transfer.origins.find { o -> o.localGroup.sessions.map { it.id }.toSet() == ss && o.localGroup.series.map { it.id }.toSet() == ps && o.localGroup.goals.map { it.id }.toSet() == goals.map { it.id }.toSet() && o.localGroup.favorites.map { it.id }.toSet() == favorites.map { it.id }.toSet() }
-            val original = previous?.takeIf { it.localGroup == content }?.let { o ->
-                d.transfer.operations.flatMap { it.groups }.firstOrNull { it.group.originId == o.originId && it.group.hash == o.hash }?.group
+            val previous = d.transfer.origins.find { o -> originMemberIds(o,"session") == ss && originMemberIds(o,"series") == ps && originMemberIds(o,"goal") == goals.map { it.id }.toSet() && originMemberIds(o,"favorite") == favorites.map { it.id }.toSet() }
+            val original = previous?.takeIf { originUnchanged(d,it) && currentOriginContent(d,it) == content }?.let { o ->
+                val earliest = d.transfer.operations.flatMap { op -> op.groups.map { op.payloadsPruned to it.group } }
+                    .firstOrNull { it.second.originId == o.originId && it.second.hash == o.hash }
+                val capsule = o.compaction ?: if(earliest?.first == true) compactTransferOrigin(d,o).compaction else null
+                if(capsule?.source != null) {
+                    val restored = rewriteTransferIds(content,capsule.identities.associateByKind(inverse = true))
+                    capsule.source.withContent(restored).also { g ->
+                        ensure(g.hash == payloadHash(g.content) && g.entities == entityManifest(g.content,g.sourceRevision,g.originId),"Compacted source reconstruction failed",ErrorCode.STORAGE)
+                    }
+                } else d.transfer.operations.filterNot { it.payloadsPruned }.flatMap { it.groups }
+                    .firstOrNull { it.group.originId == o.originId && it.group.hash == o.hash }?.group
             }
             original ?: group(id,previous?.originId ?: "${d.datasetId}:$id",d.revision,content)
         }
@@ -140,7 +149,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
                 ensure(!live.undone,"Operation was undone",ErrorCode.STALE)
                 val progress = live.groups[pending];var next = d
                 val origin = d.transfer.origins.find { it.originId == progress.group.originId }
-                val unchanged = origin != null && origin.hash == progress.group.hash && currentContent(d,origin.localGroup) == origin.localGroup
+                val unchanged = origin != null && origin.hash == progress.group.hash && originUnchanged(d,origin)
                 val reason = conflict(d,progress.group)
                 val completed = if(unchanged) progress.copy(state = TransferGroupState.UNCHANGED) else if(reason != null && progress.policy == TransferConflictPolicy.BLOCK) {
                     progress.copy(state = TransferGroupState.REJECTED,reason = reason)
@@ -169,6 +178,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
     private fun undoInternal(operationId: String,expected: Token): TransferOperation = tracker.store.transaction { d ->
         val op = d.transfer.operations.singleOrNull { it.id == operationId } ?: fail(ErrorCode.INVALID_INPUT,"Operation missing")
         checkToken(d,expected,tracker.clock.now())
+        ensureReason(!op.payloadsPruned,ErrorReason.TRANSFER_PAYLOAD_PRUNED,ErrorCode.STALE,mapOf("operationId" to ErrorArgument.Identifier(operationId)))
         ensure(op.complete && !op.undone && op.baseDatasetId == d.datasetId && op.baseControlBarrier == d.controlBarrier && op.nextRevision == d.revision,"Transfer undo base changed",ErrorCode.STALE)
         var next = d;var origins = d.transfer.origins
         for(progress in op.groups.asReversed()) {
@@ -204,7 +214,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
             axes = c.axes,metrics = c.metrics,units = c.units,schedule = ScheduleData(c.series,c.overrides,c.links),focus = c.focus,goals = c.goals,favorites = c.favorites)) }
         private fun conflict(d: Dataset,g: TransferGroup): String? {
             val origin = d.transfer.origins.find { it.originId == g.originId }
-            if(origin != null) return if(origin.hash == g.hash && currentContent(d,origin.localGroup) == origin.localGroup) null else "ORIGIN_CHANGED_OR_LOCALLY_EDITED"
+            if(origin != null) return if(origin.hash == g.hash && originUnchanged(d,origin)) null else "ORIGIN_CHANGED_OR_LOCALLY_EDITED"
             return try { validate(merge(d,g.content));null } catch(_: CoreError) { "IDENTITY_OR_REFERENCE_CONFLICT" }
         }
         private fun merge(d: Dataset,c: TransferContent): Dataset {
@@ -221,7 +231,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
                 metrics = union(d.metrics,c.metrics) { "${it.id}:${it.meaningVersion}" },units = union(d.units,c.units) { it.id },sessions = d.sessions+c.sessions,segments = d.segments+c.segments,measurements = d.measurements+c.measurements,
                 schedule = d.schedule.copy(series = d.schedule.series+c.series,overrides = d.schedule.overrides+c.overrides,links = d.schedule.links+c.links))
         }
-        private fun currentContent(d: Dataset,c: TransferContent): TransferContent {
+        internal fun currentContent(d: Dataset,c: TransferContent): TransferContent {
             fun <T,K> pick(wanted: List<T>,live: List<T>,key: (T)->K): List<T> = wanted.mapNotNull { w -> live.find { key(it) == key(w) } }
             val oldSegments = pick(c.segments,d.segments) { it.id }
             val extraSegments = d.segments.filter { seg -> c.sessions.any { it.id == seg.sessionId } && c.segments.none { it.id == seg.id } }
@@ -231,32 +241,27 @@ class SelectiveTransfer(private val tracker: Tracker) {
                 overrides = pick(c.overrides,d.schedule.overrides) { it.key },links = pick(c.links,d.schedule.links) { it.key },focus = d.focus?.takeIf { it.id == c.focus?.id },
                 goals = pick(c.goals,d.goals) { it.id },favorites = pick(c.favorites,d.favorites) { it.id })
         }
-        private fun remap(c: TransferContent): TransferContent {
-            fun ids(values: List<String>) = values.distinct().associateWith { newId() }
-            val types = ids(c.types.map { it.id });val cards = ids(c.cards.map { it.id });val axes = ids(c.axes.map { it.id });val metrics = ids(c.metrics.map { it.id })
-            val units = ids(c.units.map { it.id });val sessions = ids(c.sessions.map { it.id });val segments = ids(c.segments.map { it.id });val series = ids(c.series.map { it.id })
-            fun id(map: Map<String,String>,raw: String) = map[raw] ?: raw
-            fun sel(s: Classification) = s.copy(cardId = s.cardId?.let { id(cards,it) },activityTypeId = s.activityTypeId?.let { id(types,it) },
-                ancestorPathAtWrite = s.ancestorPathAtWrite.map { id(types,it) },facets = s.facets.map { it.copy(axisId = id(axes,it.axisId)) })
-            fun key(k: OccurrenceKey) = k.copy(seriesId = id(series,k.seriesId))
-            return c.copy(types = c.types.map { t -> t.copy(id = id(types,t.id),parentId = t.parentId?.let { id(types,it) },suggestedAxisIds = t.suggestedAxisIds.map { id(axes,it) }.toSet(),suggestedMetricIds = t.suggestedMetricIds.map { id(metrics,it) }.toSet()) },
-                cards = c.cards.map { val s = sel(it.classification());it.copy(id = id(cards,it.id),activityTypeId = s.activityTypeId,facets = s.facets,templateId = it.templateId?.let { id(types,it) }) },
-                axes = c.axes.map { it.copy(id = id(axes,it.id)) },metrics = c.metrics.map { it.copy(id = id(metrics,it.id),canonicalUnitId = id(units,it.canonicalUnitId)) },units = c.units.map { it.copy(id = id(units,it.id)) },
-                sessions = c.sessions.map { it.copy(id = id(sessions,it.id),selection = sel(it.selection)) },segments = c.segments.map { it.copy(id = id(segments,it.id),sessionId = id(sessions,it.sessionId),selection = sel(it.selection)) },
-                measurements = c.measurements.map { it.copy(id = newId(),targetId = id(if(it.scope == Scope.SESSION) sessions else segments,it.targetId),fieldId = id(metrics,it.fieldId),unit = id(units,it.unit)) },
-                series = c.series.map { it.copy(id = id(series,it.id),revisions = it.revisions.map { v -> v.copy(rule = v.rule.copy(selection = sel(v.rule.selection))) }) },
-                overrides = c.overrides.map { it.copy(key = key(it.key),selection = it.selection?.let(::sel)) },links = c.links.map { it.copy(key = key(it.key),sessionId = id(sessions,it.sessionId)) },
-                goals = c.goals.map { g -> val f = g.filter;g.copy(id = newId(),filter = f.copy(cardId = f.cardId?.let { id(cards,it) },activityTypeId = f.activityTypeId?.let { id(types,it) },facets = f.facets.map { it.copy(axisId = id(axes,it.axisId)) })) },
-                favorites = c.favorites.map { it.copy(id = newId(),selection = sel(it.selection)) },
-                focus = c.focus?.let { it.copy(id = newId(),sessionId = id(sessions,it.sessionId),segmentIds = it.segmentIds.map { seg -> id(segments,seg) }) })
-        }
+        private fun remap(c: TransferContent): TransferContent = rewriteTransferIds(c,transferIdentityIds(c).mapValues { (_,ids) -> ids.distinct().associateWith { newId() } })
     }
 }
 internal fun validateTransfer(d: Dataset) {
     ensure(d.transfer.origins.map { it.originId }.distinct().size == d.transfer.origins.size,"Duplicate transfer origins")
     ensure(d.transfer.operations.map { it.id }.distinct().size == d.transfer.operations.size,"Duplicate transfer operations")
-    d.transfer.origins.forEach { ensure(it.originId.isNotBlank() && it.hash.matches(Regex("[0-9a-f]{64}")) && payloadHash(it.localGroup) == it.localHash,"Invalid transfer provenance") }
-    d.transfer.operations.forEach { op -> op.groups.forEach { ensure(payloadHash(it.group.content) == it.group.hash && it.group.entities == SelectiveTransfer.entityManifest(it.group.content,it.group.sourceRevision,it.group.originId),"Transfer journal hash mismatch");SelectiveTransfer.validateContent(it.group.content) };ensure(op.id.isNotBlank() && op.hash.length == 128 && op.nextRevision >= 0 && op.groups.map { it.group.id }.distinct().size == op.groups.size,"Invalid transfer journal") }
+    d.transfer.origins.forEach(::validateTransferOrigin)
+    d.transfer.operations.forEach { op ->
+        op.groups.forEach {
+            if(op.payloadsPruned) {
+                ensure(op.complete && it.group.content == TransferContent() && it.inserted == null && it.previousOrigin == null,"Pruned transfer retains payload/pending state")
+                validateTransferHeader(it.group.header())
+            } else {
+                ensure(payloadHash(it.group.content) == it.group.hash && it.group.entities == SelectiveTransfer.entityManifest(it.group.content,it.group.sourceRevision,it.group.originId),"Transfer journal hash mismatch")
+                SelectiveTransfer.validateContent(it.group.content)
+                it.previousOrigin?.let(::validateTransferOrigin)
+            }
+        }
+        ensure(op.id.isNotBlank() && op.hash.matches(Regex("[0-9a-f]{128}")) && op.nextRevision >= 0 && op.groups.map { it.group.id }.distinct().size == op.groups.size,"Invalid transfer journal")
+    }
+    validateTransferCompactions(d.transfer.compactions)
 }
 
 private fun SelectivePackage.frozen(): SelectivePackage = copy(

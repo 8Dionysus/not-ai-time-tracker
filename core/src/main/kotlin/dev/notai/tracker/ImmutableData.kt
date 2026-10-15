@@ -31,8 +31,9 @@ internal fun Dataset.frozen(base: Dataset? = null): Dataset {
     fun capture(value: Classification) = selections.capture(value)
     return copy(
     transfer = if(transfer === base?.transfer) transfer else transfer.copy(
-        origins = frozenList(transfer.origins.map { it.copy(localGroup = it.localGroup.frozen()) }),
-        operations = frozenList(transfer.operations.map { it.copy(groups = frozenList(it.groups.map { g -> g.copy(group = g.group.copy(content = g.group.content.frozen(),entities = frozenList(g.group.entities)),inserted = g.inserted?.frozen(),previousOrigin = g.previousOrigin?.let { o -> o.copy(localGroup = o.localGroup.frozen()) }) })) })),
+        origins = frozenList(transfer.origins.map { it.frozenOrigin() }),
+        compactions = frozenList(transfer.compactions.map { it.copy(targets = frozenList(it.targets),acknowledgements = frozenList(it.acknowledgements)) }),
+        operations = frozenList(transfer.operations.map { it.copy(groups = frozenList(it.groups.map { g -> g.copy(group = g.group.copy(content = g.group.content.frozen(),entities = frozenList(g.group.entities)),inserted = g.inserted?.frozen(),previousOrigin = g.previousOrigin?.let { o -> o.frozenOrigin() }) })) })),
     schedule = if(schedule === base?.schedule) schedule else schedule.copy(
         series = frozenList(schedule.series.map { it.copy(revisions = frozenList(it.revisions.map { v -> v.copy(rule = v.rule.copy(selection = capture(v.rule.selection),weekdays = frozenSet(v.rule.weekdays),extraDates = frozenSet(v.rule.extraDates))) })) }),
         overrides = frozenList(schedule.overrides.map { it.copy(selection = it.selection?.let { c -> capture(c) }) }),
@@ -60,3 +61,7 @@ internal fun TransferContent.frozen(): TransferContent {
     return copy(types = d.types,cards = d.cards,axes = d.axes,metrics = d.metrics,units = d.units,sessions = d.sessions,segments = d.segments,measurements = d.measurements,
         series = d.schedule.series,overrides = d.schedule.overrides,links = d.schedule.links,focus = d.focus,goals = d.goals,favorites = d.favorites)
 }
+
+internal fun TransferOrigin.frozenOrigin() = copy(localGroup = localGroup.frozen(),compaction = compaction?.let { c ->
+    c.copy(localEntities = frozenList(c.localEntities),source = c.source?.copy(entities = frozenList(c.source.entities)),identities = frozenList(c.identities))
+})

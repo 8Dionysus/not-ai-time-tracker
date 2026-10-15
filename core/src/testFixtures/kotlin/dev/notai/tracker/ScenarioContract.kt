@@ -80,6 +80,254 @@ abstract class ScenarioContract {
         assertEquals(imported,t.data())
     }
 
+    @Test fun transferRetentionConfirmationClosureAndArchive() {
+        val clock = FakeClock();val source = Tracker(createStore(),clock)
+        val marker = "private-retention-marker";val note = marker+"🙂".repeat(4096)
+        source.manual(source.snapshot().token,clock.wall-3000,clock.wall-2000,source.typeSelection("language"),note)
+        val pack = SelectiveTransfer(source).export(TransferSelection(sessionIds = source.data().sessions.map { it.id }.toSet()))
+        var t = Tracker(createStore(),clock);var importer = SelectiveTransfer(t)
+        val plan = importer.plan(pack,pack.groups.map { it.id }.toSet());importer.apply(plan,"retained-op")
+        val before = t.data();val preview = t.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("retained-op")))
+        assertEquals(before,t.data());assertTrue(preview.canApply)
+        assertEquals(2,preview.targets.size);assertFalse(preview.targets.single { it.target.kind == RetentionTargetKind.ORIGIN }.requested)
+        assertTrue(preview.capabilities.single().undoAvailableBefore);assertFalse(preview.capabilities.single().undoAvailableAfter)
+        assertFalse(preview.capabilities.single().pendingResumeAvailableBefore);assertFalse(preview.capabilities.single().pendingResumeAvailableAfter)
+        assertTrue(preview.requiredAcknowledgements.any { it.code == RetentionWarningCode.OPERATION_UNDO_REMOVED })
+        assertTrue(preview.metadataBytesAfterWithoutReceipt < preview.metadataBytesBefore)
+        assertFailsWith<UnsupportedOperationException> { (preview.targets as MutableList).clear() }
+        assertFailsWith<UnsupportedOperationException> { (preview.requiredAcknowledgements as MutableSet).clear() }
+        val unconfirmed = assertFailsWith<CoreError> { t.applyTransferRetention(preview,"compact",emptySet()) }
+        assertEquals(ErrorReason.RETENTION_CONFIRMATION_REQUIRED,unconfirmed.reason);assertEquals(before,t.data())
+        val faulty = object: StateStore by t.store { override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T = throw java.io.IOException("before commit") }
+        expect(ErrorCode.STORAGE) { Tracker(faulty,clock).applyTransferRetention(preview,"compact",preview.requiredAcknowledgements) }
+        assertEquals(before,t.data());assertNull(t.transferRetentionReceipt("compact"))
+        assertRetentionWriteFailure(t,preview)
+        // Real legacy v8 shape: retention fields did not exist; originals/user data are untouched.
+        val v8root = codec.parseToJsonElement(Backups.encode(before,clock.now())).jsonObject.toMutableMap()
+        val oldData = v8root.getValue("data").jsonObject.toMutableMap();val oldTransfer = oldData.getValue("transfer").jsonObject.toMutableMap()
+        fun legacyOrigin(e: JsonElement): JsonElement = if(e is JsonNull) e else JsonObject(e.jsonObject.filterKeys { it != "compaction" })
+        oldTransfer.remove("compactions");oldTransfer["origins"] = JsonArray(oldTransfer.getValue("origins").jsonArray.map(::legacyOrigin))
+        oldTransfer["operations"] = JsonArray(oldTransfer.getValue("operations").jsonArray.map { operation ->
+            JsonObject(operation.jsonObject.toMutableMap().apply {
+                remove("payloadsPruned");put("groups",JsonArray(getValue("groups").jsonArray.map { group -> JsonObject(group.jsonObject.toMutableMap().apply { put("previousOrigin",legacyOrigin(getValue("previousOrigin"))) }) }))
+            })
+        })
+        oldData["transfer"] = JsonObject(oldTransfer);v8root["data"] = JsonObject(oldData);v8root["formatVersion"] = JsonPrimitive(8)
+        val legacy = JsonObject(v8root).toString();assertEquals(before,Backups.decode(legacy).data)
+        assertEquals(before,StreamingBackup.read { legacy.byteInputStream() }.data)
+        val receipt = t.applyTransferRetention(preview,"compact",preview.requiredAcknowledgements);val compacted = t.data()
+        assertEquals(before,compacted.copy(revision = before.revision,transfer = before.transfer))
+        assertTrue(compacted.transfer.operations.single().payloadsPruned);assertEquals(TransferContent(),compacted.transfer.operations.single().groups.single().group.content)
+        assertNull(compacted.transfer.operations.single().groups.single().inserted)
+        assertNotNull(compacted.transfer.origins.single().compaction);assertEquals(TransferContent(),compacted.transfer.origins.single().localGroup)
+        assertFalse(codec.encodeToString(compacted.transfer).contains(marker));assertEquals(note,compacted.sessions.single().note)
+        val rawSize = codec.encodeToString(compacted.transfer).length;assertTrue(rawSize < codec.encodeToString(before.transfer).length/2)
+        assertEquals(receipt,t.applyTransferRetention(preview,"compact",preview.requiredAcknowledgements));assertEquals(compacted,t.data())
+        assertEquals(ErrorReason.IDEMPOTENCY_CONFLICT,assertFailsWith<CoreError> { t.applyTransferRetention(preview,"compact",emptySet()) }.reason)
+        t = Tracker(reopen(t.store),clock);assertEquals(compacted,t.data());assertEquals(receipt,t.transferRetentionReceipt("compact"))
+        assertEquals(receipt,t.applyTransferRetention(preview,"compact",preview.requiredAcknowledgements));assertEquals(compacted,t.data())
+        importer = SelectiveTransfer(t)
+        assertEquals(ErrorReason.TRANSFER_PAYLOAD_PRUNED,assertFailsWith<CoreError> { importer.undo("retained-op",t.snapshot().token) }.reason)
+        assertTrue(importer.apply(importer.plan(pack,pack.groups.map { it.id }.toSet()),"retained-op").payloadsPruned)
+        assertEquals(compacted,t.data()) // old import command is a receipt replay, never a re-import
+        assertEquals(pack.groups,importer.export(TransferSelection(sessionIds = t.data().sessions.map { it.id }.toSet())).groups)
+        val again = importer.plan(pack,pack.groups.map { it.id }.toSet());assertTrue(again.conflicts.isEmpty())
+        assertEquals(TransferGroupState.UNCHANGED,importer.apply(again,"after-prune-dedupe").groups.single().state)
+        val json = Backups(t,MemoryRollback()).export();assertEquals(9,codec.parseToJsonElement(json).jsonObject.getValue("formatVersion").jsonPrimitive.int)
+        assertEquals(t.data().transfer,Backups.decode(json).data.transfer)
+        val bytes = java.io.ByteArrayOutputStream();Backups(t,MemoryRollback()).write(bytes)
+        assertEquals(t.data().transfer,StreamingBackup.read { bytes.toByteArray().inputStream() }.data.transfer)
+        for(text in listOf(json.replace("\"formatVersion\": 9","\"formatVersion\": 8"),bytes.toString("UTF-8").replace("\"formatVersion\":9","\"formatVersion\":8"))) {
+            expect(ErrorCode.UNSUPPORTED_IMPORT) { Backups.decode(text) };expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { text.byteInputStream() } }
+        }
+        val destination = Tracker(createStore(),clock);val backups = Backups(destination,MemoryRollback());backups.apply(backups.prepare(json))
+        assertEquals(t.data().transfer,destination.data().transfer)
+        assertEquals(receipt,destination.applyTransferRetention(preview,"compact",preview.requiredAcknowledgements))
+        val invalid = t.data().transfer.origins.single().let { o -> o.copy(compaction = o.compaction!!.copy(localEntities = o.compaction!!.localEntities+o.compaction!!.localEntities.first())) }
+        val unchanged = t.data();expect(ErrorCode.INVALID_INPUT) { t.store.transaction { d -> d.copy(transfer = d.transfer.copy(origins = listOf(invalid))) to Unit } };assertEquals(unchanged,t.data())
+    }
+
+    @Test fun transferRetentionCopyPreservesSourceIdentityAndDetectsEdits() {
+        val clock = FakeClock();val source = Tracker(createStore(),clock)
+        val card = Card(id = "retention-card",name = "Original card",activityTypeId = "language")
+        source.saveCard(source.snapshot().token,card)
+        val rule = ScheduleRule(source.selection(card.id),"2026-10-10",extraDates = setOf("2026-10-10"))
+        source.scheduleCommand(ScheduleCommand("retention-create",source.snapshot().token,ScheduleAction.CREATE,"retention-series",rule = rule))
+        source.scheduleCommand(ScheduleCommand("retention-start",source.snapshot().token,ScheduleAction.START,"retention-series",1,occurrence = OccurrenceKey("retention-series","2026-10-10")))
+        clock.advance(1000);source.stop(source.snapshot().token)
+        val session = source.data().sessions.single()
+        source.measure(source.snapshot().token,Measurement(id = "retention-measurement",fieldId = "own-count",unit = "count",scope = Scope.SESSION,targetId = session.id,value = 3))
+        source.saveGoal(source.snapshot().token,Goal(id = "retention-goal",name = "Original goal",metric = GoalMetric.DURATION_MS,target = 1000,filter = Filter(cardId = card.id,activityTypeId = "language")))
+        source.saveFavorite(source.snapshot().token,Favorite(id = "retention-favorite",label = "Original favorite",selection = source.selection(card.id)))
+        val selection = TransferSelection(sessionIds = setOf(session.id),seriesIds = setOf("retention-series"),measurementIds = setOf("retention-measurement"),goalIds = setOf("retention-goal"),favoriteIds = setOf("retention-favorite"))
+        val original = SelectiveTransfer(source).export(selection)
+        val t = Tracker(createStore(),clock);val importer = SelectiveTransfer(t)
+        importer.apply(importer.plan(original,original.groups.map { it.id }.toSet()),"before-copy")
+        clock.advance(10000)
+        val changed = original.copy(transferId = "changed-source",groups = original.groups.map { g ->
+            val c = g.content.copy(sessions = g.content.sessions.map { it.copy(note = "Changed source original") },segments = g.content.segments.map { it.copy(start = it.start+2000,end = it.end!!+2000) },
+                goals = g.content.goals.map { it.copy(name = "Changed goal") },favorites = g.content.favorites.map { it.copy(label = "Changed favorite") })
+            SelectiveTransfer.group(g.id,g.originId,g.sourceRevision+1,c)
+        })
+        val copy = importer.apply(importer.plan(changed,changed.groups.map { it.id }.toSet(),changed.groups.associate { it.id to TransferConflictPolicy.COPY }),"copy-all")
+        assertTrue(copy.groups.all { it.state == TransferGroupState.APPLIED })
+        val origins = t.data().transfer.origins
+        val copied = TransferSelection(sessionIds = origins.flatMap { it.localGroup.sessions }.map { it.id }.toSet(),seriesIds = origins.flatMap { it.localGroup.series }.map { it.id }.toSet(),
+            measurementIds = origins.flatMap { it.localGroup.measurements }.map { it.id }.toSet(),goalIds = origins.flatMap { it.localGroup.goals }.map { it.id }.toSet(),favoriteIds = origins.flatMap { it.localGroup.favorites }.map { it.id }.toSet())
+        assertEquals(changed.groups.associateBy { it.originId },importer.export(copied).groups.associateBy { it.originId })
+        val before = t.data()
+        val missingJournalStore = createStore();missingJournalStore.transaction { _ -> before.copy(transfer = before.transfer.copy(operations = emptyList())) to Unit }
+        val missingJournal = Tracker(missingJournalStore,clock)
+        val unavailable = missingJournal.previewTransferRetention(TransferRetentionSelection(originIds = origins.map { it.originId }.toSet()))
+        assertFalse(unavailable.canApply);assertTrue(unavailable.targets.any { RetentionBlocker.SOURCE_RECONSTRUCTION_UNAVAILABLE in it.blockers })
+        val preview = t.previewTransferRetention(TransferRetentionSelection(originIds = origins.map { it.originId }.toSet()))
+        assertTrue(preview.canApply);assertEquals(setOf("before-copy","copy-all"),preview.targets.filter { it.target.kind == RetentionTargetKind.OPERATION }.map { it.target.id }.toSet())
+        t.applyTransferRetention(preview,"copy-compact",preview.requiredAcknowledgements)
+        assertEquals(before,t.data().copy(revision = before.revision,transfer = before.transfer))
+        assertTrue(t.data().transfer.origins.all { it.compaction!!.identities.isNotEmpty() })
+        assertEquals(changed.groups.associateBy { it.originId },importer.export(copied).groups.associateBy { it.originId })
+        assertTrue(importer.plan(changed,changed.groups.map { it.id }.toSet()).conflicts.isEmpty())
+        val copiedSession = t.data().sessions.single { it.id in copied.sessionIds };val segments = t.data().segments.filter { it.sessionId == copiedSession.id }
+        t.correctSession(t.snapshot().token,copiedSession.id,segments.map { Tracker.SegmentEdit(it.id,it.start,it.end!!,it.selection) },"Locally edited after compaction")
+        val edited = importer.plan(changed,changed.groups.map { it.id }.toSet());assertTrue(edited.conflicts.any { conflict -> changed.groups.single { it.id == conflict.groupId }.content.sessions.isNotEmpty() })
+        // Repeated COPY with the same source hash must retain the earliest pruned source header/revision.
+        val oldGoalGroup = changed.groups.single { it.content.goals.isNotEmpty() }
+        val liveGoalId = t.data().transfer.origins.single { it.originId == oldGoalGroup.originId }.compaction!!.localEntities.single { it.kind == "goal" }.sourceEntityId
+        val liveGoal = t.data().goals.single { it.id == liveGoalId };t.saveGoal(t.snapshot().token,liveGoal.copy(name = "Local goal edit"))
+        val laterGoalGroup = SelectiveTransfer.group(oldGoalGroup.id,oldGoalGroup.originId,oldGoalGroup.sourceRevision+1000,oldGoalGroup.content)
+        val laterGoalPackage = changed.copy(transferId = "same-hash-later-revision",groups = listOf(laterGoalGroup))
+        val recopied = importer.apply(importer.plan(laterGoalPackage,setOf(laterGoalGroup.id),mapOf(laterGoalGroup.id to TransferConflictPolicy.COPY)),"copy-again")
+        assertEquals(TransferGroupState.APPLIED,recopied.groups.single().state)
+        val newGoalId = t.data().transfer.origins.single { it.originId == oldGoalGroup.originId }.localGroup.goals.single().id
+        assertEquals(listOf(oldGoalGroup),importer.export(TransferSelection(goalIds = setOf(newGoalId))).groups)
+        val againPreview = t.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("copy-again")))
+        assertTrue(againPreview.canApply);t.applyTransferRetention(againPreview,"copy-again-compact",againPreview.requiredAcknowledgements)
+        assertEquals(listOf(oldGoalGroup),importer.export(TransferSelection(goalIds = setOf(newGoalId))).groups)
+        // Source-group deletion is still a conflict, not a false unchanged fingerprint.
+        val plain = Tracker(createStore(),clock);plain.manual(plain.snapshot().token,clock.wall-6000,clock.wall-5000,Classification(),"Will be removed")
+        val p = SelectiveTransfer(plain).export(TransferSelection(sessionIds = plain.data().sessions.map { it.id }.toSet()))
+        val receiver = Tracker(createStore(),clock);val receive = SelectiveTransfer(receiver);receive.apply(receive.plan(p,p.groups.map { it.id }.toSet()),"orphan")
+        receiver.deleteSession(receiver.snapshot().token,receiver.data().sessions.single().id);assertTrue(receiver.canUndo(receiver.snapshot().token))
+        val orphan = receiver.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("orphan")));assertTrue(orphan.processUndoAvailable)
+        receiver.applyTransferRetention(orphan,"orphan-compact",orphan.requiredAcknowledgements);assertFalse(receiver.canUndo(receiver.snapshot().token))
+        assertTrue(receive.plan(p,p.groups.map { it.id }.toSet()).conflicts.isNotEmpty());assertFalse(codec.encodeToString(receiver.data().transfer).contains("Will be removed"))
+        expect(ErrorCode.STALE) { receiver.undo(receiver.snapshot().token) }
+    }
+
+    @Test fun transferRetentionProtectsPendingAndPreservesLeases() {
+        val clock = FakeClock();val goals = Tracker(createStore(),clock)
+        goals.saveGoal(goals.snapshot().token,Goal(id = "cleanup-goal",name = "Goal to retain",metric = GoalMetric.DURATION_MS,target = 1000))
+        val goalPack = SelectiveTransfer(goals).export(TransferSelection(goalIds = setOf("cleanup-goal")))
+        val t = Tracker(createStore(),clock);SelectiveTransfer(t).apply(SelectiveTransfer(t).plan(goalPack,goalPack.groups.map { it.id }.toSet()),"eligible")
+        val source = Tracker(createStore(),clock)
+        source.manual(source.snapshot().token,clock.wall-6000,clock.wall-5000,Classification())
+        source.manual(source.snapshot().token,clock.wall-4000,clock.wall-3000,Classification())
+        val pack = SelectiveTransfer(source).export(TransferSelection(sessionIds = source.data().sessions.map { it.id }.toSet()))
+        val base = t.store;var calls = 0
+        val faulty = object: StateStore by base {
+            override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T {
+                calls++;if(calls == 3) throw java.io.IOException("pending fixture interruption")
+                return base.transaction(block)
+            }
+        }
+        val interrupted = SelectiveTransfer(Tracker(faulty,clock));expect(ErrorCode.STORAGE) { interrupted.apply(interrupted.plan(pack,pack.groups.map { it.id }.toSet()),"pending") }
+        val pending = t.data().transfer.operations.single { it.id == "pending" };assertFalse(pending.complete)
+        val blocked = t.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("pending")))
+        assertFalse(blocked.canApply);assertTrue(blocked.targets.any { RetentionBlocker.PENDING_OPERATION in it.blockers })
+        val beforeBlock = t.data();assertEquals(ErrorReason.RETENTION_BLOCKED,assertFailsWith<CoreError> { t.applyTransferRetention(blocked,"deny-pending",blocked.requiredAcknowledgements) }.reason);assertEquals(beforeBlock,t.data())
+        val origin = t.data().transfer.origins.single { it.originId == pending.groups.first().group.originId }
+        val protected = t.previewTransferRetention(TransferRetentionSelection(originIds = setOf(origin.originId)))
+        assertFalse(protected.canApply);assertTrue(protected.targets.any { RetentionBlocker.PENDING_REFERENCE in it.blockers })
+        val preview = t.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("eligible")))
+        assertTrue(preview.canApply);assertEquals(listOf("pending"),preview.preservedLeaseOperationIds)
+        t.applyTransferRetention(preview,"keep-resume",preview.requiredAcknowledgements)
+        assertEquals(pending.copy(nextRevision = pending.nextRevision+1),t.data().transfer.operations.single { it.id == "pending" })
+        assertTrue(SelectiveTransfer(t).resume("pending").complete);assertEquals(2,t.data().sessions.size)
+        // Keep an unrelated terminal operation's undo lease across metadata-only compaction.
+        val keeper = Tracker(createStore(),clock);val keepTransfer = SelectiveTransfer(keeper)
+        keepTransfer.apply(keepTransfer.plan(goalPack,goalPack.groups.map { it.id }.toSet()),"remove-payload")
+        goals.saveGoal(goals.snapshot().token,Goal(id = "other-goal",name = "Unrelated undo",metric = GoalMetric.DURATION_MS,target = 2000))
+        val otherPack = SelectiveTransfer(goals).export(TransferSelection(goalIds = setOf("other-goal")))
+        keepTransfer.apply(keepTransfer.plan(otherPack,otherPack.groups.map { it.id }.toSet()),"keep-undo")
+        val keepPreview = keeper.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("remove-payload")))
+        assertEquals(listOf("keep-undo"),keepPreview.preservedLeaseOperationIds)
+        keeper.applyTransferRetention(keepPreview,"keep-undo-lease",keepPreview.requiredAcknowledgements)
+        assertTrue(keepTransfer.undo("keep-undo",keeper.snapshot().token).undone);assertEquals(listOf("cleanup-goal"),keeper.data().goals.map { it.id })
+        // An unrelated running timer retains its subject token and all facts.
+        val timer = Tracker(createStore(),clock);val timerTransfer = SelectiveTransfer(timer)
+        timerTransfer.apply(timerTransfer.plan(goalPack,goalPack.groups.map { it.id }.toSet()),"timer-safe")
+        timer.start(timer.snapshot().token);val target = timer.snapshot().timerTarget!!;val beforeTimer = timer.data()
+        val timerPreview = timer.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("timer-safe")));assertTrue(timerPreview.canApply)
+        timer.applyTransferRetention(timerPreview,"timer-safe-prune",timerPreview.requiredAcknowledgements)
+        assertEquals(beforeTimer,timer.data().copy(revision = beforeTimer.revision,transfer = beforeTimer.transfer));assertEquals(target,timer.snapshot().timerTarget)
+        clock.advance(1000);timer.timerCommand(target,TimerDirective.PAUSE);assertEquals(Mode.PAUSED,timer.snapshot().mode)
+        // Imported recovery/Focus and stopped-record assignments protect their own sources.
+        val focusSource = Tracker(createStore(),clock);focusSource.startFocus(focusSource.snapshot().token,plan = FocusPlan(10000,1000));clock.advance(1000)
+        val focusPack = SelectiveTransfer(focusSource).export(TransferSelection(includeFocus = true))
+        val recovery = Tracker(createStore(),clock);val recTransfer = SelectiveTransfer(recovery)
+        recTransfer.apply(recTransfer.plan(focusPack,focusPack.groups.map { it.id }.toSet()),"recovery")
+        val recPreview = recovery.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("recovery")))
+        assertFalse(recPreview.canApply);assertTrue(recPreview.targets.any { RetentionBlocker.ACTIVE_OR_RECOVERY_REFERENCE in it.blockers })
+        val recBefore = recovery.data();expect(ErrorCode.INVALID_INPUT) { recovery.applyTransferRetention(recPreview,"blocked-recovery",recPreview.requiredAcknowledgements) };assertEquals(recBefore,recovery.data())
+        val assignment = Tracker(createStore(),clock);assignment.start(assignment.snapshot().token);clock.advance(1000)
+        val offer = assignment.stopForAssignment(assignment.snapshot().timerTarget!!).assignment!!
+        assignment.store.transaction { d ->
+            val portable = StreamingBackup.portable(d,clock.now()).data
+            val content = TransferContent(sessions = portable.sessions,segments = portable.segments)
+            val group = SelectiveTransfer.group("assignment-snapshot","assignment-origin",d.revision,content)
+            val op = TransferOperation("assignment","b".repeat(128),d.datasetId,d.controlBarrier,d.revision+1,listOf(TransferGroupProgress(group,TransferConflictPolicy.BLOCK,TransferGroupState.APPLIED,inserted = content)))
+            d.copy(revision = d.revision+1,transfer = TransferState(listOf(TransferOrigin(group.originId,group.hash,content,group.hash)),listOf(op))) to Unit
+        }
+        val assPreview = assignment.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("assignment")))
+        assertFalse(assPreview.canApply);assertTrue(assPreview.targets.any { RetentionBlocker.ASSIGNMENT_REFERENCE in it.blockers })
+        assignment.cancelAssignment(offer.id);assertTrue(assignment.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("assignment"))).canApply)
+    }
+
+    @Test fun transferRetentionCrashRaceAndStale() {
+        val clock = FakeClock();val source = Tracker(createStore(),clock)
+        source.saveGoal(source.snapshot().token,Goal(id = "journal-goal",name = "Durable fixture",metric = GoalMetric.DURATION_MS,target = 1000))
+        val pack = SelectiveTransfer(source).export(TransferSelection(goalIds = setOf("journal-goal")))
+        fun target(): Tracker = Tracker(createStore(),clock).also { t -> val importer = SelectiveTransfer(t);importer.apply(importer.plan(pack,pack.groups.map { it.id }.toSet()),"cleanup") }
+        var t = target();val stale = t.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("cleanup")))
+        t.settings(t.snapshot().token,Settings("Europe/Berlin"));val unchanged = t.data()
+        expect(ErrorCode.STALE) { t.applyTransferRetention(stale,"stale-retention",stale.requiredAcknowledgements) };assertEquals(unchanged,t.data())
+        val preview = t.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("cleanup")))
+        val base = t.store
+        val postCommitFault = object: StateStore by base {
+            override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T {
+                val n = base.read().transfer.compactions.size;val result = base.transaction(block)
+                if(base.read().transfer.compactions.size > n) throw java.io.IOException("synthetic client disconnect after commit")
+                return result
+            }
+        }
+        expect(ErrorCode.STORAGE) { Tracker(postCommitFault,clock).applyTransferRetention(preview,"crash-after-commit",preview.requiredAcknowledgements) }
+        assertTrue(base.read().transfer.operations.single().payloadsPruned);assertEquals(1,base.read().transfer.compactions.size)
+        t = Tracker(reopen(base),clock);val committed = t.data();val receipt = t.transferRetentionReceipt("crash-after-commit")!!
+        assertEquals(receipt,t.applyTransferRetention(preview,"crash-after-commit",preview.requiredAcknowledgements));assertEquals(committed,t.data())
+        val missing = t.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("no-such-operation")));assertFalse(missing.canApply)
+        assertEquals(listOf(RetentionBlocker.MISSING),missing.targets.single().blockers)
+        val undone = target();val importer = SelectiveTransfer(undone);importer.undo("cleanup",undone.snapshot().token)
+        val undonePreview = undone.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("cleanup")))
+        assertTrue(undonePreview.canApply);assertFalse(undonePreview.capabilities.single().undoAvailableBefore)
+        undone.applyTransferRetention(undonePreview,"undone-prune",undonePreview.requiredAcknowledgements)
+        assertTrue(importer.resume("cleanup").undone);assertTrue(importer.resume("cleanup").payloadsPruned);assertTrue(undone.data().goals.isEmpty())
+        for(sameKey in listOf(true,false)) {
+            val raced = target();val before = raced.data();val racePreview = raced.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("cleanup")))
+            val start = CountDownLatch(1);val pool = Executors.newFixedThreadPool(2)
+            try {
+                val futures = (0..1).map { i -> pool.submit<Any> {
+                    start.await();try { Tracker(raced.store,clock).applyTransferRetention(racePreview,if(sameKey) "race" else "race-$i",racePreview.requiredAcknowledgements) } catch(e: CoreError) { e }
+                } }
+                start.countDown();val results = futures.map { it.get() }
+                assertEquals(if(sameKey) 2 else 1,results.count { it is TransferCompactionReceipt })
+                if(sameKey) assertEquals(results[0],results[1]) else assertEquals(ErrorCode.STALE,(results.single { it is CoreError } as CoreError).code)
+                assertEquals(before.revision+1,raced.data().revision);assertEquals(1,raced.data().transfer.compactions.size)
+            } finally { pool.shutdownNow() }
+        }
+    }
+
+    open fun assertRetentionWriteFailure(t: Tracker,preview: TransferRetentionPreview) {}
+
     @Test fun scheduleLocalizationAndArchiveContract() {
         val clock = FakeClock();var t = Tracker(createStore(),clock)
         val beforeLocale = t.data();val labels = CatalogLabels(emptyList())
@@ -102,7 +350,7 @@ abstract class ScenarioContract {
         val result = t.scheduleCommand(start);assertEquals(result,t.scheduleCommand(start));assertEquals(1,t.data().sessions.size)
         t = Tracker(reopen(t.store),clock);assertEquals(result,t.scheduleCommand(start));assertEquals(result.sessionId,t.data().schedule.links.single().sessionId)
         clock.advance(1000);t.stop(t.snapshot().token)
-        val backups = Backups(t,MemoryRollback());val backup = backups.export();assertEquals(8,Backups.decode(backup).formatVersion)
+        val backups = Backups(t,MemoryRollback());val backup = backups.export();assertEquals(9,Backups.decode(backup).formatVersion)
         val clean = Tracker(createStore(),clock);val restore = Backups(clean,MemoryRollback());val preview = restore.prepare(backup)
         assertEquals(1,preview.scheduleSeries);assertEquals(1,preview.scheduleLinks);restore.apply(preview)
         assertEquals(t.data().schedule,clean.data().schedule);assertEquals(t.data().sessions,clean.data().sessions)
@@ -1457,7 +1705,7 @@ abstract class ScenarioContract {
         assertTrue(Backups.decode(disk.read(result.rollbackReference)).data.sessions.isEmpty())
         val full = clean.data()
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.dropLast(7)) }; assertEquals(full,clean.data())
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 8","\"formatVersion\": 999")) }; assertEquals(full,clean.data())
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 9","\"formatVersion\": 999")) }; assertEquals(full,clean.data())
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"datasetId\": \"${raw.data.datasetId}\",", "")) }; assertEquals(full,clean.data())
         val broken = raw.copy(data = raw.data.copy(segments = raw.data.segments+raw.data.segments.first()))
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(codec.encodeToString(broken)) }; assertEquals(full,clean.data())
@@ -1512,7 +1760,7 @@ abstract class ScenarioContract {
         val text = bytes.toString(Charsets.UTF_8)
         val malformed = text.substringBefore("Streamed note").toByteArray() + byteArrayOf(0xC3.toByte(),0x28) + text.substringAfter("Streamed note").toByteArray()
         for(bad in listOf(bytes.copyOf(bytes.size-2),malformed,
-            text.replaceFirst("\"formatVersion\":8","\"formatVersion\":8,\"formatVersion\":8").toByteArray(),bytes+byteArrayOf(1))) {
+            text.replaceFirst("\"formatVersion\":9","\"formatVersion\":9,\"formatVersion\":9").toByteArray(),bytes+byteArrayOf(1))) {
             expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { bad.inputStream() } }
         }
         expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { (byteArrayOf(0xFF.toByte())+bytes).inputStream() } }

@@ -24,6 +24,51 @@ class RoomScenariosTest: ScenarioContract() {
     }
     @org.junit.After fun restoreDirectoryDurability() { DirectoryDurability.sync = originalDirectorySync;DirectoryDurability.rename = originalRename;DirectoryDurability.link = originalLink }
     private val databases = mutableMapOf<StateStore,Pair<String,TrackerDatabase>>()
+    @org.junit.Test fun transferRetentionLargeMetadataShrinksAndReopens() {
+        val clock = FakeClock();val store = createStore();val note = "large private fixture"+"🙂".repeat(8192)
+        store.transaction { d ->
+            val contents = (0 until 32).map { i ->
+                val session = Session(id = "retention-large-$i",status = SessionStatus.STOPPED,note = note)
+                TransferContent(sessions = listOf(session),segments = listOf(Segment(id = "retention-large-seg-$i",sessionId = session.id,start = 1000L+i*2000,end = 2000L+i*2000,durationMs = 1000)))
+            }
+            val groups = contents.mapIndexed { i,c -> SelectiveTransfer.group("large-group-$i","large-origin-$i",0,c) }
+            val op = TransferOperation("large-retention","a".repeat(128),d.datasetId,d.controlBarrier,1,groups.map { TransferGroupProgress(it,TransferConflictPolicy.BLOCK,TransferGroupState.APPLIED,inserted = it.content) })
+            d.copy(revision = 1,sessions = contents.flatMap { it.sessions },segments = contents.flatMap { it.segments },transfer = TransferState(groups.map { TransferOrigin(it.originId,it.hash,it.content,it.hash) },listOf(op))) to Unit
+        }
+        fun size(s: StateStore): Long = databases.getValue(s).second.openHelper.readableDatabase.query("SELECT length(CAST(payload AS BLOB)) FROM metadata WHERE id=1").use { c -> c.moveToFirst();c.getLong(0) }
+        val beforeBytes = size(store);org.junit.Assert.assertTrue(beforeBytes > 2*1024*1024)
+        val t = Tracker(store,clock);val before = t.data();val preview = t.previewTransferRetention(TransferRetentionSelection(operationIds = setOf("large-retention")))
+        org.junit.Assert.assertEquals(33,preview.targets.size);org.junit.Assert.assertTrue(preview.canApply)
+        t.applyTransferRetention(preview,"large-compact",preview.requiredAcknowledgements)
+        val after = t.data();val afterBytes = size(store);org.junit.Assert.assertTrue(afterBytes < beforeBytes/4)
+        org.junit.Assert.assertEquals(before,after.copy(revision = before.revision,transfer = before.transfer))
+        val reopened = reopen(store);org.junit.Assert.assertEquals(after,reopened.read());org.junit.Assert.assertEquals(afterBytes,size(reopened))
+        org.junit.Assert.assertFalse(codec.encodeToString(after.transfer).contains("large private fixture"))
+        val out = java.io.ByteArrayOutputStream();Backups(Tracker(reopened,clock),MemoryRollback()).write(out)
+        val decoded = StreamingBackup.read { out.toByteArray().inputStream() };org.junit.Assert.assertEquals(after.transfer,decoded.data.transfer)
+        org.junit.Assert.assertEquals(note,decoded.data.sessions.first().note)
+        val artifact = java.io.File(requireNotNull(System.getProperty("tracker.artifacts")),"retention-metadata-sizes.json");artifact.parentFile!!.mkdirs()
+        artifact.writeText("{\"beforeMetadataBytes\":$beforeBytes,\"afterMetadataBytes\":$afterBytes,\"scope\":\"current metadata row only, no physical file/WAL reclaim claim\"}")
+    }
+    @org.junit.Test fun transferRetentionV6MigrationPreservesPayloads() {
+        val clock = FakeClock();var store = createStore();val source = Tracker(createStore(),clock)
+        source.saveGoal(source.snapshot().token,Goal(id = "migration-goal",name = "Retained migration original",metric = GoalMetric.DURATION_MS,target = 1000))
+        val p = SelectiveTransfer(source).export(TransferSelection(goalIds = setOf("migration-goal")))
+        val t = Tracker(store,clock);val importer = SelectiveTransfer(t);importer.apply(importer.plan(p,p.groups.map { it.id }.toSet()),"migration-op")
+        val expected = t.data();val (name,db) = databases.remove(store)!!;db.close()
+        android.database.sqlite.SQLiteDatabase.openDatabase(RuntimeEnvironment.getApplication().getDatabasePath(name).path,null,0).use { sql ->
+            val meta = sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> c.moveToFirst();codec.parseToJsonElement(c.getString(0)).jsonObject.toMutableMap() }
+            val transfer = meta.getValue("transfer").jsonObject.toMutableMap();transfer.remove("compactions")
+            transfer["origins"] = JsonArray(transfer.getValue("origins").jsonArray.map { JsonObject(it.jsonObject.filterKeys { k -> k != "compaction" }) })
+            transfer["operations"] = JsonArray(transfer.getValue("operations").jsonArray.map { JsonObject(it.jsonObject.filterKeys { k -> k != "payloadsPruned" }) })
+            meta["transfer"] = JsonObject(transfer);sql.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(JsonObject(meta).toString()));sql.version = 6
+        }
+        store = open(name);org.junit.Assert.assertEquals(7,databases.getValue(store).second.openHelper.readableDatabase.version)
+        org.junit.Assert.assertEquals(expected,store.read());store = reopen(store);org.junit.Assert.assertEquals(expected,store.read())
+        org.junit.Assert.assertFalse(store.read().transfer.operations.single().payloadsPruned)
+        org.junit.Assert.assertTrue(codec.encodeToString(store.read().transfer).contains("Retained migration original"))
+    }
+
     @org.junit.Test fun largeTransferMetadataReopensWithoutWholeCursorRows() {
         val store = createStore();val note = "🙂".repeat(8192)
         store.transaction { d ->
@@ -61,7 +106,7 @@ class RoomScenariosTest: ScenarioContract() {
                 sql.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(legacy.toString()));sql.version = 5
             }
             store = open(name);org.junit.Assert.assertEquals(expected,store.read())
-            org.junit.Assert.assertEquals(6,databases.getValue(store).second.openHelper.readableDatabase.version)
+            org.junit.Assert.assertEquals(7,databases.getValue(store).second.openHelper.readableDatabase.version)
             store = reopen(store);org.junit.Assert.assertEquals(expected,store.read())
             val migrated = Tracker(store,clock);val archive = Backups(migrated,MemoryRollback()).export()
             val destination = Tracker(createStore(),clock);val backups = Backups(destination,MemoryRollback())
@@ -223,7 +268,7 @@ class RoomScenariosTest: ScenarioContract() {
                 })
             }
         }
-        val db = androidx.room.Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(fault,TrackerDatabase.MIGRATION_5_6).allowMainThreadQueries().build()
+        val db = androidx.room.Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(fault,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7).allowMainThreadQueries().build()
         try { org.junit.Assert.assertThrows(Exception::class.java) { RoomStore(db) } } finally { db.close() }
         org.junit.Assert.assertEquals(before,snapshot())
         org.junit.Assert.assertEquals(input,open(name).read())
@@ -474,7 +519,7 @@ class RoomScenariosTest: ScenarioContract() {
     }
     override fun createStore(): StateStore = open("test-${newId()}.db")
     private fun open(name: String): StateStore {
-        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6).allowMainThreadQueries().build()
+        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7).allowMainThreadQueries().build()
         return try { RoomStore(db).also { databases[it] = name to db } } catch(e: Exception) { db.close();throw e }
     }
     override fun reopen(store: StateStore): StateStore {
@@ -510,7 +555,7 @@ class RoomScenariosTest: ScenarioContract() {
             db.version = 1
         }
         val store = open(name)
-        org.junit.Assert.assertEquals(6,databases.getValue(store).second.openHelper.readableDatabase.version)
+        org.junit.Assert.assertEquals(7,databases.getValue(store).second.openHelper.readableDatabase.version)
         return store.read().also { validate(it) }
     }
     override fun backupDocumentInput() {
@@ -581,6 +626,15 @@ class RoomScenariosTest: ScenarioContract() {
             val error = org.junit.Assert.assertThrows(CoreError::class.java) { backups.apply(backups.prepare(json)) }
             org.junit.Assert.assertEquals(ErrorCode.STORAGE,error.code)
         } finally { db.openHelper.writableDatabase.execSQL("DROP TRIGGER fail_import") }
+    }
+    override fun assertRetentionWriteFailure(t: Tracker,preview: TransferRetentionPreview) {
+        val db = databases.getValue(t.store).second.openHelper.writableDatabase;val before = t.data()
+        db.execSQL("CREATE TRIGGER fail_retention BEFORE INSERT ON metadata BEGIN SELECT RAISE(ABORT, 'synthetic retention abort'); END")
+        try {
+            val failure = org.junit.Assert.assertThrows(CoreError::class.java) { t.applyTransferRetention(preview,"compact",preview.requiredAcknowledgements) }
+            org.junit.Assert.assertEquals(ErrorCode.STORAGE,failure.code)
+        } finally { db.execSQL("DROP TRIGGER fail_retention") }
+        org.junit.Assert.assertEquals(before,t.data());org.junit.Assert.assertNull(t.transferRetentionReceipt("compact"))
     }
     override fun assertTransferFailure(transfer: HistoryTransfer,preview: HistoryPreview,tracker: Tracker) {
         val db = databases.getValue(tracker.store).second.openHelper.writableDatabase
@@ -1039,7 +1093,7 @@ class RoomScenariosTest: ScenarioContract() {
             val phases = linkedMapOf<String,Long>()
             val start = System.nanoTime()
             val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name)
-                .addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6).allowMainThreadQueries().build()
+                .addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7).allowMainThreadQueries().build()
             val reopened = RoomStore(db,onLoadPhase = { key,ns -> phases[key] = (phases[key] ?: 0)+ns },loadPageSize = if(variant == "normalized") 512 else null)
             databases[reopened] = name to db;store = reopened
             val initDone = System.nanoTime()-start

@@ -1,6 +1,6 @@
 # Контракт интеграции интерфейса
 
-Действующий контракт для Android-приложения 0.11.0 (основной интерфейс и техническая оболочка) и Kotlin-ядра. Room schema 6; JSON export 8 и read 1–8. Новый backend-проход и точные точки интеграции: [BACKEND_PASS_2026_10](BACKEND_PASS_2026_10.md). CSV/inspection errors и warnings: [stable issue keys и typed arguments](IMPORT_ISSUES.md). Новые поверхности и локализация ещё не подключены к продуктовым экранам. Предыдущие схемы относятся к [истории реализации](history/ACCEPTANCE_GAPS_through_v15.md), а не к текущим инструкциям.
+Действующий контракт для Android-приложения 0.11.0 (основной интерфейс и техническая оболочка) и Kotlin-ядра. Room schema 7; JSON export 9 и read 1–9. Новый backend-проход и точные точки интеграции: [BACKEND_PASS_2026_10](BACKEND_PASS_2026_10.md). CSV/inspection errors и warnings: [stable issue keys и typed arguments](IMPORT_ISSUES.md). Новые поверхности и локализация ещё не подключены к продуктовым экранам. Предыдущие схемы относятся к [истории реализации](history/ACCEPTANCE_GAPS_through_v15.md), а не к текущим инструкциям.
 
 ## Runtime, чтение и команды
 
@@ -68,7 +68,7 @@ Repeat создаёт новую сессию с параметрами посл
 
 ## Backup и файловый ввод
 
-`backups.export()` захватывает Dataset/Moment в короткой транзакции; сериализация и запись SAF происходят после неё. Корень JSON: `formatVersion=8`, `backupId`, `asOf`, `data`. Данные включают словари, карточки, Favorite, сессии, сегменты, измерения, настройки, Goals и Focus. В снимок также входят ScheduleSeries/Overrides/StartLinks/receipts и transfer provenance/journals. Reader мигрирует версии 1–7 в текущую модель. Исследовательские исходники переносятся отдельно.
+`backups.export()` захватывает Dataset/Moment в короткой транзакции; сериализация и запись SAF происходят после неё. Корень JSON: `formatVersion=9`, `backupId`, `asOf`, `data`. Данные включают словари, карточки, Favorite, сессии, сегменты, измерения, настройки, Goals и Focus. В снимок также входят ScheduleSeries/Overrides/StartLinks/receipts и transfer provenance/journals. Reader мигрирует версии 1–8 в текущую модель. Исследовательские исходники переносятся отдельно.
 
 Ограниченный CSV-вход использует HistoryFiles.inspect: 10 MiB, строгий UTF-8 и BOM. Полный SAF restore использует потоковый Backups.prepare над private staged файлом без общего 10 MiB cap. Табличный текст требует явного сопоставления колонок, времени, зоны, единиц и классификации. [FILE_IMPORT](FILE_IMPORT.md) описывает полный путь.
 
@@ -101,3 +101,5 @@ SAF export передаёт только operation ID через Bundle; фор�
 ## Независимость команд от формы выбора
 
 Start, Switch, разметка, ручная запись и Start Focus используют выбранную карточку и её уточнения. Missing/archived ID отклоняется; форма сохраняется для исправления. Undo, Repeat, resolveTail и переходы/завершение существующего Focus не читают выбранную карточку. Устаревший ID после restore или архивирования не блокирует эти действия и не подмешивает уточнения формы в сохранённый вариант. Таймерные Pause/Resume/Stop также независимы от выбранной карточки.
+
+SQLite operational snapshots: [явный preview/confirmation и transactional retention](TRANSFER_RETENTION.md). Это отдельная API-граница; файловая production cleanup остаётся fail-closed.

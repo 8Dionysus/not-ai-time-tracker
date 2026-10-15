@@ -13,6 +13,19 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun choices(): ChoiceView = view().choices()
     fun data(): Dataset = storage { store.read() }
     fun snapshot(): Snapshot = storage { store.readChecked().snapshot(clock.now()) }
+    @Synchronized fun previewTransferRetention(selection: TransferRetentionSelection): TransferRetentionPreview = storage {
+        val d = data();TransferRetention.preview(d,selection,canUndo(token(d)))
+    }
+    @Synchronized fun applyTransferRetention(preview: TransferRetentionPreview,commandId: String,acknowledged: Set<RetentionWarningKey>): TransferCompactionReceipt = storage {
+        val captured = frozenSet(acknowledged)
+        val (receipt,changed,currentToken) = store.transaction { d ->
+            val (next,result) = TransferRetention.apply(d,preview,commandId,captured,canUndo(token(d)),clock.now())
+            next to Triple(result.first,result.second,token(next))
+        }
+        if(changed || undo?.first != currentToken) undo = null // never retain a process-local Dataset that could resurrect pruned snapshots
+        receipt
+    }
+    fun transferRetentionReceipt(commandId: String): TransferCompactionReceipt? = data().transfer.compactions.find { it.commandId == commandId }
     fun selection(cardId: String): Classification {
         val d = data()
         val card = d.cards.singleOrNull { it.id == cardId && !it.archived } ?: fail(ErrorCode.INVALID_INPUT,"Card missing or archived")

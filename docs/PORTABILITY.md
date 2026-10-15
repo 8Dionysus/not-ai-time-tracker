@@ -2,7 +2,7 @@
 
 ## Полная JSON-копия
 
-`Backups.write(output)` и `Backups.prepare { inputStream() }` используют `StreamingBackup`. Экспорт — JSON 7, чтение — 1–7. Потоковый reader выполняет два прохода с проверкой одного SHA-256, строгим UTF-8, BOM, отказом при повторных ключах (включая вложенные), nesting ≤128 и ограничением одного record до 16 MiB UTF-16 characters, полями формата, временными и ссылочными ограничениями. Один record декодируется за раз; весь файл не превращается в String, ByteArray или JSON AST. Дополнительная память переноса зависит от крупнейшего record; итоговый domain graph всё ещё хранится в памяти. Неограниченной ёмкости телефона это не обещает.
+`Backups.write(output)` и `Backups.prepare { inputStream() }` используют `StreamingBackup`. Экспорт — JSON 9, чтение — 1–9. Потоковый reader выполняет два прохода с проверкой одного SHA-256, строгим UTF-8, BOM, отказом при повторных ключах (включая вложенные), nesting ≤128 и ограничением одного record до 16 MiB UTF-16 characters, полями формата, временными и ссылочными ограничениями. Один record декодируется за раз; весь файл не превращается в String, ByteArray или JSON AST. Дополнительная память переноса зависит от крупнейшего record; итоговый domain graph всё ещё хранится в памяти. Неограниченной ёмкости телефона это не обещает.
 
 String convenience API и bounded inspector оставлены для маленьких файлов с лимитом 10 MiB. Полный SAF restore ими не пользуется. CSV имеет отдельный лимит `MAX_CSV_BYTES`.
 
@@ -21,3 +21,7 @@ Recovery-кнопки создаются до `TrackerRuntime`. Можно вы�
 `DatabaseRecovery` валидирует источник, закрывает runtime, сохраняет DB/WAL/SHM/journal с размером и SHA-256 без открытия SQLite, создаёт отдельную базу, проверяет чтение и checkpoint. Перед заменой сохраняет durable journal; оригиналы остаются в архиве. После замены повторно проверяет базу, только затем завершает journal. Незавершённое восстановление блокирует обычный runtime и предлагает явный retry из сохранённого источника. Default corruption handler не удаляет файлы. До холодного открытия сохраняются существующие WAL/SHM/journal: SQLite может удалить некорректные sidecars раньше callback. Повреждённый заголовок сохраняется и отклоняется до обращения к SQLite. Чистая закрытая база без sidecars не требует предварительной копии; crash-open с sidecars требует дополнительного места и I/O.
 
 Исходные файлы, откатные копии и отказавшие staged inputs не удаляются автоматически. Свободное место, реальное поведение SAF provider и fsync на устройстве требуют отдельной проверки телефона. Robolectric использует настоящие JVM rename/directory fsync на внедряемой платформенной границе, поскольку его стандартные shadows этих операций не выполняют.
+
+## Operational snapshots SQLite
+
+Сохранённые transfer payloads можно явно compact через [preview/confirmation API](TRANSFER_RETENTION.md), сохраняя origin/dedupe/receipts. Это не удаление private files или SQLite WAL/free pages; автоматического purge нет. Room 6→7 только добавляет defaults, без очистки.

@@ -106,6 +106,21 @@ class AttentionPlatformTest {
         assertNull(music.prepare(newId(),"unbound"))
         assertEquals(before,context.getSystemService(NotificationManager::class.java).currentInterruptionFilter)
     }
+    @Test @Config(sdk = [26]) fun api26AudioRefusesBeforeResolvingOrOpeningAnySource() {
+        val context = RuntimeEnvironment.getApplication()
+        val oldForeground = FocusEnvironmentBinding.foreground;val oldFile = FocusEnvironmentBinding.localFile
+        var lookups = 0
+        try {
+            FocusEnvironmentBinding.foreground = true
+            FocusEnvironmentBinding.localFile = { lookups++;error("must not resolve source") }
+            val port = AndroidFocusMusic(context)
+            assertEquals(FocusEffectStatus.UNSUPPORTED,port.availability("selected"))
+            assertNull(port.prepare(newId(),"selected"));assertEquals(0,lookups)
+            val absent = java.io.File(context.cacheDir,"never-created-${newId()}")
+            val failure = assertThrows(IllegalStateException::class.java) { openFocusAudioFile(absent) }
+            assertEquals("Secure local audio requires API27",failure.message);assertFalse(absent.exists())
+        } finally { FocusEnvironmentBinding.foreground = oldForeground;FocusEnvironmentBinding.localFile = oldFile }
+    }
     @Test @Config(shadows = [HostFocusAudioOs::class])
     fun localAudioPinsOpenedBytesAndRejectsASymlinkWithoutStartingAPlayer() {
         val context = RuntimeEnvironment.getApplication()

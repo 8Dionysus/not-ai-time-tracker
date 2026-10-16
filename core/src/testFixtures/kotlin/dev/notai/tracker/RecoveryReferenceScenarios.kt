@@ -1,0 +1,96 @@
+package dev.notai.tracker
+
+import kotlin.test.*
+
+enum class RecoveryReferenceCase { LINK, SET, EVENT_QUANTITY, FOCUS, SCHEDULE, CLOSED_RATE }
+
+/** All writes use ordinary commands on isolated stores; the same case runs in Memory and Room. */
+fun recoveryExclusionKeepsReferences(create: () -> StateStore,reopen: (StateStore) -> StateStore,kind: RecoveryReferenceCase) {
+    val clock = FakeClock();var t = Tracker(create(),clock)
+    val card = Card("recovery-card","Original identity")
+    t.saveCard(t.snapshot().token,card);t.defineSubject(t.snapshot().token,CardSubject(card.id,"item"))
+    t.saveUnit(t.snapshot().token,UnitDefinition("recovery-kg","kg","mass"))
+    t.saveUnit(t.snapshot().token,UnitDefinition("recovery-page","page","page"))
+    t.saveMetric(t.snapshot().token,Metric("recovery-pages","pages",numberKind = NumberKind.INTEGER,canonicalUnitId = "recovery-page"))
+    t.saveUnit(t.snapshot().token,UnitDefinition("recovery-m","m","distance"))
+    t.saveMetric(t.snapshot().token,Metric("recovery-distance","distance",canonicalUnitId = "recovery-m"))
+    val startCommand = if(kind == RecoveryReferenceCase.SCHEDULE) {
+        val rule = ScheduleRule(card.classification(),"2026-10-10",extraDates = setOf("2026-10-10"))
+        t.scheduleCommand(ScheduleCommand("create",t.snapshot().token,ScheduleAction.CREATE,"recovery-series",rule = rule))
+        ScheduleCommand("start",t.snapshot().token,ScheduleAction.START,"recovery-series",1,occurrence = OccurrenceKey("recovery-series","2026-10-10"))
+    } else null
+    when(kind) {
+        RecoveryReferenceCase.FOCUS -> t.startFocus(t.snapshot().token,card.classification())
+        RecoveryReferenceCase.SCHEDULE -> t.scheduleCommand(startCommand!!)
+        else -> t.start(t.snapshot().token,card.classification(),"Literal original note")
+    }
+    val session = t.snapshot().session!!
+    val ref = if(kind == RecoveryReferenceCase.EVENT_QUANTITY) {
+        t.saveSubjectEvent(t.snapshot().token,SubjectEvent("recovery-event","stage",card.id))
+        SubjectRef(SubjectKind.EVENT,"recovery-event")
+    } else SubjectRef(SubjectKind.CARD,card.id)
+    when(kind) {
+        RecoveryReferenceCase.LINK,RecoveryReferenceCase.FOCUS ->
+            t.linkSubject(t.snapshot().token,SubjectSessionLink("recovery-link",ref,session.id))
+        RecoveryReferenceCase.SET -> t.recordSet(t.snapshot().token,ExerciseSet("recovery-set",session.id,0,8,
+            Decimal("40"),"recovery-kg",LoadMeaning.TOTAL_EXTERNAL,recordedAt = clock.wall,source = "explicit set"))
+        RecoveryReferenceCase.EVENT_QUANTITY -> {
+            t.linkSubject(t.snapshot().token,SubjectSessionLink("recovery-link",ref,session.id))
+            t.recordEventQuantity(t.snapshot().token,EventQuantity("recovery-quantity",ref,QuantityDefinition("recovery-pages",1,"recovery-page"),
+                Decimal("12"),clock.wall,clock.wall,"explicit quantity",session.id))
+        }
+        RecoveryReferenceCase.CLOSED_RATE -> {
+            clock.advance(1000);t.pause(t.snapshot().token)
+            val segment = t.data().segments.single()
+            val m = Measurement("recovery-distance-measurement","recovery-distance",1,"recovery-m",Scope.SESSION,session.id,Decimal("10"))
+            t.measure(t.snapshot().token,m)
+            t.pairDistanceTime(t.snapshot().token,DistanceTimeInput("recovery-rate",m.id,m.scope,m.targetId,
+                segment.start,segment.end!!,segment.durationMs,TimeBasis.RECORDED,"explicit pairing"))
+            t.resume(t.snapshot().token)
+        }
+        RecoveryReferenceCase.SCHEDULE -> Unit
+    }
+    val before = t.data();val tail = before.segments.single { it.end == null }
+    clock.advance(5000);clock.boot = "lost-anchor";clock.elapsed = 5
+    assertEquals(Mode.RECOVERY,t.snapshot().mode)
+    if(kind == RecoveryReferenceCase.FOCUS) assertEquals(FocusMode.RECOVERY,t.snapshot().focus!!.mode)
+    assertFailsWith<CoreError> { t.stop(t.snapshot().token) }
+    val resolved = if(kind == RecoveryReferenceCase.FOCUS) t.resolveFocus(t.snapshot().token,null,null)
+        else t.resolveTail(t.snapshot().token,null,null)
+    val after = t.data();validate(after)
+    assertEquals(Mode.IDLE,t.snapshot().mode);assertNull(after.focus)
+    assertEquals(session.copy(status = SessionStatus.STOPPED),after.sessions.single())
+    assertEquals(before.subjects,after.subjects);assertEquals(before.measurements,after.measurements);assertEquals(before.schedule,after.schedule)
+    val expectedTime = if(kind == RecoveryReferenceCase.CLOSED_RATE) 1000L else 0L
+    if(expectedTime == 0L) {
+        assertEquals(tail.copy(end = tail.start,durationMs = 0,anchor = null,observedUntil = null,uncertain = false,limitMs = null),after.segments.single())
+        assertNull(after.segments.single().manualConfirmation)
+    } else assertEquals(before.segments.filter { it.end != null },after.segments)
+    val report = t.view().report(0,clock.wall+1)
+    assertEquals(expectedTime,report.recordedMs);assertTrue(report.unresolved.isEmpty())
+    if(expectedTime == 0L) { assertTrue(report.rows.isEmpty());assertTrue(report.recordedDays.isEmpty()) }
+    if(kind == RecoveryReferenceCase.EVENT_QUANTITY) assertEquals(listOf("recovery-quantity"),t.view().quantityReport(0,clock.wall+1).quantities.events.map { it.id })
+    if(kind == RecoveryReferenceCase.CLOSED_RATE) assertNull(t.subjects().rates(setOf("recovery-rate"),0,clock.wall+1).reason)
+    assertTrue(resolved.undoAvailable);t.undo(t.snapshot().token)
+    assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
+    assertEquals(before.subjects,t.data().subjects);assertEquals(Mode.RECOVERY,t.snapshot().mode)
+    if(kind == RecoveryReferenceCase.FOCUS) t.resolveFocus(t.snapshot().token,null,null) else t.resolveTail(t.snapshot().token,null,null)
+    val persisted = t.data();t = Tracker(reopen(t.store),clock);assertEquals(persisted,t.data())
+    val archive = Backups(t,MemoryRollback()).export();assertEquals(persisted,Backups.decode(archive).data)
+    val clean = Tracker(create(),clock);val restore = Backups(clean,MemoryRollback());restore.apply(restore.prepare(archive))
+    assertEquals(persisted.subjects,clean.data().subjects);assertEquals(persisted.segments,clean.data().segments)
+    assertEquals(persisted.schedule,clean.data().schedule);assertEquals(expectedTime,clean.view().report(0,clock.wall+1).recordedMs)
+    if(startCommand != null) {
+        val replayBefore = t.data();assertEquals(session.id,t.scheduleCommand(startCommand).sessionId);assertEquals(replayBefore,t.data())
+    }
+    // Recovery released the current timer; a new explicit session contributes only its actual time.
+    t.start(t.snapshot().token);clock.advance(1000);t.stop(t.snapshot().token)
+    assertEquals(expectedTime+1000,t.view().report(0,clock.wall+1).recordedMs)
+}
+
+fun recoveryExclusionDropsUnreferencedEmptySession(create: () -> StateStore) {
+    val clock = FakeClock();val t = Tracker(create(),clock);t.start(t.snapshot().token)
+    clock.advance(5000);clock.boot = "lost-anchor";clock.elapsed = 5
+    t.resolveTail(t.snapshot().token,null,null)
+    assertEquals(Mode.IDLE,t.snapshot().mode);assertTrue(t.data().sessions.isEmpty());assertTrue(t.data().segments.isEmpty())
+}

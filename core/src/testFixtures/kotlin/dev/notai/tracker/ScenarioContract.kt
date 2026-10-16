@@ -19,6 +19,13 @@ class MemoryRollback: RollbackStore {
 }
 /** The SAME three scenarios run on in-memory domain storage and on disk-backed Room/SQLite. */
 abstract class ScenarioContract {
+    @Test fun reviewP1RecoverySubjectLink() = recoveryExclusionKeepsReferences(::createStore,::reopen,RecoveryReferenceCase.LINK)
+    @Test fun reviewP1RecoveryExerciseSet() = recoveryExclusionKeepsReferences(::createStore,::reopen,RecoveryReferenceCase.SET)
+    @Test fun reviewP1RecoveryEventQuantity() = recoveryExclusionKeepsReferences(::createStore,::reopen,RecoveryReferenceCase.EVENT_QUANTITY)
+    @Test fun reviewP1FocusRecoverySubjectLink() = recoveryExclusionKeepsReferences(::createStore,::reopen,RecoveryReferenceCase.FOCUS)
+    @Test fun reviewP1RecoveryScheduleLink() = recoveryExclusionKeepsReferences(::createStore,::reopen,RecoveryReferenceCase.SCHEDULE)
+    @Test fun reviewP1RecoveryClosedRate() = recoveryExclusionKeepsReferences(::createStore,::reopen,RecoveryReferenceCase.CLOSED_RATE)
+    @Test fun reviewP1RecoveryUnreferencedTail() = recoveryExclusionDropsUnreferencedEmptySession(::createStore)
     @Test fun reviewR2RetainedChangeCausality() = retainedChangeCausality(::createStore,::reopen)
     @Test fun reviewR2ExactOriginPrecedesStaleCandidate() = exactOriginPrecedesStaleCandidate(::createStore,::reopen)
     @Test fun reviewR2SharedQueryDependenciesCloseWithoutExplicitRoot() = sharedQueryDependenciesCloseWithoutExplicitRoot(::createStore,::reopen)

@@ -121,3 +121,30 @@ fun recoveryEmptyIdentityHasNoIntervalOverlap(create: () -> StateStore,reopen: (
     assertTrue(report.rows.none { it.sessionId == sessionId })
     assertEquals(t.data(),Tracker(reopen(t.store),clock).data())
 }
+
+fun recoveryEmptyIdentityAllowsClockRollback(create: () -> StateStore,reopen: (StateStore) -> StateStore,focus: Boolean) {
+    for(openAgain in listOf(false,true)) {
+        val clock = FakeClock();var t = Tracker(create(),clock)
+        val card = Card("rollback-identity","Original item");t.saveCard(t.snapshot().token,card)
+        t.defineSubject(t.snapshot().token,CardSubject(card.id,"item"));t.start(t.snapshot().token)
+        val original = t.snapshot().session!!.id
+        t.linkSubject(t.snapshot().token,SubjectSessionLink(subject = SubjectRef(SubjectKind.CARD,card.id),sessionId = original))
+        clock.boot = "new-boot";clock.wall -= 60_000;clock.elapsed = 5
+        t.resolveTail(t.snapshot().token,null,null)
+        if(openAgain) t = Tracker(reopen(t.store),clock)
+        val facts = t.data().subjects
+        fun fullValidationAllowsStart() {
+            val d = t.data();val session = Session(id = "candidate",status = SessionStatus.RUNNING,selection = Classification())
+            validate(d.copy(sessions = d.sessions+session,segments = d.segments+Segment(sessionId = session.id,start = clock.wall,anchor = Anchor(clock.boot,clock.elapsed))))
+        }
+        fullValidationAllowsStart()
+        if(focus) t.startFocus(t.snapshot().token,plan = FocusPlan(1000,1000)) else t.start(t.snapshot().token)
+        // An immediate stop is also empty. The incrementally maintained index must ignore it.
+        t.stop(t.snapshot().token);clock.wall -= 30_000
+        fullValidationAllowsStart();t.start(t.snapshot().token)
+        clock.advance(1000);t.stop(t.snapshot().token)
+        assertEquals(facts,t.data().subjects);validate(t.data())
+        assertEquals(1000L,t.view().report(0,clock.wall+1).recordedMs)
+        assertEquals(1,t.data().subjects.links.size);assertTrue(t.data().sessions.any { it.id == original })
+    }
+}

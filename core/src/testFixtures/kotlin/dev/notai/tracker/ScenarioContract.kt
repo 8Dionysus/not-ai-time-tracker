@@ -32,6 +32,8 @@ abstract class ScenarioContract {
     @Test fun reviewP1RecoverySessionMeasurement() = recoveryExclusionKeepsReferences(::createStore,::reopen,RecoveryReferenceCase.SESSION_MEASUREMENT)
     @Test fun reviewP1RecoverySegmentMeasurement() = recoveryExclusionKeepsReferences(::createStore,::reopen,RecoveryReferenceCase.SEGMENT_MEASUREMENT)
     @Test fun reviewP1RecoveryEmptyIdentityOverlap() = recoveryEmptyIdentityHasNoIntervalOverlap(::createStore,::reopen)
+    @Test fun reviewP1RecoveryRollbackOrdinary() = recoveryEmptyIdentityAllowsClockRollback(::createStore,::reopen,false)
+    @Test fun reviewP1RecoveryRollbackFocus() = recoveryEmptyIdentityAllowsClockRollback(::createStore,::reopen,true)
     @Test fun reviewR2RetainedChangeCausality() = retainedChangeCausality(::createStore,::reopen)
     @Test fun reviewR2ExactOriginPrecedesStaleCandidate() = exactOriginPrecedesStaleCandidate(::createStore,::reopen)
     @Test fun reviewR2SharedQueryDependenciesCloseWithoutExplicitRoot() = sharedQueryDependenciesCloseWithoutExplicitRoot(::createStore,::reopen)

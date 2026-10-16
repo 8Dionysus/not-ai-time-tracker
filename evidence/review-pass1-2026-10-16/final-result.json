@@ -1,0 +1,101 @@
+{
+  "baseline": "59d0ba60e05683d7cab7cd5e0b0237f4094d365d",
+  "runtimeAndBuildSource": "0ed5b253e65cf4fec375f1a93c7b48f0e47cb0e4",
+  "branch": "fix/review-pass1-2026-10-16",
+  "mainMerged": false,
+  "review": "P1-001..011 corrections delivered for parent acceptance; no pass2 claim",
+  "findings": [
+    "P1-001",
+    "P1-002",
+    "P1-003",
+    "P1-004",
+    "P1-005",
+    "P1-006",
+    "P1-007",
+    "P1-008",
+    "P1-009",
+    "P1-010",
+    "P1-011"
+  ],
+  "formats": {
+    "Room": 12,
+    "fullWriter": 14,
+    "fullReader": "1..14",
+    "selectiveReader": "1..4"
+  },
+  "tests": {
+    "core": 189,
+    "app": 180,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "elapsed": "2m29s"
+  },
+  "pythonFingerprint": {
+    "tests": 3,
+    "failures": 0,
+    "sourceFiles": {
+      "scripts/android_store_fingerprint.py": "87b8e128739ee7135593564c9cb6681d2c662d08c8077501acbbb514508ad2e6",
+      "scripts/test_android_store_fingerprint.py": "7a52152b67bf9b27b17280f2f9854e5d8792569f30ce25d78e028435cf87ae08"
+    }
+  },
+  "buildElapsed": "3m24s",
+  "artifacts": {
+    "app-debug-unsigned.apk": {
+      "bytes": 16575579,
+      "sha256": "30c659c2339051f3f51197930a2174d6a0d9b54eaf43440bf47b90864d8f8360"
+    },
+    "app-release-unsigned.apk": {
+      "bytes": 11186813,
+      "sha256": "467f27775dced8d8442192ef88e7b4a217371fc979a753cbdca80b08380e0156"
+    }
+  },
+  "lint": {
+    "Error": 0,
+    "Fatal": 0,
+    "Warning": 68,
+    "Information": 0
+  },
+  "manifestByteEqualAcceptedC949": true,
+  "licenseArtifacts": 66,
+  "externalDocumentedExactShaMatches": 65,
+  "localeAssetsInBothApks": 24,
+  "sourceLocaleAssetsByteEqualBaseline": true,
+  "compileSdk": 36,
+  "targetSdk": 36,
+  "minSdk": 26,
+  "ndk": "30.0.16248370",
+  "unsigned": true,
+  "zipalignP16": true,
+  "fdroid": {
+    "source": "3921354a6e3c10777f49b0e1caf2aae6b55364db",
+    "lintExit": 0,
+    "scannerExit": 0,
+    "errors": 0,
+    "warnings": 1,
+    "independentServerBuild": false
+  },
+  "commands": [
+    "gradle :core:test :app:testDebugUnitTest --max-workers=1 -PtrackerUnsigned=true -PtrackerCleanupLibrary=<built-isolated-host-fixture.so> -Pkotlin.compiler.execution.strategy=in-process",
+    "gradle :app:assembleDebug :app:assembleRelease :app:lintRelease :app:releaseInventory --max-workers=1 -PtrackerUnsigned=true -PtrackerCleanupLibrary=<built-isolated-host-fixture.so> -Pkotlin.compiler.execution.strategy=in-process",
+    "python3 -m unittest discover -s scripts -p test_android_store_fingerprint.py -v",
+    "fdroid lint dev.notai.tracker",
+    "fdroid scanner --force --json --exit-code dev.notai.tracker"
+  ],
+  "toolchain": "Gradle8.13/JDK21; host fixture per README. Exact local invocation/logs in artifact; no SDK paths in final public tree.",
+  "requestedApiModel": "gpt-6.1-sol",
+  "requestedThinking": "high",
+  "runtimeModelAndEffortIndependentlyVerified": false,
+  "physicalDeviceRun": false,
+  "realUserDataImportedOrDeleted": false,
+  "releaseSigningKeysCreated": false,
+  "remaining": [
+    "Parent personal pass2/pass3 and acceptance",
+    "Frontend overlay P2, goal-edit, localization/resources/language-authority and broader integration",
+    "Physical OEM/device/TalkBack/RTL and real delivery/permissions",
+    "Legacy cleanup-owner retirement witness",
+    "Catalog source rights/native-speaker QA and native publisher provenance",
+    "Independent server reproducibility and store/signing/publication",
+    "Historical CSV receipts have no stored parse profile; fallback proves saved facts and never rewrites origins"
+  ]
+}

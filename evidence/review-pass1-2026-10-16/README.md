@@ -41,3 +41,16 @@ Additional first-pass checkpoints (same scope; no second-review claim):
 P1-0113921354 passes6core/7app: the five new CSV cases, existing COPY-origin
 replay in each store, and whole-area guarded start. Corrected legacy hash is also
 checked against the frozen original algorithm; original receipts remain unchanged.
+
+Final aggregate runtime source0ed5b253e65cf4fec375f1a93c7b48f0e47cb0e4 passes
+189core +180app,0failures/errors/skips (2m29s). Python fingerprint3/3 passes.
+Raw original aggregate XML are stored alongside verification.json. Checkpoint
+integrity checks5050 source-file references at18 exact commits plus XML hashes/
+counts against Git objects; this is artifact integrity, not another code review.
+
+Final unsigned build0ed5b25 succeeds3m24s: lint0errors/0fatal/68warnings,
+66 runtime artifacts (65 external exact documented hashes), min26/target36,
+zipalign-P16, both APKs24 locale assets equal source and baseline59d.
+Exact APK bytes/SHA256 and command semantics are in final-result.json.
+Full original Gradle/check logs and APKs are in the task archive; public evidence
+keeps metadata/XML without local SDK paths.

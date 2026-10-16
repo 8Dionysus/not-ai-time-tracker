@@ -1,0 +1,303 @@
+{
+  "verificationFiles": 18,
+  "distinctSourceCommits": 18,
+  "sourceFileReferences": 5050,
+  "uniqueGitBlobs": 328,
+  "rawXmlHashesCountsAndExactGitSourceFilesMatch": true,
+  "records": [
+    {
+      "evidence": "P1-001/38cfc9c-index-reproduced/verification.json",
+      "source": "38cfc9c89522450340e58da9e0f003914beee1c0",
+      "sourceFiles": 280,
+      "counts": {
+        "core": {
+          "tests": 2,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 2,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "P1-001/73921a6-reproduced/verification.json",
+      "source": "73921a69a2eb379159bd32bf1684c06df1328d4c",
+      "sourceFiles": 277,
+      "counts": {
+        "core": {
+          "tests": 175,
+          "failures": 5,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 7,
+          "failures": 5,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "P1-001/b7ee1df-initial-fix/verification.json",
+      "source": "b7ee1dfed0d8aa76aa4f1aa6f12058032803f6e0",
+      "sourceFiles": 277,
+      "counts": {
+        "core": {
+          "tests": 178,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 146,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "P1-002/3777584-reproduced/verification.json",
+      "source": "3777584c4320de77bccb7406497622550514b862",
+      "sourceFiles": 278,
+      "counts": {
+        "app": {
+          "tests": 3,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0
+        },
+        "core": {
+          "tests": 3,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "P1-002/49dc82f-fixed/verification.json",
+      "source": "49dc82ff0c474c612e0b2827c9c6ea759f98ea65",
+      "sourceFiles": 278,
+      "counts": {
+        "core": {
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "P1-003/242269d-absent-store-reproduced/verification.json",
+      "source": "242269d96712b5caf6841be9f11d52742f57844b",
+      "sourceFiles": 279,
+      "counts": {
+        "app": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "P1-003/c1b0659-reproduced/verification.json",
+      "source": "c1b065981e3cde30817b7b49daa71509bc5039d7",
+      "sourceFiles": 279,
+      "counts": {
+        "app": {
+          "tests": 6,
+          "failures": 5,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "P1-003/c5a34b4-fixed/verification.json",
+      "source": "c5a34b422089d780710adf59b8fc8b26e8bd1581",
+      "sourceFiles": 279,
+      "counts": {
+        "app": {
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "P1-009/446767f-fixed/verification.json",
+      "source": "446767fba2b70ba356ce2ba9c252d6f2ae073056",
+      "sourceFiles": 280,
+      "counts": {
+        "app": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "P1-009/881ec54-reproduced/verification.json",
+      "source": "881ec54082035d26e07795761d1fa7ce11673cb9",
+      "sourceFiles": 280,
+      "counts": {
+        "app": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p1-001-8b4be66-index-fixed/verification.json",
+      "source": "8b4be6692a804f434379930f7d2521d890b19c41",
+      "sourceFiles": 280,
+      "counts": {
+        "core": {
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p1-006-f369b6e-fixed/verification.json",
+      "source": "f369b6e0e058a54ae7bfc80e70192998325c412e",
+      "sourceFiles": 284,
+      "counts": {
+        "app": {
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p1-011-3921354-fixed/verification.json",
+      "source": "3921354a6e3c10777f49b0e1caf2aae6b55364db",
+      "sourceFiles": 285,
+      "counts": {
+        "core": {
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p1-011-c341e23-reproduced/verification.json",
+      "source": "c341e235bd133289a61af1bfb1bc624d2a76d4e6",
+      "sourceFiles": 285,
+      "counts": {
+        "core": {
+          "tests": 5,
+          "failures": 5,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 6,
+          "failures": 5,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p1-final-0ed5b25-full-tests/verification.json",
+      "source": "0ed5b253e65cf4fec375f1a93c7b48f0e47cb0e4",
+      "sourceFiles": 285,
+      "counts": {
+        "core": {
+          "tests": 189,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 180,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p1-ui-3ce21de-reproduced/verification.json",
+      "source": "3ce21de4d3a1f3446b95496229ab6049fe0cc5f8",
+      "sourceFiles": 281,
+      "counts": {
+        "app": {
+          "tests": 8,
+          "failures": 7,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p1-ui-4af4ab6-axis-format-expectation/verification.json",
+      "source": "4af4ab6bfc071251703e2c8bf82cdf8ebc2a183e",
+      "sourceFiles": 281,
+      "counts": {
+        "app": {
+          "tests": 10,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p1-ui-c6140ba-fixed/verification.json",
+      "source": "c6140ba931186d438feee90aecdc5a94dc81d13c",
+      "sourceFiles": 282,
+      "counts": {
+        "core": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    }
+  ]
+}

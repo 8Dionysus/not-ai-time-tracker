@@ -8,5 +8,7 @@
   "warning": "Retained previous-runtime-catalog.json.gz fixture",
   "fixtureRepo": "Local clone of exact source SHA; published recipe retains public HTTPS Repo",
   "independentServerBuild": false,
-  "independentReproducibility": false
+  "independentReproducibility": false,
+  "rawScannerLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "rawScannerLogLocation": "Final task artifact only; omitted from public Git because it includes a local SDK path"
 }

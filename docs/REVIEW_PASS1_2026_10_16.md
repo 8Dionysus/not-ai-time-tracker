@@ -47,3 +47,29 @@ are reported separately. No physical OEM/device/TalkBack/RTL checks, independent
 server reproducibility, store publication/signing, release keys, real-user import/
 delete or independent runtime model/effort attestation is claimed. UI overlay P2,
 goal-edit and the broader frontend work remain with their owner.
+
+## Original A–F package coverage at this checkpoint
+
+This corrective pass retains the existing complete engines and migrations rather
+than introducing a parallel timer/importer. The following links describe the actual
+backend and explicit acceptance boundaries; the final aggregate run covers their
+shared regression suite.
+
+| Scope | Retained implementation / correction | Remaining boundary |
+| --- | --- | --- |
+| A localization/catalog | [Localization/content interfaces](CATALOG_CONTENT_PACKS.md), typed errors and ID/meaningVersion/locale labels;11 bundled locale packs plus Russian source; stable user originals/history. Picker uses shown-choice guards. | Frontend resource migration/language-authority binding and native-speaker/rights approval. No zh-Hant or unreviewed empty pack is advertised as ready. |
+| B schedule | [Schedule/receipt interface](INDEXED_SCHEDULE_RECEIPTS.md), series/overrides/start links/projections, explicit start, canonical receipt conflict checks and [delivery ports](SCHEDULE_DELIVERY_HANDOFF.md). Recovery preserves start-link identities. | Three-surface rendering and actual Android/OEM permission/delivery acceptance. |
+| C persistence/archive | Existing Room12/full14/read1–14 and selective1–4 with legacy migrations, Memory/Room parity, preview and verified rollback. P1 adds reference-preserving recovery, rollback-clock parity and restore-review lease ownership. | Real-device legacy migration and interruption acceptance remain distinct from fixtures. |
+| D manual copy cleanup | [Descriptor/sealed-archive contract](SEALED_ARCHIVE_CONTRACT.md), registry/leases, explicit plans/confirmations, journal/quarantine/resume and exact partial outcomes retained. Restore preview cancellation now releases exact leases without deleting bytes. | UI integration, legacy-owner retirement witness and Android filesystem/device acceptance. No age purge or real-owner deletion performed. |
+| E selective transfer | [Portability](PORTABILITY.md), dependency closure/origins/COPY/replay/Undo/retention retained. P1 fixes content-derived format4 closure and CSV interpretation receipts while preserving full JSON replacement and legacy/COPY replay. | Product selective-transfer screens remain frontend-owned; CSV is still a limited append format. |
+| F release engineering | Existing own-code Apache2, Onest OFL/third-party notices, API36, unsigned builds, actual merged manifest, pinned dependency hashes and disabled F-Droid draft. Final artifact receipt records fresh outcomes. | Catalog rights, native publisher provenance, independent reproducibility, device/OEM/TalkBack/RTL, store/signing/publication and UI P2/goal-edit remain open. |
+
+## Fresh aggregate result
+
+Runtime/build source `0ed5b253e65cf4fec375f1a93c7b48f0e47cb0e4`:189core +180app, zero failures/errors/skips;
+Python fingerprint3/3. Unsigned debug/release, lint0errors/0fatal/68warnings,
+zipalign-P16, min26/target36,24 locale assets/source/baseline equality and all65
+external dependency hashes pass. [Exact artifact hashes and commands](../evidence/review-pass1-2026-10-16/final-result.json)
+and [original XML/checkpoints](../evidence/review-pass1-2026-10-16/README.md) are retained.
+The final delivery commit may add only documentation/evidence after this source;
+its receipt separately proves identical runtime/test/build/schema/assets bytes.

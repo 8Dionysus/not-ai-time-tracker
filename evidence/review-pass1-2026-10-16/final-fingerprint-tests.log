@@ -1,0 +1,8 @@
+test_absent_legacy_column_and_null_current_column_remain_comparable (test_android_store_fingerprint.FingerprintTest.test_absent_legacy_column_and_null_current_column_remain_comparable) ... ok
+test_confirmation_change_changes_hash_without_any_other_row_difference (test_android_store_fingerprint.FingerprintTest.test_confirmation_change_changes_hash_without_any_other_row_difference) ... ok
+test_confirmation_json_order_is_canonical (test_android_store_fingerprint.FingerprintTest.test_confirmation_json_order_is_canonical) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.049s
+
+OK

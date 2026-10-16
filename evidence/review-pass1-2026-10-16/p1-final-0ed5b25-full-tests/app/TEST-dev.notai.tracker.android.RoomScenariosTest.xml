@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.RoomScenariosTest" tests="89" skipped="0" failures="0" errors="0" timestamp="2026-10-16T09:27:09.927Z" hostname="69b2b5b46001" time="37.297">
+  <properties/>
+  <testcase name="savedBackendWorkspacesKeepReviewedIdentityAcrossReopenAndReleaseOnlyOwnReferences" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.502"/>
+  <testcase name="orphanSidecarsNeverInitialize" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.115"/>
+  <testcase name="largeTransferMetadataReopensWithoutWholeCursorRows" classname="dev.notai.tracker.android.RoomScenariosTest" time="1.11"/>
+  <testcase name="validClassificationPayloadCannotChangeUnderItsOldContentId" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.079"/>
+  <testcase name="v7FunctionalMigrationPreservesEverySessionStateAndRejectsFuturePayloads" classname="dev.notai.tracker.android.RoomScenariosTest" time="1.523"/>
+  <testcase name="shortcutPreferenceMigrationFromV8PreservesAllTimerStatesAndRejectsFutureMeaning" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.826"/>
+  <testcase name="healthyMainWithDamagedSidecarsPreservesEveryOriginalBeforeSQLite" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.095"/>
+  <testcase name="coldPayloadIdentityMismatchBlocksWithoutRepair" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.028"/>
+  <testcase name="v9MigrationInterruptionRollsBackColumnAndCanRetryExplicitly" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.582"/>
+  <testcase name="sessionCommandsIgnoreStaleSelectedCard" classname="dev.notai.tracker.android.RoomScenariosTest" time="3.179"/>
+  <testcase name="indexedPagingAndV3MigrationPreserveEveryRow" classname="dev.notai.tracker.android.RoomScenariosTest" time="1.598"/>
+  <testcase name="v9MigrationPreservesUnknownProvenanceAndEverySessionState" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.156"/>
+  <testcase name="shortcutDisableWithdrawsMutableEntriesAndGatesRetainedActionsAfterReopen" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.053"/>
+  <testcase name="backendPickerWidgetAndOverlayContracts" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.202"/>
+  <testcase name="transferRetentionV6MigrationPreservesPayloads" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.108"/>
+  <testcase name="normalizedMigrationRollsBackAfterReplacementFailure" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.563"/>
+  <testcase name="normalizedMigrationRejectsContradictionsWithoutChangingLegacyRows" classname="dev.notai.tracker.android.RoomScenariosTest" time="2.076"/>
+  <testcase name="repeatedArchivesShareOnlyVerifiedImmutableCopies" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.033"/>
+  <testcase name="v5MigrationPreservesStoppedPausedRunningAndRecovery" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.189"/>
+  <testcase name="transferRetentionLargeMetadataShrinksAndReopens" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.724"/>
+  <testcase name="subjectFieldsSurviveArchivesCopyReplayAndUndo" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.409"/>
+  <testcase name="transferRetentionConfirmationClosureAndArchive" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.178"/>
+  <testcase name="typedImportIssuesPreserveAtomicityAndProvenance" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.087"/>
+  <testcase name="selectiveGoalsFavoritesFocusAndUndo" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.105"/>
+  <testcase name="selectiveScheduleMeasurementClosureAndResume" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.106"/>
+  <testcase name="smallHistoryAndExport" classname="dev.notai.tracker.android.RoomScenariosTest" time="3.134"/>
+  <testcase name="subjectEventsSpanStagesWithoutHiddenHistory" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.073"/>
+  <testcase name="transferRetentionCrashRaceAndStale" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.138"/>
+  <testcase name="csvReplayAfterSelectiveCopyKeepsExternalIdentity" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.097"/>
+  <testcase name="functionalScheduleSettingsPersistAndResolveCivilDays" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.086"/>
+  <testcase name="combinedQuantityArchiveGuardsEveryRetainedSnapshot" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.068"/>
+  <testcase name="reviewP1FocusRecoverySubjectLink" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.083"/>
+  <testcase name="subjectRatesUseWeightedExplicitInputs" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.071"/>
+  <testcase name="reviewP1RecoveryScheduleLink" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.085"/>
+  <testcase name="selectiveExclusionsMustBelongToSelectedSeries" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.039"/>
+  <testcase name="reviewP1RecoverySubjectLink" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.08"/>
+  <testcase name="scheduleDstFutureAndNoAutomaticFacts" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.035"/>
+  <testcase name="transferRetentionProtectsPendingAndPreservesLeases" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.196"/>
+  <testcase name="reviewR2QuantityWindowsRequireCompatibleObservation" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.052"/>
+  <testcase name="reviewP1RecoveryUnreferencedTail" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.03"/>
+  <testcase name="scheduleLocalizationAndArchiveContract" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.062"/>
+  <testcase name="reviewP1RecoveryRollbackFocus" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.141"/>
+  <testcase name="reviewR2RetainedChangeCausality" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.292"/>
+  <testcase name="reviewP1CsvDuration" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.044"/>
+  <testcase name="reviewR2ExactOriginPrecedesStaleCandidate" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.102"/>
+  <testcase name="backupReplacementAndFailure" classname="dev.notai.tracker.android.RoomScenariosTest" time="9.341"/>
+  <testcase name="savedReportPortability" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.18"/>
+  <testcase name="reviewP1RecoveryRollbackOrdinary" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.096"/>
+  <testcase name="transferRetentionCopyPreservesSourceIdentityAndDetectsEdits" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.179"/>
+  <testcase name="reviewP1CsvActivity" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.031"/>
+  <testcase name="combinedQuantityQueryReferencesKeepCopiedTypeAndAxis" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.047"/>
+  <testcase name="reviewP1CsvLegacyReplay" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.082"/>
+  <testcase name="reviewP1ContentBoundedMetric" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.132"/>
+  <testcase name="reviewP1RecoveryExerciseSet" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.066"/>
+  <testcase name="timerPath" classname="dev.notai.tracker.android.RoomScenariosTest" time="5.204"/>
+  <testcase name="scheduleDeliveryUsesOneAlarmAndDurableReceiptsWithoutFacts" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.067"/>
+  <testcase name="combinedQuantityReportUsesHistoricalIntervals" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.211"/>
+  <testcase name="subjectSignedChangesRequireContinuousBasis" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.065"/>
+  <testcase name="subjectQuantityWindowsKeepWholeTargetsSeparate" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.047"/>
+  <testcase name="scheduleFinalPostSerializesWithConcurrentDomainCommandsWithoutWritingFacts" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.181"/>
+  <testcase name="subjectStateIsLatestKnownNotSum" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.044"/>
+  <testcase name="reviewR2SharedQueryDependenciesCloseWithoutExplicitRoot" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.128"/>
+  <testcase name="subjectSetsAndScaleBoundsHaveExplicitMeaning" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.059"/>
+  <testcase name="reviewP1DeleteSubjectConsequences" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.057"/>
+  <testcase name="backfillPreservesObservedTimeAndUndo" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.045"/>
+  <testcase name="concurrentSelectiveResumeKeepsAppliedReceipt" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.023"/>
+  <testcase name="shortcutPreferencePreservesTimerHistoryAndRoundTripsWithLegacyDefaults" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.053"/>
+  <testcase name="liveTimerKeepsCompletedHistoryIndexProof" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.103"/>
+  <testcase name="reviewP1RecoverySessionMeasurement" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.06"/>
+  <testcase name="standalonePersonalCatalogTransferUsesExistingImportEngine" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.204"/>
+  <testcase name="reviewP1RecoveryClosedRate" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.073"/>
+  <testcase name="reviewP1RecoverySegmentMeasurement" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.054"/>
+  <testcase name="reviewP1RecoveryEmptyIdentityOverlap" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.044"/>
+  <testcase name="subjectsReuseCardIdentity" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.05"/>
+  <testcase name="selectiveGroupsRepeatConflictAndStale" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.061"/>
+  <testcase name="combinedQuantityIndependentOriginsKeepReexportIdentity" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.057"/>
+  <testcase name="reviewedDraftSwitchIsOneAtomicCommit" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.028"/>
+  <testcase name="reviewP1CsvCategory" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.02"/>
+  <testcase name="reviewP1CsvNote" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.026"/>
+  <testcase name="reviewP1ContentDependencyPersonalization" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.066"/>
+  <testcase name="backfillArchiveRoundTripPreservesProvenance" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.076"/>
+  <testcase name="reviewP1RecoveryEventQuantity" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.101"/>
+  <testcase name="namedPersonalObjectsPreserveClassificationAndHistory" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.062"/>
+  <testcase name="backfillRefusalsAreAtomic" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.052"/>
+  <testcase name="scheduleRendererCannotPostAfterChangingTheCurrentOccurrence" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.053"/>
+  <testcase name="reviewP1ContentBoundedUnit" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.101"/>
+  <testcase name="rollbackReferenceSpansSaveVerificationAndDomainCommit" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.03"/>
+  <testcase name="scheduleCanonicalReceiptsAndSameDayRuleEdits" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.025"/>
+  <testcase name="reportingDayAndVersionedGoals" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.063"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Intent = Intent { act=dev.notai.tracker.WIDGET_PIN dat=notai://widget-pin/... cmp=dev.notai.tracker/.android.WidgetPinReceiver (has extras) }; Matching wrappers: [Wrapper[receiver=[dev.notai.tracker.android.WidgetPinReceiver@50382968], context=[android.app.ContextImpl@1e3af767], intentFilter=[android.content.IntentFilter@508442d1]]]
+System.logW: A resource was acquired at attached stack trace but never released. See java.io.Closeable for information on avoiding resource leaks.
+java.lang.Throwable: Explicit termination method 'close' not called
+	at dalvik.system.CloseGuard.$$robo$$dalvik_system_CloseGuard$openWithCallSite(CloseGuard.java:288)
+	at dalvik.system.CloseGuard.openWithCallSite(CloseGuard.java)
+	at dalvik.system.CloseGuard.$$robo$$dalvik_system_CloseGuard$open(CloseGuard.java:257)
+	at dalvik.system.CloseGuard.open(CloseGuard.java)
+	at android.util.CloseGuard.$$robo$$android_util_CloseGuard$open(CloseGuard.java:153)
+	at android.util.CloseGuard.open(CloseGuard.java)
+	at android.os.ParcelFileDescriptor.$$robo$$android_os_ParcelFileDescriptor$__constructor__(ParcelFileDescriptor.java:216)
+	at android.os.ParcelFileDescriptor.<init>(ParcelFileDescriptor.java:203)
+	at android.os.ParcelFileDescriptor.<init>(ParcelFileDescriptor.java:199)
+	at org.robolectric.shadows.ShadowParcelFileDescriptor.newParcelFileDescriptor(ShadowParcelFileDescriptor.java:118)
+	at org.robolectric.shadows.ShadowParcelFileDescriptor.open(ShadowParcelFileDescriptor.java:123)
+	at android.os.ParcelFileDescriptor.open(ParcelFileDescriptor.java)
+	at android.content.ContentResolver.$$robo$$android_content_ContentResolver$openAssetFileDescriptor(ContentResolver.java:1853)
+	at android.content.ContentResolver.openAssetFileDescriptor(ContentResolver.java)
+	at android.content.ContentResolver.$$robo$$android_content_ContentResolver$openOutputStream(ContentResolver.java:1574)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.robolectric.shadows.ShadowContentResolver$ContentResolverReflector$$Reflector204.openOutputStream(Unknown Source)
+	at org.robolectric.shadows.ShadowContentResolver.openOutputStream(ShadowContentResolver.java:239)
+	at android.content.ContentResolver.openOutputStream(ContentResolver.java)
+	at dev.notai.tracker.android.ExportOperations.writeUnsafe(PrivateFiles.kt:106)
+	at dev.notai.tracker.android.ExportOperations.write$lambda$19(PrivateFiles.kt:100)
+	at dev.notai.tracker.android.PrivateFileMaintenance.writing$lambda$5(PrivateFileMaintenance.kt:43)
+	at dev.notai.tracker.CopyMaintenance.writingWithReference(CopyMaintenance.kt:69)
+	at dev.notai.tracker.CopyMaintenance.writingWithReference$default(CopyMaintenance.kt:64)
+	at dev.notai.tracker.android.PrivateFileMaintenance.writingWithReference$app_debug(PrivateFileMaintenance.kt:48)
+	at dev.notai.tracker.android.PrivateFileMaintenance.writing$app_debug(PrivateFileMaintenance.kt:43)
+	at dev.notai.tracker.android.ExportOperations.write(PrivateFiles.kt:100)
+	at dev.notai.tracker.android.RoomScenariosTest.privateFilesAndMetadata$lambda$253(RoomScenariosTest.kt:1148)
+	at org.junit.Assert.assertThrows(Assert.java:1001)
+	at org.junit.Assert.assertThrows(Assert.java:981)
+	at dev.notai.tracker.android.RoomScenariosTest.privateFilesAndMetadata(RoomScenariosTest.kt:1148)
+	at dev.notai.tracker.android.RoomScenariosTest.surfaceActions(RoomScenariosTest.kt:867)
+	at dev.notai.tracker.ScenarioContract.timerPath(ScenarioContract.kt:915)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.internal.runners.statements.RunAfters.evaluate(RunAfters.java:27)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:542)
+	at org.robolectric.internal.SandboxTestRunner.lambda$executeInSandbox$4(SandboxTestRunner.java:429)
+	at org.robolectric.internal.SandboxTestRunner.runInSandbox(SandboxTestRunner.java:455)
+	at org.robolectric.internal.SandboxTestRunner.executeInSandbox(SandboxTestRunner.java:420)
+	at org.robolectric.internal.SandboxTestRunner$5.evaluate(SandboxTestRunner.java:405)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.robolectric.internal.SandboxTestRunner.access$000(SandboxTestRunner.java:64)
+	at org.robolectric.internal.SandboxTestRunner$4.evaluate(SandboxTestRunner.java:294)
+	at org.robolectric.internal.SandboxTestRunner$2.evaluate(SandboxTestRunner.java:260)
+	at org.robolectric.internal.SandboxTestRunner$3.lambda$evaluate$0(SandboxTestRunner.java:280)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThreadWithClassLoader$1(Sandbox.java:112)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+System.logW: A resource was acquired at attached stack trace but never released. See java.io.Closeable for information on avoiding resource leaks.
+java.lang.Throwable: Explicit termination method 'close' not called
+	at dalvik.system.CloseGuard.$$robo$$dalvik_system_CloseGuard$openWithCallSite(CloseGuard.java:288)
+	at dalvik.system.CloseGuard.openWithCallSite(CloseGuard.java)
+	at dalvik.system.CloseGuard.$$robo$$dalvik_system_CloseGuard$open(CloseGuard.java:257)
+	at dalvik.system.CloseGuard.open(CloseGuard.java)
+	at android.database.sqlite.SQLiteDatabase.$$robo$$android_database_sqlite_SQLiteDatabase$openInner(SQLiteDatabase.java:1164)
+	at android.database.sqlite.SQLiteDatabase.openInner(SQLiteDatabase.java)
+	at android.database.sqlite.SQLiteDatabase.$$robo$$android_database_sqlite_SQLiteDatabase$open(SQLiteDatabase.java:1143)
+	at android.database.sqlite.SQLiteDatabase.open(SQLiteDatabase.java)
+	at android.database.sqlite.SQLiteDatabase.$$robo$$android_database_sqlite_SQLiteDatabase$openDatabase(SQLiteDatabase.java:1007)
+	at android.database.sqlite.SQLiteDatabase.openDatabase(SQLiteDatabase.java)
+	at android.database.sqlite.SQLiteDatabase.$$robo$$android_database_sqlite_SQLiteDatabase$openDatabase(SQLiteDatabase.java:996)
+	at android.database.sqlite.SQLiteDatabase.openDatabase(SQLiteDatabase.java)
+	at android.database.sqlite.SQLiteOpenHelper.$$robo$$android_database_sqlite_SQLiteOpenHelper$getDatabaseLocked(SQLiteOpenHelper.java:373)
+	at android.database.sqlite.SQLiteOpenHelper.getDatabaseLocked(SQLiteOpenHelper.java)
+	at android.database.sqlite.SQLiteOpenHelper.$$robo$$android_database_sqlite_SQLiteOpenHelper$getWritableDatabase(SQLiteOpenHelper.java:316)
+	at android.database.sqlite.SQLiteOpenHelper.getWritableDatabase(SQLiteOpenHelper.java)
+	at androidx.sqlite.db.framework.FrameworkSQLiteOpenHelper$OpenHelper.getWritableOrReadableDatabase(FrameworkSQLiteOpenHelper.android.kt:224)
+	at androidx.sqlite.db.framework.FrameworkSQLiteOpenHelper$OpenHelper.innerGetDatabase(FrameworkSQLiteOpenHelper.android.kt:167)
+	at androidx.sqlite.db.framework.FrameworkSQLiteOpenHelper$OpenHelper.getSupportDatabase(FrameworkSQLiteOpenHelper.android.kt:141)
+	at androidx.sqlite.db.framework.FrameworkSQLiteOpenHelper.getWritableDatabase(FrameworkSQLiteOpenHelper.android.kt:96)
+	at androidx.room.RoomDatabase.internalBeginTransaction(RoomDatabase.android.kt:673)
+	at androidx.room.RoomDatabase.beginTransaction(RoomDatabase.android.kt:665)
+	at androidx.room.RoomDatabase.runInTransaction(RoomDatabase.android.kt:756)
+	at androidx.room.RoomDatabase.runInTransaction(RoomDatabase.android.kt:750)
+	at dev.notai.tracker.android.RoomStore.readChecked(TrackerDatabase.kt:301)
+	at dev.notai.tracker.Tracker.snapshot$lambda$3(Tracker.kt:15)
+	at dev.notai.tracker.TrackerKt.storage(Tracker.kt:636)
+	at dev.notai.tracker.Tracker.snapshot(Tracker.kt:15)
+	at dev.notai.tracker.StartBackfillScenariosKt.startBackfillArchiveRoundTrip(StartBackfillScenarios.kt:128)
+	at dev.notai.tracker.ScenarioContract.backfillArchiveRoundTripPreservesProvenance(ScenarioContract.kt:64)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.internal.runners.statements.RunAfters.evaluate(RunAfters.java:27)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:542)
+	at org.robolectric.internal.SandboxTestRunner.lambda$executeInSandbox$4(SandboxTestRunner.java:429)
+	at org.robolectric.internal.SandboxTestRunner.runInSandbox(SandboxTestRunner.java:455)
+	at org.robolectric.internal.SandboxTestRunner.executeInSandbox(SandboxTestRunner.java:420)
+	at org.robolectric.internal.SandboxTestRunner$5.evaluate(SandboxTestRunner.java:405)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.robolectric.internal.SandboxTestRunner.access$000(SandboxTestRunner.java:64)
+	at org.robolectric.internal.SandboxTestRunner$4.evaluate(SandboxTestRunner.java:294)
+	at org.robolectric.internal.SandboxTestRunner$2.evaluate(SandboxTestRunner.java:260)
+	at org.robolectric.internal.SandboxTestRunner$3.lambda$evaluate$0(SandboxTestRunner.java:280)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThreadWithClassLoader$1(Sandbox.java:112)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+]]></system-err>
+</testsuite>

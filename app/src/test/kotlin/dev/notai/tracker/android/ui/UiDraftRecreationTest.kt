@@ -15,11 +15,13 @@ import org.junit.Assert.*
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.robolectric.annotation.LooperMode
 import org.robolectric.annotation.GraphicsMode
 
 /** MainActivity, real form/picker callbacks, actual framework recreation; never a device claim. */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
+@LooperMode(LooperMode.Mode.INSTRUMENTATION_TEST)
 @Config(sdk=[36],qualifiers="w400dp-h860dp-xhdpi")
 class UiDraftRecreationTest {
     @get:Rule val compose=createEmptyComposeRule()

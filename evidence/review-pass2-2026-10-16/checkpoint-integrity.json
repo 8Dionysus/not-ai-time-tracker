@@ -1,0 +1,247 @@
+{
+  "verificationFiles": 16,
+  "distinctSourceCommits": 16,
+  "sourceFileReferences": 4627,
+  "uniqueGitBlobs": 328,
+  "rawXmlHashesCountsAndExactGitSourceFilesMatch": true,
+  "records": [
+    {
+      "evidence": "p2-48e460e-targeted-selection-remaining/verification.json",
+      "source": "48e460ef31f8bd293681f804b318db68d20b6d48",
+      "sourceFiles": 290,
+      "counts": {
+        "app": {
+          "tests": 40,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-51e5f2b-cancel-preparing-reproduced/verification.json",
+      "source": "51e5f2be17f46d018de735ce0f12b0f59a04632e",
+      "sourceFiles": 290,
+      "counts": {
+        "app": {
+          "tests": 1,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-53480c2-drafts-search-fixture/verification.json",
+      "source": "53480c2ed7a1458aa37beab4f5fc7dccad0c074d",
+      "sourceFiles": 290,
+      "counts": {
+        "app": {
+          "tests": 4,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-68f4d7c-forms-pass-cancel-edges/verification.json",
+      "source": "68f4d7c8f5f3bb60e293033e2aaf0c7fd9a10253",
+      "sourceFiles": 290,
+      "counts": {
+        "app": {
+          "tests": 6,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-84d9389-core-fixture-app-harness/verification.json",
+      "source": "84d9389a8ffbd952e11403ae56c2828dfb5c21eb",
+      "sourceFiles": 290,
+      "counts": {
+        "core": {
+          "tests": 5,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-9f30a79-technical-cancel-fixed/verification.json",
+      "source": "9f30a797031fecc85adc24ba4de708d48f900118",
+      "sourceFiles": 290,
+      "counts": {
+        "app": {
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-cd963af-surfaces-repeat-pass-drafts-partial/verification.json",
+      "source": "cd963afa7e646d0b9ad229488f68042778f1f531",
+      "sourceFiles": 290,
+      "counts": {
+        "core": {
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 30,
+          "failures": 4,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-drafts-50e48e5-harness-incompatibility/verification.json",
+      "source": "50e48e53e14e1503af59ea7a4e6e2ee79624e338",
+      "sourceFiles": 290,
+      "counts": {
+        "app": {
+          "tests": 4,
+          "failures": 4,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-export-storage-58ce0f8-fixed/verification.json",
+      "source": "58ce0f8a7b45301ee989dd64ec9ec3aa2d42f848",
+      "sourceFiles": 288,
+      "counts": {
+        "app": {
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-export-storage-a5b4a06-reproduced/verification.json",
+      "source": "a5b4a06238e77b2a313e8d4196864c6a74ba1a4b",
+      "sourceFiles": 288,
+      "counts": {
+        "app": {
+          "tests": 6,
+          "failures": 6,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-ff01ee6-full-native-classloader-failure/verification.json",
+      "source": "ff01ee6a314123f30e2fd7f79f2474405fa40c42",
+      "sourceFiles": 290,
+      "counts": {
+        "core": {
+          "tests": 194,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 216,
+          "failures": 5,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-final-5289806-full-tests/verification.json",
+      "source": "5289806d3cf5a373f5cbaa5889e64c32783777bc",
+      "sourceFiles": 290,
+      "counts": {
+        "core": {
+          "tests": 194,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 216,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-forms-6e46613-reproduced/verification.json",
+      "source": "6e46613f22bd57b8d068a0c62660d668f1e545f3",
+      "sourceFiles": 290,
+      "counts": {
+        "app": {
+          "tests": 2,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-initial-414ce40-fixed/verification.json",
+      "source": "414ce40b26a157a5dbd83c5647b67a6a37fb3427",
+      "sourceFiles": 286,
+      "counts": {
+        "core": {
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-initial-5b06c2b-reproduced/verification.json",
+      "source": "5b06c2be6852afe9b6e7d302819797b9982c6000",
+      "sourceFiles": 286,
+      "counts": {
+        "core": {
+          "tests": 4,
+          "failures": 4,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 8,
+          "failures": 8,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p2-surfaces-repeat-fad946c-reproduced/verification.json",
+      "source": "fad946c39e26408f28366a763792ff6c308f3e4b",
+      "sourceFiles": 289,
+      "counts": {
+        "app": {
+          "tests": 10,
+          "failures": 10,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    }
+  ]
+}

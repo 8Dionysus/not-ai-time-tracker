@@ -64,4 +64,18 @@ errors/skips; Python fingerprint3/3. Exact raw XML/commands/log binding are in t
 checkpoint evidence. The JNI test uses a unique path with identical host ELF bytes
 for each sandbox; production JNI is unchanged. Disabled F-Droid recipe source5289806
 lint/scanner pass with one retained gzip fixture warning. Unsigned APK/build/lint/
-dependency outcomes will be appended only after the separate build completes.
+dependency outcomes from the separate build are recorded below.
+
+## Separate unsigned build and delivery evidence
+
+Build source `34351d18ea65a357773d8116a4a5ca18cd273e6b` succeeds3m19s. Its290
+critical source/test/build/schema files match tested5289806 exactly; only docs,
+evidence and recipe metadata changed. Lint0errors/0fatal/69warnings, including one
+new SetTextI18n technical-status warning left visible for frontend resource migration.
+Both APKs pass unsigned/CRC/zipalign-P16/min26/target36 checks, preserve all24 locale
+assets byte-for-byte against b64 baseline, and contain the new backend API symbols.
+65 external dependency hashes still match their retained license declarations.
+[Exact commands, APK hashes and all9 results](../evidence/review-pass2-2026-10-16/final-result.json)
+and the original XML/log archive provide source-bound evidence. The parent may now
+independently accept this package before personal pass3; that acceptance is not
+asserted here. [Original A–F coverage/boundaries](REVIEW_PASS1_2026_10_16.md) remain.

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.CleanupProtocolTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-16T10:50:16.668Z" hostname="69b2b5b46001" time="0.029">
+  <properties/>
+  <testcase name="interruptionIsVisibleAndNeverAutomaticallyDeletes" classname="dev.notai.tracker.CleanupProtocolTest" time="0.021"/>
+  <testcase name="staleAndProtectedSelectionsNeverReachQuarantine" classname="dev.notai.tracker.CleanupProtocolTest" time="0.003"/>
+  <testcase name="selectingAllUnusedRecoveryCopiesRequiresSeparateAcknowledgementForTheWholeSelection" classname="dev.notai.tracker.CleanupProtocolTest" time="0.002"/>
+  <testcase name="warningsLastCopyAndIdempotencyAreSeparate" classname="dev.notai.tracker.CleanupProtocolTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

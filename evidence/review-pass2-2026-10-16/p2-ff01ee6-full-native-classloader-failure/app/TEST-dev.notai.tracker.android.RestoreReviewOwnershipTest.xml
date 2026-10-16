@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.RestoreReviewOwnershipTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-16T10:51:07.425Z" hostname="69b2b5b46001" time="2.805">
+  <properties/>
+  <testcase name="claimedApplySurvivesOwnerDisposalAndClosesOnlyAfterCompletion" classname="dev.notai.tracker.android.RestoreReviewOwnershipTest" time="0.173"/>
+  <testcase name="viewModelLatePrepareAfterDisposeAndCancellationReleasesItsLease" classname="dev.notai.tracker.android.RestoreReviewOwnershipTest" time="0.063"/>
+  <testcase name="technicalDialogCancelBackReplacementAndRecreationReleasePendingOwnership" classname="dev.notai.tracker.android.RestoreReviewOwnershipTest" time="2.475"/>
+  <testcase name="cancelBothPreviewKindsReleasesExactDurableLeasesAndKeepsSourceBytes" classname="dev.notai.tracker.android.RestoreReviewOwnershipTest" time="0.06"/>
+  <testcase name="cancelledApplyBeforeCoroutineStartStillClosesClaimedPreview" classname="dev.notai.tracker.android.RestoreReviewOwnershipTest" time="0.032"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

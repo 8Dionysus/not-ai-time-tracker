@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.DescriptorCleanupTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-10-16T10:55:40.052Z" hostname="69b2b5b46001" time="0.241">
+  <properties/>
+  <testcase name="rootPinsSearchOnlyAncestorsWithoutRequiringTheirDirectoryListing" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.012"/>
+  <testcase name="unrepresentableTimestampBlocksOnlyThatCopyWithoutSignedOverflow" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.084"/>
+  <testcase name="preparedButMissingOriginalCannotBeCertifiedDeletedOrRestored" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.016"/>
+  <testcase name="unknownUnicodeSiblingBlocksOnlyItself" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.005"/>
+  <testcase name="explicitChoiceDurableReceiptAndExactGroup" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.016"/>
+  <testcase name="metadataOverflowCannotReplaceReadableJournal" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.001"/>
+  <testcase name="unlinkInterruptionPersistsRemainingBytesWithoutAutomaticContinuation" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.031"/>
+  <testcase name="longWriterIsDurablyProtectedWithoutBlockingInspection" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.014"/>
+  <testcase name="leasesRecoveryAndStalePreviewProtectBytes" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.015"/>
+  <testcase name="emptyContainerFinalizationBeforeReceiptIsDoneAndNeverAnInventedRestore" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.005"/>
+  <testcase name="interruptedPreparedJournalAndFailedWriterStayProtected" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.018"/>
+  <testcase name="crashAfterRenameNeedsExplicitResumeAndCanReturnIntactGroup" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.01"/>
+  <testcase name="lastUnlinkBeforeReceiptStillHasDurableQuarantineProof" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.005"/>
+  <testcase name="symlinkHardlinkAndUnknownChildFailClosed" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.003"/>
+  <testcase name="referencedRecoveryCopyCannotHideLastUnusedCopyWarning" classname="dev.notai.tracker.DescriptorCleanupTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.GoalVersionsTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-16T10:50:32.251Z" hostname="69b2b5b46001" time="0.014">
+  <properties/>
+  <testcase name="fixedWindowRequiresCurrentExplicitCorrectionAndCalendarChangeIsAtomicRefusal" classname="dev.notai.tracker.GoalVersionsTest" time="0.001"/>
+  <testcase name="dailyAndMonthlyChangesKeepEarlierPeriodsAndCurrentCorrectionIsExplicit" classname="dev.notai.tracker.GoalVersionsTest" time="0.006"/>
+  <testcase name="goalHistoryAndSavedFilterSnapshotsCannotBeRewrittenThroughInputCollections" classname="dev.notai.tracker.GoalVersionsTest" time="0.005"/>
+  <testcase name="relativeQueriesMoveByCivilCalendarAndKeepTheirOwnPolicyAfterSettingsChange" classname="dev.notai.tracker.GoalVersionsTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

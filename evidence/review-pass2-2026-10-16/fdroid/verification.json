@@ -1,0 +1,14 @@
+{
+  "source": "5289806d3cf5a373f5cbaa5889e64c32783777bc",
+  "fdroidserver": "2.4.5",
+  "scannerExit": 0,
+  "scannerErrors": 0,
+  "scannerWarnings": 1,
+  "metadataLintExit": 0,
+  "warning": "Retained previous-runtime-catalog.json.gz fixture",
+  "rawScannerLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "rawScannerLogLocation": "Task archive only; contains a local SDK path",
+  "fixtureRepo": "Exact local clone; published recipe retains public HTTPS Repo",
+  "independentServerBuild": false,
+  "independentReproducibility": false
+}

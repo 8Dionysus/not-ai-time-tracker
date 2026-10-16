@@ -56,3 +56,12 @@ retained editor targets/text inboxes, legacy cleanup-owner retirement witness,
 catalog rights/native-speaker QA/native provenance and independent reproducibility
 remain explicit boundaries. Full aggregate/build outcomes are recorded only after
 execution in the final receipt.
+
+## Fresh aggregate checkpoint
+
+Tests on `5289806d3cf5a373f5cbaa5889e64c32783777bc`:194core +216app,0failures/
+errors/skips; Python fingerprint3/3. Exact raw XML/commands/log binding are in the
+checkpoint evidence. The JNI test uses a unique path with identical host ELF bytes
+for each sandbox; production JNI is unchanged. Disabled F-Droid recipe source5289806
+lint/scanner pass with one retained gzip fixture warning. Unsigned APK/build/lint/
+dependency outcomes will be appended only after the separate build completes.

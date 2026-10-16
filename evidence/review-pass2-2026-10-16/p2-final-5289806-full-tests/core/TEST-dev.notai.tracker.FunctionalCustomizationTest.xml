@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.FunctionalCustomizationTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-16T10:55:40.319Z" hostname="69b2b5b46001" time="0.83">
+  <properties/>
+  <testcase name="nonMidnightDayBoundaryUsesOneResolvedInstantAcrossDstGapAndFold" classname="dev.notai.tracker.FunctionalCustomizationTest" time="0.001"/>
+  <testcase name="legacySelectiveHashesRemainExactAndNewRootSetsHaveCanonicalIdentity" classname="dev.notai.tracker.FunctionalCustomizationTest" time="0.003"/>
+  <testcase name="largeOwnHierarchyCanBeSelectedWithoutFactsAndKeepsExactClosure" classname="dev.notai.tracker.FunctionalCustomizationTest" time="0.814"/>
+  <testcase name="functionalValidationUsesTypedReasonsAndStableFieldPaths" classname="dev.notai.tracker.FunctionalCustomizationTest" time="0.001"/>
+  <testcase name="changingDayPolicyDuringRenderingCannotPostAStaleRelativeDayCaption" classname="dev.notai.tracker.FunctionalCustomizationTest" time="0.005"/>
+  <testcase name="legacyArchiveCannotSmuggleNewSettingsOrCatalogRootReceipts" classname="dev.notai.tracker.FunctionalCustomizationTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

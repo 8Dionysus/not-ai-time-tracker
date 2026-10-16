@@ -14,7 +14,7 @@ Builds:
   - versionName: 0.11.0
     versionCode: 12
     disable: Unreleased review draft; frontend, catalog rights and device checks pending
-    commit: 9f30a797031fecc85adc24ba4de708d48f900118
+    commit: 5289806d3cf5a373f5cbaa5889e64c32783777bc
     ndk: 30.0.16248370
     rm:
       - docs/localization/tracker-localization-12-locales-editorial.zip

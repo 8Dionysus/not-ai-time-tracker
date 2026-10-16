@@ -35,3 +35,12 @@ Further exact checkpoints:
 All model/device/linguistic/third-person-review claims remain excluded. The parent
 independently accepted the first three findings'414ce40/fb881c7 source-bound evidence;
 this is not general pass2 acceptance. Full raw Gradle logs stay in the artifact.
+
+Final aggregate on5289806d3cf5a373f5cbaa5889e64c32783777bc executes194core +216app,
+zero failures/errors/skips,3m17s. Fingerprint Python3/3 passes.
+The preceding ff01ee6 aggregate passed194core but5 of216app checks reached a host
+JNI classloader collision (same ELF path already owned by another SDK sandbox).
+5289806 changes only that test fixture: a unique path with byte/hash-identical ELF.
+All216app now pass together; no production native/Android binding was changed.
+F-Droid disabled actual-source recipe lint/scanner exit0 with1 retained gzip warning.
+The source/runtime is not an independent physical-device/model/reproducibility claim.

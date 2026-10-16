@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.PrivateCopyCatalogTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-16T10:55:43.297Z" hostname="69b2b5b46001" time="0.108">
+  <properties/>
+  <testcase name="confirmedCancelledStagingAndUnparsedRestoreInputsRemainManuallyDiscardableWhileLeasedBytesStayProtected" classname="dev.notai.tracker.PrivateCopyCatalogTest" time="0.02"/>
+  <testcase name="incompleteComponentAndPendingDraftDoNotPreventIndependentLegacyRegistration" classname="dev.notai.tracker.PrivateCopyCatalogTest" time="0.022"/>
+  <testcase name="rollbackRestoreFormAndFinishedExportUseOneRegistryAndWriterInvalidatesOldPreview" classname="dev.notai.tracker.PrivateCopyCatalogTest" time="0.019"/>
+  <testcase name="finalRetiredArchiveGraphRegistersUnderProtectiveReferencesAndReopensExactly" classname="dev.notai.tracker.PrivateCopyCatalogTest" time="0.041"/>
+  <testcase name="finalSealCannotSilentlyAcceptNewRetiredBytesOrSymlinkTargets" classname="dev.notai.tracker.PrivateCopyCatalogTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

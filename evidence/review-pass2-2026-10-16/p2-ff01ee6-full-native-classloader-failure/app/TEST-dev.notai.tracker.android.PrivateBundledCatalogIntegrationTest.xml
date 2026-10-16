@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.PrivateBundledCatalogIntegrationTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-16T10:50:57.168Z" hostname="69b2b5b46001" time="3.914">
+  <properties/>
+  <testcase name="actualElevenAssetsResolveReviewedDisplayAndChoiceSearchLazily" classname="dev.notai.tracker.android.PrivateBundledCatalogIntegrationTest" time="3.914"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

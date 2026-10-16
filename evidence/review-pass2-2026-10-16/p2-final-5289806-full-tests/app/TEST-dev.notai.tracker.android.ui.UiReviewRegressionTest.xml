@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.ui.UiReviewRegressionTest" tests="21" skipped="0" failures="0" errors="0" timestamp="2026-10-16T10:57:37.720Z" hostname="69b2b5b46001" time="0.781">
+  <properties/>
+  <testcase name="reportDayUsesConfiguredBoundaryBeforeAndAfterFour" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.053"/>
+  <testcase name="reviewP2RowSwitchPreservesShownSegmentAndSourceNote" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.043"/>
+  <testcase name="idleHomeAndOverviewAdvanceAtReportBoundaryWithoutDatasetRevision" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.05"/>
+  <testcase name="reviewP2IncomingTextsQueueAndStaleDecisionsPreserveAllValuesUntilChoice" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.026"/>
+  <testcase name="reviewP2RecentIgnoresLaterEmptyCanonical" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.033"/>
+  <testcase name="reportDayRetainsRealDstBoundaryLength" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.028"/>
+  <testcase name="reviewP2HistoryPickerStartsShownEarlySegment" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.034"/>
+  <testcase name="nextPeriodEnabledUsesEffectiveGoalAndDayUnit" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.035"/>
+  <testcase name="reviewP2HistoryPickerPreservesClearNotePolicy" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.03"/>
+  <testcase name="ribbonLabelsUseActualElapsedFractionsInExplicitReportZone" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.016"/>
+  <testcase name="shownFavoriteRenameCannotSilentlyRebase" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.04"/>
+  <testcase name="oneSegmentWithSubjectFactsRequiresReviewAndCancelledPreviewHasNoWrites" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.049"/>
+  <testcase name="failedDraftSwitchKeepsInputAndOriginalDataset" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.053"/>
+  <testcase name="reviewP2QuickIgnoresLaterEmptyCanonical" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.045"/>
+  <testcase name="reviewP2RowRepeatStartsShownEarlySegment" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.034"/>
+  <testcase name="reviewP2RowRepeatRejectsUnseenSourceNoteAtFreshRevision" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.042"/>
+  <testcase name="shownFavoriteClassificationCannotSilentlyRebase" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.041"/>
+  <testcase name="reviewP2QuickIgnoresLaterUncertainCanonical" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.021"/>
+  <testcase name="reviewP2RecentIgnoresLaterUncertainCanonical" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.028"/>
+  <testcase name="draftSwitchHasOneCommitWithNoteAndOneUndo" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.045"/>
+  <testcase name="wholeAreaKeepsShownGuardsAndStartsWithTheReviewedParent" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.034"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

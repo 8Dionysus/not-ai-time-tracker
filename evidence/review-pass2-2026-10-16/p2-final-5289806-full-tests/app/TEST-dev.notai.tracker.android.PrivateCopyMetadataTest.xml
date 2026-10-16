@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.PrivateCopyMetadataTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-16T10:56:44.306Z" hostname="69b2b5b46001" time="3.344">
+  <properties/>
+  <testcase name="chooserReferenceSurvivesReopenUntilTheExistingResultCallbackConfirmsCompletion" classname="dev.notai.tracker.android.PrivateCopyMetadataTest" time="3.178"/>
+  <testcase name="contextRootAcceptsAndroid0771OnlyWithPrivateAppAuthority" classname="dev.notai.tracker.android.PrivateCopyMetadataTest" time="0.035"/>
+  <testcase name="rawOversizeAndMalformedUtf8RefuseReadWithoutChangingSource" classname="dev.notai.tracker.android.PrivateCopyMetadataTest" time="0.023"/>
+  <testcase name="writerCapacityRefusalPreservesReferencesAndAllowsExplicitRecoveryRelease" classname="dev.notai.tracker.android.PrivateCopyMetadataTest" time="0.019"/>
+  <testcase name="unavailableNativeBindingRetainsAReadyArchiveReferenceWithoutLosingRawBytes" classname="dev.notai.tracker.android.PrivateCopyMetadataTest" time="0.038"/>
+  <testcase name="specialMetadataFileRefusesBeforeOpeningABlockingStream" classname="dev.notai.tracker.android.PrivateCopyMetadataTest" time="0.032"/>
+  <testcase name="failedRollbackConsumerKeepsItsDurableReferenceForExplicitRecovery" classname="dev.notai.tracker.android.PrivateCopyMetadataTest" time="0.019"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

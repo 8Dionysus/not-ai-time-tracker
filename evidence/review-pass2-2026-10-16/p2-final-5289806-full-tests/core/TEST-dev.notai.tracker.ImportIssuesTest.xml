@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.ImportIssuesTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-16T10:55:41.161Z" hostname="69b2b5b46001" time="0.09">
+  <properties/>
+  <testcase name="durationVariantsNeverNeedExceptionMessageParsing" classname="dev.notai.tracker.ImportIssuesTest" time="0.003"/>
+  <testcase name="preflightAndStrictCsvFailuresAreTyped" classname="dev.notai.tracker.ImportIssuesTest" time="0.066"/>
+  <testcase name="issueSerializationUsesStableEnumsAndPreservesRawArguments" classname="dev.notai.tracker.ImportIssuesTest" time="0.011"/>
+  <testcase name="warningsAndDiagnosticsAreAlignedAndImmutable" classname="dev.notai.tracker.ImportIssuesTest" time="0.002"/>
+  <testcase name="inspectionAndConfirmationHaveTypedResults" classname="dev.notai.tracker.ImportIssuesTest" time="0.005"/>
+  <testcase name="rowIssuesCarryExactValuesFieldsAndLogicalRecordNumbers" classname="dev.notai.tracker.ImportIssuesTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

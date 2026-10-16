@@ -24,13 +24,21 @@ fun retainedChangeCausality(create: ()->StateStore,reopen: (StateStore)->StateSt
         base.copy(transfer=TransferState(operations=listOf(operation(g,inserted,previous))))
     fun delta(change: SubjectChange,observations: List<StateObservation> = emptyList())=
         TransferContent(subjects=SubjectData(observations=observations,changes=listOf(change)))
+    val copyRef=ref.copy(id="copy-book");val copyDef=def.copy(metricId="copy-pages",unitId="copy-page")
+    val copyChange=valid.copy(id="copy-change",fromObservationId="copy-a",toObservationId="copy-b")
+    val copied=good.copy(cards=listOf(good.cards.single().copy(id=copyRef.id)),metrics=listOf(good.metrics.single().copy(id=copyDef.metricId,canonicalUnitId=copyDef.unitId)),units=listOf(good.units.single().copy(id=copyDef.unitId)),
+        subjects=SubjectData(cards=listOf(CardSubject(copyRef.id,"edition")),observations=listOf(a.copy(id="copy-a",subject=copyRef,definition=copyDef),b.copy(id="copy-b",subject=copyRef,definition=copyDef)),changes=listOf(copyChange)))
+    val copyOrigin=TransferOrigin("retained-origin",contentHash(good),copied,contentHash(copied))
+    fun withCopyOrigin(d: Dataset)=d.copy(transfer=d.transfer.copy(origins=listOf(copyOrigin)))
     val negative=linkedMapOf(
         "origin.localGroup" to base.copy(transfer=TransferState(origins=listOf(origin(bad)))),
         "operation.group.content" to journal(group(bad)),
         "operation.inserted.full" to journal(empty,inserted=bad),
         "operation.previousOrigin" to journal(empty,previous=origin(bad)),
         "operation.inserted.partial" to journal(group(good),inserted=delta(early)),
-        "operation.inserted.conflictingBasis" to journal(group(good),inserted=delta(valid.copy(recordedAt=200),listOf(a.copy(recordedAt=100),b.copy(recordedAt=100))))
+        "operation.inserted.conflictingBasis" to journal(group(good),inserted=delta(valid.copy(recordedAt=200),listOf(a.copy(recordedAt=100),b.copy(recordedAt=100)))),
+        "operation.inserted.partialCopyEarly" to withCopyOrigin(journal(group(good),inserted=delta(copyChange.copy(recordedAt=1)))),
+        "operation.inserted.unrelatedOrigin" to journal(group(good),inserted=delta(copyChange)).let { d -> d.copy(transfer=d.transfer.copy(origins=listOf(copyOrigin.copy(originId="unrelated-origin")))) }
     )
     for((name,d) in negative) {
         val backup=Backup(formatVersion=14,backupId=name,asOf=1000,data=d);val text=codec.encodeToString(backup)
@@ -45,7 +53,9 @@ fun retainedChangeCausality(create: ()->StateStore,reopen: (StateStore)->StateSt
     val positive=listOf(
         base.copy(transfer=TransferState(origins=listOf(origin(good)))),
         journal(group(good)),journal(empty,inserted=good),journal(empty,previous=origin(good)),
-        journal(group(good),inserted=delta(valid))
+        journal(group(good),inserted=delta(valid)),
+        withCopyOrigin(journal(group(good),inserted=delta(copyChange))),
+        journal(group(good),inserted=delta(copyChange)).let { d -> d.copy(transfer=d.transfer.copy(operations=d.transfer.operations+operation(empty,previous=copyOrigin).copy(id="retained-snapshot-holder"))) }
     )
     for((index,d) in positive.withIndex()) {
         val backup=Backup(formatVersion=14,backupId="valid-$index",asOf=1000,data=d);val bytes=ByteArrayOutputStream()

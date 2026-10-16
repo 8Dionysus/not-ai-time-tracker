@@ -131,8 +131,8 @@ internal fun validateSubjectChange(c: SubjectChange,observations: List<StateObse
     ensure(c.recordedAt >= maxOf(a.recordedAt,b.recordedAt),"Change audit time precedes its basis")
     ensure(b.value.number.subtract(a.value.number).compareTo(c.value.number) == 0,"Signed change differs from explicit basis")
 }
-internal fun validateInsertedSubjectChanges(inserted: TransferContent,source: TransferContent) {
-    val observations=source.subjects.observations+inserted.subjects.observations
+internal fun validateInsertedSubjectChanges(inserted: TransferContent,source: TransferContent,localSnapshots: List<TransferContent>) {
+    val observations=source.subjects.observations+localSnapshots.flatMap { it.subjects.observations }+inserted.subjects.observations
     inserted.subjects.changes.forEach { validateSubjectChange(it,observations) }
 }
 

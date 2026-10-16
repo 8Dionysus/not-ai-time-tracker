@@ -15,7 +15,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
-import kotlin.test.*
+import org.junit.Assert.*
 
 /** SDK simulation and synthetic stores only, never a physical notification/device acceptance. */
 @RunWith(RobolectricTestRunner::class)
@@ -63,9 +63,9 @@ class FocusDeliveryRaceTest {
                 if(afterPreparation) FocusSignals.notificationFactory = { c -> originalFactory(c).also { change() } }
                 else { FocusSignals.notificationFactory = originalFactory;store.afterCapture = change }
                 if(refresh) FocusSignals.refresh(context,t)
-                else assertEquals(FocusDeliveryStatus.BLOCKED_BEFORE_POST,FocusSignals.deliverResult(context,t).status,"$room/$action/$afterPreparation")
+                else assertEquals("$room/$action/$afterPreparation",FocusDeliveryStatus.BLOCKED_BEFORE_POST,FocusSignals.deliverResult(context,t).status)
                 assertEquals(1,calls);assertEquals(mutated,t.data())
-                assertTrue(manager.activeNotifications.none { it.id == 43 },"Stale cue: $room/$action/$afterPreparation/$refresh")
+                assertTrue("Stale cue: $room/$action/$afterPreparation/$refresh",manager.activeNotifications.none { it.id == 43 })
                 // A reserved attempt remains consumed even when final validation blocks the post.
                 assertTrue(key in context.getSharedPreferences("focus-signals",0).getStringSet("delivered",emptySet()).orEmpty())
                 FocusSignals.notificationFactory = originalFactory
@@ -106,7 +106,7 @@ class FocusDeliveryRaceTest {
         try {
             assertFalse(DatabaseFiles.exists(context))
             FocusAlarmReceiver().handleCurrent(context,"stale-focus-id",0)
-            assertFalse(DatabaseFiles.exists(context),"Stale background callback created a new tracker database")
+            assertFalse("Stale background callback created a new tracker database",DatabaseFiles.exists(context))
         } finally {
             TrackerRuntime.beginRecovery();TrackerRuntime.endRecovery()
             DatabaseFiles.paths(context).forEach { it.delete() }

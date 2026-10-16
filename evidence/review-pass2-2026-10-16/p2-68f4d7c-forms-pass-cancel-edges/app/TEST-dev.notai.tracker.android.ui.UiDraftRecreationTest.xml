@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.ui.UiDraftRecreationTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-16T10:42:13.493Z" hostname="69b2b5b46001" time="12.356">
+  <properties/>
+  <testcase name="secondProcessTextReplacesOnlyAfterExplicitAcceptanceAcrossRecreation" classname="dev.notai.tracker.android.ui.UiDraftRecreationTest" time="10.105"/>
+  <testcase name="correctionInputsSurviveAndPreviewRecomputesAgainstChangedData" classname="dev.notai.tracker.android.ui.UiDraftRecreationTest" time="1.007"/>
+  <testcase name="secondProcessTextKeepsFirstUntilExplicitRejectionAcrossRecreation" classname="dev.notai.tracker.android.ui.UiDraftRecreationTest" time="0.553"/>
+  <testcase name="manualInputsAndTargetSurviveActivityRecreationWithoutAutosave" classname="dev.notai.tracker.android.ui.UiDraftRecreationTest" time="0.691"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

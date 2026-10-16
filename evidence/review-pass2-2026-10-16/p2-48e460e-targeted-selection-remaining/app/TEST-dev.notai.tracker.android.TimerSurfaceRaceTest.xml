@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.TimerSurfaceRaceTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-16T10:34:36.118Z" hostname="69b2b5b46001" time="1.097">
+  <properties/>
+  <testcase name="replacementBarrierWinsAfterCapturedView" classname="dev.notai.tracker.android.TimerSurfaceRaceTest" time="0.377"/>
+  <testcase name="widgetOptOutWinsWithoutDisablingOtherSurfaces" classname="dev.notai.tracker.android.TimerSurfaceRaceTest" time="0.153"/>
+  <testcase name="duePhaseWithoutRevisionChangeWinsAfterPreparation" classname="dev.notai.tracker.android.TimerSurfaceRaceTest" time="0.101"/>
+  <testcase name="shortcutOptOutWinsWithoutDisablingOtherSurfaces" classname="dev.notai.tracker.android.TimerSurfaceRaceTest" time="0.094"/>
+  <testcase name="newestTimerControlsWinAfterCapturedView" classname="dev.notai.tracker.android.TimerSurfaceRaceTest" time="0.107"/>
+  <testcase name="defaultViewReadAndTerminalStoreGateRunAwayFromCallerMainThread" classname="dev.notai.tracker.android.TimerSurfaceRaceTest" time="0.033"/>
+  <testcase name="notificationOptOutWinsAfterCapturedView" classname="dev.notai.tracker.android.TimerSurfaceRaceTest" time="0.085"/>
+  <testcase name="notificationOptOutWinsAfterActualNotificationRendering" classname="dev.notai.tracker.android.TimerSurfaceRaceTest" time="0.112"/>
+  <testcase name="preparationFailureLeavesIndependentWidgetAndShortcutUsable" classname="dev.notai.tracker.android.TimerSurfaceRaceTest" time="0.033"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

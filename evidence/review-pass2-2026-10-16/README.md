@@ -9,3 +9,29 @@ and hashes are bound to their exact commits in each verification.json.
   report oracle parity, empty backfill and later empty/uncertain history sources.
 
 Full raw Gradle logs stay with task artifacts. No device/model attestation.
+
+Further exact checkpoints:
+
+- a5b4a06 reproduces4 technical lifecycle +2 post-commit STORAGE failures;
+  58ce0f8 passes8app including prior chooser/export lifecycle tests.
+- fad946c reproduces6 surface publication races +4 wrong-segment/note VM starts.
+- 84d9389 partial run has1core fixture failure (START never promised Undo) and
+  an explicitly interrupted ActivityScenarioRule cleanup; no stale app XML claimed.
+- cd963af passes1core/1Room exact-segment scenario,6surface races and19VM checks.
+  Its4 UiDraft failures include2 real P2-009 overwrites and2 selector fixtures.
+- 6e46613 reproduces2 P2-008 missing forms AFTER actual controller recreation.
+- 48e460e passes38/40 app including9surface/21VM checks; the2 final Card-ID
+  expectations were weakened by an ambiguous test click on underlying home text.
+  53480c2's2 search-selector failures matched the search TextField itself; corrected
+  by a partial query and unique card result, with an added no-domain-write assertion.
+- 68f4d7c passes all4 actual Activity draft/form recreation tests. Its active chooser
+  manual cancellation also reproduces a duplicate chooser. The other preparation
+  test initially blocked the paused main launcher;51e5f2b corrects that fixture and
+  reproduces the actual CANCELLED/resultReceived=false before any chooser.
+- 9f30a79 passes8app: all6 technical lifecycle/cancellation cases, prior primary UI
+  export lifecycle and private-copy chooser protection. Active writers/foreign
+  references remain protected; cancelled prepared bytes can register normally.
+
+All model/device/linguistic/third-person-review claims remain excluded. The parent
+independently accepted the first three findings'414ce40/fb881c7 source-bound evidence;
+this is not general pass2 acceptance. Full raw Gradle logs stay in the artifact.

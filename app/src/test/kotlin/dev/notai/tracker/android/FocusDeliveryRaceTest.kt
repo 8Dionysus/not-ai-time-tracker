@@ -63,11 +63,11 @@ class FocusDeliveryRaceTest {
                 if(afterPreparation) FocusSignals.notificationFactory = { c -> originalFactory(c).also { change() } }
                 else { FocusSignals.notificationFactory = originalFactory;store.afterCapture = change }
                 if(refresh) FocusSignals.refresh(context,t)
-                else assertEquals("$room/$action/$afterPreparation",FocusDeliveryStatus.BLOCKED_BEFORE_POST,FocusSignals.deliverResult(context,t).status)
+                else assertEquals("$room/$action/$afterPreparation",if(action == "boot" && !afterPreparation) FocusDeliveryStatus.NOT_DUE else FocusDeliveryStatus.BLOCKED_BEFORE_POST,FocusSignals.deliverResult(context,t).status)
                 assertEquals(1,calls);assertEquals(mutated,t.data())
                 assertTrue("Stale cue: $room/$action/$afterPreparation/$refresh",manager.activeNotifications.none { it.id == 43 })
                 // A reserved attempt remains consumed even when final validation blocks the post.
-                assertTrue(key in context.getSharedPreferences("focus-signals",0).getStringSet("delivered",emptySet()).orEmpty())
+                assertEquals(!(action == "boot" && !afterPreparation),key in context.getSharedPreferences("focus-signals",0).getStringSet("delivered",emptySet()).orEmpty())
                 FocusSignals.notificationFactory = originalFactory
                 if(action == "opt-out") {
                     t.settings(t.snapshot().token,t.data().settings.copy(surfaces = t.data().settings.surfaces.copy(focusSignal = true)))

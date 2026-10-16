@@ -61,6 +61,37 @@ class AttentionMusic: FocusMusicPort {
  * intentional: these tests constrain domain effects and receipts, not Android delivery or sound. */
 abstract class AttentionScenarioContract {
     abstract fun createAttentionStore(): StateStore
+    @Test fun confirmedPrefixAndUndoReplanOnlyUnattemptedCheckins() {
+        val clock = FakeClock();val t = Tracker(createAttentionStore(),clock)
+        t.start(t.snapshot().token);val id = t.data().sessions.single().id;val start = clock.wall
+        val receipts = AttentionReminderStore();val platform = AttentionReminderPlatform()
+        val checkin = LongRecordReminder(t,receipts,platform)
+        val original = checkin.configure(t.snapshot().token,LongRecordPreference(true,100,20)).ticket!!
+        clock.advance(20)
+        t.applyStartBackfill(t.previewStartBackfill(t.snapshot().token,id,start-60))
+        val afterPrefix = t.data();val earlier = checkin.synchronize().ticket!!
+        assertEquals(original.target,earlier.target)
+        assertEquals(clock.elapsed+20,earlier.dueElapsed)
+        assertNotEquals(original.hash,earlier.hash)
+        assertEquals(afterPrefix,t.data())
+        t.undo(t.snapshot().token)
+        val afterUndo = t.data();val restored = checkin.synchronize().ticket!!
+        assertEquals(original.dueElapsed,restored.dueElapsed)
+        assertNotEquals(earlier.hash,restored.hash)
+        assertNotEquals(original.hash,restored.hash)
+        assertEquals(LongRecordOutcome.STALE,checkin.onAlarm(earlier.hash).outcome)
+        assertEquals(afterUndo,t.data())
+        clock.advance(80)
+        assertEquals(LongRecordOutcome.POST_ACCEPTED,checkin.onAlarm(restored.hash).outcome)
+        assertEquals(1,platform.posts)
+        t.applyStartBackfill(t.previewStartBackfill(t.snapshot().token,id,start-60))
+        val confirmed = t.data()
+        val consumed = checkin.synchronize()
+        assertFalse(consumed.alarmAccepted)
+        assertEquals(restored,consumed.ticket)
+        assertEquals(LongRecordOutcome.PREVIOUS_ATTEMPT,checkin.onAlarm(restored.hash).outcome)
+        assertEquals(1,platform.posts);assertEquals(confirmed,t.data())
+    }
     @Test fun ordinaryCheckinNeverInventsTimeAndReviewUsesExistingCorrection() {
         val clock = FakeClock();val t = Tracker(createAttentionStore(),clock)
         val receipts = AttentionReminderStore();val platform = AttentionReminderPlatform()

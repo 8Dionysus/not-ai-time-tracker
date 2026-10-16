@@ -98,6 +98,18 @@ class LongRecordReminder(private val tracker: Tracker,private val store: LongRec
                 control.dueDurationMs,control.generation)
             control = save(control,control.copy(pending = ticket))
         }
+        // Explicit same-session time correction/Undo can change recorded duration without
+        // changing TimerTarget or its observed anchor. Replan only an unattempted cycle;
+        // advancing the generation prevents an old callback from becoming valid again.
+        val awaiting = control.pending
+        if(awaiting != null && control.attempt == null && matching(data,now,control,awaiting) != null) {
+            val due = maxOf(0,Math.addExact(now.elapsed,control.dueDurationMs-ordinary!!.trustedDurationMs))
+            if(due != awaiting.dueElapsed) {
+                val generation = Math.addExact(control.generation,1)
+                control = save(control,control.copy(generation = generation,
+                    pending = awaiting.copy(dueElapsed = due,generation = generation)))
+            }
+        }
         // A timebase loss/reboot cannot turn an old elapsed alarm into an authorization.
         if(control.pending != null && matching(data,now,control,control.pending!!) == null)
             control = save(control,control.copy(pending = null,attempt = null))

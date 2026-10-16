@@ -61,6 +61,38 @@ class AttentionPlatformTest {
             LongRecordNoticeBinding.factory = oldFactory;DirectoryDurability.sync = oldSync;DirectoryDurability.rename = oldRename
         }
     }
+    @Test fun dndAdapterChangesOnlyItsUnmodifiedRuleAndPreservesUserEdits() {
+        val context = RuntimeEnvironment.getApplication()
+        val manager = context.getSystemService(NotificationManager::class.java)
+        val shadow = shadowOf(manager);val previous = FocusEnvironmentBinding.rule
+        val component = android.content.ComponentName(context.packageName,context.packageName+".FixtureZenConfiguration")
+        shadowOf(context.packageManager).addActivityIfNotPresent(component)
+        FocusEnvironmentBinding.rule = FocusRuleConfiguration(component,"Fixture own rule","Fixture condition")
+        shadow.setNotificationPolicyAccessGranted(true)
+        val beforeFilter = manager.currentInterruptionFilter;val beforePolicy = manager.notificationPolicy
+        val foreign = manager.addAutomaticZenRule(android.app.AutomaticZenRule("Fixture foreign",null,component,
+            android.net.Uri.parse("condition://fixture/foreign"),null,NotificationManager.INTERRUPTION_FILTER_PRIORITY,true))!!
+        val foreignBefore = manager.getAutomaticZenRule(foreign)
+        val port = AndroidFocusDistractions(context)
+        fun request() = newId().let { id -> FocusEnvironmentRequest(id,TimerTarget("fixture-data","fixture-session",0,"fixture-barrier"),
+            "fixture-focus",0,"fixture-boot","fixture-process",1000,FocusEnvironmentChoice(distractions = true)) }
+        try {
+            assertEquals(FocusEffectStatus.READY,port.availability())
+            val lease = port.prepare(request())!!
+            assertEquals(android.service.notification.Condition.STATE_FALSE,manager.getAutomaticZenRuleState(lease.ruleId))
+            assertEquals(FocusEffectStatus.APPLY_ACCEPTED,port.activate(lease))
+            assertEquals(android.service.notification.Condition.STATE_TRUE,manager.getAutomaticZenRuleState(lease.ruleId))
+            assertEquals(FocusEffectStatus.RELEASED,port.release(lease));assertNull(manager.getAutomaticZenRule(lease.ruleId))
+            val edited = port.prepare(request())!!;port.activate(edited)
+            val changed = manager.getAutomaticZenRule(edited.ruleId)!!;changed.name = "Explicit user edit"
+            assertTrue(manager.updateAutomaticZenRule(edited.ruleId,changed))
+            assertEquals(FocusEffectStatus.USER_CHANGED_RULE,port.release(edited))
+            assertEquals("Explicit user edit",manager.getAutomaticZenRule(edited.ruleId)!!.name)
+            assertEquals(android.service.notification.Condition.STATE_TRUE,manager.getAutomaticZenRuleState(edited.ruleId))
+            assertEquals(foreignBefore,manager.getAutomaticZenRule(foreign))
+            assertEquals(beforeFilter,manager.currentInterruptionFilter);assertEquals(beforePolicy,manager.notificationPolicy)
+        } finally { FocusEnvironmentBinding.rule = previous;shadow.setNotificationPolicyAccessGranted(false) }
+    }
     @Test @Config(sdk = [28]) fun unsupportedDndHasNoGlobalFallbackAndMusicHasNoDefaultSource() {
         val context = RuntimeEnvironment.getApplication()
         val before = context.getSystemService(NotificationManager::class.java).currentInterruptionFilter

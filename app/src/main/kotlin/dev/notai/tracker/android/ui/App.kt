@@ -170,7 +170,7 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     val zone = home?.zone ?: java.time.ZoneId.systemDefault()
     entryForm?.let { target -> key(target.id) {
         EntrySheet(vm,zone,target.day,target.entry,onDismiss = vm::closeEntryForm,onPickActivity = { callback -> formPicker = callback },
-            onDelete = { e -> scope.launch { if(requestDelete(e) || confirmDelete != null) vm.closeEntryForm() } })
+            onDelete = { e -> scope.launch { if(requestDelete(e) || confirmDelete != null) vm.closeEntryForm() } },targetId = target.id)
     } }
     when (val s = sheet) {
         is Sheet.Picker -> {

@@ -189,7 +189,7 @@ private fun DrawScope.bracket(left: Float, isLeft: Boolean, color: androidx.comp
  */
 @Composable
 fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, onDismiss: () -> Unit, onPickActivity: ((Classification, Label) -> Unit) -> Unit,
-               onDelete: ((EntryUi) -> Unit)? = null) {
+               onDelete: ((EntryUi) -> Unit)? = null,targetId: String) {
     val c = NotAi.colors
     val session = remember(entry) { entry?.let { vm.session(it.sessionId) } }
     val origStart = session?.second?.firstOrNull()?.start
@@ -204,11 +204,13 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
     var label by rememberSaveable(stateSaver = EntryLabelSaver) { mutableStateOf(entry?.label ?: Label("Без занятия", null, null, true)) }
     var note by rememberSaveable { mutableStateOf(session?.first?.note.orEmpty()) }
     val currentView by vm.view.collectAsState()
+    val currentForm by vm.entryForm.collectAsState()
+    val form = currentForm?.takeIf { it.id == targetId }
     var state by remember { mutableStateOf<CorrectionState?>(null) }
     var favorite by rememberSaveable { mutableStateOf(false) }
     var pending by remember { mutableStateOf(entry != null) }
     // Save always applies the preview of exactly what is on screen: any edit invalidates it until recomputed.
-    if (entry != null) LaunchedEffect(start, end, selection, note,currentView?.snapshot()?.token) {
+    if (entry != null) LaunchedEffect(start, end, selection, note,currentView?.snapshot()?.token,form?.reviewNonce) {
         pending = true
         delay(150)
         state = vm.previewCorrection(CorrectionDraft(entry.sessionId, start, end, selection, note), day.start, day.end)
@@ -230,6 +232,7 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
                         state?.freeUntil != null -> "свободно до ${Format.clock(state!!.freeUntil!!, zone)}"; else -> null })
             }
             NoteField(note, { note = it })
+            form?.error?.let { Note(it) }
             val st = state
             if (entry != null && st != null) {
                 if (st.error != null) Note(st.error)
@@ -249,9 +252,8 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
         ButtonPair(Modifier.padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 20.dp)) { m ->
             PillButton("Отмена", onDismiss, m, ButtonKind.TONAL)
             PillButton("Сохранить", {
-                if (entry != null) preview?.let(vm::applyCorrection) else vm.manual(start, end, selection ?: Classification(), note)
-                onDismiss()
-            }, m, ButtonKind.PRIMARY, enabled = entry == null || (preview != null && !pending))
+                vm.submitEntryForm(targetId,start,end,selection ?: Classification(),note,preview)
+            }, m, ButtonKind.PRIMARY, enabled = form?.saving != true && (entry == null || (preview != null && !pending)))
         }
     }
 }

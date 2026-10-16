@@ -27,7 +27,8 @@ import java.time.ZoneId
 /** What the picker does with the chosen activity. */
 enum class PickMode { START, SWITCH, LABEL, EARLIER, MANUAL, FOCUS }
 
-data class EntryFormTarget(val id: String,val entry: EntryUi?,val day: DayUi)
+data class EntryFormTarget(val id: String,val entry: EntryUi?,val day: DayUi,
+    val saving: Boolean = false,val error: String? = null,val reviewNonce: Long = 0)
 data class IncomingDraft(val id: String,val draft: EntryDraft)
 
 data class Notice(val text: String, val undo: Token? = null, val id: Long = System.nanoTime())
@@ -151,6 +152,21 @@ class TrackerViewModel internal constructor(private val app: Application,private
     val entryForm: StateFlow<EntryFormTarget?> = _entryForm
     fun openEntryForm(entry: EntryUi?,day: DayUi) { _entryForm.value = EntryFormTarget(newId(),entry,day) }
     fun closeEntryForm() { _entryForm.value = null }
+    /** A result belongs to its form identity; an old completion cannot close a new editor. */
+    fun submitEntryForm(id: String,start: Long,end: Long,selection: Classification,note: String?,preview: Tracker.CorrectionPreview?) {
+        val target = _entryForm.value?.takeIf { it.id == id && !it.saving } ?: return
+        if(!_entryForm.compareAndSet(target,target.copy(saving = true,error = null))) return
+        val completed: (Result<Tracker.Change>) -> Unit = { result ->
+            _entryForm.update { current ->
+                if(current?.id != id) current
+                else if(result.isSuccess) null
+                else current.copy(saving = false,error = Format.error(requireNotNull(result.exceptionOrNull())),reviewNonce = current.reviewNonce+1)
+            }
+        }
+        if(target.entry == null) manual(start,end,selection,note,completed)
+        else if(preview != null) applyCorrection(preview,completed)
+        else completed(Result.failure(CoreError(ErrorCode.STALE,"Correction needs a current preview")))
+    }
 
     init { load() }
     fun load() {
@@ -360,14 +376,18 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     // ---------- commands ----------
 
-    private fun command(success: ((Tracker.Change) -> String?)? = null, block: (UiBackend, Snapshot) -> Tracker.Change) {
-        val rt = runtime ?: return
-        val shown = snapshot.value ?: view.value?.snapshot() ?: return
+    private fun command(success: ((Tracker.Change) -> String?)? = null,completed: ((Result<Tracker.Change>) -> Unit)? = null,block: (UiBackend, Snapshot) -> Tracker.Change) {
+        val rt = runtime
+        val shown = snapshot.value ?: view.value?.snapshot()
+        if(rt == null || shown == null) {
+            completed?.invoke(Result.failure(CoreError(ErrorCode.STALE,"Command needs a current view")));return
+        }
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val change = block(rt, shown)
-                success?.invoke(change)?.let { notice(it, if (change.undoAvailable) change.state.token else null) }
-            } catch (e: Exception) { notice(Format.error(e)) }
+            val result = try { Result.success(block(rt,shown)) }
+            catch(e: Exception) { if(e is kotlinx.coroutines.CancellationException) throw e;Result.failure(e) }
+            result.fold(onSuccess = { change -> success?.invoke(change)?.let { notice(it,if(change.undoAvailable) change.state.token else null) } },
+                onFailure = { notice(Format.error(it)) })
+            completed?.invoke(result)
         }
     }
 
@@ -568,9 +588,9 @@ class TrackerViewModel internal constructor(private val app: Application,private
         } catch (e: Exception) { CorrectionState(null, 0, 0, Format.error(e), freeFrom, freeUntil) }
     }
 
-    fun applyCorrection(preview: Tracker.CorrectionPreview) = command({ "Запись исправлена" }) { rt, _ -> rt.tracker.applyCorrection(preview) }
+    fun applyCorrection(preview: Tracker.CorrectionPreview,completed: ((Result<Tracker.Change>) -> Unit)? = null) = command({ "Запись исправлена" },completed) { rt, _ -> rt.tracker.applyCorrection(preview) }
 
-    fun manual(start: Long, end: Long, selection: Classification, note: String?) = command({ "Запись добавлена" }) { rt, s ->
+    fun manual(start: Long, end: Long, selection: Classification, note: String?,completed: ((Result<Tracker.Change>) -> Unit)? = null) = command({ "Запись добавлена" },completed) { rt, s ->
         rt.tracker.manual(s.token, start, end, selection, note?.takeIf { it.isNotBlank() })
     }
 

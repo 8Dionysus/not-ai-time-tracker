@@ -39,10 +39,15 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
 @Serializable data class Session(@Required val id: String = newId(), val status: SessionStatus,
     val selection: Classification = Classification(), val note: String? = null, val importOrigin: ImportOrigin? = null)
 @Serializable data class Anchor(val bootId: String, val elapsedMs: Long,val processId: String? = null)
+/** Positive provenance for an explicitly confirmed interval. Null on older/unmarked
+ * segments does not assert that their time was measured by the device. */
+@Serializable data class ManualTimeConfirmation(val confirmedAt: Long)
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 @Serializable data class Segment(@Required val id: String = newId(), val sessionId: String,
     val start: Long, val end: Long? = null, @Required val durationMs: Long = 0,
     val selection: Classification = Classification(), val anchor: Anchor? = null,
-    val uncertain: Boolean = false, val observedUntil: Long? = null,val limitMs: Long? = null)
+    val uncertain: Boolean = false, val observedUntil: Long? = null,val limitMs: Long? = null,
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val manualConfirmation: ManualTimeConfirmation? = null)
 @Serializable enum class Scope { SESSION, SEGMENT }
 @Serializable data class Measurement(@Required val id: String = newId(), val fieldId: String, @Required val meaningVersion: Int = 1,
     val unit: String, val scope: Scope, val targetId: String, val value: Decimal, val source: String? = null) {
@@ -102,6 +107,10 @@ internal fun validateMoment(n: Moment) {
     ensure(n.wall in 0..MAX_TIME && n.elapsed >= 0 && n.bootId.isNotBlank() && (n.processId == null || n.processId.isNotBlank()),"Clock out of supported range",ErrorCode.INVALID_INTERVAL)
 }
 internal fun validateSegmentTime(s: Segment) {
+    s.manualConfirmation?.let {
+        ensure(it.confirmedAt in 0..MAX_TIME && s.end != null && !s.uncertain && s.anchor == null && s.limitMs == null,
+            "Invalid manually confirmed interval",ErrorCode.INVALID_INTERVAL)
+    }
     ensure(s.limitMs == null || (s.end == null && s.limitMs in 1..MAX_TIME && s.durationMs <= s.limitMs && s.start in 0..MAX_TIME && s.limitMs <= MAX_TIME-s.start),"Invalid bounded interval")
     ensure(s.anchor?.processId == null || (s.limitMs != null && s.anchor.processId.isNotBlank()),"Process anchor requires bounded Focus interval")
     ensure(s.start in 0..MAX_TIME && s.durationMs in 0..MAX_TIME, "Time out of range", ErrorCode.INVALID_INTERVAL)

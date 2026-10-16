@@ -15,7 +15,7 @@ import java.time.ZoneId
         (facets.isEmpty() || if (facetMatch == FacetMatch.ALL) facets.all { it in c.facets } else facets.any { it in c.facets })
 }
 data class ReportRow(val segmentId: String, val sessionId: String, val start: Long, val end: Long,
-    val durationMs: Long, val selection: Classification, val note: String?)
+    val durationMs: Long, val selection: Classification, val note: String?,val manualConfirmation: ManualTimeConfirmation? = null)
 data class QuantityKey(val fieldId: String,val meaningVersion: Int,val unit: String,val scope: Scope)
 data class Report(val start: Long, val end: Long, val asOf: Long, val zone: String,
     val rows: List<ReportRow>, val unresolved: List<Segment>, val measurements: List<Measurement>,
@@ -78,7 +78,7 @@ object Reports {
             val from = maxOf(start,s.start); val to = minOf(end,finish,now.wall)
             if (to <= from || finish <= s.start) null else ReportRow(s.id,s.sessionId,from,to,
                 proportional(s.durationMs,to-s.start,finish-s.start)-proportional(s.durationMs,from-s.start,finish-s.start),
-                s.selection,notes[s.sessionId])
+                s.selection,notes[s.sessionId],s.manualConfirmation)
         }.sortedWith(compareBy({it.start},{it.segmentId}))
     /** One physical observation, bounded calendar page; DST boundaries come from the explicit zone. */
     fun calendar(d: Dataset,now: Moment,first: LocalDate,days: Int,filter: Filter = Filter(),zone: String = d.settings.reportZone): CalendarHistory {

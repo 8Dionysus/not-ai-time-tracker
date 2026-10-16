@@ -8,12 +8,13 @@ import java.security.MessageDigest
 /** Owner storage columns, not a cache or a caller-supplied validation receipt. */
 internal object HistoryColumns {
     const val SESSION_COLUMNS = "id,position,status,selectionId,note,importOrigin"
-    const val SEGMENT_COLUMNS = "id,position,sessionId,openSlot,start,end,durationMs,selectionId,anchor,uncertain,observedUntil,limitMs"
+    const val LEGACY_SEGMENT_COLUMNS = "id,position,sessionId,openSlot,start,end,durationMs,selectionId,anchor,uncertain,observedUntil,limitMs"
+    const val SEGMENT_COLUMNS = LEGACY_SEGMENT_COLUMNS+",manualConfirmation"
     fun key(payload: String): String = MessageDigest.getInstance("SHA-256").digest(payload.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
     fun session(value: Session,position: Int,selectionId: String) = SessionRow(value.id,position,value.status.name,selectionId,value.note,
         value.importOrigin?.let { codec.encodeToString(it) })
     fun segment(value: Segment,position: Int,selectionId: String) = SegmentRow(value.id,position,value.sessionId,if(value.end == null) 1 else null,
-        value.start,value.end,value.durationMs,selectionId,value.anchor?.let { codec.encodeToString(it) },value.uncertain,value.observedUntil,value.limitMs)
+        value.start,value.end,value.durationMs,selectionId,value.anchor?.let { codec.encodeToString(it) },value.uncertain,value.observedUntil,value.limitMs,value.manualConfirmation?.let { codec.encodeToString(it) })
     private fun Cursor.text(i: Int): String? = if(isNull(i)) null else getString(i)
     private fun Cursor.number(i: Int): Long? = if(isNull(i)) null else getLong(i)
     private fun selection(id: String,all: Map<String,Classification>): Classification =
@@ -25,7 +26,7 @@ internal object HistoryColumns {
         ensure(c.number(3) == if(end == null) 1L else null,"Open-slot metadata contradicts the segment",ErrorCode.STORAGE)
         val uncertain = c.getInt(9);ensure(uncertain in 0..1,"Invalid stored uncertainty flag",ErrorCode.STORAGE)
         return Segment(c.getString(0),c.getString(2),c.getLong(4),end,c.getLong(6),selection(c.getString(7),all),
-            c.text(8)?.let { codec.decodeFromString<Anchor>(it) },uncertain == 1,c.number(10),c.number(11))
+            c.text(8)?.let { codec.decodeFromString<Anchor>(it) },uncertain == 1,c.number(10),c.number(11),if(c.columnCount > 12) c.text(12)?.let { codec.decodeFromString<ManualTimeConfirmation>(it) } else null)
     }
 }
 
@@ -41,6 +42,7 @@ internal fun migrateNormalizedHistory(db: SupportSQLiteDatabase) {
     val data = base.copy(types = legacyRows<ActivityType>(db,"activity_types").map { it.second },cards = legacyRows<Card>(db,"cards").map { it.second },
         sessions = sessions.map { it.second },segments = segments.map { it.second },favorites = legacyRows<Favorite>(db,"favorites").map { it.second },
         measurements = legacyRows<Measurement>(db,"measurements").map { it.second },axes = vocabulary.axes,metrics = vocabulary.metrics,units = vocabulary.units)
+    ensure(!data.hasManualTimeConfirmation(),"Manual confirmation in legacy history",ErrorCode.STORAGE)
     CheckedState.validate(data)
     db.execSQL("CREATE TABLE history_classifications (id TEXT NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(id))")
     db.execSQL("CREATE TABLE sessions_normalized (id TEXT NOT NULL, position INTEGER NOT NULL, status TEXT NOT NULL, selectionId TEXT NOT NULL, note TEXT, importOrigin TEXT, PRIMARY KEY(id), FOREIGN KEY(selectionId) REFERENCES history_classifications(id) ON UPDATE NO ACTION ON DELETE NO ACTION)")
@@ -61,12 +63,12 @@ internal fun migrateNormalizedHistory(db: SupportSQLiteDatabase) {
     db.execSQL("CREATE TABLE segments (id TEXT NOT NULL, position INTEGER NOT NULL, sessionId TEXT NOT NULL, openSlot INTEGER, start INTEGER NOT NULL, end INTEGER, durationMs INTEGER NOT NULL, selectionId TEXT NOT NULL, anchor TEXT, uncertain INTEGER NOT NULL, observedUntil INTEGER, limitMs INTEGER, PRIMARY KEY(id), FOREIGN KEY(sessionId) REFERENCES sessions(id) ON UPDATE NO ACTION ON DELETE CASCADE, FOREIGN KEY(selectionId) REFERENCES history_classifications(id) ON UPDATE NO ACTION ON DELETE NO ACTION)")
     for((position,s) in segments) {
         val row = HistoryColumns.segment(s,position,selected(s.selection))
-        db.execSQL("INSERT INTO segments(${HistoryColumns.SEGMENT_COLUMNS}) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+        db.execSQL("INSERT INTO segments(${HistoryColumns.LEGACY_SEGMENT_COLUMNS}) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
             arrayOf<Any?>(row.id,row.position,row.sessionId,row.openSlot,row.start,row.end,row.durationMs,row.selectionId,row.anchor,if(row.uncertain) 1 else 0,row.observedUntil,row.limitMs))
     }
     val selections = db.query("SELECT id,payload FROM history_classifications").use { c -> buildMap { while(c.moveToNext()) put(c.getString(0),codec.decodeFromString<Classification>(c.getString(1))) } }
     val restored = data.copy(sessions = db.query("SELECT ${HistoryColumns.SESSION_COLUMNS} FROM sessions ORDER BY position,id").use { c -> buildList { while(c.moveToNext()) add(HistoryColumns.session(c,selections)) } },
-        segments = db.query("SELECT ${HistoryColumns.SEGMENT_COLUMNS} FROM segments ORDER BY position,id").use { c -> buildList { while(c.moveToNext()) add(HistoryColumns.segment(c,selections)) } })
+        segments = db.query("SELECT ${HistoryColumns.LEGACY_SEGMENT_COLUMNS} FROM segments ORDER BY position,id").use { c -> buildList { while(c.moveToNext()) add(HistoryColumns.segment(c,selections)) } })
     ensure(data == restored,"Normalized migration readback differs",ErrorCode.STORAGE)
     CheckedState.validate(restored)
     db.execSQL("CREATE INDEX index_sessions_position_id ON sessions(position,id)");db.execSQL("CREATE INDEX index_sessions_selectionId ON sessions(selectionId)")

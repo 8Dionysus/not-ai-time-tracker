@@ -410,6 +410,33 @@ class Tracker(val store: StateStore, val clock: Clock) {
         d.copy(segments = d.segments.map { if (it.id == segmentId) it.copy(start = start,end = end,durationMs = end-start,
             selection = selected,anchor = null,uncertain = false,observedUntil = null) else it })
     }
+    /** Preview only: no clock anchor, identity or interval is changed until explicit apply. */
+    fun previewStartBackfill(expected: Token,sessionId: String,start: Long): StartBackfillPreview = storage {
+        store.transaction { d ->
+            val n = clock.now();checkToken(d,expected,n)
+            val prefix = StartBackfill.segment(d,n,sessionId,start)
+            validate(d.copy(segments = d.segments+prefix))
+            d to StartBackfillPreview(this,expected,sessionId,prefix.end!!,prefix,null,n)
+        }
+    }
+    /** Resolve the previous recorded end only as a visible, cancellable proposal. */
+    fun previewStartAtPreviousEnd(expected: Token,sessionId: String): StartBackfillPreview = storage {
+        store.transaction { d ->
+            val n = clock.now();checkToken(d,expected,n)
+            val previous = StartBackfill.previous(d,n,sessionId)
+            val prefix = StartBackfill.segment(d,n,sessionId,previous.end)
+            validate(d.copy(segments = d.segments+prefix))
+            d to StartBackfillPreview(this,expected,sessionId,prefix.end!!,prefix,previous,n)
+        }
+    }
+    fun applyStartBackfill(preview: StartBackfillPreview): Change {
+        ensure(preview.owner === this,"Backfill preview belongs to another Tracker")
+        return mutate(preview.expected,true) { d,n ->
+            val prefix = StartBackfill.segment(d,n,preview.sessionId,preview.proposedSegment.start,preview.proposedSegment.id)
+            ensure(prefix.end == preview.originalStart,"Session start changed",ErrorCode.STALE)
+            d.copy(segments = d.segments+prefix)
+        }
+    }
     /** Correct a forgotten switch inside the current uninterrupted segment in one transaction. */
     fun switchedEarlier(expected: Token, boundary: Long, selection: Classification) = mutate(expected,true) { d,n ->
         ensure(d.focus == null,"Finish Focus before a retrospective switch")
@@ -529,8 +556,8 @@ fun snapshot(d: Dataset,n: Moment): Snapshot {
         FocusMode.DUE -> setOf("stop","switch","label","details","focusNext","focusSkip","configureFocus")
         FocusMode.RECOVERY -> setOf("resolveFocus","label")
     } else when(mode) { Mode.IDLE -> setOf("start","repeat","favorite","manual")
-        Mode.RUNNING -> setOf("pause","stop","switch","label","details","switchedEarlier")
-        Mode.PAUSED -> setOf("resume","stop","switch","label","details")
+        Mode.RUNNING -> setOf("pause","stop","switch","label","details","switchedEarlier","startBackfill")
+        Mode.PAUSED -> setOf("resume","stop","switch","label","details","startBackfill")
         Mode.RECOVERY -> setOf("resolveTail","label") }
     return Snapshot(token(d),mode,s,active,segs.sumExact { it.durationMs },uncertain || focus?.mode == FocusMode.RECOVERY,
         focus?.safeLabel ?: when(mode) { Mode.IDLE -> "Таймер остановлен"; Mode.RUNNING -> "Идёт учёт времени"; Mode.PAUSED -> "Таймер на паузе"; Mode.RECOVERY -> "Требуется уточнить время" },actions,focus,

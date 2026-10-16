@@ -22,7 +22,7 @@ data class SessionRow(@PrimaryKey val id: String,val position: Int,val status: S
     ForeignKey(entity = ClassificationRow::class,parentColumns = ["id"],childColumns = ["selectionId"])],
     indices = [Index("sessionId"),Index(value = ["openSlot"],unique = true),Index(value = ["position","id"]),Index("selectionId")])
 data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId: String,val openSlot: Int?,val start: Long,val end: Long?,val durationMs: Long,
-    val selectionId: String,val anchor: String?,val uncertain: Boolean,val observedUntil: Long?,val limitMs: Long?)
+    val selectionId: String,val anchor: String?,val uncertain: Boolean,val observedUntil: Long?,val limitMs: Long?,val manualConfirmation: String?)
 @Entity(tableName = "favorites") data class FavoriteRow(@PrimaryKey val id: String,val position: Int,val payload: String)
 @Entity(tableName = "measurements") data class MeasurementRow(@PrimaryKey val id: String,val position: Int,val payload: String)
 @Entity(tableName = "store_generation") data class GenerationRow(@PrimaryKey val id: Int = 1,val generation: Long)
@@ -64,7 +64,7 @@ data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId
     @Query("DELETE FROM measurements WHERE id IN (:ids)") fun deleteMeasurements(ids: List<String>)
     @Query("SELECT * FROM measurements WHERE id IN (:ids)") fun readMeasurements(ids: List<String>): List<MeasurementRow>
 }
-const val TRACKER_DATABASE_VERSION = 9
+const val TRACKER_DATABASE_VERSION = 10
 @Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class,GenerationRow::class,VocabularyRow::class,ClassificationRow::class],version = TRACKER_DATABASE_VERSION,exportSchema = true)
 abstract class TrackerDatabase: RoomDatabase() {
     abstract fun dao(): TrackerDao
@@ -168,6 +168,17 @@ abstract class TrackerDatabase: RoomDatabase() {
             }
         }
 
+        val MIGRATION_9_10 = object: androidx.room.migration.Migration(9,10) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                readMetadataPayload(db)?.let { payload ->
+                    ensure(!codec.decodeFromString<Dataset>(payload).hasManualTimeConfirmation(),
+                        "Manual confirmation in legacy metadata",ErrorCode.STORAGE)
+                }
+                // Null preserves the old provenance as unknown; no history or anchor is rewritten.
+                db.execSQL("ALTER TABLE segments ADD COLUMN manualConfirmation TEXT")
+            }
+        }
+
         fun open(context: Context,name: String = "tracker.db"): TrackerDatabase {
             val file = context.getDatabasePath(name)
             val existing = DatabaseFiles.paths(context,name).filter { it.exists() }
@@ -190,7 +201,7 @@ abstract class TrackerDatabase: RoomDatabase() {
                 ensure(validHeader,"Database header is damaged; originals preserved. Use explicit recovery",ErrorCode.STORAGE)
             }
             return Room.databaseBuilder(context,TrackerDatabase::class.java,name)
-            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5,MIGRATION_5_6,MIGRATION_6_7,MIGRATION_7_8,MIGRATION_8_9).openHelperFactory { configuration ->
+            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5,MIGRATION_5_6,MIGRATION_6_7,MIGRATION_7_8,MIGRATION_8_9,MIGRATION_9_10).openHelperFactory { configuration ->
                 val original = configuration.callback
                 val guarded = object: androidx.sqlite.db.SupportSQLiteOpenHelper.Callback(original.version) {
                     override fun onConfigure(db: androidx.sqlite.db.SupportSQLiteDatabase) = original.onConfigure(db)

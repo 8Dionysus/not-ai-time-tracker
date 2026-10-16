@@ -52,6 +52,11 @@ class FunctionalCustomizationTest {
         val card = Card("owned-card","Заратустра")
         assertEquals("f3bc982e330f410584ceb6b4b845d7a54b128589fff25127783df390e851e2c5",SelectiveTransfer.contentHash(TransferContent(cards = listOf(card))))
         assertFalse("catalogRoots" in codec.encodeToJsonElement(TransferContent()).jsonObject)
+        // Captured by a Java serializer probe against compiled 8aaa890, before manualConfirmation existed.
+        val legacy = TransferContent(sessions = listOf(Session("legacy-session",SessionStatus.STOPPED)),
+            segments = listOf(Segment("legacy-segment","legacy-session",1000,2000,1000)))
+        assertEquals("d6d96de142abc2d24549c36758d5e4a1757e6b9c6bdf46e2212a4ee03c9634bd",SelectiveTransfer.contentHash(legacy))
+        assertFalse("manualConfirmation" in codec.encodeToJsonElement(legacy.segments.single()).jsonObject)
         val other = card.copy(id = "other")
         val a = TransferContent(cards = listOf(card,other),catalogRoots = TransferCatalogRoots(linkedSetOf(card.id,other.id)))
         val b = a.copy(catalogRoots = TransferCatalogRoots(linkedSetOf(other.id,card.id)))
@@ -76,8 +81,8 @@ class FunctionalCustomizationTest {
     @Test fun legacyArchiveCannotSmuggleNewSettingsOrCatalogRootReceipts() {
         val clock = FakeClock();val plain = Backups.encode(Dataset(),clock.now())
         fun asV9(text: String): String = JsonObject(codec.parseToJsonElement(text).jsonObject+("formatVersion" to JsonPrimitive(9))).toString()
-        assertEquals(11,Backups.decode(asV9(plain)).formatVersion)
-        assertEquals(11,StreamingBackup.read { asV9(plain).byteInputStream() }.formatVersion)
+        assertEquals(12,Backups.decode(asV9(plain)).formatVersion)
+        assertEquals(12,StreamingBackup.read { asV9(plain).byteInputStream() }.formatVersion)
         val settings = Settings(schedule = ScheduleSettings(ScheduleDayPolicy(boundary = "04:00"),true))
         val card = Card("owned-card","Заратустра");val content = TransferContent(cards = listOf(card),catalogRoots = TransferCatalogRoots(setOf(card.id)))
         val hash = SelectiveTransfer.contentHash(content)

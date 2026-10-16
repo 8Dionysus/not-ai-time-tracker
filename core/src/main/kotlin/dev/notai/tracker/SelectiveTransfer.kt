@@ -152,15 +152,16 @@ class SelectiveTransfer(private val tracker: Tracker) {
             if(wanted.discardLinks.isNotEmpty()) add("LINKS_EXPLICITLY_DISCARDED:${wanted.discardLinks.size}")
             if(wanted.excludedOverrides.isNotEmpty()) add("OVERRIDES_EXCLUDED:${wanted.excludedOverrides.size}")
         }
-        val format = if(wanted.cardIds.isEmpty() && wanted.typeIds.isEmpty()) 1 else 2
+        val format = if(groups.any { g -> g.content.segments.any { it.manualConfirmation != null } }) 3 else if(wanted.cardIds.isEmpty() && wanted.typeIds.isEmpty()) 1 else 2
         return SelectivePackage(formatVersion = format,minimumReader = format,sourceDatasetId = d.datasetId,groups = groups,losses = losses)
     }
     fun inspect(text: String): TransferInspection = try { inspect(codec.decodeFromString<SelectivePackage>(text)) }
         catch(e: CoreError) { throw e } catch(_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed selective package") }
     fun inspect(value: SelectivePackage): TransferInspection {
         val snapshot = value.frozen()
-        ensure(snapshot.formatVersion in 1..2 && snapshot.minimumReader == snapshot.formatVersion && snapshot.sourceDatasetId.isNotBlank() && snapshot.transferId.isNotBlank(),"Unsupported selective package",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(snapshot.formatVersion in 1..3 && snapshot.minimumReader == snapshot.formatVersion && snapshot.sourceDatasetId.isNotBlank() && snapshot.transferId.isNotBlank(),"Unsupported selective package",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(snapshot.formatVersion >= 2 || snapshot.groups.all { it.content.catalogRoots.empty },"Catalog roots require selective format2",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(snapshot.formatVersion >= 3 || snapshot.groups.none { g -> g.content.segments.any { it.manualConfirmation != null } },"Manual confirmation requires selective format3",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(snapshot.groups.isNotEmpty() && snapshot.groups.map { it.id }.distinct().size == snapshot.groups.size && snapshot.groups.map { it.originId }.distinct().size == snapshot.groups.size,"Duplicate/empty transfer groups")
         snapshot.groups.forEach { ensure(it.id.isNotBlank() && it.originId.isNotBlank() && it.sourceRevision >= 0 && payloadHash(it.content) == it.hash && it.entities == entityManifest(it.content,it.sourceRevision,it.originId),"Transfer hash/manifest mismatch");validateContent(it.content) }
         return TransferInspection(snapshot.transferId,snapshot.groups,snapshot.losses,frozenSet(snapshot.groups.flatMap { it.content.sessions }.filter { it.status != SessionStatus.STOPPED }.map { it.id }))

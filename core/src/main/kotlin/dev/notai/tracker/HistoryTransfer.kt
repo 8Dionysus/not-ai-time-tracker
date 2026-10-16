@@ -254,7 +254,8 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
             val issues = listOf(
                 importIssue(ImportIssueCode.INTERVALS_EXCLUDED,"${d.segments.size-eligible.size} open/uncertain/zero intervals excluded.",ImportIssueStage.EXPORT,ImportIssueSeverity.WARNING,
                     arguments = mapOf("excludedCount" to ErrorArgument.Count((d.segments.size-eligible.size).toLong()))),
-                importIssue(ImportIssueCode.SESSION_GROUPING_LOSS,"Each interval imports as one stopped session; pauses/session grouping and measurements require full JSON backup.",ImportIssueStage.EXPORT,ImportIssueSeverity.WARNING),
+                importIssue(ImportIssueCode.SESSION_GROUPING_LOSS,"Each interval imports as one stopped session; pauses/session grouping, manual-time confirmation provenance and measurements require full JSON or selective archive.",ImportIssueStage.EXPORT,ImportIssueSeverity.WARNING,
+                    arguments = mapOf("manuallyConfirmedIntervalCount" to ErrorArgument.Count(eligible.count { it.manualConfirmation != null }.toLong()))),
                 importIssue(ImportIssueCode.CONTEXT_REQUIRES_MAPPING,"selection_json and origin_json preserve source context; a CSV importer must map local classification explicitly.",ImportIssueStage.EXPORT,ImportIssueSeverity.WARNING),
                 importIssue(ImportIssueCode.EXACT_CSV_FORMULA_POLICY,"Exact machine CSV: spreadsheet formula escaping is not applied; use the analysis CSV for spreadsheets.",ImportIssueStage.EXPORT,ImportIssueSeverity.WARNING))
             return HistoryExport(CsvTable.write(rows),frozenList(issues.map { it.diagnostic }),frozenList(issues))

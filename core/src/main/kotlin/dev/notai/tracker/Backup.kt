@@ -6,7 +6,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.io.ByteArrayOutputStream
 
-@Serializable data class Backup(@Required val formatVersion: Int = 11,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
+@Serializable data class Backup(@Required val formatVersion: Int = 12,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
 /** Bounded whole-String convenience API only; streaming full backups have no total-file cap. */
 const val MAX_BACKUP_BYTES = 10*1024*1024
 
@@ -111,10 +111,11 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore,p
         fun decode(json: String): Backup {
             ensure(json.toByteArray(Charsets.UTF_8).size <= MAX_BACKUP_BYTES,"Backup exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
             val b = try { decodeBackupVersion(json) } catch (_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed or unsupported JSON") }
-            ensure(b.formatVersion == 11,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
+            ensure(b.formatVersion == 12,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
             ensure(b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
             try {
                 validate(b.data)
+                ensure(b.data.manualTimeConfirmations().all { it.confirmedAt <= b.asOf },"Confirmation after snapshot")
                 ensure(b.data.focus?.breakAnchor == null,"Backup must not contain Focus anchors")
                 ensure(b.data.segments.all { it.anchor == null },"Backup must not contain device anchors")
                 ensure(b.data.segments.all { it.start <= b.asOf || it.uncertain },"Segment starts after snapshot")

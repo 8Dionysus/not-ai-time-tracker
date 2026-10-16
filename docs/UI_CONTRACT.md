@@ -1,6 +1,6 @@
 # Контракт интеграции интерфейса
 
-Действующий контракт для Android-приложения 0.11.0 (основной интерфейс и техническая оболочка) и Kotlin-ядра. Room schema 7; JSON export 9 и read 1–9. Новый backend-проход и точные точки интеграции: [BACKEND_PASS_2026_10](BACKEND_PASS_2026_10.md). CSV/inspection errors и warnings: [stable issue keys и typed arguments](IMPORT_ISSUES.md). Новые поверхности и локализация ещё не подключены к продуктовым экранам. Предыдущие схемы относятся к [истории реализации](history/ACCEPTANCE_GAPS_through_v15.md), а не к текущим инструкциям.
+Действующий контракт для Android-приложения 0.11.0 (основной интерфейс и техническая оболочка) и Kotlin-ядра. Room schema 10; JSON export 12 и read 1–12; selective formats 1–3. Новый backend-проход и точные точки интеграции: [BACKEND_PASS_2026_10](BACKEND_PASS_2026_10.md). CSV/inspection errors и warnings: [stable issue keys и typed arguments](IMPORT_ISSUES.md). Новые поверхности и локализация ещё не подключены к продуктовым экранам. Предыдущие схемы относятся к [истории реализации](history/ACCEPTANCE_GAPS_through_v15.md), а не к текущим инструкциям.
 
 ## Runtime, чтение и команды
 
@@ -47,6 +47,7 @@ Repeat создаёт новую сессию с параметрами посл
 | `correctSession` | Атомарно сохранить все существующие сегменты завершённой сессии и заметку; каждый ID передаётся один раз. |
 | `previewCorrection` / `applyCorrection` | Показать старые/новые суммы на одном asOf до применения. |
 | `previewBoundary` / `correctBoundary` | Передвинуть общую границу двух закрытых сегментов разных завершённых сессий атомарно. |
+| `previewStartBackfill` / `previewStartAtPreviousEnd` / `applyStartBackfill` | Явно подтвердить пропущенное начало текущей обычной сессии: [контракт и provenance](START_BACKFILL_CONTRACT.md). Сохранённый сегмент таймера не сдвигается. |
 | `switchedEarlier` | Разделить текущий непрерывный сегмент по явной прошлой границе; через паузы граница не переносится. |
 | `resolveTail` | Подтвердить неизвестный хвост интервалом либо исключить его через `(null, null)`. |
 

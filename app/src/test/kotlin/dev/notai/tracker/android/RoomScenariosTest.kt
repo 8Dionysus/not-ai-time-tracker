@@ -90,7 +90,7 @@ class RoomScenariosTest: ScenarioContract() {
                 val settings = payload.getValue("settings").jsonObject.toMutableMap()
                 settings["surfaces"] = JsonObject(settings.getValue("surfaces").jsonObject.filterKeys { it != "shortcut" })
                 payload["settings"] = JsonObject(settings)
-                sql.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(JsonObject(payload).toString()));sql.version = 8
+                sql.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(JsonObject(payload).toString()));sql.execSQL("ALTER TABLE segments DROP COLUMN manualConfirmation");sql.version = 8
             }
             store = open(name);org.junit.Assert.assertEquals(expected,store.read());store = reopen(store)
             org.junit.Assert.assertEquals(expected,store.read());org.junit.Assert.assertTrue(store.read().settings.surfaces.shortcut)
@@ -99,7 +99,7 @@ class RoomScenariosTest: ScenarioContract() {
         tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(shortcut = false)))
         val (name,db) = databases.remove(store)!!;db.close();val file = context.getDatabasePath(name)
         val prior = android.database.sqlite.SQLiteDatabase.openDatabase(file.path,null,0).use { sql ->
-            sql.version = 8;sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> c.moveToFirst();c.getString(0) }
+            sql.execSQL("ALTER TABLE segments DROP COLUMN manualConfirmation");sql.version = 8;sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> c.moveToFirst();c.getString(0) }
         }
         org.junit.Assert.assertThrows(Exception::class.java) { open(name) }
         android.database.sqlite.SQLiteDatabase.openDatabase(file.path,null,0).use { sql ->
@@ -142,7 +142,7 @@ class RoomScenariosTest: ScenarioContract() {
             if(status == SessionStatus.STOPPED) t.stop(t.snapshot().token)
             if(status == SessionStatus.RECOVERY) store.transaction { d -> d.copy(sessions = d.sessions.map { it.copy(status = SessionStatus.RECOVERY) },segments = d.segments.map { it.copy(anchor = null,uncertain = true) }) to Unit }
             val expected = store.read();val (name,db) = databases.remove(store)!!;db.close()
-            android.database.sqlite.SQLiteDatabase.openDatabase(context.getDatabasePath(name).path,null,0).use { it.version = 7 }
+            android.database.sqlite.SQLiteDatabase.openDatabase(context.getDatabasePath(name).path,null,0).use { it.execSQL("ALTER TABLE segments DROP COLUMN manualConfirmation");it.version = 7 }
             store = open(name);org.junit.Assert.assertEquals(TRACKER_DATABASE_VERSION,databases.getValue(store).second.openHelper.readableDatabase.version)
             org.junit.Assert.assertEquals(expected,store.read());store = reopen(store);org.junit.Assert.assertEquals(expected,store.read())
             val source = Tracker(store,clock);val backup = Backups(source,MemoryRollback()).export()
@@ -162,7 +162,7 @@ class RoomScenariosTest: ScenarioContract() {
             }
             val (name,db) = databases.remove(store)!!;db.close();val file = context.getDatabasePath(name)
             val prior = android.database.sqlite.SQLiteDatabase.openDatabase(file.path,null,0).use { sql ->
-                sql.version = 7;sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> c.moveToFirst();c.getString(0) }
+                sql.execSQL("ALTER TABLE segments DROP COLUMN manualConfirmation");sql.version = 7;sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> c.moveToFirst();c.getString(0) }
             }
             org.junit.Assert.assertThrows(Exception::class.java) { open(name) }
             android.database.sqlite.SQLiteDatabase.openDatabase(file.path,null,0).use { sql ->
@@ -223,7 +223,7 @@ class RoomScenariosTest: ScenarioContract() {
             val transfer = meta.getValue("transfer").jsonObject.toMutableMap();transfer.remove("compactions")
             transfer["origins"] = JsonArray(transfer.getValue("origins").jsonArray.map { JsonObject(it.jsonObject.filterKeys { k -> k != "compaction" }) })
             transfer["operations"] = JsonArray(transfer.getValue("operations").jsonArray.map { JsonObject(it.jsonObject.filterKeys { k -> k != "payloadsPruned" }) })
-            meta["transfer"] = JsonObject(transfer);sql.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(JsonObject(meta).toString()));sql.version = 6
+            meta["transfer"] = JsonObject(transfer);sql.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(JsonObject(meta).toString()));sql.execSQL("ALTER TABLE segments DROP COLUMN manualConfirmation");sql.version = 6
         }
         store = open(name);org.junit.Assert.assertEquals(TRACKER_DATABASE_VERSION,databases.getValue(store).second.openHelper.readableDatabase.version)
         org.junit.Assert.assertEquals(expected,store.read());store = reopen(store);org.junit.Assert.assertEquals(expected,store.read())
@@ -253,6 +253,51 @@ class RoomScenariosTest: ScenarioContract() {
         val restored = StreamingBackup.read { output.toByteArray().inputStream() }
         org.junit.Assert.assertEquals(tracker.data().transfer,restored.data.transfer)
     }
+    private fun v9Fixture(store: StateStore): String {
+        val (name,db) = databases.remove(store)!!;db.close()
+        android.database.sqlite.SQLiteDatabase.openDatabase(RuntimeEnvironment.getApplication().getDatabasePath(name).path,null,0).use { sql ->
+            sql.execSQL("ALTER TABLE segments DROP COLUMN manualConfirmation");sql.version = 9
+        }
+        return name
+    }
+    @org.junit.Test fun v9MigrationPreservesUnknownProvenanceAndEverySessionState() {
+        for(status in SessionStatus.entries) {
+            val clock = FakeClock();val store = createStore();val t = Tracker(store,clock)
+            t.start(t.snapshot().token);clock.advance(1000)
+            if(status == SessionStatus.PAUSED) t.pause(t.snapshot().token)
+            if(status == SessionStatus.STOPPED) t.stop(t.snapshot().token)
+            if(status == SessionStatus.RECOVERY) store.transaction { d ->
+                d.copy(sessions = d.sessions.map { it.copy(status = SessionStatus.RECOVERY) },
+                    segments = d.segments.map { it.copy(anchor = null,uncertain = true) }) to Unit
+            }
+            val expected = store.read();val name = v9Fixture(store);val migrated = open(name)
+            org.junit.Assert.assertEquals(expected,migrated.read())
+            org.junit.Assert.assertTrue(migrated.read().segments.all { it.manualConfirmation == null })
+            databases.getValue(migrated).second.openHelper.readableDatabase.query("SELECT COUNT(*) FROM segments WHERE manualConfirmation IS NOT NULL").use { c ->
+                org.junit.Assert.assertTrue(c.moveToFirst());org.junit.Assert.assertEquals(0,c.getInt(0))
+            }
+            org.junit.Assert.assertEquals(expected,reopen(migrated).read())
+        }
+    }
+    @org.junit.Test fun v9MigrationInterruptionRollsBackColumnAndCanRetryExplicitly() {
+        val clock = FakeClock();val store = createStore();val t = Tracker(store,clock)
+        t.start(t.snapshot().token);clock.advance(1000);val expected = t.data();val name = v9Fixture(store)
+        val fault = object: androidx.room.migration.Migration(9,10) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                TrackerDatabase.MIGRATION_9_10.migrate(db)
+                throw IllegalStateException("Fixture interruption after adding nullable column")
+            }
+        }
+        val broken = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name)
+            .addMigrations(fault).allowMainThreadQueries().build()
+        try { org.junit.Assert.assertThrows(Exception::class.java) { RoomStore(broken) } } finally { broken.close() }
+        android.database.sqlite.SQLiteDatabase.openDatabase(RuntimeEnvironment.getApplication().getDatabasePath(name).path,null,0).use { sql ->
+            org.junit.Assert.assertEquals(9,sql.version)
+            sql.rawQuery("PRAGMA table_info(segments)",null).use { c -> while(c.moveToNext()) org.junit.Assert.assertNotEquals("manualConfirmation",c.getString(1)) }
+        }
+        val retried = open(name);org.junit.Assert.assertEquals(expected,retried.read())
+        org.junit.Assert.assertEquals(expected,reopen(retried).read())
+    }
     @org.junit.Test fun v5MigrationPreservesStoppedPausedRunningAndRecovery() {
         val context = RuntimeEnvironment.getApplication()
         for(status in SessionStatus.entries) {
@@ -265,7 +310,7 @@ class RoomScenariosTest: ScenarioContract() {
             android.database.sqlite.SQLiteDatabase.openDatabase(context.getDatabasePath(name).path,null,0).use { sql ->
                 val old = sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> c.moveToFirst();codec.parseToJsonElement(c.getString(0)).jsonObject }
                 val legacy = JsonObject(old.filterKeys { it !in setOf("schedule","transfer") })
-                sql.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(legacy.toString()));sql.version = 5
+                sql.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(legacy.toString()));sql.execSQL("ALTER TABLE segments DROP COLUMN manualConfirmation");sql.version = 5
             }
             store = open(name);org.junit.Assert.assertEquals(expected,store.read())
             org.junit.Assert.assertEquals(TRACKER_DATABASE_VERSION,databases.getValue(store).second.openHelper.readableDatabase.version)
@@ -681,7 +726,7 @@ class RoomScenariosTest: ScenarioContract() {
     }
     override fun createStore(): StateStore = open("test-${newId()}.db")
     private fun open(name: String): StateStore {
-        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9).allowMainThreadQueries().build()
+        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9,TrackerDatabase.MIGRATION_9_10).allowMainThreadQueries().build()
         return try { RoomStore(db).also { databases[it] = name to db } } catch(e: Exception) { db.close();throw e }
     }
     override fun reopen(store: StateStore): StateStore {

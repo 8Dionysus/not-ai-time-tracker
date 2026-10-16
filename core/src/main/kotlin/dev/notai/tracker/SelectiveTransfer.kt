@@ -118,15 +118,18 @@ class SelectiveTransfer(private val tracker: Tracker) {
             d.cards.any { it.id in selectedCardIds && it.personal != ChoicePersonalization() } || selectedFavorites.any { it.personal != ChoicePersonalization() }
         if(extended) {
             val owners = mutableMapOf<String,String>()
+            val classified = mutableListOf<Pair<String,Classification>>()
             fun connect(node: String,key: String) { owners.putIfAbsent(key,node)?.let { join(node,it) } }
             fun card(node: String,id: String?) { id?.let { connect(node,"card:$it") } }
             fun session(node: String,id: String?) { id?.takeIf { "session:$it" in parents }?.let { join(node,"session:$it") } }
             fun subject(node: String,ref: SubjectRef) {
                 connect(node,"subject:${ref.kind}:${ref.id}")
-                if(ref.kind == SubjectKind.CARD) card(node,ref.id)
-                else card(node,d.subjects.events.single { it.id == ref.id }.cardId)
+                val cardId=if(ref.kind == SubjectKind.CARD) ref.id else d.subjects.events.single { it.id == ref.id }.cardId
+                card(node,cardId)
+                cardId?.let { id -> val c=d.cards.single { it.id == id }.classification()
+                    classified += node to c.copy(ancestorPathAtWrite=c.activityTypeId?.let { d.ancestorPath(it) }.orEmpty())
+                }
             }
-            val classified = mutableListOf<Pair<String,Classification>>()
             selectedSessions.forEach { row ->
                 val node="session:${row.id}"
                 val selections=listOf(row.selection)+selectedSegments.filter { it.sessionId == row.id }.map { it.selection }
@@ -138,14 +141,15 @@ class SelectiveTransfer(private val tracker: Tracker) {
                 d.schedule.overrides.filter { it.key.seriesId == row.id && it.key !in wanted.excludedOverrides }.mapNotNull { it.selection }
                 selections.forEach { card(node,it.cardId);classified += node to it }
             }
-            wanted.cardIds.forEach { id -> card("card:$id",id);classified += "card:$id" to d.cards.single { it.id == id }.classification() }
+            wanted.cardIds.forEach { id -> card("card:$id",id);val c=d.cards.single { it.id == id }.classification()
+                classified += "card:$id" to c.copy(ancestorPathAtWrite=c.activityTypeId?.let { d.ancestorPath(it) }.orEmpty())
+            }
             selectedFavorites.forEach { card("favorite:${it.id}",it.selection.cardId);classified += "favorite:${it.id}" to it.selection }
             fun query(node: String,f: Filter) {
                 card(node,f.cardId)
+                f.activityTypeId?.takeIf { it in wanted.typeIds }?.let { join(node,"type:$it") }
                 classified.filter { (_,c) -> (f.activityTypeId != null && (f.activityTypeId == c.activityTypeId || f.activityTypeId in c.ancestorPathAtWrite)) || f.facets.any { facet -> c.facets.any { it.axisId == facet.axisId } } }.forEach { join(node,it.first) }
             }
-            selectedGoals.forEach { g -> g.definitions().forEach { query("goal:${g.id}",it.filter) } }
-            selectedQueries.forEach { query("report:${it.id}",it.filter) }
             wanted.subjectRecords.forEach { key ->
                 val node="subject:${key.kind}:${key.id}"
                 when(key.kind) {
@@ -158,6 +162,11 @@ class SelectiveTransfer(private val tracker: Tracker) {
                     SubjectRecordKind.QUANTITY -> d.subjects.quantities.single { it.id == key.id }.let { subject(node,it.subject);session(node,it.sessionId) }
                     SubjectRecordKind.DISTANCE_TIME -> d.subjects.distanceTimes.single { it.id == key.id }.let { input -> session(node,if(input.scope == Scope.SESSION) input.targetId else d.segments.single { it.id == input.targetId }.sessionId) }
                 }
+            }
+            selectedGoals.forEach { g -> g.definitions().forEach { query("goal:${g.id}",it.filter) } }
+            selectedQueries.forEach { q ->
+                val node="report:${q.id}";query(node,q.filter)
+                if(q.grouping == ReportGrouping.FACET) classified.filter { (_,c) -> c.facets.any { it.axisId == q.groupKey } }.forEach { join(node,it.first) }
             }
         }
         val byLeader = nodes.groupBy(::leader)

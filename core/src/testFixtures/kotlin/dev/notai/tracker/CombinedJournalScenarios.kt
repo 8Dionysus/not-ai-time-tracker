@@ -147,3 +147,24 @@ fun quantityArchiveAuditSnapshots(create: ()->StateStore) {
     assertFailsWith<CoreError> { validate(live) }
     validate(live.copy(subjects=live.subjects.copy(changes=listOf(early.copy(recordedAt=950)))))
 }
+
+fun quantityQueryReferencesShareCopiedTypeAndAxis(create: ()->StateStore) {
+    val clock=FakeClock();val source=Tracker(create(),clock)
+    source.saveType(source.snapshot().token,ActivityType("query-parent","Branch",selectable=false))
+    source.saveType(source.snapshot().token,ActivityType("query-child","Child",parentId="query-parent"))
+    source.saveAxis(source.snapshot().token,Axis("query-axis","Context",valueKind=ValueKind.FREE_LABEL))
+    val card=Card("query-card","Same title",activityTypeId="query-child",facets=listOf(Facet("query-axis",text="inside")))
+    source.saveCard(source.snapshot().token,card);source.defineSubject(source.snapshot().token,CardSubject(card.id,"edition"))
+    source.saveGoal(source.snapshot().token,Goal("query-goal","Days",GoalMetric.DISTINCT_RECORDED_DAYS,2,filter=Filter(activityTypeId="query-parent")))
+    source.saveReportQuery(source.snapshot().token,SavedReportQuery("query-axis-report","By context",grouping=ReportGrouping.FACET,groupKey="query-axis"))
+    val pack=SelectiveTransfer(source).export(TransferSelection(typeIds=setOf("query-parent"),goalIds=setOf("query-goal"),savedReportIds=setOf("query-axis-report"),subjectRecords=setOf(SubjectRecordKey(SubjectRecordKind.CARD,card.id))))
+    assertEquals(1,pack.groups.size)
+    val target=Tracker(create(),clock);target.saveCard(target.snapshot().token,Card(card.id,"Local original"))
+    val importer=SelectiveTransfer(target)
+    assertTrue(importer.apply(importer.plan(pack,pack.groups.map { it.id }.toSet(),pack.groups.associate { it.id to TransferConflictPolicy.COPY }),"query-reference-copy").complete)
+    val copied=target.data().cards.single { it.id!=card.id }
+    val child=target.data().types.single { it.id==copied.activityTypeId }
+    assertEquals(child.parentId,target.data().goals.single().filter.activityTypeId)
+    assertEquals(copied.facets.single().axisId,target.data().savedReports.single().groupKey)
+    assertEquals(copied.id,target.data().subjects.cards.single().cardId)
+}

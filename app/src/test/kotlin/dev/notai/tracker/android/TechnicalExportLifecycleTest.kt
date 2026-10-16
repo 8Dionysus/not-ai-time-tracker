@@ -106,7 +106,7 @@ class TechnicalExportLifecycleTest {
             invoke("cancelPreparedExport");waitFor { exports.read(id).state=="CANCELLED" }
             assertTrue("An explicitly cancelled preparation has no chooser result left to receive",exports.read(id).resultReceived)
             assertTrue(gate.state().references.any { it.blocker==CopyBlocker.EXPORT_WRITING })
-        } finally { release.countDown() }
+        } finally { release.countDown();waitFor { gate.state().references.none { it.owner=="export-prepare:$id" } } }
         waitFor { exports.read(id).bytes>0 && gate.state().references.none { it.owner=="export-prepare:$id" } }
         assertTrue(exports.read(id).resultReceived);assertNull(shadowOf(controller.get()).nextStartedActivityForResult)
         assertEquals("Before cancellation retained tail",File(app.noBackupFilesDir,"exports/$id/data").readText())

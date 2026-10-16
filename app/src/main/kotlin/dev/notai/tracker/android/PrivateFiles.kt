@@ -73,13 +73,21 @@ class ExportOperations(private val context: Context) {
             val data = File(dir(id),"data");DirectoryDurability.rename(part,data);syncDirectory(dir(id))
             val bytes = data.length();val hash = fileHash(data)
             PrivateFileMaintenance.forContext(context).locked {
-                op.copy(state = if(read(id).state == "CANCELLED") "CANCELLED" else "READY",bytes = bytes,sha256 = hash,error = null).also(::save)
+                val current = read(id)
+                op.copy(state = if(current.state == "CANCELLED") "CANCELLED" else "READY",bytes = bytes,sha256 = hash,error = null,resultReceived = current.resultReceived).also(::save)
             }
-        } catch(e: Exception) { save(op.copy(state = "FAILED",error = e.javaClass.simpleName));throw e }
+        } catch(e: Exception) {
+            PrivateFileMaintenance.forContext(context).locked {
+                val current = read(id)
+                save(current.copy(state = if(current.state == "CANCELLED") "CANCELLED" else "FAILED",error = e.javaClass.simpleName))
+            }
+            throw e
+        }
     }
     fun cancel(id: String) = PrivateFileMaintenance.writing(context,"export-cancel:$id") { cancelUnsafe(id) }
     private fun cancelUnsafe(id: String) = PrivateFileMaintenance.forContext(context).locked { val op = read(id);save(op.copy(state = "CANCELLED")) } // retain staged bytes for explicit retry
-    /** Persist consumption of the chooser result before scheduling any destination I/O.
+    /** Persist consumption of a chooser result (or explicit owner cancellation before any chooser).
+     * The owner must keep an active chooser protected until its actual result arrives.
      * No destination URI or grant is retained: an interrupted write needs a fresh chooser. */
     fun receiveResult(id: String,cancelled: Boolean) = PrivateFileMaintenance.writing(context,"export-result:$id") { receiveResultUnsafe(id,cancelled) }
     private fun receiveResultUnsafe(id: String,cancelled: Boolean) {

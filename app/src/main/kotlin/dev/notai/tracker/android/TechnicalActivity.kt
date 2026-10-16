@@ -473,18 +473,34 @@ class TechnicalActivity: Activity() {
     }
     private fun beginExport(mime: String,title: String,write: (java.io.OutputStream)->Unit) {
         val active = pendingExportId?.let { runCatching { exportOperations.read(it) }.getOrNull() }
-        if(active?.state in setOf("PREPARING","READY")) { status.text = "Завершите или отмените текущий экспорт";return }
+        if(active?.state in setOf("PREPARING","READY") || active?.resultReceived == false) { status.text = "Завершите или отмените текущий экспорт";return }
         val op = try { exportOperations.begin(mime,title) } catch(e: Exception) { status.text = "Подготовка экспорта не началась: ${e.message}";return }
         pendingExportId = op.id
         runAction { val prepared = exportOperations.prepare(op.id,write);withContext(Dispatchers.Main) { if(prepared.state == "READY") showExportPicker(op.id) } }
     }
     private fun cancelPreparedExport() {
         val id = pendingExportId ?: exportOperations.latestPending()?.id
-        if(id != null) runAction { exportOperations.cancel(id);withContext(Dispatchers.Main) { status.text = "Экспорт отменён; файлы сохранены. Можно подготовить новую копию.";pendingExportId = null } }
+        if(id != null) runAction {
+            val gate = PrivateFileMaintenance.forContext(this@TechnicalActivity)
+            val awaiting = gate.locked {
+                val held = gate.state().references.any { it.owner == "export-chooser:$id" }
+                if(held) exportOperations.cancel(id) else exportOperations.receiveResult(id,true)
+                held
+            }
+            withContext(Dispatchers.Main) {
+                status.text = "Экспорт отменён; файлы сохранены. Можно подготовить новую копию."
+                if(!awaiting && pendingExportId == id) pendingExportId = null
+            }
+        }
     }
-    private fun showExportPicker(id: String) {
-        val op = exportOperations.read(id)
-        exportOperations.awaitResult(id)
+    private fun showExportPicker(id: String,retry: Boolean = false) {
+        val gate = PrivateFileMaintenance.forContext(this)
+        val op = gate.locked {
+            val current = exportOperations.read(id)
+            val held = gate.state().references.any { it.owner == "export-chooser:$id" }
+            if(pendingExportId != id || held || (current.state != "READY" && !(retry && current.state == "CANCELLED"))) null
+            else { exportOperations.awaitResult(id);current }
+        } ?: return
         try {
             startActivityForResult(Intent(Intent.ACTION_CREATE_DOCUMENT).apply { type = op.mime;addCategory(Intent.CATEGORY_OPENABLE);putExtra(Intent.EXTRA_TITLE,op.title) },1)
         } catch(e: Exception) {
@@ -497,7 +513,7 @@ class TechnicalActivity: Activity() {
         if(id == null) { status.text = "Нет подготовленного экспорта";return }
         pendingExportId = id
         val op = exportOperations.read(id)
-        if(op.state in setOf("READY","CANCELLED")) showExportPicker(id) else status.text = "Экспорт ${op.state}: повторите подготовку; частичный файл сохранён"
+        if(op.state in setOf("READY","CANCELLED")) showExportPicker(id,true) else status.text = "Экспорт ${op.state}: повторите подготовку; частичный файл сохранён"
     }
     private fun restoreSource(file: java.io.File) = runAction {
         val request = restoreReviews.begin() ?: return@runAction

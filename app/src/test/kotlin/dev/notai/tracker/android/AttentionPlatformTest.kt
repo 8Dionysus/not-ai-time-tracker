@@ -44,7 +44,8 @@ class AttentionPlatformTest {
             LongRecordNoticeBinding.factory = LongRecordNoticeFactory { c,_,_ -> Notification.Builder(c,AndroidLongRecordPlatform.CHANNEL)
                 .setSmallIcon(android.R.drawable.ic_media_pause).setContentTitle("Fixture check-in").build() }
             val store = AndroidLongRecordStore(context);val controller = LongRecordReminder(tracker,store,platform)
-            val before = tracker.data();val ticket = controller.configure(tracker.snapshot().token,LongRecordPreference(true,100,20)).ticket!!
+            val ticket = controller.configure(tracker.snapshot().token,LongRecordPreference(true,100,20),store.read().revision).ticket!!
+            val before = tracker.data()
             val alarms = shadowOf(context.getSystemService(AlarmManager::class.java))
             assertEquals(1,alarms.scheduledAlarms.size)
             val scheduled = shadowOf(alarms.scheduledAlarms.single().operation).savedIntent
@@ -102,5 +103,23 @@ class AttentionPlatformTest {
         assertEquals(FocusEffectStatus.FOREGROUND_REQUIRED,music.availability(null))
         assertNull(music.prepare(newId(),"unbound"))
         assertEquals(before,context.getSystemService(NotificationManager::class.java).currentInterruptionFilter)
+    }
+    @Test fun localAudioPinsOpenedBytesAndRejectsASymlinkWithoutStartingAPlayer() {
+        val context = RuntimeEnvironment.getApplication()
+        val root = java.io.File(context.cacheDir,"attention-audio-${newId()}").apply { mkdirs() }
+        val selected = java.io.File(root,"selected");val replacement = java.io.File(root,"replacement")
+        try {
+            selected.writeBytes(byteArrayOf(1,2,3));replacement.writeBytes(byteArrayOf(9,8,7))
+            openFocusAudioFile(selected).use { input ->
+                java.nio.file.Files.move(replacement.toPath(),selected.toPath(),StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING)
+                assertArrayEquals(byteArrayOf(1,2,3),input.readBytes())
+                assertArrayEquals(byteArrayOf(9,8,7),selected.readBytes())
+            }
+            val link = java.io.File(root,"link")
+            java.nio.file.Files.createSymbolicLink(link.toPath(),selected.toPath())
+            assertThrows(Exception::class.java) { openFocusAudioFile(link).use { } }
+            val empty = java.io.File(root,"empty").apply { writeBytes(byteArrayOf()) }
+            assertThrows(Exception::class.java) { openFocusAudioFile(empty).use { } }
+        } finally { root.deleteRecursively() }
     }
 }

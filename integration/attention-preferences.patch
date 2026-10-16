@@ -1,0 +1,669 @@
+--- a/core/src/main/kotlin/dev/notai/tracker/Model.kt
++++ b/core/src/main/kotlin/dev/notai/tracker/Model.kt
+@@ -53,7 +53,8 @@
+     val shortcut: Boolean = true) // Preserve the previously always-enabled launcher timer on legacy decode.
+ @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+ @Serializable data class Settings(val reportZone: String = "UTC",val surfaces: SurfaceSettings = SurfaceSettings(),val focusPlan: FocusPlan = FocusPlan(),
+-    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val schedule: ScheduleSettings = ScheduleSettings())
++    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val schedule: ScheduleSettings = ScheduleSettings(),
++    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val longRecordReminder: LongRecordPreference = LongRecordPreference())
+ @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+ @Serializable data class Dataset(@Required val datasetId: String = newId(), @Required val revision: Long = 0,
+     @Required val types: List<ActivityType> = Catalog.types,
+@@ -121,6 +122,7 @@
+     ensure(data.datasetId.isNotBlank() && data.revision >= 0 && data.timerEpoch >= 0, "Invalid dataset metadata")
+     try { ZoneId.of(data.settings.reportZone) } catch (_: Exception) { fail(ErrorCode.INVALID_INPUT, "Invalid report zone") }
+     validateScheduleSettings(data.settings.schedule)
++    validateLongRecordPreference(data.settings.longRecordReminder)
+     ids(data.types.map { it.id }); ids(data.cards.map { it.id }); ids(data.favorites.map { it.id }); ids(data.sessions.map { it.id })
+     ids(data.segments.map { it.id }); ids(data.measurements.map { it.id })
+     val typeIds = data.types.map { it.id }.toSet()
+--- a/core/src/main/kotlin/dev/notai/tracker/Backup.kt
++++ b/core/src/main/kotlin/dev/notai/tracker/Backup.kt
+@@ -6,7 +6,7 @@
+ import java.io.OutputStream
+ import java.io.ByteArrayOutputStream
+
+-@Serializable data class Backup(@Required val formatVersion: Int = 11,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
++@Serializable data class Backup(@Required val formatVersion: Int = 12,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
+ /** Bounded whole-String convenience API only; streaming full backups have no total-file cap. */
+ const val MAX_BACKUP_BYTES = 10*1024*1024
+
+@@ -36,6 +36,8 @@
+     }
+     @Synchronized override fun close() { if(!closed) { lease?.close();closed = true } }
+     val settings get() = backup.data.settings
++    /** Portable intent is restored; delivery stays blocked until separate device confirmation. */
++    val ordinaryReminderConfirmationRequired get() = settings.longRecordReminder.enabled
+     /** Inspect incoming reminder choices without a second parse or authority to edit the restore. */
+     val schedule: ScheduleData = backup.data.schedule.frozen()
+     val datasetId get() = backup.data.datasetId
+@@ -111,7 +113,7 @@
+         fun decode(json: String): Backup {
+             ensure(json.toByteArray(Charsets.UTF_8).size <= MAX_BACKUP_BYTES,"Backup exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
+             val b = try { decodeBackupVersion(json) } catch (_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed or unsupported JSON") }
+-            ensure(b.formatVersion == 11,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
++            ensure(b.formatVersion == 12,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
+             ensure(b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
+             try {
+                 validate(b.data)
+--- a/core/src/main/kotlin/dev/notai/tracker/Migration.kt
++++ b/core/src/main/kotlin/dev/notai/tracker/Migration.kt
+@@ -34,9 +34,9 @@
+ internal fun decodeBackupVersion(json: String): Backup {
+     val root = codec.parseToJsonElement(json).jsonObject
+     val version = root["formatVersion"]?.jsonPrimitive?.intOrNull
+-    ensure(version in 8..11 || listOf("schedule","transfer").none { it in root.getValue("data").jsonObject },"Schedule in legacy archive")
++    ensure(version in 8..12 || listOf("schedule","transfer").none { it in root.getValue("data").jsonObject },"Schedule in legacy archive")
+     val backup = when(version) {
+-        8,9,10,11 -> {
++        8,9,10,11,12 -> {
+             ensure(listOf("goals","focus","schedule","transfer").all { it in root.getValue("data").jsonObject },"Missing v8 backup fields")
+             codec.decodeFromJsonElement<Backup>(root).also { ensure(version != 8 || !it.data.transfer.hasCompactionState(),"Compaction in v8 archive") }
+         }
+@@ -54,12 +54,13 @@
+         2 -> codec.decodeFromJsonElement<Backup>(root)
+         1 -> {
+             val migrated = migrateV1(root).jsonObject.toMutableMap()
+-            migrated["formatVersion"] = JsonPrimitive(11)
++            migrated["formatVersion"] = JsonPrimitive(12)
+             codec.decodeFromJsonElement<Backup>(JsonObject(migrated))
+         }
+         else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unsupported backup version")
+     }
+-    ensure(version in 10..11 || (backup.data.settings.schedule == ScheduleSettings() && !backup.data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive")
+-    ensure(version == 11 || backup.data.settings.surfaces.shortcut,"Shortcut preference in legacy archive")
+-    return backup.copy(formatVersion = 11)
++    ensure(version in 10..12 || (backup.data.settings.schedule == ScheduleSettings() && !backup.data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive")
++    ensure(version in 11..12 || backup.data.settings.surfaces.shortcut,"Shortcut preference in legacy archive")
++    ensure(version == 12 || backup.data.settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in legacy archive")
++    return backup.copy(formatVersion = 12)
+ }
+--- a/core/src/main/kotlin/dev/notai/tracker/StreamingBackup.kt
++++ b/core/src/main/kotlin/dev/notai/tracker/StreamingBackup.kt
+@@ -12,7 +12,7 @@
+
+ internal const val MAX_BACKUP_RECORD_CHARS = 16*1024*1024
+
+-/** Portable JSON 10 without a whole-file String/ByteArray/JSON tree. Only one record is decoded
++/** Portable JSON 12 without a whole-file String/ByteArray/JSON tree. Only one record is decoded
+  * at a time; the resulting domain graph has the same size as a loaded store. Total file size
+  * is not capped by CSV's text limit. Re-openable inputs permit a bounded metadata first pass.
+  */
+@@ -67,7 +67,7 @@
+                 else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unknown backup field: $key")
+             } };json.finish()
+         }
+-        ensure(version in 1..11 && !id.isNullOrBlank() && asOf != null && hasData,"Unsupported backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
++        ensure(version in 1..12 && !id.isNullOrBlank() && asOf != null && hasData,"Unsupported backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
+         val format = version!!
+         val types = mutableListOf<ActivityType>();val axes = mutableListOf<Axis>();val metrics = mutableListOf<Metric>();val units = mutableListOf<UnitDefinition>()
+         val cards = mutableListOf<Card>();val favorites = mutableListOf<Favorite>();val sessions = mutableListOf<Session>();val segments = mutableListOf<Segment>()
+@@ -123,7 +123,8 @@
+         ensure(format >= 9 || !data.transfer.hasCompactionState(),"Compaction in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+         ensure(format >= 10 || (data.settings.schedule == ScheduleSettings() && !data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+         ensure(format >= 11 || data.settings.surfaces.shortcut,"Shortcut preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+-        Backup(formatVersion = 11,backupId = id!!,asOf = asOf!!,data = data.frozen()).also {
++        ensure(format >= 12 || data.settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
++        Backup(formatVersion = 12,backupId = id!!,asOf = asOf!!,data = data.frozen()).also {
+             validateBackup(it);onVerifiedSource(sourceHash.joinToString("") { byte -> (byte.toInt() and 255).toString(16).padStart(2,'0') })
+         }
+     } catch(e: CoreError) { if(e.code == ErrorCode.UNSUPPORTED_IMPORT) throw e else fail(ErrorCode.UNSUPPORTED_IMPORT,"Invalid backup: ${e.message}") }
+@@ -131,7 +132,7 @@
+     private fun reader(input: InputStream): Reader = InputStreamReader(input,Charsets.UTF_8.newDecoder()
+         .onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT)).buffered(64*1024)
+     internal fun validateBackup(b: Backup) {
+-        ensure(b.formatVersion == 11 && b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
++        ensure(b.formatVersion == 12 && b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
+         validate(b.data)
+         ensure(b.data.focus?.breakAnchor == null && b.data.segments.all { it.anchor == null },"Backup contains device anchors",ErrorCode.UNSUPPORTED_IMPORT)
+         ensure(b.data.segments.all { (it.start <= b.asOf || it.uncertain) && (it.end == null || it.end <= b.asOf || it.uncertain) &&
+--- a/app/src/main/kotlin/dev/notai/tracker/android/TrackerDatabase.kt
++++ b/app/src/main/kotlin/dev/notai/tracker/android/TrackerDatabase.kt
+@@ -64,7 +64,7 @@
+     @Query("DELETE FROM measurements WHERE id IN (:ids)") fun deleteMeasurements(ids: List<String>)
+     @Query("SELECT * FROM measurements WHERE id IN (:ids)") fun readMeasurements(ids: List<String>): List<MeasurementRow>
+ }
+-const val TRACKER_DATABASE_VERSION = 9
++const val TRACKER_DATABASE_VERSION = 10
+ @Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class,GenerationRow::class,VocabularyRow::class,ClassificationRow::class],version = TRACKER_DATABASE_VERSION,exportSchema = true)
+ abstract class TrackerDatabase: RoomDatabase() {
+     abstract fun dao(): TrackerDao
+@@ -168,6 +168,20 @@
+             }
+         }
+
++        val MIGRATION_9_10 = object: androidx.room.migration.Migration(9,10) {
++            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
++                readMetadataPayload(db)?.let { payload ->
++                    val old = codec.parseToJsonElement(payload).jsonObject
++                    val settings = codec.decodeFromJsonElement<Settings>(old["settings"] ?: fail(ErrorCode.STORAGE,"Missing legacy settings"))
++                    ensure(settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in v9 metadata",ErrorCode.STORAGE)
++                    // Only the portable preference default is new. No operational activation,
++                    // receipt, live anchor, permission or DND lease enters domain metadata.
++                    val next = JsonObject(old + ("settings" to codec.encodeToJsonElement(settings)))
++                    db.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(next.toString()))
++                }
++            }
++        }
++
+         fun open(context: Context,name: String = "tracker.db"): TrackerDatabase {
+             val file = context.getDatabasePath(name)
+             val existing = DatabaseFiles.paths(context,name).filter { it.exists() }
+@@ -190,7 +204,7 @@
+                 ensure(validHeader,"Database header is damaged; originals preserved. Use explicit recovery",ErrorCode.STORAGE)
+             }
+             return Room.databaseBuilder(context,TrackerDatabase::class.java,name)
+-            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5,MIGRATION_5_6,MIGRATION_6_7,MIGRATION_7_8,MIGRATION_8_9).openHelperFactory { configuration ->
++            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5,MIGRATION_5_6,MIGRATION_6_7,MIGRATION_7_8,MIGRATION_8_9,MIGRATION_9_10).openHelperFactory { configuration ->
+                 val original = configuration.callback
+                 val guarded = object: androidx.sqlite.db.SupportSQLiteOpenHelper.Callback(original.version) {
+                     override fun onConfigure(db: androidx.sqlite.db.SupportSQLiteDatabase) = original.onConfigure(db)
+--- /dev/null
++++ b/app/schemas/dev.notai.tracker.android.TrackerDatabase/10.json
+@@ -0,0 +1,451 @@
++{
++  "formatVersion": 1,
++  "database": {
++    "version": 10,
++    "identityHash": "cddb95fee7f57b976ad9aa187b0a208f",
++    "entities": [
++      {
++        "tableName": "activity_types",
++        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `position` INTEGER NOT NULL, `payload` TEXT NOT NULL, PRIMARY KEY(`id`))",
++        "fields": [
++          {
++            "fieldPath": "id",
++            "columnName": "id",
++            "affinity": "TEXT",
++            "notNull": true
++          },
++          {
++            "fieldPath": "position",
++            "columnName": "position",
++            "affinity": "INTEGER",
++            "notNull": true
++          },
++          {
++            "fieldPath": "payload",
++            "columnName": "payload",
++            "affinity": "TEXT",
++            "notNull": true
++          }
++        ],
++        "primaryKey": {
++          "autoGenerate": false,
++          "columnNames": [
++            "id"
++          ]
++        }
++      },
++      {
++        "tableName": "metadata",
++        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `payload` TEXT NOT NULL, PRIMARY KEY(`id`))",
++        "fields": [
++          {
++            "fieldPath": "id",
++            "columnName": "id",
++            "affinity": "INTEGER",
++            "notNull": true
++          },
++          {
++            "fieldPath": "payload",
++            "columnName": "payload",
++            "affinity": "TEXT",
++            "notNull": true
++          }
++        ],
++        "primaryKey": {
++          "autoGenerate": false,
++          "columnNames": [
++            "id"
++          ]
++        }
++      },
++      {
++        "tableName": "cards",
++        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `position` INTEGER NOT NULL, `payload` TEXT NOT NULL, PRIMARY KEY(`id`))",
++        "fields": [
++          {
++            "fieldPath": "id",
++            "columnName": "id",
++            "affinity": "TEXT",
++            "notNull": true
++          },
++          {
++            "fieldPath": "position",
++            "columnName": "position",
++            "affinity": "INTEGER",
++            "notNull": true
++          },
++          {
++            "fieldPath": "payload",
++            "columnName": "payload",
++            "affinity": "TEXT",
++            "notNull": true
++          }
++        ],
++        "primaryKey": {
++          "autoGenerate": false,
++          "columnNames": [
++            "id"
++          ]
++        }
++      },
++      {
++        "tableName": "sessions",
++        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `position` INTEGER NOT NULL, `status` TEXT NOT NULL, `selectionId` TEXT NOT NULL, `note` TEXT, `importOrigin` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`selectionId`) REFERENCES `history_classifications`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
++        "fields": [
++          {
++            "fieldPath": "id",
++            "columnName": "id",
++            "affinity": "TEXT",
++            "notNull": true
++          },
++          {
++            "fieldPath": "position",
++            "columnName": "position",
++            "affinity": "INTEGER",
++            "notNull": true
++          },
++          {
++            "fieldPath": "status",
++            "columnName": "status",
++            "affinity": "TEXT",
++            "notNull": true
++          },
++          {
++            "fieldPath": "selectionId",
++            "columnName": "selectionId",
++            "affinity": "TEXT",
++            "notNull": true
++          },
++          {
++            "fieldPath": "note",
++            "columnName": "note",
++            "affinity": "TEXT"
++          },
++          {
++            "fieldPath": "importOrigin",
++            "columnName": "importOrigin",
++            "affinity": "TEXT"
++          }
++        ],
++        "primaryKey": {
++          "autoGenerate": false,
++          "columnNames": [
++            "id"
++          ]
++        },
++        "indices": [
++          {
++            "name": "index_sessions_position_id",
++            "unique": false,
++            "columnNames": [
++              "position",
++              "id"
++            ],
++            "orders": [],
++            "createSql": "CREATE INDEX IF NOT EXISTS `index_sessions_position_id` ON `${TABLE_NAME}` (`position`, `id`)"
++          },
++          {
++            "name": "index_sessions_selectionId",
++            "unique": false,
++            "columnNames": [
++              "selectionId"
++            ],
++            "orders": [],
++            "createSql": "CREATE INDEX IF NOT EXISTS `index_sessions_selectionId` ON `${TABLE_NAME}` (`selectionId`)"
++          }
++        ],
++        "foreignKeys": [
++          {
++            "table": "history_classifications",
++            "onDelete": "NO ACTION",
++            "onUpdate": "NO ACTION",
++            "columns": [
++              "selectionId"
++            ],
++            "referencedColumns": [
++              "id"
++            ]
++          }
++        ]
++      },
++      {
++        "tableName": "segments",
++        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `position` INTEGER NOT NULL, `sessionId` TEXT NOT NULL, `openSlot` INTEGER, `start` INTEGER NOT NULL, `end` INTEGER, `durationMs` INTEGER NOT NULL, `selectionId` TEXT NOT NULL, `anchor` TEXT, `uncertain` INTEGER NOT NULL, `observedUntil` INTEGER, `limitMs` INTEGER, PRIMARY KEY(`id`), FOREIGN KEY(`sessionId`) REFERENCES `sessions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`selectionId`) REFERENCES `history_classifications`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
++        "fields": [
++          {
++            "fieldPath": "id",
++            "columnName": "id",
++            "affinity": "TEXT",
++            "notNull": true
++          },
++          {
++            "fieldPath": "position",
++            "columnName": "position",
++            "affinity": "INTEGER",
++            "notNull": true
++          },
++          {
++            "fieldPath": "sessionId",
++            "columnName": "sessionId",
++            "affinity": "TEXT",
++            "notNull": true
++          },
++          {
++            "fieldPath": "openSlot",
++            "columnName": "openSlot",
++            "affinity": "INTEGER"
++          },
++          {
++            "fieldPath": "start",
++            "columnName": "start",
++            "affinity": "INTEGER",
++            "notNull": true
++          },
++          {
++            "fieldPath": "end",
++            "columnName": "end",
++            "affinity": "INTEGER"
++          },
++          {
++            "fieldPath": "durationMs",
++            "columnName": "durationMs",
++            "affinity": "INTEGER",
++            "notNull": true
++          },
++          {
++            "fieldPath": "selectionId",
++            "columnName": "selectionId",
++            "affinity": "TEXT",
++            "notNull": true
++          },
++          {
++            "fieldPath": "anchor",
++            "columnName": "anchor",
++            "affinity": "TEXT"
++          },
++          {
++            "fieldPath": "uncertain",
++            "columnName": "uncertain",
++            "affinity": "INTEGER",
++            "notNull": true
++          },
++          {
++            "fieldPath": "observedUntil",
++            "columnName": "observedUntil",
++            "affinity": "INTEGER"
++          },
++          {
++            "fieldPath": "limitMs",
++            "columnName": "limitMs",
++            "affinity": "INTEGER"
++          }
++        ],
++        "primaryKey": {
++          "autoGenerate": false,
++          "columnNames": [
++            "id"
++          ]
++        },
++        "indices": [
++          {
++            "name": "index_segments_sessionId",
++            "unique": false,
++            "columnNames": [
++              "sessionId"
++            ],
++            "orders": [],
++            "createSql": "CREATE INDEX IF NOT EXISTS `index_segments_sessionId` ON `${TABLE_NAME}` (`sessionId`)"
++          },
++          {
++            "name": "index_segments_openSlot",
++            "unique": true,
++            "columnNames": [
++              "openSlot"
++            ],
++            "orders": [],
++            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_segments_openSlot` ON `${TABLE_NAME}` (`openSlot`)"
++          },
++          {
++            "name": "index_segments_position_id",
++            "unique": false,
++            "columnNames": [
++              "position",
++              "id"
++            ],
++            "orders": [],
++            "createSql": "CREATE INDEX IF NOT EXISTS `index_segments_position_id` ON `${TABLE_NAME}` (`position`, `id`)"
++          },
++          {
++            "name": "index_segments_selectionId",
++            "unique": false,
++            "columnNames": [
++              "selectionId"
++            ],
++            "orders": [],
++            "createSql": "CREATE INDEX IF NOT EXISTS `index_segments_selectionId` ON `${TABLE_NAME}` (`selectionId`)"
++          }
++        ],
++        "foreignKeys": [
++          {
++            "table": "sessions",
++            "onDelete": "CASCADE",
++            "onUpdate": "NO ACTION",
++            "columns": [
++              "sessionId"
++            ],
++            "referencedColumns": [
++              "id"
++            ]
++          },
++          {
++            "table": "history_classifications",
++            "onDelete": "NO ACTION",
++            "onUpdate": "NO ACTION",
++            "columns": [
++              "selectionId"
++            ],
++            "referencedColumns": [
++              "id"
++            ]
++          }
++        ]
++      },
++      {
++        "tableName": "favorites",
++        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `position` INTEGER NOT NULL, `payload` TEXT NOT NULL, PRIMARY KEY(`id`))",
++        "fields": [
++          {
++            "fieldPath": "id",
++            "columnName": "id",
++            "affinity": "TEXT",
++            "notNull": true
++          },
++          {
++            "fieldPath": "position",
++            "columnName": "position",
++            "affinity": "INTEGER",
++            "notNull": true
++          },
++          {
++            "fieldPath": "payload",
++            "columnName": "payload",
++            "affinity": "TEXT",
++            "notNull": true
++          }
++        ],
++        "primaryKey": {
++          "autoGenerate": false,
++          "columnNames": [
++            "id"
++          ]
++        }
++      },
++      {
++        "tableName": "measurements",
++        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `position` INTEGER NOT NULL, `payload` TEXT NOT NULL, PRIMARY KEY(`id`))",
++        "fields": [
++          {
++            "fieldPath": "id",
++            "columnName": "id",
++            "affinity": "TEXT",
++            "notNull": true
++          },
++          {
++            "fieldPath": "position",
++            "columnName": "position",
++            "affinity": "INTEGER",
++            "notNull": true
++          },
++          {
++            "fieldPath": "payload",
++            "columnName": "payload",
++            "affinity": "TEXT",
++            "notNull": true
++          }
++        ],
++        "primaryKey": {
++          "autoGenerate": false,
++          "columnNames": [
++            "id"
++          ]
++        }
++      },
++      {
++        "tableName": "store_generation",
++        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `generation` INTEGER NOT NULL, PRIMARY KEY(`id`))",
++        "fields": [
++          {
++            "fieldPath": "id",
++            "columnName": "id",
++            "affinity": "INTEGER",
++            "notNull": true
++          },
++          {
++            "fieldPath": "generation",
++            "columnName": "generation",
++            "affinity": "INTEGER",
++            "notNull": true
++          }
++        ],
++        "primaryKey": {
++          "autoGenerate": false,
++          "columnNames": [
++            "id"
++          ]
++        }
++      },
++      {
++        "tableName": "vocabulary",
++        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `payload` TEXT NOT NULL, PRIMARY KEY(`id`))",
++        "fields": [
++          {
++            "fieldPath": "id",
++            "columnName": "id",
++            "affinity": "INTEGER",
++            "notNull": true
++          },
++          {
++            "fieldPath": "payload",
++            "columnName": "payload",
++            "affinity": "TEXT",
++            "notNull": true
++          }
++        ],
++        "primaryKey": {
++          "autoGenerate": false,
++          "columnNames": [
++            "id"
++          ]
++        }
++      },
++      {
++        "tableName": "history_classifications",
++        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `payload` TEXT NOT NULL, PRIMARY KEY(`id`))",
++        "fields": [
++          {
++            "fieldPath": "id",
++            "columnName": "id",
++            "affinity": "TEXT",
++            "notNull": true
++          },
++          {
++            "fieldPath": "payload",
++            "columnName": "payload",
++            "affinity": "TEXT",
++            "notNull": true
++          }
++        ],
++        "primaryKey": {
++          "autoGenerate": false,
++          "columnNames": [
++            "id"
++          ]
++        }
++      }
++    ],
++    "setupQueries": [
++      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
++      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cddb95fee7f57b976ad9aa187b0a208f')"
++    ]
++  }
++}
+--- a/core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt
++++ b/core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt
+@@ -320,11 +320,11 @@
+         assertEquals(pack.groups,importer.export(TransferSelection(sessionIds = t.data().sessions.map { it.id }.toSet())).groups)
+         val again = importer.plan(pack,pack.groups.map { it.id }.toSet());assertTrue(again.conflicts.isEmpty())
+         assertEquals(TransferGroupState.UNCHANGED,importer.apply(again,"after-prune-dedupe").groups.single().state)
+-        val json = Backups(t,MemoryRollback()).export();assertEquals(11,codec.parseToJsonElement(json).jsonObject.getValue("formatVersion").jsonPrimitive.int)
++        val json = Backups(t,MemoryRollback()).export();assertEquals(12,codec.parseToJsonElement(json).jsonObject.getValue("formatVersion").jsonPrimitive.int)
+         assertEquals(t.data().transfer,Backups.decode(json).data.transfer)
+         val bytes = java.io.ByteArrayOutputStream();Backups(t,MemoryRollback()).write(bytes)
+         assertEquals(t.data().transfer,StreamingBackup.read { bytes.toByteArray().inputStream() }.data.transfer)
+-        for(text in listOf(json.replace("\"formatVersion\": 11","\"formatVersion\": 8"),bytes.toString("UTF-8").replace("\"formatVersion\":11","\"formatVersion\":8"))) {
++        for(text in listOf(json.replace("\"formatVersion\": 12","\"formatVersion\": 8"),bytes.toString("UTF-8").replace("\"formatVersion\":12","\"formatVersion\":8"))) {
+             expect(ErrorCode.UNSUPPORTED_IMPORT) { Backups.decode(text) };expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { text.byteInputStream() } }
+         }
+         val destination = Tracker(createStore(),clock);val backups = Backups(destination,MemoryRollback());backups.apply(backups.prepare(json))
+@@ -537,7 +537,7 @@
+         val result = t.scheduleCommand(start);assertEquals(result,t.scheduleCommand(start));assertEquals(1,t.data().sessions.size)
+         t = Tracker(reopen(t.store),clock);assertEquals(result,t.scheduleCommand(start));assertEquals(result.sessionId,t.data().schedule.links.single().sessionId)
+         clock.advance(1000);t.stop(t.snapshot().token)
+-        val backups = Backups(t,MemoryRollback());val backup = backups.export();assertEquals(11,Backups.decode(backup).formatVersion)
++        val backups = Backups(t,MemoryRollback());val backup = backups.export();assertEquals(12,Backups.decode(backup).formatVersion)
+         val clean = Tracker(createStore(),clock);val restore = Backups(clean,MemoryRollback());val preview = restore.prepare(backup)
+         assertEquals(1,preview.scheduleSeries);assertEquals(1,preview.scheduleLinks);restore.apply(preview)
+         assertEquals(t.data().schedule,clean.data().schedule);assertEquals(t.data().sessions,clean.data().sessions)
+@@ -1914,7 +1914,7 @@
+         assertTrue(Backups.decode(disk.read(result.rollbackReference)).data.sessions.isEmpty())
+         val full = clean.data()
+         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.dropLast(7)) }; assertEquals(full,clean.data())
+-        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 11","\"formatVersion\": 1099")) }; assertEquals(full,clean.data())
++        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 12","\"formatVersion\": 1099")) }; assertEquals(full,clean.data())
+         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"datasetId\": \"${raw.data.datasetId}\",", "")) }; assertEquals(full,clean.data())
+         val broken = raw.copy(data = raw.data.copy(segments = raw.data.segments+raw.data.segments.first()))
+         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(codec.encodeToString(broken)) }; assertEquals(full,clean.data())
+@@ -1981,7 +1981,7 @@
+         val text = bytes.toString(Charsets.UTF_8)
+         val malformed = text.substringBefore("Streamed note").toByteArray() + byteArrayOf(0xC3.toByte(),0x28) + text.substringAfter("Streamed note").toByteArray()
+         for(bad in listOf(bytes.copyOf(bytes.size-2),malformed,
+-            text.replaceFirst("\"formatVersion\":11","\"formatVersion\":10,\"formatVersion\":11").toByteArray(),bytes+byteArrayOf(1))) {
++            text.replaceFirst("\"formatVersion\":12","\"formatVersion\":10,\"formatVersion\":12").toByteArray(),bytes+byteArrayOf(1))) {
+             expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { bad.inputStream() } }
+         }
+         expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { (byteArrayOf(0xFF.toByte())+bytes).inputStream() } }
+--- a/app/src/test/kotlin/dev/notai/tracker/android/RoomScenariosTest.kt
++++ b/app/src/test/kotlin/dev/notai/tracker/android/RoomScenariosTest.kt
+@@ -681,7 +681,7 @@
+     }
+     override fun createStore(): StateStore = open("test-${newId()}.db")
+     private fun open(name: String): StateStore {
+-        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9).allowMainThreadQueries().build()
++        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9,TrackerDatabase.MIGRATION_9_10).allowMainThreadQueries().build()
+         return try { RoomStore(db).also { databases[it] = name to db } } catch(e: Exception) { db.close();throw e }
+     }
+     override fun reopen(store: StateStore): StateStore {

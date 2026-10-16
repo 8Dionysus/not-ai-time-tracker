@@ -26,14 +26,16 @@ object ObservationFacts {
     fun week(data: Dataset,now: Moment,date: LocalDate,zone: String,request: ObservationRequest): ObservationWeek? {
         if(!request.enabled) return null
         validateMoment(now)
-        ensure(request.recordedMilestonesMs.size <= 64 && request.recordedMilestonesMs.all { it in 1..MAX_TIME },"Invalid observation milestone")
-        ensure(request.goalIds.all { id -> data.goals.any { it.id == id } },"Missing observation goal")
+        val thresholds = frozenSet(request.recordedMilestonesMs);val selectedGoals = frozenSet(request.goalIds)
+        val filter = request.filter.copy(details = frozenMap(request.filter.details),tags = frozenSet(request.filter.tags),facets = frozenList(request.filter.facets))
+        ensure(thresholds.size <= 64 && thresholds.all { it in 1..MAX_TIME },"Invalid observation milestone")
+        ensure(selectedGoals.all { id -> data.goals.any { it.id == id } },"Missing observation goal")
         val zoneId = try { ZoneId.of(zone) } catch(_: Exception) { fail(ErrorCode.INVALID_INPUT,"Invalid observation zone") }
         val first = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-        val calendar = Reports.calendar(data,now,first,7,request.filter,zoneId.id)
+        val calendar = Reports.calendar(data,now,first,7,filter,zoneId.id)
         val report = calendar.window
         val days = calendar.days.map { ObservationDay(it.date,it.recordedMs,it.recordedMs > 0) }
-        val goals = request.goalIds.sorted().map { id ->
+        val goals = selectedGoals.sorted().map { id ->
             val goal = data.goals.single { it.id == id }
             val progress = Goals.progress(data,now,id,date)
             ObservationGoal(id,progress,goal.enabled && goal.metric == GoalMetric.DURATION_MS && goal.direction == GoalDirection.MINIMUM &&
@@ -41,6 +43,6 @@ object ObservationFacts {
         }
         return ObservationWeek(token(data),now.wall,first,zone,report.recordedMs,frozenList(days),days.count { it.hasPositiveRecord },
             frozenSet(report.unresolved.map { it.id }),report.incomplete,
-            frozenList(request.recordedMilestonesMs.sorted().map { RecordedMilestone(it,report.recordedMs >= it) }),frozenList(goals))
+            frozenList(thresholds.sorted().map { RecordedMilestone(it,report.recordedMs >= it) }),frozenList(goals))
     }
 }

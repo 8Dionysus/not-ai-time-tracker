@@ -16,6 +16,7 @@ class AttentionReminderPlatform: LongRecordPlatform {
     var capability = ScheduleDeliveryAvailability()
     var pending: LongRecordTicket? = null
     var posts = 0
+    var notice: LongRecordTicket? = null
     var prepareAction: (()->Unit)? = null
     var postAction: (()->Unit)? = null
     override fun availability() = capability
@@ -23,9 +24,9 @@ class AttentionReminderPlatform: LongRecordPlatform {
     override fun cancelAlarm() { pending = null }
     override fun prepare(ticket: LongRecordTicket,snapshot: Snapshot): PreparedLongRecordNotice {
         prepareAction?.invoke()
-        return PreparedLongRecordNotice { posts++;postAction?.invoke();true }
+        return PreparedLongRecordNotice { posts++;notice = ticket;postAction?.invoke();true }
     }
-    override fun cancelNotice() {}
+    override fun cancelNotice() { notice = null }
 }
 class AttentionEnvironmentStore: FocusEnvironmentStore {
     var value = FocusEnvironmentControl()
@@ -38,11 +39,18 @@ class AttentionDistractions(private val state: AttentionEnvironmentStore): Focus
     var released = FocusEffectStatus.RELEASED
     var activations = 0
     var releases = 0
+    var creations = 0
+    var prepareAction: (()->Unit)? = null
     var alarm: FocusEnvironmentRequest? = null
     override fun availability() = capability
-    override fun prepare(request: FocusEnvironmentRequest) = FocusDndLease(request.id,"own-rule",request.id,"fingerprint")
+    override fun prepare(request: FocusEnvironmentRequest,previous: FocusDndLease?): FocusDndPreparation {
+        if(previous == null) creations++
+        prepareAction?.invoke()
+        return FocusDndPreparation(previous?.copy(requestId = request.id) ?:
+            FocusDndLease(request.id,"own-rule",request.id,"fingerprint"),FocusEffectStatus.READY)
+    }
     override fun activate(lease: FocusDndLease): FocusEffectStatus {
-        assertEquals(lease,state.value.lease);assertNotNull(alarm);activations++;return FocusEffectStatus.APPLY_ACCEPTED
+        assertEquals(lease,state.value.lease);assertTrue(state.value.leaseActive);assertNotNull(alarm);activations++;return FocusEffectStatus.APPLY_ACCEPTED
     }
     override fun release(lease: FocusDndLease): FocusEffectStatus { releases++;return released }
     override fun scheduleRelease(request: FocusEnvironmentRequest) { alarm = request }
@@ -52,12 +60,16 @@ class AttentionMusic: FocusMusicPort {
     var plays = 0
     var stops = 0
     var current = FocusEffectStatus.OFF
+    var prepareAction: (()->Unit)? = null
     override fun availability(localId: String?) = FocusEffectStatus.READY
-    override fun prepare(requestId: String,localId: String) = PreparedFocusMusic { plays++;current = FocusEffectStatus.ACTIVE;current }
+    override fun prepare(requestId: String,localId: String): PreparedFocusMusic {
+        prepareAction?.invoke()
+        return PreparedFocusMusic { plays++;current = FocusEffectStatus.ACTIVE;current }
+    }
     override fun status(requestId: String) = current
     override fun stop(requestId: String): FocusEffectStatus { stops++;current = FocusEffectStatus.RELEASED;return current }
 }
-/** The same three consumer scenarios run through Memory and Room stores. Platform fakes are
+/** The same four consumer scenarios run through Memory and Room stores. Platform fakes are
  * intentional: these tests constrain domain effects and receipts, not Android delivery or sound. */
 abstract class AttentionScenarioContract {
     abstract fun createAttentionStore(): StateStore
@@ -98,12 +110,18 @@ abstract class AttentionScenarioContract {
         val checkin = LongRecordReminder(t,receipts,platform)
         t.start(t.snapshot().token)
         assertNull(checkin.synchronize().ticket)
-        val before = t.data()
-        val ticket = checkin.configure(t.snapshot().token,LongRecordPreference(true,100,20)).ticket!!
+        val history = t.data()
+        val ticket = checkin.configure(t.snapshot().token,LongRecordPreference(true,100,20),receipts.value.revision).ticket!!
+        val before = t.data();assertEquals(history.sessions,before.sessions);assertEquals(history.segments,before.segments)
         assertEquals(before,t.data());assertEquals(LongRecordOutcome.EARLY,checkin.onAlarm(ticket.hash).outcome)
         clock.advance(100)
         assertEquals(LongRecordOutcome.POST_ACCEPTED,checkin.onAlarm(ticket.hash).outcome)
         assertEquals(before,t.data());checkin.onAlarm(ticket.hash);assertEquals(1,platform.posts)
+        clock.wall += 5000
+        assertEquals(LongRecordOutcome.STALE,checkin.onAlarm(ticket.hash).outcome)
+        assertNotNull(receipts.value.attempt);assertNull(platform.notice)
+        clock.wall -= 5000
+        assertEquals(LongRecordOutcome.PREVIOUS_ATTEMPT,checkin.onAlarm(ticket.hash).outcome);assertEquals(1,platform.posts)
         val next = checkin.respond(t.snapshot().token,ticket.hash,LongRecordAction.CONTINUE).state.ticket!!
         assertEquals(before,t.data());assertEquals(200L,next.dueDurationMs)
         assertEquals(LongRecordOutcome.STALE,checkin.onAlarm(ticket.hash).outcome)
@@ -125,15 +143,22 @@ abstract class AttentionScenarioContract {
         val effects = FocusEnvironment(t,state,dnd,audio);val before = t.data()
         effects.synchronize();assertEquals(0,dnd.activations);assertEquals(0,audio.plays)
         val id = newId();val choice = FocusEnvironmentChoice(true,true,"chosen-local")
-        val started = effects.begin(t.snapshot().token,id,choice)
+        val started = effects.begin(t.snapshot().token,id,choice,state.value.revision)
         assertEquals(FocusEffectStatus.APPLY_ACCEPTED,started.distractions);assertEquals(1,audio.plays)
-        effects.begin(t.snapshot().token,id,choice);assertEquals(1,dnd.activations);assertEquals(1,audio.plays)
+        effects.begin(t.snapshot().token,id,choice,state.value.revision);assertEquals(1,dnd.activations);assertEquals(1,audio.plays)
         assertEquals(before,t.data());clock.advance(100)
         effects.onExpiry(id);assertEquals(1,dnd.releases);assertTrue(audio.stops > 0)
+        assertFalse(state.value.leaseActive);assertNotNull(state.value.lease);assertNull(state.value.request)
         assertEquals(FocusMode.DUE,t.snapshot().focus!!.mode);assertEquals(before,t.data())
         t.focusNext(t.snapshot().token)
-        assertEquals(ErrorCode.INVALID_INPUT,assertFailsWith<CoreError> { effects.begin(t.snapshot().token,newId(),choice) }.code)
+        assertEquals(ErrorCode.INVALID_INPUT,assertFailsWith<CoreError> { effects.begin(t.snapshot().token,newId(),choice,state.value.revision) }.code)
         assertEquals(1,dnd.activations)
+        clock.advance(20)
+        t.focusNext(t.snapshot().token)
+        val nextId = newId()
+        effects.begin(t.snapshot().token,nextId,choice,state.value.revision)
+        effects.onExpiry(id) // The old alarm cannot revoke a different live request.
+        assertEquals(nextId,state.value.request!!.id);assertEquals(2,dnd.activations);assertEquals(1,dnd.creations)
     }
     @Test fun observationsAreDerivedRetractableAndUnaffectedByFragmentCount() {
         val clock = FakeClock(wall = Instant.parse("2026-10-10T12:00:00Z").toEpochMilli())
@@ -162,5 +187,32 @@ abstract class AttentionScenarioContract {
         val goals = ObservationFacts.week(t.data(),clock.now(),date,"UTC",request.copy(goalIds = setOf(durationGoal.id,countGoal.id)))!!.goals
         assertTrue(goals.single { it.id == durationGoal.id }.acknowledgementEligible)
         assertFalse(goals.single { it.id == countGoal.id }.acknowledgementEligible)
+    }
+    @Test fun portableReminderPreferencesRoundTripButRequireDeviceConfirmation() {
+        val clock = FakeClock();val source = Tracker(createAttentionStore(),clock)
+        val local = AttentionReminderStore();val platform = AttentionReminderPlatform()
+        val first = LongRecordReminder(source,local,platform)
+        source.start(source.snapshot().token)
+        val preference = LongRecordPreference(true,100,20)
+        val ticket = first.configure(source.snapshot().token,preference,local.value.revision).ticket!!
+        clock.advance(100);first.onAlarm(ticket.hash)
+        val json = Backups(source,MemoryRollback()).export()
+        val bytes = java.io.ByteArrayOutputStream();Backups(source,MemoryRollback()).write(bytes)
+        assertEquals(preference,Backups.decode(json).data.settings.longRecordReminder)
+        assertEquals(preference,StreamingBackup.read { bytes.toByteArray().inputStream() }.data.settings.longRecordReminder)
+        val target = Tracker(createAttentionStore(),clock);val backups = Backups(target,MemoryRollback())
+        val preview = backups.prepare(json);assertEquals(preference,preview.settings.longRecordReminder)
+        assertTrue(preview.ordinaryReminderConfirmationRequired)
+        backups.apply(preview)
+        val restored = LongRecordReminder(target,local,platform)
+        assertTrue(restored.synchronize().confirmationRequired);assertNull(platform.pending)
+        val segment = target.data().segments.single()
+        target.resolveTail(target.snapshot().token,segment.start,clock.wall)
+        target.start(target.snapshot().token)
+        val waiting = restored.synchronize();assertTrue(waiting.confirmationRequired);assertNull(waiting.ticket)
+        val before = target.data()
+        val confirmed = restored.confirm(target.snapshot().token,waiting.controlRevision)
+        assertFalse(confirmed.confirmationRequired);assertNotNull(confirmed.ticket);assertEquals(before,target.data())
+        assertEquals(preference,target.data().settings.longRecordReminder)
     }
 }

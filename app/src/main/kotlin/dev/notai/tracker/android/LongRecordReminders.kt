@@ -82,8 +82,8 @@ class AndroidLongRecordPlatform(context: Context): LongRecordPlatform {
 }
 /** Blocking controller; call on IO. Shared file gate also serializes multiple wrappers.
  * Runtime integration is deliberately a small owner-applied patch, not a new timer engine. */
-class AndroidLongRecordReminders(context: Context,tracker: Tracker) {
-    val controller = LongRecordReminder(tracker,AndroidLongRecordStore(context),AndroidLongRecordPlatform(context))
+class AndroidLongRecordReminders(context: Context,tracker: Tracker,active: ()->Boolean = { true }) {
+    val controller = LongRecordReminder(tracker,AndroidLongRecordStore(context),AndroidLongRecordPlatform(context),active)
     fun synchronize() = controller.synchronize()
     fun onAlarm(hash: String) = controller.onAlarm(hash)
 }

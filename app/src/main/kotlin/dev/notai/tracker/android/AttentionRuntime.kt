@@ -16,17 +16,26 @@ import kotlinx.coroutines.*
  */
 class AttentionRuntime(context: Context,tracker: Tracker) {
     private val context = context.applicationContext
-    val ordinary = AndroidLongRecordReminders(this.context,tracker)
-    val focus = AndroidFocusEnvironment(this.context,tracker)
+    @Volatile private var closed = false
+    private val visibility = Any()
+    val ordinary = AndroidLongRecordReminders(this.context,tracker) { !closed }
+    val focus = AndroidFocusEnvironment(this.context,tracker) { !closed }
     private val scope = CoroutineScope(SupervisorJob()+Dispatchers.IO)
     private var resumed = 0
     private val lifecycle = object: Application.ActivityLifecycleCallbacks {
         override fun onActivityResumed(activity: Activity) {
-            resumed++;focus.foregroundHint(true);refresh()
+            synchronized(visibility) {
+                if(closed) return
+                resumed++;focus.foregroundHint(true)
+            }
+            refresh()
         }
         override fun onActivityPaused(activity: Activity) {
-            resumed = maxOf(0,resumed-1)
-            focus.foregroundHint(resumed > 0) // prevent starts now; IO refresh releases our player
+            synchronized(visibility) {
+                if(closed) return
+                resumed = maxOf(0,resumed-1)
+                focus.foregroundHint(resumed > 0) // prevent starts now; IO refresh releases our player
+            }
             refresh()
         }
         override fun onActivityCreated(activity: Activity,savedInstanceState: Bundle?) {}
@@ -51,12 +60,20 @@ class AttentionRuntime(context: Context,tracker: Tracker) {
             addAction(NotificationManager.ACTION_APP_BLOCK_STATE_CHANGED)
             addAction(NotificationManager.ACTION_NOTIFICATION_CHANNEL_BLOCK_STATE_CHANGED)
         }
-        if(Build.VERSION.SDK_INT >= 33) this.context.registerReceiver(receiver,filter,Context.RECEIVER_NOT_EXPORTED)
-        else this.context.registerReceiver(receiver,filter)
+        try {
+            if(Build.VERSION.SDK_INT >= 33) this.context.registerReceiver(receiver,filter,Context.RECEIVER_NOT_EXPORTED)
+            else this.context.registerReceiver(receiver,filter)
+        } catch(e: Exception) {
+            (this.context as? Application)?.unregisterActivityLifecycleCallbacks(lifecycle)
+            focus.foregroundHint(false);scope.cancel();throw e
+        }
     }
-    fun refresh() { scope.launch { synchronize() } }
+    fun refresh() { if(!closed) scope.launch { synchronize() } }
     fun synchronize() {
-        for(action in listOf<()->Unit>({ ordinary.synchronize();Unit },{ focus.synchronize();Unit })) try { action() }
+        for(action in listOf<()->Unit>({ ordinary.synchronize();Unit },{ focus.synchronize();Unit })) try {
+            if(closed) return
+            action()
+        }
         catch(e: Exception) {
             if(e is CancellationException) throw e
             android.util.Log.w("AttentionRuntime","Optional controller unavailable; facts unchanged")
@@ -64,9 +81,15 @@ class AttentionRuntime(context: Context,tracker: Tracker) {
     }
     /** Call on IO before retiring/closing TrackerRuntime's database during recovery. */
     fun close() {
+        synchronized(visibility) {
+            closed = true // Final gates reject a prepared post/start even if IO is already in flight.
+            focus.foregroundHint(false)
+        }
         scope.cancel();runCatching { context.unregisterReceiver(receiver) }
         runCatching { (context as? Application)?.unregisterActivityLifecycleCallbacks(lifecycle) }
         focus.foregroundChanged(false)
+        try { ordinary.controller.suspendDelivery() }
+        catch(_: Exception) { android.util.Log.w("AttentionRuntime","Ordinary reminder revocation remains pending") }
         try { AndroidFocusEnvironment.releaseOwned(context) }
         catch(_: Exception) { android.util.Log.w("AttentionRuntime","Owned-rule cleanup remains pending during recovery") }
     }

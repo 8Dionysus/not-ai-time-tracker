@@ -9,13 +9,13 @@ class AttentionSafetyTest {
         val clock = FakeClock();val tracker = Tracker(MemoryStore(),clock)
         val store = AttentionReminderStore();val platform = AttentionReminderPlatform()
         val controller = LongRecordReminder(tracker,store,platform)
-        init { tracker.start(tracker.snapshot().token);controller.configure(tracker.snapshot().token,LongRecordPreference(true,100,20)) }
+        init { tracker.start(tracker.snapshot().token);controller.configure(tracker.snapshot().token,LongRecordPreference(true,100,20),store.value.revision) }
         val ticket get() = store.value.pending!!
     }
     @Test fun permissionsAreNotPreferenceOrDeliveryAndFocusNeverUsesThisReminder() {
         val f = ReminderFixture();val original = f.ticket;val data = f.tracker.data()
         f.platform.capability = ScheduleDeliveryAvailability(setOf(ScheduleDeliveryBlocker.PERMISSION))
-        f.controller.synchronize();assertTrue(f.store.value.preference.enabled);assertNull(f.platform.pending)
+        f.controller.synchronize();assertTrue(f.tracker.data().settings.longRecordReminder.enabled);assertNull(f.platform.pending)
         f.clock.advance(100);assertEquals(LongRecordOutcome.NOT_POSTED,f.controller.onAlarm(original.hash).outcome)
         assertNull(f.store.value.attempt);assertEquals(data,f.tracker.data())
         f.platform.capability = ScheduleDeliveryAvailability();f.controller.synchronize()
@@ -52,14 +52,15 @@ class AttentionSafetyTest {
         val g = ReminderFixture();val old = g.ticket;g.clock.advance(50);g.tracker.pause(g.tracker.snapshot().token)
         g.clock.advance(100);assertEquals(LongRecordOutcome.STALE,g.controller.onAlarm(old.hash).outcome);assertEquals(0,g.platform.posts)
     }
-    @Test fun disableIsExplicitAndNoDomainMutationWhileStaleSettingsAreRejected() {
+    @Test fun disableIsExplicitAndHistoryUnchangedWhileStaleSettingsAreRejected() {
         val f = ReminderFixture();val ticket = f.ticket;f.clock.advance(100)
         val before = f.tracker.data()
         f.controller.respond(f.tracker.snapshot().token,ticket.hash,LongRecordAction.DISABLE)
-        assertFalse(f.store.value.preference.enabled);assertEquals(before,f.tracker.data())
+        assertFalse(f.tracker.data().settings.longRecordReminder.enabled)
+        assertEquals(before.sessions,f.tracker.data().sessions);assertEquals(before.segments,f.tracker.data().segments)
         val token = f.tracker.snapshot().token;f.tracker.pause(token)
-        assertEquals(ErrorCode.STALE,assertFailsWith<CoreError> { f.controller.configure(token,LongRecordPreference(true)) }.code)
-        assertFalse(f.store.value.preference.enabled)
+        assertEquals(ErrorCode.STALE,assertFailsWith<CoreError> { f.controller.configure(token,LongRecordPreference(true),f.store.value.revision) }.code)
+        assertFalse(f.tracker.data().settings.longRecordReminder.enabled)
     }
     @Test fun focusDenialAndProcessDeathNeverReassertAndUserRuleChangesArePreserved() {
         val clock = FakeClock();val tracker = Tracker(MemoryStore(),clock)
@@ -67,17 +68,17 @@ class AttentionSafetyTest {
         val state = AttentionEnvironmentStore();val dnd = AttentionDistractions(state);val music = AttentionMusic()
         val controller = FocusEnvironment(tracker,state,dnd,music)
         dnd.capability = FocusEffectStatus.ACCESS_REQUIRED
-        val denied = controller.begin(tracker.snapshot().token,newId(),FocusEnvironmentChoice(distractions = true))
+        val denied = controller.begin(tracker.snapshot().token,newId(),FocusEnvironmentChoice(distractions = true),state.value.revision)
         assertEquals(FocusEffectStatus.ACCESS_REQUIRED,denied.distractions);assertEquals(0,dnd.activations)
         dnd.capability = FocusEffectStatus.READY;controller.synchronize();assertEquals(0,dnd.activations)
-        controller.begin(tracker.snapshot().token,newId(),FocusEnvironmentChoice(true,true,"chosen-local"))
+        controller.begin(tracker.snapshot().token,newId(),FocusEnvironmentChoice(true,true,"chosen-local"),state.value.revision)
         val stale = tracker.snapshot().token;tracker.labelCurrent(stale,Classification(name = "late label"))
         val releases = dnd.releases
-        assertEquals(ErrorCode.STALE,assertFailsWith<CoreError> { controller.begin(stale,newId(),FocusEnvironmentChoice()) }.code)
+        assertEquals(ErrorCode.STALE,assertFailsWith<CoreError> { controller.begin(stale,newId(),FocusEnvironmentChoice(),state.value.revision) }.code)
         assertEquals(releases,dnd.releases)
         clock.process = "new-process"
         val recovered = controller.synchronize();assertNull(recovered.request);assertEquals(1,dnd.activations)
-        controller.begin(tracker.snapshot().token,newId(),FocusEnvironmentChoice(distractions = true))
+        controller.begin(tracker.snapshot().token,newId(),FocusEnvironmentChoice(distractions = true),state.value.revision)
         dnd.released = FocusEffectStatus.USER_CHANGED_RULE
         val preserved = controller.stop();assertEquals(FocusEffectStatus.USER_CHANGED_RULE,preserved.distractions)
         assertFalse(preserved.cleanupPending);assertNull(state.value.lease)
@@ -86,11 +87,11 @@ class AttentionSafetyTest {
         val clock = FakeClock();val tracker = Tracker(MemoryStore(),clock);tracker.startFocus(tracker.snapshot().token)
         val state = AttentionEnvironmentStore();val dnd = AttentionDistractions(state)
         val controller = FocusEnvironment(tracker,state,dnd,AttentionMusic())
-        controller.begin(tracker.snapshot().token,newId(),FocusEnvironmentChoice(distractions = true))
+        controller.begin(tracker.snapshot().token,newId(),FocusEnvironmentChoice(distractions = true),state.value.revision)
         val lease = state.value.lease;dnd.capability = FocusEffectStatus.ACCESS_REQUIRED;dnd.released = FocusEffectStatus.ACCESS_REQUIRED
         val blocked = controller.synchronize();assertTrue(blocked.cleanupPending);assertEquals(lease,state.value.lease)
         dnd.capability = FocusEffectStatus.READY;dnd.released = FocusEffectStatus.RELEASED
         // A denied cleanup is never converted into a fresh activation.
-        controller.stop();assertNull(state.value.lease);assertEquals(1,dnd.activations)
+        controller.stop();assertNotNull(state.value.lease);assertFalse(state.value.leaseActive);assertNull(state.value.request);assertEquals(1,dnd.activations)
     }
 }

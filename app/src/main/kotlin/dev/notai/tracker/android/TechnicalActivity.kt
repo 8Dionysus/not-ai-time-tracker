@@ -483,7 +483,13 @@ class TechnicalActivity: Activity() {
     }
     private fun showExportPicker(id: String) {
         val op = exportOperations.read(id)
-        startActivityForResult(Intent(Intent.ACTION_CREATE_DOCUMENT).apply { type = op.mime;addCategory(Intent.CATEGORY_OPENABLE);putExtra(Intent.EXTRA_TITLE,op.title) },1)
+        exportOperations.awaitResult(id)
+        try {
+            startActivityForResult(Intent(Intent.ACTION_CREATE_DOCUMENT).apply { type = op.mime;addCategory(Intent.CATEGORY_OPENABLE);putExtra(Intent.EXTRA_TITLE,op.title) },1)
+        } catch(e: Exception) {
+            exportOperations.receiveResult(id,true) // This chooser did not launch; release only its own lease.
+            throw e
+        }
     }
     private fun retryExport() {
         val id = pendingExportId ?: exportOperations.latestPending()?.id
@@ -541,17 +547,22 @@ class TechnicalActivity: Activity() {
     @Deprecated("Technical harness uses framework result API")
     override fun onActivityResult(requestCode: Int,resultCode: Int,data: Intent?) {
         super.onActivityResult(requestCode,resultCode,data)
-        if(resultCode != RESULT_OK || data?.data == null) {
-            if(requestCode == 1) pendingExportId?.let { id -> runAction { exportOperations.cancel(id);withContext(Dispatchers.Main) { status.text = "Экспорт отменён; подготовленная копия доступна для повтора" } } }
-            return
-        }
-        val uri = data.data!!
         if(requestCode == 1) {
             val id = pendingExportId ?: return
+            val uri = data?.data?.takeIf { resultCode == RESULT_OK }
+            // Commit consumption before scheduling destination I/O: recreation must not
+            // leave a completed/cancelled copy owned by a chooser that already returned.
+            try { exportOperations.receiveResult(id,uri == null) }
+            catch(e: Exception) { status.text = "Результат экспорта не подтверждён: ${e.message}";return }
+            if(uri == null) { status.text = "Экспорт отменён; подготовленная копия доступна для повтора";return }
             runAction { val result = exportOperations.write(id,uri);withContext(Dispatchers.Main) {
                 status.text = "Записано ${result.bytes} bytes. ${if(result.verified) "Копия проверена чтением." else "Provider не позволяет прочитать результат для проверки."}";pendingExportId = null
             } }
-        } else if(requestCode == 3) runAction {
+            return
+        }
+        if(resultCode != RESULT_OK || data?.data == null) return
+        val uri = data.data!!
+        if(requestCode == 3) runAction {
             val bytes = contentResolver.openInputStream(uri)?.use { input ->
                 val out = java.io.ByteArrayOutputStream();val buffer = ByteArray(8192)
                 while(out.size() <= MAX_CSV_BYTES) { val n = input.read(buffer,0,minOf(buffer.size,MAX_CSV_BYTES+1-out.size()));if(n<0) break;if(n==0) { val b=input.read();if(b<0) break;out.write(b) } else out.write(buffer,0,n) }

@@ -176,8 +176,8 @@ class TimerActionReceiver: BroadcastReceiver() {
                 }
                 try { TimerSurfaces.execute(tracker,action,permitted) }
                 catch(e: CoreError) {
-                    val message = "${e.code}: ${e.message}. Откройте приложение; история не изменена."
-                    context.getSharedPreferences("surface-results",Context.MODE_PRIVATE).edit().putString("last",message).apply()
+                    val message = "${e.code}: ${e.message}. Откройте приложение и проверьте текущее состояние."
+                    context.getSharedPreferences("surface-results",Context.MODE_PRIVATE).edit().putString("last",message).putString("lastCode",e.code.name).apply()
                     android.os.Handler(android.os.Looper.getMainLooper()).post { android.widget.Toast.makeText(context,message,android.widget.Toast.LENGTH_LONG).show() }
                 }
                 TimerSurfaces.refresh(context,tracker.view(),forceWidget = action.source == Surface.WIDGET)

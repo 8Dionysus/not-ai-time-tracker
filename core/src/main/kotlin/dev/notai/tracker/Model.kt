@@ -133,6 +133,9 @@ internal fun validateSegmentTime(s: Segment) {
     }
 }
 
+/** A closed empty interval retains identity/classification but contains no recorded time. */
+internal fun Segment.isEmptyInterval() = end == start && durationMs == 0L
+
 fun validate(data: Dataset) {
     fun ids(values: List<String>) { ensure(values.all { it.isNotBlank() } && values.distinct().size == values.size, "Empty or duplicate ID") }
     ensure(data.datasetId.isNotBlank() && data.revision >= 0 && data.timerEpoch >= 0, "Invalid dataset metadata")
@@ -185,7 +188,7 @@ fun validate(data: Dataset) {
         ensure(own.isNotEmpty(), "Session without segments")
     }
     // A closed empty identity segment contains no time and cannot overlap a real interval.
-    val certain = data.segments.filter { !it.uncertain && (it.end == null || it.end > it.start) }.sortedBy { it.start }
+    val certain = data.segments.filter { !it.uncertain && !it.isEmptyInterval() }.sortedBy { it.start }
     certain.zipWithNext().forEach { (a,b) -> ensure(a.end != null && a.end <= b.start, "Intervals overlap", ErrorCode.OVERLAP) }
     data.measurements.forEach {
         ensure(it.fieldId.isNotBlank() && it.meaningVersion > 0 && it.unit.isNotBlank() && it.value.number.signum() >= 0, "Invalid measurement")

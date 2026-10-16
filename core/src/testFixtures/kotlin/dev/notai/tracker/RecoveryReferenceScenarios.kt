@@ -133,6 +133,17 @@ fun recoveryEmptyIdentityAllowsClockRollback(create: () -> StateStore,reopen: (S
         t.resolveTail(t.snapshot().token,null,null)
         if(openAgain) t = Tracker(reopen(t.store),clock)
         val facts = t.data().subjects
+        // The old wall start is identity metadata, not future measured time. Both archive
+        // readers and restore must preserve it, while positive future intervals still fail.
+        val saved = t.data();val archive = Backups(t,MemoryRollback()).export()
+        assertEquals(saved,Backups.decode(archive).data)
+        assertEquals(saved,StreamingBackup.read { archive.byteInputStream() }.data)
+        val restored = Tracker(create(),clock);val backups = Backups(restored,MemoryRollback())
+        backups.apply(backups.prepare(archive));assertEquals(saved.segments,restored.data().segments);assertEquals(facts,restored.data().subjects)
+        val positive = saved.copy(segments = saved.segments.map { it.copy(end = it.start+1000,durationMs = 1000) })
+        assertFailsWith<CoreError> { Backups.encode(positive,clock.now()) }
+        val pack = SelectiveTransfer(t).export(TransferSelection(sessionIds = setOf(original)))
+        SelectiveTransfer(t).inspect(pack)
         fun fullValidationAllowsStart() {
             val d = t.data();val session = Session(id = "candidate",status = SessionStatus.RUNNING,selection = Classification())
             validate(d.copy(sessions = d.sessions+session,segments = d.segments+Segment(sessionId = session.id,start = clock.wall,anchor = Anchor(clock.boot,clock.elapsed))))
@@ -141,7 +152,10 @@ fun recoveryEmptyIdentityAllowsClockRollback(create: () -> StateStore,reopen: (S
         if(focus) t.startFocus(t.snapshot().token,plan = FocusPlan(1000,1000)) else t.start(t.snapshot().token)
         // An immediate stop is also empty. The incrementally maintained index must ignore it.
         t.stop(t.snapshot().token);clock.wall -= 30_000
-        fullValidationAllowsStart();t.start(t.snapshot().token)
+        fullValidationAllowsStart();t.start(t.snapshot().token);t.stop(t.snapshot().token)
+        // Empty identities must not become a proposed "previous recorded end" either.
+        clock.wall += 120_000;t.start(t.snapshot().token)
+        assertFailsWith<CoreError> { t.previewStartAtPreviousEnd(t.snapshot().token,t.snapshot().session!!.id) }
         clock.advance(1000);t.stop(t.snapshot().token)
         assertEquals(facts,t.data().subjects);validate(t.data())
         assertEquals(1000L,t.view().report(0,clock.wall+1).recordedMs)

@@ -122,8 +122,8 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore,p
                 ensure(b.data.manualTimeConfirmations().all { it.confirmedAt <= b.asOf },"Confirmation after snapshot")
                 ensure(b.data.focus?.breakAnchor == null,"Backup must not contain Focus anchors")
                 ensure(b.data.segments.all { it.anchor == null },"Backup must not contain device anchors")
-                ensure(b.data.segments.all { it.start <= b.asOf || it.uncertain },"Segment starts after snapshot")
-                ensure(b.data.segments.all { it.end == null || it.end <= b.asOf || it.uncertain },"Segment ends after snapshot")
+                ensure(b.data.segments.all { it.start <= b.asOf || it.uncertain || it.isEmptyInterval() },"Segment starts after snapshot")
+                ensure(b.data.segments.all { it.end == null || it.end <= b.asOf || it.uncertain || it.isEmptyInterval() },"Segment ends after snapshot")
                 ensure(b.data.segments.all { it.observedUntil == null || it.observedUntil <= b.asOf || it.uncertain },"Observation after snapshot")
             } catch (e: CoreError) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Invalid backup: ${e.message}") }
             return b

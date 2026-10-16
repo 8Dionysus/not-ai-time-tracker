@@ -146,7 +146,7 @@ object StreamingBackup {
         ensure(b.data.quantityRecordedTimes().all { it <= b.asOf },"Quantity audit time after snapshot",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(b.data.manualTimeConfirmations().all { it.confirmedAt <= b.asOf },"Confirmation after snapshot",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(b.data.focus?.breakAnchor == null && b.data.segments.all { it.anchor == null },"Backup contains device anchors",ErrorCode.UNSUPPORTED_IMPORT)
-        ensure(b.data.segments.all { (it.start <= b.asOf || it.uncertain) && (it.end == null || it.end <= b.asOf || it.uncertain) &&
+        ensure(b.data.segments.all { (it.start <= b.asOf || it.uncertain || it.isEmptyInterval()) && (it.end == null || it.end <= b.asOf || it.uncertain || it.isEmptyInterval()) &&
             (it.observedUntil == null || it.observedUntil <= b.asOf || it.uncertain) },"Time after snapshot",ErrorCode.UNSUPPORTED_IMPORT)
     }
 }

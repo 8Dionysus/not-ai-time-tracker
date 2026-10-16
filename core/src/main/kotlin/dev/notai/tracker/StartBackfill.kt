@@ -27,7 +27,7 @@ internal object StartBackfill {
     fun previous(d: Dataset,n: Moment,sessionId: String): PreviousStoppedEnd {
         val before = first(d,n,sessionId).start
         val stopped = d.sessions.filter { it.status == SessionStatus.STOPPED }.map { it.id }.toSet()
-        val segment = d.segments.filter { it.sessionId in stopped && !it.uncertain && it.end != null && it.end <= before }
+        val segment = d.segments.filter { it.sessionId in stopped && !it.uncertain && it.end != null && !it.isEmptyInterval() && it.end <= before }
             .maxWithOrNull(compareBy<Segment> { it.end }.thenBy { it.id })
             ?: fail(ErrorCode.INVALID_INPUT,"No previous certain stopped interval")
         return PreviousStoppedEnd(segment.sessionId,segment.id,segment.end!!)

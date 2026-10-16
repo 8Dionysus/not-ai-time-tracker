@@ -50,7 +50,7 @@ class CheckedState private constructor(val data: Dataset,private val sessionPosi
                 val closed = closeMeasured(active!!,now)
                 validateSegmentTime(closed)
                 total = listOf(total-active.durationMs,closed.durationMs).sumExact { it }
-                end = maxOf(end,closed.end!!)
+                if(!closed.isEmptyInterval()) end = maxOf(end,closed.end!!)
                 segmentRows += Positioned(segmentPosition!!,closed)
                 sessionRows += Positioned(sessionPosition!!,session.copy(status = status))
                 own = own.map { if(it.id == closed.id) closed else it }
@@ -116,7 +116,7 @@ class CheckedState private constructor(val data: Dataset,private val sessionPosi
             val segment = data.segments.indexOfFirst { it.end == null }.takeIf { it >= 0 }
             val id = session?.let { data.sessions[it].id }
             val checked = CheckedState(data,session,segment,if(id == null) emptyList() else data.segments.filter { it.sessionId == id },
-                data.segments.filter { !it.uncertain && it.end != null }.maxOfOrNull { it.end!! } ?: 0,
+                data.segments.filter { !it.uncertain && it.end != null && !it.isEmptyInterval() }.maxOfOrNull { it.end!! } ?: 0,
                 data.segments.sumExact { it.durationMs },data.types.map { it.id }.toSet(),data.cards.map { it.id }.toSet(),historyKey)
             onPhase?.invoke("checked-index",System.nanoTime()-start)
             return checked

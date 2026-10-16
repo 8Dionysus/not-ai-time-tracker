@@ -5,7 +5,7 @@ import kotlin.test.*
 private const val meaningCsv = "id,activity,alt_activity,category,alt_category,note,alt_note,start,end,duration\nx,A,B,Cat A,Cat B,Note A,Note B,2026-10-01T00:00:00Z,2026-10-01T00:00:01Z,1\n"
 private val meaningMapping = CsvMapping("csv-meaning","activity","start",end = "end",duration = "duration",durationFormat = DurationFormat.SECONDS,
     category = "category",note = "note",id = "id",clockToleranceMs = 1000)
-private const val legacyMeaningHash = "3816a92086798b087a7cbdc0f4fc72069cf08209beb9b298d0fe2075583863b2"
+private const val legacyMeaningHash = "601cf7a2107b37bf100bdb49386edf09b0445b37182e63af7915e1a60c98f3ab"
 
 fun csvInterpretationConflict(create: () -> StateStore,reopen: (StateStore) -> StateStore,changed: String) {
     val t = Tracker(create(),FakeClock());t.saveType(t.snapshot().token,ActivityType("csv-type","CSV"))
@@ -31,6 +31,9 @@ fun csvLegacyInterpretationReplay(create: () -> StateStore,reopen: (StateStore) 
     val t = Tracker(create(),FakeClock());t.saveType(t.snapshot().token,ActivityType("csv-type","CSV"))
     val rows = HistoryTransfer.parseCsv(meaningCsv,meaningMapping);val transfer = HistoryTransfer(t,MemoryRollback())
     transfer.apply(transfer.preview(rows,rows.activities.associateWith { Classification(name = it.activity,activityTypeId = "csv-type",details = mapOf("category" to it.category)) }))
+    val row = rows.rows.single()
+    val raw = sha256(codec.encodeToString(row.origin.fields.toSortedMap().toMap()).toByteArray())
+    assertEquals(legacyMeaningHash,sha256(codec.encodeToString(listOf(raw,row.start.toString(),row.end.toString(),row.origin.zone)).toByteArray()))
     // Isolated legacy fixture: the frozen receipt was produced by the old raw/start/end/zone algorithm.
     val legacy = t.data().let { it.copy(sessions = it.sessions.map { s -> s.copy(importOrigin = s.importOrigin!!.copy(rowHash = legacyMeaningHash)) }) }
     val store = create();store.transaction { legacy to Unit };var opened = Tracker(reopen(store),t.clock)

@@ -30,7 +30,8 @@ data class SourceActivity(val activity: String,val category: String)
     }
 }
 data class TransferRow(val number: Int,val activity: SourceActivity,val start: Long,val end: Long,
-    val note: String?,val origin: ImportOrigin,val durationMs: Long)
+    val note: String?,val origin: ImportOrigin,val durationMs: Long,
+    internal val legacyRowHash: String? = null)
 class TransferFile internal constructor(rows: List<TransferRow>,errors: List<String>,warnings: List<String>,issues: List<ImportIssue> = emptyList()) {
     val issues = frozenList(issues.map { it.frozenIssue() })
     val errorIssues get() = frozenList(issues.filter { it.severity == ImportIssueSeverity.ERROR })
@@ -67,19 +68,30 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
         fun error(issue: ImportIssue) { issues += issue;errors += issue.diagnostic }
         val known = d.sessions.associateBy { it.id }.toMutableMap(); var duplicates = 0
         // Selective COPY can remap the local session ID while retaining the external record identity.
-        val knownOrigins = mutableMapOf<Pair<String,String>,MutableSet<String>>()
+        val knownOrigins = mutableMapOf<Pair<String,String>,MutableList<Session>>()
         for(session in d.sessions) session.importOrigin?.let { origin ->
-            knownOrigins.getOrPut(origin.namespace to origin.recordKey) { mutableSetOf() }.add(origin.rowHash)
+            knownOrigins.getOrPut(origin.namespace to origin.recordKey) { mutableListOf() }.add(session)
+        }
+        val savedSegments by lazy { d.segments.groupBy { it.sessionId } }
+        fun matchesReceipt(session: Session,row: TransferRow): Boolean {
+            val origin = session.importOrigin ?: return false
+            if(origin.rowHash == row.origin.rowHash) return true
+            // Old receipts omitted interpretation. Prove the saved fact, without upgrading its origin.
+            if(row.legacyRowHash == null || origin.rowHash != row.legacyRowHash || session.status != SessionStatus.STOPPED || session.note != row.note) return false
+            val interval = savedSegments[session.id]?.singleOrNull() ?: return false
+            if(interval.start != row.start || interval.end != row.end || interval.durationMs != row.durationMs || interval.uncertain) return false
+            val explicit = mapping[row.activity] ?: return true // Known COPY replay needs no new target choice.
+            return try { d.classify(explicit) == session.selection } catch(_: CoreError) { false }
         }
         for(row in file.rows) {
             val id = "import:"+sha256(codec.encodeToString(listOf(row.origin.namespace,row.origin.recordKey)).toByteArray())
             val args = mapOf("activity" to ErrorArgument.Text(row.activity.activity),"category" to ErrorArgument.Text(row.activity.category))
             val sourceKey = row.origin.namespace to row.origin.recordKey
-            val matchingHashes = knownOrigins[sourceKey]
+            val matchingSessions = knownOrigins[sourceKey]
             val previous = known[id]
-            if(previous != null || matchingHashes != null) {
+            if(previous != null || matchingSessions != null) {
                 val sameIdentity = previous == null || previous.importOrigin?.let { it.namespace == row.origin.namespace && it.recordKey == row.origin.recordKey } == true
-                if(sameIdentity && matchingHashes?.all { it == row.origin.rowHash } == true) duplicates++
+                if(sameIdentity && matchingSessions?.all { matchesReceipt(it,row) } == true) duplicates++
                 else error(importIssue(ImportIssueCode.SOURCE_ID_CONFLICT,"Row ${row.number}: source ID already exists with different content; resolve explicitly",
                     ImportIssueStage.PREVIEW,row = row.number,arguments = args+mapOf("namespace" to ErrorArgument.Identifier(row.origin.namespace),"recordKey" to ErrorArgument.Identifier(row.origin.recordKey))))
                 continue
@@ -99,7 +111,7 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
                 val session = Session(id,SessionStatus.STOPPED,selected,row.note,row.origin)
                 val segment = Segment("$id:segment",id,row.start,row.end,row.durationMs,selected)
                 sessions += session; segments += segment; known[id] = session
-                knownOrigins.getOrPut(sourceKey) { mutableSetOf() }.add(row.origin.rowHash)
+                knownOrigins.getOrPut(sourceKey) { mutableListOf() }.add(session)
             } catch(e: CoreError) { error(importIssue(ImportIssueCode.MAPPING_INVALID,"Row ${row.number}: ${e.message}",ImportIssueStage.PREVIEW,row = row.number,arguments = args,cause = e.localized)) }
         }
         if(errors.isEmpty()) try { StreamingBackup.portable(d.copy(sessions = d.sessions+sessions,segments = d.segments+segments),now) }
@@ -202,10 +214,13 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
                         row = number,field = ImportField.DURATION,column = mapping.duration,
                         arguments = mapOf("durationMs" to ErrorArgument.Count(duration ?: (end-start)),"endpointDurationMs" to ErrorArgument.Count(end-start),"clockToleranceMs" to ErrorArgument.Count(mapping.clockToleranceMs)))
                     val rawHash = sha256(codec.encodeToString(fields.toSortedMap().toMap()).toByteArray())
-                    val hash = sha256(codec.encodeToString(listOf(rawHash,start.toString(),end.toString(),mapping.zone)).toByteArray())
+                    val legacyHash = sha256(codec.encodeToString(listOf(rawHash,start.toString(),end.toString(),mapping.zone)).toByteArray())
+                    val activity = SourceActivity(get(mapping.activity),get(mapping.category))
+                    val note = get(mapping.note).takeIf { it.isNotEmpty() };val durationMs = duration ?: (end-start)
+                    val hash = sha256(codec.encodeToString(listOf("csv-interpretation-v2",rawHash,start.toString(),end.toString(),mapping.zone,
+                        durationMs.toString(),activity.activity,activity.category,note.orEmpty())).toByteArray())
                     val key = mapping.id?.let { get(it).also { value -> importEnsure(value.isNotBlank(),ImportIssueCode.SOURCE_ID_MISSING,"Missing source ID",row = number,field = ImportField.ID,column = it) } } ?: rawHash
-                    rows += TransferRow(number,SourceActivity(get(mapping.activity),get(mapping.category)),start,end,
-                        get(mapping.note).takeIf { it.isNotEmpty() },ImportOrigin(mapping.namespace,key,hash,fileHash,mapping.zone,fields),duration ?: (end-start))
+                    rows += TransferRow(number,activity,start,end,note,ImportOrigin(mapping.namespace,key,hash,fileHash,mapping.zone,fields),durationMs,legacyHash)
                 } catch(e: Exception) {
                     val diagnostic = "Row $number: ${e.message ?: e.javaClass.simpleName}"
                     val issue = (e as? CoreError)?.importIssue?.copy(diagnostic = diagnostic)

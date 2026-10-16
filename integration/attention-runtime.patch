@@ -1,0 +1,64 @@
+--- a/app/src/main/kotlin/dev/notai/tracker/android/AndroidRuntime.kt
++++ b/app/src/main/kotlin/dev/notai/tracker/android/AndroidRuntime.kt
+@@ -65,6 +65,8 @@
+     val calendarOccurrences = CalendarOccurrences(context.applicationContext)
+     val focusDueSignals = FocusDueSignals()
+     val scheduleDelivery = AndroidScheduleDelivery(context.applicationContext,tracker)
++    private val attentionDelegate = lazy { AttentionRuntime(context.applicationContext,tracker) }
++    val attention: AttentionRuntime get() = attentionDelegate.value
+     private val surfaceScope = CoroutineScope(SupervisorJob()+Dispatchers.IO)
+     internal val shortcuts = ShortcutCommands(tracker,surfaceScope)
+     private val platformContext = context.applicationContext
+@@ -83,7 +85,10 @@
+         else platformContext.registerReceiver(platformReceiver,filter)
+         platformRegistered = true
+     }
+-    private fun detachPlatform() { if(platformRegistered) { platformContext.unregisterReceiver(platformReceiver);platformRegistered = false } }
++    private fun detachPlatform() {
++        if(platformRegistered) { platformContext.unregisterReceiver(platformReceiver);platformRegistered = false }
++        if(attentionDelegate.isInitialized()) attentionDelegate.value.close()
++    }
+     init {
+         StartupTrace.mark(context,"store-initialized")
+         tracker.store.readChecked() // fail before publishing a runtime or starting observers
+@@ -95,6 +100,7 @@
+                 if(e is CancellationException) throw e
+                 android.util.Log.w("TimerSurfaces","Store observation unavailable; open recovery controls")
+             }.collect { view ->
++                try { attention.synchronize() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("AttentionRuntime","Optional refresh pending") }
+                 try { scheduleProjection.synchronize() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("ScheduleProjection","Projection refresh pending") }
+                 try { TimerSurfaces.refresh(context,view,previous);FocusSignals.refresh(context,tracker) }
+                 catch(e: Exception) { if(e is CancellationException) throw e; android.util.Log.w("TimerSurfaces","Surface refresh unavailable") }
+@@ -108,7 +114,7 @@
+         }
+     }
+     private fun refreshPlatform(focusContext: Context?) {
+-        val actions = listOf<() -> Unit>({ if(focusContext != null) FocusSignals.refresh(focusContext,tracker) },{ scheduleProjection.synchronize();Unit },{ scheduleDelivery.synchronize();Unit })
++        val actions = listOf<() -> Unit>({ if(focusContext != null) FocusSignals.refresh(focusContext,tracker) },{ scheduleProjection.synchronize();Unit },{ scheduleDelivery.synchronize();Unit },{ attention.synchronize() })
+         for(action in actions) try { action() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("TrackerPlatform","Independent refresh pending; no facts changed") }
+     }
+     companion object {
+--- a/app/src/main/AndroidManifest.xml
++++ b/app/src/main/AndroidManifest.xml
+@@ -1,5 +1,6 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
++    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+     <uses-permission android:name="android.permission.READ_CALENDAR" />
+     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+@@ -22,6 +23,14 @@
+         <activity android:name=".TechnicalActivity" android:exported="false" android:label="@string/technical_name"
+             android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+         <receiver android:name=".FocusAlarmReceiver" android:exported="false" />
++        <receiver android:name=".LongRecordAlarmReceiver" android:exported="false" />
++        <receiver android:name=".FocusEnvironmentExpiryReceiver" android:exported="false" />
++        <receiver android:name=".FocusEnvironmentRecoveryReceiver" android:exported="false">
++            <intent-filter>
++                <action android:name="android.intent.action.BOOT_COMPLETED" />
++                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
++            </intent-filter>
++        </receiver>
+         <receiver android:name=".ScheduleAlarmReceiver" android:exported="false" />
+         <receiver android:name=".ScheduleProjectionReceiver" android:exported="false" android:enabled="false">
+             <intent-filter>

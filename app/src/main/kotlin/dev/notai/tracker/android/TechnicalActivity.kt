@@ -298,7 +298,7 @@ class TechnicalActivity: Activity() {
         }
     }
     internal fun configureTechnicalFocusSignal(t: Tracker,enabled: Boolean) {
-        val d = t.data();t.settings(t.snapshot().token,d.settings.copy(surfaces = d.settings.surfaces.copy(focusSignal = enabled)))
+        t.configureFocusSignal(t.snapshot().token,enabled)
     }
     internal fun deliverTechnicalFocus(t: Tracker,focus: FocusSnapshot) {
         if(t.data().settings.surfaces.focusSignal && FocusSignals.allowed(this)) FocusSignals.deliver(this,focus)

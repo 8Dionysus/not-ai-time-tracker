@@ -33,8 +33,14 @@ class UiDraftRecreationTest {
     private fun at(value:String)=Instant.parse("2026-10-16T${value}:00Z").toEpochMilli()
     private class Store:StateStore {
         private var value=Dataset(settings=Settings("UTC"));override val changes=MutableStateFlow(value)
+        var beforeTransaction: (() -> Unit)? = null
+        @Volatile var failure: CoreError? = null
         @Synchronized override fun read()=value
-        @Synchronized override fun <T> transaction(block:(Dataset)->Pair<Dataset,T>):T {val(n,r)=block(value);validate(n);value=n;changes.value=n;return r}
+        @Synchronized override fun <T> transaction(block:(Dataset)->Pair<Dataset,T>):T {
+            val hook = beforeTransaction;beforeTransaction = null;hook?.invoke()
+            try { val(n,r)=block(value);validate(n);value=n;changes.value=n;return r }
+            catch(e: CoreError) { failure = e;throw e }
+        }
     }
     private fun prepareBackend() {
         t=Tracker(Store(),FakeClock(at("14:00")))
@@ -97,6 +103,67 @@ class UiDraftRecreationTest {
     }
     @Test fun manualInputsAndTargetSurviveActivityRecreationWithoutAutosave()=form(false)
     @Test fun correctionInputsSurviveAndPreviewRecomputesAgainstChangedData()=form(true)
+    private fun failedSave(kind: String) {
+        val correction = kind == "stale"
+        if(correction) compose.onNodeWithText("Original correction note",substring = true).performScrollTo().performClick()
+        else compose.onNodeWithText("Добавить запись задним числом").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Заметка").performTextReplacement("Retain after refused Save")
+        compose.onNode(SemanticsMatcher("Activity chooser action") { it.config.getOrNull(SemanticsActions.OnClick)?.label == "Изменить занятие" }).performClick()
+        compose.onNodeWithContentDescription("Найти или создать занятие").performTextInput("Draft selected")
+        compose.waitUntil(10000) { compose.onAllNodesWithText("Draft selected activity").fetchSemanticsNodes().size == 1 }
+        compose.onNodeWithText("Draft selected activity").performScrollTo().performClick();compose.waitForIdle()
+        if(kind == "invalid") repeat(6) { compose.onNodeWithContentDescription("Конец раньше на 5 минут").performClick() }
+        if(kind == "overlap") t.manual(t.snapshot().token,at("13:35"),at("13:45"),Classification(name = "Independent overlapping fact"),"Keep overlap fact")
+        compose.waitUntil(10000) { vm.view.value?.snapshot()?.token == t.snapshot().token }
+        compose.waitUntil(10000) { compose.onAllNodes(hasText("Сохранить") and isEnabled()).fetchSemanticsNodes().isNotEmpty() }
+        val store = t.store as Store;store.failure = null
+        if(correction) store.beforeTransaction = {
+            t.settings(t.snapshot().token,t.data().settings.copy(reportDayStartMinute = 240))
+        }
+        val before = t.data();compose.onNodeWithText("Сохранить").performClick()
+        val expected = when(kind) { "invalid" -> ErrorCode.INVALID_INTERVAL;"overlap" -> ErrorCode.OVERLAP;else -> ErrorCode.STALE }
+        compose.waitUntil(10000) { store.failure?.code == expected }
+        compose.waitForIdle()
+        compose.onNodeWithText(if(correction) "Исправить запись" else "Добавить запись").assertExists()
+        compose.onNodeWithContentDescription("Заметка").assertTextContains("Retain after refused Save")
+        compose.onNodeWithText("Draft selected activity").assertExists()
+        assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
+        if(kind == "invalid") {
+            recreate();compose.onNodeWithText("13:30").assertExists()
+            compose.onNodeWithContentDescription("Конец позже на 5 минут").performClick()
+        }
+        if(kind == "overlap") repeat(3) { compose.onNodeWithContentDescription("Начало позже на 5 минут").performClick() }
+        val afterRefusal = t.data();compose.waitForIdle();assertEquals(afterRefusal,t.data())
+        compose.waitUntil(10000) { compose.onAllNodes(hasText("Сохранить") and isEnabled()).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("Сохранить").performClick()
+        compose.waitUntil(10000) { t.data().sessions.any { it.note == "Retain after refused Save" } && vm.entryForm.value == null }
+        val saved = t.data().sessions.single { it.note == "Retain after refused Save" }
+        assertEquals("p2-form-choice",saved.selection.cardId)
+        if(correction) assertEquals(240,t.data().settings.reportDayStartMinute)
+        if(kind == "overlap") assertTrue(t.data().sessions.any { it.note == "Keep overlap fact" })
+    }
+    @Test fun reviewP3InvalidManualSaveRetainsDraftUntilExplicitCorrectedSave() = failedSave("invalid")
+    @Test fun reviewP3OverlappingManualSaveRetainsDraftUntilExplicitCorrectedSave() = failedSave("overlap")
+    @Test fun reviewP3StaleCorrectionSaveRetainsDraftAndRefreshesPreview() = failedSave("stale")
+    private fun fractionalEarlier(offset: Long,elapsed: Long) {
+        val clock = t.clock as FakeClock;clock.wall = at("14:00")+offset
+        t.start(t.snapshot().token,Classification(name = "Earlier source"));val original = t.snapshot().session!!.id
+        val start = clock.wall;clock.advance(elapsed)
+        compose.waitUntil(10000) { vm.snapshot.value?.session?.id == original }
+        compose.onNodeWithText("Указать когда").performScrollTo().performClick()
+        compose.onNodeWithText("Когда ты переключился?").assertExists()
+        compose.onNodeWithText("Выбрать занятие").performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Найти или создать занятие").performTextInput("Draft selected")
+        compose.waitUntil(10000) { compose.onAllNodesWithText("Draft selected activity").fetchSemanticsNodes().size == 1 }
+        compose.onNodeWithText("Draft selected activity").performScrollTo().performClick()
+        compose.waitUntil(10000) { t.snapshot().session?.id != original }
+        assertEquals("p2-form-choice",t.snapshot().session!!.selection.cardId)
+        val closed = t.data().segments.single { it.sessionId == original }
+        assertEquals(start,closed.end);assertEquals(start,t.data().segments.single { it.end == null }.start)
+        assertEquals(0L,closed.durationMs)
+    }
+    @Test fun reviewP3EarlierInitialTimeKeepsSecondsWithinShortInterval() = fractionalEarlier(30000,270000)
+    @Test fun reviewP3EarlierInitialTimeKeepsMillisecondsWithinSubsecondInterval() = fractionalEarlier(30123,250)
     private fun incoming(text:String) {
         MainActivity::class.java.getDeclaredMethod("onNewIntent",Intent::class.java).apply { isAccessible=true }.invoke(controller.get(),
             Intent(Intent.ACTION_PROCESS_TEXT).setType("text/plain").putExtra(Intent.EXTRA_PROCESS_TEXT,text))

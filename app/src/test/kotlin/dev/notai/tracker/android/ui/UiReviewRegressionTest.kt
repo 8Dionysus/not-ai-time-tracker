@@ -232,6 +232,37 @@ class UiReviewRegressionTest {
     @Test fun reviewP3BoundedFrequencyStartsShownSource() = p3BoundedChoice("bounded-frequent")
     @Test fun reviewP3BoundedQuickStartsShownSource() = p3BoundedChoice("bounded-quick")
     @Test fun reviewP3BoundedQuickKeepsStrictRevisionGuard() = p3BoundedChoice("bounded-quick",true)
+    private fun p3FocusDelivery(outcome: String) {
+        val app = RuntimeEnvironment.getApplication<Application>()
+        val manager = app.getSystemService(android.app.NotificationManager::class.java)
+        val prefs = app.getSharedPreferences("focus-signals",0);prefs.edit().clear().commit();manager.cancelAll()
+        shadowOf(app).grantPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+        val originalFactory = FocusSignals.notificationFactory
+        val clock = FakeClock();val seed = Tracker(Store(Dataset()),clock)
+        seed.configureFocusSignal(seed.snapshot().token,true);seed.startFocus(seed.snapshot().token,plan = FocusPlan(1000,1000));clock.advance(1000)
+        val due = seed.snapshot().focus!!
+        if(outcome == "previous") prefs.edit().putStringSet("delivered",setOf(due.signalKey!!)).commit()
+        if(outcome == "blocked") shadowOf(app).denyPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+        if(outcome == "unknown") FocusSignals.notificationFactory = { throw IllegalStateException("Synthetic post preparation uncertainty") }
+        try {
+            val f = fixture(clock,initial = seed.data())
+            pump { f.vm.snapshot.value?.focus?.mode == FocusMode.DUE }
+            // The runtime's later asynchronous refresh used to post after the VM had
+            // already emitted a local fallback. Exercise the same platform delivery.
+            FocusSignals.refresh(app,f.tracker)
+            if(outcome == "fresh") assertTrue(manager.activeNotifications.any { it.id == 43 })
+            if(outcome == "blocked") pump { f.notices.any { it.text == due.safeLabel } }
+            else {
+                pump { due.signalKey in prefs.getStringSet("delivered",emptySet()).orEmpty() }
+                assertTrue("Automatic duplicate fallback for $outcome: ${f.notices}",f.notices.none { it.text == due.safeLabel })
+            }
+            assertEquals(seed.data(),f.tracker.data())
+        } finally { FocusSignals.notificationFactory = originalFactory }
+    }
+    @Test fun reviewP3FocusFirstDuePostsWithoutLocalDuplicate() = p3FocusDelivery("fresh")
+    @Test fun reviewP3FocusPreviousReceiptHasNoLocalDuplicate() = p3FocusDelivery("previous")
+    @Test fun reviewP3FocusUnknownPostHasNoLocalDuplicate() = p3FocusDelivery("unknown")
+    @Test fun reviewP3FocusBlockedBeforePostKeepsLocalCue() = p3FocusDelivery("blocked")
     @Test fun reviewP2RecentIgnoresLaterEmptyCanonical() = p2HistoryChoice(false,false)
     @Test fun reviewP2QuickIgnoresLaterUncertainCanonical() = p2HistoryChoice(true,true)
     @Test fun reviewP2RecentIgnoresLaterUncertainCanonical() = p2HistoryChoice(true,false)

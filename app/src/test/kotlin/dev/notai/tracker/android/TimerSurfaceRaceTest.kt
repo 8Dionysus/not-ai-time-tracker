@@ -11,6 +11,8 @@ import android.widget.TextView
 import androidx.room.Room
 import dev.notai.tracker.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.take
 import org.junit.*
 import org.junit.Assert.*
 import org.junit.runner.RunWith
@@ -108,5 +110,46 @@ class TimerSurfaceRaceTest {
         kotlinx.coroutines.runBlocking { TimerSurfaces.refresh(c,Tracker(workerStore,FakeClock())) }
         assertTrue(reads.get()>0);assertTrue(writes.get()>0)
     }
+
+    private fun skippedDisableInRuntimeObserver(overlay: Boolean) = runBlocking {
+        val c = RuntimeEnvironment.getApplication()
+        val widgets = shadowOf(AppWidgetManager.getInstance(c));widgets.bindAppWidgetId(809,ComponentName(c,TimerWidget::class.java))
+        for(room in listOf(false,true)) {
+            val db = if(room) Room.inMemoryDatabaseBuilder(c,TrackerDatabase::class.java).allowMainThreadQueries().build() else null
+            try {
+                while(shadowOf(c).nextStoppedService != null) { /* discard only fixture service requests */ }
+                val t = Tracker(db?.let(::RoomStore) ?: memory(),FakeClock())
+                t.settings(t.snapshot().token,t.data().settings.copy(surfaces = SurfaceSettings(widget = true,overlay = overlay)))
+                val observer = TimerSurfaceObserver(c,t);val published = CompletableDeferred<Unit>();val observed = mutableListOf<Long>()
+                val job = launch(Dispatchers.IO) {
+                    t.views.take(3).collect { view ->
+                        observed += view.data.revision;observer.refresh(view)
+                        if(observed.size == 1) published.complete(Unit)
+                    }
+                }
+                try {
+                    withTimeout(10000) { published.await() }
+                    assertNotEquals("Виджет выключен",widgets.getViewFor(809).findViewById<TextView>(R.id.surface_title).text.toString())
+                    val oldSnapshot = t.snapshot();val oldAction = SurfaceAction(Surface.WIDGET,TimerCommand.START,oldSnapshot.token,oldSnapshot.timerTarget)
+                    val oldPending = TimerSurfaces.pending(c,oldAction)
+                    TimerSurfaces.refreshPrepared = { _,view ->
+                        if(!view.data.settings.surfaces.widget) {
+                            TimerSurfaces.refreshPrepared = null
+                            t.saveFavorite(t.snapshot().token,Favorite("p3-independent","Independent mutation",Classification()))
+                        }
+                    }
+                    t.settings(t.snapshot().token,t.data().settings.copy(surfaces = t.data().settings.surfaces.copy(widget = false,overlay = false)))
+                    withTimeout(10000) { job.join() }
+                    assertEquals(3,observed.size);assertEquals(3,observed.distinct().size)
+                    assertEquals("Skipped opt-out lost after next collector emission; room=$room", "Виджет выключен",widgets.getViewFor(809).findViewById<TextView>(R.id.surface_title).text.toString())
+                    assertEquals(oldAction,TimerSurfaces.parse(shadowOf(oldPending).savedIntent))
+                    if(overlay) assertEquals(FloatingTimerService::class.java.name,shadowOf(c).nextStoppedService?.component?.className)
+                    assertFalse(t.data().settings.surfaces.widget);assertEquals(Mode.IDLE,t.snapshot().mode)
+                } finally { job.cancelAndJoin() }
+            } finally { TimerSurfaces.refreshPrepared = null;db?.close() }
+        }
+    }
+    @Test fun reviewP3RuntimeCollectorRetriesSkippedWidgetDisableWithoutForce() = skippedDisableInRuntimeObserver(false)
+    @Test fun reviewP3RuntimeObserverRetainsOverlayStopRequestAfterSkippedTransition() = skippedDisableInRuntimeObserver(true)
 
 }

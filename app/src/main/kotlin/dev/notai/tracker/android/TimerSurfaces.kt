@@ -16,6 +16,14 @@ import kotlinx.coroutines.*
 enum class Surface { WIDGET, NOTIFICATION, OVERLAY, SHORTCUT }
 enum class TimerCommand { START, PAUSE, RESUME, STOP }
 data class SurfaceAction(val source: Surface,val command: TimerCommand,val token: Token,val target: TimerTarget? = null)
+/** The runtime collector's publication history, independent of view observation history. */
+internal class TimerSurfaceObserver(private val context: Context,private val tracker: Tracker) {
+    private var previous: SurfaceSettings? = null
+    suspend fun refresh(view: TrackerView) {
+        TimerSurfaces.refresh(context,tracker,view,previous)
+        previous = view.data.settings.surfaces
+    }
+}
 object TimerSurfaces {
     const val CONTROL_CHANNEL = "timer_controls"
     /** Minimal-importance channel: the system indicator the floating button's service must show. */

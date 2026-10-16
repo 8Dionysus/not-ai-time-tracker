@@ -294,8 +294,15 @@ class TechnicalActivity: Activity() {
             if(loading) return@setOnCheckedChangeListener
             if(enabled && android.os.Build.VERSION.SDK_INT >= 33 && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED)
                 requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),20)
-            runAction { val t = runtime.tracker;val d = t.data();t.settings(t.snapshot().token,d.settings.copy(surfaces = d.settings.surfaces.copy(focusSignal = enabled))) }
+            runAction { configureTechnicalFocusSignal(runtime.tracker,enabled) }
         }
+    }
+    internal fun configureTechnicalFocusSignal(t: Tracker,enabled: Boolean) {
+        val d = t.data();t.settings(t.snapshot().token,d.settings.copy(surfaces = d.settings.surfaces.copy(focusSignal = enabled)))
+    }
+    internal fun deliverTechnicalFocus(t: Tracker,focus: FocusSnapshot) {
+        if(t.data().settings.surfaces.focusSignal && FocusSignals.allowed(this)) FocusSignals.deliver(this,focus)
+        else AlertDialog.Builder(this).setTitle("Focus").setMessage(focus.safeLabel).setPositiveButton("OK",null).show()
     }
     private fun buildCalendarControl() {
         button("Выбрать occurrence из календаря…") {
@@ -461,9 +468,7 @@ class TechnicalActivity: Activity() {
                     val focusText = s.focus?.let { "${it.safeLabel}: ${it.remainingMs} ms\n" }.orEmpty()
                     status.text = "Техническая оболочка · Room 5\n${s.safeLabel}\n${s.trustedDurationMs} ms · ревизия ${s.token.revision}\n$focusText${s.session?.selection ?: ""}\n$reportText"
                     runtime.focusDueSignals.consume(s.focus) { focus ->
-                        if(revision.data.settings.surfaces.focusSignal && FocusSignals.allowed(this@TechnicalActivity)) FocusSignals.deliver(this@TechnicalActivity,focus)
-                        else AlertDialog.Builder(this@TechnicalActivity).setTitle("Focus").setMessage(focus.safeLabel)
-                            .setPositiveButton("OK",null).show()
+                        deliverTechnicalFocus(runtime.tracker,focus)
                     }
                     if(s.focus?.let { it.mode != FocusMode.RUNNING } ?: (s.mode != Mode.RUNNING)) break
                     delay(1000)

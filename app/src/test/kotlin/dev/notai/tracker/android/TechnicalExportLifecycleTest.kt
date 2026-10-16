@@ -129,5 +129,25 @@ class TechnicalExportLifecycleTest {
         result(null);assertTrue(exports.read(id).resultReceived);assertFalse(held in gate.state().references);assertTrue(foreign in gate.state().references)
         assertRegistered(id,"CANCELLED")
     }
+    @Test fun reviewP3TechnicalFocusUsesFreshTypedDelivery() {
+        shadowOf(app).grantPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+        app.getSharedPreferences("focus-signals",0).edit().clear().commit()
+        val store = object: StateStore {
+            private var value = Dataset();override val changes = kotlinx.coroutines.flow.MutableStateFlow(value)
+            override fun read() = value
+            @Synchronized override fun <T> transaction(block: (Dataset) -> Pair<Dataset,T>): T {
+                val (next,result) = block(value);validate(next);value = next;changes.value = next;return result
+            }
+        }
+        val clock = FakeClock();val t = Tracker(store,clock)
+        t.configureFocusSignal(t.snapshot().token,true);t.startFocus(t.snapshot().token,plan = FocusPlan(1000,1000));clock.advance(1000)
+        val before = t.data();controller.get().deliverTechnicalFocus(t,t.snapshot().focus!!)
+        waitFor { app.getSystemService(android.app.NotificationManager::class.java).activeNotifications.any { it.id == 43 } }
+        assertEquals(before,t.data())
+        shadowOf(app).denyPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+        controller.get().deliverTechnicalFocus(t,t.snapshot().focus!!)
+        shadowOf(Looper.getMainLooper()).idle()
+        assertNull("A previous attempt cannot turn into a duplicate dialog after permission loss",org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog())
+    }
 
 }

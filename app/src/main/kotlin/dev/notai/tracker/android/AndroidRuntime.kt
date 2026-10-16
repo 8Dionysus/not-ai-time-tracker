@@ -94,7 +94,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
         tracker.store.readChecked() // fail before publishing a runtime or starting observers
         StartupTrace.mark(context,"history-graph-ready");platformChanges()
         surfaceScope.launch {
-            var previous: SurfaceSettings? = null
+            val surfaceObserver = TimerSurfaceObserver(context,tracker)
             var previousSchedule: ScheduleDeliveryReport? = null
             tracker.views.catch { e ->
                 if(e is CancellationException) throw e
@@ -102,9 +102,8 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
             }.collect { view ->
                 try { attention.synchronize() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("AttentionRuntime","Optional refresh pending") }
                 try { scheduleProjection.synchronize() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("ScheduleProjection","Projection refresh pending") }
-                try { TimerSurfaces.refresh(context,tracker,view,previous);FocusSignals.refresh(context,tracker) }
+                try { surfaceObserver.refresh(view);FocusSignals.refresh(context,tracker) }
                 catch(e: Exception) { if(e is CancellationException) throw e; android.util.Log.w("TimerSurfaces","Surface refresh unavailable") }
-                previous = view.data.settings.surfaces
                 val delivered = previousSchedule
                 if(delivered == null || delivered.sourceDatasetId != view.data.datasetId || delivered.sourceBarrier != view.data.controlBarrier || delivered.sourceSchedule != view.data.schedule || delivered.sourcePreferences != view.data.settings.schedule) {
                     try { previousSchedule = scheduleDelivery.synchronize() }

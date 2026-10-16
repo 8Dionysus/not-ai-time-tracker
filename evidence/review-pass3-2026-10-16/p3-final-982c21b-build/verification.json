@@ -1,0 +1,228 @@
+{
+  "source": "982c21baee068a1ab9827defb05dcb7dba5cc68f",
+  "private": false,
+  "logSha256": "46537da4376ecb8fa9362bac67b70c43f819a1be08d5ab373cbad6bf0e772cf1",
+  "artifacts": {
+    "app-debug-unsigned.apk": {
+      "localPath": "/workspace/tracker-journal-final-evidence/p3-final-982c21b-build/apk/app-debug-unsigned.apk",
+      "bytes": 16584838,
+      "sha256": "5bc83bed96ce94a6cfe6db715a731c6689f25dc95d13ead36e144ee6485a9b47",
+      "embeddedVcs": {},
+      "sourceBinding": "Exact build invocation and matching source manifest; debug has no embedded VCS",
+      "privateLocaleAssets": {
+        "assets/catalog/locales/ar/labels.json": "c10c355be13d90a0685682603022c97962816db22d7e0b9efac4a4e18fd481d9",
+        "assets/catalog/locales/ar/manifest.json": "bca73ba166f91120a819c58fcf715fb46c47922f118108a452f6c50ec21f267a",
+        "assets/catalog/locales/de/labels.json": "5171dbe443d212e2ab533b8ee563f19451bb777d180fa61d364e47abf6a275ab",
+        "assets/catalog/locales/de/manifest.json": "2e91b46ddc1eeb36e7595a9892b89b39e86483ccfb79bf406868c7293c47fefe",
+        "assets/catalog/locales/en/labels.json": "aee5fe5bb39498121f7367b78b6bec84ab62ed4005c7bbf062805cc056638fc8",
+        "assets/catalog/locales/en/manifest.json": "b16bf9e1ae20c689ba38a6835d7cdb94bb5307aaacc3893b6ff044793b828045",
+        "assets/catalog/locales/es/labels.json": "bc11a626cd9850170d225f9169db728066ebc787f0d08612eaf481de277be35d",
+        "assets/catalog/locales/es/manifest.json": "d4e96fe7bd6450b2e79bc3db0851656cb3150130847cc3d4d2ef6a7e5a417172",
+        "assets/catalog/locales/fr/labels.json": "07dea42d93f884191ea7ebea40da25c719a47547461a168add469af90688d60e",
+        "assets/catalog/locales/fr/manifest.json": "dda4d0f1e340b042a6b1d26306bd663fecec643920e59fe73734b242813e1524",
+        "assets/catalog/locales/hi/labels.json": "4f05864c4760b99b0bf6d394b6fe9360fce86d2240794ad98c678ad0443b90b3",
+        "assets/catalog/locales/hi/manifest.json": "710e1f9c2c55515f8eee709b0473c72f8e5e920b7adfb55cc10e13c8843d929d",
+        "assets/catalog/locales/index.json": "04de026fc2854037c714dc73b44d3a667123ae9e14d5058db174a97962f10a21",
+        "assets/catalog/locales/it/labels.json": "ca667be6a0fe8eb7ccfc8cc9e8044f83328d383d6e416f7bfffffeadcf925af0",
+        "assets/catalog/locales/it/manifest.json": "964a8b212e9301a2a3f2e2121d990a71bae626b0d2964d405e719313ee407829",
+        "assets/catalog/locales/ja/labels.json": "8405aea39297c13630c39ec98a49af11d909e045fe0575b99c1446e139e85cf9",
+        "assets/catalog/locales/ja/manifest.json": "a860ca65d39cc48c5ed053d84f46ec2f8acf4cbe4821eb5fee65d270aa329198",
+        "assets/catalog/locales/ko/labels.json": "0ebc657dd40a11b5fce5c99492f07d82ead1e06437b0c924dda3f7b35a7e504f",
+        "assets/catalog/locales/ko/manifest.json": "970f40c17953f0f10afdc58dd0778686b27493230c9dd1b1593038a6361b72cf",
+        "assets/catalog/locales/manifest.json": "a2e7def822a374d2e93006bb40804ec69097ac52f7ed286510d8b7b3c6fb2626",
+        "assets/catalog/locales/pt-BR/labels.json": "e4f9b8cb56f705263ed4a8b930147df00937931294380ed91e4daf76dce1e0df",
+        "assets/catalog/locales/pt-BR/manifest.json": "afb9b9ea392abd6307482731931c0b22a9316c9efba726f32d0301eb2744cd59",
+        "assets/catalog/locales/zh-Hans/labels.json": "b94d63da61e8c83b7d23a93a628786870652f420bd07dbc07a6cb028eaef6468",
+        "assets/catalog/locales/zh-Hans/manifest.json": "fc7ec76017f2f5e7390cabc9a9fce8e1f7ded04f391f90d3ed45b91f94f3f28e"
+      },
+      "nativeFiles": {
+        "lib/arm64-v8a/libandroidx.graphics.path.so": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6",
+        "lib/armeabi-v7a/libandroidx.graphics.path.so": "41399eba6fc2a60f6f14642375c1824f3cf25eb8fec7397d753730a3ceda3e2b",
+        "lib/x86/libandroidx.graphics.path.so": "eb0570b41fd3bff25d8204a967c03bd7550719e768b791f680cc40cbe35f29af",
+        "lib/x86_64/libandroidx.graphics.path.so": "4e56c996f13670e70082658de7880c4020eabf4f25e43387f88ed78a713fc9f0",
+        "lib/arm64-v8a/libtracker_copy_io.so": "56578c3ba714a9a5ecd5a61f223052599634bb65734a48b80e1102a8b8337ba5",
+        "lib/armeabi-v7a/libtracker_copy_io.so": "fe892f2ea8e98328bdb25a21ee084f5e054b084136fe0bc02370e1ee3304e2f1",
+        "lib/x86/libtracker_copy_io.so": "ee79955972478c2b59aa3480b327d24b542357522c5ae46279ed0cd0141a29ce",
+        "lib/x86_64/libtracker_copy_io.so": "5204b44189ebe116cfb8d5c4a801088a7a60173a94ba1f7f9ae6266a5ef363e3"
+      }
+    },
+    "app-release-unsigned.apk": {
+      "localPath": "/workspace/tracker-journal-final-evidence/p3-final-982c21b-build/apk/app-release-unsigned.apk",
+      "bytes": 11203197,
+      "sha256": "f238112477300c1807c83d422020d1b3eda091ced72cfdb2f1455b709276fb6c",
+      "embeddedVcs": {
+        "META-INF/version-control-info.textproto": "repositories {\n  system: GIT\n  local_root_path: \"$PROJECT_DIR\"\n  revision: \"982c21baee068a1ab9827defb05dcb7dba5cc68f\"\n}\n"
+      },
+      "sourceBinding": "embedded VCS",
+      "privateLocaleAssets": {
+        "assets/catalog/locales/ar/labels.json": "c10c355be13d90a0685682603022c97962816db22d7e0b9efac4a4e18fd481d9",
+        "assets/catalog/locales/ar/manifest.json": "bca73ba166f91120a819c58fcf715fb46c47922f118108a452f6c50ec21f267a",
+        "assets/catalog/locales/de/labels.json": "5171dbe443d212e2ab533b8ee563f19451bb777d180fa61d364e47abf6a275ab",
+        "assets/catalog/locales/de/manifest.json": "2e91b46ddc1eeb36e7595a9892b89b39e86483ccfb79bf406868c7293c47fefe",
+        "assets/catalog/locales/en/labels.json": "aee5fe5bb39498121f7367b78b6bec84ab62ed4005c7bbf062805cc056638fc8",
+        "assets/catalog/locales/en/manifest.json": "b16bf9e1ae20c689ba38a6835d7cdb94bb5307aaacc3893b6ff044793b828045",
+        "assets/catalog/locales/es/labels.json": "bc11a626cd9850170d225f9169db728066ebc787f0d08612eaf481de277be35d",
+        "assets/catalog/locales/es/manifest.json": "d4e96fe7bd6450b2e79bc3db0851656cb3150130847cc3d4d2ef6a7e5a417172",
+        "assets/catalog/locales/fr/labels.json": "07dea42d93f884191ea7ebea40da25c719a47547461a168add469af90688d60e",
+        "assets/catalog/locales/fr/manifest.json": "dda4d0f1e340b042a6b1d26306bd663fecec643920e59fe73734b242813e1524",
+        "assets/catalog/locales/hi/labels.json": "4f05864c4760b99b0bf6d394b6fe9360fce86d2240794ad98c678ad0443b90b3",
+        "assets/catalog/locales/hi/manifest.json": "710e1f9c2c55515f8eee709b0473c72f8e5e920b7adfb55cc10e13c8843d929d",
+        "assets/catalog/locales/index.json": "04de026fc2854037c714dc73b44d3a667123ae9e14d5058db174a97962f10a21",
+        "assets/catalog/locales/it/labels.json": "ca667be6a0fe8eb7ccfc8cc9e8044f83328d383d6e416f7bfffffeadcf925af0",
+        "assets/catalog/locales/it/manifest.json": "964a8b212e9301a2a3f2e2121d990a71bae626b0d2964d405e719313ee407829",
+        "assets/catalog/locales/ja/labels.json": "8405aea39297c13630c39ec98a49af11d909e045fe0575b99c1446e139e85cf9",
+        "assets/catalog/locales/ja/manifest.json": "a860ca65d39cc48c5ed053d84f46ec2f8acf4cbe4821eb5fee65d270aa329198",
+        "assets/catalog/locales/ko/labels.json": "0ebc657dd40a11b5fce5c99492f07d82ead1e06437b0c924dda3f7b35a7e504f",
+        "assets/catalog/locales/ko/manifest.json": "970f40c17953f0f10afdc58dd0778686b27493230c9dd1b1593038a6361b72cf",
+        "assets/catalog/locales/manifest.json": "a2e7def822a374d2e93006bb40804ec69097ac52f7ed286510d8b7b3c6fb2626",
+        "assets/catalog/locales/pt-BR/labels.json": "e4f9b8cb56f705263ed4a8b930147df00937931294380ed91e4daf76dce1e0df",
+        "assets/catalog/locales/pt-BR/manifest.json": "afb9b9ea392abd6307482731931c0b22a9316c9efba726f32d0301eb2744cd59",
+        "assets/catalog/locales/zh-Hans/labels.json": "b94d63da61e8c83b7d23a93a628786870652f420bd07dbc07a6cb028eaef6468",
+        "assets/catalog/locales/zh-Hans/manifest.json": "fc7ec76017f2f5e7390cabc9a9fce8e1f7ded04f391f90d3ed45b91f94f3f28e"
+      },
+      "nativeFiles": {
+        "lib/arm64-v8a/libandroidx.graphics.path.so": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6",
+        "lib/arm64-v8a/libtracker_copy_io.so": "7b2bac30793d5098c26387dedcfd57b9c6f58777429882a62737c1002257c537",
+        "lib/armeabi-v7a/libandroidx.graphics.path.so": "41399eba6fc2a60f6f14642375c1824f3cf25eb8fec7397d753730a3ceda3e2b",
+        "lib/armeabi-v7a/libtracker_copy_io.so": "b5d97101c42541f449b9c5ed59dd482c15870da5aed465e5872d478fd33c0e33",
+        "lib/x86/libandroidx.graphics.path.so": "eb0570b41fd3bff25d8204a967c03bd7550719e768b791f680cc40cbe35f29af",
+        "lib/x86/libtracker_copy_io.so": "6ce50684851e31837bdcc83dce66ab0b99a9354ccb267772ef75444bd1f68e79",
+        "lib/x86_64/libandroidx.graphics.path.so": "4e56c996f13670e70082658de7880c4020eabf4f25e43387f88ed78a713fc9f0",
+        "lib/x86_64/libtracker_copy_io.so": "3e220950ba6068458eed3e45a99e8d188dcfed00792b49c509bd76aa7cf18565"
+      }
+    }
+  },
+  "checks": {
+    "debug-zipalign": {
+      "exit": 0
+    },
+    "debug-unsigned": {
+      "exit": 1
+    },
+    "debug-badging": {
+      "exit": 0
+    },
+    "release-zipalign": {
+      "exit": 0
+    },
+    "release-unsigned": {
+      "exit": 1
+    },
+    "release-badging": {
+      "exit": 0
+    }
+  },
+  "modelRuntimeAttested": false,
+  "manifest": {
+    "sha256": "b69cc3f66930285c46838c34e1ef3d08ce027bd24756997800150756f22d6f7c",
+    "permissions": [
+      "android.permission.POST_NOTIFICATIONS",
+      "android.permission.ACCESS_NOTIFICATION_POLICY",
+      "android.permission.READ_CALENDAR",
+      "android.permission.SYSTEM_ALERT_WINDOW",
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.FOREGROUND_SERVICE_SPECIAL_USE",
+      "android.permission.RECEIVE_BOOT_COMPLETED",
+      "dev.notai.tracker.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+    ],
+    "sdk": {
+      "{http://schemas.android.com/apk/res/android}minSdkVersion": "26",
+      "{http://schemas.android.com/apk/res/android}targetSdkVersion": "36"
+    },
+    "byteEqualAcceptedC949": true
+  },
+  "lint": {
+    "Error": 0,
+    "Fatal": 0,
+    "Warning": 69,
+    "Information": 0,
+    "Hint": 1
+  },
+  "licenseGraph": {
+    "artifacts": 66,
+    "externalExactDocumentedShaMatches": 65,
+    "projectOwnApache2": [
+      {
+        "coordinate": "not-ai-time-tracker:core:unspecified",
+        "artifact": "core.jar",
+        "sha256": "9025b9ff18d3bf430f2585d9de36389bad988594553c42a67191a1d5b8a49590"
+      }
+    ],
+    "scope": "External POM declarations and retained notices; native publisher provenance remains separate"
+  },
+  "localeAssetsVerification": {
+    "sourceCount": 24,
+    "sourceByteEqualBaseline": "b64e4fd68ba97a78ee4b773cce9f5a3d391107f7",
+    "bothApkAssetMapsEqualSource": true,
+    "localeTags": [
+      "en",
+      "es",
+      "fr",
+      "pt-BR",
+      "ar",
+      "zh-Hans",
+      "de",
+      "it",
+      "ja",
+      "ko",
+      "hi"
+    ],
+    "sha256ByAsset": {
+      "assets/catalog/locales/ar/labels.json": "c10c355be13d90a0685682603022c97962816db22d7e0b9efac4a4e18fd481d9",
+      "assets/catalog/locales/ar/manifest.json": "bca73ba166f91120a819c58fcf715fb46c47922f118108a452f6c50ec21f267a",
+      "assets/catalog/locales/de/labels.json": "5171dbe443d212e2ab533b8ee563f19451bb777d180fa61d364e47abf6a275ab",
+      "assets/catalog/locales/de/manifest.json": "2e91b46ddc1eeb36e7595a9892b89b39e86483ccfb79bf406868c7293c47fefe",
+      "assets/catalog/locales/en/labels.json": "aee5fe5bb39498121f7367b78b6bec84ab62ed4005c7bbf062805cc056638fc8",
+      "assets/catalog/locales/en/manifest.json": "b16bf9e1ae20c689ba38a6835d7cdb94bb5307aaacc3893b6ff044793b828045",
+      "assets/catalog/locales/es/labels.json": "bc11a626cd9850170d225f9169db728066ebc787f0d08612eaf481de277be35d",
+      "assets/catalog/locales/es/manifest.json": "d4e96fe7bd6450b2e79bc3db0851656cb3150130847cc3d4d2ef6a7e5a417172",
+      "assets/catalog/locales/fr/labels.json": "07dea42d93f884191ea7ebea40da25c719a47547461a168add469af90688d60e",
+      "assets/catalog/locales/fr/manifest.json": "dda4d0f1e340b042a6b1d26306bd663fecec643920e59fe73734b242813e1524",
+      "assets/catalog/locales/hi/labels.json": "4f05864c4760b99b0bf6d394b6fe9360fce86d2240794ad98c678ad0443b90b3",
+      "assets/catalog/locales/hi/manifest.json": "710e1f9c2c55515f8eee709b0473c72f8e5e920b7adfb55cc10e13c8843d929d",
+      "assets/catalog/locales/index.json": "04de026fc2854037c714dc73b44d3a667123ae9e14d5058db174a97962f10a21",
+      "assets/catalog/locales/it/labels.json": "ca667be6a0fe8eb7ccfc8cc9e8044f83328d383d6e416f7bfffffeadcf925af0",
+      "assets/catalog/locales/it/manifest.json": "964a8b212e9301a2a3f2e2121d990a71bae626b0d2964d405e719313ee407829",
+      "assets/catalog/locales/ja/labels.json": "8405aea39297c13630c39ec98a49af11d909e045fe0575b99c1446e139e85cf9",
+      "assets/catalog/locales/ja/manifest.json": "a860ca65d39cc48c5ed053d84f46ec2f8acf4cbe4821eb5fee65d270aa329198",
+      "assets/catalog/locales/ko/labels.json": "0ebc657dd40a11b5fce5c99492f07d82ead1e06437b0c924dda3f7b35a7e504f",
+      "assets/catalog/locales/ko/manifest.json": "970f40c17953f0f10afdc58dd0778686b27493230c9dd1b1593038a6361b72cf",
+      "assets/catalog/locales/manifest.json": "a2e7def822a374d2e93006bb40804ec69097ac52f7ed286510d8b7b3c6fb2626",
+      "assets/catalog/locales/pt-BR/labels.json": "e4f9b8cb56f705263ed4a8b930147df00937931294380ed91e4daf76dce1e0df",
+      "assets/catalog/locales/pt-BR/manifest.json": "afb9b9ea392abd6307482731931c0b22a9316c9efba726f32d0301eb2744cd59",
+      "assets/catalog/locales/zh-Hans/labels.json": "b94d63da61e8c83b7d23a93a628786870652f420bd07dbc07a6cb028eaef6468",
+      "assets/catalog/locales/zh-Hans/manifest.json": "fc7ec76017f2f5e7390cabc9a9fce8e1f7ded04f391f90d3ed45b91f94f3f28e"
+    },
+    "rightsAndNativeSpeakerQa": "Original provenance retained; SOURCE_RIGHTS_REVIEW_PENDING/nativeSpeakerQa false are not overridden by packaging or technical checks"
+  },
+  "newBackendDexSymbols": {
+    "app-debug-unsigned.apk": {
+      "submitEntryForm": true,
+      "TimerSurfaceObserver": true,
+      "configureTechnicalFocusSignal": true,
+      "deliverTechnicalFocus": true,
+      "sourceSessionId": true,
+      "sourceSegmentId": true,
+      "reviewNonce": true
+    },
+    "app-release-unsigned.apk": {
+      "submitEntryForm": true,
+      "TimerSurfaceObserver": true,
+      "configureTechnicalFocusSignal": true,
+      "deliverTechnicalFocus": true,
+      "sourceSessionId": true,
+      "sourceSegmentId": true,
+      "reviewNonce": true
+    }
+  },
+  "testSource": "282495ac96030d003d888a474a53dad8c1d20bde",
+  "testBuildCriticalSourceFilesEqual": 292,
+  "compileSdk": 36,
+  "buildElapsed": "2m55s",
+  "lintHints": [
+    {
+      "id": "ReportShortcutUsage",
+      "message": "Calling this method indicates use of dynamic shortcuts, but there are no calls to methods that track shortcut usage, such as `pushDynamicShortcut` or `reportShortcutUsed`. Calling these methods is recommended, as they track shortcut usage and allow launchers to adjust which shortcuts appear based on activation history. Please see https://developer.android.com/develop/ui/views/launch/shortcuts/managing-shortcuts#track-usage"
+    }
+  ]
+}

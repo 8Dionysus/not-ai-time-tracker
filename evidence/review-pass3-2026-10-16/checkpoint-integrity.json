@@ -1,0 +1,111 @@
+{
+  "verificationFiles": 6,
+  "distinctSourceCommits": 6,
+  "sourceFileReferences": 1750,
+  "uniqueGitBlobs": 315,
+  "rawXmlHashesCountsAndExactGitSourceFilesMatch": true,
+  "records": [
+    {
+      "evidence": "p3-001-b799695-reproduced/verification.json",
+      "source": "b799695b2703d235ea016bdda83afc60f12e59cc",
+      "sourceFiles": 291,
+      "counts": {
+        "core": {
+          "tests": 3,
+          "failures": 3,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 6,
+          "failures": 5,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p3-001-f2de99c-fixed/verification.json",
+      "source": "f2de99cf79ef8a5190857b59dbc7494504600b1d",
+      "sourceFiles": 291,
+      "counts": {
+        "core": {
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 33,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p3-002-006-343b860-reproduced/verification.json",
+      "source": "343b860aff8f34fe766c516a19c38b6a746bb997",
+      "sourceFiles": 292,
+      "counts": {
+        "app": {
+          "tests": 14,
+          "failures": 11,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p3-2acaa96-targeted-fixed/verification.json",
+      "source": "2acaa96be379b43a88484fa3cd61ff0c52ac149f",
+      "sourceFiles": 292,
+      "counts": {
+        "core": {
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 69,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p3-final-282495a-full-tests/verification.json",
+      "source": "282495ac96030d003d888a474a53dad8c1d20bde",
+      "sourceFiles": 292,
+      "counts": {
+        "core": {
+          "tests": 198,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "app": {
+          "tests": 240,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    {
+      "evidence": "p3-room-earlier-0b2e424-reproduced/verification.json",
+      "source": "0b2e4244dcd2f38409b37212c7bb94aa4d16f65e",
+      "sourceFiles": 292,
+      "counts": {
+        "app": {
+          "tests": 5,
+          "failures": 5,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    }
+  ]
+}

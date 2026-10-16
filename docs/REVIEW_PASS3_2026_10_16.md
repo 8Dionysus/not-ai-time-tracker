@@ -164,3 +164,33 @@ Physical OEM/device/TalkBack/RTL, broader frontend resource/overlay P2/goal-edit
 process-death editor/inbox persistence, catalog source rights/native-speaker QA,
 and independent server reproducibility remain outside JVM/APK claims. No fourth
 full parent review is planned. No independent runtime model/effort attestation.
+
+## Unsigned delivery build
+
+Build source `982c21baee068a1ab9827defb05dcb7dba5cc68f` completes unsigned debug,
+release, lint and releaseInventory in 2m55s. All 292 critical source/build/schema
+files match the aggregate test source. Lint has 0 errors/fatal, 69 warnings and
+one ReportShortcutUsage hint; no usage tracking or warning suppression was added
+to satisfy that hint. The technical Focus error path uses existing error formatting.
+
+Both APKs pass CRC, unsigned signature verification, zipalign-P16 and min26/target36
+checks (compile36). Release VCS metadata matches the exact build SHA. Both contain
+the new command/reference/observer symbols and all 24 locale assets byte-identical
+to baseline b64e4fd; original rights/native-speaker QA markers remain unchanged.
+Release merged manifest is byte-identical to the accepted baseline. All 65 external
+runtime dependency hashes match retained declarations (66 artifacts including own
+Apache-2.0 core); Onest OFL and third-party boundaries are preserved.
+
+Debug: 16584838 bytes, SHA256
+`5bc83bed96ce94a6cfe6db715a731c6689f25dc95d13ead36e144ee6485a9b47`.
+Release: 11203197 bytes, SHA256
+`f238112477300c1807c83d422020d1b3eda091ced72cfdb2f1455b709276fb6c`.
+
+F-Droid 2.4.5 scanner of the disabled recipe's exact test-source clone exits 0,
+zero errors and one retained gzip-fixture warning. Lint exits 0 with the explicit
+Time Tracker category config included in evidence; an initial unconfigured run
+exited 1 for the missing category and its log is retained too. This is a configured
+local recipe check, not independent server build/reproducibility or store acceptance.
+
+Exact counts, six finding outcomes, preserved A-F coverage, artifact/manifest/asset
+hashes and outstanding boundaries are in `evidence/review-pass3-2026-10-16/final-result.json`.

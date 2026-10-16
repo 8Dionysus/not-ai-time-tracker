@@ -29,3 +29,11 @@ and the entire `UiReviewRegressionTest` class. Both use `:core:test` and
 independent failing suites. Exact invocation logs are retained in the environment.
 The verification JSONs bind original XML hashes and source bytes to each commit.
 These are JVM/Robolectric checks, not new APK or physical-device acceptance.
+
+Final aggregate `p3-final-282495a-full-tests`: 198 core +240 app, no errors/failures/
+skips, 4m27s with both tasks rerun; Python fingerprint 3/3.
+Build `p3-final-982c21b-build`: debug/release unsigned, lint, releaseInventory pass
+in 2m55s. 292 critical files match the test source; source differences are only
+docs/evidence/recipe metadata. APK hashes, manifest and dependency/locale evidence
+are retained in verification.json and final-result.json. Lint: 0errors/0fatal,
+69warnings, 1hint. No physical-device or independent reproducibility claim.

@@ -1,0 +1,298 @@
+{
+  "reviewBaseline": "754196e98d590083a93f290dcbd777590e841327",
+  "parentFullReview": {
+    "files": 201,
+    "lines": 30034,
+    "sourceHashes": 1364,
+    "findingSetClosed": true,
+    "findingSet": "P3-001..006",
+    "fourthFullReview": false,
+    "remainingDeltaAndDeliveryAcceptancePending": true
+  },
+  "branch": "fix/review-pass1-2026-10-16",
+  "main": "59d0ba60e05683d7cab7cd5e0b0237f4094d365d",
+  "mainMerged": false,
+  "testSource": "282495ac96030d003d888a474a53dad8c1d20bde",
+  "buildSource": "982c21baee068a1ab9827defb05dcb7dba5cc68f",
+  "testBuildCriticalSourceFilesEqual": 292,
+  "findings": {
+    "P3-001": {
+      "fix": "f2de99cf79ef8a5190857b59dbc7494504600b1d",
+      "implemented": true,
+      "targetedRegression": true,
+      "fullRegression": true,
+      "parentAccepted": true,
+      "remaining": "Old ambiguous history references intentionally fail STALE; parent independently accepted source/XML."
+    },
+    "P3-002": {
+      "fix": "168bd0f88342861afe7744a84401fbc21a260caa",
+      "implemented": true,
+      "targetedRegression": true,
+      "fullRegression": true,
+      "parentAccepted": false,
+      "remaining": "Physical installed-widget/OEM behavior pending; overlay service separately self-observes false, no persistent overlay-retention defect claimed."
+    },
+    "P3-003": {
+      "fix": "3a537816ae5c051dbb5b13249bee69b96aeba945",
+      "implemented": true,
+      "targetedRegression": true,
+      "fullRegression": true,
+      "parentAccepted": false,
+      "remaining": "Actual production checkbox adapter is tested under interleavings; physical permission/UI behavior remains unverified."
+    },
+    "P3-004": {
+      "fix": "7169027b5410f82c10afb6ca30b5377dbf7eab4b",
+      "implemented": true,
+      "targetedRegression": true,
+      "fullRegression": true,
+      "parentAccepted": false,
+      "remaining": "POST_ACCEPTED is platform acceptance, not physical delivery; no automatic fallback for previous/unknown attempt."
+    },
+    "P3-005": {
+      "fix": "ffc974f1addfcd9c9c05da642dd9c90b0ce5fdd9",
+      "implemented": true,
+      "targetedRegression": true,
+      "fullRegression": true,
+      "parentAccepted": false,
+      "remaining": "Configuration recreation, refused Save and pending completion ownership covered; process-death target persistence not claimed."
+    },
+    "P3-006": {
+      "fix": "2acaa96be379b43a88484fa3cd61ff0c52ac149f",
+      "implemented": true,
+      "targetedRegression": true,
+      "fullRegression": true,
+      "parentAccepted": false,
+      "remaining": "Real Robolectric form/picker callbacks preserve seconds/milliseconds; physical TimePicker/device checks pending."
+    }
+  },
+  "reproductions": [
+    {
+      "source": "b799695b2703d235ea016bdda83afc60f12e59cc",
+      "core": {
+        "tests": 3,
+        "failures": 3
+      },
+      "app": {
+        "tests": 6,
+        "failures": 5
+      },
+      "scope": "P3-001; revision guard control passed"
+    },
+    {
+      "source": "d0c653f",
+      "scope": "Test getter compilation failure only; no new XML claimed"
+    },
+    {
+      "source": "343b860aff8f34fe766c516a19c38b6a746bb997",
+      "app": {
+        "tests": 14,
+        "failures": 11
+      },
+      "actualProductFailures": 9,
+      "fixtureFailures": 2,
+      "fixtureReason": "Earlier unscrollable button scrollTo; these two are not product evidence"
+    },
+    {
+      "source": "0b2e4244dcd2f38409b37212c7bb94aa4d16f65e",
+      "app": {
+        "tests": 5,
+        "failures": 5
+      },
+      "scope": "Actual Room opt-out x2, exact Earlier INVALID_INTERVAL x2, settings overwrite x1"
+    }
+  ],
+  "targetedFixed": {
+    "source": "2acaa96be379b43a88484fa3cd61ff0c52ac149f",
+    "core": 4,
+    "app": 69,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "tests": {
+    "core": {
+      "tests": 198,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "app": {
+      "tests": 240,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "testElapsed": "4m27s",
+  "pythonFingerprint": {
+    "tests": 3,
+    "failures": 0,
+    "scriptSha256": "87b8e128739ee7135593564c9cb6681d2c662d08c8077501acbbb514508ad2e6"
+  },
+  "buildElapsed": "2m55s",
+  "artifacts": {
+    "app-debug-unsigned.apk": {
+      "bytes": 16584838,
+      "sha256": "5bc83bed96ce94a6cfe6db715a731c6689f25dc95d13ead36e144ee6485a9b47"
+    },
+    "app-release-unsigned.apk": {
+      "bytes": 11203197,
+      "sha256": "f238112477300c1807c83d422020d1b3eda091ced72cfdb2f1455b709276fb6c"
+    }
+  },
+  "lint": {
+    "Error": 0,
+    "Fatal": 0,
+    "Warning": 69,
+    "Information": 0,
+    "Hint": 1
+  },
+  "lintHints": [
+    {
+      "id": "ReportShortcutUsage",
+      "message": "Calling this method indicates use of dynamic shortcuts, but there are no calls to methods that track shortcut usage, such as `pushDynamicShortcut` or `reportShortcutUsed`. Calling these methods is recommended, as they track shortcut usage and allow launchers to adjust which shortcuts appear based on activation history. Please see https://developer.android.com/develop/ui/views/launch/shortcuts/managing-shortcuts#track-usage"
+    }
+  ],
+  "manifest": {
+    "sha256": "b69cc3f66930285c46838c34e1ef3d08ce027bd24756997800150756f22d6f7c",
+    "permissions": [
+      "android.permission.POST_NOTIFICATIONS",
+      "android.permission.ACCESS_NOTIFICATION_POLICY",
+      "android.permission.READ_CALENDAR",
+      "android.permission.SYSTEM_ALERT_WINDOW",
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.FOREGROUND_SERVICE_SPECIAL_USE",
+      "android.permission.RECEIVE_BOOT_COMPLETED",
+      "dev.notai.tracker.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+    ],
+    "sdk": {
+      "{http://schemas.android.com/apk/res/android}minSdkVersion": "26",
+      "{http://schemas.android.com/apk/res/android}targetSdkVersion": "36"
+    },
+    "byteEqualAcceptedC949": true
+  },
+  "compileSdk": 36,
+  "licenseGraph": {
+    "artifacts": 66,
+    "externalExactDocumentedShaMatches": 65,
+    "projectOwnApache2": [
+      {
+        "coordinate": "not-ai-time-tracker:core:unspecified",
+        "artifact": "core.jar",
+        "sha256": "9025b9ff18d3bf430f2585d9de36389bad988594553c42a67191a1d5b8a49590"
+      }
+    ],
+    "scope": "External POM declarations and retained notices; native publisher provenance remains separate"
+  },
+  "localeAssets": {
+    "sourceCount": 24,
+    "sourceByteEqualBaseline": "b64e4fd68ba97a78ee4b773cce9f5a3d391107f7",
+    "bothApkAssetMapsEqualSource": true,
+    "localeTags": [
+      "en",
+      "es",
+      "fr",
+      "pt-BR",
+      "ar",
+      "zh-Hans",
+      "de",
+      "it",
+      "ja",
+      "ko",
+      "hi"
+    ],
+    "sha256ByAsset": {
+      "assets/catalog/locales/ar/labels.json": "c10c355be13d90a0685682603022c97962816db22d7e0b9efac4a4e18fd481d9",
+      "assets/catalog/locales/ar/manifest.json": "bca73ba166f91120a819c58fcf715fb46c47922f118108a452f6c50ec21f267a",
+      "assets/catalog/locales/de/labels.json": "5171dbe443d212e2ab533b8ee563f19451bb777d180fa61d364e47abf6a275ab",
+      "assets/catalog/locales/de/manifest.json": "2e91b46ddc1eeb36e7595a9892b89b39e86483ccfb79bf406868c7293c47fefe",
+      "assets/catalog/locales/en/labels.json": "aee5fe5bb39498121f7367b78b6bec84ab62ed4005c7bbf062805cc056638fc8",
+      "assets/catalog/locales/en/manifest.json": "b16bf9e1ae20c689ba38a6835d7cdb94bb5307aaacc3893b6ff044793b828045",
+      "assets/catalog/locales/es/labels.json": "bc11a626cd9850170d225f9169db728066ebc787f0d08612eaf481de277be35d",
+      "assets/catalog/locales/es/manifest.json": "d4e96fe7bd6450b2e79bc3db0851656cb3150130847cc3d4d2ef6a7e5a417172",
+      "assets/catalog/locales/fr/labels.json": "07dea42d93f884191ea7ebea40da25c719a47547461a168add469af90688d60e",
+      "assets/catalog/locales/fr/manifest.json": "dda4d0f1e340b042a6b1d26306bd663fecec643920e59fe73734b242813e1524",
+      "assets/catalog/locales/hi/labels.json": "4f05864c4760b99b0bf6d394b6fe9360fce86d2240794ad98c678ad0443b90b3",
+      "assets/catalog/locales/hi/manifest.json": "710e1f9c2c55515f8eee709b0473c72f8e5e920b7adfb55cc10e13c8843d929d",
+      "assets/catalog/locales/index.json": "04de026fc2854037c714dc73b44d3a667123ae9e14d5058db174a97962f10a21",
+      "assets/catalog/locales/it/labels.json": "ca667be6a0fe8eb7ccfc8cc9e8044f83328d383d6e416f7bfffffeadcf925af0",
+      "assets/catalog/locales/it/manifest.json": "964a8b212e9301a2a3f2e2121d990a71bae626b0d2964d405e719313ee407829",
+      "assets/catalog/locales/ja/labels.json": "8405aea39297c13630c39ec98a49af11d909e045fe0575b99c1446e139e85cf9",
+      "assets/catalog/locales/ja/manifest.json": "a860ca65d39cc48c5ed053d84f46ec2f8acf4cbe4821eb5fee65d270aa329198",
+      "assets/catalog/locales/ko/labels.json": "0ebc657dd40a11b5fce5c99492f07d82ead1e06437b0c924dda3f7b35a7e504f",
+      "assets/catalog/locales/ko/manifest.json": "970f40c17953f0f10afdc58dd0778686b27493230c9dd1b1593038a6361b72cf",
+      "assets/catalog/locales/manifest.json": "a2e7def822a374d2e93006bb40804ec69097ac52f7ed286510d8b7b3c6fb2626",
+      "assets/catalog/locales/pt-BR/labels.json": "e4f9b8cb56f705263ed4a8b930147df00937931294380ed91e4daf76dce1e0df",
+      "assets/catalog/locales/pt-BR/manifest.json": "afb9b9ea392abd6307482731931c0b22a9316c9efba726f32d0301eb2744cd59",
+      "assets/catalog/locales/zh-Hans/labels.json": "b94d63da61e8c83b7d23a93a628786870652f420bd07dbc07a6cb028eaef6468",
+      "assets/catalog/locales/zh-Hans/manifest.json": "fc7ec76017f2f5e7390cabc9a9fce8e1f7ded04f391f90d3ed45b91f94f3f28e"
+    },
+    "rightsAndNativeSpeakerQa": "Original provenance retained; SOURCE_RIGHTS_REVIEW_PENDING/nativeSpeakerQa false are not overridden by packaging or technical checks"
+  },
+  "newBackendDexSymbols": {
+    "app-debug-unsigned.apk": {
+      "submitEntryForm": true,
+      "TimerSurfaceObserver": true,
+      "configureTechnicalFocusSignal": true,
+      "deliverTechnicalFocus": true,
+      "sourceSessionId": true,
+      "sourceSegmentId": true,
+      "reviewNonce": true
+    },
+    "app-release-unsigned.apk": {
+      "submitEntryForm": true,
+      "TimerSurfaceObserver": true,
+      "configureTechnicalFocusSignal": true,
+      "deliverTechnicalFocus": true,
+      "sourceSessionId": true,
+      "sourceSegmentId": true,
+      "reviewNonce": true
+    }
+  },
+  "fdroid": {
+    "source": "282495ac96030d003d888a474a53dad8c1d20bde",
+    "fdroidserver": "2.4.5",
+    "scannerExit": 0,
+    "scannerErrors": 0,
+    "scannerWarnings": 1,
+    "warning": "Retained previous-runtime-catalog.json.gz fixture",
+    "metadataLintExit": 0,
+    "metadataLintRequiresExplicitCategoryConfig": true,
+    "categoryConfigSha256": "4c86f3dcfa4dcc7e88423c3a8478393c3d893d90471eb8a72f4d96ddd0f0e452",
+    "initialUnconfiguredLintExit": 1,
+    "rawScannerLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rawConfiguredLintLogSha256": "fd1b5f99703ecbaf4537ff8c7c85210a2a389195ce591e45e64b9980e343bc13",
+    "rawInitialLintLogSha256": "343f9ba447628f556d2eaf83bea4ff094cd6f2fcfec12e15d0b3e92acbb6068e",
+    "rawLogLocation": "Task archive; local SDK path excluded from public evidence",
+    "fixtureRepo": "Exact isolated local clone; published recipe retains public HTTPS Repo",
+    "checkedOutSource": "282495ac96030d003d888a474a53dad8c1d20bde",
+    "publishedRecipeSha256": "55b878c2acbe3b0cfe0fbb0a9a365a1b6212035b92122ad9b0c61fc1c29ca505",
+    "independentServerBuild": false,
+    "independentReproducibility": false
+  },
+  "formats": {
+    "Room": 12,
+    "fullWriter": 14,
+    "fullReader": "1..14",
+    "selectiveReader": "1..4"
+  },
+  "baselineCapabilitiesRetained": {
+    "A": "Localization/catalog, original locale provenance, stable IDs and literal notes retained; P3-001 binds displayed occurrence without history rewrite. Frontend resources and linguistic/rights QA remain separate.",
+    "B": "Existing schedule series/overrides/links/projections and receipt semantics retained; complete core/Room schedule regressions rerun.",
+    "C": "Room12/full14/selective4 unchanged; legacy migration/restore/rollback/recovery shared and Room scenarios rerun.",
+    "D": "Existing descriptor-relative cleanup/journals/reference registry retained; export chooser/cancel, native catalog and private metadata regressions rerun.",
+    "E": "Existing inspect/plan/preview/apply/resume selective transfer retained; complete shared Memory/Room scenarios rerun. No second importer.",
+    "F": "Apache2/OFL/notices retained;65 external dependency hashes checked, unsigned builds/manifest/API36/lint verified; disabled F-Droid recipe checked with explicit category configuration, no independent server reproducibility."
+  },
+  "runtimeModelAndEffortIndependentlyAttested": false,
+  "physicalDeviceChecks": false,
+  "remaining": [
+    "Parent targeted acceptance of P3-002..006 and package before conditional main integration",
+    "Physical OEM/device/TalkBack/RTL and actual cue/widget/permission delivery",
+    "Broader frontend resources, overlay P2 and goal-edit integration",
+    "Process-death persistence of retained form target/inbox",
+    "Catalog source rights/native-speaker QA and native publisher provenance",
+    "Legacy cleanup owner retirement witness and legacy parse-profile attribution limits remain as previously documented",
+    "Independent server reproducibility, release signing, stores and publication not performed"
+  ]
+}

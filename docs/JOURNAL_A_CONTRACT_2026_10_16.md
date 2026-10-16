@@ -2,7 +2,7 @@
 
 Assigned requirements4/5/8/9 from the approved14-item report. Integration owner A
 will merge B/C migration fragments at one final Room/archive/selective floor.
-Current provisional floor is Room12/full JSON14/read1–14/selective1–4. The original
+The merged floor is Room12/full JSON14/read1–14/selective1–4. The original
 Room11/full13/selective1–3 remain supported. This is a new work branch after delivered
 public70a7155/runtime6fcc; it does not replace the previous checkpoint or its evidence.
 No Compose/ViewModel/resources/TechnicalActivity/RemoteViews production path is edited.
@@ -106,6 +106,8 @@ a new Android migration test used unavailable core-test-only APIs. Both were fix
 failed logs/results are retained separately. No successful old C949 result is
 re-attributed or rerun as acceptance of these new operations.
 
-Exact XML/log/source evidence is under evidence/journal-a-2026-10-16. B/C integration,
-combined old-data migration→export→preview→restore comparison and final all14
-regression/APKs remain outstanding. JVM/Robolectric evidence does not close device/UI.
+Earlier A-only XML/log/source evidence is under evidence/journal-a-2026-10-16.
+The combined source8bbd19a now passes163core/131app, including the old-data migration
+comparison and mixed A/B/C COPY/Undo/compaction and origin reconstruction. Final
+private11/APK evidence is source-bound in JOURNAL_14_VERIFICATION_2026_10_16.md.
+JVM/Robolectric evidence does not close device/UI.

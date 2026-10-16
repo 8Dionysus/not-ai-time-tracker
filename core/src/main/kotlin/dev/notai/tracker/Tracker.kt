@@ -157,7 +157,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
                 if(d.focus != null) FocusTransitions.cancel(d,n) else close(d,current(d) ?: fail(ErrorCode.INVALID_INPUT,"No current session"),n,SessionStatus.STOPPED)
             }
         }
-        append(base,entry.selection,entry.note,n)
+        append(base,entry.selection,choiceStartNote(d,entry.kind,entry.sourceId,entry.selection,entry.note),n)
     }
     class DeletePreview internal constructor(val expected: Token,val sessionId: String,val before: Dataset,val after: Dataset,val asOf: Moment) {
         val segmentCount get() = before.segments.count { it.sessionId == sessionId }
@@ -205,19 +205,19 @@ class Tracker(val store: StateStore, val clock: Clock) {
         ensure(current(d) == null, "Stop or switch current session first")
         val s = d.sessions.find { it.id == sessionId } ?: fail(ErrorCode.INVALID_INPUT, "Missing session")
         val lastSelection = d.segments.filter { it.sessionId == sessionId }.maxByOrNull { it.start }?.selection ?: s.selection
-        append(d,lastSelection,s.note,n)
+        append(d,lastSelection,choiceStartNote(d,ChoiceKind.HISTORY,sessionId,lastSelection,s.note),n)
     }
     fun startFavorite(expected: Token, favoriteId: String) = mutate(expected) { d,n ->
         ensure(current(d) == null, "Stop or switch current session first")
         val f = d.favorites.find { it.id == favoriteId } ?: fail(ErrorCode.INVALID_INPUT, "Missing favorite")
-        append(d,f.selection,null,n)
+        append(d,f.selection,choiceStartNote(d,ChoiceKind.FAVORITE,f.id,f.selection,null),n)
     }
     fun removeFavorite(expected: Token, favoriteId: String) = mutate(expected) { d,_ ->
         ensure(d.favorites.any { it.id == favoriteId }, "Missing favorite")
         d.copy(favorites = d.favorites.filterNot { it.id == favoriteId })
     }
     fun saveFavorite(expected: Token, favorite: Favorite) = mutate(expected) { d,_ ->
-        d.copy(favorites = d.favorites.filterNot { it.id == favorite.id } + favorite)
+        d.copy(favorites = d.favorites.filterNot { it.id == favorite.id } + favorite.copy(personal = d.favorites.find { it.id == favorite.id }?.personal ?: favorite.personal))
     }
     fun saveType(expected: Token, type: ActivityType) = mutate(expected) { d,_ ->
         d.types.find { it.id == type.id }?.let { old ->
@@ -262,11 +262,33 @@ class Tracker(val store: StateStore, val clock: Clock) {
         d.copy(units = d.units.filterNot { it.id == unit.id } + unit)
     }
     fun saveCard(expected: Token, card: Card) = mutate(expected) { d,_ ->
-        d.copy(cards = d.cards.filterNot { it.id == card.id } + card)
+        d.copy(cards = d.cards.filterNot { it.id == card.id } + card.copy(personal = d.cards.find { it.id == card.id }?.personal ?: card.personal))
+    }
+    /** Profile edits have a dedicated boundary: ordinary card/catalog saves preserve them. */
+    fun personalizeChoice(expected: Token,kind: ChoiceKind,id: String,value: ChoicePersonalization) = mutate(expected,true) { d,_ ->
+        validatePersonalChoice(value)
+        when(kind) {
+            ChoiceKind.CARD -> { ensure(d.cards.any { it.id == id },"Missing card");d.copy(cards = d.cards.map { if(it.id == id) it.copy(personal = value) else it }) }
+            ChoiceKind.FAVORITE -> { ensure(d.favorites.any { it.id == id },"Missing favorite");d.copy(favorites = d.favorites.map { if(it.id == id) it.copy(personal = value) else it }) }
+            else -> fail(ErrorCode.INVALID_INPUT,"Personal profiles require Card/Favorite IDs")
+        }
+    }
+    /** Supplied IDs are a pinned prefix; omitted IDs are explicitly unpinned. */
+    fun orderChoices(expected: Token,kind: ChoiceKind,ids: List<String>): Change {
+        val captured = frozenList(ids)
+        return mutate(expected,true) { d,_ ->
+            ensure(captured.size <= 1_000_000 && captured.distinct().size == captured.size,"Duplicate/oversize order")
+            val ranks = captured.withIndex().associate { it.value to it.index }
+            when(kind) {
+                ChoiceKind.CARD -> { ensure(captured.all { id -> d.cards.any { it.id == id } },"Missing card");d.copy(cards = d.cards.map { it.copy(personal = it.personal.copy(order = ranks[it.id])) }) }
+                ChoiceKind.FAVORITE -> { ensure(captured.all { id -> d.favorites.any { it.id == id } },"Missing favorite");d.copy(favorites = d.favorites.map { it.copy(personal = it.personal.copy(order = ranks[it.id])) }) }
+                else -> fail(ErrorCode.INVALID_INPUT,"Ordering requires Card/Favorite IDs")
+            }
+        }
     }
     fun copyCard(expected: Token, cardId: String, name: String) = mutate(expected) { d,_ ->
         val c = d.cards.find { it.id == cardId } ?: fail(ErrorCode.INVALID_INPUT, "Missing card")
-        d.copy(cards = d.cards + c.copy(id = newId(), name = name, archived = false))
+        d.copy(cards = d.cards + c.copy(id = newId(), name = name, archived = false,personal = c.personal.copy(order = null)))
     }
     fun startFocus(expected: Token,selection: Classification = Classification(),plan: FocusPlan? = null) = mutate(expected) { d,n ->
         FocusTransitions.start(d,n,plan ?: d.settings.focusPlan,selection)
@@ -315,6 +337,23 @@ class Tracker(val store: StateStore, val clock: Clock) {
     }
     data class SegmentEdit(val id: String,val start: Long,val end: Long,val selection: Classification)
     /** Save a completed session form atomically; retained segment IDs retain their measurements. */
+    fun historyGaps(start: Long,end: Long): HistoryGapReview = storage { HistoryGaps.inspect(data(),clock.now(),start,end) }
+    /** Form preparation only. Uncertainty must be resolved through recovery first. */
+    fun gapDraft(review: HistoryGapReview,gapId: String,selection: Classification = Classification(),note: String? = null): EntryDraft = storage {
+        val d=data();checkToken(d,review.token,clock.now())
+        val actual=HistoryGaps.inspect(d,review.asOf,review.start,review.requestedEnd)
+        val gap=actual.gaps.singleOrNull { it.id==gapId }
+        ensureReason(gap!=null,ErrorReason.HISTORY_GAP_CHANGED,ErrorCode.STALE,mapOf("gapId" to ErrorArgument.Identifier(gapId)),"historyGaps.gapId")
+        ensureReason(gap!!.kind!=HistoryGapKind.RECOVERY_UNCERTAIN,ErrorReason.HISTORY_GAP_UNCERTAIN,ErrorCode.RECOVERY_REQUIRED,mapOf("gapId" to ErrorArgument.Identifier(gapId)),"historyGaps.gapId")
+        EntryDraft(selection.frozen(),note,DraftInterval(gap.start,gap.end),DraftSource.HISTORY_GAP).also { it.validateForApply() }
+    }
+    fun previewMetadata(input: BatchMetadataRequest): BatchMetadataPreview = storage { previewBatchMetadata(data(),input) }
+    fun applyMetadata(preview: BatchMetadataPreview) = mutate(preview.expected,true) { d,_ ->
+        val checked=previewBatchMetadata(d,preview.request)
+        ensureReason(checked.changes==preview.changes,ErrorReason.METADATA_BATCH_CHANGED,ErrorCode.STALE,fieldPath="metadataBatch")
+        ensureReason(checked.changes.isNotEmpty(),ErrorReason.METADATA_BATCH_INVALID,arguments=mapOf("rule" to ErrorArgument.Identifier("NO_CHANGES")),fieldPath="metadataBatch")
+        checked.after
+    }
     fun correctSession(expected: Token,sessionId: String,edits: List<SegmentEdit>,note: String?,reclassify: Boolean = false) = mutate(expected,true) { d,n ->
         correctedSession(d,n,sessionId,edits,note,reclassify)
     }

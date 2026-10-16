@@ -291,7 +291,7 @@ class RoomScenariosTest: ScenarioContract() {
             }
         }
         val broken = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name)
-            .addMigrations(fault,TrackerDatabase.MIGRATION_10_11).allowMainThreadQueries().build()
+            .addMigrations(fault,TrackerDatabase.MIGRATION_10_11,TrackerDatabase.MIGRATION_11_12).allowMainThreadQueries().build()
         try { org.junit.Assert.assertThrows(Exception::class.java) { RoomStore(broken) } } finally { broken.close() }
         org.junit.Assert.assertTrue("Injected migration interruption was reached",injected)
         android.database.sqlite.SQLiteDatabase.openDatabase(RuntimeEnvironment.getApplication().getDatabasePath(name).path,null,0).use { sql ->
@@ -480,7 +480,7 @@ class RoomScenariosTest: ScenarioContract() {
                 })
             }
         }
-        val db = androidx.room.Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(fault,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9,TrackerDatabase.MIGRATION_9_10,TrackerDatabase.MIGRATION_10_11).allowMainThreadQueries().build()
+        val db = androidx.room.Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(fault,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9,TrackerDatabase.MIGRATION_9_10,TrackerDatabase.MIGRATION_10_11,TrackerDatabase.MIGRATION_11_12).allowMainThreadQueries().build()
         try { org.junit.Assert.assertThrows(Exception::class.java) { RoomStore(db) } } finally { db.close() }
         org.junit.Assert.assertTrue("Injected normalized migration failure was reached",injected)
         org.junit.Assert.assertEquals(before,snapshot())
@@ -732,7 +732,7 @@ class RoomScenariosTest: ScenarioContract() {
     }
     override fun createStore(): StateStore = open("test-${newId()}.db")
     private fun open(name: String): StateStore {
-        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9,TrackerDatabase.MIGRATION_9_10,TrackerDatabase.MIGRATION_10_11).allowMainThreadQueries().build()
+        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9,TrackerDatabase.MIGRATION_9_10,TrackerDatabase.MIGRATION_10_11,TrackerDatabase.MIGRATION_11_12).allowMainThreadQueries().build()
         return try { RoomStore(db).also { databases[it] = name to db } } catch(e: Exception) { db.close();throw e }
     }
     override fun reopen(store: StateStore): StateStore {

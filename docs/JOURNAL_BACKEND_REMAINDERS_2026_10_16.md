@@ -21,9 +21,10 @@ and paraphrases are reproduced here; full page snapshots remain outside the repo
 Personal catalog-only selective transfer is implemented (`TransferSelection.cardIds/typeIds`,
 format2+); it must not be resurrected as an old missing feature. Names alone never merge
 objects. `Report.groupSimilar()` already preserves row identities/notes while grouping
-exact classification snapshots. Current typed backend locale/content interfaces do not
-certify installed reviewed translation packs, UI resource migration, localized alias
-search integration, RTL or accessibility acceptance.
+exact classification snapshots. Current6fcc4c2 interfaces implement translated existing ChoiceView search; the private
+11-language ab0d1a5 fixtures positively exercise reviewed display and search.
+Ancestor word/context matching remains absent. UI resources/LocaleManager/RTL and
+accessibility acceptance remain separate. See BACKEND_FOLLOWUP_VERIFICATION_2026_10_16.md.
 
 Release/OEM/TalkBack/overlay P2/goal-edit and native publisher provenance conditions
 remain separate from missing backend functions. C v3 is integrated with130core/99app passing on c949a8f and independent APK/lint/inventory evidence; this includes34Attention-specific executions. Exact source, hashes and device/UI limits are in ATTENTION_VERIFICATION_2026_10_16.md. These results do not substitute for the coordinator's full latest-journal audit.

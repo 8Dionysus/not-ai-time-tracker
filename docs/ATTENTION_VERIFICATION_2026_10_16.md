@@ -1,5 +1,7 @@
 # Attention backend integration verification, 16 October 2026
 
+Historical checkpoint. Current readiness/search/API26 behavior and scoped verification supersede the corresponding older claims below: [follow-up verification](BACKEND_FOLLOWUP_VERIFICATION_2026_10_16.md). Original test/source evidence is retained.
+
 Runtime, core tests, app tests and both unsigned APKs: `c949a8f202e143151e216a8932956a7a93b001bc`.
 Published integration baseline: `7e240e45990fdcda2b938464f2f7f8697c3c7be1`.
 C v3 source: `c403bc6216519aed817245830b19a3e81bc7aa7d`; exact delta transport,

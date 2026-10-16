@@ -1,5 +1,7 @@
 # English catalog candidate: source-bound preparation
 
+Historical checkpoint. Current readiness/search/API26 behavior and scoped verification supersede the corresponding older claims below: [follow-up verification](BACKEND_FOLLOWUP_VERIFICATION_2026_10_16.md). Original test/source evidence is retained.
+
 `catalog/editorial/en/{manifest.json,labels.json}` is a complete schema-1 candidate for the existing `CatalogContentPacks` loader. It is not installed or bundled into Android assets: the current asset task includes `locales/**`, not `editorial/**`, and no runtime locale index or UI resource is changed. `REVIEWED` describes the coordinator-reported editorial review. Source/catalog rights remain pending, license is null, and native-speaker QA remains false. The existing loader continues to use Russian source fallback until its explicit rights/quality/coverage conditions are met. Application-code Apache licensing does not cover this content; see NOTICE.
 
 ## Verified input and output

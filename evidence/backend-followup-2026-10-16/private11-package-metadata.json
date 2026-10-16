@@ -1,0 +1,11 @@
+{
+  "bytes": 27921326,
+  "sha256": "e6bd047884bba4c2cbc8a6abcfdb8f2ef21121140adbc04c5a962dcb6f9f90d1",
+  "verifiedPayloadMembers": 65,
+  "crcVerified": true,
+  "private": true,
+  "publicPush": false,
+  "source": "ab0d1a5d92c96beb7e4748d302ade4278f1106ba",
+  "runtimeProductionSource": "6fcc4c212a854f4da320e4911605a7beb5c6db52",
+  "publicPrerequisite": "89cc405830003a5a82ecffac459f9a9b1c0c32cb"
+}

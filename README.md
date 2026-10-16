@@ -84,3 +84,5 @@ Project-owned code is licensed under [Apache-2.0](LICENSE). The [NOTICE](NOTICE)
 [Проверенный редакционный пакет RU и 11 переводных языков](docs/localization/README.md) находится в main вместе с точными хешами и инструкцией для Опуса. Он включает составные сообщения и 64 typed CSV issue codes; подключение ресурсов к Android UI и проверка на устройстве ещё предстоят.
 
 Сохранённые невизуальные контроллеры расписания и выборочного файла, lifecycle/recovery и тихая проекция: [handoff для Opus](docs/BACKEND_WORKSPACES_HANDOFF.md). Каталогные sidecar manifest/loader и batch resolver описаны в [контракте content packs](docs/CATALOG_CONTENT_PACKS.md); установленные DRAFT или отсутствующие пакеты не считаются поддержанными переводами. Сверка всех 21 направлений и A–F: [покрытие](docs/FUNCTIONAL_COVERAGE_2026_10_15.md).
+
+Текущий бэкенд/API26/локализованный поиск: [проверка и границы](docs/BACKEND_FOLLOWUP_VERIFICATION_2026_10_16.md). Полный C949 прогон и последующие адресные проверки привязаны к разным SHA; приватные новые тексты не включены в публичные APK.

@@ -72,6 +72,6 @@ Opus подключает notification renderer/channel/actions, явное devi
 
 Физическое DND, audio focus/playback, actual delivery, background/OEM timing и доступность UI требуют отдельной приёмки. Фоновая музыка, внешние музыкальные интеграции и рисунок празднования остаются продуктовыми вариантами. JVM/Robolectric/APK/lint не закрывают эти пункты.
 
-Local music requires API27+ because the public O_CLOEXEC constant is API27. API26 returns UNSUPPORTED and the direct open helper refuses before opening a source; minSdk26 for the application is unchanged. [Android API](https://developer.android.com/reference/android/system/OsConstants#O_CLOEXEC).
+Local music supports API26 through the existing native module's compiled ABI O_CLOEXEC getter (745c7ed); API27+ uses the public constant. One atomic Os.open retains O_RDONLY/O_CLOEXEC/O_NOFOLLOW/O_NONBLOCK, followed by regular/nonempty fstat and retained descriptor. Missing native capability fails closed. This has host JNI/fixture and four-ABI build evidence; actual Android Os/audio/device execution remains unverified. See [current verification](BACKEND_FOLLOWUP_VERIFICATION_2026_10_16.md).
 
 Reference owner patch is a zero-context diff from46128a3 toC949; isolated-index `git apply --cached --check --unidiff-zero` passed. It is already integrated and must not be reapplied to current main.

@@ -29,12 +29,16 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
     val tags: Set<String> = emptySet(),
     val ancestorPathAtWrite: List<String> = emptyList(), val facets: List<Facet> = emptyList()
 )
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 @Serializable data class Card(@Required val id: String = newId(), val name: String, val templateId: String? = null,
     val activityTypeId: String? = null, val details: Map<String, String> = emptyMap(),
-    val tags: Set<String> = emptySet(), val archived: Boolean = false, val facets: List<Facet> = emptyList()) {
+    val tags: Set<String> = emptySet(), val archived: Boolean = false, val facets: List<Facet> = emptyList(),
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val personal: ChoicePersonalization = ChoicePersonalization()) {
     fun classification() = Classification(id, name, activityTypeId, details, tags, facets = facets)
 }
-@Serializable data class Favorite(@Required val id: String = newId(), val label: String, val selection: Classification)
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+@Serializable data class Favorite(@Required val id: String = newId(), val label: String, val selection: Classification,
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val personal: ChoicePersonalization = ChoicePersonalization())
 @Serializable enum class SessionStatus { RUNNING, PAUSED, STOPPED, RECOVERY }
 @Serializable data class Session(@Required val id: String = newId(), val status: SessionStatus,
     val selection: Classification = Classification(), val note: String? = null, val importOrigin: ImportOrigin? = null)
@@ -143,8 +147,8 @@ fun validate(data: Dataset) {
     validateTransfer(data)
     val cards = data.cards.associateBy { it.id }; val sessions = data.sessions.associateBy { it.id }
     fun selection(c: Classification) = validateSelection(data,c,typeIds,cards.keys)
-    data.cards.forEach { ensure(it.name.isNotBlank(), "Card needs a name"); selection(it.classification()) }
-    data.favorites.forEach { ensure(it.label.isNotBlank(), "Favorite needs a label"); selection(it.selection) }
+    data.cards.forEach { validatePersonalChoice(it.personal);ensure(it.name.isNotBlank(), "Card needs a name"); selection(it.classification()) }
+    data.favorites.forEach { validatePersonalChoice(it.personal);ensure(it.label.isNotBlank(), "Favorite needs a label"); selection(it.selection) }
     val checkedHistorical = java.util.IdentityHashMap<Classification,Boolean>()
     fun historical(c: Classification) {
         if(checkedHistorical.put(c,true) != null) return

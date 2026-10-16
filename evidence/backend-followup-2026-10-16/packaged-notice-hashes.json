@@ -1,0 +1,58 @@
+[
+  {
+    "variant": "debug",
+    "asset": "release-runtime-index.json",
+    "bytes": 33430,
+    "sha256": "3ba3773b53ced2777c8d636e98b9848931b147a6ca6ec220903c5a9781ed7caa",
+    "matchesCommittedLicenseAsset": true
+  },
+  {
+    "variant": "debug",
+    "asset": "onest-OFL.txt",
+    "bytes": 4380,
+    "sha256": "1b10b77bbd5198a6d6dd4ec8ccb0410624b8c994b0bd880161cc46959e9f6374",
+    "matchesCommittedLicenseAsset": true
+  },
+  {
+    "variant": "debug",
+    "asset": "third-party-notices.txt",
+    "bytes": 278399,
+    "sha256": "f0be537fa24896cdfbb8b66015bda9fc8eb1a7c983eacb407db3120a380d46bb",
+    "matchesCommittedLicenseAsset": true
+  },
+  {
+    "variant": "debug",
+    "asset": "project-Apache-2.0.txt",
+    "bytes": 11359,
+    "sha256": "b1d2870f1a00e4d7f56576e5f0870cba109e041f8af66866cf5b499478e654e7",
+    "matchesCommittedLicenseAsset": true
+  },
+  {
+    "variant": "release",
+    "asset": "release-runtime-index.json",
+    "bytes": 33430,
+    "sha256": "3ba3773b53ced2777c8d636e98b9848931b147a6ca6ec220903c5a9781ed7caa",
+    "matchesCommittedLicenseAsset": true
+  },
+  {
+    "variant": "release",
+    "asset": "onest-OFL.txt",
+    "bytes": 4380,
+    "sha256": "1b10b77bbd5198a6d6dd4ec8ccb0410624b8c994b0bd880161cc46959e9f6374",
+    "matchesCommittedLicenseAsset": true
+  },
+  {
+    "variant": "release",
+    "asset": "third-party-notices.txt",
+    "bytes": 278399,
+    "sha256": "f0be537fa24896cdfbb8b66015bda9fc8eb1a7c983eacb407db3120a380d46bb",
+    "matchesCommittedLicenseAsset": true
+  },
+  {
+    "variant": "release",
+    "asset": "project-Apache-2.0.txt",
+    "bytes": 11359,
+    "sha256": "b1d2870f1a00e4d7f56576e5f0870cba109e041f8af66866cf5b499478e654e7",
+    "matchesCommittedLicenseAsset": true
+  }
+]

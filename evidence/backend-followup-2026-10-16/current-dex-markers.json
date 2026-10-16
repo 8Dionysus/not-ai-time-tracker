@@ -1,0 +1,24 @@
+[
+  {
+    "variant": "debug",
+    "sha256": "47339f1fd51c299df9ce0c97cb725f44d6d0e4feb18ab0283690354411832b56",
+    "markers": [
+      "ChoiceCatalogLabels",
+      "withCatalogLabels",
+      "choiceLabels",
+      "DescriptorOpenFlags",
+      "closeOnExecFlag"
+    ]
+  },
+  {
+    "variant": "release",
+    "sha256": "cd784587c4c15a8c09245eacddfae39ced3aeeff0099e406bc380c6de38d1449",
+    "markers": [
+      "ChoiceCatalogLabels",
+      "withCatalogLabels",
+      "choiceLabels",
+      "DescriptorOpenFlags",
+      "closeOnExecFlag"
+    ]
+  }
+]

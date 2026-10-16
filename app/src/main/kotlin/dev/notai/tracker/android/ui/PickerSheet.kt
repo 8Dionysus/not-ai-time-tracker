@@ -88,7 +88,8 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
     val data by produceState<PickerData?>(null, committed) { value = vm.pickerData() }
     val results by produceState(emptyList<PickerItem>(), query, committed) { if (query.isBlank()) value = emptyList() else { delay(120); value = vm.search(query) } }
     val breadcrumb = stack.lastOrNull()
-    val parent by produceState(breadcrumb,breadcrumb,committed) { value = breadcrumb?.let { vm.refreshPickerItem(it) } }
+    val projectedParent by produceState(breadcrumb,breadcrumb,committed) { value = breadcrumb?.let { vm.refreshPickerItem(it) } }
+    val parent = projectedParent
     val children by produceState(emptyList<PickerItem>(), parent, committed) { value = parent?.let { vm.children(it.entry.sourceId) } ?: emptyList() }
     val draft by vm.draft.collectAsStateWithLifecycle()
 

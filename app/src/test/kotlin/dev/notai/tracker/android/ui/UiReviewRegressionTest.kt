@@ -11,6 +11,7 @@ import java.time.ZoneId
 import java.util.Collections
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import org.junit.After
 import org.junit.Assert.*
@@ -52,7 +53,7 @@ class UiReviewRegressionTest {
     }
     private data class Shown(val entry: ChoiceEntry,val reference: ChoiceReference,val token: Token)
     private class Fixture(val clock: FakeClock,val store: Store,val tracker: Tracker,val vm: TrackerViewModel,val scope: CoroutineScope) {
-        val notices = Collections.synchronizedList(mutableListOf<Notice>())
+        val notices = java.util.concurrent.CopyOnWriteArrayList<Notice>()
         fun shown(id: String): Shown {
             val view = tracker.view();val choices = view.choices();val entry = requireNotNull(choices.resolve(id))
             return Shown(entry,choices.reference(entry),view.snapshot().token)
@@ -67,10 +68,10 @@ class UiReviewRegressionTest {
             Thread.sleep(5)
         }
     }
-    private fun fixture(clock: FakeClock,settings: Settings = Settings("UTC")): Fixture {
+    private fun fixture(clock: FakeClock,settings: Settings = Settings("UTC"),waitBoundary: (suspend (Long) -> Unit)? = null): Fixture {
         val store = Store(Dataset(settings = settings));val tracker = Tracker(store,clock)
         UiBackends.open = { Backend(tracker) }
-        val vm = TrackerViewModel(RuntimeEnvironment.getApplication())
+        val vm = if(waitBoundary == null) TrackerViewModel(RuntimeEnvironment.getApplication()) else TrackerViewModel(RuntimeEnvironment.getApplication(),waitBoundary)
         val scope = CoroutineScope(SupervisorJob()+Dispatchers.IO)
         val fixture = Fixture(clock,store,tracker,vm,scope);fixtures += fixture
         scope.launch(start = CoroutineStart.UNDISPATCHED) { vm.snapshot.collect { } }
@@ -110,6 +111,7 @@ class UiReviewRegressionTest {
         val today = runBlocking { f.vm.overview(Period.DAY) }!!.goals
         assertEquals(1,today.size);assertTrue(today.single().name,today.single().name.startsWith("Active today"))
         assertFalse(today.single().name,today.single().name.contains("раз"))
+        assertTrue(today.single().name,today.single().name.contains("дн."))
         f.clock.wall = at("2026-10-11T12:00:00Z")
         val tomorrow = runBlocking { f.vm.overview(Period.DAY) }!!.goals
         assertEquals(1,tomorrow.size);assertTrue(tomorrow.single().name,tomorrow.single().name.startsWith("Inactive today"))
@@ -127,6 +129,13 @@ class UiReviewRegressionTest {
         f.synced();val before = t.data();val commits = f.store.commits.get()
         val result = runBlocking { f.vm.requestDelete(session) }
         assertTrue(result.toString(),result is DeleteRequest.Confirm);assertEquals(before,t.data());assertEquals(commits,f.store.commits.get())
+        val review = result as DeleteRequest.Confirm
+        assertEquals(1,review.subjectLinks);assertEquals(1,review.exerciseSets);assertEquals(1,review.eventQuantities);assertEquals(0,review.distanceTimes)
+        assertTrue(review.consequences.any { it.contains("подход") });assertTrue(review.consequences.any { it.contains("величин") });assertTrue(review.consequences.any { it.contains("связ") })
+        f.vm.applyDeleteSession(review.preview);pump { f.notices.any { it.text == "Запись удалена" } }
+        assertTrue(t.data().sessions.none { it.id == session });f.synced();f.vm.undo(t.snapshot().token)
+        pump { f.notices.any { it.text == "Отменено" } }
+        assertEquals(before.subjects,t.data().subjects);assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
     }
     private fun staleFavorite(renameOnly: Boolean) {
         val f = fixture(FakeClock());val t = f.tracker
@@ -158,5 +167,21 @@ class UiReviewRegressionTest {
         f.vm.receiveDraft(draft);val before = t.data();f.store.rejectWrite = f.store.attempts.get()+1
         f.choose(shown,PickMode.SWITCH);pump { f.notices.isNotEmpty() }
         assertEquals(before,t.data());assertEquals(draft,f.vm.draft.value)
+    }
+    @Test fun idleHomeAndOverviewAdvanceAtReportBoundaryWithoutDatasetRevision() {
+        val boundary = at("2026-10-11T04:00:00Z");val wake = Channel<Unit>(Channel.UNLIMITED)
+        val f = fixture(FakeClock(boundary-1),Settings("UTC",reportDayStartMinute = 240)) { wake.receive() }
+        f.scope.launch(start = CoroutineStart.UNDISPATCHED) { f.vm.home.collect { } }
+        pump { f.vm.home.value?.today == LocalDate.parse("2026-10-10") && f.vm.reportingDate.value == LocalDate.parse("2026-10-10") }
+        val before = f.tracker.data();assertEquals(LocalDate.parse("2026-10-10"),runBlocking { f.vm.overview(Period.DAY) }!!.last)
+        f.clock.wall = boundary;f.clock.elapsed++;wake.trySend(Unit)
+        pump { f.vm.home.value?.today == LocalDate.parse("2026-10-11") && f.vm.reportingDate.value == LocalDate.parse("2026-10-11") }
+        assertEquals(before,f.tracker.data());assertEquals(LocalDate.parse("2026-10-11"),runBlocking { f.vm.overview(Period.DAY) }!!.last)
+    }
+    @Test fun ribbonLabelsUseActualElapsedFractionsInExplicitReportZone() {
+        val zone = ZoneId.of("America/New_York");val policy = ReportingDayPolicy(zone.id,240)
+        val fall = LocalDate.parse("2026-10-31");val spring = LocalDate.parse("2026-03-07")
+        assertEquals(listOf("04:00","10:15","16:30","22:45","04:00"),ribbonAxisLabels(policy.boundary(fall),policy.boundary(fall.plusDays(1)),zone))
+        assertEquals(listOf("04:00","09:45","15:30","21:15","04:00"),ribbonAxisLabels(policy.boundary(spring),policy.boundary(spring.plusDays(1)),zone))
     }
 }

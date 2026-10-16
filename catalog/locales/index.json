@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "locales": [
+    "en",
+    "es",
+    "fr",
+    "pt-BR",
+    "ar",
+    "zh-Hans",
+    "de",
+    "it",
+    "ja",
+    "ko",
+    "hi"
+  ]
+}

@@ -1,8 +1,8 @@
-Текущий backend-проход 2026-10-15: [контракты и границы](BACKEND_PASS_2026_10.md), [SQLite retention](TRANSFER_RETENTION.md). Точные новые SHA/команды/JUnit/APK находятся в сопровождающем verification.json поставки. Датированные результаты ниже относятся к прежним сборкам и не являются приёмкой нового прохода.
+Текущая интеграция backend R2 и 11 каталогных пакетов (2026-10-16): [post-merge SHA/команды/JUnit/APK](JOURNAL_PUBLIC_MERGE_2026_10_16.md), [контракт четырнадцати направлений](JOURNAL_COMBINED_CONTRACT_2026_10_16.md). Room12/full14/selective4. Датированные результаты ниже относятся к прежним сборкам и не являются device-приёмкой объединённого дерева.
 
 # Проверки и пределы результатов
 
-## Текущий Compose-код и поставка (2026-10-13)
+## Исторический Compose-код и поставка (2026-10-13)
 
 Проверенный code commit: `a589f56779163aef07952f1696a97593d0e09b6b`. Текущие указатели: [машинный отчёт](../evidence/compose-current/verification.json) и [матрица действий Android](../evidence/compose-current/android-action-matrix.json). Они включают Compose `TimerScreen`, `TrackerViewModel`, повторный переключатель темы, уникальные ключи одного сегмента в разных днях и ActivityResult экспорт. Исторические результаты ниже относятся к своим прежним состояниям.
 

@@ -64,7 +64,7 @@ data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId
     @Query("DELETE FROM measurements WHERE id IN (:ids)") fun deleteMeasurements(ids: List<String>)
     @Query("SELECT * FROM measurements WHERE id IN (:ids)") fun readMeasurements(ids: List<String>): List<MeasurementRow>
 }
-const val TRACKER_DATABASE_VERSION = 11
+const val TRACKER_DATABASE_VERSION = 12
 @Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class,GenerationRow::class,VocabularyRow::class,ClassificationRow::class],version = TRACKER_DATABASE_VERSION,exportSchema = true)
 abstract class TrackerDatabase: RoomDatabase() {
     abstract fun dao(): TrackerDao
@@ -193,6 +193,45 @@ abstract class TrackerDatabase: RoomDatabase() {
             }
         }
 
+        val MIGRATION_11_12 = object: androidx.room.migration.Migration(11,12) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                run {
+                    readMetadataPayload(db)?.let { payload ->
+                        val old = codec.parseToJsonElement(payload).jsonObject
+                        val legacySettings = codec.decodeFromJsonElement<Settings>(old["settings"] ?: fail(ErrorCode.STORAGE,"Missing legacy settings"))
+                        ensure(legacySettings.reportDayStartMinute == 0 && old["savedReports"] == null,
+                            "Reporting fields in legacy metadata",ErrorCode.STORAGE)
+                        val goals = old["goals"]?.let { codec.decodeFromJsonElement<List<Goal>>(it) }.orEmpty()
+                        ensure(goals.none { it.revisions.isNotEmpty() || it.dayStartMinute != 0 || it.metric == GoalMetric.DISTINCT_RECORDED_DAYS },
+                            "Versioned goals in legacy metadata",ErrorCode.STORAGE)
+                        val transfer = old["transfer"]?.let { codec.decodeFromJsonElement<TransferState>(it) } ?: TransferState()
+                        ensure(!Dataset(types = emptyList(),axes = emptyList(),metrics = emptyList(),units = emptyList(),
+                            settings = legacySettings,goals = goals,transfer = transfer).hasReportingExtensions(),
+                            "Reporting receipts in legacy metadata",ErrorCode.STORAGE)
+                    }
+                }
+                readMetadataPayload(db)?.let { payload ->
+                    val prior = codec.decodeFromString<Dataset>(payload)
+                    ensure(!prior.hasChoicePersonalization(),"Personal choices in v11 metadata",ErrorCode.STORAGE)
+                    ensure(!prior.hasSubjectQuantities(),"Subject quantities in v11 metadata",ErrorCode.STORAGE)
+                }
+                for(table in listOf("cards","favorites")) db.query("SELECT payload FROM $table").use { rows ->
+                    while(rows.moveToNext()) {
+                        val json = codec.parseToJsonElement(rows.getString(0)).jsonObject
+                        val profile = json["personal"]?.let { codec.decodeFromJsonElement<ChoicePersonalization>(it) } ?: ChoicePersonalization()
+                        ensure(profile == ChoicePersonalization(),"Personal choices in v11 rows",ErrorCode.STORAGE)
+                    }
+                }
+                db.query("SELECT payload FROM vocabulary WHERE id=1").use { rows ->
+                    if(rows.moveToFirst()) {
+                        val vocabulary = codec.decodeFromString<VocabularyData>(rows.getString(0))
+                        ensure(vocabulary.metrics.none { it.bounds != null },"Subject quantities in v11 vocabulary",ErrorCode.STORAGE)
+                    }
+                }
+                // Defaults decode losslessly; no facts, anchors, IDs or rows are rewritten.
+            }
+        }
+
         fun open(context: Context,name: String = "tracker.db"): TrackerDatabase {
             val file = context.getDatabasePath(name)
             val existing = DatabaseFiles.paths(context,name).filter { it.exists() }
@@ -215,7 +254,7 @@ abstract class TrackerDatabase: RoomDatabase() {
                 ensure(validHeader,"Database header is damaged; originals preserved. Use explicit recovery",ErrorCode.STORAGE)
             }
             return Room.databaseBuilder(context,TrackerDatabase::class.java,name)
-            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5,MIGRATION_5_6,MIGRATION_6_7,MIGRATION_7_8,MIGRATION_8_9,MIGRATION_9_10,MIGRATION_10_11).openHelperFactory { configuration ->
+            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5,MIGRATION_5_6,MIGRATION_6_7,MIGRATION_7_8,MIGRATION_8_9,MIGRATION_9_10,MIGRATION_10_11,MIGRATION_11_12).openHelperFactory { configuration ->
                 val original = configuration.callback
                 val guarded = object: androidx.sqlite.db.SupportSQLiteOpenHelper.Callback(original.version) {
                     override fun onConfigure(db: androidx.sqlite.db.SupportSQLiteDatabase) = original.onConfigure(db)

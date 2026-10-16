@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.ScheduleDeliveryTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-10-16T07:15:50.794Z" hostname="69b2b5b46001" time="0.236">
+  <properties/>
+  <testcase name="permissionLossPreservesPreferenceAndOnlyDurablePendingCanCatchUp" classname="dev.notai.tracker.ScheduleDeliveryTest" time="0.01"/>
+  <testcase name="concurrentReceiversAndReentrantRendererCannotOverwriteOrRepeatReceipts" classname="dev.notai.tracker.ScheduleDeliveryTest" time="0.018"/>
+  <testcase name="staleCallbacksAndEarlyClockNeverPostAndMoveNeverRepeatsAReceipt" classname="dev.notai.tracker.ScheduleDeliveryTest" time="0.009"/>
+  <testcase name="independentPlatformFailuresStillCancelAlarmAndDisableWakeupsWithoutConsumingReceipts" classname="dev.notai.tracker.ScheduleDeliveryTest" time="0.017"/>
+  <testcase name="receiptCapacityRefusalPreservesEveryReceiptDisarmsAndNeverPosts" classname="dev.notai.tracker.ScheduleDeliveryTest" time="0.14"/>
+  <testcase name="compactOperationalJsonReadsLegacyWithoutChangingReceiptsOrCallbackHashes" classname="dev.notai.tracker.ScheduleDeliveryTest" time="0.004"/>
+  <testcase name="optInAndExplicitTimesAreRequiredWhileQuietProjectionRemains" classname="dev.notai.tracker.ScheduleDeliveryTest" time="0.001"/>
+  <testcase name="storageUncertaintyCannotProduceDuplicatePostsOrLoseReceipts" classname="dev.notai.tracker.ScheduleDeliveryTest" time="0.009"/>
+  <testcase name="nextReminderMatchesProjectionAndHasNoTenYearHorizon" classname="dev.notai.tracker.ScheduleDeliveryTest" time="0.022"/>
+  <testcase name="postExceptionIsUnknownAndSecondTieRechecksFreshOptIn" classname="dev.notai.tracker.ScheduleDeliveryTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

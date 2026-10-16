@@ -1,0 +1,12 @@
+{
+  "source": "24cfe9d12c43900022f7b39abf44fbcffd6559ef",
+  "productionSource": "3d26c07fc340df8054e7a6a147468dc8c042294e",
+  "productionInputsUnchanged": true,
+  "core": 1,
+  "room": 1,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "build": "BUILD SUCCESSFUL in1m34s",
+  "scope": "Personal profiles: selective COPY, exact-policy receipt replay, compaction, reconstructed export, reopen, full archive, explicit pruned Undo refusal; B/C not yet integrated"
+}

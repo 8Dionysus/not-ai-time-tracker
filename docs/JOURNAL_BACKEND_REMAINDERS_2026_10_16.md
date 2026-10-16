@@ -1,5 +1,11 @@
 # Backend journal audit notes, 16 October 2026
 
+Historical seq207 audit below. The subsequently approved fourteen-item pass adds
+effective goals, saved report queries, subject quantities and ancestor context. Use
+JOURNAL_14_COVERAGE_2026_10_16.md and JOURNAL_14_VERIFICATION_2026_10_16.md for the
+current implementation and source-bound acceptance; old “missing” rows below are
+preserved as historical findings, not current backend blockers.
+
 These are source-specific findings for the coordinator's full journal audit, not a
 claim that the older 21-family matrix proves the whole journal complete. The A
 reader's saved main-page snapshot is seq207. Later coordinator decisions are assessed separately; the integrated C v3 result is source-bound in ATTENTION_VERIFICATION_2026_10_16.md. Only public requirement links

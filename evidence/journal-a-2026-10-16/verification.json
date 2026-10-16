@@ -1,0 +1,58 @@
+{
+  "source": "3d26c07fc340df8054e7a6a147468dc8c042294e",
+  "base": "70a7155b3ef548be4638cf71849d3b05dbbef7a6",
+  "executed": {
+    "core": {
+      "tests": 17,
+      "classes": {
+        "dev.notai.tracker.JournalATest": 8,
+        "dev.notai.tracker.FunctionalCustomizationTest": 6,
+        "dev.notai.tracker.ChoiceLocalizationTest": 3
+      }
+    },
+    "app": {
+      "tests": 14,
+      "classes": {
+        "dev.notai.tracker.android.JournalAMigrationTest": 3,
+        "dev.notai.tracker.android.RoomJournalATest": 8,
+        "dev.notai.tracker.android.RoomChoiceLocalizationTest": 3
+      }
+    }
+  },
+  "build": "BUILD SUCCESSFUL in4m12s",
+  "scope": "A4/5/8/9 affected suite, profile full/streaming/selective COPY/replay, shared Memory/Room, actual reached11-12 migration guard and rollback; no whole14/B/C acceptance",
+  "private11": {
+    "privateSource": "26de40aad35c64374b6a5d2f03c096c3ece02c4d",
+    "coreExecutionSource": "c751fb59eaf76c39f82f767143f82d2a34b5f7d8",
+    "appExecutionSource": "26de40aad35c64374b6a5d2f03c096c3ece02c4d",
+    "core": 1,
+    "app": 1,
+    "build": "BUILD SUCCESSFUL in2m7s",
+    "coreTaskInFinalInvocation": "UP-TO-DATE; actual successful core execution in prior4m28s attempt, whose app compile failed",
+    "realLocaleAncestorQueries": 11,
+    "canonicalReferencesUnchanged": true,
+    "sourceAndPayloadsUnchanged": true,
+    "verifiedRelevantSourceEquivalence": {
+      "core/src/main/kotlin/dev/notai/tracker/Choices.kt": "5130839038101234b25c8181eee88a16d57223c7f5b13d818d3cf09f31649318",
+      "core/src/main/kotlin/dev/notai/tracker/ChoiceCatalogLabels.kt": "bf55166b6f6215d11536c41adb8cf4ee075c38464eb83c8c82543515410a2da8",
+      "core/src/main/kotlin/dev/notai/tracker/CatalogContentPacks.kt": "f3730ce404c975f9d6103342f00bc99e987c972c8a39eb55bd2e70862f3cd2fb",
+      "core/src/main/kotlin/dev/notai/tracker/Model.kt": "cd79d98c00f3d84aad1a36873e2e7a798b40bfa17e70a8d4105ac4e95ec7ce0f",
+      "core/src/main/kotlin/dev/notai/tracker/ImmutableData.kt": "fd8d2e866ed6b67a48a4f383d0ea3df9b0cb4c2d33bd3779622c7e11e2ac11a8",
+      "core/src/main/kotlin/dev/notai/tracker/Backup.kt": "4122d68fbe4b0450b81f3b7a2f5c0cccb9ab601e1831bfc33eb4b5dd393dca6a",
+      "core/src/main/kotlin/dev/notai/tracker/Migration.kt": "0f893cbb10b825e8a93f41ab0d7fa684b286cdea6bf820445bd7269421bf0608",
+      "app/src/main/kotlin/dev/notai/tracker/android/CatalogContentAdapter.kt": "208fea4fe5ab2c490e19348aa1c9286722424691493580b33b938f32775d454e"
+    },
+    "deviceExecution": false
+  },
+  "room": 12,
+  "fullJson": 14,
+  "selectiveReader": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "oldSchema11Untouched": true,
+  "schema12OnlyVersionDelta": true,
+  "remaining": "B/C integration, complete old-data→migration→all14 export/selective/restore comparison and fresh combined build/regression; physical/UI/release acceptance separate"
+}

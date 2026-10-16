@@ -7,7 +7,7 @@ import java.util.Locale
 enum class ChoiceKind { TYPE, CARD, FAVORITE, HISTORY }
 enum class CatalogScope { ALL, ROOTS, CHILDREN, SUBTREE }
 enum class ChoiceAvailability { AVAILABLE, ARCHIVED_CARD, ARCHIVED_TYPE, GROUP, EMPTY_GROUP }
-enum class MatchField { NAME, ALIAS, SELECTION_NAME, CURRENT_CARD_NAME, CURRENT_TYPE_NAME, CURRENT_TYPE_ALIAS, UNCLASSIFIED }
+enum class MatchField { NAME, ALIAS, SELECTION_NAME, CURRENT_CARD_NAME, CURRENT_TYPE_NAME, CURRENT_TYPE_ALIAS, UNCLASSIFIED, ANCESTOR_NAME, ANCESTOR_ALIAS, PERSONAL_ALIAS }
 enum class MatchStrength { EXACT, PREFIX, CONTAINS }
 data class ChoiceQuery(val text: String = "",val kinds: Set<ChoiceKind> = setOf(ChoiceKind.TYPE,ChoiceKind.CARD,ChoiceKind.FAVORITE),
     val scope: CatalogScope = CatalogScope.ALL,val parentId: String? = null,val includeArchived: Boolean = false)
@@ -15,7 +15,7 @@ enum class SuggestionOrder { RECENT_RECORDED, FREQUENT_RECORDED }
 data class HistoryWindow(val start: Long,val end: Long)
 data class SuggestionQuery(val enabled: Boolean = false,val order: SuggestionOrder = SuggestionOrder.RECENT_RECORDED,val window: HistoryWindow? = null)
 data class ChoicePath(val id: String,val name: String,val archived: Boolean,val selectable: Boolean)
-data class MatchEvidence(val field: MatchField,val text: String,val strength: MatchStrength,val localeTag: String? = null)
+data class MatchEvidence(val field: MatchField,val text: String,val strength: MatchStrength,val localeTag: String? = null,val sourceTypeId: String? = null)
 data class SuggestionEvidence(val order: SuggestionOrder,val window: HistoryWindow?,val sessionCount: Int,val lastRecordedEnd: Long)
 data class ChoiceEntry(val id: String,val kind: ChoiceKind,val sourceId: String,val title: String,
     val path: List<ChoicePath>,val selection: Classification,val note: String?,val availability: ChoiceAvailability,
@@ -28,11 +28,11 @@ class ChoiceCursor internal constructor(internal val owner: ChoiceView,internal 
     internal val hits: List<RankedChoice>,internal val offset: Int)
 data class ChoiceIndexStats(val catalogBuilds: Int,val personalBuilds: Int,val historyBuilds: Int,val historyScans: Int = 0)
 
-private fun normalized(value: String) = Normalizer.normalize(value,Normalizer.Form.NFKC).lowercase(Locale.ROOT).trim().replace(Regex("\\s+")," ")
-internal data class ChoiceText(val field: MatchField,val original: String,val normalized: String = normalized(original),val localeTag: String? = null)
+internal fun normalizedChoiceText(value: String) = Normalizer.normalize(value,Normalizer.Form.NFKC).lowercase(Locale.ROOT).trim().replace(Regex("\\s+")," ")
+internal data class ChoiceText(val field: MatchField,val original: String,val normalized: String = normalizedChoiceText(original),val localeTag: String? = null,val sourceTypeId: String? = null)
 internal data class ChoiceRecord(val id: String,val kind: ChoiceKind,val sourceId: String,val title: String,
     val selection: Classification,val fields: List<ChoiceText>,val sourceSessionId: String? = null,val sourceSegmentId: String? = null) {
-    val sortName = normalized(title)
+    val sortName = normalizedChoiceText(title)
 }
 internal data class Occurrence(val segment: Segment,val sessionId: String)
 internal data class HistoryVariant(val record: ChoiceRecord,val occurrences: List<Occurrence>) {
@@ -66,10 +66,12 @@ internal class CatalogChoices(types: List<ActivityType>) {
 }
 internal class PersonalChoices(cards: List<Card>,favorites: List<Favorite>) {
     val cardsById = cards.associateBy { it.id }
+    val favoritesById = favorites.associateBy { it.id }
+    val cardAliases = cards.associate { it.id to it.personal.aliases.map { alias -> ChoiceText(MatchField.PERSONAL_ALIAS,alias) } }
     val cardNames = cards.associate { it.id to ChoiceText(MatchField.CURRENT_CARD_NAME,it.name) }
-    val records = cards.map { ChoiceRecord("card:${it.id}",ChoiceKind.CARD,it.id,it.name,it.classification(),listOf(ChoiceText(MatchField.NAME,it.name))) } +
+    val records = cards.map { ChoiceRecord("card:${it.id}",ChoiceKind.CARD,it.id,it.name,it.classification(),listOf(ChoiceText(MatchField.NAME,it.name))+it.personal.aliases.map { alias -> ChoiceText(MatchField.PERSONAL_ALIAS,alias) }) } +
         favorites.map { ChoiceRecord("favorite:${it.id}",ChoiceKind.FAVORITE,it.id,it.label,it.selection,
-            listOf(ChoiceText(MatchField.NAME,it.label))+listOfNotNull(it.selection.name?.let { name -> ChoiceText(MatchField.SELECTION_NAME,name) })) }
+            listOf(ChoiceText(MatchField.NAME,it.label))+it.personal.aliases.map { alias -> ChoiceText(MatchField.PERSONAL_ALIAS,alias) }+listOfNotNull(it.selection.name?.let { name -> ChoiceText(MatchField.SELECTION_NAME,name) })) }
 }
 /** Reuse normalized data on ticks/typing and unrelated revisions. No global cache or search service. */
 internal class ChoiceCache {
@@ -121,6 +123,14 @@ class ChoiceView private constructor(private val d: Dataset,private val cache: C
     val token: Token = token(d)
     private val catalog by lazy { cache.catalog(d) }
     private val personal by lazy { cache.personal(d) }
+    /** Normalize ancestor context once per immutable view. Current tree/display context
+     * is search-only; historical classifications and their saved paths are untouched. */
+    private val ancestorFields by lazy { catalog.paths.mapValues { (_,path) -> frozenList(path.dropLast(1).flatMap { node ->
+        (catalog.fields[node.id].orEmpty()+localized?.currentTypeFields?.get(node.id).orEmpty()).map { field ->
+            field.copy(field = if(field.field == MatchField.CURRENT_TYPE_NAME) MatchField.ANCESTOR_NAME else MatchField.ANCESTOR_ALIAS,
+                sourceTypeId = node.id)
+        }
+    }) } }
     private val history by lazy { cache.history(d,historyKey) }
     private val sessions by lazy { d.sessions.associateBy { it.id } }
     /** Diagnostic counters, not persisted analytics. Useful for integration/performance verification. */
@@ -142,7 +152,7 @@ class ChoiceView private constructor(private val d: Dataset,private val cache: C
         if(query.scope in setOf(CatalogScope.CHILDREN,CatalogScope.SUBTREE)) ensure(query.parentId != null && query.parentId in catalog.byId,"Missing browse parent")
         val request = query
         if(cursor != null) return page(request,cursor.hits,cursor,pageSize)
-        val text = normalized(query.text)
+        val text = normalizedChoiceText(query.text)
         val records = buildList {
             if(ChoiceKind.TYPE in query.kinds) addAll(catalog.records)
             if(ChoiceKind.CARD in query.kinds || ChoiceKind.FAVORITE in query.kinds) addAll(personal.records.filter { it.kind in query.kinds })
@@ -151,7 +161,7 @@ class ChoiceView private constructor(private val d: Dataset,private val cache: C
         val ranked = records.asSequence().filter { record ->
             val availability = availability(record.selection)
             (query.includeArchived || availability !in setOf(ChoiceAvailability.ARCHIVED_CARD,ChoiceAvailability.ARCHIVED_TYPE,ChoiceAvailability.EMPTY_GROUP)) && inScope(record,query)
-        }.mapNotNull { record -> match(record,text) }.sortedWith(compareBy<RankedChoice>({it.score},{kindOrder(it.record.kind)},{sortName(it.record)},{it.record.id})).toList()
+        }.mapNotNull { record -> match(record,text) }.sortedWith(compareBy<RankedChoice>({if(personalOrder(it.record) == null) 1 else 0},{if(personalOrder(it.record) == null) 0 else kindOrder(it.record.kind)},{personalOrder(it.record) ?: 0},{if(personalOrder(it.record) == null) "" else it.record.id},{it.score},{kindOrder(it.record.kind)},{sortName(it.record)},{it.record.id})).toList()
         return page(request,ranked,null,pageSize)
     }
     /** No work at all for disabled suggestions. Frequency always has an explicit [start,end) window. */
@@ -205,7 +215,7 @@ class ChoiceView private constructor(private val d: Dataset,private val cache: C
     /** Bounded favorites first, followed by recorded frequency within an explicit window. */
     fun quick(window: HistoryWindow,limit: Int = 6): List<QuickChoice> {
         ensure(limit in 1..20,"Quick choice limit must be 1..20")
-        val favorites = personal.records.filter { it.kind == ChoiceKind.FAVORITE }.sortedWith(compareBy({it.sortName},{it.id}))
+        val favorites = personal.records.filter { it.kind == ChoiceKind.FAVORITE }.sortedWith(compareBy({personalOrder(it) ?: Int.MAX_VALUE},{it.sortName},{it.id}))
             .mapNotNull { resolve(it.id)?.takeIf { entry -> entry.canStart } }
         val frequent = suggestions(SuggestionQuery(true,SuggestionOrder.FREQUENT_RECORDED,window),pageSize = 100).items.map { it.entry }
         return frozenList((favorites+frequent).distinctBy { selectionIdentity(it.selection) }.take(limit).map {
@@ -224,6 +234,11 @@ class ChoiceView private constructor(private val d: Dataset,private val cache: C
                 frozenList(hit.matches),hit.suggestion)
         }
         return ChoicePage(token,frozenList(rows),hits.size,if(end < hits.size) ChoiceCursor(this,request,hits,end) else null)
+    }
+    private fun personalOrder(r: ChoiceRecord): Int? = when(r.kind) {
+        ChoiceKind.CARD -> personal.cardsById[r.sourceId]?.personal?.order
+        ChoiceKind.FAVORITE -> personal.favoritesById[r.sourceId]?.personal?.order
+        else -> null
     }
     private fun title(r: ChoiceRecord): String {
         if(r.kind == ChoiceKind.TYPE) return localized?.presentations?.get(r.sourceId)?.label ?: r.title
@@ -258,19 +273,29 @@ class ChoiceView private constructor(private val d: Dataset,private val cache: C
     private fun match(r: ChoiceRecord,text: String): RankedChoice? {
         if(text.isEmpty()) return RankedChoice(r)
         val fields = r.fields + (if(r.kind == ChoiceKind.TYPE) emptyList() else r.selection.activityTypeId?.let { catalog.fields[it] }.orEmpty()) +
-            listOfNotNull(r.selection.cardId?.let { personal.cardNames[it] }) +
+            listOfNotNull(r.selection.cardId?.let { personal.cardNames[it] }) + r.selection.cardId?.let { personal.cardAliases[it] }.orEmpty() +
             (if(r.kind == ChoiceKind.TYPE) localized?.typeFields?.get(r.sourceId).orEmpty()
-                else r.selection.activityTypeId?.let { localized?.currentTypeFields?.get(it) }.orEmpty())
+                else r.selection.activityTypeId?.let { localized?.currentTypeFields?.get(it) }.orEmpty()) +
+            r.selection.activityTypeId?.let { ancestorFields[it] }.orEmpty()
         fun evidence(field: ChoiceText,part: String): MatchEvidence? = when {
-            field.normalized == part -> MatchEvidence(field.field,field.original,MatchStrength.EXACT,field.localeTag)
-            field.normalized.startsWith(part) -> MatchEvidence(field.field,field.original,MatchStrength.PREFIX,field.localeTag)
-            field.normalized.contains(part) -> MatchEvidence(field.field,field.original,MatchStrength.CONTAINS,field.localeTag)
+            field.normalized == part -> MatchEvidence(field.field,field.original,MatchStrength.EXACT,field.localeTag,field.sourceTypeId)
+            field.normalized.startsWith(part) -> MatchEvidence(field.field,field.original,MatchStrength.PREFIX,field.localeTag,field.sourceTypeId)
+            field.normalized.contains(part) -> MatchEvidence(field.field,field.original,MatchStrength.CONTAINS,field.localeTag,field.sourceTypeId)
             else -> null
         }
-        val whole = fields.mapNotNull { evidence(it,text) }.minWithOrNull(compareBy({it.strength.ordinal},{it.field.ordinal},{it.text}))
-        if(whole != null) return RankedChoice(r,whole.strength.ordinal*10+whole.field.ordinal,listOf(whole))
-        val reasons = text.split(' ').map { term -> fields.mapNotNull { evidence(it,term) }.minWithOrNull(compareBy({it.strength.ordinal},{it.field.ordinal},{it.text})) ?: return null }
-        return RankedChoice(r,40,reasons.distinct())
+        fun rank(e: MatchEvidence): Int {
+            val category = when(e.field) {
+                MatchField.NAME -> 0
+                MatchField.ANCESTOR_NAME,MatchField.ANCESTOR_ALIAS -> 2
+                else -> 1
+            }
+            return category*100+e.strength.ordinal*20+e.field.ordinal
+        }
+        val order = compareBy<MatchEvidence>({rank(it)},{it.text},{it.sourceTypeId ?: ""})
+        val whole = fields.mapNotNull { evidence(it,text) }.minWithOrNull(order)
+        if(whole != null) return RankedChoice(r,rank(whole),listOf(whole))
+        val reasons = text.split(' ').map { term -> fields.mapNotNull { evidence(it,term) }.minWithOrNull(order) ?: return null }
+        return RankedChoice(r,300+reasons.maxOf(::rank),reasons.distinct())
     }
     private fun kindOrder(kind: ChoiceKind) = when(kind) { ChoiceKind.FAVORITE -> 0; ChoiceKind.CARD -> 1; ChoiceKind.HISTORY -> 2; ChoiceKind.TYPE -> 3 }
 }

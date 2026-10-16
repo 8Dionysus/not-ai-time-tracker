@@ -34,9 +34,11 @@ private fun migrateV1(element: JsonElement): JsonElement = when(element) {
 internal fun decodeBackupVersion(json: String): Backup {
     val root = codec.parseToJsonElement(json).jsonObject
     val version = root["formatVersion"]?.jsonPrimitive?.intOrNull
-    ensure(version in 8..13 || listOf("schedule","transfer").none { it in root.getValue("data").jsonObject },"Schedule in legacy archive")
+    ensure(version in 8..14 || listOf("schedule","transfer").none { it in root.getValue("data").jsonObject },"Schedule in legacy archive")
+    ensure(version == 14 || root.getValue("data").jsonObject.keys.none { it in setOf("subjects","savedReports") },
+        "New domain fields in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
     val backup = when(version) {
-        8,9,10,11,12,13 -> {
+        8,9,10,11,12,13,14 -> {
             ensure(listOf("goals","focus","schedule","transfer").all { it in root.getValue("data").jsonObject },"Missing v8 backup fields")
             codec.decodeFromJsonElement<Backup>(root).also { ensure(version != 8 || !it.data.transfer.hasCompactionState(),"Compaction in v8 archive") }
         }
@@ -54,14 +56,17 @@ internal fun decodeBackupVersion(json: String): Backup {
         2 -> codec.decodeFromJsonElement<Backup>(root)
         1 -> {
             val migrated = migrateV1(root).jsonObject.toMutableMap()
-            migrated["formatVersion"] = JsonPrimitive(13)
+            migrated["formatVersion"] = JsonPrimitive(14)
             codec.decodeFromJsonElement<Backup>(JsonObject(migrated))
         }
         else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unsupported backup version")
     }
-    ensure(version in 10..13 || (backup.data.settings.schedule == ScheduleSettings() && !backup.data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive")
-    ensure(version in 11..13 || backup.data.settings.surfaces.shortcut,"Shortcut preference in legacy archive")
-    ensure(version in 12..13 || !backup.data.hasManualTimeConfirmation(),"Manual confirmation in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
-    ensure(version == 13 || backup.data.settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
-    return backup.copy(formatVersion = 13)
+    ensure(version in 10..14 || (backup.data.settings.schedule == ScheduleSettings() && !backup.data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive")
+    ensure(version in 11..14 || backup.data.settings.surfaces.shortcut,"Shortcut preference in legacy archive")
+    ensure(version in 12..14 || !backup.data.hasManualTimeConfirmation(),"Manual confirmation in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+    ensure(version in 13..14 || backup.data.settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+    ensure(version == 14 || !backup.data.hasChoicePersonalization(),"Personal choices in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+    ensure(version == 14 || !backup.data.hasReportingExtensions(),"Reporting extensions in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+    ensure(version == 14 || !backup.data.hasSubjectQuantities(),"Quantity extension in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+    return backup.copy(formatVersion = 14)
 }

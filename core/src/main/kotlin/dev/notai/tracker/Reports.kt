@@ -20,7 +20,7 @@ data class QuantityKey(val fieldId: String,val meaningVersion: Int,val unit: Str
 data class Report(val start: Long, val end: Long, val asOf: Long, val zone: String,
     val rows: List<ReportRow>, val unresolved: List<Segment>, val measurements: List<Measurement>,
     val recordedMs: Long, val calendarDays: Long, val recordedDays: Set<LocalDate>, val incomplete: Boolean, val metricDefinitions: List<Metric> = emptyList(),
-    val unresolvedSessionNotes: Map<String,String?> = emptyMap()) {
+    val unresolvedSessionNotes: Map<String,String?> = emptyMap(),val dayPolicy: ReportingDayPolicy = ReportingDayPolicy(zone),val filter: Filter = Filter()) {
     /** Whole-target quantities, not apportioned to this report window. Scope stays separate. */
     fun quantityTotals(): Map<QuantityKey,Decimal> = measurements.distinctBy { it.id }.filter { m ->
         metricDefinitions.find { it.id == m.fieldId && it.meaningVersion == m.meaningVersion }?.aggregation != Aggregation.BY_TARGET
@@ -40,37 +40,47 @@ data class Report(val start: Long, val end: Long, val asOf: Long, val zone: Stri
 }
 data class Comparison(val current: Report, val previous: Report, val absoluteDifferenceMs: Long, val percent: Double?)
 object Reports {
-    internal fun indexed(d: Dataset,index: ReportIndex,now: Moment,start: Long,end: Long,filter: Filter,zone: String): Report {
+    internal fun indexed(d: Dataset,index: ReportIndex,now: Moment,start: Long,end: Long,filter: Filter,zone: String,dayStartMinute: Int = d.settings.reportDayStartMinute): Report {
         validateMoment(now);ensure(start >= 0 && end > start && end <= MAX_TIME,"Invalid report window",ErrorCode.INVALID_INTERVAL)
-        return observedReport(d,now,start,end,ZoneId.of(zone),index.observed(now,start,end,filter),index.notes,index)
+        return observedReport(d,now,start,end,ZoneId.of(zone),index.observed(now,start,end,filter),index.notes,index,ReportingDayPolicy(zone,dayStartMinute),filter)
     }
-    fun report(d: Dataset, now: Moment, start: Long, end: Long, filter: Filter = Filter(), zone: String = d.settings.reportZone): Report {
+    fun report(d: Dataset, now: Moment, start: Long, end: Long, filter: Filter = Filter(), zone: String = d.settings.reportZone,dayStartMinute: Int = d.settings.reportDayStartMinute): Report {
         validateMoment(now)
         ensure(start >= 0 && end > start && end <= MAX_TIME, "Invalid report window", ErrorCode.INVALID_INTERVAL)
         val zoneId = ZoneId.of(zone)
         val observed = d.segments.distinctBy { it.id }.filter { filter.matches(it.selection) }.map { materialize(it,now) }
-        return observedReport(d,now,start,end,zoneId,observed)
+        return observedReport(d,now,start,end,zoneId,observed,policy = ReportingDayPolicy(zone,dayStartMinute),filter = filter)
     }
     private fun observedReport(d: Dataset,now: Moment,start: Long,end: Long,zoneId: ZoneId,observed: List<Segment>,
-        capturedNotes: Map<String,String?>? = null,index: ReportIndex? = null): Report {
+        capturedNotes: Map<String,String?>? = null,index: ReportIndex? = null,policy: ReportingDayPolicy = ReportingDayPolicy(zoneId.id),filter: Filter = Filter()): Report {
+        policy.validate()
         val zone = zoneId.id
         val notes = capturedNotes ?: d.sessions.associate { it.id to it.note }
         val rows = windowRows(observed,now,start,end,notes)
         val sessions = rows.map { it.sessionId }.toSet(); val segments = rows.map { it.segmentId }.toSet()
         val measurements = index?.measurements(sessions,segments) ?: d.measurements.filter { if (it.scope == Scope.SESSION) it.targetId in sessions else it.targetId in segments }
         val days = mutableSetOf<LocalDate>()
-        rows.forEach { row ->
-            var day = Instant.ofEpochMilli(row.start).atZone(zoneId).toLocalDate()
-            val last = Instant.ofEpochMilli(row.end-1).atZone(zoneId).toLocalDate()
-            while (day <= last) { days += day; day = day.plusDays(1) }
+        val observedById = observed.associateBy { it.id }
+        rows.filter { it.durationMs > 0 }.forEach { row ->
+            val source = observedById.getValue(row.segmentId)
+            val finish = source.end ?: source.observedUntil ?: now.wall
+            var day = policy.dateAt(row.start)
+            val last = policy.dateAt(row.end-1)
+            while(day <= last) {
+                val from = maxOf(row.start,policy.boundary(day))
+                val to = minOf(row.end,policy.boundary(day.plusDays(1)))
+                if(to > from && proportional(source.durationMs,to-source.start,finish-source.start) >
+                    proportional(source.durationMs,from-source.start,finish-source.start)) days += day
+                day = day.plusDays(1)
+            }
         }
-        val first = Instant.ofEpochMilli(start).atZone(zoneId).toLocalDate()
-        val last = Instant.ofEpochMilli(end-1).atZone(zoneId).toLocalDate()
+        val first = policy.dateAt(start)
+        val last = policy.dateAt(end-1)
         return Report(start,end,now.wall,zone,frozenList(rows.map { it.copy(selection = it.selection.frozen()) }),
             frozenList(observed.filter { it.uncertain }.map { it.copy(selection = it.selection.frozen()) }),frozenList(measurements),
             rows.sumExact { it.durationMs },java.time.temporal.ChronoUnit.DAYS.between(first,last)+1,frozenSet(days),end > now.wall,
             frozenList(d.metrics.map { it.copy(scopes = frozenSet(it.scopes),researchOrigins = frozenList(it.researchOrigins)) }),
-            frozenMap(observed.filter { it.uncertain }.associate { it.sessionId to notes[it.sessionId] }))
+            frozenMap(observed.filter { it.uncertain }.associate { it.sessionId to notes[it.sessionId] }),policy,filter.frozenFilter())
     }
     private fun windowRows(observed: List<Segment>,now: Moment,start: Long,end: Long,notes: Map<String,String?>): List<ReportRow> =
         observed.filterNot { it.uncertain }.mapNotNull { s ->
@@ -81,28 +91,28 @@ object Reports {
                 s.selection,notes[s.sessionId],s.manualConfirmation)
         }.sortedWith(compareBy({it.start},{it.segmentId}))
     /** One physical observation, bounded calendar page; DST boundaries come from the explicit zone. */
-    fun calendar(d: Dataset,now: Moment,first: LocalDate,days: Int,filter: Filter = Filter(),zone: String = d.settings.reportZone): CalendarHistory {
+    fun calendar(d: Dataset,now: Moment,first: LocalDate,days: Int,filter: Filter = Filter(),zone: String = d.settings.reportZone,dayStartMinute: Int = d.settings.reportDayStartMinute): CalendarHistory {
         ensure(days in 1..62,"Calendar page must contain 1..62 days",ErrorCode.INVALID_INTERVAL)
         validateMoment(now)
-        val (start,end) = calendarBounds(first,days,zone)
+        val (start,end) = calendarBounds(first,days,zone,dayStartMinute)
         ensure(start >= 0 && end > start && end <= MAX_TIME,"Calendar window is empty or out of range",ErrorCode.INVALID_INTERVAL)
         val zoneId = ZoneId.of(zone)
         val observed = d.segments.distinctBy { it.id }.filter { filter.matches(it.selection) }.map { materialize(it,now) }
-        return calendarObserved(d,now,first,days,zone,start,end,zoneId,observed)
+        return calendarObserved(d,now,first,days,zone,start,end,zoneId,observed,policy = ReportingDayPolicy(zone,dayStartMinute),filter = filter)
     }
-    internal fun indexedCalendar(d: Dataset,index: ReportIndex,now: Moment,first: LocalDate,days: Int,filter: Filter,zone: String): CalendarHistory {
+    internal fun indexedCalendar(d: Dataset,index: ReportIndex,now: Moment,first: LocalDate,days: Int,filter: Filter,zone: String,dayStartMinute: Int = d.settings.reportDayStartMinute): CalendarHistory {
         ensure(days in 1..62,"Calendar page must contain 1..62 days",ErrorCode.INVALID_INTERVAL)
         validateMoment(now)
-        val (start,end) = calendarBounds(first,days,zone)
+        val (start,end) = calendarBounds(first,days,zone,dayStartMinute)
         ensure(start >= 0 && end > start && end <= MAX_TIME,"Calendar window is empty or out of range",ErrorCode.INVALID_INTERVAL)
-        return calendarObserved(d,now,first,days,zone,start,end,ZoneId.of(zone),index.observed(now,start,end,filter),index)
+        return calendarObserved(d,now,first,days,zone,start,end,ZoneId.of(zone),index.observed(now,start,end,filter),index,ReportingDayPolicy(zone,dayStartMinute),filter)
     }
     private fun calendarObserved(d: Dataset,now: Moment,first: LocalDate,days: Int,zone: String,start: Long,end: Long,
-        zoneId: ZoneId,observed: List<Segment>,index: ReportIndex? = null): CalendarHistory {
-        val whole = observedReport(d,now,start,end,zoneId,observed,index?.notes,index)
+        zoneId: ZoneId,observed: List<Segment>,index: ReportIndex? = null,policy: ReportingDayPolicy = ReportingDayPolicy(zone),filter: Filter = Filter()): CalendarHistory {
+        val whole = observedReport(d,now,start,end,zoneId,observed,index?.notes,index,policy,filter)
         val notes = index?.notes ?: d.sessions.associate { it.id to it.note }
         val pages = (0 until days).map { offset ->
-            val date = first.plusDays(offset.toLong()); val (a,b) = calendarBounds(date,1,zone)
+            val date = first.plusDays(offset.toLong()); val (a,b) = policy.bounds(date,1)
             ensure(b > a,"Calendar page contains a skipped local date: $date in $zone",ErrorCode.INVALID_INTERVAL)
             val rows = windowRows(observed,now,a,b,notes)
             // Uncertain attribution and whole-target quantities are exposed once at the window level.
@@ -110,9 +120,9 @@ object Reports {
         }
         return CalendarHistory(token(d),whole,frozenList(pages))
     }
-    fun day(d: Dataset,now: Moment,date: LocalDate,filter: Filter = Filter(),zone: String = d.settings.reportZone): Report {
-        val (start,end) = calendarBounds(date,1,zone)
-        return report(d,now,start,end,filter,zone)
+    fun day(d: Dataset,now: Moment,date: LocalDate,filter: Filter = Filter(),zone: String = d.settings.reportZone,dayStartMinute: Int = d.settings.reportDayStartMinute): Report {
+        val (start,end) = calendarBounds(date,1,zone,dayStartMinute)
+        return report(d,now,start,end,filter,zone,dayStartMinute)
     }
     /** Explicit equal elapsed-time windows. Calendar-day windows have a separate DST-aware operation. */
     fun compare(d: Dataset,now: Moment,currentStart: Long,currentEnd: Long,previousStart: Long,previousEnd: Long,filter: Filter = Filter()): Comparison {
@@ -124,19 +134,13 @@ object Reports {
      * Incomplete windows are labeled; values are never extrapolated or silently scaled.
      */
     fun compareCalendarDays(d: Dataset,now: Moment,currentStart: LocalDate,previousStart: LocalDate,days: Int,
-        filter: Filter = Filter(),zone: String = d.settings.reportZone): Comparison {
-        val (a0,a1) = calendarBounds(currentStart,days,zone)
-        val (b0,b1) = calendarBounds(previousStart,days,zone)
-        return comparison(report(d,now,a0,a1,filter,zone),report(d,now,b0,b1,filter,zone))
+        filter: Filter = Filter(),zone: String = d.settings.reportZone,dayStartMinute: Int = d.settings.reportDayStartMinute): Comparison {
+        val (a0,a1) = calendarBounds(currentStart,days,zone,dayStartMinute)
+        val (b0,b1) = calendarBounds(previousStart,days,zone,dayStartMinute)
+        return comparison(report(d,now,a0,a1,filter,zone,dayStartMinute),report(d,now,b0,b1,filter,zone,dayStartMinute))
     }
-    internal fun calendarBounds(start: LocalDate,days: Int,zone: String): Pair<Long,Long> {
-        ensure(days > 0,"Calendar day count must be positive",ErrorCode.INVALID_INTERVAL)
-        return try {
-            val z = ZoneId.of(zone)
-            start.atStartOfDay(z).toInstant().toEpochMilli() to start.plusDays(days.toLong()).atStartOfDay(z).toInstant().toEpochMilli()
-        } catch (_: java.time.DateTimeException) { fail(ErrorCode.INVALID_INTERVAL,"Calendar window out of range") }
-        catch (_: ArithmeticException) { fail(ErrorCode.INVALID_INTERVAL,"Calendar window out of range") }
-    }
+    internal fun calendarBounds(start: LocalDate,days: Int,zone: String,dayStartMinute: Int = 0): Pair<Long,Long> =
+        ReportingDayPolicy(zone,dayStartMinute).bounds(start,days)
     private fun comparison(a: Report,b: Report): Comparison {
         val delta = a.recordedMs-b.recordedMs // both nonnegative, so the difference fits Long
         return Comparison(a,b,delta,if (b.recordedMs == 0L) null else 100.0*delta/b.recordedMs)

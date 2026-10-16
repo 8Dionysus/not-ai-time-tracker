@@ -37,10 +37,11 @@ object DecimalSerializer: KSerializer<Decimal> {
     val valueMeaningVersion: Int? = null,val text: String? = null)
 @Serializable enum class NumberKind { INTEGER, DECIMAL }
 @Serializable enum class Aggregation { SUM, BY_TARGET }
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 @Serializable data class Metric(val id: String,val name: String,val meaningVersion: Int = 1,
     val numberKind: NumberKind,val canonicalUnitId: String,val maxScale: Int = 0,
     val scopes: Set<Scope> = setOf(Scope.SESSION,Scope.SEGMENT),val aggregation: Aggregation = Aggregation.BY_TARGET,
-    val researchOrigins: List<ResearchOrigin> = emptyList())
+    val researchOrigins: List<ResearchOrigin> = emptyList(),@kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val bounds: ScaleBounds? = null)
 @Serializable data class UnitDefinition(val id: String,val name: String,val dimension: String,
     val factorToBase: Decimal = Decimal("1"))
 
@@ -92,6 +93,7 @@ internal fun validateVocabulary(d: Dataset) {
         validateResearchOrigins(m.researchOrigins)
         ensure(m.id.isNotBlank() && m.name.isNotBlank() && m.meaningVersion > 0 && m.maxScale in 0..1000 && m.scopes.isNotEmpty(),"Invalid metric")
         ensure(d.units.any { it.id == m.canonicalUnitId },"Missing canonical unit")
+        m.bounds?.let { ensure(it.min.number <= it.max.number && it.minMeaning.isNotBlank() && it.maxMeaning.isNotBlank() && maxOf(0,it.min.number.scale(),it.max.number.scale()) <= m.maxScale,"Invalid scale bounds") }
         ensure(m.numberKind != NumberKind.INTEGER || m.maxScale == 0,"Integer metric cannot have fractional precision")
     }
 }
@@ -110,6 +112,7 @@ internal fun validateMeasurement(d: Dataset,m: Measurement) {
     // Unregistered v1/user fields retain their own explicit ID/version/unit; no guessed mapping.
     val metric = d.metrics.find { it.id == m.fieldId && it.meaningVersion == m.meaningVersion } ?: return
     ensure(m.unit == metric.canonicalUnitId && m.scope in metric.scopes,"Metric unit/scope mismatch")
+    metric.bounds?.let { ensure(m.value.number >= it.min.number && m.value.number <= it.max.number,"Measurement outside scale bounds") }
     ensure(maxOf(0,m.value.number.scale()) <= metric.maxScale,"Metric precision exceeded")
 }
 /** Explicit conversion; unrelated dimensions or nonterminating conversions are rejected, never rounded. */

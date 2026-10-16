@@ -1,0 +1,16 @@
+{
+  "source": "a09d21e3aec6248371bb425ef92c5369c0c1bbd2",
+  "fdroidserver": "2.4.5",
+  "scannerExit": 0,
+  "scannerErrors": 0,
+  "scannerWarnings": 1,
+  "warning": "Retained previous-runtime-catalog.json.gz test fixture",
+  "scannerLogSha256": "5139c82f681b4250ae0cc39be888cb3d995a9dbbe4bb5754740634bd9272f445",
+  "metadataLintExit": 0,
+  "initialMissingCategoriesConfigurationLintExit": 1,
+  "categoryFixture": "Time Tracker: {name: Time Tracker}",
+  "categoryReference": "https://gitlab.com/fdroid/fdroiddata/-/raw/master/config/categories.yml",
+  "fixtureRepo": "Local clone of exact source SHA; delivered recipe retains public HTTPS Repo",
+  "sourceBuildOnIndependentFdroidServer": false,
+  "independentReproducibilityClaimed": false
+}

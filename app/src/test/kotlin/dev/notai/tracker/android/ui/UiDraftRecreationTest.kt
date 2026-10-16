@@ -39,7 +39,6 @@ class UiDraftRecreationTest {
     private fun prepareBackend() {
         t=Tracker(Store(),FakeClock(at("14:00")))
         val selected=Card("p2-form-choice","Draft selected activity");t.saveCard(t.snapshot().token,selected)
-        t.saveFavorite(t.snapshot().token,Favorite("p2-form-favorite",selected.name,selected.classification()))
         t.manual(t.snapshot().token,at("12:00"),at("12:30"),Classification(name="Original activity"),"Original correction note")
         val backend=object:UiBackend {
             override val tracker=t;override val backups=Backups(t,MemoryRollback());override val focusDue=FocusDueSignals();override val runtime:TrackerRuntime?=null
@@ -63,6 +62,7 @@ class UiDraftRecreationTest {
         compose.waitForIdle()
     }
     private fun form(correction:Boolean) {
+        val initial=t.data()
         if(correction) compose.onNodeWithText("Original correction note",substring=true).performScrollTo().performClick()
         else compose.onNodeWithText("Добавить запись задним числом").performScrollTo().performClick()
         compose.onNodeWithText(if(correction) "Исправить запись" else "Добавить запись").assertExists()
@@ -70,8 +70,11 @@ class UiDraftRecreationTest {
         compose.onNodeWithContentDescription("Начало позже на 5 минут").performClick()
         compose.onNodeWithContentDescription("Конец раньше на 5 минут").performClick()
         compose.onNode(SemanticsMatcher("Activity chooser action") { it.config.getOrNull(SemanticsActions.OnClick)?.label=="Изменить занятие" }).performClick()
-        compose.onAllNodesWithText("Draft selected activity").onFirst().performScrollTo().performClick()
+        compose.onNodeWithContentDescription("Найти или создать занятие").performTextInput("Draft selected activity")
+        compose.waitUntil(10000) { compose.onAllNodesWithText("Draft selected activity").fetchSemanticsNodes().size==1 }
+        compose.onNodeWithText("Draft selected activity").performScrollTo().performClick()
         compose.waitForIdle()
+        assertEquals(initial,t.data()) // Selecting the form activity cannot hit a home quick-start tile.
         val before=t.data()
         if(correction) t.manual(t.snapshot().token,at("10:00"),at("11:00"),Classification(name="Concurrent fixture fact"),"Keep this fact")
         val afterExternal=t.data();recreate()
@@ -85,7 +88,7 @@ class UiDraftRecreationTest {
         compose.onNodeWithText("Сохранить").performClick()
         compose.waitUntil(10000) { t.data().sessions.any { it.note=="Typed retained note" } }
         val saved=t.data().sessions.single { it.note=="Typed retained note" }
-        assertEquals("p2-form-choice",saved.selection.cardId)
+        assertEquals("Saved classification: ${saved.selection}","p2-form-choice",saved.selection.cardId)
         val intervals=t.data().segments.filter { it.sessionId==saved.id }
         assertEquals(if(correction)at("12:05") else at("13:35"),intervals.minOf { it.start })
         assertEquals(if(correction)at("12:25") else at("13:55"),intervals.maxOf { it.end!! })

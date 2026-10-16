@@ -1,5 +1,9 @@
 # Combined journal fourteen-item verification, 16 October 2026
 
+Historical checkpoint, not final acceptance: four reachable paths were found after
+this delivery. See JOURNAL_REVIEW_R2_2026_10_16.md and its source-bound corrective
+receipt. The counts and artifacts below remain exact historical evidence.
+
 Runtime source **8bbd19ae88dcb446a29e2e13bb5ca9f2cc7908cc**, local branch backend/journal-a-2026-10-16,
 after read-only main70a7155b3ef548be4638cf71849d3b05dbbef7a6. Final documentation/recipe
 commits are separate; they do not change compiled source. No new public push, PR,

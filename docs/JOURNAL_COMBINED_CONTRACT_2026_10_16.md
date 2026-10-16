@@ -104,3 +104,14 @@ TechnicalActivity, RemoteViews, overlay P2 and goal-edit presentation. Store sig
 publishing, native publisher provenance and independent reproducibility remain
 separate release conditions. Private eleven-locale functional evidence must be
 bound to its actual private source/APK, never inferred from a public APK.
+
+## Review R2 compatibility corrections
+
+QuantityWindow.selection identifies Stored(sessionIds) versus Reported(asOf,filter,
+dayPolicy). combine requires equal token and selection; different cutoffs/modes/
+filters are refused. Recompute one union range instead of changing the identity.
+Selected format4 dependency components close over actual shared identities, even
+without explicit type/axis roots. A split format4 input fails closed; legacy1–3
+admission and existing full replacement remain supported. Retained full snapshots
+validate subject causality, and partial COPY deltas use only matching complete
+source/origin snapshots. See JOURNAL_REVIEW_R2_2026_10_16.md for exact regressions.

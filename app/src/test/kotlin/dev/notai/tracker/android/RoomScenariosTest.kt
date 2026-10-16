@@ -282,15 +282,18 @@ class RoomScenariosTest: ScenarioContract() {
     @org.junit.Test fun v9MigrationInterruptionRollsBackColumnAndCanRetryExplicitly() {
         val clock = FakeClock();val store = createStore();val t = Tracker(store,clock)
         t.start(t.snapshot().token);clock.advance(1000);val expected = t.data();val name = v9Fixture(store)
+        var injected = false
         val fault = object: androidx.room.migration.Migration(9,10) {
             override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
                 TrackerDatabase.MIGRATION_9_10.migrate(db)
+                injected = true
                 throw IllegalStateException("Fixture interruption after adding nullable column")
             }
         }
         val broken = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name)
             .addMigrations(fault).allowMainThreadQueries().build()
         try { org.junit.Assert.assertThrows(Exception::class.java) { RoomStore(broken) } } finally { broken.close() }
+        org.junit.Assert.assertTrue("Injected migration interruption was reached",injected)
         android.database.sqlite.SQLiteDatabase.openDatabase(RuntimeEnvironment.getApplication().getDatabasePath(name).path,null,0).use { sql ->
             org.junit.Assert.assertEquals(9,sql.version)
             sql.rawQuery("PRAGMA table_info(segments)",null).use { c -> while(c.moveToNext()) org.junit.Assert.assertNotEquals("manualConfirmation",c.getString(1)) }
@@ -464,19 +467,22 @@ class RoomScenariosTest: ScenarioContract() {
                 buildList { while(c.moveToNext()) add((0 until c.columnCount).map { if(c.isNull(it)) null else c.getString(it) }) }
             } }
         }
-        val before = snapshot()
+        val before = snapshot();var injected = false
         val fault = object: androidx.room.migration.Migration(4,5) {
             override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
                 migrateNormalizedHistory(object: androidx.sqlite.db.SupportSQLiteDatabase by db {
                     override fun execSQL(sql: String) {
-                        if(sql == "CREATE INDEX index_sessions_position_id ON sessions(position,id)") throw android.database.sqlite.SQLiteException("injected after rebuild/readback")
+                        if(sql == "CREATE INDEX index_sessions_position_id ON sessions(position,id)") {
+                            injected = true;throw android.database.sqlite.SQLiteException("injected after rebuild/readback")
+                        }
                         db.execSQL(sql)
                     }
                 })
             }
         }
-        val db = androidx.room.Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(fault,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8).allowMainThreadQueries().build()
+        val db = androidx.room.Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(fault,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9,TrackerDatabase.MIGRATION_9_10).allowMainThreadQueries().build()
         try { org.junit.Assert.assertThrows(Exception::class.java) { RoomStore(db) } } finally { db.close() }
+        org.junit.Assert.assertTrue("Injected normalized migration failure was reached",injected)
         org.junit.Assert.assertEquals(before,snapshot())
         org.junit.Assert.assertEquals(input,open(name).read())
     }

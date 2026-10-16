@@ -1,0 +1,32 @@
+# Backend journal audit notes, 16 October 2026
+
+These are source-specific findings for the coordinator's full journal audit, not a
+claim that the older 21-family matrix proves the whole journal complete. The A
+reader's saved main-page snapshot is seq207. Later coordinator decisions and C's
+unintegrated artifact must be assessed separately. Only public requirement links
+and paraphrases are reproduced here; full page snapshots remain outside the repository.
+
+| Original source | Current code/result | Boundary still requiring a decision or integration |
+| --- | --- | --- |
+| [Accepted “start at previous end” convenience](https://chatgpt.com/space/page_cc7a02fed97081918f59ffa4517bb6dc#block-bb02de88-3987-42eb-bd0d-a7acc20a0849) | `previewStartBackfill`, `previewStartAtPreviousEnd`, `applyStartBackfill`; same-session closed prefix with explicit provenance, Room10/full12/selective3. See START_BACKFILL_CONTRACT.md and source-bound verification. | Opus authoring/confirmation UI; no Compose changes were made. Existing `switchedEarlier` alone did not cover the gap before an active session. |
+| [Optional extended Focus](https://chatgpt.com/space/page_cc7a02fed97081918f59ffa4517bb6dc#block-3e2a9235-e9ba-4340-a324-0447ff8670b6) | Existing WORK/BREAK/countdown/recovery and activity/Card classification link. Existing `FocusSignals` explicitly did not implement DND/music. | C artifact f6fcadf supplies independent non-UI modules but is not compiled or integrated in this record. A separate ToDo/task-object layer is not established by the current activity link. Android capability/owner consent remains necessary. |
+| [Forgotten ordinary timer proposal](https://chatgpt.com/space/page_e89e68117f608191b098acd706c45f89#block-f8356f97-af3b-4ac3-923c-1ede68cb0c56) | Focus phase due signals and schedule reminders are different features; the pre-C backend has no dedicated ordinary long-running reminder policy. | C's source is prepared, not accepted by tests. Continue/stop/correct and disable/snooze/restart semantics belong to that integration, with no automatic clipping. |
+| [General game-layer direction](https://chatgpt.com/space/page_e89e68117f608191b098acd706c45f89#block-d1820cd4-b692-4818-b594-7eb631b626d1) and [candidate mechanics](https://chatgpt.com/space/page_0cbb78733570819186606339ff20ae84#block-b2a072bb-7a57-40da-bee2-ff1107ca9846) | Calendar/Reports and GoalProgress already supply recorded evidence and thresholds. This does not itself supply a game-layer projection or stored rewards. | C's minimal contracts await integration. General approval of a direction does not select every proposed mosaic/reward/streak mechanism. No additional general engine is justified. |
+| [Advanced goals](https://chatgpt.com/space/page_0cbb78733570819186606339ff20ae84#block-8ed39ffa-3a31-4659-9ae4-0797563d0756) and [goal-version history](https://chatgpt.com/space/page_0cbb78733570819186606339ff20ae84#block-81a46e79-6d4e-4b7c-865b-1d0cf5f0e131) | Goals support duration and distinct session count. `saveGoal` replaces the current definition; past progress uses the current target. | Distinct-days metric and effective-date goal versions are backend proposals not implemented here. They must not be described as only missing goal-edit UI, nor assumed selected from the entire candidate list. |
+| [Quantitative model boundaries](https://chatgpt.com/space/page_0cbb78733570819186606339ff20ae84#block-0a654bfd-5b3c-4d65-92f6-d8f3450ff1b1) | Exact decimal SESSION/SEGMENT measurements and SUM/BY_TARGET aggregation exist. | No general nested set/item identity, book/edition/episode registry, weighted tempo/speed conversion or structured nature-observation engine. Research candidates are not an automatic instruction to add all these models. |
+| [Text summary for external AI proposal](https://chatgpt.com/space/page_e89e68117f608191b098acd706c45f89#block-c3e65208-0c45-43a8-b5a1-c915120162b5) | Report and CSV data exist. A dedicated reviewed text-summary builder and ACTION_SEND/EXTRA_TEXT path were not found. | This conditional proposal is distinct from the accepted selected-text-to-entry draft flow, which exists. Selection/preview/share integration requires a product decision; no embedded runtime AI is inferred. |
+| [Three schedule surfaces](https://chatgpt.com/space/page_cc7a02fed97081918f59ffa4517bb6dc#block-cfb746c1-a398-40d1-88b7-329bd687fda2) | Shared recurrence/projection/reminder/lifecycle ports exist. `ScheduleProjectionBinding` defaults to no consumers; production consumer/renderer registration is not established. | Concrete Opus consumers and app registration are required. This is not evidence that nearest-calendar-event reading or recurrence computation is missing. `CalendarOccurrences.list/nearest/readSelected` already exist. |
+| [Manual private-copy cleanup](https://chatgpt.com/space/page_cc7a02fed97081918f59ffa4517bb6dc#block-45d72b0d-5f36-4845-a146-04b473197eb0) | Exact leases/native operations/seals/hardlink inventory/explicit partial recovery exist; legacy UNKNOWN protection and bytes remain intact. | A historical owner/census witness is missing for safe legacy-owner retirement. Completion by a different new owner is not proof the old owner ended. See LEGACY_OWNER_MIGRATION_REVIEW.md; do not silently purge protection. |
+| [Saved view preferences](https://chatgpt.com/space/page_0cbb78733570819186606339ff20ae84#block-9896cd11-6ffd-4b6f-bee4-67a44c1184ba) | Language backend preference and UI theme persistence exist. UI also already records last backup time/size/verification. | Saved report filters, ordering, collapsed groups and compact presentation belong to Opus's persisted view state. Their absence does not justify another domain engine. |
+
+Personal catalog-only selective transfer is implemented (`TransferSelection.cardIds/typeIds`,
+format2+); it must not be resurrected as an old missing feature. Names alone never merge
+objects. `Report.groupSimilar()` already preserves row identities/notes while grouping
+exact classification snapshots. Current typed backend locale/content interfaces do not
+certify installed reviewed translation packs, UI resource migration, localized alias
+search integration, RTL or accessibility acceptance.
+
+Release/OEM/TalkBack/overlay P2/goal-edit and native publisher provenance conditions
+remain separate from missing backend functions. The newly supplied C artifact's fifteen
+prepared scenarios are **not test results**. Exact A+B source, test counts, build hashes
+and any C integration result must be taken from the current verification record.

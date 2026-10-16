@@ -102,7 +102,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
             }.collect { view ->
                 try { attention.synchronize() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("AttentionRuntime","Optional refresh pending") }
                 try { scheduleProjection.synchronize() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("ScheduleProjection","Projection refresh pending") }
-                try { TimerSurfaces.refresh(context,view,previous);FocusSignals.refresh(context,tracker) }
+                try { TimerSurfaces.refresh(context,tracker,view,previous);FocusSignals.refresh(context,tracker) }
                 catch(e: Exception) { if(e is CancellationException) throw e; android.util.Log.w("TimerSurfaces","Surface refresh unavailable") }
                 previous = view.data.settings.surfaces
                 val delivered = previousSchedule

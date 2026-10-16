@@ -110,41 +110,57 @@ object TimerSurfaces {
     }
     fun widget(c: Context,view: TrackerView,enabled: Boolean): RemoteViews = SurfaceViews.widget(c,view,enabled)
     /** Launcher may throttle updates. A retained/pinned old shortcut fails STALE, never replays. */
-    fun shortcut(c: Context,s: Snapshot,settings: SurfaceSettings) {
+    fun shortcut(c: Context,s: Snapshot,settings: SurfaceSettings) { prepareShortcut(c,s,settings).invoke() }
+    private fun prepareShortcut(c: Context,s: Snapshot,settings: SurfaceSettings): () -> Unit {
         val manager = c.getSystemService(android.content.pm.ShortcutManager::class.java)
-        if(!settings.shortcut) {
-            manager.disableShortcuts(listOf("timer_action"))
-            manager.removeDynamicShortcuts(listOf("timer_action"))
-            return
-        }
+        if(!settings.shortcut) return { manager.disableShortcuts(listOf("timer_action"));manager.removeDynamicShortcuts(listOf("timer_action")) }
         val command = primary(s)
-        if(command == null) {
+        if(command == null) return {
             manager.disableShortcuts(listOf("timer_action"),"Откройте приложение для уточнения времени")
             manager.removeDynamicShortcuts(listOf("timer_action"))
-            return
         }
         val action = intent(c,SurfaceAction(Surface.SHORTCUT,command,s.token,s.timerTarget)).setClass(c,MainActivity::class.java)
-        manager.enableShortcuts(listOf("timer_action"))
-        manager.setDynamicShortcuts(listOf(android.content.pm.ShortcutInfo.Builder(c,"timer_action")
+        val info = android.content.pm.ShortcutInfo.Builder(c,"timer_action")
             .setShortLabel(label(command)).setLongLabel("Таймер: ${label(command).lowercase()}")
-            .setIcon(android.graphics.drawable.Icon.createWithResource(c,R.drawable.ic_shortcut)).setIntent(action).build()))
+            .setIcon(android.graphics.drawable.Icon.createWithResource(c,R.drawable.ic_shortcut)).setIntent(action).build()
+        return { manager.enableShortcuts(listOf("timer_action"));manager.setDynamicShortcuts(listOf(info));Unit }
     }
-    fun refresh(c: Context,view: TrackerView,previous: SurfaceSettings? = null,forceWidget: Boolean = false) {
-        val settings = view.data.settings.surfaces
-        refreshPrepared?.invoke(c,view)
-        try { shortcut(c,view.snapshot(),settings) } catch(_: RuntimeException) { android.util.Log.w("TimerSurfaces","Launcher shortcut update unavailable") }
-        if(!forceWidget && settings == SurfaceSettings() && previous == SurfaceSettings()) return
-        // No per-second work; called on committed revisions or explicit widget/permission events only.
-        if(settings.widget || previous?.widget == true || forceWidget) {
+    /** Prepare outside the store gate; publish only while the same shown revision/target is current.
+     * The IO hop is inside this entry point, including the default view read. No global publication
+     * lock precedes the store lock; failed platform surfaces cannot prevent the others' effects. */
+    suspend fun refresh(c: Context,tracker: Tracker,view: TrackerView? = null,previous: SurfaceSettings? = null,forceWidget: Boolean = false) = withContext(Dispatchers.IO) {
+        val captured = view ?: tracker.view();val shown = captured.snapshot();val settings = captured.data.settings.surfaces
+        fun <T> prepare(surface: Surface,block: () -> T): T? = try { block() } catch(_: RuntimeException) {
+            android.util.Log.w("TimerSurfaces","$surface preparation unavailable");null
+        }
+        fun effect(surface: Surface,block: () -> Unit) { try { block() } catch(_: RuntimeException) { android.util.Log.w("TimerSurfaces","$surface publication unavailable") } }
+        val launcher = prepare(Surface.SHORTCUT) { prepareShortcut(c,shown,settings) }
+        val preparedWidget = if(settings.widget || previous?.widget == true || forceWidget) prepare(Surface.WIDGET) {
             val manager = AppWidgetManager.getInstance(c)
             val ids = manager.getAppWidgetIds(ComponentName(c,TimerWidget::class.java))
-            if(ids.isNotEmpty()) manager.updateAppWidget(ids,widget(c,view,settings.widget))
+            Triple(manager,ids,if(ids.isEmpty()) null else widget(c,captured,settings.widget))
+        } else null
+        val notice = if(settings.notification) prepare(Surface.NOTIFICATION) { if(notificationsAllowed(c)) notification(c,captured) else null } else null
+        refreshPrepared?.invoke(c,captured)
+        tracker.store.checkedTransaction { checked ->
+            val live = checked.data;val current = checked.snapshot(tracker.clock.now())
+            val valid = live.datasetId == captured.data.datasetId && live.revision == captured.data.revision &&
+                live.controlBarrier == captured.data.controlBarrier && current.token == shown.token && current.timerTarget == shown.timerTarget &&
+                current.mode == shown.mode && current.focus?.id == shown.focus?.id && current.focus?.phaseIndex == shown.focus?.phaseIndex && current.focus?.mode == shown.focus?.mode
+            checked.replace(live) {
+                if(valid) {
+                    launcher?.let { effect(Surface.SHORTCUT,it) }
+                    preparedWidget?.let { (manager,ids,views) -> if(views != null) effect(Surface.WIDGET) { manager.updateAppWidget(ids,views) } }
+                    effect(Surface.NOTIFICATION) {
+                        val manager = c.getSystemService(NotificationManager::class.java)
+                        if(settings.notification && notificationsAllowed(c) && notice != null) manager.notify(CONTROL_ID,notice)
+                        else manager.cancel(CONTROL_ID)
+                    }
+                    if(previous?.overlay == true && !settings.overlay) effect(Surface.OVERLAY) { c.stopService(Intent(c,FloatingTimerService::class.java));Unit }
+                }
+                Unit // A stale refresh must not cancel or replace any newer publication.
+            }
         }
-        val notifications = c.getSystemService(NotificationManager::class.java)
-        if(settings.notification && notificationsAllowed(c)) {
-            try { notifications.notify(CONTROL_ID,notification(c,view)) } catch(_: SecurityException) { notifications.cancel(CONTROL_ID) }
-        } else if(previous == null || previous.notification) notifications.cancel(CONTROL_ID)
-        if(previous?.overlay == true && !settings.overlay) c.stopService(Intent(c,FloatingTimerService::class.java))
     }
 }
 
@@ -171,7 +187,7 @@ class TimerActionReceiver: BroadcastReceiver() {
             finally { pending.finish() }
         }
     }
-    internal fun handleCurrent(context: Context,tracker: Tracker,action: SurfaceAction) {
+    internal suspend fun handleCurrent(context: Context,tracker: Tracker,action: SurfaceAction) = withContext(Dispatchers.IO) {
                 val permitted = when(action.source) {
                     Surface.NOTIFICATION -> TimerSurfaces.notificationsAllowed(context)
                     Surface.OVERLAY -> TimerSurfaces.overlayAllowed(context)
@@ -183,7 +199,7 @@ class TimerActionReceiver: BroadcastReceiver() {
                     context.getSharedPreferences("surface-results",Context.MODE_PRIVATE).edit().putString("last",message).putString("lastCode",e.code.name).apply()
                     android.os.Handler(android.os.Looper.getMainLooper()).post { android.widget.Toast.makeText(context,message,android.widget.Toast.LENGTH_LONG).show() }
                 }
-                TimerSurfaces.refresh(context,tracker.view(),forceWidget = action.source == Surface.WIDGET)
+                TimerSurfaces.refresh(context,tracker,forceWidget = action.source == Surface.WIDGET)
     }
 
 }
@@ -191,7 +207,7 @@ class TimerWidget: AppWidgetProvider() {
     override fun onUpdate(context: Context,manager: AppWidgetManager,ids: IntArray) {
         val pending = goAsync()
         CoroutineScope(SupervisorJob()+Dispatchers.IO).launch {
-            try { TimerSurfaces.refresh(context,TrackerRuntime.get(context).tracker.view(),forceWidget = true) }
+            try { TimerSurfaces.refresh(context,TrackerRuntime.get(context).tracker,forceWidget = true) }
             catch(_: Exception) { android.util.Log.w("TimerSurfaces","Widget unavailable; open application") }
             finally { pending.finish() }
         }

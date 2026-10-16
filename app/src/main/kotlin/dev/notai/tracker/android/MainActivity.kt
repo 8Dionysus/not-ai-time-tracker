@@ -78,7 +78,7 @@ class MainActivity : ComponentActivity() {
         vm.refreshCapabilities(reconcileForeground = true)
         // Overlay may only start from a visible Activity; widget/notification are redrawn on explicit events.
         vm.refreshSurfaces { runtime, view ->
-            TimerSurfaces.refresh(this, view, forceWidget = true)
+            TimerSurfaces.refresh(this, runtime.tracker, view, forceWidget = true)
             FocusSignals.refresh(this, view)
             runOnUiThread { if (!isFinishing) FloatingTimerService.fromVisibleActivity(this, view.data.settings.surfaces) }
         }

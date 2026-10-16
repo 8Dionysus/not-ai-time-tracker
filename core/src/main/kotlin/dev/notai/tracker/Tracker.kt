@@ -258,6 +258,27 @@ class Tracker(val store: StateStore, val clock: Clock) {
         val lastSelection = d.segments.filter { it.sessionId == sessionId }.maxByOrNull { it.start }?.selection ?: s.selection
         append(d,lastSelection,when(notePolicy) { ChoiceNotePolicy.CLEAR -> null;ChoiceNotePolicy.COPY_SOURCE -> s.note;null -> choiceStartNote(d,ChoiceKind.HISTORY,sessionId,lastSelection,s.note) },n)
     }
+    /** Repeat the explicitly shown historical segment, preserving the existing history note policy.
+     * The caller's revision and source IDs are checked within this single ordinary start/switch. */
+    fun repeatSegment(expected: Token,sessionId: String,segmentId: String,application: ChoiceApplication = ChoiceApplication.START,
+        notePolicy: ChoiceNotePolicy? = null) = mutate(expected,application == ChoiceApplication.SWITCH) { d,n ->
+        val source = d.sessions.singleOrNull { it.id == sessionId } ?: fail(ErrorCode.STALE,"Source session no longer exists")
+        val segment = d.segments.singleOrNull { it.id == segmentId && it.sessionId == sessionId } ?: fail(ErrorCode.STALE,"Source segment no longer exists")
+        checkStartable(d,segment.selection)
+        val note = when(notePolicy) {
+            ChoiceNotePolicy.CLEAR -> null
+            ChoiceNotePolicy.COPY_SOURCE -> source.note
+            null -> choiceStartNote(d,ChoiceKind.HISTORY,sessionId,segment.selection,source.note)
+        }
+        val base = when(application) {
+            ChoiceApplication.START -> { ensure(current(d) == null && d.focus == null,"Stop current session first");d }
+            ChoiceApplication.SWITCH -> {
+                ensure(snapshot(d,n).mode != Mode.RECOVERY,"Resolve uncertain time first",ErrorCode.RECOVERY_REQUIRED)
+                if(d.focus != null) FocusTransitions.cancel(d,n) else close(d,current(d) ?: fail(ErrorCode.INVALID_INPUT,"No current session"),n,SessionStatus.STOPPED)
+            }
+        }
+        append(base,segment.selection,note,n)
+    }
     fun startFavorite(expected: Token, favoriteId: String) = mutate(expected) { d,n ->
         ensure(current(d) == null, "Stop or switch current session first")
         val f = d.favorites.find { it.id == favoriteId } ?: fail(ErrorCode.INVALID_INPUT, "Missing favorite")

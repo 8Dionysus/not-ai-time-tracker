@@ -365,9 +365,10 @@ class TrackerViewModel internal constructor(private val app: Application,private
             mode == PickMode.LABEL -> t.labelCurrent(s.token, selection, s.session?.note)
             draft != null && idle -> t.startDraft(s.token, draft.copy(selection = selection)).also { _draft.value = null }
             idle && entry?.kind == ChoiceKind.FAVORITE -> t.startFavorite(s.token, entry.sourceId)
-            idle && entry?.kind == ChoiceKind.HISTORY && entry.sourceSessionId != null -> t.repeat(s.token, entry.sourceSessionId!!)
+            idle && entry?.kind == ChoiceKind.HISTORY -> t.repeatSegment(s.token,requireNotNull(entry.sourceSessionId),requireNotNull(entry.sourceSegmentId))
             idle -> t.start(s.token, selection)
             draft != null -> t.switchDraft(s.token,draft.copy(selection = selection)).also { _draft.value = null }
+            entry?.kind == ChoiceKind.HISTORY -> t.repeatSegment(s.token,requireNotNull(entry.sourceSessionId),requireNotNull(entry.sourceSegmentId),ChoiceApplication.SWITCH)
             else -> {
                 val change = t.switch(s.token, selection)
                 change
@@ -409,7 +410,11 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     /** History row's play button: repeat when idle, switch to it while tracking. */
     fun repeat(entry: EntryUi) = command({ c -> null }) { rt, s ->
-        if (s.mode == Mode.IDLE && s.focus == null) rt.tracker.repeat(s.token, entry.sessionId) else rt.tracker.switch(s.token, entry.selection)
+        val data = rt.tracker.data()
+        val segment = data.segments.singleOrNull { it.id == entry.segmentId && it.sessionId == entry.sessionId }
+        val source = data.sessions.singleOrNull { it.id == entry.sessionId }
+        ensure(segment?.selection == entry.selection && source != null && source.note == entry.note,"Shown history entry changed",ErrorCode.STALE)
+        rt.tracker.repeatSegment(s.token,entry.sessionId,entry.segmentId,if(s.mode == Mode.IDLE && s.focus == null) ChoiceApplication.START else ChoiceApplication.SWITCH)
     }
 
     fun resolveTail(start: Long, end: Long) = command({ "Время уточнено" }) { rt, s ->
@@ -785,7 +790,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     }
     private suspend fun waitRuntime(): UiBackend? = boot.first { it !is Boot.Loading }.let { (it as? Boot.Ready)?.backend }
 
-    fun refreshSurfaces(block: (TrackerRuntime, TrackerView) -> Unit) {
+    fun refreshSurfaces(block: suspend (TrackerRuntime, TrackerView) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             val rt = waitRuntime()?.runtime ?: return@launch
             runCatching { block(rt, rt.tracker.view()) }

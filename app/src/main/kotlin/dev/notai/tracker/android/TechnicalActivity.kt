@@ -370,7 +370,7 @@ class TechnicalActivity: Activity() {
     private fun refreshSurfacePermissions() {
         if(!::runtime.isInitialized || !::surfaceStatus.isInitialized) return
         scope.launch {
-            val view = withContext(Dispatchers.IO) { runtime.tracker.view().also { TimerSurfaces.refresh(this@TechnicalActivity,it,forceWidget = true) } }
+            val view = withContext(Dispatchers.IO) { runtime.tracker.view().also { TimerSurfaces.refresh(this@TechnicalActivity,runtime.tracker,it,forceWidget = true) } }
             val settings = view.data.settings.surfaces
             renderSurfaceSettings(settings)
             val overlay = if(resumed) FloatingTimerService.fromVisibleActivity(this@TechnicalActivity,settings) else "Overlay запускается только из видимого приложения"

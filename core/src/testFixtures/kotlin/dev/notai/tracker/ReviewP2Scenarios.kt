@@ -91,3 +91,23 @@ fun reviewP2HistoryCanonical(create: () -> StateStore,reopen: (StateStore) -> St
         t = Tracker(reopen(t.store),clock)
     }
 }
+
+fun reviewP2ExactSegmentRepeat(create: () -> StateStore,reopen: (StateStore) -> StateStore) {
+    for(policy in listOf(null,ChoiceNotePolicy.CLEAR,ChoiceNotePolicy.COPY_SOURCE)) for(application in ChoiceApplication.entries) {
+        val clock=FakeClock();var t=Tracker(create(),clock)
+        val card=Card("p2-exact-card","Exact source",personal=ChoicePersonalization(notePolicy=policy));t.saveCard(t.snapshot().token,card)
+        val a=card.classification().copy(details=mapOf("part" to "A"));val b=a.copy(details=mapOf("part" to "B"))
+        t.start(t.snapshot().token,a,"Source note");clock.advance(1000);t.changeDetails(t.snapshot().token,b);clock.advance(1000);t.stop(t.snapshot().token)
+        val original=t.data().sessions.single();val first=t.data().segments.first();clock.advance(1000)
+        if(application==ChoiceApplication.SWITCH) t.start(t.snapshot().token,Classification(name="Current"),"Current note")
+        val before=t.data();t.repeatSegment(t.snapshot().token,original.id,first.id,application)
+        assertEquals(a,t.snapshot().session!!.selection);assertEquals(if(policy==ChoiceNotePolicy.CLEAR) null else "Source note",t.snapshot().session!!.note)
+        assertEquals(before.segments.filter { it.sessionId==original.id },t.data().segments.filter { it.sessionId==original.id })
+        t.undo(t.snapshot().token);assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
+        t=Tracker(reopen(t.store),clock)
+        val stale=t.snapshot().token;t.saveFavorite(stale,Favorite("p2-revision","Unrelated revision",Classification()))
+        val unchanged=t.data();assertEquals(ErrorCode.STALE,assertFailsWith<CoreError> { t.repeatSegment(stale,original.id,first.id,application) }.code);assertEquals(unchanged,t.data())
+        t.repeatSegment(t.snapshot().token,original.id,first.id,application,ChoiceNotePolicy.COPY_SOURCE);assertEquals("Source note",t.snapshot().session!!.note)
+        t.stop(t.snapshot().token);t.repeat(t.snapshot().token,original.id);assertEquals(b,t.snapshot().session!!.selection) // Legacy session repeat stays latest.
+    }
+}

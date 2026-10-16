@@ -30,7 +30,7 @@ class TimerSurfaceRaceTest {
         override fun read()=value
         @Synchronized override fun <T> transaction(block:(Dataset)->Pair<Dataset,T>):T {val(n,r)=block(value);validate(n);value=n;changes.value=n;return r}
     }
-    private fun refresh(c: Context,t: Tracker,v: TrackerView,previous: SurfaceSettings? = null) { TimerSurfaces.refresh(c,v,previous,forceWidget=true) }
+    private fun refresh(c: Context,t: Tracker,v: TrackerView,previous: SurfaceSettings? = null) { kotlinx.coroutines.runBlocking { TimerSurfaces.refresh(c,t,v,previous,forceWidget=true) } }
     private fun race(action: String,afterNotification: Boolean=false) {
         val c=RuntimeEnvironment.getApplication();shadowOf(c).grantPermissions(Manifest.permission.POST_NOTIFICATIONS);TimerSurfaces.channels(c)
         val notifications=c.getSystemService(NotificationManager::class.java);val shortcuts=c.getSystemService(ShortcutManager::class.java)

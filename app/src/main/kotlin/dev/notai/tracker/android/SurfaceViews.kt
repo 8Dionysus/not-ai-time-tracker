@@ -176,7 +176,7 @@ class QuickChoiceReceiver : BroadcastReceiver() {
                         android.widget.Toast.makeText(context, "Таймер уже изменился. Открой уведомление ещё раз", android.widget.Toast.LENGTH_SHORT).show()
                     }
                 }
-                TimerSurfaces.refresh(context, runtime.tracker.view())
+                TimerSurfaces.refresh(context, runtime.tracker)
             } catch (_: Exception) { android.util.Log.w("SurfaceViews", "Quick choice unavailable; history unchanged") }
             finally { pending.finish() }
         }

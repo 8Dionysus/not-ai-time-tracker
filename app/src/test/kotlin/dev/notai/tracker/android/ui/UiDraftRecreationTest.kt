@@ -2,7 +2,7 @@ package dev.notai.tracker.android.ui
 
 import android.content.Intent
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.core.app.ActivityScenario
 import dev.notai.tracker.*
@@ -15,18 +15,20 @@ import org.junit.Assert.*
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import org.robolectric.annotation.LooperMode
 import org.robolectric.annotation.GraphicsMode
 
 /** MainActivity, real form/picker callbacks, actual framework recreation; never a device claim. */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@LooperMode(LooperMode.Mode.INSTRUMENTATION_TEST)
 @Config(sdk=[36],qualifiers="w400dp-h860dp-xhdpi")
 class UiDraftRecreationTest {
-    @get:Rule val compose=createEmptyComposeRule()
+    val compose=createAndroidComposeRule<MainActivity>()
+    @get:Rule val rules: org.junit.rules.TestRule = org.junit.rules.RuleChain.outerRule(object: org.junit.rules.ExternalResource() {
+        override fun before() { prepareBackend() }
+        override fun after() { UiBackends.open=oldOpen }
+    }).around(compose)
     private val oldOpen=UiBackends.open
-    private lateinit var scenario: ActivityScenario<MainActivity>
+    private val scenario get() = compose.activityRule.scenario
     private lateinit var t: Tracker
     private lateinit var vm: TrackerViewModel
     private fun at(value:String)=Instant.parse("2026-10-16T${value}:00Z").toEpochMilli()
@@ -35,7 +37,7 @@ class UiDraftRecreationTest {
         @Synchronized override fun read()=value
         @Synchronized override fun <T> transaction(block:(Dataset)->Pair<Dataset,T>):T {val(n,r)=block(value);validate(n);value=n;changes.value=n;return r}
     }
-    @Before fun setup() {
+    private fun prepareBackend() {
         t=Tracker(Store(),FakeClock(at("14:00")))
         val selected=Card("p2-form-choice","Draft selected activity");t.saveCard(t.snapshot().token,selected)
         t.saveFavorite(t.snapshot().token,Favorite("p2-form-favorite",selected.name,selected.classification()))
@@ -46,12 +48,13 @@ class UiDraftRecreationTest {
             override fun applyCatalog(preview:CatalogPreview):Tracker.Change=error("Unused fixture")
             override fun submitShortcut(action:SurfaceAction)=CompletableDeferred<Result<Tracker.Change>>(Result.failure(IllegalStateException("Unused fixture")))
         }
-        UiBackends.open={backend};scenario=ActivityScenario.launch(MainActivity::class.java)
+        UiBackends.open={backend}
+    }
+    @Before fun setup() {
         scenario.onActivity { vm=ViewModelProvider(it)[TrackerViewModel::class.java] }
         compose.waitUntil(10000) { vm.home.value!=null && vm.view.value!=null }
         compose.waitForIdle()
     }
-    @After fun close() { if(::scenario.isInitialized)scenario.close();UiBackends.open=oldOpen }
     private fun form(correction:Boolean) {
         if(correction) compose.onNodeWithText("Original correction note").performScrollTo().performClick()
         else compose.onNodeWithText("Добавить запись задним числом").performScrollTo().performClick()

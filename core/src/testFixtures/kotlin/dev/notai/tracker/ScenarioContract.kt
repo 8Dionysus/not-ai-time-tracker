@@ -19,6 +19,7 @@ class MemoryRollback: RollbackStore {
 }
 /** The SAME three scenarios run on in-memory domain storage and on disk-backed Room/SQLite. */
 abstract class ScenarioContract {
+    @Test fun reviewP2ExactSegmentRepeat() = reviewP2ExactSegmentRepeat(::createStore,::reopen)
     @Test fun reviewP2EmptyReportOracle() = reviewP2EmptyReportIndex(::createStore,::reopen)
     @Test fun reviewP2EmptyBackfill() = reviewP2EmptyBackfill(::createStore,::reopen)
     @Test fun reviewP2HistoryEmptyCanonical() = reviewP2HistoryCanonical(::createStore,::reopen,false)

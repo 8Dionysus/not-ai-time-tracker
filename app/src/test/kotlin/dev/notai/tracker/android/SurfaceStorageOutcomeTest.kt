@@ -30,7 +30,7 @@ class SurfaceStorageOutcomeTest {
             override fun <T> transaction(block: (Dataset) -> Pair<Dataset,T>): T { var wrote=false;val result=base.transaction { old -> block(old).also { wrote=it.first!=old } };if(wrote) throw IOException("Synthetic post-commit failure");return result }
         }
         val t=Tracker(uncertain,clock);val shown=t.snapshot()
-        TimerActionReceiver().handleCurrent(app,t,SurfaceAction(source,TimerCommand.STOP,shown.token,shown.timerTarget))
+        kotlinx.coroutines.runBlocking { TimerActionReceiver().handleCurrent(app,t,SurfaceAction(source,TimerCommand.STOP,shown.token,shown.timerTarget)) }
         assertEquals(SessionStatus.STOPPED,base.read().sessions.single().status);assertEquals(1000L,base.read().segments.single().durationMs)
         val prefs=app.getSharedPreferences("surface-results",Context.MODE_PRIVATE);val message=requireNotNull(prefs.getString("last",null))
         assertTrue(message,message.contains("STORAGE"));assertFalse(message,message.contains("история не изменена"));assertTrue(message,message.contains("проверь",ignoreCase=true))

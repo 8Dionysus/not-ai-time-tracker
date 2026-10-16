@@ -118,7 +118,7 @@ class RoomScenariosTest: ScenarioContract() {
         tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(shortcut = false)))
         org.junit.Assert.assertEquals(timer,tracker.snapshot().timerTarget)
         // This is the ordinary refresh path; it must not republish while disabled.
-        TimerSurfaces.refresh(context,tracker.view(),SurfaceSettings(shortcut = true))
+        kotlinx.coroutines.runBlocking { TimerSurfaces.refresh(context,tracker,tracker.view(),SurfaceSettings(shortcut = true)) }
         org.junit.Assert.assertTrue(manager.dynamicShortcuts.isEmpty())
         org.junit.Assert.assertThrows(IllegalArgumentException::class.java) { manager.requestPinShortcut(published,null) }
         val reopened = Tracker(reopen(tracker.store),tracker.clock);val before = reopened.data()
@@ -126,7 +126,7 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertThrows(CoreError::class.java) { TimerSurfaces.execute(reopened,oldAction) }
         org.junit.Assert.assertEquals(before,reopened.data());org.junit.Assert.assertTrue(before.sessions.isEmpty())
         reopened.settings(reopened.snapshot().token,before.settings.copy(surfaces = before.settings.surfaces.copy(shortcut = true)))
-        TimerSurfaces.refresh(context,reopened.view(),before.settings.surfaces)
+        kotlinx.coroutines.runBlocking { TimerSurfaces.refresh(context,reopened,reopened.view(),before.settings.surfaces) }
         org.junit.Assert.assertTrue((manager.dynamicShortcuts+manager.pinnedShortcuts).any { it.id == "timer_action" })
         org.junit.Assert.assertTrue(manager.requestPinShortcut(published,null))
         val fresh = reopened.snapshot()

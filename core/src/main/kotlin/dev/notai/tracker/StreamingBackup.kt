@@ -108,7 +108,7 @@ object StreamingBackup {
                     "sessions" -> json.array { val row = codec.decodeFromString<Session>(record());sessions += row.copy(selection = selections.capture(row.selection)) }
                     "segments" -> json.array { val row = codec.decodeFromString<Segment>(record());segments += row.copy(selection = selections.capture(row.selection)) }
                     "measurements" -> json.array { measurements += codec.decodeFromString<Measurement>(record()) }
-                    "savedReports" -> json.array { savedReports += codec.decodeFromString<SavedReportQuery>(record()) }
+                    "savedReports" -> { ensure(format >= 14,"Saved reports in legacy archive",ErrorCode.UNSUPPORTED_IMPORT);json.array { savedReports += codec.decodeFromString<SavedReportQuery>(record()) } }
                     "goals" -> json.array { goals += codec.decodeFromString<Goal>(record()) }
                     else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unknown dataset field: $field")
                 }

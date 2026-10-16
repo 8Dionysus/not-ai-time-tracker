@@ -20,13 +20,17 @@ fun retainedChangeCausality(create: ()->StateStore,reopen: (StateStore)->StateSt
         TransferOperation("retained-op","0".repeat(128),"retained-dataset","",0,listOf(TransferGroupProgress(g,TransferConflictPolicy.BLOCK,TransferGroupState.APPLIED,inserted=inserted,previousOrigin=previous)))
     val base=Dataset(datasetId="retained-dataset",types=emptyList(),axes=emptyList(),metrics=emptyList(),units=emptyList())
     val empty=group(TransferContent());val good=content(valid);val bad=content(early)
+    fun journal(g: TransferGroup,inserted: TransferContent?=null,previous: TransferOrigin?=null)=
+        base.copy(transfer=TransferState(operations=listOf(operation(g,inserted,previous))))
+    fun delta(change: SubjectChange,observations: List<StateObservation> = emptyList())=
+        TransferContent(subjects=SubjectData(observations=observations,changes=listOf(change)))
     val negative=linkedMapOf(
         "origin.localGroup" to base.copy(transfer=TransferState(origins=listOf(origin(bad)))),
-        "operation.group.content" to base.copy(transfer=TransferState(operations=listOf(operation(group(bad)))))),
-        "operation.inserted.full" to base.copy(transfer=TransferState(operations=listOf(operation(empty,inserted=bad)))),
-        "operation.previousOrigin" to base.copy(transfer=TransferState(operations=listOf(operation(empty,previous=origin(bad))))),
-        "operation.inserted.partial" to base.copy(transfer=TransferState(operations=listOf(operation(group(good),inserted=TransferContent(subjects=SubjectData(changes=listOf(early))))))),
-        "operation.inserted.conflictingBasis" to base.copy(transfer=TransferState(operations=listOf(operation(group(good),inserted=TransferContent(subjects=SubjectData(observations=listOf(a.copy(recordedAt=100),b.copy(recordedAt=100)),changes=listOf(valid.copy(recordedAt=200))))))))
+        "operation.group.content" to journal(group(bad)),
+        "operation.inserted.full" to journal(empty,inserted=bad),
+        "operation.previousOrigin" to journal(empty,previous=origin(bad)),
+        "operation.inserted.partial" to journal(group(good),inserted=delta(early)),
+        "operation.inserted.conflictingBasis" to journal(group(good),inserted=delta(valid.copy(recordedAt=200),listOf(a.copy(recordedAt=100),b.copy(recordedAt=100))))
     )
     for((name,d) in negative) {
         val backup=Backup(formatVersion=14,backupId=name,asOf=1000,data=d);val text=codec.encodeToString(backup)
@@ -38,11 +42,11 @@ fun retainedChangeCausality(create: ()->StateStore,reopen: (StateStore)->StateSt
         assertEquals(before,store.read(),name)
     }
     // A partial delta's basis belongs to the corresponding complete source, not live data.
-    val positive=listOf(base.copy(transfer=TransferState(origins=listOf(origin(good))))),
-        base.copy(transfer=TransferState(operations=listOf(operation(group(good)))))),
-        base.copy(transfer=TransferState(operations=listOf(operation(empty,inserted=good)))),
-        base.copy(transfer=TransferState(operations=listOf(operation(empty,previous=origin(good))))),
-        base.copy(transfer=TransferState(operations=listOf(operation(group(good),inserted=TransferContent(subjects=SubjectData(changes=listOf(valid))))))))
+    val positive=listOf(
+        base.copy(transfer=TransferState(origins=listOf(origin(good)))),
+        journal(group(good)),journal(empty,inserted=good),journal(empty,previous=origin(good)),
+        journal(group(good),inserted=delta(valid))
+    )
     for((index,d) in positive.withIndex()) {
         val backup=Backup(formatVersion=14,backupId="valid-$index",asOf=1000,data=d);val bytes=ByteArrayOutputStream()
         StreamingBackup.write(backup,bytes);assertEquals(backup,Backups.decode(bytes.toString("UTF-8")))
@@ -50,7 +54,7 @@ fun retainedChangeCausality(create: ()->StateStore,reopen: (StateStore)->StateSt
         val store=create();store.transaction { d to Unit };assertEquals(d,reopen(store).read())
     }
     val live=base.copy(cards=good.cards,metrics=good.metrics,units=good.units,subjects=good.subjects.copy(changes=emptyList()))
-    val missing=live.copy(transfer=TransferState(operations=listOf(operation(empty,inserted=TransferContent(subjects=SubjectData(changes=listOf(valid))))))))
+    val missing=live.copy(transfer=journal(empty,inserted=delta(valid)).transfer)
     assertFailsWith<CoreError> { validate(missing) } // Never borrow an unrelated live basis.
     val store=create();store.transaction { positive.first() to Unit };val t=Tracker(store,FakeClock(1000))
     val retention=t.previewTransferRetention(TransferRetentionSelection(originIds=setOf("retained-origin")))

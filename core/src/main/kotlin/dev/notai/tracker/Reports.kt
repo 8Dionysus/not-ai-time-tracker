@@ -153,8 +153,9 @@ object Reports {
  * path; no mutable/global cache can make a caller's edits disappear. */
 internal class ReportIndex(private val data: Dataset) {
     val notes = data.sessions.associate { it.id to it.note }
-    // Validated certain intervals do not overlap, so end order equals start order.
-    private val closed = data.segments.mapIndexed { i,s -> i to s }.filter { it.second.end != null && !it.second.uncertain }.sortedBy { it.second.start }
+    // Nonempty validated certain intervals do not overlap: end order equals start order.
+    // Identity-only markers may sit inside a longer fact and have no report interval.
+    private val closed = data.segments.mapIndexed { i,s -> i to s }.filter { it.second.end != null && !it.second.uncertain && !it.second.isEmptyInterval() }.sortedBy { it.second.start }
     private val other = data.segments.mapIndexed { i,s -> i to s }.filter { it.second.end == null || it.second.uncertain }
     private val sessionMeasurements = data.measurements.mapIndexed { i,m -> i to m }.filter { it.second.scope == Scope.SESSION }.groupBy { it.second.targetId }
     private val segmentMeasurements = data.measurements.mapIndexed { i,m -> i to m }.filter { it.second.scope == Scope.SEGMENT }.groupBy { it.second.targetId }

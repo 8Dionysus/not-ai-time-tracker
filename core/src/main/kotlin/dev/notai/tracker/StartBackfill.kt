@@ -35,7 +35,7 @@ internal object StartBackfill {
     fun segment(d: Dataset,n: Moment,sessionId: String,start: Long,id: String = newId()): Segment {
         val first = first(d,n,sessionId)
         ensure(start >= 0 && start < first.start && first.start <= n.wall,"Choose a positive past gap before the current session",ErrorCode.INVALID_INTERVAL)
-        val conflict = d.segments.firstOrNull { it.sessionId != sessionId && it.start < first.start &&
+        val conflict = d.segments.firstOrNull { it.sessionId != sessionId && !it.isEmptyInterval() && it.start < first.start &&
             (it.end ?: it.observedUntil ?: it.start) > start }
         if(conflict != null) throw CoreError(if(conflict.uncertain) ErrorCode.RECOVERY_REQUIRED else ErrorCode.OVERLAP,
             "The proposed start crosses an existing interval",arguments = mapOf("segmentId" to ErrorArgument.Identifier(conflict.id)),fieldPath = "startBackfill.start")

@@ -103,7 +103,10 @@ internal class ChoiceCache {
         if(history == null || completedIds != ids || completedSegments != segments) {
             val groups = segments.groupBy { classificationKey(it.selection) }
             history = groups.map { (key,values) ->
-                val latest = values.maxWith(recordedSegmentOrder)
+                // Resolve the same recorded source shown by suggestions/quick starts. Keep
+                // an ineligible-only variant available for explicit historical search.
+                val latest = values.filter { !it.uncertain && it.end != null && it.durationMs > 0 }
+                    .maxWithOrNull(recordedSegmentOrder) ?: values.maxWith(recordedSegmentOrder)
                 val c = latest.selection
                 HistoryVariant(ChoiceRecord("history:"+sha256(key.toByteArray(Charsets.UTF_8)),ChoiceKind.HISTORY,latest.id,c.name ?: "Без уточнения",c,
                     if(c.name != null) listOf(ChoiceText(MatchField.NAME,c.name)) else if(c.activityTypeId == null) listOf(ChoiceText(MatchField.UNCLASSIFIED,"Без уточнения")) else emptyList(),latest.sessionId,latest.id),

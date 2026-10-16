@@ -261,7 +261,7 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
 /** "Forgot to switch": choose the past moment first; the picker then applies the retrospective switch. */
 @Composable
 fun EarlierSheet(zone: ZoneId, segmentStart: Long, now: Long, onNext: (Long) -> Unit, onDismiss: () -> Unit) {
-    var at by remember { mutableLongStateOf(floorMinute(maxOf(segmentStart, now - 10 * MINUTE))) }
+    var at by remember { mutableLongStateOf(floorMinute(maxOf(segmentStart, now - 10 * MINUTE)).coerceIn(segmentStart,now)) }
     NotAiSheet(onDismiss, fullHeight = false) {
         SheetHeader("Когда ты переключился?", onDismiss)
         Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {

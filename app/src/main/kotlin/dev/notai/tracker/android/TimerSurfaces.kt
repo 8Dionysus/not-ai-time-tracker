@@ -20,8 +20,7 @@ data class SurfaceAction(val source: Surface,val command: TimerCommand,val token
 internal class TimerSurfaceObserver(private val context: Context,private val tracker: Tracker) {
     private var previous: SurfaceSettings? = null
     suspend fun refresh(view: TrackerView) {
-        TimerSurfaces.refresh(context,tracker,view,previous)
-        previous = view.data.settings.surfaces
+        if(TimerSurfaces.refresh(context,tracker,view,previous)) previous = view.data.settings.surfaces
     }
 }
 object TimerSurfaces {
@@ -136,18 +135,24 @@ object TimerSurfaces {
     /** Prepare outside the store gate; publish only while the same shown revision/target is current.
      * The IO hop is inside this entry point, including the default view read. No global publication
      * lock precedes the store lock; failed platform surfaces cannot prevent the others' effects. */
-    suspend fun refresh(c: Context,tracker: Tracker,view: TrackerView? = null,previous: SurfaceSettings? = null,forceWidget: Boolean = false) = withContext(Dispatchers.IO) {
+    @Suppress("UNUSED_PARAMETER") // Retained source compatibility; every installed widget converges to current policy.
+    suspend fun refresh(c: Context,tracker: Tracker,view: TrackerView? = null,previous: SurfaceSettings? = null,forceWidget: Boolean = false): Boolean = withContext(Dispatchers.IO) {
         val captured = view ?: tracker.view();val shown = captured.snapshot();val settings = captured.data.settings.surfaces
+        var prepared = true
         fun <T> prepare(surface: Surface,block: () -> T): T? = try { block() } catch(_: RuntimeException) {
-            android.util.Log.w("TimerSurfaces","$surface preparation unavailable");null
+            prepared = false;android.util.Log.w("TimerSurfaces","$surface preparation unavailable");null
         }
-        fun effect(surface: Surface,block: () -> Unit) { try { block() } catch(_: RuntimeException) { android.util.Log.w("TimerSurfaces","$surface publication unavailable") } }
+        fun effect(surface: Surface,block: () -> Unit): Boolean = try { block();true } catch(_: RuntimeException) {
+            android.util.Log.w("TimerSurfaces","$surface publication unavailable");false
+        }
         val launcher = prepare(Surface.SHORTCUT) { prepareShortcut(c,shown,settings) }
-        val preparedWidget = if(settings.widget || previous?.widget == true || forceWidget) prepare(Surface.WIDGET) {
+        // Disabled is a current policy, not a transition that observation may lose.
+        // Also repair installed widgets when another publisher or conflation skipped a view.
+        val preparedWidget = prepare(Surface.WIDGET) {
             val manager = AppWidgetManager.getInstance(c)
             val ids = manager.getAppWidgetIds(ComponentName(c,TimerWidget::class.java))
             Triple(manager,ids,if(ids.isEmpty()) null else widget(c,captured,settings.widget))
-        } else null
+        }
         val notice = if(settings.notification) prepare(Surface.NOTIFICATION) { if(notificationsAllowed(c)) notification(c,captured) else null } else null
         refreshPrepared?.invoke(c,captured)
         tracker.store.checkedTransaction { checked ->
@@ -156,17 +161,18 @@ object TimerSurfaces {
                 live.controlBarrier == captured.data.controlBarrier && current.token == shown.token && current.timerTarget == shown.timerTarget &&
                 current.mode == shown.mode && current.focus?.id == shown.focus?.id && current.focus?.phaseIndex == shown.focus?.phaseIndex && current.focus?.mode == shown.focus?.mode
             checked.replace(live) {
+                var applied = valid && prepared
                 if(valid) {
-                    launcher?.let { effect(Surface.SHORTCUT,it) }
-                    preparedWidget?.let { (manager,ids,views) -> if(views != null) effect(Surface.WIDGET) { manager.updateAppWidget(ids,views) } }
-                    effect(Surface.NOTIFICATION) {
+                    launcher?.let { applied = effect(Surface.SHORTCUT,it) && applied }
+                    preparedWidget?.let { (manager,ids,views) -> if(views != null) applied = effect(Surface.WIDGET) { manager.updateAppWidget(ids,views) } && applied }
+                    applied = effect(Surface.NOTIFICATION) {
                         val manager = c.getSystemService(NotificationManager::class.java)
                         if(settings.notification && notificationsAllowed(c) && notice != null) manager.notify(CONTROL_ID,notice)
                         else manager.cancel(CONTROL_ID)
-                    }
-                    if(previous?.overlay == true && !settings.overlay) effect(Surface.OVERLAY) { c.stopService(Intent(c,FloatingTimerService::class.java));Unit }
+                    } && applied
+                    if(previous?.overlay != false && !settings.overlay) applied = effect(Surface.OVERLAY) { c.stopService(Intent(c,FloatingTimerService::class.java));Unit } && applied
                 }
-                Unit // A stale refresh must not cancel or replace any newer publication.
+                applied // A stale/failed attempt cannot advance the observer's publication history.
             }
         }
     }

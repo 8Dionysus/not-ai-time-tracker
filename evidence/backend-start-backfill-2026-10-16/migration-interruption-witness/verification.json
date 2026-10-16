@@ -1,0 +1,11 @@
+{
+  "source": "e4435919948a361f2b023f750134d765b8d379ee",
+  "tests": 3,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "build": "BUILD SUCCESSFUL in 56s",
+  "injectedFailureWitnessesRequired": true,
+  "productionInputsEqualToFullBuild": "0def529a610232f557530f7f74a2facf3507136f",
+  "scope": "v9 state-preservation migration; reached 9\u219210 interruption; reached historical 4\u21925 replacement failure with complete path to schema10"
+}

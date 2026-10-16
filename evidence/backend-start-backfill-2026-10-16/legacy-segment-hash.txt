@@ -1,0 +1,54 @@
+d6d96de142abc2d24549c36758d5e4a1757e6b9c6bdf46e2212a4ee03c9634bd
+{
+    "types": [],
+    "cards": [],
+    "axes": [],
+    "metrics": [],
+    "units": [],
+    "sessions": [
+        {
+            "id": "legacy-session",
+            "status": "STOPPED",
+            "selection": {
+                "cardId": null,
+                "name": null,
+                "activityTypeId": null,
+                "details": {},
+                "tags": [],
+                "ancestorPathAtWrite": [],
+                "facets": []
+            },
+            "note": null,
+            "importOrigin": null
+        }
+    ],
+    "segments": [
+        {
+            "id": "legacy-segment",
+            "sessionId": "legacy-session",
+            "start": 1000,
+            "end": 2000,
+            "durationMs": 1000,
+            "selection": {
+                "cardId": null,
+                "name": null,
+                "activityTypeId": null,
+                "details": {},
+                "tags": [],
+                "ancestorPathAtWrite": [],
+                "facets": []
+            },
+            "anchor": null,
+            "uncertain": false,
+            "observedUntil": null,
+            "limitMs": null
+        }
+    ],
+    "measurements": [],
+    "series": [],
+    "overrides": [],
+    "links": [],
+    "focus": null,
+    "goals": [],
+    "favorites": []
+}

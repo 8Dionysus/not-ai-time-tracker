@@ -1,0 +1,16 @@
+{
+  "artifacts": 65,
+  "unknownPomDeclarations": 0,
+  "dependencyNoticeMembers": 27,
+  "apk": {
+    "debug": {
+      "licenseAssetsByteMatch": true,
+      "editorialCandidateAssetsAbsent": true
+    },
+    "release": {
+      "licenseAssetsByteMatch": true,
+      "editorialCandidateAssetsAbsent": true
+    }
+  },
+  "scope": "POM declarations and exact packaged asset bytes; native static-runtime publisher rights binding remains open"
+}

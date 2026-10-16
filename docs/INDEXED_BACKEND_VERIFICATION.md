@@ -1,5 +1,16 @@
 # Backend verification and evidence boundaries
 
+Current A+B runtime/build source: `0def529a610232f557530f7f74a2facf3507136f`.
+Full execution succeeded in7m39s: **109core / 86app**, zero failures/errors/skips;
+unsigned debug/release, release lint and inventory completed. Room10, fullJSON12/read1–12,
+selective1–3. Details, hashes and the separate3-test interruption witness at e443591
+are in [START_BACKFILL_VERIFICATION_2026_10_16.md](START_BACKFILL_VERIFICATION_2026_10_16.md).
+Production inputs are unchanged by that test/docs-only witness commit. C's prepared
+source has not been compiled or integrated here; Library materialization failed.
+The journal-specific remainder notes do not treat the old21-family matrix as whole-journal acceptance.
+
+## Prior EN/ES editorial integration (historical)
+
 Current merged build/core-test source: `6d2e466bf286477911d340d2ae65ebff44ac7d67`. Final invocation completed in47s with core101 passing, zero failures/errors/skips. App80 passed in the preceding full execution at `7f14d7820317b86be9a0c1ade5a389ab949ae598`; the final task is UP-TO-DATE. Exact app/core-main/fixture/build/included-catalog asset inputs are unchanged since that execution, with source equivalence recorded. No new app execution is inferred from caching.
 
 ```text

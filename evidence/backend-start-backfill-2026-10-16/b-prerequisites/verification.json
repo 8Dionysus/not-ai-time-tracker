@@ -1,0 +1,43 @@
+{
+  "base": "3ae129e414ce5903b3c998724faf62f9a27a9f94",
+  "validatedHead": "8aaa89033560db95a16ce74f2aa2f4b6f4f2b6c0",
+  "localCommitsNewestFirst": [
+    "8aaa89033560db95a16ce74f2aa2f4b6f4f2b6c0",
+    "3550af875a97da5f6cf81b9c5486815f12bba13f"
+  ],
+  "patches": [
+    {
+      "file": "catalog-strict-utf8-from-3ae129e.patch",
+      "bytes": 8168,
+      "sha256": "7d47a874ea6e5ff85a79b9d1314e90e9440fa81d9f2853df9e4aeed89b8e0c5c",
+      "sourceCommit": "99b67ead74e57e757e01caab4b76d5f783803e3c",
+      "transport": "Exact coordinator-provided text reconstructed and byte/hash checked; Library metadata confirmed size, read returned no readable content."
+    },
+    {
+      "file": "csv-copy-provenance-from-3ae129e.patch",
+      "bytes": 9798,
+      "sha256": "2d0257c536d1bcfb3d4dc021648993c8b5a2ece6baf4ab953b1cf0ecdb53eb1b",
+      "sourceCommit": "c4a90e74011a5569672bec384002e29e6811186d",
+      "transport": "Exact coordinator-provided text reconstructed and byte/hash checked; Library metadata confirmed size, read returned no readable content."
+    }
+  ],
+  "tests": {
+    "core": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "app": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "build": "BUILD SUCCESSFUL in 2m 51s",
+  "mainCompatibilityCheck": "git apply --check both patches at01f7ee9 passed",
+  "untrackedBeforeApply": "scripts/__pycache__/ from A own editorial reproduction; not source/patch content, not committed",
+  "newModelOrEnvironment": false,
+  "newAndroidBoot": false
+}

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.ui.UiScreensTest" tests="20" skipped="0" failures="0" errors="0" timestamp="2026-10-16T00:48:32.937Z" hostname="69b2b5b46001" time="50.297">
+  <properties/>
+  <testcase name="largeFontTimeAndButtonsKeepTheirText" classname="dev.notai.tracker.android.ui.UiScreensTest" time="6.171"/>
+  <testcase name="settingsFullPage" classname="dev.notai.tracker.android.ui.UiScreensTest" time="4.005"/>
+  <testcase name="largeFontSearchPlaceholderFitsItsContainer" classname="dev.notai.tracker.android.ui.UiScreensTest" time="0.165"/>
+  <testcase name="firstLaunch" classname="dev.notai.tracker.android.ui.UiScreensTest" time="3.541"/>
+  <testcase name="picker" classname="dev.notai.tracker.android.ui.UiScreensTest" time="2.765"/>
+  <testcase name="deleteMultiSegmentAsksFirstAndSheetIcon" classname="dev.notai.tracker.android.ui.UiScreensTest" time="3.167"/>
+  <testcase name="recovery" classname="dev.notai.tracker.android.ui.UiScreensTest" time="2.529"/>
+  <testcase name="floatingButtonAndAssignmentCard" classname="dev.notai.tracker.android.ui.UiScreensTest" time="3.464"/>
+  <testcase name="focus" classname="dev.notai.tracker.android.ui.UiScreensTest" time="2.329"/>
+  <testcase name="deleteFromMenuAndSwipe" classname="dev.notai.tracker.android.ui.UiScreensTest" time="2.408"/>
+  <testcase name="finishedFocusKeepsItsSnapshotDuringOutgoingAnimation" classname="dev.notai.tracker.android.ui.UiScreensTest" time="1.304"/>
+  <testcase name="overview" classname="dev.notai.tracker.android.ui.UiScreensTest" time="2.218"/>
+  <testcase name="headerThemeToggleUsesCurrentAppearanceOnEveryClick" classname="dev.notai.tracker.android.ui.UiScreensTest" time="1.707"/>
+  <testcase name="notificationQuickPick" classname="dev.notai.tracker.android.ui.UiScreensTest" time="2.721"/>
+  <testcase name="runningTimer" classname="dev.notai.tracker.android.ui.UiScreensTest" time="1.917"/>
+  <testcase name="crossMidnightSegmentHasDistinctKeysForEachCalendarDay" classname="dev.notai.tracker.android.ui.UiScreensTest" time="1.401"/>
+  <testcase name="correction" classname="dev.notai.tracker.android.ui.UiScreensTest" time="2.211"/>
+  <testcase name="surfacesOutsideTheApp" classname="dev.notai.tracker.android.ui.UiScreensTest" time="2.434"/>
+  <testcase name="settings" classname="dev.notai.tracker.android.ui.UiScreensTest" time="1.968"/>
+  <testcase name="idleTimer" classname="dev.notai.tracker.android.ui.UiScreensTest" time="1.868"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

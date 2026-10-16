@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.RoomScenariosTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-16T00:53:09.374Z" hostname="69b2b5b46001" time="7.532">
+  <properties/>
+  <testcase name="v9MigrationInterruptionRollsBackColumnAndCanRetryExplicitly" classname="dev.notai.tracker.android.RoomScenariosTest" time="6.361"/>
+  <testcase name="v9MigrationPreservesUnknownProvenanceAndEverySessionState" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.453"/>
+  <testcase name="normalizedMigrationRollsBackAfterReplacementFailure" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.717"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

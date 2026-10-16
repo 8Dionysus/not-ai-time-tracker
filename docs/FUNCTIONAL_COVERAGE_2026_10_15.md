@@ -1,5 +1,7 @@
 # Functional backend coverage, 15 October 2026
 
+Scope note,16October: this dated family matrix is not exhaustive journal acceptance. See [source-specific backend remainders](JOURNAL_BACKEND_REMAINDERS_2026_10_16.md) and the [verified start-backfill integration](START_BACKFILL_VERIFICATION_2026_10_16.md).
+
 Sources: complete main Page snapshot seq207 (SHA256 ff33e062b2292e872d82a85eb21469302b09dca26d75026cc7b7911fc82acd82), including the 21-family matrix block71f20de7-2cef-47c3-9445-7f47a4f6b61d, and complete localization Page (SHA256889e96f944e6109f3a0fc6ae64615e11b4db7094ae4ab10f81e0b01d9e441630). Source snapshots stay outside the public repository/package. This matrix concerns backend scope; API availability is not user-visible product acceptance. UI remains with Opus by direct user instruction15:10UTC.
 
 | Family | Backend/result boundary | Exact remaining acceptance/owner |

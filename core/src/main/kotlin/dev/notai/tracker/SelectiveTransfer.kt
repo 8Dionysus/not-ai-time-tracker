@@ -101,10 +101,32 @@ class SelectiveTransfer(private val tracker: Tracker) {
         for(l in links) join("session:${l.sessionId}","series:${l.key.seriesId}")
         for(c in d.cards.filter { it.id in wanted.cardIds }) c.activityTypeId?.takeIf { it in wanted.typeIds }?.let { join("card:${c.id}","type:$it") }
         for(t in d.types.filter { it.id in wanted.typeIds }) t.parentId?.takeIf { it in wanted.typeIds }?.let { join("type:${t.id}","type:$it") }
-        // Shared subject revisions/links must be imported atomically. This joins selected roots only.
-        if(wanted.subjectRecords.isNotEmpty() || wanted.sessionIds.any { id -> d.subjects.links.any { it.sessionId == id } || d.subjects.sets.any { it.sessionId == id } || d.subjects.quantities.any { it.sessionId == id } || d.subjects.distanceTimes.any { input -> input.targetId == id || d.segments.any { it.id == input.targetId && it.sessionId == id } } }) {
-            val subjectNodes = nodes.filter { it.startsWith("subject:") || it.startsWith("session:") }
+        // A selected subject component and queries about its identities share COPY mapping.
+        // Unrelated roots retain their separate groups; legacy packages retain their hashes.
+        val subjectSessions = d.sessions.filter { it.id in wanted.sessionIds }
+        val subjectSegments = d.segments.filter { it.sessionId in wanted.sessionIds }
+        val selectedSubjectCards = (subjectSessions.mapNotNull { it.selection.cardId }+subjectSegments.mapNotNull { it.selection.cardId }+wanted.cardIds).toSet()
+        val selectedSubjects = d.subjectDependencies(wanted.sessionIds,selectedSubjectCards,wanted.subjectRecords)
+        if(!selectedSubjects.empty) {
+            val subjectNodes = nodes.filter { it.startsWith("subject:") || it.startsWith("session:") ||
+                (it.startsWith("card:") && it.removePrefix("card:") in selectedSubjects.cardDependencies()) }
             subjectNodes.zipWithNext().forEach { (a,b) -> join(a,b) }
+            val anchor = subjectNodes.firstOrNull()
+            if(anchor != null) {
+                val cards = selectedSubjects.cardDependencies().toSet()+selectedSubjectCards
+                val selections = subjectSessions.map { it.selection }+subjectSegments.map { it.selection }+
+                    d.cards.filter { it.id in cards }.map { it.classification() }
+                val types = selections.flatMap { it.ancestorPathAtWrite+listOfNotNull(it.activityTypeId) }.toMutableSet()
+                val queue = ArrayDeque(types)
+                while(queue.isNotEmpty()) typeRows.getValue(queue.removeFirst()).value.parentId?.let { if(types.add(it)) queue.addLast(it) }
+                val axes = selections.flatMap { it.facets.map { f -> f.axisId } }.toSet()
+                fun related(f: Filter) = f.cardId in cards || f.activityTypeId in types || f.facets.any { it.axisId in axes }
+                d.goals.filter { it.id in wanted.goalIds && it.definitions().any { g -> related(g.filter) } }.forEach { join(anchor,"goal:${it.id}") }
+                d.savedReports.filter { it.id in wanted.savedReportIds && (related(it.filter) || (it.grouping == ReportGrouping.FACET && it.groupKey in axes)) }.forEach { join(anchor,"report:${it.id}") }
+                d.favorites.filter { it.id in wanted.favoriteIds && related(Filter(it.selection.cardId,it.selection.activityTypeId,facets=it.selection.facets)) }.forEach { join(anchor,"favorite:${it.id}") }
+                wanted.cardIds.filter { it in cards }.forEach { join(anchor,"card:$it") }
+                wanted.typeIds.filter { it in types }.forEach { join(anchor,"type:$it") }
+            }
         }
         val byLeader = nodes.groupBy(::leader)
         // Retain the original keep-first-component ordering, including legacy linked facts.

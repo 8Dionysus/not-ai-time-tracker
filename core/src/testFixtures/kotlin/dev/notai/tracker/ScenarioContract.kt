@@ -23,6 +23,7 @@ abstract class ScenarioContract {
     @Test fun reviewP3BoundedHistoryReference() = reviewP3WindowReference(::createStore,::reopen)
     @Test fun reviewP3BoundedHistoryApply() = reviewP3WindowApply(::createStore,::reopen)
     @Test fun reviewP3BoundedHistorySourceChange() = reviewP3WindowSourceChange(::createStore,::reopen)
+    @Test fun reviewP3BoundedHistoryCompatibility() = reviewP3ReferenceCompatibility(::createStore,::reopen)
     @Test fun reviewP2EmptyReportOracle() = reviewP2EmptyReportIndex(::createStore,::reopen)
     @Test fun reviewP2EmptyBackfill() = reviewP2EmptyBackfill(::createStore,::reopen)
     @Test fun reviewP2HistoryEmptyCanonical() = reviewP2HistoryCanonical(::createStore,::reopen,false)

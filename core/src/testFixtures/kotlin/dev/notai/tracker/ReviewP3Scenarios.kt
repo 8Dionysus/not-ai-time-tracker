@@ -1,6 +1,8 @@
 package dev.notai.tracker
 
 import kotlin.test.*
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 
 fun reviewP3WindowFixture(): Dataset {
     val selection = Classification(name = "Same historical classification")
@@ -65,4 +67,28 @@ fun reviewP3WindowSourceChange(create: () -> StateStore,reopen: (StateStore) -> 
         assertEquals(ErrorCode.STALE,assertFailsWith<CoreError> { tracker.startChoice(tracker.snapshot().timerTarget!!,reference) }.code,change)
         assertEquals(before,tracker.data(),change)
     }
+}
+
+fun reviewP3ReferenceCompatibility(create: () -> StateStore,reopen: (StateStore) -> StateStore) {
+    val clock = FakeClock(10000);val store = create();store.transaction { reviewP3WindowFixture() to Unit };var tracker = Tracker(store,clock)
+    tracker.saveType(tracker.snapshot().token,ActivityType("p3-type","Own type"))
+    tracker.saveCard(tracker.snapshot().token,Card("p3-card","Own card",activityTypeId = "p3-type"))
+    tracker.saveFavorite(tracker.snapshot().token,Favorite("p3-favorite","Own favorite",Classification(name = "Favorite selection")))
+    val choices = tracker.view().choices()
+    for(id in listOf("type:p3-type","card:p3-card","favorite:p3-favorite")) {
+        val shown = requireNotNull(choices.resolve(id));val reference = choices.reference(shown)
+        val legacyWire = JsonObject(codec.encodeToJsonElement(ChoiceReference.serializer(),reference).jsonObject.filterKeys { it !in setOf("sourceSessionId","sourceSegmentId") })
+        val legacy = codec.decodeFromString(ChoiceReference.serializer(),legacyWire.toString())
+        assertEquals(shown,choices.resolve(legacy),id)
+        assertEquals(ErrorCode.STALE,assertFailsWith<CoreError> { choices.resolve(reference.copy(sourceSessionId = "p3-s1",sourceSegmentId = "p3-g1")) }.code)
+    }
+    val shown = reviewP3Shown(choices,"bounded-frequent");val reference = choices.reference(shown)
+    val legacy = ChoiceReference(reference.datasetId,reference.barrier,reference.choiceId,sha256(classificationKey(shown.selection).toByteArray(Charsets.UTF_8)))
+    assertEquals(ErrorCode.STALE,assertFailsWith<CoreError> { choices.resolve(legacy) }.code)
+    assertEquals(ErrorCode.STALE,assertFailsWith<CoreError> { choices.resolve(reference.copy(sourceSessionId = "p3-s2",sourceSegmentId = "p3-g2")) }.code)
+    tracker.manual(tracker.snapshot().token,5000,6000,shown.selection,"Even newer note C")
+    tracker = Tracker(reopen(tracker.store),clock)
+    assertEquals(shown,tracker.view().choices().resolve(reference))
+    tracker.startChoice(tracker.snapshot().timerTarget!!,reference)
+    assertEquals("Note A",tracker.snapshot().session!!.note)
 }

@@ -25,7 +25,10 @@ fun selectionIdentity(c: Classification): String = sha256(classificationKey(c.co
     name = if(c.cardId != null || c.activityTypeId != null) null else c.name,
     ancestorPathAtWrite = emptyList())).toByteArray(Charsets.UTF_8))
 @Serializable enum class ChoiceApplication { START, SWITCH }
-@Serializable data class ChoiceReference(val datasetId: String,val barrier: String,val choiceId: String,val fingerprint: String)
+/** History references bind the displayed occurrence and note, including bounded suggestions.
+ * Old references without an occurrence remain decodable but cannot rebind to a newer record. */
+@Serializable data class ChoiceReference(val datasetId: String,val barrier: String,val choiceId: String,val fingerprint: String,
+    val sourceSessionId: String? = null,val sourceSegmentId: String? = null)
 data class QuickChoice(val entry: ChoiceEntry,val reference: ChoiceReference,val icon: ActivityIcon)
 @Serializable data class StoppedAssignment(val id: String,val datasetId: String,val barrier: String,val timerEpoch: Long,
     val sessionId: String,val recordFingerprint: String)

@@ -207,11 +207,25 @@ class ChoiceView private constructor(private val d: Dataset,private val cache: C
         } ?: return null
         return page(id,listOf(RankedChoice(record)),null,1).items.single().entry
     }
-    fun reference(entry: ChoiceEntry) = ChoiceReference(d.datasetId,d.controlBarrier,entry.id,
-        sha256(classificationKey(entry.selection).toByteArray(Charsets.UTF_8)))
+    fun reference(entry: ChoiceEntry): ChoiceReference {
+        val historical = entry.kind == ChoiceKind.HISTORY
+        return ChoiceReference(d.datasetId,d.controlBarrier,entry.id,
+            if(historical) payloadHash(listOf(classificationKey(entry.selection),entry.note))
+            else sha256(classificationKey(entry.selection).toByteArray(Charsets.UTF_8)),
+            if(historical) entry.sourceSessionId else null,if(historical) entry.sourceSegmentId else null)
+    }
     fun resolve(reference: ChoiceReference): ChoiceEntry {
         ensure(reference.datasetId == d.datasetId && reference.barrier == d.controlBarrier,"Choice dataset changed",ErrorCode.STALE)
-        val entry = resolve(reference.choiceId) ?: fail(ErrorCode.STALE,"Choice no longer exists")
+        val entry = if(reference.choiceId.startsWith("history:")) {
+            // A classification can have many occurrences with different notes. Resolve
+            // the displayed source, never the canonical representative outside its window.
+            val variant = history.find { it.record.id == reference.choiceId } ?: fail(ErrorCode.STALE,"History choice no longer exists")
+            val source = variant.occurrences.find { it.sessionId == reference.sourceSessionId && it.segment.id == reference.sourceSegmentId }
+                ?: fail(ErrorCode.STALE,"Displayed history source no longer exists")
+            val record = variant.record.copy(sourceId = source.segment.id,selection = source.segment.selection,
+                sourceSessionId = source.sessionId,sourceSegmentId = source.segment.id)
+            page(reference,listOf(RankedChoice(record)),null,1).items.single().entry
+        } else resolve(reference.choiceId) ?: fail(ErrorCode.STALE,"Choice no longer exists")
         ensure(entry.canStart && reference(entry) == reference,"Choice changed or is unavailable",ErrorCode.STALE)
         return entry
     }

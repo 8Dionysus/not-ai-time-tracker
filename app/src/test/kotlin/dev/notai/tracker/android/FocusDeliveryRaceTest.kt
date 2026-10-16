@@ -100,6 +100,10 @@ class FocusDeliveryRaceTest {
     }
     @Test fun staleAlarmWithoutStoreDoesNotBootstrapAnEmptyDatabase() = runBlocking(Dispatchers.IO) {
         val context = RuntimeEnvironment.getApplication()
+        val oldSync = DirectoryDurability.sync;val oldRename = DirectoryDurability.rename
+        // Robolectric has no directory-fsync shadow; exercise the real host filesystem fixture.
+        DirectoryDurability.sync = { java.nio.channels.FileChannel.open(it.toPath(),java.nio.file.StandardOpenOption.READ).use { fd -> fd.force(true) } }
+        DirectoryDurability.rename = { a,b -> java.nio.file.Files.move(a.toPath(),b.toPath(),java.nio.file.StandardCopyOption.ATOMIC_MOVE,java.nio.file.StandardCopyOption.REPLACE_EXISTING);Unit }
         TrackerRuntime.beginRecovery();TrackerRuntime.endRecovery()
         // These paths belong only to this Robolectric synthetic Application fixture.
         DatabaseFiles.paths(context).forEach { it.delete() }
@@ -110,6 +114,7 @@ class FocusDeliveryRaceTest {
         } finally {
             TrackerRuntime.beginRecovery();TrackerRuntime.endRecovery()
             DatabaseFiles.paths(context).forEach { it.delete() }
+            DirectoryDurability.sync = oldSync;DirectoryDurability.rename = oldRename
         }
     }
 }

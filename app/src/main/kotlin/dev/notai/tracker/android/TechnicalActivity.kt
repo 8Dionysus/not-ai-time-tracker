@@ -301,8 +301,17 @@ class TechnicalActivity: Activity() {
         t.configureFocusSignal(t.snapshot().token,enabled)
     }
     internal fun deliverTechnicalFocus(t: Tracker,focus: FocusSnapshot) {
-        if(t.data().settings.surfaces.focusSignal && FocusSignals.allowed(this)) FocusSignals.deliver(this,focus)
-        else AlertDialog.Builder(this).setTitle("Focus").setMessage(focus.safeLabel).setPositiveButton("OK",null).show()
+        scope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) { FocusSignals.deliverResult(this@TechnicalActivity,t) }
+                val current = result.focus
+                if(result.status == FocusDeliveryStatus.BLOCKED_BEFORE_POST && current?.mode == FocusMode.DUE && current.signalKey == focus.signalKey)
+                    AlertDialog.Builder(this@TechnicalActivity).setTitle("Focus").setMessage(current.safeLabel).setPositiveButton("OK",null).show()
+            } catch(e: Exception) {
+                if(e is CancellationException) throw e
+                status.text = "${(e as? CoreError)?.code ?: "Ошибка"}: ${e.message}"
+            }
+        }
     }
     private fun buildCalendarControl() {
         button("Выбрать occurrence из календаря…") {

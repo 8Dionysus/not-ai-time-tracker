@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dev.notai.tracker.*
 import dev.notai.tracker.android.ExportOperations
 import dev.notai.tracker.android.FocusSignals
+import dev.notai.tracker.android.FocusDeliveryStatus
 import dev.notai.tracker.android.SurfaceAction
 import dev.notai.tracker.android.TrackerRuntime
 import dev.notai.tracker.android.stageRestore
@@ -178,8 +179,18 @@ class TrackerViewModel internal constructor(private val app: Application,private
         .flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     private fun deliverFocus(due: FocusSnapshot) {
-        val enabled = view.value?.data?.settings?.surfaces?.focusSignal == true
-        if (!(enabled && FocusSignals.allowed(app) && FocusSignals.deliver(app, due))) notice(due.safeLabel)
+        val tracker = runtime?.tracker ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val result = FocusSignals.deliverResult(app,tracker)
+                val current = result.focus
+                if(result.status == FocusDeliveryStatus.BLOCKED_BEFORE_POST && current?.mode == FocusMode.DUE && current.signalKey == due.signalKey)
+                    notice(current.safeLabel)
+            } catch(e: Exception) {
+                if(e is kotlinx.coroutines.CancellationException) throw e
+                notice(Format.error(e))
+            }
+        }
     }
 
     private val shownDays = MutableStateFlow(7)

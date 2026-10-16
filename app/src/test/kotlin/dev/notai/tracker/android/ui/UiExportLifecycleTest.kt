@@ -145,6 +145,7 @@ class UiExportLifecycleTest {
             synchronized(DocumentExportCoordination.lock) { DocumentExportCoordination.writing.clear() } // new-process boundary
             DocumentExportCoordination.afterResultCommit = null
             val afterCancel = TrackerViewModel(app);models.put("after-cancel-result",afterCancel)
+            waitFor { afterCancel.boot.value is TrackerViewModel.Boot.Ready }
             afterCancel.recoverDocumentExport(cancelledId) // deliberately stale saved Activity state
             waitFor { afterCancel.documentExportId() == null };assertNull(afterCancel.documentExport.value)
             afterCancel.requestExport();waitFor { !afterCancel.exportPreparing.value && afterCancel.documentExportId() != null }

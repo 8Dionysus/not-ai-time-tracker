@@ -16,11 +16,11 @@ fun quantityReportClassificationJoin(create: ()->StateStore,reopen: (StateStore)
     t.settings(t.snapshot().token,t.data().settings.copy(reportZone="Europe/Berlin",reportDayStartMinute=240))
     val active = card.classification().copy(details=mapOf("method" to "active"))
     val passive = active.copy(details=mapOf("method" to "passive"))
-    t.manual(t.snapshot().token,time("01:40"),time("02:20"),passive)
-    val session = t.data().sessions.single().id;val segment = t.data().segments.single().id
-    t.correctSession(t.snapshot().token,session,listOf(
-        Tracker.SegmentEdit(segment,time("01:40"),time("02:05"),active),
-        Tracker.SegmentEdit(null,time("02:05"),time("02:20"),passive)),null,true)
+    clock.wall=time("01:40")
+    t.start(t.snapshot().token,active);clock.advance(25*60_000)
+    t.switch(t.snapshot().token,passive);clock.advance(15*60_000);t.stop(t.snapshot().token)
+    val session = t.data().sessions.single().id
+    clock.wall=time("12:00")
     t.linkSubject(t.snapshot().token,SubjectSessionLink(subject=ref,sessionId=session))
     fun quantity(id: String,value: String,at: Long?,sid: String?=session) = t.recordEventQuantity(t.snapshot().token,
         EventQuantity(id,ref,def,Decimal(value),at,clock.wall,"manual",sid))
@@ -48,7 +48,7 @@ fun quantityReportClassificationJoin(create: ()->StateStore,reopen: (StateStore)
     assertEquals(Decimal("2"),t.view().savedQuantityReport(query.id).quantities.totals().getValue(ref to def))
 }
 
-fun quantityArchiveAuditSnapshots() {
+fun quantityArchiveAuditSnapshots(create: ()->StateStore) {
     val ref=SubjectRef(SubjectKind.CARD,"B");val def=QuantityDefinition("pages",1,"page")
     val subjects=SubjectData(cards=listOf(CardSubject("B","edition")),observations=listOf(StateObservation("o",ref,def,Decimal("100"),10,200,"manual")))
     val content=TransferContent(cards=listOf(Card("B","B")),metrics=listOf(Metric("pages","pages",numberKind=NumberKind.INTEGER,canonicalUnitId="page")),units=listOf(UnitDefinition("page","page","page")),subjects=subjects)
@@ -71,6 +71,17 @@ fun quantityArchiveAuditSnapshots() {
         val valid=backup.copy(asOf=200);val bytes=ByteArrayOutputStream();StreamingBackup.write(valid,bytes)
         assertEquals(valid,StreamingBackup.read { bytes.toByteArray().inputStream() })
     }
+    // A genuinely pruned capsule has hashes, not retained future audit values.
+    val store=create();store.transaction { base.copy(transfer=TransferState(origins=listOf(origin))) to Unit }
+    val compacted=Tracker(store,FakeClock(1000))
+    val retention=compacted.previewTransferRetention(TransferRetentionSelection(originIds=setOf("O")))
+    compacted.applyTransferRetention(retention,"compact-audit",retention.requiredAcknowledgements)
+    assertEquals(TransferContent(),compacted.data().transfer.origins.single().localGroup)
+    val compactBackup=Backup(formatVersion=14,backupId="compacted-audit",asOf=100,data=compacted.data())
+    val compactText=codec.encodeToString(compactBackup)
+    assertEquals(compactBackup,Backups.decode(compactText))
+    val compactBytes=ByteArrayOutputStream();StreamingBackup.write(compactBackup,compactBytes)
+    assertEquals(compactBackup,StreamingBackup.read { compactBytes.toByteArray().inputStream() })
     val observations=listOf(StateObservation("a",ref,def,Decimal("2300"),10,900,"manual"),StateObservation("b",ref,def,Decimal("2420"),20,950,"manual"))
     val early=SubjectChange("change","a","b",SignedDecimal("120"),1,"manual")
     val live=base.copy(cards=content.cards,metrics=content.metrics,units=content.units,subjects=subjects.copy(observations=observations,changes=listOf(early)))

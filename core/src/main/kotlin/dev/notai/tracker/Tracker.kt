@@ -312,13 +312,23 @@ class Tracker(val store: StateStore, val clock: Clock) {
             d.copy(focus = null,sessions = d.sessions.map { if(it.id == f.sessionId) it.copy(status = SessionStatus.STOPPED) else it })
         }
     }
-    fun saveGoal(expected: Token,goal: Goal) = mutate(expected,true) { d,_ ->
-        d.copy(goals = if(d.goals.any { it.id == goal.id }) d.goals.map { if(it.id == goal.id) goal else it } else d.goals+goal)
+    fun saveGoal(expected: Token,goal: Goal,mode: GoalEditMode = GoalEditMode.NEXT_PERIOD) = mutate(expected,true) { d,n ->
+        Goals.save(d,n,goal,mode)
     }
     fun deleteGoal(expected: Token,id: String) = mutate(expected,true) { d,_ ->
         ensure(d.goals.any { it.id == id },"Missing goal"); d.copy(goals = d.goals.filterNot { it.id == id })
     }
     fun goalProgress(id: String,date: java.time.LocalDate? = null): GoalProgress = view().goalProgress(id,date)
+    fun configureReportingDay(expected: Token,policy: ReportingDayPolicy) = mutate(expected,true) { d,_ ->
+        policy.validate();d.copy(settings = d.settings.copy(reportZone = policy.zone,reportDayStartMinute = policy.startMinute))
+    }
+    fun saveReportQuery(expected: Token,query: SavedReportQuery) = mutate(expected,true) { d,_ ->
+        d.copy(savedReports = d.savedReports.filterNot { it.id == query.id }+query)
+    }
+    fun deleteReportQuery(expected: Token,id: String) = mutate(expected,true) { d,_ ->
+        ensure(d.savedReports.any { it.id == id },"Missing saved report")
+        d.copy(savedReports = d.savedReports.filterNot { it.id == id })
+    }
     fun settings(expected: Token, settings: Settings) = mutate(expected) { d,_ -> d.copy(settings = settings) }
     fun configureSchedule(expected: Token,value: ScheduleSettings) = mutate(expected) { d,_ ->
         d.copy(settings = d.settings.copy(schedule = value.canonical()))

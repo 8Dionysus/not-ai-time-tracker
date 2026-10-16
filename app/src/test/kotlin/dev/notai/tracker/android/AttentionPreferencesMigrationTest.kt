@@ -68,7 +68,7 @@ class AttentionPreferencesMigrationTest {
         SQLiteDatabase.openDatabase(file.path,null,SQLiteDatabase.OPEN_READWRITE).use { sql ->
             assertEquals(10,sql.version)
             sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> assertTrue(c.moveToFirst());assertEquals(prior,c.getString(0)) }
-            sql.version = 11 // Restore only this isolated fixture to inspect exact domain bytes.
+            sql.version = TRACKER_DATABASE_VERSION // Restore only this isolated fixture to inspect exact domain bytes.
         }
         val restored = open(name)
         try { assertEquals(expected,RoomStore(restored).read()) }

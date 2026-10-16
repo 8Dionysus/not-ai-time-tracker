@@ -195,6 +195,21 @@ abstract class TrackerDatabase: RoomDatabase() {
 
         val MIGRATION_11_12 = object: androidx.room.migration.Migration(11,12) {
             override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                run {
+                    readMetadataPayload(db)?.let { payload ->
+                        val old = codec.parseToJsonElement(payload).jsonObject
+                        val legacySettings = codec.decodeFromJsonElement<Settings>(old["settings"] ?: fail(ErrorCode.STORAGE,"Missing legacy settings"))
+                        ensure(legacySettings.reportDayStartMinute == 0 && old["savedReports"] == null,
+                            "Reporting fields in legacy metadata",ErrorCode.STORAGE)
+                        val goals = old["goals"]?.let { codec.decodeFromJsonElement<List<Goal>>(it) }.orEmpty()
+                        ensure(goals.none { it.revisions.isNotEmpty() || it.dayStartMinute != 0 || it.metric == GoalMetric.DISTINCT_RECORDED_DAYS },
+                            "Versioned goals in legacy metadata",ErrorCode.STORAGE)
+                        val transfer = old["transfer"]?.let { codec.decodeFromJsonElement<TransferState>(it) } ?: TransferState()
+                        ensure(!Dataset(types = emptyList(),axes = emptyList(),metrics = emptyList(),units = emptyList(),
+                            settings = legacySettings,goals = goals,transfer = transfer).hasReportingExtensions(),
+                            "Reporting receipts in legacy metadata",ErrorCode.STORAGE)
+                    }
+                }
                 readMetadataPayload(db)?.let { payload ->
                     val prior = codec.decodeFromString<Dataset>(payload)
                     ensure(!prior.hasChoicePersonalization(),"Personal choices in v11 metadata",ErrorCode.STORAGE)

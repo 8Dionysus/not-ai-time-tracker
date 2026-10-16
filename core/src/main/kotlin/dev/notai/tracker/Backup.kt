@@ -117,6 +117,7 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore,p
             ensure(b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
             try {
                 validate(b.data)
+                ensure(b.data.goalRevisionTimes().all { it <= b.asOf },"Goal revision after snapshot")
                 ensure(b.data.manualTimeConfirmations().all { it.confirmedAt <= b.asOf },"Confirmation after snapshot")
                 ensure(b.data.focus?.breakAnchor == null,"Backup must not contain Focus anchors")
                 ensure(b.data.segments.all { it.anchor == null },"Backup must not contain device anchors")

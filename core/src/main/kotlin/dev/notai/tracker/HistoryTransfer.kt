@@ -66,12 +66,20 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
         val sessions = mutableListOf<Session>(); val segments = mutableListOf<Segment>()
         fun error(issue: ImportIssue) { issues += issue;errors += issue.diagnostic }
         val known = d.sessions.associateBy { it.id }.toMutableMap(); var duplicates = 0
+        // Selective COPY can remap the local session ID while retaining the external record identity.
+        val knownOrigins = mutableMapOf<Pair<String,String>,MutableSet<String>>()
+        for(session in d.sessions) session.importOrigin?.let { origin ->
+            knownOrigins.getOrPut(origin.namespace to origin.recordKey) { mutableSetOf() }.add(origin.rowHash)
+        }
         for(row in file.rows) {
             val id = "import:"+sha256(codec.encodeToString(listOf(row.origin.namespace,row.origin.recordKey)).toByteArray())
             val args = mapOf("activity" to ErrorArgument.Text(row.activity.activity),"category" to ErrorArgument.Text(row.activity.category))
+            val sourceKey = row.origin.namespace to row.origin.recordKey
+            val matchingHashes = knownOrigins[sourceKey]
             val previous = known[id]
-            if(previous != null) {
-                if(previous.importOrigin?.rowHash == row.origin.rowHash) duplicates++
+            if(previous != null || matchingHashes != null) {
+                val sameIdentity = previous == null || previous.importOrigin?.let { it.namespace == row.origin.namespace && it.recordKey == row.origin.recordKey } == true
+                if(sameIdentity && matchingHashes?.all { it == row.origin.rowHash } == true) duplicates++
                 else error(importIssue(ImportIssueCode.SOURCE_ID_CONFLICT,"Row ${row.number}: source ID already exists with different content; resolve explicitly",
                     ImportIssueStage.PREVIEW,row = row.number,arguments = args+mapOf("namespace" to ErrorArgument.Identifier(row.origin.namespace),"recordKey" to ErrorArgument.Identifier(row.origin.recordKey))))
                 continue
@@ -91,6 +99,7 @@ class HistoryTransfer(private val tracker: Tracker,private val rollback: Rollbac
                 val session = Session(id,SessionStatus.STOPPED,selected,row.note,row.origin)
                 val segment = Segment("$id:segment",id,row.start,row.end,row.durationMs,selected)
                 sessions += session; segments += segment; known[id] = session
+                knownOrigins.getOrPut(sourceKey) { mutableSetOf() }.add(row.origin.rowHash)
             } catch(e: CoreError) { error(importIssue(ImportIssueCode.MAPPING_INVALID,"Row ${row.number}: ${e.message}",ImportIssueStage.PREVIEW,row = row.number,arguments = args,cause = e.localized)) }
         }
         if(errors.isEmpty()) try { StreamingBackup.portable(d.copy(sessions = d.sessions+sessions,segments = d.segments+segments),now) }

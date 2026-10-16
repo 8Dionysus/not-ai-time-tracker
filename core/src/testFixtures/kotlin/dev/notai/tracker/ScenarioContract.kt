@@ -567,6 +567,7 @@ abstract class ScenarioContract {
     }
 
     @Test fun selectiveExclusionsMustBelongToSelectedSeries() = selectiveExclusionsScenario(createStore())
+    @Test fun csvReplayAfterSelectiveCopyKeepsExternalIdentity() = csvCopiedOriginScenario(::createStore,::reopen)
 
     @Test fun selectiveGroupsRepeatConflictAndStale() {
         val clock = FakeClock();val source = Tracker(createStore(),clock)

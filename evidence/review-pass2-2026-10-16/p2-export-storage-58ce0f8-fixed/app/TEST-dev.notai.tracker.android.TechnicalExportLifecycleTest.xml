@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.TechnicalExportLifecycleTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-16T10:01:15.912Z" hostname="69b2b5b46001" time="5.694">
+  <properties/>
+  <testcase name="successConsumesChooserBeforeWriteAndRegistersExactCompleteGroup" classname="dev.notai.tracker.android.TechnicalExportLifecycleTest" time="2.691"/>
+  <testcase name="chooserLeaseIsDurableBeforeExternalPickerAndSurvivesRecreation" classname="dev.notai.tracker.android.TechnicalExportLifecycleTest" time="1.417"/>
+  <testcase name="cancelConsumesChooserPreservesBytesAndRegistersRetryWarning" classname="dev.notai.tracker.android.TechnicalExportLifecycleTest" time="0.623"/>
+  <testcase name="cancelledCopyRetriesSameBytesAcrossActivityRecreation" classname="dev.notai.tracker.android.TechnicalExportLifecycleTest" time="0.963"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

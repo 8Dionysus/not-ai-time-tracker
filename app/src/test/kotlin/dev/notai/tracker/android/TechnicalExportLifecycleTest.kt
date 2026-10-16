@@ -56,7 +56,12 @@ class TechnicalExportLifecycleTest {
     }
     private fun result(uri: Uri?) = invoke("onActivityResult",1,if(uri == null) Activity.RESULT_CANCELED else Activity.RESULT_OK,uri?.let { Intent().setData(it) })
     private fun assertRegistered(id: String,state: String) {
-        DescriptorCopyFiles(app.noBackupFilesDir.path,requireNotNull(System.getProperty("tracker.cleanup.library"))).use { files ->
+        // SDK sandboxes use distinct classloaders. The same host ELF needs a distinct
+        // path here, as another SDK's native-ABI tests may already own the original.
+        val source=File(requireNotNull(System.getProperty("tracker.cleanup.library")))
+        val local=File(File(requireNotNull(System.getProperty("tracker.artifacts"))).apply { mkdirs() },"technical-copy-${newId()}.so")
+        source.copyTo(local);assertEquals(fileHash(source),fileHash(local))
+        DescriptorCopyFiles(app.noBackupFilesDir.path,local.path).use { files ->
             val catalog = PrivateCopyCatalog(files,PrivateFileMaintenance.forContext(app));val opaque = catalog.registerExport(id)
             val item = catalog.inventory().items.single { it.id == opaque }
             assertEquals(state,item.state);assertFalse(item.hardBlockers.contains(CopyBlocker.CHOOSER_RESULT_PENDING))

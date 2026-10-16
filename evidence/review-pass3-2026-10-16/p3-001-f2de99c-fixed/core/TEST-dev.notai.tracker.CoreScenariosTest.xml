@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.CoreScenariosTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-16T11:24:23.279Z" hostname="69b2b5b46001" time="0.53">
+  <properties/>
+  <testcase name="reviewP2HistoryEmptyCanonical" classname="dev.notai.tracker.CoreScenariosTest" time="0.336"/>
+  <testcase name="reviewP3BoundedHistorySourceChange" classname="dev.notai.tracker.CoreScenariosTest" time="0.053"/>
+  <testcase name="reviewP3BoundedHistoryReference" classname="dev.notai.tracker.CoreScenariosTest" time="0.03"/>
+  <testcase name="reviewP2HistoryUncertainCanonical" classname="dev.notai.tracker.CoreScenariosTest" time="0.014"/>
+  <testcase name="reviewP3BoundedHistoryCompatibility" classname="dev.notai.tracker.CoreScenariosTest" time="0.037"/>
+  <testcase name="reviewP3BoundedHistoryApply" classname="dev.notai.tracker.CoreScenariosTest" time="0.056"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

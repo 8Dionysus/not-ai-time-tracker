@@ -58,7 +58,7 @@ object Format {
         ErrorCode.INVALID_INTERVAL -> "Такой интервал невозможен: проверь начало и конец."
         ErrorCode.OVERLAP -> "Интервал пересекается с другой записью."
         ErrorCode.RECOVERY_REQUIRED -> "Сначала уточни неизвестное время."
-        ErrorCode.STORAGE -> "Не удалось сохранить. Данные не изменены."
+        ErrorCode.STORAGE -> "Ошибка хранения. Проверьте текущее состояние перед повтором."
         ErrorCode.UNSUPPORTED_IMPORT -> "Этот файл не подходит: ${e.message}"
         ErrorCode.INVALID_INPUT -> "Не получилось: ${e.message}"
         null -> "Не получилось: ${e.message ?: e.javaClass.simpleName}"

@@ -21,6 +21,15 @@ class MemoryRollback: RollbackStore {
 abstract class ScenarioContract {
     @Test fun reportingDayAndVersionedGoals() = reportingDaysAndGoalVersions(::createStore,::reopen)
     @Test fun savedReportPortability() = savedReportsAndPortableHistory(::createStore,::reopen)
+    @Test fun subjectsReuseCardIdentity() = subjectBooks(::createStore,::reopen)
+    @Test fun subjectStateIsLatestKnownNotSum() = subjectState(::createStore,::reopen)
+    @Test fun subjectEventsSpanStagesWithoutHiddenHistory() = subjectEvents(::createStore,::reopen)
+    @Test fun subjectSignedChangesRequireContinuousBasis() = subjectChanges(::createStore,::reopen)
+    @Test fun subjectSetsAndScaleBoundsHaveExplicitMeaning() = subjectSets(::createStore,::reopen)
+    @Test fun subjectQuantityWindowsKeepWholeTargetsSeparate() = subjectWindow(::createStore,::reopen)
+    @Test fun subjectRatesUseWeightedExplicitInputs() = subjectRates(::createStore,::reopen)
+    @Test fun subjectFieldsSurviveArchivesCopyReplayAndUndo() = subjectTransport(::createStore,::reopen)
+
     @Test fun backfillPreservesObservedTimeAndUndo() = startBackfillPreservesObservedTime(::createStore,::reopen)
     @Test fun backfillRefusalsAreAtomic() = startBackfillRefusalsAreAtomic(::createStore)
     @Test fun backfillArchiveRoundTripPreservesProvenance() = startBackfillArchiveRoundTrip(::createStore,::reopen)

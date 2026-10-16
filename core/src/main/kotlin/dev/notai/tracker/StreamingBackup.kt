@@ -19,7 +19,7 @@ internal const val MAX_BACKUP_RECORD_CHARS = 16*1024*1024
 object StreamingBackup {
     fun portable(data: Dataset,now: Moment): Backup {
         validateMoment(now);validate(data)
-        return Backup(asOf = now.wall,data = data.copy(pendingAssignments = emptyList(),segments = data.segments.map { materialize(it,now).copy(anchor = null) },
+        return Backup(formatVersion = 14,asOf = now.wall,data = data.copy(pendingAssignments = emptyList(),segments = data.segments.map { materialize(it,now).copy(anchor = null) },
             focus = Focus.freeze(data,now)))
     }
     fun write(backup: Backup,output: OutputStream) {
@@ -43,6 +43,7 @@ object StreamingBackup {
         writer.write("{");field("formatVersion","14",true);field("backupId",codec.encodeToString(backup.backupId));field("asOf",backup.asOf.toString())
         writer.write(",\"data\":{");val d = backup.data
         field("datasetId",codec.encodeToString(d.datasetId),true);field("revision",d.revision.toString())
+        if(!d.subjects.empty) field("subjects",codec.encodeToString(d.subjects))
         field("transfer",codec.encodeToString(d.transfer));field("schedule",codec.encodeToString(d.schedule));field("settings",codec.encodeToString(d.settings));field("focus",codec.encodeToString(d.focus))
         field("catalogVersion",codec.encodeToString(d.catalogVersion))
         field("timerEpoch",d.timerEpoch.toString());field("controlBarrier",codec.encodeToString(d.controlBarrier))
@@ -78,7 +79,7 @@ object StreamingBackup {
         // until the final graph validation, especially alongside the live store.
         val selections = SelectionFreezer()
         var datasetId: String? = null;var revision: Long? = null;var settings: Settings? = null;var focus: FocusRun? = null;var catalogVersion: String? = null
-        var schedule = ScheduleData();var transfer = TransferState()
+        var schedule = ScheduleData();var transfer = TransferState();var subjects = SubjectData()
         var timerEpoch = 0L;var controlBarrier = ""
         val seen = mutableSetOf<String>()
         val secondDigest = MessageDigest.getInstance("SHA-256")
@@ -88,6 +89,7 @@ object StreamingBackup {
             json.members { key -> if(key != "data") json.skip() else json.members { field ->
                 seen += field
                 when(field) {
+                    "subjects" -> { ensure(format >= SUBJECT_FULL_FORMAT,"Subject data in legacy archive",ErrorCode.UNSUPPORTED_IMPORT);subjects = codec.decodeFromString(json.value()) }
                     "transfer" -> { ensure(format >= 8,"Transfer in legacy archive",ErrorCode.UNSUPPORTED_IMPORT);transfer = codec.decodeFromString(json.value()) }
                     "schedule" -> { ensure(format >= 8,"Schedule in legacy archive",ErrorCode.UNSUPPORTED_IMPORT);schedule = codec.decodeFromString(json.value()) }
                     "datasetId" -> datasetId = codec.decodeFromString(json.value())
@@ -121,7 +123,7 @@ object StreamingBackup {
         ensure(format < 8 || seen.containsAll(listOf("schedule","transfer")),"Missing schedule",ErrorCode.UNSUPPORTED_IMPORT)
         val data = Dataset(datasetId = datasetId!!,revision = revision!!,types = types,cards = cards,favorites = favorites,
             sessions = sessions,segments = segments,measurements = measurements,settings = settings!!,axes = axes,metrics = metrics,units = units,
-            savedReports = savedReports,schedule = schedule,transfer = transfer,goals = goals,focus = focus,catalogVersion = catalogVersion,timerEpoch = timerEpoch,controlBarrier = controlBarrier)
+            savedReports = savedReports,subjects = subjects,schedule = schedule,transfer = transfer,goals = goals,focus = focus,catalogVersion = catalogVersion,timerEpoch = timerEpoch,controlBarrier = controlBarrier)
         ensure(format >= 9 || !data.transfer.hasCompactionState(),"Compaction in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format >= 10 || (data.settings.schedule == ScheduleSettings() && !data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format >= 11 || data.settings.surfaces.shortcut,"Shortcut preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
@@ -129,6 +131,7 @@ object StreamingBackup {
         ensure(format >= 13 || data.settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format >= 14 || !data.hasChoicePersonalization(),"Personal choices in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format >= 14 || !data.hasReportingExtensions(),"Reporting extensions in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(format >= 14 || !data.hasSubjectQuantities(),"Quantity extension in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
         Backup(formatVersion = 14,backupId = id!!,asOf = asOf!!,data = data.frozen()).also {
             validateBackup(it);onVerifiedSource(sourceHash.joinToString("") { byte -> (byte.toInt() and 255).toString(16).padStart(2,'0') })
         }
@@ -140,6 +143,7 @@ object StreamingBackup {
         ensure(b.formatVersion == 14 && b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
         validate(b.data)
         ensure(b.data.goalRevisionTimes().all { it <= b.asOf },"Goal revision after snapshot",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(b.data.quantityRecordedTimes().all { it <= b.asOf },"Quantity audit time after snapshot",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(b.data.manualTimeConfirmations().all { it.confirmedAt <= b.asOf },"Confirmation after snapshot",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(b.data.focus?.breakAnchor == null && b.data.segments.all { it.anchor == null },"Backup contains device anchors",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(b.data.segments.all { (it.start <= b.asOf || it.uncertain) && (it.end == null || it.end <= b.asOf || it.uncertain) &&

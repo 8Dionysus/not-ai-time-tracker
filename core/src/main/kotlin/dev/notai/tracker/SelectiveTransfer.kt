@@ -9,7 +9,7 @@ import kotlinx.serialization.encoding.Encoder
 
 @Serializable data class TransferSelection(val sessionIds: Set<String> = emptySet(),val seriesIds: Set<String> = emptySet(),
     val measurementIds: Set<String> = emptySet(),val excludedOverrides: Set<OccurrenceKey> = emptySet(),val discardLinks: Set<OccurrenceKey> = emptySet(),val includeFocus: Boolean = false,val goalIds: Set<String> = emptySet(),val favoriteIds: Set<String> = emptySet(),
-    val cardIds: Set<String> = emptySet(),val typeIds: Set<String> = emptySet(),val savedReportIds: Set<String> = emptySet())
+    val cardIds: Set<String> = emptySet(),val typeIds: Set<String> = emptySet(),val savedReportIds: Set<String> = emptySet(),val subjectRecords: Set<SubjectRecordKey> = emptySet())
 /** Canonical selection roots, unlike ordered hierarchy paths. Never lose duplicate input IDs. */
 internal object CatalogRootIdsSerializer: KSerializer<Set<String>> {
     private val list = ListSerializer(String.serializer())
@@ -31,7 +31,8 @@ internal object CatalogRootIdsSerializer: KSerializer<Set<String>> {
     val metrics: List<Metric> = emptyList(),val units: List<UnitDefinition> = emptyList(),val sessions: List<Session> = emptyList(),val segments: List<Segment> = emptyList(),
     val measurements: List<Measurement> = emptyList(),val series: List<ScheduleSeries> = emptyList(),val overrides: List<OccurrenceOverride> = emptyList(),val links: List<ScheduleStartLink> = emptyList(),val focus: FocusRun? = null,val goals: List<Goal> = emptyList(),val favorites: List<Favorite> = emptyList(),
     @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val catalogRoots: TransferCatalogRoots = TransferCatalogRoots(),
-    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val savedReports: List<SavedReportQuery> = emptyList())
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val savedReports: List<SavedReportQuery> = emptyList(),
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val subjects: SubjectData = SubjectData())
 @Serializable data class TransferEntityOrigin(val kind: String,val sourceEntityId: String,val sourceRevision: Long,val hash: String,val originId: String)
 @Serializable data class TransferGroup(val id: String,val originId: String,val sourceRevision: Long,val hash: String,val content: TransferContent,val entities: List<TransferEntityOrigin>)
 @Serializable data class SelectivePackage(val formatVersion: Int = 1,val minimumReader: Int = 1,val transferId: String = newId(),val sourceDatasetId: String,
@@ -63,13 +64,13 @@ class SelectiveTransfer(private val tracker: Tracker) {
         val cardRows = d.cards.withIndex().associate { it.value.id to it }
         val captured = selection.copy(sessionIds = frozenSet(selection.sessionIds),seriesIds = frozenSet(selection.seriesIds),
             measurementIds = frozenSet(selection.measurementIds),excludedOverrides = frozenSet(selection.excludedOverrides),discardLinks = frozenSet(selection.discardLinks),
-            savedReportIds = frozenSet(selection.savedReportIds),goalIds = frozenSet(selection.goalIds),favoriteIds = frozenSet(selection.favoriteIds),cardIds = frozenSet(selection.cardIds),typeIds = frozenSet(selection.typeIds))
+            savedReportIds = frozenSet(selection.savedReportIds),goalIds = frozenSet(selection.goalIds),favoriteIds = frozenSet(selection.favoriteIds),cardIds = frozenSet(selection.cardIds),typeIds = frozenSet(selection.typeIds),subjectRecords = frozenSet(selection.subjectRecords))
         val wanted = if(captured.includeFocus) {
             val focus = d.focus ?: fail(ErrorCode.INVALID_INPUT,"No focus selected")
             captured.copy(sessionIds = frozenSet(captured.sessionIds+focus.sessionId))
         } else captured
         ensure(d.focus == null || d.focus.sessionId !in wanted.sessionIds || wanted.includeFocus,"Active Focus is a required explicit dependency")
-        ensure(wanted.savedReportIds.isNotEmpty() || wanted.sessionIds.isNotEmpty() || wanted.seriesIds.isNotEmpty() || wanted.goalIds.isNotEmpty() || wanted.favoriteIds.isNotEmpty() || wanted.cardIds.isNotEmpty() || wanted.typeIds.isNotEmpty(),"Empty selection")
+        ensure(wanted.savedReportIds.isNotEmpty() || wanted.subjectRecords.isNotEmpty() || wanted.sessionIds.isNotEmpty() || wanted.seriesIds.isNotEmpty() || wanted.goalIds.isNotEmpty() || wanted.favoriteIds.isNotEmpty() || wanted.cardIds.isNotEmpty() || wanted.typeIds.isNotEmpty(),"Empty selection")
         ensure(wanted.sessionIds.all { id -> d.sessions.any { it.id == id } } && wanted.seriesIds.all { id -> d.schedule.series.any { it.id == id } },"Missing selection")
         ensure(wanted.savedReportIds.all { id -> d.savedReports.any { it.id == id } },"Missing saved report selection")
         ensure(wanted.goalIds.all { id -> d.goals.any { it.id == id } } && wanted.favoriteIds.all { id -> d.favorites.any { it.id == id } },"Missing goal/favorite selection")
@@ -87,7 +88,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
         ensure(wanted.discardLinks.all { key -> relevant.any { it.key == key } },"Unknown discarded link")
         val links = relevant.filterNot { it.key in wanted.discardLinks }
         val nodes = (wanted.sessionIds.map { "session:$it" }+wanted.seriesIds.map { "series:$it" }+wanted.goalIds.map { "goal:$it" }+wanted.favoriteIds.map { "favorite:$it" }+
-            wanted.savedReportIds.map { "report:$it" }+wanted.cardIds.map { "card:$it" }+wanted.typeIds.map { "type:$it" }).sorted()
+            wanted.savedReportIds.map { "report:$it" }+wanted.subjectRecords.map { "subject:${it.kind}:${it.id}" }+wanted.cardIds.map { "card:$it" }+wanted.typeIds.map { "type:$it" }).sorted()
         val parents = nodes.associateWith { it }.toMutableMap()
         fun leader(node: String): String {
             var root = node;while(parents.getValue(root) != root) root = parents.getValue(root)
@@ -100,6 +101,11 @@ class SelectiveTransfer(private val tracker: Tracker) {
         for(l in links) join("session:${l.sessionId}","series:${l.key.seriesId}")
         for(c in d.cards.filter { it.id in wanted.cardIds }) c.activityTypeId?.takeIf { it in wanted.typeIds }?.let { join("card:${c.id}","type:$it") }
         for(t in d.types.filter { it.id in wanted.typeIds }) t.parentId?.takeIf { it in wanted.typeIds }?.let { join("type:${t.id}","type:$it") }
+        // Shared subject revisions/links must be imported atomically. This joins selected roots only.
+        if(wanted.subjectRecords.isNotEmpty() || wanted.sessionIds.any { id -> d.subjects.links.any { it.sessionId == id } || d.subjects.sets.any { it.sessionId == id } || d.subjects.quantities.any { it.sessionId == id } || d.subjects.distanceTimes.any { input -> input.targetId == id || d.segments.any { it.id == input.targetId && it.sessionId == id } } }) {
+            val subjectNodes = nodes.filter { it.startsWith("subject:") || it.startsWith("session:") }
+            subjectNodes.zipWithNext().forEach { (a,b) -> join(a,b) }
+        }
         val byLeader = nodes.groupBy(::leader)
         // Retain the original keep-first-component ordering, including legacy linked facts.
         val components = nodes.filter { leader(it) == it }.map { byLeader.getValue(it).toSet() }
@@ -111,7 +117,9 @@ class SelectiveTransfer(private val tracker: Tracker) {
             val segments = portable.segments.filter { it.sessionId in ss }.map { it.copy(uncertain = it.uncertain || it.end == null) }
             val series = d.schedule.series.filter { it.id in ps }
             val overrides = d.schedule.overrides.filter { it.key.seriesId in ps && it.key !in wanted.excludedOverrides }
-            val measurements = d.measurements.filter { it.id in wanted.measurementIds && (it.targetId in ss || it.targetId in segments.map { seg -> seg.id }) }
+            val subjectRoots = wanted.subjectRecords.filter { "subject:${it.kind}:${it.id}" in component }.toSet()
+            val subjectData = d.subjectDependencies(ss,sessions.mapNotNull { it.selection.cardId }.toSet()+segments.mapNotNull { it.selection.cardId }+wanted.cardIds.filter { "card:$it" in component },subjectRoots)
+            val measurements = d.measurements.filter { (it.id in wanted.measurementIds || subjectData.distanceTimes.any { input -> input.measurementId == it.id }) && (it.targetId in ss || it.targetId in segments.map { seg -> seg.id }) }
             val savedReports = d.savedReports.filter { "report:${it.id}" in component }
             val goals = d.goals.filter { "goal:${it.id}" in component };val favorites = d.favorites.filter { "favorite:${it.id}" in component }
             val roots = TransferCatalogRoots(frozenSet(wanted.cardIds.filter { "card:$it" in component }.sorted()),frozenSet(wanted.typeIds.filter { "type:$it" in component }.sorted()))
@@ -122,17 +130,17 @@ class SelectiveTransfer(private val tracker: Tracker) {
             }
             val ownLinks = links.filter { it.key.seriesId in ps }
             val selections = goalSelections+favorites.map { it.selection }+sessions.map { it.selection }+segments.map { it.selection }+series.flatMap { it.revisions.map { v -> v.rule.selection } }+overrides.mapNotNull { it.selection }
-            val cards = (roots.cardIds+selections.mapNotNull { it.cardId }).map { cardRows.getValue(it) }.sortedBy { it.index }.map { it.value }
+            val cards = (roots.cardIds+selections.mapNotNull { it.cardId }+subjectData.cardDependencies()).map { cardRows.getValue(it) }.sortedBy { it.index }.map { it.value }
             val allSelections = selections+cards.map { it.classification() }
             val typeIds = (allSelections.flatMap { it.ancestorPathAtWrite+listOfNotNull(it.activityTypeId) }+roots.typeIds).toMutableSet()
             val queue = ArrayDeque(typeIds)
             while(queue.isNotEmpty()) typeRows.getValue(queue.removeFirst()).value.parentId?.let { if(typeIds.add(it)) queue.addLast(it) }
             val types = typeIds.map { typeRows.getValue(it) }.sortedBy { it.index }.map { it.value }
             val groupingAxes = savedReports.filter { it.grouping == ReportGrouping.FACET }.mapNotNull { it.groupKey }.toSet()
-            val axisIds = groupingAxes+allSelections.flatMap { it.facets.map { f -> f.axisId } }.toSet()+types.flatMap { it.suggestedAxisIds }
-            val metricIds = measurements.map { it.fieldId }.toSet()+types.flatMap { it.suggestedMetricIds }
-            val metrics = d.metrics.filter { it.id in metricIds };val units = d.units.filter { it.id in (metrics.map { m -> m.canonicalUnitId }+measurements.map { m -> m.unit }) }
-            val content = TransferContent(types,cards,d.axes.filter { it.id in axisIds },metrics,units,sessions,segments,measurements,series,overrides,ownLinks,portable.focus?.takeIf { wanted.includeFocus && it.sessionId in ss },goals,favorites,roots,savedReports)
+            val axisIds = groupingAxes+ allSelections.flatMap { it.facets.map { f -> f.axisId } }.toSet()+types.flatMap { it.suggestedAxisIds }
+            val metricIds = measurements.map { it.fieldId }.toSet()+subjectData.metricDependencies()+types.flatMap { it.suggestedMetricIds }
+            val metrics = d.metrics.filter { it.id in metricIds };val units = d.units.filter { it.id in (metrics.map { m -> m.canonicalUnitId }+measurements.map { m -> m.unit }+subjectData.unitDependencies()) }
+            val content = TransferContent(types,cards,d.axes.filter { it.id in axisIds },metrics,units,sessions,segments,measurements,series,overrides,ownLinks,portable.focus?.takeIf { wanted.includeFocus && it.sessionId in ss },goals,favorites,roots,savedReports = savedReports,subjects = subjectData)
             validateContent(content)
             val id = if(roots.empty) component.sorted().joinToString("|") else "catalog:"+payloadHash(component.sorted())
             val previous = d.transfer.origins.find { o -> originMemberIds(o,"report") == savedReports.map { it.id }.toSet() && originMemberIds(o,"session") == ss && originMemberIds(o,"series") == ps && originMemberIds(o,"goal") == goals.map { it.id }.toSet() && originMemberIds(o,"favorite") == favorites.map { it.id }.toSet() && originCatalogRoots(o) == roots }
@@ -157,11 +165,16 @@ class SelectiveTransfer(private val tracker: Tracker) {
             if(d.goals.any { it.id !in wanted.goalIds }) add("GOALS_NOT_SELECTED:${d.goals.count { it.id !in wanted.goalIds }}")
             if(d.favorites.any { it.id !in wanted.favoriteIds }) add("FAVORITES_NOT_SELECTED:${d.favorites.count { it.id !in wanted.favoriteIds }}")
             if(d.focus != null && !wanted.includeFocus) add("FOCUS_NOT_SELECTED")
+            val transferredSubjects = groups.fold(SubjectData()) { acc,g -> acc.merge(g.content.subjects) }
+            val omittedObservations = d.subjects.observations.size-transferredSubjects.observations.size
+            if(omittedObservations > 0) add("SUBJECT_OBSERVATIONS_NOT_SELECTED:$omittedObservations")
+            val omittedLinks = d.subjects.links.count { l -> transferredSubjects.events.any { it.id == l.subject.id } && transferredSubjects.links.none { it.id == l.id } }
+            if(omittedLinks > 0) add("SUBJECT_OTHER_SESSION_LINKS_EXCLUDED:$omittedLinks")
             if(omittedMeasurements > 0) add("MEASUREMENTS_EXCLUDED:$omittedMeasurements")
             if(wanted.discardLinks.isNotEmpty()) add("LINKS_EXPLICITLY_DISCARDED:${wanted.discardLinks.size}")
             if(wanted.excludedOverrides.isNotEmpty()) add("OVERRIDES_EXCLUDED:${wanted.excludedOverrides.size}")
         }
-        val format = if(groups.any { it.content.hasChoicePersonalization() || it.content.hasReportingExtensions() }) 4 else if(groups.any { g -> g.content.segments.any { it.manualConfirmation != null } }) 3 else if(wanted.cardIds.isEmpty() && wanted.typeIds.isEmpty()) 1 else 2
+        val format = if(groups.any { it.content.hasChoicePersonalization() || it.content.hasReportingExtensions() || !it.content.subjects.empty || it.content.metrics.any { m -> m.bounds != null } }) 4 else if(groups.any { g -> g.content.segments.any { it.manualConfirmation != null } }) 3 else if(wanted.cardIds.isEmpty() && wanted.typeIds.isEmpty()) 1 else 2
         return SelectivePackage(formatVersion = format,minimumReader = format,sourceDatasetId = d.datasetId,groups = groups,losses = losses)
     }
     fun inspect(text: String): TransferInspection = try { inspect(codec.decodeFromString<SelectivePackage>(text)) }
@@ -169,6 +182,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
     fun inspect(value: SelectivePackage): TransferInspection {
         val snapshot = value.frozen()
         ensure(snapshot.formatVersion in 1..4 && snapshot.minimumReader == snapshot.formatVersion && snapshot.sourceDatasetId.isNotBlank() && snapshot.transferId.isNotBlank(),"Unsupported selective package",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(snapshot.formatVersion >= SUBJECT_SELECTIVE_FORMAT || snapshot.groups.all { it.content.subjects.empty && it.content.metrics.all { m -> m.bounds == null } },"Subject quantities require selective format4",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(snapshot.formatVersion >= 2 || snapshot.groups.all { it.content.catalogRoots.empty },"Catalog roots require selective format2",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(snapshot.formatVersion >= 4 || snapshot.groups.none { it.content.hasReportingExtensions() },"Reporting extensions require selective format4",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(snapshot.formatVersion >= 3 || snapshot.groups.none { g -> g.content.segments.any { it.manualConfirmation != null } },"Manual confirmation requires selective format3",ErrorCode.UNSUPPORTED_IMPORT)
@@ -229,6 +243,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
                         val savedOrigin = TransferOrigin(progress.group.originId,progress.group.hash,imported,payloadHash(imported))
                         next = next.copy(transfer = d.transfer.copy(origins = d.transfer.origins.filterNot { it.originId == savedOrigin.originId }+savedOrigin))
                         progress.copy(state = TransferGroupState.APPLIED,previousOrigin = origin,inserted = imported.copy(
+                            subjects = imported.subjects.minus(d.subjects),
                             types = imported.types.filter { x -> d.types.none { it.id == x.id } },cards = imported.cards.filter { x -> d.cards.none { it.id == x.id } },
                             axes = imported.axes.filter { x -> d.axes.none { it.id == x.id && it.meaningVersion == x.meaningVersion } },
                             metrics = imported.metrics.filter { x -> d.metrics.none { it.id == x.id && it.meaningVersion == x.meaningVersion } },
@@ -251,7 +266,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
         var next = d;var origins = d.transfer.origins
         for(progress in op.groups.asReversed()) {
             val c = progress.inserted ?: continue
-            next = next.copy(types = next.types.filterNot { x -> c.types.any { it.id == x.id } },cards = next.cards.filterNot { x -> c.cards.any { it.id == x.id } },
+            next = next.copy(subjects = next.subjects.minus(c.subjects),types = next.types.filterNot { x -> c.types.any { it.id == x.id } },cards = next.cards.filterNot { x -> c.cards.any { it.id == x.id } },
                 axes = next.axes.filterNot { x -> c.axes.any { it.id == x.id && it.meaningVersion == x.meaningVersion } },metrics = next.metrics.filterNot { x -> c.metrics.any { it.id == x.id && it.meaningVersion == x.meaningVersion } },
                 units = next.units.filterNot { x -> c.units.any { it.id == x.id } },sessions = next.sessions.filterNot { x -> c.sessions.any { it.id == x.id } },segments = next.segments.filterNot { x -> c.segments.any { it.id == x.id } },
                 savedReports = next.savedReports.filterNot { x -> c.savedReports.any { it.id == x.id } },
@@ -275,7 +290,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
             c.overrides.forEach { add("override","${it.key.seriesId}:${it.key.originalDate}",payloadHash(it)) };c.links.forEach { add("link","${it.key.seriesId}:${it.key.originalDate}",payloadHash(it)) }
             c.savedReports.forEach { add("report",it.id,payloadHash(it)) }
             c.goals.forEach { add("goal",it.id,payloadHash(it)) };c.favorites.forEach { add("favorite",it.id,payloadHash(it)) }
-            c.focus?.let { add("focus",it.id,payloadHash(it)) }
+            c.focus?.let { add("focus",it.id,payloadHash(it)) };addAll(subjectManifest(c.subjects,revision,origin))
         }
         fun contentHash(content: TransferContent): String = payloadHash(content)
         internal fun validateContent(c: TransferContent) {
@@ -285,7 +300,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
             }
             ensure(c.sessions.none { it.status == SessionStatus.RUNNING } && c.segments.all { it.anchor == null && (it.end != null || it.uncertain) } && c.focus?.breakAnchor == null,"Transfer cannot contain live device anchors")
             validate(Dataset(types = c.types,cards = c.cards,sessions = c.sessions,segments = c.segments,measurements = c.measurements,
-            axes = c.axes,metrics = c.metrics,units = c.units,schedule = ScheduleData(c.series,c.overrides,c.links),focus = c.focus,goals = c.goals,favorites = c.favorites,savedReports = c.savedReports)) }
+            axes = c.axes,metrics = c.metrics,units = c.units,schedule = ScheduleData(c.series,c.overrides,c.links),focus = c.focus,goals = c.goals,favorites = c.favorites,savedReports = c.savedReports,subjects = c.subjects)) }
         private fun conflict(d: Dataset,g: TransferGroup): String? {
             val origin = d.transfer.origins.find { it.originId == g.originId }
             if(origin != null) return if(origin.hash == g.hash && originUnchanged(d,origin)) null else "ORIGIN_CHANGED_OR_LOCALLY_EDITED"
@@ -301,7 +316,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
             ensure(c.metrics.none { m -> d.metrics.none { it.id == m.id } && d.measurements.any { it.fieldId == m.id } },"Metric ID already used by an unregistered field")
             // Entity identity collision is explicit even for identical sessions with no shared origin.
             ensure(c.savedReports.none { q -> d.savedReports.any { it.id == q.id } } && c.sessions.none { s -> d.sessions.any { it.id == s.id } } && c.series.none { s -> d.schedule.series.any { it.id == s.id } } && c.goals.none { g -> d.goals.any { it.id == g.id } } && c.favorites.none { f -> d.favorites.any { it.id == f.id } },"Local entity ID collision")
-            return d.copy(savedReports = d.savedReports+c.savedReports,goals = d.goals+c.goals,favorites = d.favorites+c.favorites,focus = c.focus ?: d.focus,types = union(d.types,c.types) { it.id },cards = union(d.cards,c.cards) { it.id },axes = union(d.axes,c.axes) { "${it.id}:${it.meaningVersion}" },
+            return d.copy(subjects = d.subjects.merge(c.subjects),savedReports = d.savedReports+c.savedReports,goals = d.goals+c.goals,favorites = d.favorites+c.favorites,focus = c.focus ?: d.focus,types = union(d.types,c.types) { it.id },cards = union(d.cards,c.cards) { it.id },axes = union(d.axes,c.axes) { "${it.id}:${it.meaningVersion}" },
                 metrics = union(d.metrics,c.metrics) { "${it.id}:${it.meaningVersion}" },units = union(d.units,c.units) { it.id },sessions = d.sessions+c.sessions,segments = d.segments+c.segments,measurements = d.measurements+c.measurements,
                 schedule = d.schedule.copy(series = d.schedule.series+c.series,overrides = d.schedule.overrides+c.overrides,links = d.schedule.links+c.links))
         }
@@ -309,7 +324,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
             fun <T,K> pick(wanted: List<T>,live: List<T>,key: (T)->K): List<T> = wanted.mapNotNull { w -> live.find { key(it) == key(w) } }
             val oldSegments = pick(c.segments,d.segments) { it.id }
             val extraSegments = d.segments.filter { seg -> c.sessions.any { it.id == seg.sessionId } && c.segments.none { it.id == seg.id } }
-            return c.copy(types = pick(c.types,d.types) { it.id },cards = pick(c.cards,d.cards) { it.id },axes = pick(c.axes,d.axes) { it.id to it.meaningVersion },
+            return c.copy(subjects = d.subjects.pick(c.subjects),types = pick(c.types,d.types) { it.id },cards = pick(c.cards,d.cards) { it.id },axes = pick(c.axes,d.axes) { it.id to it.meaningVersion },
                 metrics = pick(c.metrics,d.metrics) { it.id to it.meaningVersion },units = pick(c.units,d.units) { it.id },sessions = pick(c.sessions,d.sessions) { it.id },
                 segments = oldSegments+extraSegments,measurements = pick(c.measurements,d.measurements) { it.id },series = pick(c.series,d.schedule.series) { it.id },
                 overrides = pick(c.overrides,d.schedule.overrides) { it.key },links = pick(c.links,d.schedule.links) { it.key },focus = d.focus?.takeIf { it.id == c.focus?.id },

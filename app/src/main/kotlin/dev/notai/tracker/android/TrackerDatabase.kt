@@ -213,12 +213,19 @@ abstract class TrackerDatabase: RoomDatabase() {
                 readMetadataPayload(db)?.let { payload ->
                     val prior = codec.decodeFromString<Dataset>(payload)
                     ensure(!prior.hasChoicePersonalization(),"Personal choices in v11 metadata",ErrorCode.STORAGE)
+                    ensure(!prior.hasSubjectQuantities(),"Subject quantities in v11 metadata",ErrorCode.STORAGE)
                 }
                 for(table in listOf("cards","favorites")) db.query("SELECT payload FROM $table").use { rows ->
                     while(rows.moveToNext()) {
                         val json = codec.parseToJsonElement(rows.getString(0)).jsonObject
                         val profile = json["personal"]?.let { codec.decodeFromJsonElement<ChoicePersonalization>(it) } ?: ChoicePersonalization()
                         ensure(profile == ChoicePersonalization(),"Personal choices in v11 rows",ErrorCode.STORAGE)
+                    }
+                }
+                db.query("SELECT payload FROM vocabulary WHERE id=1").use { rows ->
+                    if(rows.moveToFirst()) {
+                        val vocabulary = codec.decodeFromString<VocabularyData>(rows.getString(0))
+                        ensure(vocabulary.metrics.none { it.bounds != null },"Subject quantities in v11 vocabulary",ErrorCode.STORAGE)
                     }
                 }
                 // Defaults decode losslessly; no facts, anchors, IDs or rows are rewritten.

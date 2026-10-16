@@ -34,6 +34,7 @@ internal fun Dataset.frozen(base: Dataset? = null): Dataset {
     val selections = SelectionFreezer()
     fun capture(value: Classification) = selections.capture(value)
     return copy(
+    subjects = if(subjects === base?.subjects) subjects else subjects.frozen(),
     transfer = if(transfer === base?.transfer) transfer else transfer.copy(
         origins = frozenList(transfer.origins.map { it.frozenOrigin() }),
         compactions = frozenList(transfer.compactions.map { it.copy(targets = frozenList(it.targets),acknowledgements = frozenList(it.acknowledgements)) }),
@@ -59,8 +60,8 @@ internal fun Dataset.frozen(base: Dataset? = null): Dataset {
 
 internal fun TransferContent.frozen(): TransferContent {
     val d = Dataset(types = types,cards = cards,axes = axes,metrics = metrics,units = units,sessions = sessions,segments = segments,measurements = measurements,
-        schedule = ScheduleData(series,overrides,links),focus = focus,goals = goals,favorites = favorites,savedReports = savedReports).frozen()
-    return copy(types = d.types,cards = d.cards,axes = d.axes,metrics = d.metrics,units = d.units,sessions = d.sessions,segments = d.segments,measurements = d.measurements,
+        schedule = ScheduleData(series,overrides,links),focus = focus,goals = goals,favorites = favorites,savedReports = savedReports,subjects = subjects).frozen()
+    return copy(subjects = d.subjects,types = d.types,cards = d.cards,axes = d.axes,metrics = d.metrics,units = d.units,sessions = d.sessions,segments = d.segments,measurements = d.measurements,
         series = d.schedule.series,overrides = d.schedule.overrides,links = d.schedule.links,focus = d.focus,goals = d.goals,favorites = d.favorites,
         savedReports = d.savedReports,catalogRoots = catalogRoots.copy(cardIds = frozenSet(catalogRoots.cardIds),typeIds = frozenSet(catalogRoots.typeIds)))
 }

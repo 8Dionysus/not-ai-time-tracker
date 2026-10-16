@@ -75,6 +75,7 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
     val goals: List<Goal> = emptyList(),val focus: FocusRun? = null,val catalogVersion: String? = null,
     val timerEpoch: Long = 0,val controlBarrier: String = "",
     @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val pendingAssignments: List<StoppedAssignment> = emptyList(),
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val subjects: SubjectData = SubjectData(),
     @Required val measurements: List<Measurement> = emptyList(), @Required val settings: Settings = Settings(),
     @Required val axes: List<Axis> = Catalog.vocabulary.axes, @Required val metrics: List<Metric> = Catalog.vocabulary.metrics, @Required val units: List<UnitDefinition> = Catalog.vocabulary.units)
 
@@ -144,6 +145,7 @@ fun validate(data: Dataset) {
     ids(data.segments.map { it.id }); ids(data.measurements.map { it.id })
     val typeIds = data.types.map { it.id }.toSet()
     validateVocabulary(data)
+    validateSubjects(data)
     validateGoals(data)
     validateFocus(data)
     validateAssignments(data)

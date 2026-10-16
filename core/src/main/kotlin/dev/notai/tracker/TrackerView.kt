@@ -6,6 +6,7 @@ package dev.notai.tracker
  */
 class TrackerView internal constructor(private val checked: CheckedState,private val clock: Clock,private val choiceCache: ChoiceCache) {
     private val choiceView by lazy { ChoiceView(data,choiceCache,checked.historyKey,::snapshot) }
+    fun subjects(): SubjectRead = SubjectRead(data)
     fun choices(): ChoiceView = choiceView
     val data get() = checked.data
     fun snapshot(): Snapshot = checked.snapshot(clock.now())

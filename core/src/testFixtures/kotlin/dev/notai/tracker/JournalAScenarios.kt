@@ -176,7 +176,8 @@ abstract class JournalAScenarioContract {
         var receiver=Tracker(createJournalStore(),clock)
         receiver.saveCard(receiver.snapshot().token,Card("profile-origin","Different local object"))
         var importer=SelectiveTransfer(receiver)
-        val copied=importer.apply(importer.plan(pack,pack.groups.map { it.id }.toSet(),pack.groups.associate { it.id to TransferConflictPolicy.COPY }),"profile-copy-before-compaction")
+        val policies=pack.groups.associate { it.id to TransferConflictPolicy.COPY }
+        val copied=importer.apply(importer.plan(pack,pack.groups.map { it.id }.toSet(),policies),"profile-copy-before-compaction")
         assertEquals(TransferGroupState.APPLIED,copied.groups.single().state)
         val id=receiver.data().cards.single { it.id!="profile-origin" }.id
         val profile=receiver.data().cards.single { it.id==id }.personal
@@ -191,7 +192,7 @@ abstract class JournalAScenarioContract {
         assertEquals(profile,backup.data.cards.single { it.id==id }.personal)
         receiver=Tracker(reopenJournalStore(receiver.store),clock);importer=SelectiveTransfer(receiver)
         assertEquals(pack.groups,importer.export(TransferSelection(cardIds=setOf(id))).groups)
-        assertTrue(importer.apply(importer.plan(pack,pack.groups.map { it.id }.toSet()),"profile-copy-before-compaction").payloadsPruned)
+        assertTrue(importer.apply(importer.plan(pack,pack.groups.map { it.id }.toSet(),policies),"profile-copy-before-compaction").payloadsPruned)
         val afterReplay=receiver.data()
         val rejected=assertFailsWith<CoreError> { importer.undo("profile-copy-before-compaction",receiver.snapshot().token) }
         assertEquals(ErrorReason.TRANSFER_PAYLOAD_PRUNED,rejected.reason);assertEquals(afterReplay,receiver.data())

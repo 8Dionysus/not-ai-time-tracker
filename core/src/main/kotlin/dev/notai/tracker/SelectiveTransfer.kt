@@ -174,7 +174,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
         val components = nodes.filter { leader(it) == it }.map { byLeader.getValue(it).toSet() }
         val now = tracker.clock.now()
         val portable = StreamingBackup.portable(d,now).data
-        val groups = components.map { component ->
+        fun contentOf(component: Set<String>): TransferContent {
             val ss = wanted.sessionIds.filter { "session:$it" in component }.toSet();val ps = wanted.seriesIds.filter { "series:$it" in component }.toSet()
             val sessions = portable.sessions.filter { it.id in ss }.map { if(it.status == SessionStatus.RUNNING) it.copy(status = SessionStatus.RECOVERY) else it }
             val segments = portable.segments.filter { it.sessionId in ss }.map { it.copy(uncertain = it.uncertain || it.end == null) }
@@ -205,9 +205,30 @@ class SelectiveTransfer(private val tracker: Tracker) {
             val metrics = d.metrics.filter { it.id in metricIds };val units = d.units.filter { it.id in (metrics.map { m -> m.canonicalUnitId }+measurements.map { m -> m.unit }+subjectData.unitDependencies()) }
             val content = TransferContent(types,cards,d.axes.filter { it.id in axisIds },metrics,units,sessions,segments,measurements,series,overrides,ownLinks,portable.focus?.takeIf { wanted.includeFocus && it.sessionId in ss },goals,favorites,roots,savedReports = savedReports,subjects = subjectData)
             validateContent(content)
+            return content
+        }
+        val initialContents=components.associateWith(::contentOf)
+        if(extended) {
+            val dependencyOwners=mutableMapOf<Pair<String,String>,String>()
+            initialContents.forEach { (component,content) ->
+                val node=component.first()
+                transferIdentityIds(content).forEach { (kind,ids) -> ids.distinct().forEach { id ->
+                    dependencyOwners.putIfAbsent(kind to id,node)?.let { join(node,it) }
+                } }
+            }
+        }
+        val finalByLeader=nodes.groupBy(::leader)
+        val finalComponents=nodes.filter { leader(it) == it }.map { finalByLeader.getValue(it).toSet() }
+        val groups=finalComponents.map { component ->
+            val content=initialContents[component] ?: contentOf(component)
+            val ss=content.sessions.map { it.id }.toSet();val ps=content.series.map { it.id }.toSet()
+            val roots=content.catalogRoots;val subjectData=content.subjects
+            val savedReports=content.savedReports;val goals=content.goals;val favorites=content.favorites
             val id = if(roots.empty) component.sorted().joinToString("|") else "catalog:"+payloadHash(component.sorted())
-            val previous = d.transfer.origins.find { o -> subjectIdentityIds(subjectData).all { (kind,ids) -> originMemberIds(o,kind) == ids.toSet() } && originMemberIds(o,"report") == savedReports.map { it.id }.toSet() && originMemberIds(o,"session") == ss && originMemberIds(o,"series") == ps && originMemberIds(o,"goal") == goals.map { it.id }.toSet() && originMemberIds(o,"favorite") == favorites.map { it.id }.toSet() && originCatalogRoots(o) == roots }
-            val original = previous?.takeIf { originUnchanged(d,it) && currentOriginContent(d,it) == content }?.let { o ->
+            val candidates = d.transfer.origins.filter { o -> subjectIdentityIds(subjectData).all { (kind,ids) -> originMemberIds(o,kind) == ids.toSet() } && originMemberIds(o,"report") == savedReports.map { it.id }.toSet() && originMemberIds(o,"session") == ss && originMemberIds(o,"series") == ps && originMemberIds(o,"goal") == goals.map { it.id }.toSet() && originMemberIds(o,"favorite") == favorites.map { it.id }.toSet() && originCatalogRoots(o) == roots }
+            val exact=candidates.firstOrNull { originUnchanged(d,it) && currentOriginContent(d,it) == content }
+            val previous=exact ?: candidates.firstOrNull()
+            val original = exact?.let { o ->
                 val earliest = d.transfer.operations.flatMap { op -> op.groups.map { op.payloadsPruned to it.group } }
                     .firstOrNull { it.second.originId == o.originId && it.second.hash == o.hash }
                 val capsule = o.compaction ?: if(earliest?.first == true) compactTransferOrigin(d,o).compaction else null
@@ -257,6 +278,12 @@ class SelectiveTransfer(private val tracker: Tracker) {
         ensure(snapshot.formatVersion >= 4 || snapshot.groups.none { it.content.hasChoicePersonalization() },"Personal choices require selective format4",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(snapshot.groups.isNotEmpty() && snapshot.groups.map { it.id }.distinct().size == snapshot.groups.size && snapshot.groups.map { it.originId }.distinct().size == snapshot.groups.size,"Duplicate/empty transfer groups")
         snapshot.groups.forEach { ensure(it.id.isNotBlank() && it.originId.isNotBlank() && it.sourceRevision >= 0 && payloadHash(it.content) == it.hash && it.entities == entityManifest(it.content,it.sourceRevision,it.originId),"Transfer hash/manifest mismatch");validateContent(it.content) }
+        if(snapshot.formatVersion >= 4) {
+            val dependencies=mutableSetOf<Pair<String,String>>()
+            snapshot.groups.forEach { group -> transferIdentityIds(group.content).forEach { (kind,ids) ->
+                ids.distinct().forEach { id -> ensure(dependencies.add(kind to id),"Shared dependency split across transfer groups",ErrorCode.UNSUPPORTED_IMPORT) }
+            } }
+        }
         return TransferInspection(snapshot.transferId,snapshot.groups,snapshot.losses,frozenSet(snapshot.groups.flatMap { it.content.sessions }.filter { it.status != SessionStatus.STOPPED }.map { it.id }))
     }
     fun plan(value: SelectivePackage,groupIds: Set<String>,policies: Map<String,TransferConflictPolicy> = emptyMap()): TransferPlan {
@@ -414,6 +441,7 @@ internal fun validateTransfer(d: Dataset) {
                 ensure(payloadHash(it.group.content) == it.group.hash && it.group.entities == SelectiveTransfer.entityManifest(it.group.content,it.group.sourceRevision,it.group.originId),"Transfer journal hash mismatch")
                 SelectiveTransfer.validateContent(it.group.content)
                 it.previousOrigin?.let(::validateTransferOrigin)
+                it.inserted?.let { delta -> validateInsertedSubjectChanges(delta,it.group.content) }
             }
         }
         ensure(op.id.isNotBlank() && op.hash.matches(Regex("[0-9a-f]{128}")) && op.nextRevision >= 0 && op.groups.map { it.group.id }.distinct().size == op.groups.size,"Invalid transfer journal")

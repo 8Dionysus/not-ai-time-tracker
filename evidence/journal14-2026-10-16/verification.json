@@ -1,0 +1,380 @@
+{
+  "runtimeSource": "8bbd19ae88dcb446a29e2e13bb5ca9f2cc7908cc",
+  "baseMain": "70a7155b3ef548be4638cf71849d3b05dbbef7a6",
+  "privateSource": "b3d79bb9d6a6e868a40086490c1c85384a45ce2a",
+  "publicTests": {
+    "core": {
+      "tests": 163,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "app": {
+      "tests": 131,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "privateTests": {
+    "core": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "app": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "publicBuild": {
+    "source": "8bbd19ae88dcb446a29e2e13bb5ca9f2cc7908cc",
+    "private": false,
+    "logSha256": "ce6a003ce954575965350637d80ac2489ebd042abcb5e67e8c4caf6506124732",
+    "artifacts": {
+      "app-debug-unsigned.apk": {
+        "localPath": "/workspace/tracker-journal-final-evidence/8bbd19a-public-build-success/apk/app-debug-unsigned.apk",
+        "bytes": 15447666,
+        "sha256": "07258ca30ca1b1b4bbd28f01ce47070be51569a2d178f8b6b70dd774583f638e",
+        "embeddedVcs": {},
+        "sourceBinding": "Exact build invocation and matching source manifest; debug has no embedded VCS",
+        "privateLocaleAssets": {
+          "assets/catalog/locales/manifest.json": "354a2a7c717f62fe5ab36f8b41fed482930c4000c503c1b9fbe2ec08f24649c1"
+        },
+        "nativeFiles": {
+          "lib/arm64-v8a/libandroidx.graphics.path.so": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6",
+          "lib/armeabi-v7a/libandroidx.graphics.path.so": "41399eba6fc2a60f6f14642375c1824f3cf25eb8fec7397d753730a3ceda3e2b",
+          "lib/x86/libandroidx.graphics.path.so": "eb0570b41fd3bff25d8204a967c03bd7550719e768b791f680cc40cbe35f29af",
+          "lib/x86_64/libandroidx.graphics.path.so": "4e56c996f13670e70082658de7880c4020eabf4f25e43387f88ed78a713fc9f0",
+          "lib/arm64-v8a/libtracker_copy_io.so": "56578c3ba714a9a5ecd5a61f223052599634bb65734a48b80e1102a8b8337ba5",
+          "lib/armeabi-v7a/libtracker_copy_io.so": "fe892f2ea8e98328bdb25a21ee084f5e054b084136fe0bc02370e1ee3304e2f1",
+          "lib/x86/libtracker_copy_io.so": "ee79955972478c2b59aa3480b327d24b542357522c5ae46279ed0cd0141a29ce",
+          "lib/x86_64/libtracker_copy_io.so": "5204b44189ebe116cfb8d5c4a801088a7a60173a94ba1f7f9ae6266a5ef363e3"
+        },
+        "dexEntries": {
+          "classes.dex": {
+            "bytes": 17961344,
+            "sha256": "b3889e9ed1fdf62dcfc6d03b2b2db4fea63da940c10b7eec3520304d1de56e58"
+          },
+          "classes3.dex": {
+            "bytes": 41064,
+            "sha256": "32cfe6ebff060818e4645cd41608f22f3239fc538e36ac6059c437e1eb4bdfd3"
+          },
+          "classes6.dex": {
+            "bytes": 8368540,
+            "sha256": "d39487cf77157922434a255cbe5448bb26df3f21967e2796c24f2cbf7a54a128"
+          },
+          "classes4.dex": {
+            "bytes": 1161280,
+            "sha256": "1ee5d13b43da7adbd05c43838374cfa27b77a46ecf22b80f4a405bebda25ebe4"
+          },
+          "classes5.dex": {
+            "bytes": 1036208,
+            "sha256": "f54e2424f70019394ad41e8ecca90ef8e25466898c470ca3a9851ceda4318f81"
+          },
+          "classes2.dex": {
+            "bytes": 2505416,
+            "sha256": "8f522ed7ac43c665631e02a9e541a9c902dac423bdcb2aa6e365ebb4e207af5e"
+          }
+        }
+      },
+      "app-release-unsigned.apk": {
+        "localPath": "/workspace/tracker-journal-final-evidence/8bbd19a-public-build-success/apk/app-release-unsigned.apk",
+        "bytes": 9196222,
+        "sha256": "d4d898ce94a0ae619263d9ca3a9b1818ed1c7d6c9f50a0084e2bcbceb056ad38",
+        "embeddedVcs": {
+          "META-INF/version-control-info.textproto": "repositories {\n  system: GIT\n  local_root_path: \"$PROJECT_DIR\"\n  revision: \"8bbd19ae88dcb446a29e2e13bb5ca9f2cc7908cc\"\n}\n"
+        },
+        "sourceBinding": "embedded VCS",
+        "privateLocaleAssets": {
+          "assets/catalog/locales/manifest.json": "354a2a7c717f62fe5ab36f8b41fed482930c4000c503c1b9fbe2ec08f24649c1"
+        },
+        "nativeFiles": {
+          "lib/arm64-v8a/libandroidx.graphics.path.so": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6",
+          "lib/arm64-v8a/libtracker_copy_io.so": "7b2bac30793d5098c26387dedcfd57b9c6f58777429882a62737c1002257c537",
+          "lib/armeabi-v7a/libandroidx.graphics.path.so": "41399eba6fc2a60f6f14642375c1824f3cf25eb8fec7397d753730a3ceda3e2b",
+          "lib/armeabi-v7a/libtracker_copy_io.so": "b5d97101c42541f449b9c5ed59dd482c15870da5aed465e5872d478fd33c0e33",
+          "lib/x86/libandroidx.graphics.path.so": "eb0570b41fd3bff25d8204a967c03bd7550719e768b791f680cc40cbe35f29af",
+          "lib/x86/libtracker_copy_io.so": "6ce50684851e31837bdcc83dce66ab0b99a9354ccb267772ef75444bd1f68e79",
+          "lib/x86_64/libandroidx.graphics.path.so": "4e56c996f13670e70082658de7880c4020eabf4f25e43387f88ed78a713fc9f0",
+          "lib/x86_64/libtracker_copy_io.so": "3e220950ba6068458eed3e45a99e8d188dcfed00792b49c509bd76aa7cf18565"
+        },
+        "dexEntries": {
+          "classes.dex": {
+            "bytes": 14094088,
+            "sha256": "84869b0e4584f18abee688cbe7325761a59fb9aaebc0b3d5ddc90005413bb92f"
+          },
+          "classes2.dex": {
+            "bytes": 9086584,
+            "sha256": "b8386ecb522fb3c10c60e109b054d6d2dd43503609a5c61d4b721b0ea5781241"
+          }
+        }
+      }
+    },
+    "checks": {
+      "debug-zipalign": {
+        "exit": 0
+      },
+      "debug-unsigned": {
+        "exit": 1
+      },
+      "debug-badging": {
+        "exit": 0
+      },
+      "release-zipalign": {
+        "exit": 0
+      },
+      "release-unsigned": {
+        "exit": 1
+      },
+      "release-badging": {
+        "exit": 0
+      }
+    },
+    "modelRuntimeAttested": false,
+    "manifest": {
+      "sha256": "b69cc3f66930285c46838c34e1ef3d08ce027bd24756997800150756f22d6f7c",
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.ACCESS_NOTIFICATION_POLICY",
+        "android.permission.READ_CALENDAR",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_SPECIAL_USE",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "dev.notai.tracker.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+      ],
+      "sdk": {
+        "{http://schemas.android.com/apk/res/android}minSdkVersion": "26",
+        "{http://schemas.android.com/apk/res/android}targetSdkVersion": "36"
+      },
+      "byteEqualAcceptedC949": true
+    },
+    "lint": {
+      "Error": 0,
+      "Fatal": 0,
+      "Warning": 68,
+      "Information": 0
+    },
+    "licenseGraph": {
+      "artifacts": 66,
+      "externalExactDocumentedShaMatches": 65,
+      "projectOwnApache2": [
+        {
+          "coordinate": "not-ai-time-tracker:core:unspecified",
+          "artifact": "core.jar",
+          "sha256": "2e4269dae94ed3706ffdf5f6c403c433c27bb9aeed3f55de8749b5d7bd7f097b"
+        }
+      ],
+      "scope": "External POM declarations and retained notices; native publisher provenance remains separate"
+    }
+  },
+  "privateBuild": {
+    "source": "b3d79bb9d6a6e868a40086490c1c85384a45ce2a",
+    "private": true,
+    "logSha256": "d7c0d8b8429911826d1d5a05ddd03e07f37b3b0acefb7a9481a1f2b552f9bd94",
+    "artifacts": {
+      "app-release-unsigned.apk": {
+        "localPath": "/workspace/tracker-journal-final-evidence/b3d79bb-private11-build-success/apk/app-release-unsigned.apk",
+        "bytes": 11170333,
+        "sha256": "9dd15ad13cc743987666d22aa615cf1776fc9b003748edf55cefbbf10430f403",
+        "embeddedVcs": {
+          "META-INF/version-control-info.textproto": "generate_error_reason: NO_VALID_GIT_FOUND\n"
+        },
+        "sourceBinding": "Git worktree VCS unavailable; exact source SHA and public DEX equality are verified separately",
+        "privateLocaleAssets": {
+          "assets/catalog/locales/ar/labels.json": "c10c355be13d90a0685682603022c97962816db22d7e0b9efac4a4e18fd481d9",
+          "assets/catalog/locales/ar/manifest.json": "bca73ba166f91120a819c58fcf715fb46c47922f118108a452f6c50ec21f267a",
+          "assets/catalog/locales/de/labels.json": "5171dbe443d212e2ab533b8ee563f19451bb777d180fa61d364e47abf6a275ab",
+          "assets/catalog/locales/de/manifest.json": "2e91b46ddc1eeb36e7595a9892b89b39e86483ccfb79bf406868c7293c47fefe",
+          "assets/catalog/locales/en/labels.json": "aee5fe5bb39498121f7367b78b6bec84ab62ed4005c7bbf062805cc056638fc8",
+          "assets/catalog/locales/en/manifest.json": "b16bf9e1ae20c689ba38a6835d7cdb94bb5307aaacc3893b6ff044793b828045",
+          "assets/catalog/locales/es/labels.json": "bc11a626cd9850170d225f9169db728066ebc787f0d08612eaf481de277be35d",
+          "assets/catalog/locales/es/manifest.json": "d4e96fe7bd6450b2e79bc3db0851656cb3150130847cc3d4d2ef6a7e5a417172",
+          "assets/catalog/locales/fr/labels.json": "07dea42d93f884191ea7ebea40da25c719a47547461a168add469af90688d60e",
+          "assets/catalog/locales/fr/manifest.json": "dda4d0f1e340b042a6b1d26306bd663fecec643920e59fe73734b242813e1524",
+          "assets/catalog/locales/hi/labels.json": "4f05864c4760b99b0bf6d394b6fe9360fce86d2240794ad98c678ad0443b90b3",
+          "assets/catalog/locales/hi/manifest.json": "710e1f9c2c55515f8eee709b0473c72f8e5e920b7adfb55cc10e13c8843d929d",
+          "assets/catalog/locales/index.json": "04de026fc2854037c714dc73b44d3a667123ae9e14d5058db174a97962f10a21",
+          "assets/catalog/locales/it/labels.json": "ca667be6a0fe8eb7ccfc8cc9e8044f83328d383d6e416f7bfffffeadcf925af0",
+          "assets/catalog/locales/it/manifest.json": "964a8b212e9301a2a3f2e2121d990a71bae626b0d2964d405e719313ee407829",
+          "assets/catalog/locales/ja/labels.json": "8405aea39297c13630c39ec98a49af11d909e045fe0575b99c1446e139e85cf9",
+          "assets/catalog/locales/ja/manifest.json": "a860ca65d39cc48c5ed053d84f46ec2f8acf4cbe4821eb5fee65d270aa329198",
+          "assets/catalog/locales/ko/labels.json": "0ebc657dd40a11b5fce5c99492f07d82ead1e06437b0c924dda3f7b35a7e504f",
+          "assets/catalog/locales/ko/manifest.json": "970f40c17953f0f10afdc58dd0778686b27493230c9dd1b1593038a6361b72cf",
+          "assets/catalog/locales/manifest.json": "354a2a7c717f62fe5ab36f8b41fed482930c4000c503c1b9fbe2ec08f24649c1",
+          "assets/catalog/locales/pt-BR/labels.json": "e4f9b8cb56f705263ed4a8b930147df00937931294380ed91e4daf76dce1e0df",
+          "assets/catalog/locales/pt-BR/manifest.json": "afb9b9ea392abd6307482731931c0b22a9316c9efba726f32d0301eb2744cd59",
+          "assets/catalog/locales/zh-Hans/labels.json": "b94d63da61e8c83b7d23a93a628786870652f420bd07dbc07a6cb028eaef6468",
+          "assets/catalog/locales/zh-Hans/manifest.json": "fc7ec76017f2f5e7390cabc9a9fce8e1f7ded04f391f90d3ed45b91f94f3f28e"
+        },
+        "nativeFiles": {
+          "lib/arm64-v8a/libandroidx.graphics.path.so": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6",
+          "lib/arm64-v8a/libtracker_copy_io.so": "f24430a59297960da89c27710fdb58f855187ed66e24d3402d1bb6491bbc23c8",
+          "lib/armeabi-v7a/libandroidx.graphics.path.so": "41399eba6fc2a60f6f14642375c1824f3cf25eb8fec7397d753730a3ceda3e2b",
+          "lib/armeabi-v7a/libtracker_copy_io.so": "95f2f44a995e3084e5fe32dc2e0b79c5cb3435d004c722a7bfa5406e7acaa7da",
+          "lib/x86/libandroidx.graphics.path.so": "eb0570b41fd3bff25d8204a967c03bd7550719e768b791f680cc40cbe35f29af",
+          "lib/x86/libtracker_copy_io.so": "c1b8b499280d324a94dc03f28069d78924a62d1c7f7c2773e50e1d811877ec0a",
+          "lib/x86_64/libandroidx.graphics.path.so": "4e56c996f13670e70082658de7880c4020eabf4f25e43387f88ed78a713fc9f0",
+          "lib/x86_64/libtracker_copy_io.so": "cea5c440b3cd211832573a978dc41048c2be8c5f42ae8c451951efd15ad3d862"
+        }
+      }
+    },
+    "checks": {
+      "release-zipalign": {
+        "exit": 0
+      },
+      "release-unsigned": {
+        "exit": 1
+      },
+      "release-badging": {
+        "exit": 0
+      }
+    },
+    "modelRuntimeAttested": false,
+    "manifest": {
+      "sha256": "b69cc3f66930285c46838c34e1ef3d08ce027bd24756997800150756f22d6f7c",
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.ACCESS_NOTIFICATION_POLICY",
+        "android.permission.READ_CALENDAR",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_SPECIAL_USE",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "dev.notai.tracker.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+      ],
+      "sdk": {
+        "{http://schemas.android.com/apk/res/android}minSdkVersion": "26",
+        "{http://schemas.android.com/apk/res/android}targetSdkVersion": "36"
+      },
+      "byteEqualAcceptedC949": true
+    },
+    "private11": {
+      "sidecars": 24,
+      "byteEqualPreviousAcceptedSidecars": true,
+      "sourceAndApkAssets": {
+        "assets/catalog/locales/ar/labels.json": "c10c355be13d90a0685682603022c97962816db22d7e0b9efac4a4e18fd481d9",
+        "assets/catalog/locales/ar/manifest.json": "bca73ba166f91120a819c58fcf715fb46c47922f118108a452f6c50ec21f267a",
+        "assets/catalog/locales/de/labels.json": "5171dbe443d212e2ab533b8ee563f19451bb777d180fa61d364e47abf6a275ab",
+        "assets/catalog/locales/de/manifest.json": "2e91b46ddc1eeb36e7595a9892b89b39e86483ccfb79bf406868c7293c47fefe",
+        "assets/catalog/locales/en/labels.json": "aee5fe5bb39498121f7367b78b6bec84ab62ed4005c7bbf062805cc056638fc8",
+        "assets/catalog/locales/en/manifest.json": "b16bf9e1ae20c689ba38a6835d7cdb94bb5307aaacc3893b6ff044793b828045",
+        "assets/catalog/locales/es/labels.json": "bc11a626cd9850170d225f9169db728066ebc787f0d08612eaf481de277be35d",
+        "assets/catalog/locales/es/manifest.json": "d4e96fe7bd6450b2e79bc3db0851656cb3150130847cc3d4d2ef6a7e5a417172",
+        "assets/catalog/locales/fr/labels.json": "07dea42d93f884191ea7ebea40da25c719a47547461a168add469af90688d60e",
+        "assets/catalog/locales/fr/manifest.json": "dda4d0f1e340b042a6b1d26306bd663fecec643920e59fe73734b242813e1524",
+        "assets/catalog/locales/hi/labels.json": "4f05864c4760b99b0bf6d394b6fe9360fce86d2240794ad98c678ad0443b90b3",
+        "assets/catalog/locales/hi/manifest.json": "710e1f9c2c55515f8eee709b0473c72f8e5e920b7adfb55cc10e13c8843d929d",
+        "assets/catalog/locales/index.json": "04de026fc2854037c714dc73b44d3a667123ae9e14d5058db174a97962f10a21",
+        "assets/catalog/locales/it/labels.json": "ca667be6a0fe8eb7ccfc8cc9e8044f83328d383d6e416f7bfffffeadcf925af0",
+        "assets/catalog/locales/it/manifest.json": "964a8b212e9301a2a3f2e2121d990a71bae626b0d2964d405e719313ee407829",
+        "assets/catalog/locales/ja/labels.json": "8405aea39297c13630c39ec98a49af11d909e045fe0575b99c1446e139e85cf9",
+        "assets/catalog/locales/ja/manifest.json": "a860ca65d39cc48c5ed053d84f46ec2f8acf4cbe4821eb5fee65d270aa329198",
+        "assets/catalog/locales/ko/labels.json": "0ebc657dd40a11b5fce5c99492f07d82ead1e06437b0c924dda3f7b35a7e504f",
+        "assets/catalog/locales/ko/manifest.json": "970f40c17953f0f10afdc58dd0778686b27493230c9dd1b1593038a6361b72cf",
+        "assets/catalog/locales/manifest.json": "354a2a7c717f62fe5ab36f8b41fed482930c4000c503c1b9fbe2ec08f24649c1",
+        "assets/catalog/locales/pt-BR/labels.json": "e4f9b8cb56f705263ed4a8b930147df00937931294380ed91e4daf76dce1e0df",
+        "assets/catalog/locales/pt-BR/manifest.json": "afb9b9ea392abd6307482731931c0b22a9316c9efba726f32d0301eb2744cd59",
+        "assets/catalog/locales/zh-Hans/labels.json": "b94d63da61e8c83b7d23a93a628786870652f420bd07dbc07a6cb028eaef6468",
+        "assets/catalog/locales/zh-Hans/manifest.json": "fc7ec76017f2f5e7390cabc9a9fce8e1f7ded04f391f90d3ed45b91f94f3f28e"
+      },
+      "localeTags": [
+        "en",
+        "es",
+        "fr",
+        "pt-BR",
+        "ar",
+        "zh-Hans",
+        "de",
+        "it",
+        "ja",
+        "ko",
+        "hi"
+      ],
+      "quality": "REVIEWED; prior independent semantic review accepted",
+      "rightsStatus": "SOURCE_RIGHTS_REVIEW_PENDING",
+      "license": null,
+      "nativeSpeakerQaClaimed": false
+    }
+  },
+  "fdroid": {
+    "source": "8bbd19ae88dcb446a29e2e13bb5ca9f2cc7908cc",
+    "tool": "fdroidserver2.4.5",
+    "commands": {
+      "scanner": {
+        "command": [
+          "fdroid",
+          "scanner",
+          "--force",
+          "--json",
+          "--exit-code",
+          "dev.notai.tracker:12"
+        ],
+        "exit": 0
+      },
+      "metadata-lint": {
+        "command": [
+          "fdroid",
+          "lint",
+          "dev.notai.tracker"
+        ],
+        "exit": 0
+      }
+    },
+    "parsedErrors": 0,
+    "parsedWarnings": 1,
+    "processingWitness": {
+      "infos": [
+        [
+          "Removing gradlew at gradlew",
+          "gradlew"
+        ],
+        [
+          "Removing gradlew.bat at gradlew.bat",
+          "gradlew.bat"
+        ],
+        [
+          "Removing gradle-wrapper.jar at gradle/wrapper/gradle-wrapper.jar",
+          "gradle/wrapper/gradle-wrapper.jar"
+        ]
+      ],
+      "warnings": [
+        [
+          "gzip file archive",
+          "core/src/testFixtures/resources/previous-runtime-catalog.json.gz"
+        ]
+      ],
+      "errors": []
+    },
+    "recipeDisabled": true,
+    "recipePin": "8bbd19ae88dcb446a29e2e13bb5ca9f2cc7908cc",
+    "fixtureRepo": "Local clone for unpublished exact commit; HTTPS Repo retained in distribution metadata",
+    "independentServerBuild": false,
+    "reproducibilityComparison": false,
+    "rawPrivateLintSha256": "0c57eeb9434179b65f63fc1a7e2cfbb8067b769aed605d134bb558458c0acb53",
+    "actualDistributionRecipe": {
+      "httpsRepoPreserved": true,
+      "disabled": true,
+      "pin": "8bbd19ae88dcb446a29e2e13bb5ca9f2cc7908cc",
+      "lintExit": 0,
+      "serverBuildPossibleFromPublicMainNow": false
+    }
+  },
+  "commonSourceFilesEqual": 273,
+  "rawFullPublicLogSha256": "67201632d80bbdaec45992e0867f26e648c381fef49b6eee4faacad1b877f299",
+  "rawPrivateLogSha256": "d7c0d8b8429911826d1d5a05ddd03e07f37b3b0acefb7a9481a1f2b552f9bd94",
+  "formats": {
+    "Room": 12,
+    "fullWriter": 14,
+    "fullReader": "1..14",
+    "selectiveReader": "1..4"
+  },
+  "modelRuntimeIndependentlyAttested": false,
+  "published": false,
+  "physicalDeviceRun": false,
+  "testHistory": "Original failed fixtures and ddfb33b picker timeout retained separately. Isolated picker then full163/131 passed; timeout cause unproven."
+}

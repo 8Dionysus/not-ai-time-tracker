@@ -1,0 +1,12 @@
+
+Symbol table '.dynsym' contains 9 entries:
+   Num:    Value  Size Type    Bind   Vis      Ndx Name
+     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 00000000     0 FUNC    GLOBAL DEFAULT  UND __cxa_finalize@LIBC (3)
+     2: 00000000     0 FUNC    GLOBAL DEFAULT  UND __cxa_atexit@LIBC (3)
+     3: 00000000     0 FUNC    GLOBAL DEFAULT  UND __stack_chk_fail@LIBC (3)
+     4: 00000000     0 FUNC    GLOBAL DEFAULT  UND __system_property_get@LIBC (3)
+     5: 00000000     0 FUNC    GLOBAL DEFAULT  UND atoi@LIBC (3)
+     6: 00000000     0 FUNC    GLOBAL DEFAULT  UND malloc@LIBC (3)
+     7: 00000000     0 FUNC    GLOBAL DEFAULT  UND free@LIBC (3)
+     8: 00001740   474 FUNC    GLOBAL DEFAULT   15 JNI_OnLoad@@LIBANDROIDX.GRAPHICS.PATH

@@ -1,0 +1,72 @@
+{
+  "reviewedAt": "2026-10-16",
+  "sourcePin": "f352dd6e8a26be3ef94fa97350c053a823b44cdb",
+  "fdroidVersion": "2.4.5",
+  "command": [
+    "fdroid",
+    "scanner",
+    "--force",
+    "--json",
+    "--exit-code",
+    "dev.notai.tracker:12"
+  ],
+  "before": {
+    "exitCode": 0,
+    "errors": [
+      [
+        "ZIP file archive",
+        "docs/localization/tracker-localization-12-locales-editorial.zip"
+      ]
+    ],
+    "warnings": [
+      [
+        "gzip file archive",
+        "core/src/testFixtures/resources/previous-runtime-catalog.json.gz"
+      ]
+    ]
+  },
+  "after": {
+    "exitCode": 0,
+    "errors": [],
+    "warnings": [
+      [
+        "gzip file archive",
+        "core/src/testFixtures/resources/previous-runtime-catalog.json.gz"
+      ]
+    ]
+  },
+  "fixtureOnlyChanges": [
+    "F-Droid normal wrapper removal",
+    "docs/localization/tracker-localization-12-locales-editorial.zip"
+  ],
+  "recipeChange": {
+    "rm": [
+      "docs/localization/tracker-localization-12-locales-editorial.zip"
+    ],
+    "disableUnchanged": true,
+    "commitPinUnchangedInRepository": "6d2e466bf286477911d340d2ae65ebff44ac7d67"
+  },
+  "mainArchive": {
+    "path": "docs/localization/tracker-localization-12-locales-editorial.zip",
+    "bytes": 1911097,
+    "sha256": "eca102490bb89f163141813043e59e351d6bad8d1c0b659027371d25a52cc310",
+    "mainSourcePreserved": true
+  },
+  "mainArchiveUnchanged": true,
+  "metadataLintExit": 0,
+  "signatureRefreshRequested": false,
+  "serverBuildOrReproducibilityClaimed": false,
+  "newSdkOrServiceInstalled": false,
+  "actualRecipePinVerification": {
+    "sourcePin": "6d2e466bf286477911d340d2ae65ebff44ac7d67",
+    "exitCode": 0,
+    "errors": [],
+    "warnings": [
+      [
+        "gzip file archive",
+        "core/src/testFixtures/resources/previous-runtime-catalog.json.gz"
+      ]
+    ],
+    "exactRepositoryRecipeUsed": true
+  }
+}

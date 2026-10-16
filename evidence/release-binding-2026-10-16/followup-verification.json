@@ -1,0 +1,38 @@
+{
+  "reviewedAt": "2026-10-16",
+  "reviewSource": "f352dd6e8a26be3ef94fa97350c053a823b44cdb",
+  "publishedCoordinate": "androidx.graphics:graphics-path:1.0.1",
+  "aarSha256": "8ca4032b6d79b351f0b59ad4b580eddbb9423e1652f7c958830687f1eee2ec03",
+  "officialModuleMatched": true,
+  "allFourNativeEntriesMatchBothCurrentApks": true,
+  "sourceCorroborationPin": "94d93d113d20483317b9b8ef83e113d6a400459d",
+  "sourceFilesAndHeadersVerified": 10,
+  "localIncludeClosureVerified": true,
+  "allSourceApacheHeadersVerified": true,
+  "sourceGradleVersion": "8.7",
+  "publishedModuleGradleVersion": "8.6-rc-1",
+  "gradleMismatchMeaning": "94d full-tree build configuration is not an exact reproduced publication recipe; individual native files may still coincide, but no exact release source binding follows.",
+  "sourceFlags": [
+    "-nostdlib++",
+    "-fno-exceptions",
+    "-fno-rtti"
+  ],
+  "sourceCmakeVersion": "3.22.1",
+  "releaseNotesRange": "4fcd99eacd92d7c73fb1d3580fd423ed7704a98a..8a05a22af450d589ef911d772a001a49dcb05b71",
+  "rangeMembershipProven": false,
+  "accessResults": {
+    "officialGitilesRange": "403 via web",
+    "officialGitHubReleaseEndpointRaw": "404 via web",
+    "GitHubApi": "proxy CONNECT403 via environment"
+  },
+  "nativeSourceRevisionInPublishedMetadata": null,
+  "staticRuntimeAbsenceProven": false,
+  "remainingUpstreamEvidence": [
+    "publisher binding from these exact ELF hashes/build IDs to native source revision and complete build/toolchain inputs",
+    "exact link command/map and retained static-runtime/archive-member hashes, or equivalent publisher attestation/native source/runtime notice package",
+    "exact historical license/notice texts for any proven retained runtime/header objects; current NDK30 is not substituted for the ELF-reported NDK25c"
+  ],
+  "noDependencyOrUiChanges": true,
+  "noNewSdkOrService": true,
+  "nextReleaseEngineeringItem": "F-Droid exact-source scan fixed by one narrow build-only rm path; raw before/after retained"
+}

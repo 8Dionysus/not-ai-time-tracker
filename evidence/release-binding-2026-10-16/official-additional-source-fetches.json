@@ -1,0 +1,23 @@
+[
+  {
+    "path": "scalar.h",
+    "url": "https://raw.githubusercontent.com/androidx/androidx/94d93d113d20483317b9b8ef83e113d6a400459d/graphics/graphics-path/src/main/cpp/scalar.h",
+    "status": 200,
+    "bytes": 1998,
+    "sha256": "b1d2bba80a4c9272d84473b6f09f700972b016f7579842d3a87bdbbdb2af1edc"
+  },
+  {
+    "path": "math/vec2.h",
+    "url": "https://raw.githubusercontent.com/androidx/androidx/94d93d113d20483317b9b8ef83e113d6a400459d/graphics/graphics-path/src/main/cpp/math/vec2.h",
+    "status": 200,
+    "bytes": 3063,
+    "sha256": "09e1a8eb3f8fdf9c1071500f1a4933f67caeb6d0f765d5c44ba968370de9fcb1"
+  },
+  {
+    "path": "math/TVecHelpers.h",
+    "url": "https://raw.githubusercontent.com/androidx/androidx/94d93d113d20483317b9b8ef83e113d6a400459d/graphics/graphics-path/src/main/cpp/math/TVecHelpers.h",
+    "status": 200,
+    "bytes": 19058,
+    "sha256": "1b0d6b06c5bbd6b438f9d8440ac78cf93fb8a713761badc59a4412b6457c1014"
+  }
+]

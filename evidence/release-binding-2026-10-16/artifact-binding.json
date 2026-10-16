@@ -1,0 +1,158 @@
+{
+  "reviewSource": "f352dd6e8a26be3ef94fa97350c053a823b44cdb",
+  "apkBuildSource": "6d2e466bf286477911d340d2ae65ebff44ac7d67",
+  "coordinate": "androidx.graphics:graphics-path:1.0.1",
+  "aar": {
+    "bytes": 39380,
+    "sha256": "8ca4032b6d79b351f0b59ad4b580eddbb9423e1652f7c958830687f1eee2ec03"
+  },
+  "officialModule": {
+    "bytes": 4016,
+    "sha256": "3f6fc7e96f8a1fd21045da7f2e332aef528aa1f56b6455fb8f25043aafa0e1b8",
+    "publishedGradleVersion": "8.6-rc-1"
+  },
+  "sourceJar": {
+    "bytes": 9908,
+    "sha256": "9f1b5995b9577a8876525c3411ebb2a49f9ef0e875f6aec3059e807596dc6ca6",
+    "members": [
+      "META-INF/",
+      "META-INF/MANIFEST.MF",
+      "androidx/",
+      "androidx/graphics/",
+      "androidx/graphics/path/",
+      "androidx/graphics/path/ConicConverter.kt",
+      "androidx/graphics/path/PathIterator.kt",
+      "androidx/graphics/path/PathIteratorImpl.kt",
+      "androidx/graphics/path/PathSegment.kt"
+    ],
+    "nativeSources": false
+  },
+  "elf": [
+    {
+      "aarEntry": "jni/x86_64/libandroidx.graphics.path.so",
+      "bytes": 10760,
+      "sha256": "4e56c996f13670e70082658de7880c4020eabf4f25e43387f88ed78a713fc9f0",
+      "apkMatches": {
+        "debug": true,
+        "release": true
+      },
+      "buildIds": [
+        "f3e82b0a78f4c567cca77fe6c132199d806987d1"
+      ],
+      "needed": [
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "hasStaticSymbolTable": false,
+      "undefinedSymbols": [
+        "UND",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)"
+      ]
+    },
+    {
+      "aarEntry": "jni/arm64-v8a/libandroidx.graphics.path.so",
+      "bytes": 10096,
+      "sha256": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6",
+      "apkMatches": {
+        "debug": true,
+        "release": true
+      },
+      "buildIds": [
+        "a7846ae06d6bf6cf63fa7c5e056b5de493c71567"
+      ],
+      "needed": [
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "hasStaticSymbolTable": false,
+      "undefinedSymbols": [
+        "UND",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)"
+      ]
+    },
+    {
+      "aarEntry": "jni/armeabi-v7a/libandroidx.graphics.path.so",
+      "bytes": 7252,
+      "sha256": "41399eba6fc2a60f6f14642375c1824f3cf25eb8fec7397d753730a3ceda3e2b",
+      "apkMatches": {
+        "debug": true,
+        "release": true
+      },
+      "buildIds": [
+        "fa98a997cdd9b43f190a4bd20f3dad441b4062f0"
+      ],
+      "needed": [
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "hasStaticSymbolTable": false,
+      "undefinedSymbols": [
+        "UND",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)"
+      ]
+    },
+    {
+      "aarEntry": "jni/x86/libandroidx.graphics.path.so",
+      "bytes": 9284,
+      "sha256": "eb0570b41fd3bff25d8204a967c03bd7550719e768b791f680cc40cbe35f29af",
+      "apkMatches": {
+        "debug": true,
+        "release": true
+      },
+      "buildIds": [
+        "56b3f97a7efb05fc89674cf68f6c27847a93860b"
+      ],
+      "needed": [
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "hasStaticSymbolTable": false,
+      "undefinedSymbols": [
+        "UND",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)",
+        "(3)"
+      ]
+    }
+  ],
+  "nativeSourceRevisionInPublishedMetadata": null,
+  "attestationOrLinkMapInAar": false,
+  "staticRuntimeAbsenceProven": false,
+  "apk": {
+    "debug": {
+      "bytes": 13758001,
+      "sha256": "a6f901af35eaa1de42366ad687f90b30ce6bfd25a5d3b8e9f59cdbceb69ffa1d"
+    },
+    "release": {
+      "bytes": 8999338,
+      "sha256": "7d7d2273a97dbffbb4b4f5121f1c162f09667e30e4da9dbec4b1dd576b6b7e1e"
+    }
+  }
+}

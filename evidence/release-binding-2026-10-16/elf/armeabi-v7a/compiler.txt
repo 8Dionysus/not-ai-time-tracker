@@ -1,0 +1,5 @@
+
+String dump of section '.comment':
+  [     0]  Linker: LLD 14.0.7
+  [    13]  Android (9352603, based on r450784d1) clang version 14.0.7 (https://android.googlesource.com/toolchain/llvm-project 4c603efb0cca074e9238af8b4106c30add4418f6)
+

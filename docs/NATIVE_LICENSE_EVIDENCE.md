@@ -1,5 +1,7 @@
 # Native dependency evidence and remaining binding
 
+Current follow-up: [16 October native binding/source-scan review](release/NATIVE_BINDING_FOLLOWUP_2026_10_16.md) independently ties all four published AAR ELF entries to both current APKs, reads the complete10-file pinned native source/include closure, identifies the source/publication Gradle-version mismatch and records the exact remaining publisher link/runtime evidence. It also verifies a narrow build-only F-Droid documentation-archive removal. This narrows the open boundary; it does not clear native rights or claim reproducibility.
+
 Historical AndroidX-only inventory, before the own-code cleanup JNI was added: observed release dependency `androidx.graphics:graphics-path:1.0.1`. Its cached AAR is 39,380 bytes, SHA-256 `8ca4032b6d79b351f0b59ad4b580eddbb9423e1652f7c958830687f1eee2ec03`. The resolved module metadata records the same hash. That earlier release APK contained only this library's four ABI variants of `libandroidx.graphics.path.so`; their bytes matched that AAR and the saved native alignment evidence. POM metadata declares Apache-2.0; this is not full native license clearance.
 
 ## Dated inventory update — 15 October 2026, Library v4

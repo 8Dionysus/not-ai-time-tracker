@@ -22,6 +22,10 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.mapSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import dev.notai.tracker.codec
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +49,11 @@ import kotlinx.coroutines.delay
 import java.time.Instant
 import java.time.ZoneId
 
+private val EntrySelectionSaver = Saver<Classification?,String>(save = { it?.let { c -> codec.encodeToString(c) } },restore = { codec.decodeFromString<Classification>(it) })
+private val EntryLabelSaver = mapSaver<Label>(
+    save = { mapOf("title" to it.title,"detail" to it.detail,"slot" to it.slot,"unclassified" to it.unclassified,"glyph" to it.glyph) },
+    restore = { Label(it["title"] as String,it["detail"] as String?,it["slot"] as Int?,it["unclassified"] as Boolean,it["glyph"] as Int) })
+
 private const val MINUTE = 60_000L
 private fun floorMinute(ms: Long) = ms - ms % MINUTE
 
@@ -52,7 +61,7 @@ private fun floorMinute(ms: Long) = ms - ms % MINUTE
 @Composable
 fun TimeField(label: String, value: Long, zone: ZoneId, onChange: (Long) -> Unit, modifier: Modifier = Modifier, focused: Boolean = false, hint: String? = null) {
     val c = NotAi.colors
-    var dial by remember { mutableStateOf(false) }
+    var dial by rememberSaveable { mutableStateOf(false) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(label, style = NotAi.type.caption, color = c.ink2)
         Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(RoundedCornerShape(14.dp))
@@ -188,17 +197,18 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
     val now = remember { vm.now() }
     val reportingDate by vm.reportingDate.collectAsState()
     val today = reportingDate ?: ReportingDayPolicy(zone.id,vm.view.value?.data?.settings?.reportDayStartMinute ?: 0).dateAt(vm.now())
-    var start by remember { mutableLongStateOf(origStart ?: floorMinute(minOf(now, day.end) - 30 * MINUTE).coerceAtLeast(day.start)) }
-    var end by remember { mutableLongStateOf(origEnd ?: floorMinute(minOf(now, day.end - 1))) }
-    var selection by remember { mutableStateOf<Classification?>(null) }
+    var start by rememberSaveable { mutableLongStateOf(origStart ?: floorMinute(minOf(now, day.end) - 30 * MINUTE).coerceAtLeast(day.start)) }
+    var end by rememberSaveable { mutableLongStateOf(origEnd ?: floorMinute(minOf(now, day.end - 1))) }
+    var selection by rememberSaveable(stateSaver = EntrySelectionSaver) { mutableStateOf<Classification?>(null) }
     val baseSelection = session?.first?.selection ?: Classification()
-    var label by remember { mutableStateOf(entry?.label ?: Label("Без занятия", null, null, true)) }
-    var note by remember { mutableStateOf(session?.first?.note.orEmpty()) }
+    var label by rememberSaveable(stateSaver = EntryLabelSaver) { mutableStateOf(entry?.label ?: Label("Без занятия", null, null, true)) }
+    var note by rememberSaveable { mutableStateOf(session?.first?.note.orEmpty()) }
+    val currentView by vm.view.collectAsState()
     var state by remember { mutableStateOf<CorrectionState?>(null) }
-    var favorite by remember { mutableStateOf(false) }
+    var favorite by rememberSaveable { mutableStateOf(false) }
     var pending by remember { mutableStateOf(entry != null) }
     // Save always applies the preview of exactly what is on screen: any edit invalidates it until recomputed.
-    if (entry != null) LaunchedEffect(start, end, selection, note) {
+    if (entry != null) LaunchedEffect(start, end, selection, note,currentView?.snapshot()?.token) {
         pending = true
         delay(150)
         state = vm.previewCorrection(CorrectionDraft(entry.sessionId, start, end, selection, note), day.start, day.end)

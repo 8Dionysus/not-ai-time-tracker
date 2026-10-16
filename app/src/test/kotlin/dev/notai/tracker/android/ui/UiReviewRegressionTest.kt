@@ -168,6 +168,27 @@ class UiReviewRegressionTest {
     @Test fun reviewP2RowRepeatStartsShownEarlySegment()=p2ShownSegment(false)
     @Test fun reviewP2HistoryPickerPreservesClearNotePolicy()=p2ShownSegment(true,ChoiceNotePolicy.CLEAR)
     @Test fun reviewP2RowSwitchPreservesShownSegmentAndSourceNote()=p2ShownSegment(false,active=true)
+
+    @Test fun reviewP2RowRepeatRejectsUnseenSourceNoteAtFreshRevision() {
+        val f=fixture(FakeClock());val t=f.tracker
+        t.manual(t.snapshot().token,f.clock.wall-1000,f.clock.wall-500,Classification(name="Shown original"),"Shown note");f.synced()
+        val source=t.data().sessions.single();val segment=t.data().segments.single()
+        val entry=EntryUi(segment.id,source.id,segment.start,segment.end!!,segment.durationMs,t.data().label(segment.selection),source.note,segment.selection)
+        t.correctSession(t.snapshot().token,source.id,listOf(Tracker.SegmentEdit(segment.id,segment.start,segment.end!!,segment.selection)),"Unseen changed note");f.synced()
+        val before=t.data();f.vm.repeat(entry);pump { f.notices.isNotEmpty() }
+        assertEquals(before,t.data());assertTrue(f.notices.any { it.text==Format.error(CoreError(ErrorCode.STALE,"stale")) })
+    }
+    @Test fun reviewP2IncomingTextsQueueAndStaleDecisionsPreserveAllValuesUntilChoice() {
+        val f=fixture(FakeClock());val before=f.tracker.data()
+        f.vm.receiveDraft(EntryDrafts.selectedText("First"));f.vm.receiveDraft(EntryDrafts.selectedText("Second"));f.vm.receiveDraft(EntryDrafts.selectedText("Third"))
+        assertEquals("First",f.vm.draft.value!!.note);assertEquals(listOf("Second","Third"),f.vm.incomingDrafts.value.map { it.draft.note })
+        val second=f.vm.incomingDrafts.value.first();f.vm.resolveIncomingDraft("not-the-shown-request",true)
+        assertEquals("First",f.vm.draft.value!!.note);assertEquals(2,f.vm.incomingDrafts.value.size)
+        f.vm.resolveIncomingDraft(second.id,false);assertEquals("First",f.vm.draft.value!!.note)
+        val third=f.vm.incomingDrafts.value.single();f.vm.resolveIncomingDraft(second.id,true);assertEquals(third,f.vm.incomingDrafts.value.single())
+        f.vm.resolveIncomingDraft(third.id,true);assertEquals("Third",f.vm.draft.value!!.note);assertTrue(f.vm.incomingDrafts.value.isEmpty())
+        assertEquals(before,f.tracker.data())
+    }
     private fun p2HistoryChoice(uncertain: Boolean,quick: Boolean) {
         val clock = FakeClock();val f = fixture(clock,initial = reviewP2HistoryFixture(clock.wall,uncertain));val t = f.tracker
         val before = t.data()

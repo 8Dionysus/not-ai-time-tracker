@@ -26,6 +26,9 @@ import java.time.ZoneId
 /** What the picker does with the chosen activity. */
 enum class PickMode { START, SWITCH, LABEL, EARLIER, MANUAL, FOCUS }
 
+data class EntryFormTarget(val id: String,val entry: EntryUi?,val day: DayUi)
+data class IncomingDraft(val id: String,val draft: EntryDraft)
+
 data class Notice(val text: String, val undo: Token? = null, val id: Long = System.nanoTime())
 
 data class EntryUi(val segmentId: String, val sessionId: String, val start: Long, val end: Long, val durationMs: Long,
@@ -120,8 +123,33 @@ class TrackerViewModel internal constructor(private val app: Application,private
     private val _draft = MutableStateFlow<EntryDraft?>(null)
     /** Text another app explicitly sent. Nothing is written until the person picks and confirms. */
     val draft: StateFlow<EntryDraft?> = _draft
-    fun receiveDraft(d: EntryDraft) { _draft.value = d }
-    fun dropDraft() { _draft.value = null }
+    private val draftLock = Any()
+    private var currentDraftId: String? = null
+    private val _incomingDrafts = MutableStateFlow<List<IncomingDraft>>(emptyList())
+    val incomingDrafts: StateFlow<List<IncomingDraft>> = _incomingDrafts
+    fun receiveDraft(d: EntryDraft) = synchronized(draftLock) {
+        if(_draft.value == null) { currentDraftId = newId();_draft.value = d } else _incomingDrafts.value = _incomingDrafts.value+IncomingDraft(newId(),d)
+    }
+    fun resolveIncomingDraft(id: String,replace: Boolean) = synchronized(draftLock) {
+        val incoming = _incomingDrafts.value.firstOrNull() ?: return@synchronized
+        if(incoming.id != id) return@synchronized
+        if(replace) { currentDraftId = incoming.id;_draft.value = incoming.draft }
+        _incomingDrafts.value = _incomingDrafts.value.drop(1)
+    }
+    fun dropDraft() = synchronized(draftLock) {
+        val next = _incomingDrafts.value.firstOrNull()
+        currentDraftId = next?.id
+        _draft.value = next?.draft
+        if(next != null) _incomingDrafts.value = _incomingDrafts.value.drop(1)
+    }
+    private fun readDraft(): IncomingDraft? = synchronized(draftLock) { _draft.value?.let { IncomingDraft(requireNotNull(currentDraftId),it) } }
+    private fun consumeDraft(id: String) = synchronized(draftLock) { if(currentDraftId == id) dropDraft() }
+    // Retained ViewModel owns only the open form target. Editable fields use Compose saved
+    // state; CorrectionPreview stays transient and is recomputed from current data.
+    private val _entryForm = MutableStateFlow<EntryFormTarget?>(null)
+    val entryForm: StateFlow<EntryFormTarget?> = _entryForm
+    fun openEntryForm(entry: EntryUi?,day: DayUi) { _entryForm.value = EntryFormTarget(newId(),entry,day) }
+    fun closeEntryForm() { _entryForm.value = null }
 
     init { load() }
     fun load() {
@@ -357,17 +385,17 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     private fun applyChoice(rt: UiBackend, s: Snapshot, selection: Classification, entry: ChoiceEntry?, mode: PickMode, boundary: Long?): Tracker.Change {
         val t = rt.tracker
-        val draft = _draft.value
+        val draftInput = readDraft();val draft = draftInput?.draft
         val idle = s.mode == Mode.IDLE && s.focus == null
         return when {
             mode == PickMode.EARLIER -> t.switchedEarlier(s.token, boundary ?: fail(ErrorCode.INVALID_INPUT, "Boundary missing"), selection)
             mode == PickMode.FOCUS -> t.startFocus(s.token, selection)
             mode == PickMode.LABEL -> t.labelCurrent(s.token, selection, s.session?.note)
-            draft != null && idle -> t.startDraft(s.token, draft.copy(selection = selection)).also { _draft.value = null }
+            draft != null && idle -> t.startDraft(s.token, draft.copy(selection = selection)).also { consumeDraft(requireNotNull(draftInput).id) }
             idle && entry?.kind == ChoiceKind.FAVORITE -> t.startFavorite(s.token, entry.sourceId)
             idle && entry?.kind == ChoiceKind.HISTORY -> t.repeatSegment(s.token,requireNotNull(entry.sourceSessionId),requireNotNull(entry.sourceSegmentId))
             idle -> t.start(s.token, selection)
-            draft != null -> t.switchDraft(s.token,draft.copy(selection = selection)).also { _draft.value = null }
+            draft != null -> t.switchDraft(s.token,draft.copy(selection = selection)).also { consumeDraft(requireNotNull(draftInput).id) }
             entry?.kind == ChoiceKind.HISTORY -> t.repeatSegment(s.token,requireNotNull(entry.sourceSessionId),requireNotNull(entry.sourceSegmentId),ChoiceApplication.SWITCH)
             else -> {
                 val change = t.switch(s.token, selection)
@@ -404,8 +432,8 @@ class TrackerViewModel internal constructor(private val app: Application,private
     }
 
     fun startDraftBlank() = command { rt, s ->
-        val d = _draft.value ?: fail(ErrorCode.INVALID_INPUT, "Draft missing")
-        rt.tracker.startDraft(s.token, d.copy(selection = Classification())).also { _draft.value = null }
+        val draftInput = readDraft() ?: fail(ErrorCode.INVALID_INPUT, "Draft missing");val d = draftInput.draft
+        rt.tracker.startDraft(s.token, d.copy(selection = Classification())).also { consumeDraft(draftInput.id) }
     }
 
     /** History row's play button: repeat when idle, switch to it while tracking. */

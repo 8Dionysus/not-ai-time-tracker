@@ -40,7 +40,9 @@ class TimerSurfaceRaceTest {
             try {
                 val t=Tracker(db?.let(::RoomStore) ?: memory(),FakeClock())
                 t.settings(t.snapshot().token,t.data().settings.copy(surfaces=SurfaceSettings(widget=true,notification=true,shortcut=true)))
-                t.start(t.snapshot().token,Classification(name="Shown timer"));val captured=t.view();val original=captured.snapshot()
+                if(action=="focus-due") t.startFocus(t.snapshot().token,plan=FocusPlan(1000,1000)) else t.start(t.snapshot().token,Classification(name="Shown timer"))
+                val captured=t.view();val original=captured.snapshot()
+                val oldAction=SurfaceAction(Surface.WIDGET,TimerCommand.PAUSE,original.token,original.timerTarget);val oldPending=TimerSurfaces.pending(c,oldAction)
                 var expected: Dataset?=null;var newest: Notification?=null;var expectedShortcut: SurfaceAction?=null;var calls=0
                 val change={
                     calls++;TimerSurfaces.refreshPrepared=null;TimerSurfaces.notificationFactory=factory
@@ -49,6 +51,7 @@ class TimerSurfaceRaceTest {
                         "widget" -> t.settings(t.snapshot().token,t.data().settings.copy(surfaces=t.data().settings.surfaces.copy(widget=false)))
                         "shortcut" -> t.settings(t.snapshot().token,t.data().settings.copy(surfaces=t.data().settings.surfaces.copy(shortcut=false)))
                         "barrier" -> t.store.transaction { it.copy(controlBarrier=newId()) to Unit }
+                        "focus-due" -> (t.clock as FakeClock).advance(1000)
                         else -> t.pause(t.snapshot().token)
                     }
                     refresh(c,t,t.view(),captured.data.settings.surfaces);expected=t.data()
@@ -63,13 +66,16 @@ class TimerSurfaceRaceTest {
                 if(action=="notification") assertTrue("Disabled shade was resurrected: $room",notifications.activeNotifications.none { it.id==TimerSurfaces.CONTROL_ID })
                 else assertSame("New timer notification replaced by captured view: $room/$action",newest,notifications.activeNotifications.single { it.id==TimerSurfaces.CONTROL_ID }.notification)
                 val widget=widgets.getViewFor(807)
-                assertEquals(if(action=="widget") "Виджет выключен" else "Shown timer",widget.findViewById<TextView>(R.id.surface_title).text.toString())
+                if(action=="focus-due") {
+                    assertEquals(android.view.View.GONE,widget.findViewById<android.view.View>(R.id.surface_secondary).visibility)
+                    assertTrue(widget.findViewById<TextView>(R.id.surface_status).text.toString().contains("закончилась"))
+                } else assertEquals(if(action=="widget") "Виджет выключен" else "Shown timer",widget.findViewById<TextView>(R.id.surface_title).text.toString())
                 if(action=="pause") assertEquals("Продолжить",widget.findViewById<android.view.View>(R.id.surface_secondary).contentDescription)
                 assertEquals(expectedShortcut,shortcuts.dynamicShortcuts.singleOrNull()?.intent?.let(TimerSurfaces::parse))
                 if(action=="shortcut") assertTrue(shortcuts.dynamicShortcuts.isEmpty())
                 // Every shown PendingIntent keeps its original immutable revision/target.
-                assertEquals(SurfaceAction(Surface.WIDGET,TimerCommand.PAUSE,original.token,original.timerTarget),
-                    TimerSurfaces.parse(TimerSurfaces.intent(c,SurfaceAction(Surface.WIDGET,TimerCommand.PAUSE,original.token,original.timerTarget))))
+                assertEquals(oldAction,TimerSurfaces.parse(shadowOf(oldPending).savedIntent))
+                if(action=="focus-due") { assertEquals(FocusMode.DUE,t.snapshot().focus!!.mode);assertTrue(shortcuts.dynamicShortcuts.isEmpty()) }
             } finally { TimerSurfaces.refreshPrepared=null;TimerSurfaces.notificationFactory=factory;db?.close() }
         }
     }
@@ -79,4 +85,28 @@ class TimerSurfaceRaceTest {
     @Test fun newestTimerControlsWinAfterCapturedView()=race("pause")
     @Test fun replacementBarrierWinsAfterCapturedView()=race("barrier")
     @Test fun notificationOptOutWinsAfterActualNotificationRendering()=race("notification",true)
+    @Test fun duePhaseWithoutRevisionChangeWinsAfterPreparation()=race("focus-due")
+    @Test fun preparationFailureLeavesIndependentWidgetAndShortcutUsable() {
+        val c=RuntimeEnvironment.getApplication();shadowOf(c).grantPermissions(Manifest.permission.POST_NOTIFICATIONS);TimerSurfaces.channels(c)
+        val t=Tracker(memory(),FakeClock());t.settings(t.snapshot().token,t.data().settings.copy(surfaces=SurfaceSettings(widget=true,notification=true)))
+        t.start(t.snapshot().token,Classification(name="Independent current"));val before=t.data()
+        val widgets=shadowOf(AppWidgetManager.getInstance(c));widgets.bindAppWidgetId(808,ComponentName(c,TimerWidget::class.java))
+        TimerSurfaces.notificationFactory={ _,_ -> throw IllegalStateException("Synthetic notification preparation failure") }
+        refresh(c,t,t.view())
+        assertEquals(before,t.data());assertEquals("Independent current",widgets.getViewFor(808).findViewById<TextView>(R.id.surface_title).text.toString())
+        assertEquals(t.snapshot().token,TimerSurfaces.parse(c.getSystemService(ShortcutManager::class.java).dynamicShortcuts.single().intent!!)?.token)
+        assertTrue(c.getSystemService(NotificationManager::class.java).activeNotifications.none { it.id==TimerSurfaces.CONTROL_ID })
+    }
+    @Test fun defaultViewReadAndTerminalStoreGateRunAwayFromCallerMainThread() {
+        val c=RuntimeEnvironment.getApplication();val caller=Thread.currentThread();val source=memory()
+        val reads=java.util.concurrent.atomic.AtomicInteger();val writes=java.util.concurrent.atomic.AtomicInteger()
+        val workerStore=object:StateStore {
+            override val changes=source.changes
+            override fun read():Dataset { assertNotSame(caller,Thread.currentThread());reads.incrementAndGet();return source.read() }
+            override fun <T> transaction(block:(Dataset)->Pair<Dataset,T>):T {assertNotSame(caller,Thread.currentThread());writes.incrementAndGet();return source.transaction(block)}
+        }
+        kotlinx.coroutines.runBlocking { TimerSurfaces.refresh(c,Tracker(workerStore,FakeClock())) }
+        assertTrue(reads.get()>0);assertTrue(writes.get()>0)
+    }
+
 }

@@ -43,7 +43,6 @@ enum class Tab(val title: String) { TIMER("Таймер"), OVERVIEW("Обзор"
 
 private sealed interface Sheet {
     data class Picker(val mode: PickMode, val boundary: Long? = null) : Sheet
-    data class Edit(val entry: EntryUi?, val day: DayUi) : Sheet
     data object Earlier : Sheet
     data object Resolve : Sheet
 }
@@ -107,6 +106,8 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     val home by vm.home.collectAsStateWithLifecycle()
     val view by vm.view.collectAsStateWithLifecycle()
     val draft by vm.draft.collectAsStateWithLifecycle()
+    val incomingDrafts by vm.incomingDrafts.collectAsStateWithLifecycle()
+    val entryForm by vm.entryForm.collectAsStateWithLifecycle()
     val surfacePicker by vm.surfacePicker.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     val dark = c.isDark
@@ -134,8 +135,8 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     val actions = remember(vm,dark) {
         TimerActions(
             pick = { mode -> sheet = Sheet.Picker(mode) },
-            edit = { e, d -> sheet = Sheet.Edit(e, d) },
-            manual = { d -> sheet = Sheet.Edit(null, d) },
+            edit = { e, d -> vm.openEntryForm(e,d) },
+            manual = { d -> vm.openEntryForm(null,d) },
             earlier = { sheet = Sheet.Earlier },
             resolve = { sheet = Sheet.Resolve },
             toggleTheme = { vm.setTheme(if (dark) ThemeChoice.LIGHT else ThemeChoice.DARK) },
@@ -167,15 +168,16 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     }
 
     val zone = home?.zone ?: java.time.ZoneId.systemDefault()
+    entryForm?.let { target -> key(target.id) {
+        EntrySheet(vm,zone,target.day,target.entry,onDismiss = vm::closeEntryForm,onPickActivity = { callback -> formPicker = callback },
+            onDelete = { e -> scope.launch { if(requestDelete(e) || confirmDelete != null) vm.closeEntryForm() } })
+    } }
     when (val s = sheet) {
         is Sheet.Picker -> {
             val active = snapshot?.let { it.mode != Mode.IDLE } == true
             PickerSheet(vm, s.mode, active, home?.currentStart?.let { Format.clock(it, zone) }, s.boundary?.let { Format.clock(it, zone) }, s.boundary,
                 onDismiss = { sheet = null })
         }
-        // The form stays open underneath; the picker hands its choice back to it.
-        is Sheet.Edit -> EntrySheet(vm, zone, s.day, s.entry, onDismiss = { sheet = null }, onPickActivity = { callback -> formPicker = callback },
-            onDelete = { e -> scope.launch { if (requestDelete(e) || confirmDelete != null) sheet = null } })
         Sheet.Earlier -> {
             val seg = snapshot?.active
             if (seg != null) EarlierSheet(zone, seg.start, remember { vm.now() }, onNext = { at -> sheet = Sheet.Picker(PickMode.EARLIER, at) }, onDismiss = { sheet = null })
@@ -201,6 +203,10 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
         val corrections = if(r.subjectCorrections > 0) " В том числе ${Format.plural(r.subjectCorrections,"исправление","исправления","исправлений")} этих данных." else ""
         ConfirmDialog("Удалить запись целиком?", "${r.range}: вместе с записью удалятся $parts.$corrections Сразу после удаления можно отменить.",
             "Удалить", onConfirm = { vm.applyDeleteSession(r.preview); confirmDelete = null }, onDismiss = { confirmDelete = null }, destructive = true)
+    }
+    incomingDrafts.firstOrNull()?.let { incoming ->
+        ConfirmDialog("Заменить черновик?", "Текущий текст: «${draft?.note.orEmpty()}»\nНовый текст: «${incoming.draft.note.orEmpty()}»",
+            "Заменить",onConfirm = { vm.resolveIncomingDraft(incoming.id,true) },onDismiss = { vm.resolveIncomingDraft(incoming.id,false) })
     }
     formPicker?.let { back ->
         PickerSheet(vm, PickMode.MANUAL, false, null, null, null, onDismiss = { formPicker = null }, onReturn = { sel, label -> back(sel, label) })

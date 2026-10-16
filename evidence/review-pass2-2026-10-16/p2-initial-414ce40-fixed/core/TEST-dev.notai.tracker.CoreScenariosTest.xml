@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.CoreScenariosTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-16T09:51:33.141Z" hostname="69b2b5b46001" time="0.42">
+  <properties/>
+  <testcase name="reviewP2HistoryEmptyCanonical" classname="dev.notai.tracker.CoreScenariosTest" time="0.214"/>
+  <testcase name="reviewP2HistoryUncertainCanonical" classname="dev.notai.tracker.CoreScenariosTest" time="0.01"/>
+  <testcase name="reviewP2EmptyBackfill" classname="dev.notai.tracker.CoreScenariosTest" time="0.122"/>
+  <testcase name="reviewP2EmptyReportOracle" classname="dev.notai.tracker.CoreScenariosTest" time="0.071"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

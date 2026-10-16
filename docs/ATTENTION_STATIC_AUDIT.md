@@ -54,6 +54,7 @@
 - `app/src/main/kotlin/dev/notai/tracker/android/TrackerDatabase.kt`: Room10 и 9→10; только metadata preference default, без стирания/изменения history/anchors.
 - `app/schemas/dev.notai.tracker.android.TrackerDatabase/10.json`: точный **projected candidate**. Entity SQL/identityHash совпадают с9; A должен получить штатный generated output KSP и сравнить. Здесь генератор не запускался.
 - `core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt`: current format assertions/probes 12, legacy semantics сохранены.
+- `core/src/test/kotlin/dev/notai/tracker/FunctionalCustomizationTest.kt`: две existing normalized-format assertions 12 после чтения legacy9.
 - `app/src/test/kotlin/dev/notai/tracker/android/RoomScenariosTest.kt`: новая migration в существующих chain lists, уже доходивших до9.
 
 Tracker.kt, ImmutableData.kt и build-файлы дополнительной дельты не требуют: используется существующая транзакция settings, LongRecordPreference immutable и не содержит коллекций. **Новые модули ссылаются на Settings.longRecordReminder: core/app нельзя компилировать до применения preferences patch.** Общие файлы в C не переписаны напрямую.

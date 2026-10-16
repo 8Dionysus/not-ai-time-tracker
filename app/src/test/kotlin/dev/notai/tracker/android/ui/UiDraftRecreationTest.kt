@@ -2,9 +2,10 @@ package dev.notai.tracker.android.ui
 
 import android.content.Intent
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.lifecycle.ViewModelProvider
-import androidx.test.core.app.ActivityScenario
+import org.robolectric.Robolectric
+import org.robolectric.android.controller.ActivityController
 import dev.notai.tracker.*
 import dev.notai.tracker.android.*
 import java.time.Instant
@@ -22,13 +23,9 @@ import org.robolectric.annotation.GraphicsMode
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk=[36],qualifiers="w400dp-h860dp-xhdpi")
 class UiDraftRecreationTest {
-    val compose=createAndroidComposeRule<MainActivity>()
-    @get:Rule val rules: org.junit.rules.TestRule = org.junit.rules.RuleChain.outerRule(object: org.junit.rules.ExternalResource() {
-        override fun before() { prepareBackend() }
-        override fun after() { UiBackends.open=oldOpen }
-    }).around(compose)
+    @get:Rule val compose=createEmptyComposeRule()
     private val oldOpen=UiBackends.open
-    private val scenario get() = compose.activityRule.scenario
+    private lateinit var controller: ActivityController<MainActivity>
     private lateinit var t: Tracker
     private lateinit var vm: TrackerViewModel
     private fun at(value:String)=Instant.parse("2026-10-16T${value}:00Z").toEpochMilli()
@@ -51,8 +48,16 @@ class UiDraftRecreationTest {
         UiBackends.open={backend}
     }
     @Before fun setup() {
-        scenario.onActivity { vm=ViewModelProvider(it)[TrackerViewModel::class.java] }
+        prepareBackend()
+        controller=Robolectric.buildActivity(MainActivity::class.java).create().start().resume().visible()
+        vm=ViewModelProvider(controller.get())[TrackerViewModel::class.java]
         compose.waitUntil(10000) { vm.home.value!=null && vm.view.value!=null }
+        compose.waitForIdle()
+    }
+    @After fun close() { if(::controller.isInitialized)controller.pause().stop().destroy();UiBackends.open=oldOpen }
+    private fun recreate() {
+        controller.recreate().visible()
+        assertSame(vm,ViewModelProvider(controller.get())[TrackerViewModel::class.java])
         compose.waitForIdle()
     }
     private fun form(correction:Boolean) {
@@ -67,7 +72,7 @@ class UiDraftRecreationTest {
         compose.waitForIdle()
         val before=t.data()
         if(correction) t.manual(t.snapshot().token,at("10:00"),at("11:00"),Classification(name="Concurrent fixture fact"),"Keep this fact")
-        val afterExternal=t.data();scenario.recreate();compose.waitForIdle()
+        val afterExternal=t.data();recreate()
         compose.onNodeWithText(if(correction) "Исправить запись" else "Добавить запись").assertExists()
         compose.onNodeWithContentDescription("Заметка").assertTextContains("Typed retained note")
         compose.onNodeWithText("Draft selected activity").assertExists()
@@ -88,19 +93,19 @@ class UiDraftRecreationTest {
     @Test fun manualInputsAndTargetSurviveActivityRecreationWithoutAutosave()=form(false)
     @Test fun correctionInputsSurviveAndPreviewRecomputesAgainstChangedData()=form(true)
     private fun incoming(text:String) {
-        scenario.onActivity { a -> MainActivity::class.java.getDeclaredMethod("onNewIntent",Intent::class.java).apply { isAccessible=true }.invoke(a,
-            Intent(Intent.ACTION_PROCESS_TEXT).setType("text/plain").putExtra(Intent.EXTRA_PROCESS_TEXT,text)) }
+        MainActivity::class.java.getDeclaredMethod("onNewIntent",Intent::class.java).apply { isAccessible=true }.invoke(controller.get(),
+            Intent(Intent.ACTION_PROCESS_TEXT).setType("text/plain").putExtra(Intent.EXTRA_PROCESS_TEXT,text))
         compose.waitForIdle()
     }
     private fun replacement(accept:Boolean) {
         val before=t.data();incoming("First retained text");assertEquals("First retained text",vm.draft.value!!.note)
         incoming("Second incoming text");assertEquals("First retained text",vm.draft.value!!.note)
-        scenario.recreate();compose.waitForIdle()
+        recreate()
         compose.onNodeWithText("Заменить черновик?").assertExists()
         compose.onNodeWithText(if(accept) "Заменить" else "Отмена").performClick();compose.waitForIdle()
         val expected=if(accept) "Second incoming text" else "First retained text"
         assertEquals(expected,vm.draft.value!!.note);assertEquals(before,t.data())
-        scenario.recreate();compose.waitForIdle();assertEquals(expected,vm.draft.value!!.note);assertEquals(before,t.data())
+        recreate();assertEquals(expected,vm.draft.value!!.note);assertEquals(before,t.data())
         compose.onNodeWithText("Заменить черновик?").assertDoesNotExist()
     }
     @Test fun secondProcessTextKeepsFirstUntilExplicitRejectionAcrossRecreation()=replacement(false)

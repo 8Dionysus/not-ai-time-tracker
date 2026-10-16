@@ -63,7 +63,9 @@ fun reviewP2EmptyBackfill(create: () -> StateStore,reopen: (StateStore) -> State
         assertEquals(empty,t.data().segments.single { it.id == empty.id });assertEquals(target,t.snapshot().timerTarget)
         assertEquals(7000L,t.snapshot().trustedDurationMs);assertEquals(7000L,t.view().report(0,clock.wall).recordedMs)
         assertEquals(before.sessions,t.data().sessions)
-        t.undo(t.snapshot().token);assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
+        if(application==ChoiceApplication.SWITCH) {
+            assertTrue(change.undoAvailable);t.undo(t.snapshot().token);assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
+        } else { assertFalse(change.undoAvailable);t.stop(t.snapshot().token) }
         t.applyStartBackfill(t.previewStartBackfill(t.snapshot().token,session,5000));t.stop(t.snapshot().token)
         val saved = t.data();t = Tracker(reopen(t.store),clock);assertEquals(saved,t.data())
         val restored = Tracker(create(),clock);val backups = Backups(restored,MemoryRollback())
@@ -100,10 +102,12 @@ fun reviewP2ExactSegmentRepeat(create: () -> StateStore,reopen: (StateStore) -> 
         t.start(t.snapshot().token,a,"Source note");clock.advance(1000);t.changeDetails(t.snapshot().token,b);clock.advance(1000);t.stop(t.snapshot().token)
         val original=t.data().sessions.single();val first=t.data().segments.first();clock.advance(1000)
         if(application==ChoiceApplication.SWITCH) t.start(t.snapshot().token,Classification(name="Current"),"Current note")
-        val before=t.data();t.repeatSegment(t.snapshot().token,original.id,first.id,application)
+        val before=t.data();val change=t.repeatSegment(t.snapshot().token,original.id,first.id,application)
         assertEquals(a,t.snapshot().session!!.selection);assertEquals(if(policy==ChoiceNotePolicy.CLEAR) null else "Source note",t.snapshot().session!!.note)
         assertEquals(before.segments.filter { it.sessionId==original.id },t.data().segments.filter { it.sessionId==original.id })
-        t.undo(t.snapshot().token);assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
+        if(application==ChoiceApplication.SWITCH) {
+            assertTrue(change.undoAvailable);t.undo(t.snapshot().token);assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
+        } else { assertFalse(change.undoAvailable);t.stop(t.snapshot().token) }
         t=Tracker(reopen(t.store),clock)
         val stale=t.snapshot().token;t.saveFavorite(stale,Favorite("p2-revision","Unrelated revision",Classification()))
         val unchanged=t.data();assertEquals(ErrorCode.STALE,assertFailsWith<CoreError> { t.repeatSegment(stale,original.id,first.id,application) }.code);assertEquals(unchanged,t.data())

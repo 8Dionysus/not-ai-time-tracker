@@ -29,6 +29,7 @@ abstract class JournalAScenarioContract {
         assertEquals(listOf("card:a"),t.choices().search(ChoiceQuery("Personal discovery",setOf(ChoiceKind.CARD))).items.map { it.entry.id })
         t.saveCard(t.snapshot().token,a.copy(name="Renamed personal original"))
         assertEquals(listOf("Personal discovery"),t.data().cards.single { it.id==a.id }.personal.aliases)
+        assertEquals(listOf("favorite:fb","favorite:fa"),t.choices().quick(HistoryWindow(clock.wall-1000,clock.wall)).take(2).map { it.entry.id })
         val before=t.data();val old=t.snapshot().token
         assertFailsWith<CoreError> { t.orderChoices(old,ChoiceKind.CARD,listOf(a.id,a.id)) };assertEquals(before,t.data())
         t=Tracker(reopenJournalStore(t.store),clock)
@@ -131,6 +132,9 @@ abstract class JournalAScenarioContract {
         val preview=t.previewMetadata(request);assertEquals(before,t.data())
         t.applyMetadata(preview)
         assertEquals("Keep note",t.data().sessions.last().note);assertEquals("Existing",t.data().sessions.last().selection.name)
+        assertEquals("batch-type",t.data().sessions.last().selection.activityTypeId)
+        val changedExisting=preview.changes.single { it.sessionId==ids.last() && it.segmentId==null }
+        assertEquals(setOf(MetadataChangedField.ACTIVITY_TYPE,MetadataChangedField.HISTORICAL_PATH),changedExisting.fields)
         assertEquals("Fill note",t.data().sessions.first().note)
         assertEquals(durations,t.data().segments.map { listOf(it.id,it.start,it.end,it.durationMs) })
         assertEquals(before.measurements,t.data().measurements)
@@ -153,6 +157,15 @@ abstract class JournalAScenarioContract {
         val sums=before.gaps.sumOf { it.end-it.start }+after.gaps.sumOf { it.end-it.start }
         assertEquals(6000L,sums)
         assertEquals(4000L,t.view().report(midnight-5000,midnight+5000).rows.sumOf { it.durationMs })
+    }
+
+    @Test fun explicitRepeatPolicyAlsoWorksWithoutAnyCardProfile() {
+        val clock=FakeClock();val t=Tracker(createJournalStore(),clock)
+        t.manual(t.snapshot().token,clock.wall-2000,clock.wall-1000,Classification(),"Unclassified source note")
+        val id=t.data().sessions.single().id
+        t.repeat(t.snapshot().token,id,ChoiceNotePolicy.CLEAR);assertNull(t.snapshot().session!!.note)
+        clock.advance(1000);t.stop(t.snapshot().token)
+        t.repeat(t.snapshot().token,id,ChoiceNotePolicy.COPY_SOURCE);assertEquals("Unclassified source note",t.snapshot().session!!.note)
     }
 
 }

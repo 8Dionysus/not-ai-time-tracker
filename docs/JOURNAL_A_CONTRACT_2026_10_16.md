@@ -42,7 +42,8 @@ session note for History/Repeat; Card/Favorite explicitly opting in use the late
 positive completed certain recorded segment with the exact selection identity.
 A latest null note remains null; names alone never match notes. Measurements are
 never copied into a start. startChoice and legacy repeat/startFavorite share this
-policy. Profiles travel with selected Card/Favorite dependencies through the existing
+policy; legacy repeat also accepts an explicit per-action notePolicy, including
+for unclassified history without a Card profile. Profiles travel with selected Card/Favorite dependencies through the existing
 selective engine, origin hashes, COPY ID rewriting and full replacement. No new
 importer. Legacy archive/selective versions refuse nondefault new profiles.
 
@@ -72,11 +73,12 @@ rewrite fact timestamps. Saved manual facts use existing archive/selective paths
 
 `previewMetadata(BatchMetadataRequest(sessionIds,selection,selectionPolicy,note))`
 accepts distinct stable IDs (up to10000). All must exist and be STOPPED; one unsuitable
-record rejects the whole preview/apply. selection is one reviewed classification
-aggregate, including historical name/path; EMPTY_ONLY fills wholly unclassified
-Session/Segment targets and leaves partial classifications intact. REPLACE explicitly
-replaces the aggregate. This avoids silently erasing existing facets/tags/card links
-under an implicit fill operation. A separate note edit defaults to EMPTY_ONLY;
+record rejects the whole preview/apply. EMPTY_ONLY fills missing name/Card/type fields,
+missing detail keys, and empty tags/facets while retaining existing values; assigning
+a previously absent type captures its explicit current path. REPLACE explicitly
+replaces the reviewed classification aggregate, including historical name/path.
+Preview exposes stable MetadataChangedField values as well as before/after values.
+A separate note edit defaults to EMPTY_ONLY;
 explicit REPLACE with null clears it.
 
 Preview lists exact Session/Segment field changes with before/after values and a

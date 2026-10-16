@@ -201,11 +201,11 @@ class Tracker(val store: StateStore, val clock: Clock) {
             closed.copy(sessions = closed.sessions.replace(s.copy(selection = selected)), segments = closed.segments + open(s.id,selected,n))
         }
     }
-    fun repeat(expected: Token, sessionId: String) = mutate(expected) { d,n ->
+    fun repeat(expected: Token, sessionId: String,notePolicy: ChoiceNotePolicy? = null) = mutate(expected) { d,n ->
         ensure(current(d) == null, "Stop or switch current session first")
         val s = d.sessions.find { it.id == sessionId } ?: fail(ErrorCode.INVALID_INPUT, "Missing session")
         val lastSelection = d.segments.filter { it.sessionId == sessionId }.maxByOrNull { it.start }?.selection ?: s.selection
-        append(d,lastSelection,choiceStartNote(d,ChoiceKind.HISTORY,sessionId,lastSelection,s.note),n)
+        append(d,lastSelection,when(notePolicy) { ChoiceNotePolicy.CLEAR -> null;ChoiceNotePolicy.COPY_SOURCE -> s.note;null -> choiceStartNote(d,ChoiceKind.HISTORY,sessionId,lastSelection,s.note) },n)
     }
     fun startFavorite(expected: Token, favoriteId: String) = mutate(expected) { d,n ->
         ensure(current(d) == null, "Stop or switch current session first")

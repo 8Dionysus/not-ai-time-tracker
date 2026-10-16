@@ -13,8 +13,8 @@ Repo: https://github.com/8Dionysus/not-ai-time-tracker.git
 Builds:
   - versionName: 0.11.0
     versionCode: 12
-    disable: Unreleased backend branch; integration, rights and device checks pending
-    commit: cea1bc973ef78e8b76ff3d9df34e43f533ab59d1
+    disable: Unreleased review draft; frontend, catalog rights and device checks pending
+    commit: a09d21e3aec6248371bb425ef92c5369c0c1bbd2
     ndk: 30.0.16248370
     rm:
       - docs/localization/tracker-localization-12-locales-editorial.zip

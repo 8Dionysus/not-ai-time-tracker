@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.JournalAMigrationTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-16T07:17:50.956Z" hostname="69b2b5b46001" time="2.659">
+  <properties/>
+  <testcase name="futureSubjectAndBoundsEachReachTheirV11GuardWithoutChangingRows" classname="dev.notai.tracker.android.JournalAMigrationTest" time="1.181"/>
+  <testcase name="futureProfileInV11ReachesGuardAndKeepsEveryRowAndVersion" classname="dev.notai.tracker.android.JournalAMigrationTest" time="0.564"/>
+  <testcase name="actualV11DefaultRowsKeepAllSessionStatesAndExportRestoreComparison" classname="dev.notai.tracker.android.JournalAMigrationTest" time="0.317"/>
+  <testcase name="interruptionAfterMigrationWriteRollsBackWholeIsolatedDatabase" classname="dev.notai.tracker.android.JournalAMigrationTest" time="0.596"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

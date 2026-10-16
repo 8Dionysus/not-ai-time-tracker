@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.ScheduleDeliveryTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-16T07:18:50.120Z" hostname="69b2b5b46001" time="0.553">
+  <properties/>
+  <testcase name="rendererOptOutOfCurrentSeriesIsRejectedBeforeNotifyInsteadOfCancellingAfterPost" classname="dev.notai.tracker.android.ScheduleDeliveryTest" time="0.144"/>
+  <testcase name="oneAlarmPostsOnceAndReopenKeepsReceiptAndRevocationCancelsNotice" classname="dev.notai.tracker.android.ScheduleDeliveryTest" time="0.09"/>
+  <testcase name="unboundRendererAndPermissionNeverArmOrConsumeAnOccurrence" classname="dev.notai.tracker.android.ScheduleDeliveryTest" time="0.037"/>
+  <testcase name="startedOccurrenceCancelsPendingWithoutInventingAnotherSession" classname="dev.notai.tracker.android.ScheduleDeliveryTest" time="0.055"/>
+  <testcase name="backgroundWakeCannotInitializeAMissingDataset" classname="dev.notai.tracker.android.ScheduleDeliveryTest" time="0.024"/>
+  <testcase name="legacyReceiptsMigrateThroughAndroidSqlAndMissingIndexNeverFallsBackToEmpty" classname="dev.notai.tracker.android.ScheduleDeliveryTest" time="0.177"/>
+  <testcase name="unsafeIndexedFileRefusesBeforeOpeningWithoutMutatingItsTarget" classname="dev.notai.tracker.android.ScheduleDeliveryTest" time="0.025"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

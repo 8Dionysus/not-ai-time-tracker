@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.AttentionSafetyTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-16T02:10:45.107Z" hostname="69b2b5b46001" time="0.045">
+  <properties/>
+  <testcase name="permissionsAreNotPreferenceOrDeliveryAndFocusNeverUsesThisReminder" classname="dev.notai.tracker.AttentionSafetyTest" time="0.01"/>
+  <testcase name="rebootAndPauseInvalidateWakeupsWithoutInventingARecordedEnd" classname="dev.notai.tracker.AttentionSafetyTest" time="0.011"/>
+  <testcase name="disableIsExplicitAndHistoryUnchangedWhileStaleSettingsAreRejected" classname="dev.notai.tracker.AttentionSafetyTest" time="0.004"/>
+  <testcase name="staleStopCannotStopAnotherSessionAndChangedRenderingNeverPosts" classname="dev.notai.tracker.AttentionSafetyTest" time="0.005"/>
+  <testcase name="focusDenialAndProcessDeathNeverReassertAndUserRuleChangesArePreserved" classname="dev.notai.tracker.AttentionSafetyTest" time="0.004"/>
+  <testcase name="postOutcomeLossAndFailedReceiptNeverReplay" classname="dev.notai.tracker.AttentionSafetyTest" time="0.01"/>
+  <testcase name="revocationRetainsAnExactLeaseUntilCleanupCanSucceed" classname="dev.notai.tracker.AttentionSafetyTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

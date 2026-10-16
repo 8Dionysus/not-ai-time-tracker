@@ -1,6 +1,6 @@
 # Напоминание, окружение Focus и фактические наблюдения — направление C
 
-Основа: фактический `main` `01f7ee97424140286245019ffe22b6cc8ce26d90`, прочитан 16 октября 2026. Ветка C: `work/c-focus-reminder-observations`. Код не содержит изменений Compose, ViewModel, ресурсов, экранов и прямых UI callers. Общие Tracker/Model/Room/backup/build-файлы не менялись напрямую; их точная последовательная дельта находится в `integration/attention-preferences.patch` и должна быть применена A перед компиляцией новых модулей. Сборка, JVM, Robolectric, APK, lint и устройство в этой среде **не проверены**: есть JDK 21, отсутствуют Kotlin/Gradle/Android SDK и подготовленные кэши. Новый toolchain не устанавливался.
+Текущая последовательная интеграция A сохраняет опубликованный baseline `7e240e45990fdcda2b938464f2f7f8697c3c7be1`, исходную поставку C `f6fcadff696198d1bb4d34d0207340da1c0ac850` и обязательную audit-дельту C v3 `c403bc6216519aed817245830b19a3e81bc7aa7d`. Обе owner-дельты интегрированы по смыслу: текущие Room11 / полный JSON13 (read1–13), selective1–3. Исходная projected schema10 C не заменяла существующую schema10 A. Сгенерированная KSP schema11 отличается от10 только номером версии. Compose, ViewModel, ресурсы, экраны и UI callers не изменены. Фактические команды, результаты и границы приёмки находятся в [проверке интеграции](ATTENTION_VERIFICATION_2026_10_16.md); исходный C выполнял только source review в своей среде.
 
 ## Источники и границы выбора
 
@@ -18,7 +18,7 @@ Production: `core/.../LongRecordReminder.kt`, `app/.../LongRecordReminders.kt`.
 
 `LongRecordReminder.configure(expected, LongRecordPreference(...), controlRevision)` проверяет domain Token и локальную ревизию, сохраняет изменённое переносимое предпочтение через существующий `Tracker.settings`, затем отдельно подтверждает активацию на этом устройстве. Сохранение неизменённой формы не сбрасывает receipt и не заменяет явный `confirm` после restore. По умолчанию `enabled=false`. `afterMs=2 часа`, `snoozeMs=15 минут` — обратимые инженерные defaults, **не назначенные пользователем значения**. Измеряется доверенная записанная длительность текущей обычной сессии, без пауз; Focus и recovery исключены. Переход на другой timer target, stop, pause, потеря timebase делают прежний callback недействительным. После возобновления длительной обычной записи возможен новый вопрос.
 
-Пользовательский выбор `enabled/afterMs/snoozeMs` хранится в `Settings.longRecordReminder` и входит в полный JSON 12. Owner-patch добавляет Room10, чтение JSON1–12 и отказ от nondefault новой настройки, подставленной в старый format. Локально в `noBackupFilesDir/long-record-reminder.json` остаются receipts и подтверждение активации для `(datasetId, controlBarrier, preferenceHash)`. Полный restore создаёт новый barrier: предпочтение сохраняется, `confirmationRequired=true`, alarm отсутствует до отдельного `confirm(expected, controlRevision)`. Preview показывает входящие settings и `ordinaryReminderConfirmationRequired`. Потеря permission/channel не выключает переносимое намерение и не выдаёт grant за полученный. Ошибка после domain preference commit, но до сохранения device activation оставляет безопасное состояние с требованием подтверждения. Legacy device-local поле C-v2 читается, но не является authority и не переписывает Dataset.
+Пользовательский выбор `enabled/afterMs/snoozeMs` хранится в `Settings.longRecordReminder` и входит в полный JSON13. Интеграция добавляет Room11/migration10→11, чтение JSON1–13 и отказ от nondefault новой настройки, подставленной в старый format. Локально в `noBackupFilesDir/long-record-reminder.json` остаются receipts и подтверждение активации для `(datasetId, controlBarrier, preferenceHash)`. Полный restore создаёт новый barrier: предпочтение сохраняется, `confirmationRequired=true`, alarm отсутствует до отдельного `confirm(expected, controlRevision)`. Preview показывает входящие settings и `ordinaryReminderConfirmationRequired`. Потеря permission/channel не выключает переносимое намерение и не выдаёт grant за полученный. Ошибка после domain preference commit, но до сохранения device activation оставляет безопасное состояние с требованием подтверждения. Legacy device-local поле C-v2 читается, но не является authority и не переписывает Dataset.
 
 `synchronize()` поддерживает один elapsed inexact alarm. `onAlarm(hash)` проверяет актуальные opt-in, timer target, boot, segment и срок, сохраняет RESERVED до внешнего эффекта, готовит уведомление вне StateStore gate и повторно проверяет состояние перед коротким `post()`. Используются существующие статусы receipt-first Schedule, но отдельный ticket без поддельных Schedule occurrence. Остаточный RESERVED означает UNKNOWN; автоматически не повторяется. POST_ACCEPTED — только возврат `notify`, без утверждения о показе человеку. Служебный файл ограничен текущим циклом; продолжение/откладывание явно создаёт новый цикл.
 
@@ -28,7 +28,7 @@ Production: `core/.../LongRecordReminder.kt`, `app/.../LongRecordReminders.kt`.
 |---|---|
 | CONTINUE | Никаких изменений истории; следующий вопрос после `afterMs` дополнительного доверенного времени. |
 | SNOOZE | Никаких изменений истории; следующий вопрос после `snoozeMs`. |
-| DISABLE | Выключает локальную настройку, отзывает alarm/уведомление. |
+| DISABLE | Выключает переносимое предпочтение через Tracker.settings, отзывает alarm/уведомление. |
 | STOP | Существующий `Tracker.stop(expected)`, граница — текущий момент. |
 | REVIEW | Явный **«Остановить и исправить»**: тот же stop сейчас, затем `reviewSessionId` для существующих `previewCorrection` → `applyCorrection`. Предполагаемый прошлый конец не выбирается. Отмена формы не отменяет явно выбранный stop. |
 
@@ -56,27 +56,22 @@ Production: `core/.../ObservationFacts.kt`.
 
 Цели возвращаются со своей существующей window/zone. `acknowledgementEligible` возможен только для включённой MINIMUM цели **по времени**, с фактическими записями, достигнутым target и без unresolved; session-count цель не получает игрового поощрения за дробление. Метод не посылает ни уведомления, ни animation. Визуальная мозаика, вид/ритм празднования и сохранение пользовательского выбора остаются у продукта/Opus. Предложенный минимальный вариант — добровольно выбранные записанные вехи и семь фактических клеток недели.
 
-## Последовательная интеграция A
+## Интеграция и проверяемые границы
 
-`integration/attention-runtime.patch` — отдельный owner-applied patch только для `AndroidRuntime.kt` и manifest. Он не применён в C из-за shared-file ownership. На исходном `01f7ee9` проверка применимости обеих дельт прошла. При другом main обновить привязку по смыслу, не перезаписывать изменения A.
+`runtime.attention` уже связан с существующим event-driven observer/refresh. Cleanup выполняется до закрытия runtime; manifest содержит receivers и ACCESS_NOTIFICATION_POLICY. Декларация permission не выдаёт доступ. API28 block-state actions регистрируются только на API28+. Новый service, polling или INTERNET permission не добавлены.
 
-`integration/attention-preferences.patch` затрагивает Model/Backup/Migration/StreamingBackup, TrackerDatabase, projected schema10 и существующие version/migration fixtures. Его необходимо применить **до компиляции**: новые модули намеренно используют `Settings.longRecordReminder`. Schema10 имеет ту же SQL-структуру и identityHash, что schema9, и изменённый metadata contract/version; A должен сгенерировать её штатным KSP и сравнить с кандидатом.
+`integration/attention-runtime.patch` сохраняет исходную owner-дельту к `01f7ee9`; она уже применена. `integration/attention-preferences.patch` — актуализированная справочная дельта shared-файлов к интегрированному C v3, с Room11/JSON13 и generated schema11. **Повторно применять эти файлы к текущей ветке не нужно.** Историю применения и авторство сохраняют commits. Миграция9→10 и nullable manualConfirmation остаются на месте; 10→11 меняет только defaults metadata. Readers сохраняют реальную legacy12 ручную пометку и отклоняют nondefault ordinary preference, подставленный в format≤12.
 
-Patch runtime добавляет lazy `runtime.attention`, вызов из существующего event-driven observer/refresh, cleanup до закрытия runtime и manifest receivers/декларацию ACCESS_NOTIFICATION_POLICY. Декларация permission не выдаёт доступ. UI bindings остаются отсутствующими до отдельного подключения Opus; сборка только новых файлов без patch не является end-to-end включением функции.
+Непредпринятый check-in пересчитывает elapsed deadline после подтверждённого дополнения начала и Undo, меняя generation; использованный/UNKNOWN receipt не переигрывается. Временная потеря часов при неизменном target только приостанавливает доставку. Реальный reboot требует существующего Recovery и явного разрешения истории; старый alarm не становится новым фактом.
 
-Проверки в уже подготовленной среде A, без установки новых сред и без устройства пользователя:
+Исходный C подготовил 27 исполнений: shared4×2, safety7, audit7, archive1, platform3, migration1. A добавил Memory/Room regressions для backfill/Undo и timebase, сохранение DND status после synchronize, точную парковку своего SDK36 rule и сохранение чужого/отредактированного rule, legacy12+current13 round-trip и миграцию10→11 всех SessionStatus с reached-refusal/rollback. Это перечень проверок; фактические исходы берутся только из [source-bound record](ATTENTION_VERIFICATION_2026_10_16.md).
 
-```sh
-git apply --check integration/attention-preferences.patch
-git apply --check integration/attention-runtime.patch
-# A применяет согласованную дельту после сверки своего actual main.
-git apply integration/attention-preferences.patch
-git apply integration/attention-runtime.patch
-./gradlew :core:test --tests dev.notai.tracker.AttentionScenariosTest --tests dev.notai.tracker.AttentionSafetyTest --tests dev.notai.tracker.AttentionAuditRegressionTest --tests dev.notai.tracker.AttentionPreferenceArchiveTest
-./gradlew :app:testDebugUnitTest --tests dev.notai.tracker.android.AttentionScenariosTest --tests dev.notai.tracker.android.AttentionPlatformTest --tests dev.notai.tracker.android.AttentionPreferencesMigrationTest -PtrackerUnsigned=true
-./gradlew :core:test :app:testDebugUnitTest :app:assembleDebug :app:lintRelease -PtrackerUnsigned=true
-```
+Файловый Robolectric-тест использует узкий host bridge: штатный ShadowLinux4.17 игнорирует flags и возвращает fstat(fd) как stat(null). Bridge проверяет переданные Android flags, использует NIO NOFOLLOW и metadata открытого descriptor через /proc. Это не выполнение Android Os/O_NONBLOCK и не device-проверка музыки.
 
-Подготовлены четыре shared-сценария для Memory и Room, семь safety, семь audit-regression, один archive, три Android adapter и один Room migration: 27 исполнений. Полный перечень инвариантов, дефектов и остатка — в [ATTENTION_STATIC_AUDIT](ATTENTION_STATIC_AUDIT.md). Они подготовлены, **не выполнены в C**. Coverage: неизменность истории до явного stop/correction; snooze/disable; старый callback/token; permission и Focus isolation; failed reserve/unknown post без replay; lease-before-activate; отсутствие auto-reassert; cleanup при revoked access/user edit; пересчёт milestones без бонуса за дробление. Android tests — Robolectric simulation, не физическое устройство. Реальное DND, audio focus, delivery, background/OEM timing и доступность UI требуют будущей отдельной приёмки.
+Opus подключает notification renderer/channel/actions, явное device confirmation, настоящий DND configuration Activity, чистый lookup выбранного локального файла и его lifetime, показ controlRevision/confirmationRequired/sourceAvailable/cleanupPending. Отсутствующий binding остаётся явным blocker. [Потоки данных](ATTENTION_DATA_FLOWS.md) описывают добавленную capability-границу.
 
-Не выполнены push, merge, публикация или разрешения устройства. Source patches/commit доступны координатору для проверки; конечная последовательная main/Library-интеграция остаётся у A/root.
+Физическое DND, audio focus/playback, actual delivery, background/OEM timing и доступность UI требуют отдельной приёмки. Фоновая музыка, внешние музыкальные интеграции и рисунок празднования остаются продуктовыми вариантами. JVM/Robolectric/APK/lint не закрывают эти пункты.
+
+Local music requires API27+ because the public O_CLOEXEC constant is API27. API26 returns UNSUPPORTED and the direct open helper refuses before opening a source; minSdk26 for the application is unchanged. [Android API](https://developer.android.com/reference/android/system/OsConstants#O_CLOEXEC).
+
+Reference owner patch is a zero-context diff from46128a3 toC949; isolated-index `git apply --cached --check --unidiff-zero` passed. It is already integrated and must not be reapplied to current main.

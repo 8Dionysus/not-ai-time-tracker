@@ -1,0 +1,19 @@
+{
+  "source": "c949a8f202e143151e216a8932956a7a93b001bc",
+  "tool": "fdroidserver2.4.5",
+  "command": "fdroid scanner --force --json --exit-code dev.notai.tracker:12",
+  "scannerExit": 0,
+  "parsedErrors": 0,
+  "parsedWarnings": 1,
+  "processingWitness": "three wrapper removals; expected retained gzip fixture warning; nonempty structured result",
+  "metadataLintExit": 0,
+  "recipeDisabled": true,
+  "recipePin": "c949a8f202e143151e216a8932956a7a93b001bc",
+  "independentServerBuild": false,
+  "reproducibilityComparison": false,
+  "disposableCheckout": true,
+  "originalEditorialZipPreserved": true,
+  "originalEditorialZipSha256": "eca102490bb89f163141813043e59e351d6bad8d1c0b659027371d25a52cc310",
+  "privateRawMetadataLintLogSha256": "b31ca43587aade93116e1efa04b04978318f4408ac18c309916a417fa909d541",
+  "publicMetadataLintLog": "Normalized to omit environment SDK path; private raw retained"
+}

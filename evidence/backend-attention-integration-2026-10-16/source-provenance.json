@@ -1,0 +1,61 @@
+{
+  "runtimeSource": "c949a8f202e143151e216a8932956a7a93b001bc",
+  "publishedBaseline": "7e240e45990fdcda2b938464f2f7f8697c3c7be1",
+  "upstreamCInitialSource": "f6fcadff696198d1bb4d34d0207340da1c0ac850",
+  "upstreamCV3": "c403bc6216519aed817245830b19a3e81bc7aa7d",
+  "localCommits": [
+    "af4a4b98c66218687ca0dd4730cbb389c3f22dab Tracker C <tracker-c@users.noreply.github.com> Add optional ordinary timer check-in and Focus environment backend ports",
+    "7771c5ba1d368c03036a9fd999a63fd377df264d 8Dionysus <8Dionysus@users.noreply.github.com> Bind optional attention controllers to existing runtime and protected receivers",
+    "9f47ee4983dd004b7c45cf198cb631435a38f2e1 8Dionysus <8Dionysus@users.noreply.github.com> Replan unattempted check-ins after confirmed start corrections and Undo",
+    "062cc470c8c0863ec71129a3f5fd89abcc2b3676 Tracker C <tracker-c@users.noreply.github.com> Harden attention lifecycle and receipts and prepare portable preference integration",
+    "ffbcb863985481190bccec6c0867432b851fc304 Tracker C <tracker-c@users.noreply.github.com> Include legacy customization normalization fixtures in preference owner patch",
+    "46128a3e5c98e8844b604ae0d3b3aab82b8feb4c Tracker C <tracker-c@users.noreply.github.com> Keep restored unchanged reminder forms gated by explicit device confirmation",
+    "122e66cfc3673a09158b1a41a97ccb9d991ea5f2 8Dionysus <8Dionysus@users.noreply.github.com> Integrate C v3 portable preferences on Room11 and full archive13 with preserved manual provenance",
+    "9eff967d816bc1bb83e16cc8d748c6e79808a363 8Dionysus <8Dionysus@users.noreply.github.com> Wait for restored backend readiness before requesting export in lifecycle fixture",
+    "c949a8f202e143151e216a8932956a7a93b001bc 8Dionysus <8Dionysus@users.noreply.github.com> Refuse optional secure local music on API26 before resolving a source"
+  ],
+  "v3Transport": {
+    "transportLibraryId": "libfile_793aa03eeddc819187494d0ff5e18909",
+    "transportFileId": "file_00000000efc082309382be024cb8693c",
+    "jsonSha256": "f8b429418325578fdd11ae2262d826b5a631ecf05697775a8545fe6ad91982c1",
+    "jsonBytes": 225193,
+    "files": {
+      "audit-followup.patch": {
+        "bytes": 181626,
+        "sha256": "101a29a372ed030c21aa6972ecbd37ac5860a12a37c20d352349989e5f27523d"
+      },
+      "attention-preferences.patch": {
+        "bytes": 33322,
+        "sha256": "d528b512292133d0b72211c5bbf0cd4dd2c1c848ac4ee32b083875904809234e"
+      },
+      "attention-runtime.patch": {
+        "bytes": 4619,
+        "sha256": "c60033b25cb37e68b18fd38e18c7dbf431716162db0802abf9bee301c6e5ee58"
+      }
+    },
+    "zipDownloadedHere": false,
+    "method": "Native Library read of private text/plain base64 transport; no public publication"
+  },
+  "originalOwnerPreferencePatchAppliedVerbatim": false,
+  "integrationReason": "C assumed Room9/full11. Preserve actual A Room10/full12/manualConfirmation and advance to11/13. Do not overwrite schema10.",
+  "schema11KspGenerated": true,
+  "schema11DiffersFrom10OnlyByVersion": true,
+  "sourceChangesAfterRuntime": "Contracts/evidence/reference patch/disabled recipe only; verify packaging assertion.",
+  "reviewCorrections": [
+    "Pause/resume changes target; no speculative stale-same-target fix",
+    "DND final save already existed; added regression, no fictitious implementation fix",
+    "Shared transient timebase repair and actual reboot with explicit Recovery passed Memory/Room"
+  ],
+  "productionAudioApi26": "UNSUPPORTED before source lookup/open; public O_CLOEXEC API27 guard; SDK26 regression",
+  "audioHostBridge": "NIO NOFOLLOW and /proc opened-FD metadata in a test-only Os shadow; not actual Android Os/O_NONBLOCK execution",
+  "protectedUiMainPathsUnchanged": true,
+  "newCatalogTextsPublished": false,
+  "requestedModel": "gpt-6.1-sol/high; no independent runtime attestation",
+  "ownerReferencePatch": {
+    "base": "46128a3e5c98e8844b604ae0d3b3aab82b8feb4c",
+    "tip": "c949a8f202e143151e216a8932956a7a93b001bc",
+    "zeroContext": true,
+    "isolatedIndexApplyCheck": true,
+    "sha256": "9886f7b9c44c5ee6ba6dbe2e2188f04d584008c5cd56d1d17fcc48195a461830"
+  }
+}

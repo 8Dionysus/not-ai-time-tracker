@@ -1,5 +1,7 @@
 # Verified start backfill and B fixes, 16 October 2026
 
+Historical A+B checkpoint. Current Room11/full13 and C v3 results are in [ATTENTION_VERIFICATION_2026_10_16](ATTENTION_VERIFICATION_2026_10_16.md).
+
 Full runtime/build/test source: **0def529a610232f557530f7f74a2facf3507136f**.
 Separate reached-interruption test source: **e4435919948a361f2b023f750134d765b8d379ee**.
 The latter changes tests/docs only; core/app production sources and build inputs

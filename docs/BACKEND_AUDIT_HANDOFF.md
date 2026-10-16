@@ -1,6 +1,6 @@
 # Backend audit follow-up and Opus handoff
 
-Current follow-up: [saved controllers/lifetimes](BACKEND_WORKSPACES_HANDOFF.md), [catalog sidecars](CATALOG_CONTENT_PACKS.md), [21-family coverage](FUNCTIONAL_COVERAGE_2026_10_15.md). Current persistence is Room10/full JSON12/read1–12, selective1–3; maintenance/recovery operational format3. The baseline-specific text and evidence below remain historical unless superseded by these follow-ups.
+Current follow-up: [saved controllers/lifetimes](BACKEND_WORKSPACES_HANDOFF.md), [catalog sidecars](CATALOG_CONTENT_PACKS.md), [21-family coverage](FUNCTIONAL_COVERAGE_2026_10_15.md). Current persistence is Room11/full JSON13/read1–13, selective1–3; maintenance/recovery operational format3. The baseline-specific text and evidence below remain historical unless superseded by these follow-ups.
 15 October 2026. Follow-up details: [sealed archive contract](SEALED_ARCHIVE_CONTRACT.md), [schedule delivery and mandatory caller migration](SCHEDULE_DELIVERY_HANDOFF.md), [functional customization](FUNCTIONAL_CUSTOMIZATION_HANDOFF.md), [exact functional verification](FUNCTIONAL_CUSTOMIZATION_VERIFICATION.md). The historical functional stage based on main `f14fa3c` used Room8 / portable JSON10 / Android
 0.11.0 (12), compile/target API36. Static fixes through `9d115df` used Room7/JSON9;
 the functional follow-up adds validated schedule preferences and catalog selection roots with migration7→8 and archive10/read1–10. The user restored backend-only
@@ -104,7 +104,7 @@ The independent scheduler index has its own durable migration/authority marker.
 ## Historical A–F checkpoint at the functional stage
 
 This dated table retains its original Room8/full10/selective1–2 scope. For current
-Room10/full12/selective1–3 and source-bound results, use
+Room11/full13/selective1–3 and source-bound results, use
 [START_BACKFILL_VERIFICATION_2026_10_16.md](START_BACKFILL_VERIFICATION_2026_10_16.md).
 
 | Package | Backend evidence / remaining boundary |

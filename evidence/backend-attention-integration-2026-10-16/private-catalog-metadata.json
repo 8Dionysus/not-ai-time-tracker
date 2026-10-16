@@ -1,0 +1,123 @@
+{
+  "privateSourceCommit": "ee19355249ac800a2ebd53359888e147b31c506e",
+  "runtimeProductionSource": "c949a8f202e143151e216a8932956a7a93b001bc",
+  "productionSourceBuildFilesUnchanged": true,
+  "tests": {
+    "core": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "app": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "pythonPreparationTests": 10,
+  "build": "BUILD SUCCESSFUL in3m47s;61tasks executed",
+  "apk": {
+    "bytes": 15550027,
+    "sha256": "f5cbc58d0c8f85c9841b198d7db65e4082d2c0d35985faa4a632d4254248980d",
+    "checks": {
+      "zipalign-16k": 0,
+      "signature": 1,
+      "badging": 0
+    }
+  },
+  "locales": [
+    "en",
+    "es",
+    "fr",
+    "pt-BR",
+    "ar",
+    "zh-Hans",
+    "de",
+    "it",
+    "ja",
+    "ko",
+    "hi"
+  ],
+  "entries": 26235,
+  "fields": 74723,
+  "assetPayloadsMatchPreparedBytes": true,
+  "payloads": [
+    {
+      "locale": "en",
+      "file": "labels.json",
+      "bytes": 1184934,
+      "sha256": "aee5fe5bb39498121f7367b78b6bec84ab62ed4005c7bbf062805cc056638fc8"
+    },
+    {
+      "locale": "es",
+      "file": "labels.json",
+      "bytes": 1265051,
+      "sha256": "bc11a626cd9850170d225f9169db728066ebc787f0d08612eaf481de277be35d"
+    },
+    {
+      "locale": "fr",
+      "file": "labels.json",
+      "bytes": 1302697,
+      "sha256": "07dea42d93f884191ea7ebea40da25c719a47547461a168add469af90688d60e"
+    },
+    {
+      "locale": "pt-BR",
+      "file": "labels.json",
+      "bytes": 1251778,
+      "sha256": "e4f9b8cb56f705263ed4a8b930147df00937931294380ed91e4daf76dce1e0df"
+    },
+    {
+      "locale": "ar",
+      "file": "labels.json",
+      "bytes": 1381578,
+      "sha256": "c10c355be13d90a0685682603022c97962816db22d7e0b9efac4a4e18fd481d9"
+    },
+    {
+      "locale": "zh-Hans",
+      "file": "labels.json",
+      "bytes": 1136825,
+      "sha256": "b94d63da61e8c83b7d23a93a628786870652f420bd07dbc07a6cb028eaef6468"
+    },
+    {
+      "locale": "de",
+      "file": "labels.json",
+      "bytes": 1270948,
+      "sha256": "5171dbe443d212e2ab533b8ee563f19451bb777d180fa61d364e47abf6a275ab"
+    },
+    {
+      "locale": "it",
+      "file": "labels.json",
+      "bytes": 1249097,
+      "sha256": "ca667be6a0fe8eb7ccfc8cc9e8044f83328d383d6e416f7bfffffeadcf925af0"
+    },
+    {
+      "locale": "ja",
+      "file": "labels.json",
+      "bytes": 1266265,
+      "sha256": "8405aea39297c13630c39ec98a49af11d909e045fe0575b99c1446e139e85cf9"
+    },
+    {
+      "locale": "ko",
+      "file": "labels.json",
+      "bytes": 1205810,
+      "sha256": "0ebc657dd40a11b5fce5c99492f07d82ead1e06437b0c924dda3f7b35a7e504f"
+    },
+    {
+      "locale": "hi",
+      "file": "labels.json",
+      "bytes": 1735654,
+      "sha256": "4f05864c4760b99b0bf6d394b6fe9360fce86d2240794ad98c678ad0443b90b3"
+    }
+  ],
+  "quality": "DRAFT input statuses preserved; coordinator independent semantic review recorded separately",
+  "nativeSpeakerQA": false,
+  "rightsStatus": "source_rights_review_pending",
+  "installedReviewedLocales": [],
+  "localeResourcesMigrated": false,
+  "newTextsPublicGitPushed": false,
+  "wholePrivateBranchRegressionExecuted": false,
+  "currentRuntimeFullRegression": "C949:130core+99app; this private branch ran only the2new integration scenarios",
+  "deviceExecution": false
+}

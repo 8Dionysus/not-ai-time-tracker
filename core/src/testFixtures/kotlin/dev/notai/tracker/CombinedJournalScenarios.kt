@@ -42,12 +42,17 @@ fun quantityReportClassificationJoin(create: ()->StateStore,reopen: (StateStore)
     assertEquals(Decimal("15"),t.view().quantityReport(a,b).quantities.totals().getValue(ref to def))
     assertTrue(t.view().quantityReport(a,b,Filter(cardId="missing")).quantities.events.isEmpty())
     assertTrue(t.subjects().window(a,b,emptySet()).events.isEmpty())
-    val query = SavedReportQuery("joined-query","Active pages",ReportWindow(ReportWindowKind.FIXED,firstDate="2026-03-29",endDateExclusive="2026-03-30"),filter,policy=policy)
+    val query = SavedReportQuery("joined-query","Active pages",ReportWindow(ReportWindowKind.FIXED,firstDate="2026-03-29",endDateExclusive="2026-03-30"),filter.copy(cardId=card.id),policy=policy)
     t.saveReportQuery(t.snapshot().token,query)
     assertEquals(result.quantities.events,t.view().savedQuantityReport(query.id).quantities.events)
     t=Tracker(reopen(t.store),clock)
     assertEquals(Decimal("2"),t.view().savedQuantityReport(query.id).quantities.totals().getValue(ref to def))
 
+    val unrelated=Card("unrelated-book",card.name);t.saveCard(t.snapshot().token,unrelated)
+    t.manual(t.snapshot().token,clock.wall-2000,clock.wall-1000,unrelated.classification())
+    val otherSession=t.data().sessions.last().id
+    t.manual(t.snapshot().token,clock.wall-500,clock.wall-100,card.classification())
+    val hiddenSession=t.data().sessions.last().id
     // A profiles, B goal revisions/query and C quantities share one archive and COPY closure.
     t.personalizeChoice(t.snapshot().token,ChoiceKind.CARD,card.id,ChoicePersonalization(listOf("Private own alias"),0,ChoiceNotePolicy.CLEAR))
     val goal=Goal("joined-goal","Reading days",GoalMetric.DISTINCT_RECORDED_DAYS,3,period=GoalPeriod.WEEK,zone=policy.zone,filter=Filter(cardId=card.id),dayStartMinute=policy.startMinute)
@@ -57,17 +62,23 @@ fun quantityReportClassificationJoin(create: ()->StateStore,reopen: (StateStore)
     val backup=Backups(restored,MemoryRollback());backup.apply(backup.prepare(full))
     assertEquals(t.data().cards,restored.data().cards);assertEquals(t.data().goals,restored.data().goals)
     assertEquals(t.data().savedReports,restored.data().savedReports);assertEquals(t.data().subjects,restored.data().subjects)
-    val pack=SelectiveTransfer(restored).export(TransferSelection(sessionIds=setOf(session),measurementIds=setOf("whole-pages"),goalIds=setOf(goal.id),savedReportIds=setOf(query.id),subjectRecords=restored.data().subjects.recordKeys()))
-    assertEquals(4,pack.formatVersion)
+    val pack=SelectiveTransfer(restored).export(TransferSelection(sessionIds=setOf(session,otherSession),cardIds=setOf(unrelated.id),measurementIds=setOf("whole-pages"),goalIds=setOf(goal.id),savedReportIds=setOf(query.id),subjectRecords=restored.data().subjects.recordKeys()))
+    assertEquals(4,pack.formatVersion);assertEquals(2,pack.groups.size)
+    assertEquals(setOf(session,otherSession),pack.groups.flatMap { it.content.sessions }.map { it.id }.toSet())
+    assertTrue(pack.groups.flatMap { it.content.sessions }.none { it.id==hiddenSession })
     val copied=Tracker(create(),clock);copied.saveCard(copied.snapshot().token,card.copy(name="Local original"))
     val importer=SelectiveTransfer(copied);val policies=pack.groups.associate { it.id to TransferConflictPolicy.COPY }
     val plan=importer.plan(pack,pack.groups.map { it.id }.toSet(),policies)
     val receipt=importer.apply(importer.preview(plan),"joined-copy");assertTrue(receipt.complete)
-    val copyCard=copied.data().cards.single { it.id!=card.id }
-    assertEquals(t.data().cards.single().personal,copyCard.personal)
+    val copyCard=copied.data().cards.single { it.id!=card.id && it.id!=unrelated.id }
+    assertEquals(t.data().cards.single { it.id==card.id }.personal,copyCard.personal)
     assertEquals(copyCard.id,copied.data().subjects.cards.single().cardId)
     assertTrue(copied.data().goals.single().revisions.all { it.definition.filter.cardId==copyCard.id })
     val copiedQuery=copied.data().savedReports.single()
+    assertEquals(copyCard.id,copiedQuery.filter.cardId)
+    assertEquals(3,copied.data().cards.size);assertEquals(2,copied.data().cards.count { it.name==card.name })
+    assertEquals(2,copied.data().sessions.size)
+    assertTrue(copied.data().sessions.none { it.id==hiddenSession })
     assertEquals(Decimal("2"),copied.view().savedQuantityReport(copiedQuery.id).quantities.totals().values.single())
     assertEquals(receipt,importer.apply(plan,"joined-copy"))
     val undoTarget=Tracker(create(),clock);val undoBackup=Backups(undoTarget,MemoryRollback())
@@ -135,4 +146,25 @@ fun quantityArchiveAuditSnapshots(create: ()->StateStore) {
     val live=base.copy(cards=content.cards,metrics=content.metrics,units=content.units,subjects=subjects.copy(observations=observations,changes=listOf(early)))
     assertFailsWith<CoreError> { validate(live) }
     validate(live.copy(subjects=live.subjects.copy(changes=listOf(early.copy(recordedAt=950)))))
+}
+
+fun quantityQueryReferencesShareCopiedTypeAndAxis(create: ()->StateStore) {
+    val clock=FakeClock();val source=Tracker(create(),clock)
+    source.saveType(source.snapshot().token,ActivityType("query-parent","Branch",selectable=false))
+    source.saveType(source.snapshot().token,ActivityType("query-child","Child",parentId="query-parent"))
+    source.saveAxis(source.snapshot().token,Axis("query-axis","Context",valueKind=ValueKind.FREE_LABEL))
+    val card=Card("query-card","Same title",activityTypeId="query-child",facets=listOf(Facet("query-axis",text="inside")))
+    source.saveCard(source.snapshot().token,card);source.defineSubject(source.snapshot().token,CardSubject(card.id,"edition"))
+    source.saveGoal(source.snapshot().token,Goal("query-goal","Days",GoalMetric.DISTINCT_RECORDED_DAYS,2,filter=Filter(activityTypeId="query-parent")))
+    source.saveReportQuery(source.snapshot().token,SavedReportQuery("query-axis-report","By context",grouping=ReportGrouping.FACET,groupKey="query-axis"))
+    val pack=SelectiveTransfer(source).export(TransferSelection(typeIds=setOf("query-parent"),goalIds=setOf("query-goal"),savedReportIds=setOf("query-axis-report"),subjectRecords=setOf(SubjectRecordKey(SubjectRecordKind.CARD,card.id))))
+    assertEquals(1,pack.groups.size)
+    val target=Tracker(create(),clock);target.saveCard(target.snapshot().token,Card(card.id,"Local original"))
+    val importer=SelectiveTransfer(target)
+    assertTrue(importer.apply(importer.plan(pack,pack.groups.map { it.id }.toSet(),pack.groups.associate { it.id to TransferConflictPolicy.COPY }),"query-reference-copy").complete)
+    val copied=target.data().cards.single { it.id!=card.id }
+    val child=target.data().types.single { it.id==copied.activityTypeId }
+    assertEquals(child.parentId,target.data().goals.single().filter.activityTypeId)
+    assertEquals(copied.facets.single().axisId,target.data().savedReports.single().groupKey)
+    assertEquals(copied.id,target.data().subjects.cards.single().cardId)
 }

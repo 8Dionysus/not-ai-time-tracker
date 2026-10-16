@@ -101,31 +101,72 @@ class SelectiveTransfer(private val tracker: Tracker) {
         for(l in links) join("session:${l.sessionId}","series:${l.key.seriesId}")
         for(c in d.cards.filter { it.id in wanted.cardIds }) c.activityTypeId?.takeIf { it in wanted.typeIds }?.let { join("card:${c.id}","type:$it") }
         for(t in d.types.filter { it.id in wanted.typeIds }) t.parentId?.takeIf { it in wanted.typeIds }?.let { join("type:${t.id}","type:$it") }
-        // A selected subject component and queries about its identities share COPY mapping.
-        // Unrelated roots retain their separate groups; legacy packages retain their hashes.
-        val subjectSessions = d.sessions.filter { it.id in wanted.sessionIds }
-        val subjectSegments = d.segments.filter { it.sessionId in wanted.sessionIds }
-        val selectedSubjectCards = (subjectSessions.mapNotNull { it.selection.cardId }+subjectSegments.mapNotNull { it.selection.cardId }+wanted.cardIds).toSet()
-        val selectedSubjects = d.subjectDependencies(wanted.sessionIds,selectedSubjectCards,wanted.subjectRecords)
-        if(!selectedSubjects.empty) {
-            val subjectNodes = nodes.filter { it.startsWith("subject:") || it.startsWith("session:") ||
-                (it.startsWith("card:") && it.removePrefix("card:") in selectedSubjects.cardDependencies()) }
-            subjectNodes.zipWithNext().forEach { (a,b) -> join(a,b) }
-            val anchor = subjectNodes.firstOrNull()
-            if(anchor != null) {
-                val cards = selectedSubjects.cardDependencies().toSet()+subjectSessions.mapNotNull { it.selection.cardId }+subjectSegments.mapNotNull { it.selection.cardId }
-                val selections = subjectSessions.map { it.selection }+subjectSegments.map { it.selection }+
-                    d.cards.filter { it.id in cards }.map { it.classification() }
-                val types = selections.flatMap { it.ancestorPathAtWrite+listOfNotNull(it.activityTypeId) }.toMutableSet()
-                val queue = ArrayDeque(types)
-                while(queue.isNotEmpty()) typeRows.getValue(queue.removeFirst()).value.parentId?.let { if(types.add(it)) queue.addLast(it) }
-                val axes = selections.flatMap { it.facets.map { f -> f.axisId } }.toSet()
-                fun related(f: Filter) = f.cardId in cards || f.activityTypeId in types || f.facets.any { it.axisId in axes }
-                d.goals.filter { it.id in wanted.goalIds && it.definitions().any { g -> related(g.filter) } }.forEach { join(anchor,"goal:${it.id}") }
-                d.savedReports.filter { it.id in wanted.savedReportIds && (related(it.filter) || (it.grouping == ReportGrouping.FACET && it.groupKey in axes)) }.forEach { join(anchor,"report:${it.id}") }
-                d.favorites.filter { it.id in wanted.favoriteIds && related(Filter(it.selection.cardId,it.selection.activityTypeId,facets=it.selection.facets)) }.forEach { join(anchor,"favorite:${it.id}") }
-                wanted.cardIds.filter { it in cards }.forEach { join(anchor,"card:$it") }
-                wanted.typeIds.filter { it in types }.forEach { join(anchor,"type:$it") }
+        // Extend the existing selected-root graph by stable referenced identities. Names
+        // never participate, and a missing/unselected session is never enrolled here.
+        val selectedSessions = d.sessions.filter { it.id in wanted.sessionIds }
+        val selectedSegments = d.segments.filter { it.sessionId in wanted.sessionIds }
+        val selectedSeries = d.schedule.series.filter { it.id in wanted.seriesIds }
+        val selectedGoals = d.goals.filter { it.id in wanted.goalIds }
+        val selectedQueries = d.savedReports.filter { it.id in wanted.savedReportIds }
+        val selectedFavorites = d.favorites.filter { it.id in wanted.favoriteIds }
+        val selectedCardIds = wanted.cardIds+selectedSessions.mapNotNull { it.selection.cardId }+selectedSegments.mapNotNull { it.selection.cardId }+
+            selectedSeries.flatMap { it.revisions.mapNotNull { r -> r.rule.selection.cardId } }+
+            d.schedule.overrides.filter { it.key.seriesId in wanted.seriesIds && it.key !in wanted.excludedOverrides }.mapNotNull { it.selection?.cardId }+
+            selectedGoals.flatMap { it.definitions().mapNotNull { g -> g.filter.cardId } }+selectedQueries.mapNotNull { it.filter.cardId }+selectedFavorites.mapNotNull { it.selection.cardId }
+        val selectedSubjects = d.subjectDependencies(wanted.sessionIds,selectedCardIds,wanted.subjectRecords)
+        val extended = !selectedSubjects.empty || selectedQueries.isNotEmpty() || selectedGoals.any { it.hasReportingExtensions() } ||
+            d.cards.any { it.id in selectedCardIds && it.personal != ChoicePersonalization() } || selectedFavorites.any { it.personal != ChoicePersonalization() }
+        if(extended) {
+            val owners = mutableMapOf<String,String>()
+            val classified = mutableListOf<Pair<String,Classification>>()
+            fun connect(node: String,key: String) { owners.putIfAbsent(key,node)?.let { join(node,it) } }
+            fun card(node: String,id: String?) { id?.let { connect(node,"card:$it") } }
+            fun session(node: String,id: String?) { id?.takeIf { "session:$it" in parents }?.let { join(node,"session:$it") } }
+            fun subject(node: String,ref: SubjectRef) {
+                connect(node,"subject:${ref.kind}:${ref.id}")
+                val cardId=if(ref.kind == SubjectKind.CARD) ref.id else d.subjects.events.single { it.id == ref.id }.cardId
+                card(node,cardId)
+                cardId?.let { id -> val c=d.cards.single { it.id == id }.classification()
+                    classified += node to c.copy(ancestorPathAtWrite=c.activityTypeId?.let { d.ancestorPath(it) }.orEmpty())
+                }
+            }
+            selectedSessions.forEach { row ->
+                val node="session:${row.id}"
+                val selections=listOf(row.selection)+selectedSegments.filter { it.sessionId == row.id }.map { it.selection }
+                selections.forEach { card(node,it.cardId);classified += node to it }
+                d.subjects.links.filter { it.sessionId == row.id }.forEach { subject(node,it.subject) }
+                d.subjects.quantities.filter { it.sessionId == row.id }.forEach { subject(node,it.subject) }
+            }
+            selectedSeries.forEach { row -> val node="series:${row.id}";val selections=row.revisions.map { it.rule.selection }+
+                d.schedule.overrides.filter { it.key.seriesId == row.id && it.key !in wanted.excludedOverrides }.mapNotNull { it.selection }
+                selections.forEach { card(node,it.cardId);classified += node to it }
+            }
+            wanted.cardIds.forEach { id -> card("card:$id",id);val c=d.cards.single { it.id == id }.classification()
+                classified += "card:$id" to c.copy(ancestorPathAtWrite=c.activityTypeId?.let { d.ancestorPath(it) }.orEmpty())
+            }
+            selectedFavorites.forEach { card("favorite:${it.id}",it.selection.cardId);classified += "favorite:${it.id}" to it.selection }
+            fun query(node: String,f: Filter) {
+                card(node,f.cardId)
+                f.activityTypeId?.takeIf { it in wanted.typeIds }?.let { join(node,"type:$it") }
+                classified.filter { (_,c) -> (f.activityTypeId != null && (f.activityTypeId == c.activityTypeId || f.activityTypeId in c.ancestorPathAtWrite)) || f.facets.any { facet -> c.facets.any { it.axisId == facet.axisId } } }.forEach { join(node,it.first) }
+            }
+            wanted.subjectRecords.forEach { key ->
+                val node="subject:${key.kind}:${key.id}"
+                when(key.kind) {
+                    SubjectRecordKind.CARD -> subject(node,SubjectRef(SubjectKind.CARD,key.id))
+                    SubjectRecordKind.EVENT -> subject(node,SubjectRef(SubjectKind.EVENT,key.id))
+                    SubjectRecordKind.LINK -> d.subjects.links.single { it.id == key.id }.let { subject(node,it.subject);session(node,it.sessionId) }
+                    SubjectRecordKind.OBSERVATION -> subject(node,d.subjects.observations.single { it.id == key.id }.subject)
+                    SubjectRecordKind.CHANGE -> d.subjects.changes.single { it.id == key.id }.let { c -> subject(node,d.subjects.observations.single { it.id == c.fromObservationId }.subject) }
+                    SubjectRecordKind.SET -> session(node,d.subjects.sets.single { it.id == key.id }.sessionId)
+                    SubjectRecordKind.QUANTITY -> d.subjects.quantities.single { it.id == key.id }.let { subject(node,it.subject);session(node,it.sessionId) }
+                    SubjectRecordKind.DISTANCE_TIME -> d.subjects.distanceTimes.single { it.id == key.id }.let { input -> session(node,if(input.scope == Scope.SESSION) input.targetId else d.segments.single { it.id == input.targetId }.sessionId) }
+                }
+            }
+            selectedGoals.forEach { g -> g.definitions().forEach { query("goal:${g.id}",it.filter) } }
+            selectedQueries.forEach { q ->
+                val node="report:${q.id}";query(node,q.filter)
+                if(q.grouping == ReportGrouping.FACET) classified.filter { (_,c) -> c.facets.any { it.axisId == q.groupKey } }.forEach { join(node,it.first) }
             }
         }
         val byLeader = nodes.groupBy(::leader)

@@ -431,7 +431,8 @@ class TechnicalActivity: Activity() {
         runAction { result.await().getOrThrow() }
     }
     private fun time(value: String): Long = Instant.parse(value).toEpochMilli()
-    private fun runAction(block: suspend ()->Unit): Job = scope.launch {
+    private fun runAction(block: suspend ()->Unit) { launchAction(block) }
+    private fun launchAction(block: suspend ()->Unit): Job = scope.launch {
         try { withContext(Dispatchers.IO) { block() } }
         catch (e: Exception) { if (e is CancellationException) throw e; AlertDialog.Builder(this@TechnicalActivity).setMessage("${(e as? CoreError)?.code ?: "Ошибка"}: ${e.message}").setPositiveButton("OK",null).show() }
     }
@@ -520,7 +521,7 @@ class TechnicalActivity: Activity() {
         pendingRestoreDialog?.dismiss()
         val dialog = AlertDialog.Builder(this).setTitle(title).setMessage(message)
             .setNegativeButton("Отмена",null).setPositiveButton(confirm) { _,_ ->
-                if(restoreReviews.claim(preview)) runAction(apply).invokeOnCompletion { CopyLifetimes.get(this).releasePreview(preview) }
+                if(restoreReviews.claim(preview)) launchAction(apply).invokeOnCompletion { CopyLifetimes.get(this).releasePreview(preview) }
             }.create()
         dialog.setOnDismissListener { restoreReviews.discard(preview);if(pendingRestoreDialog === dialog) pendingRestoreDialog = null }
         pendingRestoreDialog = dialog;dialog.show()

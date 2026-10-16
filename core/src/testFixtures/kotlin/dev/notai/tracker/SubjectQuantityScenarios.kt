@@ -185,6 +185,10 @@ fun subjectTransport(create: ()->StateStore,reopen: (StateStore)->StateStore) {
     val destination = Tracker(create(),f.clock);val full = Backups(destination,MemoryRollback());full.apply(full.prepare(json));assertEquals(f.t.data().subjects,destination.data().subjects)
     val downgraded = JsonObject(codec.parseToJsonElement(json).jsonObject+("formatVersion" to JsonPrimitive(13))).toString()
     assertFailsWith<CoreError> { Backups.decode(downgraded) };assertFailsWith<CoreError> { StreamingBackup.read { downgraded.byteInputStream() } }
+    val automatic = SelectiveTransfer(f.t).export(TransferSelection(sessionIds = setOf(session)))
+    assertEquals(setOf("distance"),automatic.groups.flatMap { it.content.measurements }.map { it.id }.toSet())
+    assertTrue("MEASUREMENTS_EXCLUDED:1" in automatic.losses)
+    assertFalse("MEASUREMENTS_EXCLUDED:2" in automatic.losses)
     val roots = f.t.data().subjects.recordKeys()
     val pack = SelectiveTransfer(f.t).export(TransferSelection(sessionIds = setOf(session),measurementIds = f.t.data().measurements.map { it.id }.toSet(),subjectRecords = roots))
     assertEquals(4,pack.formatVersion);assertEquals(1,pack.groups.size)

@@ -113,7 +113,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
             subjectNodes.zipWithNext().forEach { (a,b) -> join(a,b) }
             val anchor = subjectNodes.firstOrNull()
             if(anchor != null) {
-                val cards = selectedSubjects.cardDependencies().toSet()+selectedSubjectCards
+                val cards = selectedSubjects.cardDependencies().toSet()+subjectSessions.mapNotNull { it.selection.cardId }+subjectSegments.mapNotNull { it.selection.cardId }
                 val selections = subjectSessions.map { it.selection }+subjectSegments.map { it.selection }+
                     d.cards.filter { it.id in cards }.map { it.classification() }
                 val types = selections.flatMap { it.ancestorPathAtWrite+listOfNotNull(it.activityTypeId) }.toMutableSet()
@@ -180,7 +180,8 @@ class SelectiveTransfer(private val tracker: Tracker) {
             }
             original ?: group(id,previous?.originId ?: "${d.datasetId}:$id",d.revision,content)
         }
-        val omittedMeasurements = d.measurements.count { (it.targetId in wanted.sessionIds || it.targetId in segmentIds) && it.id !in wanted.measurementIds }
+        val includedMeasurements = groups.flatMap { it.content.measurements }.map { it.id }.toSet()
+        val omittedMeasurements = d.measurements.count { (it.targetId in wanted.sessionIds || it.targetId in segmentIds) && it.id !in includedMeasurements }
         val losses = buildList {
             add("GLOBAL_SETTINGS_AND_CONTROL_ASSIGNMENTS_NOT_PORTABLE")
             if(d.savedReports.any { it.id !in wanted.savedReportIds }) add("SAVED_REPORTS_NOT_SELECTED:${d.savedReports.count { it.id !in wanted.savedReportIds }}")
@@ -190,6 +191,10 @@ class SelectiveTransfer(private val tracker: Tracker) {
             val transferredSubjects = groups.fold(SubjectData()) { acc,g -> acc.merge(g.content.subjects) }
             val omittedObservations = d.subjects.observations.size-transferredSubjects.observations.size
             if(omittedObservations > 0) add("SUBJECT_OBSERVATIONS_NOT_SELECTED:$omittedObservations")
+            (d.subjects.recordKeys()-transferredSubjects.recordKeys()).filter { it.kind != SubjectRecordKind.OBSERVATION }
+                .groupingBy { it.kind }.eachCount().toSortedMap(compareBy { it.name }).forEach { (kind,count) ->
+                    add("SUBJECT_RECORDS_NOT_SELECTED:${kind.name}:$count")
+                }
             val omittedLinks = d.subjects.links.count { l -> transferredSubjects.events.any { it.id == l.subject.id } && transferredSubjects.links.none { it.id == l.id } }
             if(omittedLinks > 0) add("SUBJECT_OTHER_SESSION_LINKS_EXCLUDED:$omittedLinks")
             if(omittedMeasurements > 0) add("MEASUREMENTS_EXCLUDED:$omittedMeasurements")

@@ -1,0 +1,7 @@
+{
+  "source": "c751fb59eaf76c39f82f767143f82d2a34b5f7d8",
+  "coreTests": 1,
+  "coreFailures": 0,
+  "appTestExecuted": false,
+  "failure": "new migration test referenced core-test-only MemoryStore and compile-unexposed kotlin.test; no production defect inferred; app compilation refused"
+}

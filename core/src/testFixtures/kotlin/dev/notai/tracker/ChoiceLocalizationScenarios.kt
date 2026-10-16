@@ -68,4 +68,32 @@ abstract class ChoiceLocalizationScenarioContract {
         t.saveCard(t.snapshot().token,Card("later","Later"))
         assertEquals(ErrorCode.STALE,assertFailsWith<CoreError> { t.view().choices().withCatalogLabels(packs.choiceLabels(data,"en")) }.code)
     }
+    @Test fun ancestorContextDisambiguatesBranchesWithStableLocaleEvidenceAndOwnNamePriority() {
+        val packs = packs();val t = Tracker(createChoiceStore(),FakeClock())
+        t.saveType(t.snapshot().token,one);t.saveType(t.snapshot().token,two)
+        val other = ActivityType("other-root","Other root")
+        val a = ActivityType("leaf-a","Same leaf",parentId=two.id)
+        val b = ActivityType("leaf-b","Same leaf",parentId=other.id)
+        val own = Card("own","en translated-only-0 personal")
+        for(type in listOf(other,a,b)) t.saveType(t.snapshot().token,type)
+        t.saveCard(t.snapshot().token,own)
+        val before=t.data();val view=t.choices().withCatalogLabels(packs.choiceLabels(before,"en-US"))
+        val hits=view.search(ChoiceQuery("en translated-only-0",setOf(ChoiceKind.TYPE,ChoiceKind.CARD)),pageSize=100).items
+        assertEquals("card:own",hits.first().entry.id) // literal own name beats even an exact alias/context
+        val child=hits.single { it.entry.id=="type:leaf-a" }
+        val reason=child.matches.single()
+        assertEquals(MatchField.ANCESTOR_ALIAS,reason.field);assertEquals(one.id,reason.sourceTypeId)
+        assertEquals("en",reason.localeTag);assertEquals(MatchStrength.EXACT,reason.strength)
+        assertFalse(hits.any { it.entry.id=="type:leaf-b" })
+        val mixed=view.search(ChoiceQuery("Same leaf en translated-only-0",setOf(ChoiceKind.TYPE))).items
+        assertEquals(listOf("type:leaf-a"),mixed.map { it.entry.id })
+        assertTrue(mixed.single().matches.any { it.sourceTypeId==one.id })
+        assertTrue(t.choices().search(ChoiceQuery("Same leaf Исходное первое",setOf(ChoiceKind.TYPE))).items.any { it.entry.id=="type:leaf-a" })
+        assertEquals(before,t.data())
+        t.saveType(t.snapshot().token,one.copy(name="Personal branch",aliases=listOf("Personal branch alias")))
+        val changed=t.data();val personal=t.choices().withCatalogLabels(packs.choiceLabels(changed,"en"))
+        assertTrue(personal.search(ChoiceQuery("Same leaf Personal branch alias",setOf(ChoiceKind.TYPE))).items.any { it.entry.id=="type:leaf-a" })
+        assertFalse(personal.search(ChoiceQuery("en translated-only-0",setOf(ChoiceKind.TYPE))).items.any { it.entry.id=="type:leaf-a" })
+    }
+
 }

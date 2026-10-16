@@ -17,7 +17,7 @@ data class ObservationGoal(val id: String,val progress: GoalProgress,
 data class ObservationWeek(val source: Token,val asOf: Long,val firstDate: LocalDate,val zone: String,
     val recordedMs: Long,val days: List<ObservationDay>,val positiveDays: Int,
     val unresolvedSegmentIds: Set<String>,val incompletePeriod: Boolean,
-    val milestones: List<RecordedMilestone>,val goals: List<ObservationGoal>)
+    val milestones: List<RecordedMilestone>,val goals: List<ObservationGoal>,val dayPolicy: ReportingDayPolicy = ReportingDayPolicy(zone))
 
 object ObservationFacts {
     /** ISO Monday week. Recompute on EVERY revision/correction and time observation; consumers
@@ -36,13 +36,13 @@ object ObservationFacts {
         val report = calendar.window
         val days = calendar.days.map { ObservationDay(it.date,it.recordedMs,it.recordedMs > 0) }
         val goals = selectedGoals.sorted().map { id ->
-            val goal = data.goals.single { it.id == id }
             val progress = Goals.progress(data,now,id,date)
+            val goal = progress.goal
             ObservationGoal(id,progress,goal.enabled && goal.metric == GoalMetric.DURATION_MS && goal.direction == GoalDirection.MINIMUM &&
                 progress.recordedStatus == GoalStatus.MINIMUM_REACHED && !progress.uncertain && progress.hasRecords)
         }
         return ObservationWeek(token(data),now.wall,first,zone,report.recordedMs,frozenList(days),days.count { it.hasPositiveRecord },
             frozenSet(report.unresolved.map { it.id }),report.incomplete,
-            frozenList(thresholds.sorted().map { RecordedMilestone(it,report.recordedMs >= it) }),frozenList(goals))
+            frozenList(thresholds.sorted().map { RecordedMilestone(it,report.recordedMs >= it) }),frozenList(goals),report.dayPolicy)
     }
 }

@@ -278,6 +278,12 @@ class SelectiveTransfer(private val tracker: Tracker) {
         ensure(snapshot.formatVersion >= 4 || snapshot.groups.none { it.content.hasChoicePersonalization() },"Personal choices require selective format4",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(snapshot.groups.isNotEmpty() && snapshot.groups.map { it.id }.distinct().size == snapshot.groups.size && snapshot.groups.map { it.originId }.distinct().size == snapshot.groups.size,"Duplicate/empty transfer groups")
         snapshot.groups.forEach { ensure(it.id.isNotBlank() && it.originId.isNotBlank() && it.sourceRevision >= 0 && payloadHash(it.content) == it.hash && it.entities == entityManifest(it.content,it.sourceRevision,it.originId),"Transfer hash/manifest mismatch");validateContent(it.content) }
+        if(snapshot.formatVersion >= 4) {
+            val dependencies=mutableSetOf<Pair<String,String>>()
+            snapshot.groups.forEach { group -> transferIdentityIds(group.content).forEach { (kind,ids) ->
+                ids.distinct().forEach { id -> ensure(dependencies.add(kind to id),"Shared dependency split across transfer groups",ErrorCode.UNSUPPORTED_IMPORT) }
+            } }
+        }
         return TransferInspection(snapshot.transferId,snapshot.groups,snapshot.losses,frozenSet(snapshot.groups.flatMap { it.content.sessions }.filter { it.status != SessionStatus.STOPPED }.map { it.id }))
     }
     fun plan(value: SelectivePackage,groupIds: Set<String>,policies: Map<String,TransferConflictPolicy> = emptyMap()): TransferPlan {

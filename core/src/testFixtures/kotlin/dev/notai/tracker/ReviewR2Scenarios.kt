@@ -107,6 +107,13 @@ fun sharedQueryDependenciesCloseWithoutExplicitRoot(create: ()->StateStore,reope
         val pack=SelectiveTransfer(source).export(TransferSelection(goalIds=setOf("G","H"),savedReportIds=setOf("Q")))
         assertEquals(2,pack.groups.size);assertTrue(pack.groups.all { it.content.sessions.isEmpty() })
         assertEquals(listOf("Q"),pack.groups.single { it.content.goals.any { g -> g.id=="G" } }.content.savedReports.map { it.id })
+        val joint=pack.groups.single { it.content.savedReports.isNotEmpty() }
+        val split=pack.copy(groups=listOf(
+            SelectiveTransfer.group("split-goal","split-O1",0,joint.content.copy(savedReports=emptyList())),
+            SelectiveTransfer.group("split-query","split-O2",0,joint.content.copy(goals=emptyList()))))
+        val rejected=assertFailsWith<CoreError> { SelectiveTransfer(source).inspect(split) }
+        assertEquals(ErrorCode.UNSUPPORTED_IMPORT,rejected.code)
+        assertTrue(rejected.message!!.contains("dependency"))
         val target=Tracker(create(),clock)
         if(axis) target.saveAxis(target.snapshot().token,Axis("shared-axis","Local conflict",valueKind=ValueKind.FREE_LABEL))
         else target.saveType(target.snapshot().token,ActivityType("shared-type","Local conflict"))
@@ -124,6 +131,11 @@ fun sharedQueryDependenciesCloseWithoutExplicitRoot(create: ()->StateStore,reope
         val reexport=repeat.export(TransferSelection(goalIds=opened.data().goals.map { it.id }.toSet(),savedReportIds=setOf(q.id)))
         assertEquals(pack.groups.map { it.hash }.toSet(),reexport.groups.map { it.hash }.toSet())
     }
+    val legacyType=ActivityType("legacy-shared-type","Shared legacy type")
+    fun legacy(id: String)=TransferContent(types=listOf(legacyType),cards=listOf(Card(id,"Same title",activityTypeId=legacyType.id)))
+    val legacy=SelectivePackage(sourceDatasetId="legacy-source",groups=listOf(SelectiveTransfer.group("legacy-a","legacy-O1",0,legacy("a")),SelectiveTransfer.group("legacy-b","legacy-O2",0,legacy("b"))))
+    assertEquals(2,SelectiveTransfer(Tracker(create(),FakeClock())).inspect(legacy).groups.size)
+
 }
 
 fun quantityWindowsRequireCompatibleObservation(create: ()->StateStore) {

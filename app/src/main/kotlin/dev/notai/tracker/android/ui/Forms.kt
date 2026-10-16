@@ -184,6 +184,8 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
     val origStart = session?.second?.firstOrNull()?.start
     val origEnd = session?.second?.lastOrNull()?.end
     val now = remember { vm.now() }
+    val reportingDate by vm.reportingDate.collectAsState()
+    val today = reportingDate ?: ReportingDayPolicy(zone.id,vm.view.value?.data?.settings?.reportDayStartMinute ?: 0).dateAt(vm.now())
     var start by remember { mutableLongStateOf(origStart ?: floorMinute(minOf(now, day.end) - 30 * MINUTE).coerceAtLeast(day.start)) }
     var end by remember { mutableLongStateOf(origEnd ?: floorMinute(minOf(now, day.end - 1))) }
     var selection by remember { mutableStateOf<Classification?>(null) }
@@ -220,7 +222,7 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
             if (entry != null && st != null) {
                 if (st.error != null) Note(st.error)
                 else Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(c.amberWash).padding(horizontal = 14.dp, vertical = 12.dp)) {
-                    Row { Text("${Format.dayTitle(day.date, Instant.ofEpochMilli(now).atZone(zone).toLocalDate())}, итог", Modifier.weight(1f), style = NotAi.type.bodySmall, color = c.ink)
+                    Row { Text("${Format.dayTitle(day.date, today)}, итог", Modifier.weight(1f), style = NotAi.type.bodySmall, color = c.ink)
                         Text(Format.duration(st.beforeMs), style = NotAi.type.bodySmall, color = c.ink2)
                         Text(" → ${Format.duration(st.afterMs)}", style = NotAi.type.bodySmall, color = c.ink) }
                 }

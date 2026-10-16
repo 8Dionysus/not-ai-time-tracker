@@ -26,7 +26,8 @@ import dev.notai.tracker.TrackerView
 fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier = Modifier) {
     val c = NotAi.colors
     var period by rememberSaveableEnum(Period.WEEK)
-    val data by produceState<OverviewData?>(null, period, view) { value = vm.overview(period) }
+    val reportingDate by vm.reportingDate.collectAsState()
+    val data by produceState<OverviewData?>(null, period, view, reportingDate) { value = vm.overview(period) }
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp)) {
         Row(Modifier.fillMaxWidth().height(64.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("Обзор", Modifier.weight(1f), style = NotAi.type.title, color = c.ink)
@@ -56,7 +57,7 @@ fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier 
             return@Column
         }
         if (d.period == Period.DAY) {
-            DayRibbon(d.dayStart, d.dayEnd, d.ribbon.map { RibbonPiece(it.start, it.end, it.slot?.let { s -> c.areas[s] } ?: c.none) }, height = 16.dp)
+            DayRibbon(d.dayStart, d.dayEnd, d.ribbon.map { RibbonPiece(it.start, it.end, it.slot?.let { s -> c.areas[s] } ?: c.none) }, height = 16.dp,zone = d.zone)
         } else Columns(d.columns, d.period)
         if (d.unresolved > 0) Note("Есть отрезки с неизвестным временем: ${d.unresolved}. В итог они не входят, пока ты их не уточнишь.", Modifier.padding(top = 14.dp))
 

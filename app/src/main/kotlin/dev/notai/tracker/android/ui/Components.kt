@@ -146,10 +146,13 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier, trailing: String? 
 
 data class RibbonPiece(val start: Long, val end: Long, val color: Color, val hatched: Boolean = false, val live: Boolean = false)
 
-/** A day as a thin 24-hour strip. Positions are drawn from the report rows' own start/end. */
+internal fun ribbonAxisLabels(start: Long,end: Long,zone: java.time.ZoneId): List<String> =
+    (0..4).map { Format.clock(start+(end-start)*it/4,zone) }
+
+/** A report-day strip. Equal elapsed fractions are labelled in the explicit report zone. */
 @Composable
 fun DayRibbon(dayStart: Long, dayEnd: Long, pieces: List<RibbonPiece>, modifier: Modifier = Modifier, now: Long? = null, labels: Boolean = true,
-              height: Dp = 8.dp) {
+              height: Dp = 8.dp,zone: java.time.ZoneId = java.time.ZoneId.systemDefault()) {
     val c = NotAi.colors
     Column(modifier.fillMaxWidth().semantics { contentDescription = "Лента дня" }) {
         Canvas(Modifier.fillMaxWidth().height(height)) {
@@ -175,7 +178,7 @@ fun DayRibbon(dayStart: Long, dayEnd: Long, pieces: List<RibbonPiece>, modifier:
             }
         }
         if (labels) Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            listOf("0", "6", "12", "18", "24").forEach { Text(it, style = NotAi.type.micro, color = c.ink2) }
+            ribbonAxisLabels(dayStart,dayEnd,zone).forEach { Text(it, style = NotAi.type.micro, color = c.ink2) }
         }
     }
 }

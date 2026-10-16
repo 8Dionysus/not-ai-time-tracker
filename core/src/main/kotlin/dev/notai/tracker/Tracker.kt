@@ -206,6 +206,11 @@ class Tracker(val store: StateStore, val clock: Clock) {
     class DeletePreview internal constructor(val expected: Token,val sessionId: String,val before: Dataset,val after: Dataset,val asOf: Moment) {
         val segmentCount get() = before.segments.count { it.sessionId == sessionId }
         val measurementCount get() = before.measurements.size-after.measurements.size
+        val subjectLinkCount get() = before.subjects.links.size-after.subjects.links.size
+        val exerciseSetCount get() = before.subjects.sets.size-after.subjects.sets.size
+        val eventQuantityCount get() = before.subjects.quantities.size-after.subjects.quantities.size
+        val distanceTimeCount get() = before.subjects.distanceTimes.size-after.subjects.distanceTimes.size
+        val hasDependentFacts get() = measurementCount > 0 || subjectLinkCount > 0 || exerciseSetCount > 0 || eventQuantityCount > 0 || distanceTimeCount > 0
         fun reports(start: Long,end: Long,filter: Filter = Filter()) = Reports.report(before,asOf,start,end,filter) to Reports.report(after,asOf,start,end,filter)
     }
     /** Opening/cancelling confirmation has no writes. Applying is the explicit confirmation. */

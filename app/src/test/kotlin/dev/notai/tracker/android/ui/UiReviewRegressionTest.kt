@@ -57,7 +57,7 @@ class UiReviewRegressionTest {
             val view = tracker.view();val choices = view.choices();val entry = requireNotNull(choices.resolve(id))
             return Shown(entry,choices.reference(entry),view.snapshot().token)
         }
-        fun choose(shown: Shown,mode: PickMode) { vm.choose(shown.entry,mode) }
+        fun choose(shown: Shown,mode: PickMode) { vm.choose(shown.entry,mode,reference = shown.reference,expected = shown.token) }
     }
     private fun pump(until: () -> Boolean) {
         val deadline = System.nanoTime()+5_000_000_000L

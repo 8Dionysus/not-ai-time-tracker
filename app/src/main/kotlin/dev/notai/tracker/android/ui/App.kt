@@ -197,11 +197,9 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
         })
     }
     confirmDelete?.let { r ->
-        val parts = buildList {
-            if (r.segments > 1) add(Format.plural(r.segments, "отрезок", "отрезка", "отрезков") + " между паузами")
-            if (r.measurements > 0) add(Format.plural(r.measurements, "измерение", "измерения", "измерений"))
-        }.joinToString(" и ")
-        ConfirmDialog("Удалить запись целиком?", "${r.range}: вместе с записью удалятся $parts. Сразу после удаления можно отменить.",
+        val parts = r.consequences.joinToString(" и ")
+        val corrections = if(r.exerciseSets > 0 || r.eventQuantities > 0) " Включая сохранённые исправления этих данных." else ""
+        ConfirmDialog("Удалить запись целиком?", "${r.range}: вместе с записью удалятся $parts.$corrections Сразу после удаления можно отменить.",
             "Удалить", onConfirm = { vm.applyDeleteSession(r.preview); confirmDelete = null }, onDismiss = { confirmDelete = null }, destructive = true)
     }
     formPicker?.let { back ->

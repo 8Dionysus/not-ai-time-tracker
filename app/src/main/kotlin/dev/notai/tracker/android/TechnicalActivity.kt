@@ -159,7 +159,7 @@ class TechnicalActivity: Activity() {
         }
         button("CSV отчёт за сегодня (не полная копия)") { runAction {
             val t = runtime.tracker; val d = t.data(); val now = t.clock.now()
-            val report = t.view().day(Instant.ofEpochMilli(now.wall).atZone(ZoneId.of(d.settings.reportZone)).toLocalDate())
+            val report = t.view().day(ReportingDayPolicy(d.settings.reportZone,d.settings.reportDayStartMinute).dateAt(now.wall))
             withContext(Dispatchers.Main) { beginExport("text/csv","not-ai-today.csv") { out ->
                 val writer = out.bufferedWriter(Charsets.UTF_8);Csv.write(report,writer);writer.flush()
             } }
@@ -442,7 +442,7 @@ class TechnicalActivity: Activity() {
                 renderSurfaceSettings(revision.data.settings.surfaces)
                 reportText = withContext(Dispatchers.IO) {
                     val d = revision.data; val now = runtime.tracker.clock.now()
-                    val report = revision.day(Instant.ofEpochMilli(now.wall).atZone(ZoneId.of(d.settings.reportZone)).toLocalDate())
+                    val report = revision.day(ReportingDayPolicy(d.settings.reportZone,d.settings.reportDayStartMinute).dateAt(now.wall))
                     "Итоги на ${Instant.ofEpochMilli(report.asOf)} (${report.zone}): ${report.recordedMs} ms; неопределённых: ${report.unresolved.size}\nКарточки: ${d.cards.joinToString { it.name }}\nСессий: ${d.sessions.size}; сегментов: ${d.segments.size}\n${report.rows.joinToString("\n") { "${it.selection.name ?: "Без уточнения"}: ${it.durationMs} ms" }}"
                 }
                 while(isActive) {

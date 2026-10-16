@@ -150,7 +150,7 @@ private fun IdleHero(home: HomeData?, vm: TrackerViewModel, actions: TimerAction
                 if (quick.isNotEmpty()) SectionLabel("Начать сразу")
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     quick.forEach { q ->
-                        Chip(q.title, { vm.choose(q.entry, PickMode.START) }, slot = q.slot, glyph = q.glyph)
+                        Chip(q.title, { vm.choose(q.entry, PickMode.START,reference = q.reference,expected = q.expected) }, slot = q.slot, glyph = q.glyph)
                     }
                     Chip(if (quick.isEmpty()) "Начать с занятием" else "Все занятия", { actions.pick(PickMode.START) }, dashed = true, icon = Icon.Plus)
                 }
@@ -304,7 +304,7 @@ private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: Track
                 else {
                     val pieces = day.ribbon.map { RibbonPiece(it.start, it.end, it.slot?.let { s -> c.areas[s] } ?: c.none) } +
                         day.live.map { RibbonPiece(it.start, it.end, c.amber, live = true) }
-                    DayRibbon(day.start, day.end, pieces)
+                    DayRibbon(day.start, day.end, pieces,zone = home.zone)
                 }
             }
         }

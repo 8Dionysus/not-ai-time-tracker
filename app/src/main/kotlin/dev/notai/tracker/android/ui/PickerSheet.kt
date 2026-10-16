@@ -84,18 +84,19 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
     var query by remember { mutableStateOf("") }
     var stack by remember { mutableStateOf(listOf<PickerItem>()) }
     var showMore by remember { mutableStateOf(false) }
-    var refresh by remember { mutableIntStateOf(0) }
-    val data by produceState<PickerData?>(null, refresh) { value = vm.pickerData() }
-    val results by produceState(emptyList<PickerItem>(), query) { if (query.isBlank()) value = emptyList() else { delay(120); value = vm.search(query) } }
-    val parent = stack.lastOrNull()
-    val children by produceState(emptyList<PickerItem>(), parent) { value = parent?.let { vm.children(it.entry.sourceId) } ?: emptyList() }
+    val committed by vm.view.collectAsStateWithLifecycle()
+    val data by produceState<PickerData?>(null, committed) { value = vm.pickerData() }
+    val results by produceState(emptyList<PickerItem>(), query, committed) { if (query.isBlank()) value = emptyList() else { delay(120); value = vm.search(query) } }
+    val breadcrumb = stack.lastOrNull()
+    val parent by produceState(breadcrumb,breadcrumb,committed) { value = breadcrumb?.let { vm.refreshPickerItem(it) } }
+    val children by produceState(emptyList<PickerItem>(), parent, committed) { value = parent?.let { vm.children(it.entry.sourceId) } ?: emptyList() }
     val draft by vm.draft.collectAsStateWithLifecycle()
 
     fun pick(item: PickerItem) {
         // Areas with children open first; the area itself stays choosable as "Вся область" inside.
         if (!item.whole && (item.entry.availability == ChoiceAvailability.GROUP || (item.count ?: 0) > 0)) { stack = stack + item; query = ""; return }
         if (!item.entry.canStart) return
-        if (onReturn != null) onReturn(item.entry.selection, item.label) else vm.choose(item.entry, effective, boundary)
+        if (onReturn != null) onReturn(item.entry.selection, item.label) else vm.choose(item.entry, effective, boundary,item.reference,item.expected)
         onDismiss()
     }
     fun create(name: String) {
@@ -156,14 +157,14 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
                         if (d.recents.isNotEmpty()) {
                             item { SectionLabel("Недавние", Modifier.padding(top = 14.dp, bottom = 4.dp)) }
                             items(d.recents, key = { "h-" + it.entry.id }) { r ->
-                                ChoiceRow(r, ::pick, trailing = { IconAction(Icon.StarLine, "В избранное", { vm.saveFavorite(r.label.title, r.entry.selection); refresh++ }, size = 16.dp) })
+                                ChoiceRow(r, ::pick, trailing = { IconAction(Icon.StarLine, "В избранное", { vm.saveFavorite(r.label.title, r.entry.selection) }, size = 16.dp) })
                             }
                         }
                         if (d.favorites.isNotEmpty()) {
                             item { SectionLabel("Избранное", Modifier.padding(top = 20.dp, bottom = 4.dp)) }
                             items(d.favorites, key = { "f-" + it.entry.id }) { f ->
                                 ChoiceRow(f, ::pick, title = f.entry.title, trailing = {
-                                    IconAction(Icon.Star, "Убрать из избранного", { vm.removeFavorite(f.entry.sourceId); refresh++ }, tint = c.amber, size = 16.dp)
+                                    IconAction(Icon.Star, "Убрать из избранного", { vm.removeFavorite(f.entry.sourceId) }, tint = c.amber, size = 16.dp)
                                 })
                             }
                         }

@@ -30,11 +30,12 @@ data class EntryUi(val segmentId: String, val sessionId: String, val start: Long
                    val label: Label, val note: String?, val selection: Classification)
 data class DayUi(val date: LocalDate, val start: Long, val end: Long, val recordedMs: Long, val incomplete: Boolean, val entries: List<EntryUi>,
                  val ribbon: List<RibbonSlot>, val live: List<RibbonSlot>)
-data class QuickStart(val title: String, val slot: Int?, val entry: ChoiceEntry, val favorite: Boolean, val glyph: Int, val reference: ChoiceReference)
+data class QuickStart(val title: String, val slot: Int?, val entry: ChoiceEntry, val favorite: Boolean, val glyph: Int, val reference: ChoiceReference, val expected: Token)
 data class HomeData(val today: LocalDate, val zone: ZoneId, val days: List<DayUi>, val quick: List<QuickStart>,
                     val currentLabel: Label?, val currentStart: Long?, val canLoadMore: Boolean, val focusMinutes: Long)
 
-data class PickerItem(val entry: ChoiceEntry, val label: Label, val count: Int? = null, val whole: Boolean = false)
+data class PickerItem(val entry: ChoiceEntry, val label: Label, val count: Int? = null, val whole: Boolean = false,
+                      val reference: ChoiceReference? = null, val expected: Token? = null)
 data class PickerData(val recents: List<PickerItem>, val favorites: List<PickerItem>, val areas: List<PickerItem>, val moreAreas: List<PickerItem>)
 
 enum class Period(val days: Int, val title: String) { DAY(1, "День"), WEEK(7, "7 дней"), MONTH(30, "30 дней") }
@@ -44,7 +45,7 @@ data class GoalUi(val name: String, val value: String, val status: String, val o
 data class OverviewData(val period: Period, val first: LocalDate, val last: LocalDate, val totalMs: Long, val incomplete: Boolean,
                         val differenceMs: Long?, val previousMs: Long?, val previousFirst: LocalDate, val previousLast: LocalDate, val areas: List<AreaTotal>,
                         val columns: List<DayColumn>, val ribbon: List<RibbonSlot>, val dayStart: Long, val dayEnd: Long,
-                        val goals: List<GoalUi>, val unresolved: Int)
+                        val goals: List<GoalUi>, val unresolved: Int, val zone: ZoneId = ZoneId.of("UTC"))
 data class RibbonSlot(val start: Long, val end: Long, val slot: Int?)
 
 data class CorrectionDraft(val sessionId: String, val start: Long, val end: Long, val selection: Classification?, val note: String?)
@@ -64,8 +65,21 @@ private val STARTERS = listOf(
 sealed interface DeleteRequest {
     data object Applied : DeleteRequest
     data object Failed : DeleteRequest
-    /** Several segments or measurements go together with the record: ask once, then apply this exact preview. */
-    class Confirm(val preview: Tracker.DeletePreview, val range: String, val segments: Int, val measurements: Int) : DeleteRequest
+    /** Counts include retained correction rows, not only the currently effective set/value. */
+    class Confirm(val preview: Tracker.DeletePreview, val range: String, val segments: Int, val measurements: Int) : DeleteRequest {
+        val subjectLinks get() = preview.subjectLinkCount
+        val exerciseSets get() = preview.exerciseSetCount
+        val eventQuantities get() = preview.eventQuantityCount
+        val distanceTimes get() = preview.distanceTimeCount
+        val consequences get() = buildList {
+            if(segments > 1) add(Format.plural(segments,"отрезок","отрезка","отрезков")+" между паузами")
+            if(measurements > 0) add(Format.plural(measurements,"измерение","измерения","измерений"))
+            if(subjectLinks > 0) add(Format.plural(subjectLinks,"связь с предметом","связи с предметами","связей с предметами"))
+            if(exerciseSets > 0) add(Format.plural(exerciseSets,"запись подхода","записи подходов","записей подходов"))
+            if(eventQuantities > 0) add(Format.plural(eventQuantities,"запись событийной величины","записи событийных величин","записей событийных величин"))
+            if(distanceTimes > 0) add(Format.plural(distanceTimes,"основание темпа","основания темпа","оснований темпа"))
+        }
+    }
 }
 internal object DocumentExportCoordination {
     val lock = Any()
@@ -77,7 +91,8 @@ internal object DocumentExportCoordination {
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
+class TrackerViewModel internal constructor(private val app: Application,private val waitForBoundary: suspend (Long) -> Unit) : AndroidViewModel(app) {
+    constructor(app: Application): this(app,{ delay(it) })
     sealed interface Boot { data object Loading : Boot; data class Ready(val backend: UiBackend) : Boot; data class Failed(val message: String) : Boot }
 
     private val _boot = MutableStateFlow<Boot>(Boot.Loading)
@@ -135,8 +150,21 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
     private val shownDays = MutableStateFlow(7)
     fun showMoreDays() { shownDays.update { minOf(it + 14, 62) } }
 
-    /** History by local day. Recomputed per revision and once a minute while a session is open. */
-    val home: StateFlow<HomeData?> = combine(view, shownDays) { v, n -> v to n }.flatMapLatest { (v, n) ->
+    /** Display invalidation only; report-day meaning comes from the core policy. It stays live
+     * while an idle home/overview is collected, without writing timer or Dataset state. */
+    val reportingDate: StateFlow<LocalDate?> = view.flatMapLatest { v ->
+        if(v == null) flowOf<LocalDate?>(null) else flow<LocalDate?> {
+            val policy = ReportingDayPolicy(v.data.settings.reportZone,v.data.settings.reportDayStartMinute)
+            while(true) {
+                val wall = now();val date = policy.dateAt(wall);emit(date)
+                val next = runCatching { policy.boundary(date.plusDays(1)) }.getOrNull()
+                waitForBoundary(next?.let { (it-wall).coerceIn(1L,60_000L) } ?: 60_000L)
+            }
+        }
+    }.distinctUntilChanged().flowOn(Dispatchers.IO).stateIn(viewModelScope,SharingStarted.WhileSubscribed(5_000),null)
+
+    /** History by report day. Revision/date changes invalidate idle data; open sessions also tick. */
+    val home: StateFlow<HomeData?> = combine(view, shownDays, reportingDate) { v, n, _ -> v to n }.flatMapLatest { (v, n) ->
         if (v == null) flowOf<HomeData?>(null) else flow<HomeData?> {
             while (true) {
                 emit(homeData(v, n))
@@ -153,15 +181,15 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
         val end = minOf(MAX_TIME, now() + 1)
         return v.choices().quick(HistoryWindow(maxOf(0L, end - 30L * 24 * 60 * 60 * 1000), end), limit)
     }
-    private fun QuickChoice.toQuickStart(d: Dataset): QuickStart {
+    private fun QuickChoice.toQuickStart(d: Dataset,expected: Token): QuickStart {
         val l = d.label(entry.selection)
-        return QuickStart(if (entry.kind == ChoiceKind.FAVORITE) entry.title else l.title, l.slot, entry, entry.kind == ChoiceKind.FAVORITE, l.glyph, reference)
+        return QuickStart(if (entry.kind == ChoiceKind.FAVORITE) entry.title else l.title, l.slot, entry, entry.kind == ChoiceKind.FAVORITE, l.glyph, reference,expected)
     }
 
     private fun homeData(v: TrackerView, days: Int): HomeData {
         val d = v.data
         val zone = ZoneId.of(d.settings.reportZone)
-        val today = Instant.ofEpochMilli(now()).atZone(zone).toLocalDate()
+        val today = ReportingDayPolicy(d.settings.reportZone,d.settings.reportDayStartMinute).dateAt(now())
         val calendar = v.calendar(today.minusDays(days - 1L), days)
         val open = current(d)
         val notes = d.sessions.associate { it.id to it.note }
@@ -175,7 +203,7 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
                 day.rows.filter { it.sessionId == open?.id }.map { RibbonSlot(it.start, it.end, null) })
         }
         // Same bounded source as the notification: favourites, then the most frequent of the last 30 days.
-        val quick = quickChoices(v, 8).filter { it.entry.canStart && !d.label(it.entry.selection).unclassified }.take(5).map { q -> q.toQuickStart(d) }
+        val quick = quickChoices(v, 8).filter { it.entry.canStart && !d.label(it.entry.selection).unclassified }.take(5).map { q -> q.toQuickStart(d,v.snapshot().token) }
         return HomeData(today, zone, dayList, quick, open?.let { d.label(it.selection) }, open?.let { s -> d.segments.filter { it.sessionId == s.id }.minOfOrNull { it.start } },
             // Older days only when something older exists: a new install has nothing to load.
             days < 62 && (d.segments.minOfOrNull { it.start } ?: Long.MAX_VALUE) < (calendar.days.firstOrNull()?.start ?: Long.MIN_VALUE),
@@ -265,7 +293,7 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
     fun applyDeleteSession(preview: Tracker.DeletePreview) = command({ "Запись удалена" }) { rt,_ -> rt.tracker.applyDeleteSession(preview) }
 
     /**
-     * One entrance for the row menu, swipe and the entry sheet. A single-segment record without measurements is
+     * One entrance for the row menu, swipe and the entry sheet. A single-segment record without dependent facts is
      * deleted at once (Undo stays available); anything larger returns the preview for an explicit confirmation.
      */
     suspend fun requestDelete(sessionId: String): DeleteRequest {
@@ -273,7 +301,7 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
             notice(if ((e as? CoreError)?.code == ErrorCode.STALE) Format.error(e) else "Удалить можно только завершённую запись. Идущая запись и текущий Фокус не удаляются.")
             return DeleteRequest.Failed
         } ?: return DeleteRequest.Failed
-        if (preview.segmentCount > 1 || preview.measurementCount > 0) {
+        if (preview.segmentCount > 1 || preview.hasDependentFacts) {
             val zone = ZoneId.of(preview.before.settings.reportZone)
             val segments = preview.before.segments.filter { it.sessionId == sessionId }
             val first = segments.minOf { it.start }
@@ -310,8 +338,15 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
     fun undo(token: Token) = command({ "Отменено" }) { rt, _ -> rt.tracker.undo(token) }
 
     /** One decision point for every picked activity, so Start, Switch and labelling stay explicit. */
-    fun choose(entry: ChoiceEntry, mode: PickMode, earlierBoundary: Long? = null) =
-        command({ if (mode == PickMode.SWITCH) "Новая запись начата" else null }) { rt, s -> applyChoice(rt, s, entry.selection, entry, mode, earlierBoundary) }
+    fun choose(entry: ChoiceEntry, mode: PickMode, earlierBoundary: Long? = null,reference: ChoiceReference? = null,expected: Token? = null) =
+        command({ if (mode == PickMode.SWITCH) "Новая запись начата" else null }) { rt, _ ->
+            val shown = reference ?: fail(ErrorCode.STALE,"Choice needs its displayed reference")
+            val view = rt.tracker.view();val state = view.snapshot()
+            ensure(expected == state.token,"Displayed choice revision changed",ErrorCode.STALE)
+            val resolved = view.choices().resolve(shown)
+            ensure(resolved == entry,"Displayed choice changed",ErrorCode.STALE)
+            applyChoice(rt,state,resolved.selection,resolved,mode,earlierBoundary)
+        }
 
     private fun applyChoice(rt: UiBackend, s: Snapshot, selection: Classification, entry: ChoiceEntry?, mode: PickMode, boundary: Long?): Tracker.Change {
         val t = rt.tracker
@@ -325,9 +360,10 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
             idle && entry?.kind == ChoiceKind.FAVORITE -> t.startFavorite(s.token, entry.sourceId)
             idle && entry?.kind == ChoiceKind.HISTORY && entry.sourceSessionId != null -> t.repeat(s.token, entry.sourceSessionId!!)
             idle -> t.start(s.token, selection)
+            draft != null -> t.switchDraft(s.token,draft.copy(selection = selection)).also { _draft.value = null }
             else -> {
                 val change = t.switch(s.token, selection)
-                if (draft != null) t.labelCurrent(change.state.token, selection, draft.note).also { _draft.value = null } else change
+                change
             }
         }
     }
@@ -422,13 +458,13 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
     suspend fun pickerData(): PickerData = withContext(Dispatchers.IO) {
         val v = view.value ?: runtime?.tracker?.view() ?: return@withContext PickerData(emptyList(), emptyList(), emptyList(), emptyList())
         val d = v.data; val choices = v.choices()
-        val recents = choices.suggestions(SuggestionQuery(enabled = true), pageSize = 5).items.map { PickerItem(it.entry, d.label(it.entry.selection)) }
-        val favorites = choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.FAVORITE)), pageSize = 30).items.map { PickerItem(it.entry, d.label(it.entry.selection)) }
+        val recents = choices.suggestions(SuggestionQuery(enabled = true), pageSize = 5).items.map { PickerItem(it.entry, d.label(it.entry.selection),reference = choices.reference(it.entry),expected = v.snapshot().token) }
+        val favorites = choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.FAVORITE)), pageSize = 30).items.map { PickerItem(it.entry, d.label(it.entry.selection),reference = choices.reference(it.entry),expected = v.snapshot().token) }
         val roots = generateSequence(choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.ROOTS), pageSize = 100)) { p ->
             p.next?.let { choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.ROOTS), it, 100) }
         }.flatMap { it.items }.filter { it.entry.availability == ChoiceAvailability.GROUP || d.types.any { t -> t.parentId == it.entry.sourceId } }.map { hit ->
             val count = choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.CHILDREN, parentId = hit.entry.sourceId), pageSize = 1).total
-            PickerItem(hit.entry, d.label(hit.entry.selection).copy(slot = Areas.slot(hit.entry.sourceId)), count)
+            PickerItem(hit.entry, d.label(hit.entry.selection).copy(slot = Areas.slot(hit.entry.sourceId)), count,reference = choices.reference(hit.entry),expected = v.snapshot().token)
         }.toList()
         val order = Areas.everyday
         val everyday = roots.filter { it.entry.sourceId in order }.sortedBy { order.indexOf(it.entry.sourceId) }
@@ -442,14 +478,22 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
         generateSequence(choices.search(q, pageSize = 100)) { p -> p.next?.let { choices.search(q, it, 100) } }.flatMap { it.items }.map { hit ->
             val kids = if (hit.entry.availability == ChoiceAvailability.GROUP)
                 choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.CHILDREN, parentId = hit.entry.sourceId), pageSize = 1).total else null
-            PickerItem(hit.entry, v.data.label(hit.entry.selection), kids)
+            PickerItem(hit.entry, v.data.label(hit.entry.selection), kids,reference = choices.reference(hit.entry),expected = v.snapshot().token)
         }.toList()
     }
 
     suspend fun search(text: String): List<PickerItem> = withContext(Dispatchers.IO) {
         val v = view.value ?: return@withContext emptyList()
-        v.choices().search(ChoiceQuery(text = text.take(256), kinds = setOf(ChoiceKind.FAVORITE, ChoiceKind.CARD, ChoiceKind.TYPE)), pageSize = 40)
-            .items.map { PickerItem(it.entry, v.data.label(it.entry.selection)) }
+        val choices = v.choices()
+        choices.search(ChoiceQuery(text = text.take(256), kinds = setOf(ChoiceKind.FAVORITE, ChoiceKind.CARD, ChoiceKind.TYPE)), pageSize = 40)
+            .items.map { PickerItem(it.entry, v.data.label(it.entry.selection),reference = choices.reference(it.entry),expected = v.snapshot().token) }
+    }
+
+    /** Re-project the current breadcrumb without changing the picker navigation stack. */
+    suspend fun refreshPickerItem(item: PickerItem): PickerItem? = withContext(Dispatchers.IO) {
+        val v = view.value ?: return@withContext null;val choices = v.choices()
+        val entry = choices.resolve(item.entry.id) ?: return@withContext null
+        item.copy(entry = entry,label = v.data.label(entry.selection),reference = choices.reference(entry),expected = v.snapshot().token)
     }
 
     // ---------- corrections ----------
@@ -492,7 +536,7 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
         val v = view.value ?: rt.tracker.view()
         val d = v.data
         val zone = ZoneId.of(d.settings.reportZone)
-        val today = Instant.ofEpochMilli(now()).atZone(zone).toLocalDate()
+        val today = ReportingDayPolicy(d.settings.reportZone,d.settings.reportDayStartMinute).dateAt(now())
         val first = today.minusDays(period.days - 1L)
         val calendar = v.calendar(first, period.days)
         val window = calendar.window
@@ -512,16 +556,20 @@ class TrackerViewModel(private val app: Application) : AndroidViewModel(app) {
         val comparison = runCatching {
             Reports.compareCalendarDays(d, rt.tracker.clock.now(), first, first.minusDays(period.days.toLong()), period.days)
         }.getOrNull()
-        val goals = d.goals.filter { it.enabled }.mapNotNull { g -> runCatching { goalUi(v.goalProgress(g.id)) }.getOrNull() }
+        val goals = d.goals.mapNotNull { g -> runCatching { v.goalProgress(g.id) }.getOrNull()?.takeIf { it.goal.enabled }?.let(::goalUi) }
         val day = calendar.days.first()
         OverviewData(period, first, today, window.recordedMs, window.incomplete, comparison?.absoluteDifferenceMs, comparison?.previous?.recordedMs,
             first.minusDays(period.days.toLong()), first.minusDays(1), areas, columns, ribbon, day.start, calendar.days.last().end,
-            goals, window.unresolved.size)
+            goals, window.unresolved.size,zone)
     }
 
     private fun goalUi(p: GoalProgress): GoalUi {
         val g = p.goal
-        fun amount(x: Long) = if (g.metric == GoalMetric.DURATION_MS) Format.duration(x) else "$x раз"
+        fun amount(x: Long) = when(g.metric) {
+            GoalMetric.DURATION_MS -> Format.duration(x)
+            GoalMetric.SESSION_COUNT -> "$x раз"
+            GoalMetric.DISTINCT_RECORDED_DAYS -> "$x дн."
+        }
         val per = when (g.period) { GoalPeriod.DAY -> " в день"; GoalPeriod.WEEK -> " в неделю"; GoalPeriod.MONTH -> " в месяц"; GoalPeriod.FIXED -> "" }
         val name = g.name + if (g.direction == GoalDirection.MINIMUM) ", от ${amount(g.target)}$per" else ", не больше ${amount(g.target)}$per"
         val (status, ok) = when (p.recordedStatus) {

@@ -1,0 +1,13 @@
+.F.
+======================================================================
+FAIL: test_confirmation_change_changes_hash_without_any_other_row_difference (__main__.FingerprintTest.test_confirmation_change_changes_hash_without_any_other_row_difference)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/not-ai-time-tracker/scripts/test_android_store_fingerprint.py", line 68, in test_confirmation_change_changes_hash_without_any_other_row_difference
+    self.assertNotEqual(first["tables"]["segments"]["canonicalValuesSha256"], second["tables"]["segments"]["canonicalValuesSha256"])
+AssertionError: '7850800daeb463a3841fc679f9cf9bcf9d58f9afad94be269d7c40cbb9831297' == '7850800daeb463a3841fc679f9cf9bcf9d58f9afad94be269d7c40cbb9831297'
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.109s
+
+FAILED (failures=1)

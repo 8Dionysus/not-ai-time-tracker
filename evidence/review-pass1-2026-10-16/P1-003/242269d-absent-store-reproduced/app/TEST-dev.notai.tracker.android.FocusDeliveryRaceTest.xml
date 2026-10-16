@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.FocusDeliveryRaceTest" tests="1" skipped="0" failures="1" errors="0" timestamp="2026-10-16T08:01:18.282Z" hostname="69b2b5b46001" time="5.676">
+  <properties/>
+  <testcase name="staleAlarmWithoutStoreDoesNotBootstrapAnEmptyDatabase" classname="dev.notai.tracker.android.FocusDeliveryRaceTest" time="5.676">
+    <failure message="java.lang.AssertionError: Stale background callback created a new tracker database" type="java.lang.AssertionError">java.lang.AssertionError: Stale background callback created a new tracker database
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.junit.Assert.assertFalse(Assert.java:65)
+	at dev.notai.tracker.android.FocusDeliveryRaceTest$staleAlarmWithoutStoreDoesNotBootstrapAnEmptyDatabase$1.invokeSuspend(FocusDeliveryRaceTest.kt:114)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.internal.LimitedDispatcher$Worker.run(LimitedDispatcher.kt:124)
+	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:586)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:820)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:717)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:704)
+</failure>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

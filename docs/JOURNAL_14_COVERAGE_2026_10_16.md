@@ -47,7 +47,7 @@ fresh full regression. Default fields preserve legacy content hash vectors.
 
 A: localization/catalog presentation and stable IDs remain separate from originals,
 user overrides, rights and offline availability. The accepted private eleven packs
-have dedicated real-payload tests; no locale payload is published in public Git.
+have dedicated real-payload tests; locale payloads were private during preparation; this is superseded by Dionysus’s explicit2026-10-16 public authorization: all eleven accepted catalog packs are now in public Git/APK, with original rights/QA metadata retained (see PRIVATE_CATALOG11.md).
 B: the existing schedule series/overrides/start links/projection/receipts remain one
 engine and receive the shared full/selective floor. UI surface binding is separate.
 C: Room12/full14/read1–14/selective1–4, one merged migration, complete new snapshots,

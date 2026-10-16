@@ -95,7 +95,10 @@ internal fun validateTransferHeader(h: TransferGroupHeader) {
 internal fun validateTransferOrigin(origin: TransferOrigin) {
     ensure(origin.originId.isNotBlank() && listOf(origin.hash,origin.localHash).all { it.matches(Regex("[0-9a-f]{64}")) },"Invalid transfer provenance digest")
     val c = origin.compaction
-    if(c == null) ensure(payloadHash(origin.localGroup) == origin.localHash,"Invalid transfer provenance") else {
+    if(c == null) {
+        ensure(payloadHash(origin.localGroup) == origin.localHash,"Invalid transfer provenance")
+        SelectiveTransfer.validateContent(origin.localGroup)
+    } else {
         ensure(origin.localGroup == TransferContent(),"Compacted origin retains values");validateTransferManifest(c.localEntities)
         ensure(c.catalogRoots.cardIds.all { id -> c.localEntities.any { it.kind == "card" && it.sourceEntityId == id } } &&
             c.catalogRoots.typeIds.all { id -> c.localEntities.any { it.kind == "type" && it.sourceEntityId == id } },"Compacted catalog root missing")

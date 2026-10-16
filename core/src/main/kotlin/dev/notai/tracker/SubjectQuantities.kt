@@ -86,15 +86,7 @@ internal fun validateSubjects(d: Dataset) {
     }
     s.observations.forEach { subject(it.subject);definition(it.definition,it.value);audit(it.effectiveAt,it.recordedAt,it.source) }
     corrections(s.observations,{it.id},{it.replacesId},{it.recordedAt}) { a,b -> a.subject == b.subject && a.definition == b.definition }
-    s.changes.forEach { c ->
-        val a = s.observations.singleOrNull { it.id == c.fromObservationId } ?: fail(ErrorCode.INVALID_INPUT,"Missing change basis")
-        val b = s.observations.singleOrNull { it.id == c.toObservationId } ?: fail(ErrorCode.INVALID_INPUT,"Missing change end")
-        audit(null,c.recordedAt,c.source)
-        ensure(a.id != b.id && a.subject == b.subject && a.definition == b.definition && a.effectiveAt != null && b.effectiveAt != null && a.effectiveAt < b.effectiveAt,
-            "Change needs ordered observations on one subject definition")
-        ensure(c.recordedAt >= maxOf(a.recordedAt,b.recordedAt),"Change audit time precedes its basis")
-        ensure(b.value.number.subtract(a.value.number).compareTo(c.value.number) == 0,"Signed change differs from explicit basis")
-    }
+    s.changes.forEach { validateSubjectChange(it,s.observations) }
     corrections(s.changes,{it.id},{it.replacesId},{it.recordedAt}) { a,b ->
         s.observations.single { it.id == a.fromObservationId }.let { x -> s.observations.single { it.id == b.fromObservationId }.let { y -> x.subject == y.subject && x.definition == y.definition } }
     }
@@ -122,6 +114,28 @@ internal fun validateSubjects(d: Dataset) {
     ensure(s.distanceTimes.map { it.measurementId to it.timeBasis }.distinct().size == s.distanceTimes.size,"Duplicate rate pairing")
 }
 
+/** One basis rule for live and retained records; partial Undo deltas use their source snapshot.
+ * Conflicting same-ID observations cannot lower a retained change's audit-time floor. */
+internal fun validateSubjectChange(c: SubjectChange,observations: List<StateObservation>) {
+    fun basis(id: String): StateObservation {
+        val matches=observations.filter { it.id == id }.distinct()
+        ensure(matches.size == 1,"Missing or conflicting change basis")
+        return matches.single().also { o ->
+            ensure(o.recordedAt in 0..MAX_TIME && o.effectiveAt?.let { it in 0..o.recordedAt } != false && o.source.isNotBlank(),"Invalid change basis audit")
+        }
+    }
+    val a=basis(c.fromObservationId);val b=basis(c.toObservationId)
+    ensure(c.recordedAt in 0..MAX_TIME && c.source.isNotBlank(),"Invalid change audit")
+    ensure(a.id != b.id && a.subject == b.subject && a.definition == b.definition && a.effectiveAt != null && b.effectiveAt != null && a.effectiveAt < b.effectiveAt,
+        "Change needs ordered observations on one subject definition")
+    ensure(c.recordedAt >= maxOf(a.recordedAt,b.recordedAt),"Change audit time precedes its basis")
+    ensure(b.value.number.subtract(a.value.number).compareTo(c.value.number) == 0,"Signed change differs from explicit basis")
+}
+internal fun validateInsertedSubjectChanges(inserted: TransferContent,source: TransferContent) {
+    val observations=source.subjects.observations+inserted.subjects.observations
+    inserted.subjects.changes.forEach { validateSubjectChange(it,observations) }
+}
+
 data class SubjectCount(val cardIds: Set<String>,val eventIds: Set<String>,val sessionIds: Set<String>)
 enum class QuantityUnavailable { NO_OBSERVATION, CONFLICT, UNKNOWN_EFFECTIVE_TIME, DISCONTINUOUS_BASIS, SUPERSEDED_BASIS, INCOMPATIBLE_INPUTS, ZERO_DISTANCE, ZERO_TIME, CLIPPED_WINDOW, OVERLAPPING_TARGETS, TARGET_CHANGED, NO_INPUTS }
 data class StateAt(val observations: List<StateObservation>,val value: Decimal?,val reason: QuantityUnavailable?)
@@ -130,17 +144,24 @@ data class SetTotal(val setIds: List<String>,val repetitions: Long,val volume: D
 data class ExactRatio(val numerator: BigDecimal,val denominator: BigDecimal)
 data class RateResult(val speedBaseUnitsPerMs: ExactRatio?,val paceMsPerBaseUnit: ExactRatio?,val measurementIds: List<String>,
     val inputIds: List<String>,val timeBasis: TimeBasis,val start: Long,val end: Long,val reason: QuantityUnavailable?)
-data class QuantityWindow(val token: Token,val events: List<EventQuantity>,val unknownTime: List<EventQuantity>,val wholeTargets: List<Measurement>) {
+sealed interface QuantityWindowSelection {
+    /** Stored latest corrections, with no audit-time cutoff. Null and empty session sets differ. */
+    data class Stored(val sessionIds: Set<String>? = null): QuantityWindowSelection
+    /** One captured report cutoff and immutable selection policy, independent of window bounds. */
+    data class Reported(val asOf: Long,val filter: Filter,val policy: ReportingDayPolicy): QuantityWindowSelection
+}
+data class QuantityWindow(val token: Token,val events: List<EventQuantity>,val unknownTime: List<EventQuantity>,val wholeTargets: List<Measurement>,val selection: QuantityWindowSelection = QuantityWindowSelection.Stored()) {
     /** Only timed event quantities are additive across disjoint windows. Legacy values stay separate. */
     /** Combining daily rows unions provenance IDs; whole-session values remain whole-session. */
     fun combine(other: QuantityWindow): QuantityWindow {
         ensure(token == other.token,"Quantity windows belong to different revisions")
+        ensure(selection == other.selection,"Quantity windows use different cutoffs or selection semantics")
         fun <T> union(a: List<T>,b: List<T>,id: (T)->String): List<T> {
             val byId = a.associateBy(id)
             ensure(b.all { byId[id(it)] == null || byId[id(it)] == it },"Quantity windows belong to different revisions")
             return frozenList(a+b.filter { id(it) !in byId })
         }
-        return QuantityWindow(token,union(events,other.events) { it.id },union(unknownTime,other.unknownTime) { it.id },union(wholeTargets,other.wholeTargets) { it.id })
+        return QuantityWindow(token,union(events,other.events) { it.id },union(unknownTime,other.unknownTime) { it.id },union(wholeTargets,other.wholeTargets) { it.id },selection)
     }
     fun totals() = events.groupBy { it.subject to it.definition }.mapValues { (_,q) -> q.fold(Decimal.ZERO) { sum,v -> sum+v.value } }
 }
@@ -197,7 +218,8 @@ class SubjectRead internal constructor(private val d: Dataset) {
         val sessions = d.segments.filter { (sessionIds == null || it.sessionId in sessionIds) && it.start < end && (it.end ?: it.observedUntil ?: it.start) > start }.map { it.sessionId }.toSet()
         val segments = d.segments.filter { it.sessionId in sessions && it.start < end && (it.end ?: it.observedUntil ?: it.start) > start }.map { it.id }.toSet()
         return QuantityWindow(token(d),frozenList(quantities.filter { it.effectiveAt != null && it.effectiveAt >= start && it.effectiveAt < end }),frozenList(quantities.filter { it.effectiveAt == null }),
-            frozenList(d.measurements.filter { if(it.scope == Scope.SESSION) it.targetId in sessions else it.targetId in segments }))
+            frozenList(d.measurements.filter { if(it.scope == Scope.SESSION) it.targetId in sessions else it.targetId in segments }),
+            QuantityWindowSelection.Stored(sessionIds?.let { frozenSet(it) }))
     }
     fun rates(inputIds: Set<String>,start: Long,end: Long,basis: TimeBasis = TimeBasis.RECORDED): RateResult {
         ensure(start >= 0 && end > start && end <= MAX_TIME,"Invalid rate window")

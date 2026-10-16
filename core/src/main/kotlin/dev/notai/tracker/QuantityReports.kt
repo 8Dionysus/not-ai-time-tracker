@@ -37,7 +37,7 @@ internal object QuantityReports {
             if(!accepted) excluded += ExcludedQuantity(m.id,QuantityReportExclusion.MIXED_WHOLE_TARGET)
             accepted
         }
-        val window = QuantityWindow(token(data),frozenList(events),frozenList(unknown),frozenList(whole))
+        val window = QuantityWindow(token(data),frozenList(events),frozenList(unknown),frozenList(whole),QuantityWindowSelection.Reported(report.asOf,report.filter.frozenFilter(),report.dayPolicy))
         return QuantityReport(token(data),report,window,frozenList(excluded))
     }
 }

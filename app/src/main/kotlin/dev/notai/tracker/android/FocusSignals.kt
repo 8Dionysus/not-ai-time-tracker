@@ -17,6 +17,12 @@ data class FocusDeliveryResult(val status: FocusDeliveryStatus,val focus: FocusS
 object FocusSignals {
     const val CHANNEL = "focus_completion"
     private const val NOTICE = 43
+    // Preparation stays outside the final domain gate; tests can mutate after preparation.
+    internal var notificationFactory: (Context) -> Notification = { c ->
+        Notification.Builder(c,CHANNEL).setSmallIcon(android.R.drawable.ic_media_pause)
+            .setContentTitle("Focus: интервал завершён").setContentText("Выберите следующий этап в приложении")
+            .setContentIntent(TimerSurfaces.open(c)).setAutoCancel(true).setVisibility(Notification.VISIBILITY_PRIVATE).build()
+    }
     private fun preferences(c: Context) = c.getSharedPreferences("focus-signals",Context.MODE_PRIVATE)
     fun allowed(c: Context): Boolean {
         val manager = c.getSystemService(NotificationManager::class.java)
@@ -86,23 +92,24 @@ object FocusSignals {
         val next = (delivered.filter { it.startsWith(focus.id+":") }+key).takeLast(64).toSet()
         if(!prefs.edit().putStringSet("delivered",next).commit()) return false
         try {
-            val notification = Notification.Builder(c,CHANNEL).setSmallIcon(android.R.drawable.ic_media_pause)
-                .setContentTitle("Focus: интервал завершён").setContentText("Выберите следующий этап в приложении")
-                .setContentIntent(TimerSurfaces.open(c)).setAutoCancel(true).setVisibility(Notification.VISIBILITY_PRIVATE).build()
+            val notification = notificationFactory(c)
             c.getSystemService(NotificationManager::class.java).notify(NOTICE,notification)
             return true
         } catch(_: RuntimeException) { return false } // Keep the durable attempt: notify may already have had an effect.
     }
 }
 class FocusAlarmReceiver: BroadcastReceiver() {
+    internal fun handleCurrent(context: Context,id: String,index: Long) {
+        val runtime = TrackerRuntime.get(context);val view = runtime.tracker.view();val focus = view.snapshot().focus
+        if(!view.data.settings.surfaces.focusSignal || focus?.id != id || focus.phaseIndex != index) return
+        if(focus.mode == FocusMode.DUE) FocusSignals.deliverResult(context,runtime.tracker) else FocusSignals.refresh(context,runtime.tracker)
+    }
     override fun onReceive(context: Context,intent: Intent) {
         val id = intent.getStringExtra("id") ?: return;val index = intent.getLongExtra("index",-1)
         val pending = goAsync()
         CoroutineScope(SupervisorJob()+Dispatchers.IO).launch {
             try {
-                val runtime = TrackerRuntime.get(context);val view = runtime.tracker.view();val focus = view.snapshot().focus
-                if(!view.data.settings.surfaces.focusSignal || focus?.id != id || focus.phaseIndex != index) return@launch
-                if(focus.mode == FocusMode.DUE) FocusSignals.deliverResult(context,runtime.tracker) else FocusSignals.refresh(context,runtime.tracker)
+                handleCurrent(context,id,index)
             } catch(_: Exception) { android.util.Log.w("FocusSignals","Signal unavailable; phase/history unchanged") }
             finally { pending.finish() }
         }

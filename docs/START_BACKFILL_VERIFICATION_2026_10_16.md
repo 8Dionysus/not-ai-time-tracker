@@ -57,6 +57,12 @@ The new core preserves it; probe source, old runtime JAR hash and exact output a
 retained. Full XML/logs and artifact metadata live under
 evidence/backend-start-backfill-2026-10-16.
 
+The disabled F-Droid recipe now pins the tested0def529 runtime. Scanner2.4.5
+actually processed that source with0errors/1retained gzip-fixture warning; metadata
+lint passed. An initial empty JSON result was rejected after identifying an unwritable
+default cache; the successful disposable-checkout run used a workspace cache. No
+server build or reproducibility is claimed, and the real editorial ZIP remains intact.
+
 C artifact f6fcadf was supplied by the coordinator but its ZIP could not be materialized
 by the normal Library helper in this executor (`download failed`). Its15prepared
 scenarios are not counted here. Source compilation/runtime binding is pending exact

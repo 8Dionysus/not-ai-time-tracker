@@ -1,0 +1,27 @@
+{
+  "dev.notai.tracker": {
+    "12": {
+      "infos": [
+        [
+          "Removing gradlew at gradlew",
+          "gradlew"
+        ],
+        [
+          "Removing gradlew.bat at gradlew.bat",
+          "gradlew.bat"
+        ],
+        [
+          "Removing gradle-wrapper.jar at gradle/wrapper/gradle-wrapper.jar",
+          "gradle/wrapper/gradle-wrapper.jar"
+        ]
+      ],
+      "warnings": [
+        [
+          "gzip file archive",
+          "core/src/testFixtures/resources/previous-runtime-catalog.json.gz"
+        ]
+      ],
+      "errors": []
+    }
+  }
+}

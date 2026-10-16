@@ -1,0 +1,16 @@
+{
+  "sourcePin": "0def529a610232f557530f7f74a2facf3507136f",
+  "fdroidVersion": "2.4.5",
+  "repositoryRecipeSha256": "d0b10d63ca77e0108d1e613bdea487dadc2e3ca755e9c7f546c19a6144a68000",
+  "disableRetained": true,
+  "command": "fdroid scanner --force --verbose --json --exit-code dev.notai.tracker:12",
+  "errors": 0,
+  "warnings": 1,
+  "metadataLintExit": 0,
+  "initialAttempt": "Scanner CLI returned empty JSON after a read-only /home/agent/.cache failure; not accepted as a scan. Repeated with explicit workspace cachedir in disposable config; expected processing/removal/warning records verified.",
+  "sourceChanges": "Only F-Droid normal wrapper removal and recipe exact documentation-ZIP removal in disposable build checkout; no repository source deletion.",
+  "mainEditorialZipSha256": "eca102490bb89f163141813043e59e351d6bad8d1c0b659027371d25a52cc310",
+  "serverBuild": false,
+  "reproducibility": false,
+  "newSdk": false
+}

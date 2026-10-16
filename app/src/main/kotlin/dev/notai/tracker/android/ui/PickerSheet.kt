@@ -148,7 +148,7 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
                 }
                 parent != null -> {
                     if (parent.entry.canStart) item(key = "whole") {
-                        ChoiceRow(PickerItem(parent.entry, parent.label.copy(title = "Вся область", detail = parent.label.title.lowercase()), whole = true), ::pick)
+                        ChoiceRow(parent.wholeArea(), ::pick)
                     }
                     items(children, key = { "c-" + it.entry.id }) { ch -> ChoiceRow(ch, ::pick) }
                 }

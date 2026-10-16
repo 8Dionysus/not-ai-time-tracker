@@ -38,6 +38,7 @@ data class HomeData(val today: LocalDate, val zone: ZoneId, val days: List<DayUi
 
 data class PickerItem(val entry: ChoiceEntry, val label: Label, val count: Int? = null, val whole: Boolean = false,
                       val reference: ChoiceReference? = null, val expected: Token? = null)
+internal fun PickerItem.wholeArea() = copy(label = label.copy(title = "Вся область",detail = label.title.lowercase()),whole = true)
 data class PickerData(val recents: List<PickerItem>, val favorites: List<PickerItem>, val areas: List<PickerItem>, val moreAreas: List<PickerItem>)
 
 enum class Period(val days: Int, val title: String) { DAY(1, "День"), WEEK(7, "7 дней"), MONTH(30, "30 дней") }

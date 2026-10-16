@@ -148,6 +148,19 @@ class UiReviewRegressionTest {
     }
     @Test fun shownFavoriteRenameCannotSilentlyRebase() = staleFavorite(true)
     @Test fun shownFavoriteClassificationCannotSilentlyRebase() = staleFavorite(false)
+    @Test fun wholeAreaKeepsShownGuardsAndStartsWithTheReviewedParent() {
+        val f = fixture(FakeClock());val t = f.tracker
+        t.saveType(t.snapshot().token,ActivityType("whole-parent","Parent"))
+        t.saveType(t.snapshot().token,ActivityType("whole-child","Child",parentId = "whole-parent"));f.synced()
+        val parent = runBlocking { f.vm.pickerData() }.let { it.areas+it.moreAreas }.single { it.entry.sourceId == "whole-parent" }
+        val whole = parent.wholeArea()
+        assertEquals(parent.reference,whole.reference);assertNotNull(whole.reference)
+        assertEquals(parent.expected,whole.expected);assertNotNull(whole.expected);assertTrue(whole.whole)
+        f.vm.choose(whole.entry,PickMode.START,reference = whole.reference,expected = whole.expected)
+        pump { t.data().sessions.isNotEmpty() || f.notices.isNotEmpty() }
+        assertEquals("whole-parent",t.snapshot().session!!.selection.activityTypeId)
+        assertTrue(f.notices.none { it.text == Format.error(CoreError(ErrorCode.STALE,"stale")) })
+    }
     @Test fun draftSwitchHasOneCommitWithNoteAndOneUndo() {
         val f = fixture(FakeClock());val t = f.tracker
         t.start(t.snapshot().token,Classification(name = "Before"),"Before note");f.clock.advance(1000)

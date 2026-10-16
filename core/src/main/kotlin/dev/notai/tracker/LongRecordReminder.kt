@@ -89,6 +89,14 @@ class LongRecordReminder(private val tracker: Tracker,private val store: LongRec
         ensure(active(),"Attention runtime was closed",ErrorCode.STALE)
         val old = read();ensure(old.revision == controlRevision,"Check-in control changed",ErrorCode.STALE)
         val data = tracker.data()
+        if(data.settings.longRecordReminder == value) {
+            tracker.store.checkedTransaction { checked ->
+                checkToken(checked.data,expected,tracker.clock.now())
+                checked.replace(checked.data) { Unit }
+            }
+            // Saving an unchanged restored form is not consent and cannot reset a receipt.
+            return synchronizeLocked()
+        }
         val change = tracker.settings(expected,data.settings.copy(longRecordReminder = value))
         tracker.store.checkedTransaction { checked ->
             checkToken(checked.data,change.state.token,tracker.clock.now());ensure(active(),"Attention runtime was closed",ErrorCode.STALE)

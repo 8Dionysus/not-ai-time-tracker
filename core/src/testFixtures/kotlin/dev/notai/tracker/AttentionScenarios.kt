@@ -210,8 +210,10 @@ abstract class AttentionScenarioContract {
         target.resolveTail(target.snapshot().token,segment.start,clock.wall)
         target.start(target.snapshot().token)
         val waiting = restored.synchronize();assertTrue(waiting.confirmationRequired);assertNull(waiting.ticket)
+        val unchanged = restored.configure(target.snapshot().token,preference,waiting.controlRevision)
+        assertTrue(unchanged.confirmationRequired);assertNull(unchanged.ticket)
         val before = target.data()
-        val confirmed = restored.confirm(target.snapshot().token,waiting.controlRevision)
+        val confirmed = restored.confirm(target.snapshot().token,unchanged.controlRevision)
         assertFalse(confirmed.confirmationRequired);assertNotNull(confirmed.ticket);assertEquals(before,target.data())
         assertEquals(preference,target.data().settings.longRecordReminder)
     }

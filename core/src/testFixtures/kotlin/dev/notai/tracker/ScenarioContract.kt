@@ -19,6 +19,8 @@ class MemoryRollback: RollbackStore {
 }
 /** The SAME three scenarios run on in-memory domain storage and on disk-backed Room/SQLite. */
 abstract class ScenarioContract {
+    @Test fun combinedQuantityReportUsesHistoricalIntervals() = quantityReportClassificationJoin(::createStore,::reopen)
+    @Test fun combinedQuantityArchiveGuardsEveryRetainedSnapshot() = quantityArchiveAuditSnapshots()
     @Test fun reportingDayAndVersionedGoals() = reportingDaysAndGoalVersions(::createStore,::reopen)
     @Test fun savedReportPortability() = savedReportsAndPortableHistory(::createStore,::reopen)
     @Test fun subjectsReuseCardIdentity() = subjectBooks(::createStore,::reopen)

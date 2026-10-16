@@ -91,7 +91,11 @@ internal fun SubjectData.unitDependencies() = (observations.map { it.definition 
 /** Provisional capability numbers are isolated for A's final format reconciliation. */
 internal const val SUBJECT_FULL_FORMAT = 14
 internal const val SUBJECT_SELECTIVE_FORMAT = 4
-internal fun Dataset.hasSubjectQuantities(): Boolean = !subjects.empty || metrics.any { it.bounds != null } ||
-    transfer.origins.any { !it.localGroup.subjects.empty || it.localGroup.metrics.any { m -> m.bounds != null } || it.compaction?.localEntities?.any { e -> e.kind in subjectIdentityIds(SubjectData()).keys } == true } ||
-    transfer.operations.any { op -> op.groups.any { !it.group.content.subjects.empty || it.group.content.metrics.any { m -> m.bounds != null } || it.inserted?.subjects?.empty == false } }
-internal fun Dataset.fullQuantityFormat() = 14
+internal fun TransferContent.hasSubjectQuantities() = !subjects.empty || metrics.any { it.bounds != null }
+private fun TransferOrigin.hasSubjectQuantities() = localGroup.hasSubjectQuantities() ||
+    compaction?.localEntities?.any { it.kind in subjectIdentityIds(SubjectData()).keys } == true
+fun Dataset.hasSubjectQuantities(): Boolean = !subjects.empty || metrics.any { it.bounds != null } ||
+    transfer.origins.any { it.hasSubjectQuantities() } || transfer.operations.any { op -> op.groups.any {
+        it.group.content.hasSubjectQuantities() || it.group.entities.any { e -> e.kind in subjectIdentityIds(SubjectData()).keys } ||
+            it.inserted?.hasSubjectQuantities() == true || it.previousOrigin?.hasSubjectQuantities() == true
+    } }

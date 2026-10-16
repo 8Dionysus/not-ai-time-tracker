@@ -92,6 +92,7 @@ internal fun validateSubjects(d: Dataset) {
         audit(null,c.recordedAt,c.source)
         ensure(a.id != b.id && a.subject == b.subject && a.definition == b.definition && a.effectiveAt != null && b.effectiveAt != null && a.effectiveAt < b.effectiveAt,
             "Change needs ordered observations on one subject definition")
+        ensure(c.recordedAt >= maxOf(a.recordedAt,b.recordedAt),"Change audit time precedes its basis")
         ensure(b.value.number.subtract(a.value.number).compareTo(c.value.number) == 0,"Signed change differs from explicit basis")
     }
     corrections(s.changes,{it.id},{it.replacesId},{it.recordedAt}) { a,b ->
@@ -223,4 +224,16 @@ internal fun distanceTimeMatches(d: Dataset,input: DistanceTimeInput): Boolean {
         (input.timeBasis != TimeBasis.RECORDED || input.durationMs == segments.sumExact { it.durationMs })
 }
 
-internal fun Dataset.quantityRecordedTimes(): List<Long> = subjects.observations.map { it.recordedAt }+subjects.changes.map { it.recordedAt }+subjects.sets.map { it.recordedAt }+subjects.quantities.map { it.recordedAt }
+/** Audit guards include every retained value snapshot. Pruned capsules contain hashes only. */
+internal fun Dataset.quantityRecordedTimes(): Sequence<Long> = sequence {
+    suspend fun SequenceScope<Long>.content(s: SubjectData?) {
+        if(s==null)return
+        s.observations.forEach { yield(it.recordedAt) };s.changes.forEach { yield(it.recordedAt) }
+        s.sets.forEach { yield(it.recordedAt) };s.quantities.forEach { yield(it.recordedAt) }
+    }
+    content(subjects)
+    transfer.origins.forEach { content(it.localGroup.subjects) }
+    transfer.operations.forEach { op -> op.groups.forEach { g ->
+        content(g.group.content.subjects);content(g.inserted?.subjects);content(g.previousOrigin?.localGroup?.subjects)
+    } }
+}

@@ -98,7 +98,9 @@ object TimerSurfaces {
         }
     }
     /** Shade controls: rendered by SurfaceViews (row with start/stop, quick choices when expanded). */
-    fun notification(c: Context,view: TrackerView): Notification = SurfaceViews.notification(c,view)
+    internal var notificationFactory: (Context,TrackerView) -> Notification = { c,v -> SurfaceViews.notification(c,v) }
+    internal var refreshPrepared: ((Context,TrackerView) -> Unit)? = null
+    fun notification(c: Context,view: TrackerView): Notification = notificationFactory(c,view)
     /** The floating button's mandatory foreground-service indicator. */
     fun overlayNotification(c: Context): Notification {
         channels(c)
@@ -129,6 +131,7 @@ object TimerSurfaces {
     }
     fun refresh(c: Context,view: TrackerView,previous: SurfaceSettings? = null,forceWidget: Boolean = false) {
         val settings = view.data.settings.surfaces
+        refreshPrepared?.invoke(c,view)
         try { shortcut(c,view.snapshot(),settings) } catch(_: RuntimeException) { android.util.Log.w("TimerSurfaces","Launcher shortcut update unavailable") }
         if(!forceWidget && settings == SurfaceSettings() && previous == SurfaceSettings()) return
         // No per-second work; called on committed revisions or explicit widget/permission events only.

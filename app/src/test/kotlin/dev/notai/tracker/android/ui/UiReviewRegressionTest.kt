@@ -148,6 +148,26 @@ class UiReviewRegressionTest {
     }
     @Test fun shownFavoriteRenameCannotSilentlyRebase() = staleFavorite(true)
     @Test fun shownFavoriteClassificationCannotSilentlyRebase() = staleFavorite(false)
+    private fun p2ShownSegment(picker: Boolean,policy: ChoiceNotePolicy? = null,active: Boolean = false) {
+        val f=fixture(FakeClock());val t=f.tracker
+        val card=Card("two-segment-card","Two segment",personal=ChoicePersonalization(notePolicy=policy));t.saveCard(t.snapshot().token,card)
+        val a=card.classification().copy(details=mapOf("part" to "A"));val b=a.copy(details=mapOf("part" to "B"))
+        t.start(t.snapshot().token,a,"Original session note");f.clock.advance(1000);t.changeDetails(t.snapshot().token,b);f.clock.advance(1000);t.stop(t.snapshot().token)
+        val source=t.data().sessions.single();val segment=t.data().segments.first();f.clock.advance(1000)
+        if(active) t.start(t.snapshot().token,Classification(name="Other current"),"Other note")
+        f.synced();val before=t.data()
+        if(picker) {
+            val shown=runBlocking { f.vm.pickerData() }.recents.single { it.entry.selection.details["part"]=="A" }
+            f.vm.choose(shown.entry,if(active) PickMode.SWITCH else PickMode.START,reference=shown.reference,expected=shown.expected)
+        } else f.vm.repeat(EntryUi(segment.id,source.id,segment.start,segment.end!!,segment.durationMs,t.data().label(a),source.note,a))
+        pump { t.data().sessions.size>before.sessions.size || f.notices.isNotEmpty() }
+        assertEquals(a,t.snapshot().session!!.selection);assertEquals(if(policy==ChoiceNotePolicy.CLEAR) null else "Original session note",t.snapshot().session!!.note)
+        assertEquals(before.segments.filter { it.sessionId==source.id },t.data().segments.filter { it.sessionId==source.id })
+    }
+    @Test fun reviewP2HistoryPickerStartsShownEarlySegment()=p2ShownSegment(true)
+    @Test fun reviewP2RowRepeatStartsShownEarlySegment()=p2ShownSegment(false)
+    @Test fun reviewP2HistoryPickerPreservesClearNotePolicy()=p2ShownSegment(true,ChoiceNotePolicy.CLEAR)
+    @Test fun reviewP2RowSwitchPreservesShownSegmentAndSourceNote()=p2ShownSegment(false,active=true)
     private fun p2HistoryChoice(uncertain: Boolean,quick: Boolean) {
         val clock = FakeClock();val f = fixture(clock,initial = reviewP2HistoryFixture(clock.wall,uncertain));val t = f.tracker
         val before = t.data()

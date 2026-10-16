@@ -100,6 +100,7 @@ class FocusDeliveryRaceTest {
     }
     @Test fun staleAlarmWithoutStoreDoesNotBootstrapAnEmptyDatabase() = runBlocking(Dispatchers.IO) {
         val context = RuntimeEnvironment.getApplication()
+        android.provider.Settings.Global.putInt(context.contentResolver,"boot_count",1)
         val oldSync = DirectoryDurability.sync;val oldRename = DirectoryDurability.rename
         // Robolectric has no directory-fsync shadow; exercise the real host filesystem fixture.
         DirectoryDurability.sync = { java.nio.channels.FileChannel.open(it.toPath(),java.nio.file.StandardOpenOption.READ).use { fd -> fd.force(true) } }

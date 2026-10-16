@@ -163,22 +163,26 @@ class TimerActionReceiver: BroadcastReceiver() {
         CoroutineScope(SupervisorJob()+Dispatchers.IO).launch {
             try {
                 val runtime = TrackerRuntime.get(context)
+                handleCurrent(context,runtime.tracker,action)
+            } catch(_: Exception) { android.util.Log.w("TimerSurfaces","Action unavailable; local state retained") }
+            finally { pending.finish() }
+        }
+    }
+    internal fun handleCurrent(context: Context,tracker: Tracker,action: SurfaceAction) {
                 val permitted = when(action.source) {
                     Surface.NOTIFICATION -> TimerSurfaces.notificationsAllowed(context)
                     Surface.OVERLAY -> TimerSurfaces.overlayAllowed(context)
                     Surface.WIDGET, Surface.SHORTCUT -> true
                 }
-                try { TimerSurfaces.execute(runtime.tracker,action,permitted) }
+                try { TimerSurfaces.execute(tracker,action,permitted) }
                 catch(e: CoreError) {
                     val message = "${e.code}: ${e.message}. Откройте приложение; история не изменена."
                     context.getSharedPreferences("surface-results",Context.MODE_PRIVATE).edit().putString("last",message).apply()
                     android.os.Handler(android.os.Looper.getMainLooper()).post { android.widget.Toast.makeText(context,message,android.widget.Toast.LENGTH_LONG).show() }
                 }
-                TimerSurfaces.refresh(context,runtime.tracker.view(),forceWidget = action.source == Surface.WIDGET)
-            } catch(_: Exception) { android.util.Log.w("TimerSurfaces","Action unavailable; local state retained") }
-            finally { pending.finish() }
-        }
+                TimerSurfaces.refresh(context,tracker.view(),forceWidget = action.source == Surface.WIDGET)
     }
+
 }
 class TimerWidget: AppWidgetProvider() {
     override fun onUpdate(context: Context,manager: AppWidgetManager,ids: IntArray) {

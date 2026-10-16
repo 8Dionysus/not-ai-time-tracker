@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.RoomJournalATest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-16T11:45:55.513Z" hostname="69b2b5b46001" time="0.705">
+  <properties/>
+  <testcase name="gapsDistinguishPausesAndOnlyPrepareExplicitManualDrafts" classname="dev.notai.tracker.android.RoomJournalATest" time="0.071"/>
+  <testcase name="personalProfilesRoundTripFullAndSelectiveWithLegacyGuards" classname="dev.notai.tracker.android.RoomJournalATest" time="0.163"/>
+  <testcase name="personalProfilesPersistAndPinnedOrderDoesNotChangeWithSearchRank" classname="dev.notai.tracker.android.RoomJournalATest" time="0.075"/>
+  <testcase name="explicitRepeatPolicyAlsoWorksWithoutAnyCardProfile" classname="dev.notai.tracker.android.RoomJournalATest" time="0.05"/>
+  <testcase name="batchMetadataIsPreviewedAtomicVersionCheckedAndUndoable" classname="dev.notai.tracker.android.RoomJournalATest" time="0.079"/>
+  <testcase name="gapWindowsPartitionAcrossMidnightAndUnknownTimeDoesNotBecomeZero" classname="dev.notai.tracker.android.RoomJournalATest" time="0.028"/>
+  <testcase name="personalProfilesSurviveCopiedOriginCompactionAndReplayWithoutFalseUndo" classname="dev.notai.tracker.android.RoomJournalATest" time="0.115"/>
+  <testcase name="recoveryUncertaintyIsNotAnUnrecordedDraftAndFutureIsExcluded" classname="dev.notai.tracker.android.RoomJournalATest" time="0.032"/>
+  <testcase name="repeatPolicyPreservesDefaultsAndNeverCopiesMeasurements" classname="dev.notai.tracker.android.RoomJournalATest" time="0.091"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

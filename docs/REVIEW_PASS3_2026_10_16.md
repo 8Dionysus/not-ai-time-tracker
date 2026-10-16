@@ -145,8 +145,11 @@ The fixed cohort at `2acaa96be379b43a88484fa3cd61ff0c52ac149f` passed 4 core and
 69 app tests, without failures/errors/skips. It includes Memory/Room P3 history,
 the complete TimerSurfaceRaceTest, technical settings/export adapters, VM/form
 regressions and FocusDeliveryRaceTest. This is targeted verification, not a new
-aggregate or new APK. The aggregate is running at `282495a` after stronger callback
-completion and pending-form ownership checks; its result will be recorded below.
+aggregate or new APK. The aggregate at
+`282495ac96030d003d888a474a53dad8c1d20bde` after stronger callback completion and
+pending-form ownership checks passed **198 core and 240 app** tests with no failures,
+errors or skips (4m27s). Both tasks were explicitly rerun. Python fingerprint
+checks passed 3/3. Original complete XML and source manifests are retained.
 
 First cohort source `d0c653f` failed to compile a test-only generic call to the
 non-generic Robolectric Application getter; no new XML is attributed to that run.

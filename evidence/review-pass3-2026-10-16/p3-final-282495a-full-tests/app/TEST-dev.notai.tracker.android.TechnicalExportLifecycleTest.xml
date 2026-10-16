@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.TechnicalExportLifecycleTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-16T11:46:32.657Z" hostname="69b2b5b46001" time="1.105">
+  <properties/>
+  <testcase name="explicitCancelCannotLoseActiveChooserOrLaunchAnotherBeforeResult" classname="dev.notai.tracker.android.TechnicalExportLifecycleTest" time="0.169"/>
+  <testcase name="successConsumesChooserBeforeWriteAndRegistersExactCompleteGroup" classname="dev.notai.tracker.android.TechnicalExportLifecycleTest" time="0.164"/>
+  <testcase name="reviewP3TechnicalFocusUsesFreshTypedDelivery" classname="dev.notai.tracker.android.TechnicalExportLifecycleTest" time="0.118"/>
+  <testcase name="chooserLeaseIsDurableBeforeExternalPickerAndSurvivesRecreation" classname="dev.notai.tracker.android.TechnicalExportLifecycleTest" time="0.205"/>
+  <testcase name="explicitCancelDuringPreparationBecomesTerminalOnlyAfterWriterReleases" classname="dev.notai.tracker.android.TechnicalExportLifecycleTest" time="0.09"/>
+  <testcase name="cancelConsumesChooserPreservesBytesAndRegistersRetryWarning" classname="dev.notai.tracker.android.TechnicalExportLifecycleTest" time="0.092"/>
+  <testcase name="cancelledCopyRetriesSameBytesAcrossActivityRecreation" classname="dev.notai.tracker.android.TechnicalExportLifecycleTest" time="0.264"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

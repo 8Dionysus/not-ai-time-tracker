@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.ChoiceWindowTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-16T11:43:39.312Z" hostname="69b2b5b46001" time="0.018">
+  <properties/>
+  <testcase name="boundedSuggestionsMatchFullScanIncludingReorderedHistory" classname="dev.notai.tracker.ChoiceWindowTest" time="0.018"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

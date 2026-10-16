@@ -1,0 +1,21 @@
+{
+  "source": "282495ac96030d003d888a474a53dad8c1d20bde",
+  "fdroidserver": "2.4.5",
+  "scannerExit": 0,
+  "scannerErrors": 0,
+  "scannerWarnings": 1,
+  "warning": "Retained previous-runtime-catalog.json.gz fixture",
+  "metadataLintExit": 0,
+  "metadataLintRequiresExplicitCategoryConfig": true,
+  "categoryConfigSha256": "4c86f3dcfa4dcc7e88423c3a8478393c3d893d90471eb8a72f4d96ddd0f0e452",
+  "initialUnconfiguredLintExit": 1,
+  "rawScannerLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "rawConfiguredLintLogSha256": "fd1b5f99703ecbaf4537ff8c7c85210a2a389195ce591e45e64b9980e343bc13",
+  "rawInitialLintLogSha256": "343f9ba447628f556d2eaf83bea4ff094cd6f2fcfec12e15d0b3e92acbb6068e",
+  "rawLogLocation": "Task archive; local SDK path excluded from public evidence",
+  "fixtureRepo": "Exact isolated local clone; published recipe retains public HTTPS Repo",
+  "checkedOutSource": "282495ac96030d003d888a474a53dad8c1d20bde",
+  "publishedRecipeSha256": "55b878c2acbe3b0cfe0fbb0a9a365a1b6212035b92122ad9b0c61fc1c29ca505",
+  "independentServerBuild": false,
+  "independentReproducibility": false
+}

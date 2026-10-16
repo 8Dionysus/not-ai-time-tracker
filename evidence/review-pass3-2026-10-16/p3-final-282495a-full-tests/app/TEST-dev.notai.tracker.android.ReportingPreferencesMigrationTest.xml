@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.ReportingPreferencesMigrationTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-16T11:45:52.017Z" hostname="69b2b5b46001" time="1.145">
+  <properties/>
+  <testcase name="legacy11KeepsAllHistoryAndCPreferencesByteForByte" classname="dev.notai.tracker.android.ReportingPreferencesMigrationTest" time="0.6"/>
+  <testcase name="newReportingFieldsLabelled11FailWithoutMutatingMetadata" classname="dev.notai.tracker.android.ReportingPreferencesMigrationTest" time="0.545"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

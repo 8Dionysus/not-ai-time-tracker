@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.RoomChoiceLocalizationTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-16T11:45:55.336Z" hostname="69b2b5b46001" time="0.163">
+  <properties/>
+  <testcase name="personalOverridesAndExactSnapshotBindingPreventCrossLanguageStalePresentation" classname="dev.notai.tracker.android.RoomChoiceLocalizationTest" time="0.039"/>
+  <testcase name="ancestorContextDisambiguatesBranchesWithStableLocaleEvidenceAndOwnNamePriority" classname="dev.notai.tracker.android.RoomChoiceLocalizationTest" time="0.056"/>
+  <testcase name="existingSearchUsesTranslatedAliasesWithoutChangingLiteralHistoryOrStableCommandReferences" classname="dev.notai.tracker.android.RoomChoiceLocalizationTest" time="0.068"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

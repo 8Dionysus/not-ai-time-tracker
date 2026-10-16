@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.JournalATest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-16T11:43:58.796Z" hostname="69b2b5b46001" time="0.057">
+  <properties/>
+  <testcase name="gapsDistinguishPausesAndOnlyPrepareExplicitManualDrafts" classname="dev.notai.tracker.JournalATest" time="0.01"/>
+  <testcase name="personalProfilesRoundTripFullAndSelectiveWithLegacyGuards" classname="dev.notai.tracker.JournalATest" time="0.016"/>
+  <testcase name="personalProfilesPersistAndPinnedOrderDoesNotChangeWithSearchRank" classname="dev.notai.tracker.JournalATest" time="0.003"/>
+  <testcase name="explicitRepeatPolicyAlsoWorksWithoutAnyCardProfile" classname="dev.notai.tracker.JournalATest" time="0.001"/>
+  <testcase name="batchMetadataIsPreviewedAtomicVersionCheckedAndUndoable" classname="dev.notai.tracker.JournalATest" time="0.007"/>
+  <testcase name="gapWindowsPartitionAcrossMidnightAndUnknownTimeDoesNotBecomeZero" classname="dev.notai.tracker.JournalATest" time="0.001"/>
+  <testcase name="personalProfilesSurviveCopiedOriginCompactionAndReplayWithoutFalseUndo" classname="dev.notai.tracker.JournalATest" time="0.014"/>
+  <testcase name="recoveryUncertaintyIsNotAnUnrecordedDraftAndFutureIsExcluded" classname="dev.notai.tracker.JournalATest" time="0.001"/>
+  <testcase name="repeatPolicyPreservesDefaultsAndNeverCopiesMeasurements" classname="dev.notai.tracker.JournalATest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

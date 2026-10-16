@@ -1,0 +1,2 @@
+fdroidserver 2.4.5 lint: exit 0 with explicit config/categories.yml (retained Time Tracker category).
+Initial unconfigured lint: exit 1, category unavailable; original logs retained in task archive.

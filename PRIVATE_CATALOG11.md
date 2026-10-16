@@ -1,11 +1,22 @@
-Private local technical integration of coordinator compact ZIP6f0806c57a26a0ae35f4a2b8336ce6d97fbceb4eff2fed1933c2cd997625d944.
-Eleven supplied DRAFT_COMPLETE locales are loaded using existing sidecar/asset APIs.
-Per-field draft/nativeSpeakerQA=false/rights pending provenance remains unchanged.
-No public push, UI resource migration or installed reviewed locale claim is authorized by this branch.
-Do not include this branch or payloads in the public backend source bundle.
+# Catalog locale delivery provenance
 
-Functional follow-up: coordinator's full independent semantic acceptance is recorded
-as REVIEWED with its named receipt (system Page66 blockdc1d2a63). Original JSONL
-DRAFT_NOT_NATIVE_REVIEWED/nativeSpeakerQA=false and rights pending/license null remain
-preserved in the input evidence. A general NOTICE is no runtime display veto. New
-fixtures verify real translated display and existing ChoiceView search, not fallback.
+Historical preparation: these eleven catalog sidecars were first integrated privately
+from coordinator compact ZIP SHA-256
+`6f0806c57a26a0ae35f4a2b8336ce6d97fbceb4eff2fed1933c2cd997625d944`.
+The coordinator accepted an independent full semantic pass (Page seq66,
+block dc1d2a63); runtime quality is REVIEWED. Original input provenance
+DRAFT_NOT_NATIVE_REVIEWED/nativeSpeakerQA=false and rights pending/license null
+are retained. No native-speaker QA or new license grant is asserted.
+
+On 2026-10-16 at 07:11:09 UTC, Dionysus explicitly authorized including all
+eleven checked language packs in public GitHub main (Sentinel
+9a589ccab61c819194873a519a11993c). This supersedes the preparation-stage
+private-only restriction. The per-locale payloads and manifests remain byte-for-byte
+equal to the accepted delivery; publication authorization does not rewrite their
+source-rights metadata or third-party notices.
+
+The existing catalog loader supplies offline labels and choice search. These are
+catalog content packs, not Android UI resource translations. Historical test class
+names containing Private identify the original fixtures; they now run as part of
+the public combined suite. No input ZIP, unrelated private files, credentials,
+release signing keys, or personal user data are included.

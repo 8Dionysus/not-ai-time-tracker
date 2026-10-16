@@ -44,9 +44,10 @@ For unrelated currently valid transfer operations, compaction advances `nextRevi
 
 ## Persistence and archive compatibility
 
-Room schema 7 adds `MIGRATION_6_7` alongside the existing v5→6 migration. It only records defaults for the new fields in the existing metadata row. All history tables/active/recovery data remain unchanged; no payload is removed during migration. Metadata reads/verification still use bounded SQLite text slices.
+Current domain storage is Room10 and full JSON12/read1–12; selective reader1–3.
+The original retention migration was Room6→7 (`MIGRATION_6_7`) after v5→6. It only records defaults for the new fields in the existing metadata row. All history tables/active/recovery data remain unchanged; no payload is removed during migration. Metadata reads/verification still use bounded SQLite text slices.
 
-Full JSON format 9/read 1–9 carries pruned receipts/capsules. The convenience and streaming readers both reject compaction state disguised as format 8 or earlier. Real legacy v8 snapshots without the new fields migrate with their full payloads intact. Restore remains preview + verified rollback + atomic replacement. Selective package format 1 and CSV semantics are unchanged; a pruned receipt header is not an importable selective group. Receipts survive restore, and a receipt replay never resurrects removed snapshots. An older full archive may intentionally restore old snapshots through the existing explicit replacement flow; this API does not delete those archives.
+Full JSON12 carries pruned receipts/capsules; these were introduced in format9/read1–9. The convenience and streaming readers both reject compaction state disguised as format 8 or earlier. Real legacy v8 snapshots without the new fields migrate with their full payloads intact. Restore remains preview + verified rollback + atomic replacement. Selective formats1–3 use the same import engine and CSV remains limited fact append; a pruned receipt header is not an importable selective group. Receipts survive restore, and a receipt replay never resurrects removed snapshots. An older full archive may intentionally restore old snapshots through the existing explicit replacement flow; this API does not delete those archives.
 
 ## Verification boundary
 

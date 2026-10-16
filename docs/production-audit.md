@@ -1,5 +1,8 @@
 # Production audit ledger
 
+Historical ledger for the pinned baseline/stages below. Current backend versions
+and execution evidence are in [INDEXED_BACKEND_VERIFICATION.md](INDEXED_BACKEND_VERIFICATION.md).
+
 Baseline: `f14fa3c` (2026-10-15). Current branch: `backend/sealed-archive-graph`.
 Scope: all tracked source, tests, resources, build/release configuration, schemas,
 catalog adapters and bundled data. Prior APK evidence at `0980c50` is historical.
@@ -104,11 +107,11 @@ Full run6m9s; a separate profile-only command19s measures the16MiB receipt ceili
 See [addressed findings and exact resource limits](BACKEND_STATIC_FOLLOWUP.md).
 No palette/theme model was added; the user deferred that model to Opus.
 
-## Latest functional checkpoint
+## Historical functional checkpoint at fe0e490
 
 Runtime `fe0e490a932f3a789e1a7b78de575634ec6fbbef` passed core83/app67,
 zero failures/errors/skips; unsigned debug/release and lint0errors/60warnings/1hint.
-Full run6m58s; the separate receipt profile command20s. Current persistent versions
+Full run6m58s; the separate receipt profile command20s. At that checkpoint persistent versions
 are Room8/fullJSON10, selective reader1/2. Own catalog roots can transfer without
 facts; schedule day/home-zone/quiet-shade preferences persist without rewriting
 history/reportZone/timer anchors. The final post guard includes the full rendered

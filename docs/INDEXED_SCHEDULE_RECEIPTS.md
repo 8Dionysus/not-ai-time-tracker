@@ -39,7 +39,7 @@ refuses replacement rather than deleting old receipts.
 ## Storage and crash-safe v1 migration
 
 - noBackupFilesDir/schedule-delivery.sqlite: operational SQLite schema1, independent
-  of domain Room8/full portable JSON10. FULL synchronous rollback journal commits
+  of current domain Room10/full portable JSON12. FULL synchronous rollback journal commits
   and directory fsync precede return. Corruption never invokes automatic DB deletion.
 - schedule-delivery.json: old strict format1 snapshot, then a small format2 authority
   marker naming the database identity and imported source digest.

@@ -7,7 +7,7 @@ Base: `435c3be86f7597223addbcf15a1d2f2cb7ec94b8`. The existing full restore, CSV
 - A catalog candidate declaring complete coverage must retain at least each source entry's alias count. Previously one translated alias could satisfy an entry with several source aliases, allowing incomplete content to advertise completeness. Validation still happens before replacing the installed immutable pack; refusal retains the previous pack. Additional editorial aliases are accepted.
 - Selective export rejects excluded override keys that do not exist in selected series. Previously unknown or unselected keys were silently ignored while `OVERRIDES_EXCLUDED` counted them. Valid selections, serialized request hashes, operation IDs/receipts, resume, source ownership and Undo remain unchanged. The independent fixture is called by the existing shared ScenarioContract for Memory and Room runners.
 - `scripts/catalog_content_pack.py` exports exact source identity/presentation rows and prepares complete, uninstalled schema-1 candidate packs from explicitly adapted payloads. Input labels.json bytes/hash are preserved. Rights stay pending and the source catalog is never rewritten. The static locale manifest now documents full parent-qualified identities.
-- FILE_IMPORT.md's stale format9 claim is corrected to the actual format11 writer/legacy1–11 reader.
+- At this B checkpoint, FILE_IMPORT.md's stale format9 claim was corrected to the then-current format11 writer/legacy1–11 reader. Current full12/read1–12 is described by START_BACKFILL_CONTRACT.md.
 
 ## Exact Opus/editorial contract
 

@@ -1,6 +1,6 @@
 # Catalog sidecar contract, schema 1
 
-Backend `CatalogContentPacks` and Android `TrackerRuntime.catalogContent` load display content independently of Dataset, Room9, full JSON11 and CSV. They never write a translated name into historical classifications or user objects. UI wiring belongs to Opus. Empty/uninstalled/draft packs do not count as supported translations. No translation content is invented by this adapter.
+Backend `CatalogContentPacks` and Android `TrackerRuntime.catalogContent` load display content independently of Dataset, Room10, full JSON12 and CSV. They never write a translated name into historical classifications or user objects. UI wiring belongs to Opus. Empty/uninstalled/draft packs do not count as supported translations. No translation content is invented by this adapter.
 
 Each locale has `catalog/locales/<canonical-BCP47-tag>/manifest.json` and `labels.json`. `catalog/locales/index.json` is `{ "schemaVersion": 1, "locales": ["en", "es-419"] }`, listing only folders actually bundled. Until editorial delivery is validated there is no installed locale claim. Gradle includes `locales/**` as data assets; it excludes source research. Current source has 1,918 TYPE, 337 AXIS and 130 VALUE entries; metrics/units are empty. All 2,385 exact identities must occur once in a complete pack. 130 values have only 53 raw IDs: never key by raw value ID.
 

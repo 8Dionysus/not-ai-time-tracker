@@ -69,7 +69,7 @@ Repeat создаёт новую сессию с параметрами посл
 
 ## Backup и файловый ввод
 
-`backups.export()` захватывает Dataset/Moment в короткой транзакции; сериализация и запись SAF происходят после неё. Корень JSON: `formatVersion=9`, `backupId`, `asOf`, `data`. Данные включают словари, карточки, Favorite, сессии, сегменты, измерения, настройки, Goals и Focus. В снимок также входят ScheduleSeries/Overrides/StartLinks/receipts и transfer provenance/journals. Reader мигрирует версии 1–8 в текущую модель. Исследовательские исходники переносятся отдельно.
+`backups.export()` захватывает Dataset/Moment в короткой транзакции; сериализация и запись SAF происходят после неё. Корень JSON: `formatVersion=12`, `backupId`, `asOf`, `data`. Данные включают словари, карточки, Favorite, сессии, сегменты, измерения, настройки, Goals и Focus. В снимок также входят ScheduleSeries/Overrides/StartLinks/receipts и transfer provenance/journals. Reader принимает версии 1–12 и мигрирует 1–11 в текущую модель. Ненулевой `Segment.manualConfirmation` допустим только с формата12, включая retained transfer payloads; время подтверждения не может быть после `asOf`. Исследовательские исходники переносятся отдельно.
 
 Ограниченный CSV-вход использует HistoryFiles.inspect: 10 MiB, строгий UTF-8 и BOM. Полный SAF restore использует потоковый Backups.prepare над private staged файлом без общего 10 MiB cap. Табличный текст требует явного сопоставления колонок, времени, зоны, единиц и классификации. [FILE_IMPORT](FILE_IMPORT.md) описывает полный путь.
 

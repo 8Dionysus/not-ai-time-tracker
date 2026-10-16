@@ -129,7 +129,7 @@ class UiDraftRecreationTest {
         compose.onNodeWithText("Draft selected activity").assertExists()
         assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
         if(kind == "invalid") {
-            recreate();compose.onNodeWithText("13:30").assertExists()
+            recreate();assertTrue(compose.onAllNodesWithText("13:30").fetchSemanticsNodes().size >= 2)
             compose.onNodeWithContentDescription("Конец позже на 5 минут").performClick()
         }
         if(kind == "overlap") repeat(3) { compose.onNodeWithContentDescription("Начало позже на 5 минут").performClick() }

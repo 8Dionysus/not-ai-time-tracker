@@ -233,7 +233,7 @@ class UiReviewRegressionTest {
     @Test fun reviewP3BoundedQuickStartsShownSource() = p3BoundedChoice("bounded-quick")
     @Test fun reviewP3BoundedQuickKeepsStrictRevisionGuard() = p3BoundedChoice("bounded-quick",true)
     private fun p3FocusDelivery(outcome: String) {
-        val app = RuntimeEnvironment.getApplication<Application>()
+        val app = RuntimeEnvironment.getApplication()
         val manager = app.getSystemService(android.app.NotificationManager::class.java)
         val prefs = app.getSharedPreferences("focus-signals",0);prefs.edit().clear().commit();manager.cancelAll()
         shadowOf(app).grantPermissions(android.Manifest.permission.POST_NOTIFICATIONS)

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.RoomScenariosTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-16T09:25:38.684Z" hostname="69b2b5b46001" time="7.619">
+  <properties/>
+  <testcase name="csvReplayAfterSelectiveCopyKeepsExternalIdentity" classname="dev.notai.tracker.android.RoomScenariosTest" time="6.611"/>
+  <testcase name="reviewP1CsvDuration" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.155"/>
+  <testcase name="reviewP1CsvActivity" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.12"/>
+  <testcase name="reviewP1CsvLegacyReplay" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.499"/>
+  <testcase name="reviewP1CsvCategory" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.147"/>
+  <testcase name="reviewP1CsvNote" classname="dev.notai.tracker.android.RoomScenariosTest" time="0.085"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,12 @@
+{
+  "source": "3921354a6e3c10777f49b0e1caf2aae6b55364db",
+  "fdroidserver": "2.4.5",
+  "scannerExit": 0,
+  "scannerErrors": 0,
+  "scannerWarnings": 1,
+  "metadataLintExit": 0,
+  "warning": "Retained previous-runtime-catalog.json.gz fixture",
+  "fixtureRepo": "Local clone of exact source SHA; published recipe retains public HTTPS Repo",
+  "independentServerBuild": false,
+  "independentReproducibility": false
+}

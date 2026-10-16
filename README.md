@@ -90,3 +90,5 @@ Project-owned code is licensed under [Apache-2.0](LICENSE). The [NOTICE](NOTICE)
 Все 11 проверенных каталогных языковых пакетов (en/es/fr/pt-BR/ar/zh-Hans/de/it/ja/ko/hi) включены в публичные исходники и assets APK по прямому разрешению Диониса от 2026-10-16. Русский остаётся исходным каталогом. Это offline content packs для отображения и поиска, отдельно от ещё не подключённых переводов Android UI. [Происхождение и границы](PRIVATE_CATALOG11.md) сохраняют исходные QA/rights/license metadata и сторонние notices.
 
 [Свежая проверка объединения](docs/JOURNAL_PUBLIC_MERGE_2026_10_16.md) привязывает команды, JUnit и APK к точным SHA. Ранние [C949/API26 проверки](docs/BACKEND_FOLLOWUP_VERIFICATION_2026_10_16.md) и AVD-результаты относятся к своим прежним сборкам и не принимают новое объединённое дерево на Android-устройстве.
+
+Исправления первого родительского прохода описаны в [контракте P1](docs/REVIEW_PASS1_2026_10_16.md); исходные XML и привязка к версиям — в [evidence P1](evidence/review-pass1-2026-10-16/README.md). Это не утверждение завершённой повторной приёмки.

@@ -24,3 +24,20 @@ with the task artifact delivery; they are not copied into public Git with local 
 
 All failures and positive results refer to their actual source. No physical-device,
 OEM, TalkBack/RTL, fresh linguistic expertise or independent model/effort claim.
+
+Additional first-pass checkpoints (same scope; no second-review claim):
+
+- P1-0018b4be66 fixes the remaining empty-index/clock-rollback archive path;
+  11core/11Room pass. The original b7 checkpoint remains historical.
+- UI3ce21de reproduces7/8 failures;4af4ab6 has one test-only leading-zero
+  expectation failure. c6140ba passes1core/11app including10 ViewModel cases.
+- P1-006f369b6e passes16app:5 ownership scenarios,10 VM regressions and1 export
+  lifecycle. Actual durable lease references/source bytes are checked on fixtures.
+- P1-011c341e23 reproduces4 semantic receipt collisions in both stores. Its fifth
+  failure is a test-fixture legacy hash encoded without the production pretty-print
+  setting, not a product failure; corrected separately in3921354. The same invocation
+  passes the new whole-area guarded-start regression (1app).
+
+P1-0113921354 passes6core/7app: the five new CSV cases, existing COPY-origin
+replay in each store, and whole-area guarded start. Corrected legacy hash is also
+checked against the frozen original algorithm; original receipts remain unchanged.

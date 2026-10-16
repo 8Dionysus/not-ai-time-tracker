@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.ui.UiReviewRegressionTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-10-16T08:52:41.112Z" hostname="69b2b5b46001" time="6.038">
+  <properties/>
+  <testcase name="reportDayUsesConfiguredBoundaryBeforeAndAfterFour" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="5.407"/>
+  <testcase name="idleHomeAndOverviewAdvanceAtReportBoundaryWithoutDatasetRevision" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.104"/>
+  <testcase name="reportDayRetainsRealDstBoundaryLength" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.043"/>
+  <testcase name="nextPeriodEnabledUsesEffectiveGoalAndDayUnit" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.088"/>
+  <testcase name="ribbonLabelsUseActualElapsedFractionsInExplicitReportZone" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.028"/>
+  <testcase name="shownFavoriteRenameCannotSilentlyRebase" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.087"/>
+  <testcase name="oneSegmentWithSubjectFactsRequiresReviewAndCancelledPreviewHasNoWrites" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.124"/>
+  <testcase name="failedDraftSwitchKeepsInputAndOriginalDataset" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.062"/>
+  <testcase name="shownFavoriteClassificationCannotSilentlyRebase" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.048"/>
+  <testcase name="draftSwitchHasOneCommitWithNoteAndOneUndo" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.047"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

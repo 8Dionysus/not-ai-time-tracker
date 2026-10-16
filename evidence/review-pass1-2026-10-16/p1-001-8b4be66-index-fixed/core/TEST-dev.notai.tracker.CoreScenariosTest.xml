@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.CoreScenariosTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-10-16T08:26:31.114Z" hostname="69b2b5b46001" time="0.723">
+  <properties/>
+  <testcase name="reviewP1RecoveryScheduleLink" classname="dev.notai.tracker.CoreScenariosTest" time="0.384"/>
+  <testcase name="reviewP1RecoverySubjectLink" classname="dev.notai.tracker.CoreScenariosTest" time="0.027"/>
+  <testcase name="reviewP1RecoveryUnreferencedTail" classname="dev.notai.tracker.CoreScenariosTest" time="0.001"/>
+  <testcase name="reviewP1RecoveryRollbackFocus" classname="dev.notai.tracker.CoreScenariosTest" time="0.094"/>
+  <testcase name="reviewP1RecoveryRollbackOrdinary" classname="dev.notai.tracker.CoreScenariosTest" time="0.037"/>
+  <testcase name="reviewP1RecoveryExerciseSet" classname="dev.notai.tracker.CoreScenariosTest" time="0.023"/>
+  <testcase name="reviewP1RecoverySessionMeasurement" classname="dev.notai.tracker.CoreScenariosTest" time="0.024"/>
+  <testcase name="reviewP1RecoveryClosedRate" classname="dev.notai.tracker.CoreScenariosTest" time="0.043"/>
+  <testcase name="reviewP1RecoverySegmentMeasurement" classname="dev.notai.tracker.CoreScenariosTest" time="0.028"/>
+  <testcase name="reviewP1RecoveryEmptyIdentityOverlap" classname="dev.notai.tracker.CoreScenariosTest" time="0.025"/>
+  <testcase name="reviewP1RecoveryEventQuantity" classname="dev.notai.tracker.CoreScenariosTest" time="0.034"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

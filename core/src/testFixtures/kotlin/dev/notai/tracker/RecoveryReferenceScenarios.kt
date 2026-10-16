@@ -13,7 +13,7 @@ fun recoveryExclusionKeepsReferences(create: () -> StateStore,reopen: (StateStor
     t.saveUnit(t.snapshot().token,UnitDefinition("recovery-page","page","page"))
     t.saveMetric(t.snapshot().token,Metric("recovery-pages","pages",numberKind = NumberKind.INTEGER,canonicalUnitId = "recovery-page"))
     t.saveUnit(t.snapshot().token,UnitDefinition("recovery-m","m","distance"))
-    t.saveMetric(t.snapshot().token,Metric("recovery-distance","distance",canonicalUnitId = "recovery-m"))
+    t.saveMetric(t.snapshot().token,Metric("recovery-distance","distance",numberKind = NumberKind.DECIMAL,canonicalUnitId = "recovery-m"))
     val startCommand = if(kind == RecoveryReferenceCase.SCHEDULE) {
         val rule = ScheduleRule(card.classification(),"2026-10-10",extraDates = setOf("2026-10-10"))
         t.scheduleCommand(ScheduleCommand("create",t.snapshot().token,ScheduleAction.CREATE,"recovery-series",rule = rule))

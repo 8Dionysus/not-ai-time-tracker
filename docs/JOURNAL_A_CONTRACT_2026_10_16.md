@@ -92,8 +92,20 @@ export entity or hidden timer/import engine is introduced.
 
 ## Acceptance
 
-Search source3f7cb53 passed shared Memory3/Room3 scenarios in3m49s. The next A change
-adds shared profile/gap/batch scenarios and legacy guards; its result is recorded
-separately after execution. Real11 ancestor queries, migration failure/rollback,
-COPY/replay, retained hash vectors and final B/C combined regression remain explicit
-acceptance work. JVM/Robolectric/build evidence does not close device/UI acceptance.
+A4/5/8/9 source3d26c07 passes17core/14app (shared Memory/Room, selective COPY/replay,
+retained legacy hash vectors and reached migration guard/interruption rollback),
+build4m12s. Source3f7cb53 earlier passed3Memory/3Room search scenarios. Private real11
+ancestor-context coverage passes1core atc751fb5 and1Android asset-Robolectric at26de40a;
+the latter final invocation's core task is UP-TO-DATE, with actual execution retained
+from the earlier attempt. Relevant search/model/archive/adapter source bytes match
+public3d26c07; this is component equivalence, not an assertion of whole private/public
+source equality. No device execution. Private texts/assets remain excluded from public Git.
+
+Earlier failures are explicit: a current-format fixture expected13 instead of14;
+a new Android migration test used unavailable core-test-only APIs. Both were fixed;
+failed logs/results are retained separately. No successful old C949 result is
+re-attributed or rerun as acceptance of these new operations.
+
+Exact XML/log/source evidence is under evidence/journal-a-2026-10-16. B/C integration,
+combined old-data migration→export→preview→restore comparison and final all14
+regression/APKs remain outstanding. JVM/Robolectric evidence does not close device/UI.

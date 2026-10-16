@@ -58,7 +58,7 @@ object FocusSignals {
         if(!permitted || state?.mode != FocusMode.DUE) c.getSystemService(NotificationManager::class.java).cancel(NOTICE)
         if(!permitted) return
         channel(c)
-        if(state.mode == FocusMode.DUE) { deliverCurrent(c,state);return }
+        if(state.mode == FocusMode.DUE) { deliverCurrent(c,tracker,view.data,state);return }
         if(state.mode != FocusMode.RUNNING) return
         val intent = pending(c,state.id,state.phaseIndex)
         // Android/OEM may delay this in idle; the receiver checks the same phase again.
@@ -81,31 +81,49 @@ object FocusSignals {
         if(!permitted) {
             c.getSystemService(NotificationManager::class.java).cancel(NOTICE);return FocusDeliveryResult(FocusDeliveryStatus.BLOCKED_BEFORE_POST,focus)
         }
-        return FocusDeliveryResult(if(deliverCurrent(c,focus)) FocusDeliveryStatus.POST_ACCEPTED else FocusDeliveryStatus.OUTCOME_UNKNOWN,focus)
+        return deliverCurrent(c,tracker,view.data,focus)
     }
-    private fun deliverCurrent(c: Context,focus: FocusSnapshot): Boolean {
-        if(focus.mode != FocusMode.DUE || !allowed(c)) return false
-        val key = focus.signalKey ?: return false;val prefs = preferences(c)
+    private fun deliverCurrent(c: Context,tracker: Tracker,captured: Dataset,focus: FocusSnapshot): FocusDeliveryResult {
+        fun result(status: FocusDeliveryStatus) = FocusDeliveryResult(status,focus)
+        if(focus.mode != FocusMode.DUE || !allowed(c)) return result(FocusDeliveryStatus.BLOCKED_BEFORE_POST)
+        val key = focus.signalKey ?: return result(FocusDeliveryStatus.NOT_DUE);val prefs = preferences(c)
         val delivered = prefs.getStringSet("delivered",emptySet()).orEmpty()
-        if(key in delivered) return false
+        if(key in delivered) return result(FocusDeliveryStatus.PREVIOUS_RECEIPT)
         channel(c)
         val next = (delivered.filter { it.startsWith(focus.id+":") }+key).takeLast(64).toSet()
-        if(!prefs.edit().putStringSet("delivered",next).commit()) return false
+        if(!prefs.edit().putStringSet("delivered",next).commit()) return result(FocusDeliveryStatus.OUTCOME_UNKNOWN)
         try {
             val notification = notificationFactory(c)
-            c.getSystemService(NotificationManager::class.java).notify(NOTICE,notification)
-            return true
-        } catch(_: RuntimeException) { return false } // Keep the durable attempt: notify may already have had an effect.
+            return tracker.store.checkedTransaction { checked ->
+                val live = checked.data;val current = checked.snapshot(tracker.clock.now()).focus
+                val valid = live.datasetId == captured.datasetId && live.controlBarrier == captured.controlBarrier &&
+                    current?.mode == FocusMode.DUE && current.id == focus.id && current.phaseIndex == focus.phaseIndex &&
+                    current.signalKey == key && live.settings.surfaces.focusSignal && allowed(c)
+                // Rendering and the durable attempt are complete. Only the short terminal
+                // effect shares the same gate as stop/advance/settings/restore; no Dataset write.
+                checked.replace(live) {
+                    if(!valid) {
+                        c.getSystemService(NotificationManager::class.java).cancel(NOTICE)
+                        FocusDeliveryResult(FocusDeliveryStatus.BLOCKED_BEFORE_POST,current)
+                    } else {
+                        c.getSystemService(NotificationManager::class.java).notify(NOTICE,notification)
+                        FocusDeliveryResult(FocusDeliveryStatus.POST_ACCEPTED,current)
+                    }
+                }
+            }
+        } catch(_: RuntimeException) { return result(FocusDeliveryStatus.OUTCOME_UNKNOWN) } // Keep the durable attempt: no automatic replay.
     }
 }
 class FocusAlarmReceiver: BroadcastReceiver() {
     internal fun handleCurrent(context: Context,id: String,index: Long) {
+        if(!DatabaseFiles.exists(context)) return
         val runtime = TrackerRuntime.get(context);val view = runtime.tracker.view();val focus = view.snapshot().focus
         if(!view.data.settings.surfaces.focusSignal || focus?.id != id || focus.phaseIndex != index) return
         if(focus.mode == FocusMode.DUE) FocusSignals.deliverResult(context,runtime.tracker) else FocusSignals.refresh(context,runtime.tracker)
     }
     override fun onReceive(context: Context,intent: Intent) {
         val id = intent.getStringExtra("id") ?: return;val index = intent.getLongExtra("index",-1)
+        if(!DatabaseFiles.exists(context)) return
         val pending = goAsync()
         CoroutineScope(SupervisorJob()+Dispatchers.IO).launch {
             try {

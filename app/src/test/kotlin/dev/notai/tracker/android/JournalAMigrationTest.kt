@@ -80,4 +80,28 @@ class JournalAMigrationTest {
         val recovered=open(name)
         try { assertEquals(expected,RoomStore(recovered).read()) } finally { recovered.close();context.deleteDatabase(name) }
     }
+    @Test fun futureSubjectAndBoundsEachReachTheirV11GuardWithoutChangingRows() {
+        for(kind in listOf("subject","bounds")) {
+            val name="journal-v11-$kind-${newId()}.db";val first=open(name);val t=Tracker(RoomStore(first),FakeClock())
+            t.saveCard(t.snapshot().token,Card("future-card","Future"))
+            val expected=if(kind=="subject") {
+                t.defineSubject(t.snapshot().token,CardSubject("future-card","edition"))
+                "Subject quantities in v11 metadata"
+            } else {
+                t.saveUnit(t.snapshot().token,UnitDefinition("future-score","score","score"))
+                t.saveMetric(t.snapshot().token,Metric("future-scale","Scale",numberKind=NumberKind.INTEGER,canonicalUnitId="future-score",bounds=ScaleBounds(Decimal.ZERO,Decimal("5"),"none","all")))
+                "Subject quantities in v11 vocabulary"
+            }
+            first.close();lateinit var before: Map<String,List<List<String?>>>
+            sql(name) { it.version=11;before=contents(it) }
+            val candidate=open(name)
+            try {
+                val failure=assertThrows(Exception::class.java) { RoomStore(candidate).read() }
+                assertTrue(generateSequence(failure as Throwable?) { it.cause }.any { it is CoreError && it.code==ErrorCode.STORAGE && it.message==expected })
+            } finally { candidate.close() }
+            sql(name) { assertEquals(11,it.version);assertEquals(before,contents(it)) }
+            context.deleteDatabase(name)
+        }
+    }
+
 }

@@ -7,7 +7,7 @@ data class QuantityReport(val token: Token,val report: Report,val quantities: Qu
 
 /** Joins one immutable revision to its already captured report. Event totals use half-open rows,
  * never the session's latest classification. Whole-target measurements are never apportioned. */
-object QuantityReports {
+internal object QuantityReports {
     fun build(data: Dataset,report: Report): QuantityReport {
         val filtered = report.filter.let { it.cardId != null || it.activityTypeId != null || it.details.isNotEmpty() || it.tags.isNotEmpty() || it.facets.isNotEmpty() }
         val excluded = mutableListOf<ExcludedQuantity>()
@@ -23,11 +23,12 @@ object QuantityReports {
                 at != null && at > report.asOf -> QuantityReportExclusion.EFFECTIVE_AFTER_AS_OF
                 filtered && q.sessionId == null -> QuantityReportExclusion.NO_SESSION_CLASSIFICATION
                 filtered && at != null && rows[q.sessionId].orEmpty().none { at >= it.start && at < it.end } -> QuantityReportExclusion.OUTSIDE_MATCHING_INTERVAL
-                filtered && at == null && rows[q.sessionId].isNullOrEmpty() -> QuantityReportExclusion.NO_SESSION_CLASSIFICATION
+                filtered && at == null && (rows[q.sessionId].isNullOrEmpty() || data.segments.any { it.sessionId == q.sessionId && (it.uncertain || !report.filter.matches(it.selection)) }) -> QuantityReportExclusion.NO_SESSION_CLASSIFICATION
                 else -> null
             }
+            if(at == null && q.recordedAt <= report.asOf) unknown += q
             if(reason != null) excluded += ExcludedQuantity(q.id,reason)
-            else if(at == null) unknown += q else events += q
+            else if(at != null) events += q
         }
         val whole = report.measurements.filter { m ->
             val accepted = !filtered || m.scope == Scope.SEGMENT || data.segments.filter { it.sessionId == m.targetId }.let { segments ->

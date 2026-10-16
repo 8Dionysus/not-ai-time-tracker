@@ -65,6 +65,8 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
     val calendarOccurrences = CalendarOccurrences(context.applicationContext)
     val focusDueSignals = FocusDueSignals()
     val scheduleDelivery = AndroidScheduleDelivery(context.applicationContext,tracker)
+    private val attentionDelegate = lazy { AttentionRuntime(context.applicationContext,tracker) }
+    val attention: AttentionRuntime get() = attentionDelegate.value
     private val surfaceScope = CoroutineScope(SupervisorJob()+Dispatchers.IO)
     internal val shortcuts = ShortcutCommands(tracker,surfaceScope)
     private val platformContext = context.applicationContext
@@ -83,7 +85,10 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
         else platformContext.registerReceiver(platformReceiver,filter)
         platformRegistered = true
     }
-    private fun detachPlatform() { if(platformRegistered) { platformContext.unregisterReceiver(platformReceiver);platformRegistered = false } }
+    private fun detachPlatform() {
+        if(platformRegistered) { platformContext.unregisterReceiver(platformReceiver);platformRegistered = false }
+        if(attentionDelegate.isInitialized()) attentionDelegate.value.close()
+    }
     init {
         StartupTrace.mark(context,"store-initialized")
         tracker.store.readChecked() // fail before publishing a runtime or starting observers
@@ -95,6 +100,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
                 if(e is CancellationException) throw e
                 android.util.Log.w("TimerSurfaces","Store observation unavailable; open recovery controls")
             }.collect { view ->
+                try { attention.synchronize() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("AttentionRuntime","Optional refresh pending") }
                 try { scheduleProjection.synchronize() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("ScheduleProjection","Projection refresh pending") }
                 try { TimerSurfaces.refresh(context,view,previous);FocusSignals.refresh(context,tracker) }
                 catch(e: Exception) { if(e is CancellationException) throw e; android.util.Log.w("TimerSurfaces","Surface refresh unavailable") }
@@ -108,7 +114,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
         }
     }
     private fun refreshPlatform(focusContext: Context?) {
-        val actions = listOf<() -> Unit>({ if(focusContext != null) FocusSignals.refresh(focusContext,tracker) },{ scheduleProjection.synchronize();Unit },{ scheduleDelivery.synchronize();Unit })
+        val actions = listOf<() -> Unit>({ if(focusContext != null) FocusSignals.refresh(focusContext,tracker) },{ scheduleProjection.synchronize();Unit },{ scheduleDelivery.synchronize();Unit },{ attention.synchronize() })
         for(action in actions) try { action() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("TrackerPlatform","Independent refresh pending; no facts changed") }
     }
     companion object {

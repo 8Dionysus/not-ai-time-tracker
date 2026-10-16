@@ -206,7 +206,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
             val content = TransferContent(types,cards,d.axes.filter { it.id in axisIds },metrics,units,sessions,segments,measurements,series,overrides,ownLinks,portable.focus?.takeIf { wanted.includeFocus && it.sessionId in ss },goals,favorites,roots,savedReports = savedReports,subjects = subjectData)
             validateContent(content)
             val id = if(roots.empty) component.sorted().joinToString("|") else "catalog:"+payloadHash(component.sorted())
-            val previous = d.transfer.origins.find { o -> originMemberIds(o,"report") == savedReports.map { it.id }.toSet() && originMemberIds(o,"session") == ss && originMemberIds(o,"series") == ps && originMemberIds(o,"goal") == goals.map { it.id }.toSet() && originMemberIds(o,"favorite") == favorites.map { it.id }.toSet() && originCatalogRoots(o) == roots }
+            val previous = d.transfer.origins.find { o -> subjectIdentityIds(subjectData).all { (kind,ids) -> originMemberIds(o,kind) == ids.toSet() } && originMemberIds(o,"report") == savedReports.map { it.id }.toSet() && originMemberIds(o,"session") == ss && originMemberIds(o,"series") == ps && originMemberIds(o,"goal") == goals.map { it.id }.toSet() && originMemberIds(o,"favorite") == favorites.map { it.id }.toSet() && originCatalogRoots(o) == roots }
             val original = previous?.takeIf { originUnchanged(d,it) && currentOriginContent(d,it) == content }?.let { o ->
                 val earliest = d.transfer.operations.flatMap { op -> op.groups.map { op.payloadsPruned to it.group } }
                     .firstOrNull { it.second.originId == o.originId && it.second.hash == o.hash }

@@ -70,7 +70,7 @@ class UiDraftRecreationTest {
         compose.onNodeWithContentDescription("Начало позже на 5 минут").performClick()
         compose.onNodeWithContentDescription("Конец раньше на 5 минут").performClick()
         compose.onNode(SemanticsMatcher("Activity chooser action") { it.config.getOrNull(SemanticsActions.OnClick)?.label=="Изменить занятие" }).performClick()
-        compose.onNodeWithContentDescription("Найти или создать занятие").performTextInput("Draft selected activity")
+        compose.onNodeWithContentDescription("Найти или создать занятие").performTextInput("Draft selected")
         compose.waitUntil(10000) { compose.onAllNodesWithText("Draft selected activity").fetchSemanticsNodes().size==1 }
         compose.onNodeWithText("Draft selected activity").performScrollTo().performClick()
         compose.waitForIdle()

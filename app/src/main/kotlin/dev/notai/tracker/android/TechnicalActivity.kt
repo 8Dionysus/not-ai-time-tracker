@@ -155,10 +155,7 @@ class TechnicalActivity: Activity() {
         }
         button("Экспорт полного JSON") { beginExport("application/json","not-ai-backup.json") { runtime.backups.write(it) } }
         button("Повторить подготовленный экспорт…") { retryExport() }
-        button("Отменить подготовленный экспорт") {
-            val id = pendingExportId ?: exportOperations.latestPending()?.id
-            if(id != null) runAction { exportOperations.cancel(id);withContext(Dispatchers.Main) { status.text = "Экспорт отменён; файлы сохранены. Можно подготовить новую копию.";pendingExportId = null } }
-        }
+        button("Отменить подготовленный экспорт") { cancelPreparedExport() }
         button("CSV отчёт за сегодня (не полная копия)") { runAction {
             val t = runtime.tracker; val d = t.data(); val now = t.clock.now()
             val report = t.view().day(ReportingDayPolicy(d.settings.reportZone,d.settings.reportDayStartMinute).dateAt(now.wall))
@@ -480,6 +477,10 @@ class TechnicalActivity: Activity() {
         val op = try { exportOperations.begin(mime,title) } catch(e: Exception) { status.text = "Подготовка экспорта не началась: ${e.message}";return }
         pendingExportId = op.id
         runAction { val prepared = exportOperations.prepare(op.id,write);withContext(Dispatchers.Main) { if(prepared.state == "READY") showExportPicker(op.id) } }
+    }
+    private fun cancelPreparedExport() {
+        val id = pendingExportId ?: exportOperations.latestPending()?.id
+        if(id != null) runAction { exportOperations.cancel(id);withContext(Dispatchers.Main) { status.text = "Экспорт отменён; файлы сохранены. Можно подготовить новую копию.";pendingExportId = null } }
     }
     private fun showExportPicker(id: String) {
         val op = exportOperations.read(id)

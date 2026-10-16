@@ -96,4 +96,33 @@ class TechnicalExportLifecycleTest {
         waitFor { exports.read(id).state == "COMPLETE" };assertTrue(exports.read(id).resultReceived)
         assertEquals(before.sha256,fileHash(destination));assertRegistered(id,"COMPLETE")
     }
+    @Test fun explicitCancelDuringPreparationBecomesTerminalOnlyAfterWriterReleases() {
+        val entered=java.util.concurrent.CountDownLatch(1);val release=java.util.concurrent.CountDownLatch(1)
+        val writer:(java.io.OutputStream)->Unit={ out -> out.write("Before cancellation".toByteArray());entered.countDown();check(release.await(10,java.util.concurrent.TimeUnit.SECONDS));out.write(" retained tail".toByteArray()) }
+        invoke("beginExport","application/json","cancel-preparing.json",writer)
+        val id=requireNotNull(pending());assertTrue(entered.await(10,java.util.concurrent.TimeUnit.SECONDS))
+        val exports=ExportOperations(app);val gate=PrivateFileMaintenance.forContext(app)
+        try {
+            invoke("cancelPreparedExport");waitFor { exports.read(id).state=="CANCELLED" }
+            assertTrue("An explicitly cancelled preparation has no chooser result left to receive",exports.read(id).resultReceived)
+            assertTrue(gate.state().references.any { it.blocker==CopyBlocker.EXPORT_WRITING })
+        } finally { release.countDown() }
+        waitFor { exports.read(id).bytes>0 && gate.state().references.none { it.owner=="export-prepare:$id" } }
+        assertTrue(exports.read(id).resultReceived);assertNull(shadowOf(controller.get()).nextStartedActivityForResult)
+        assertEquals("Before cancellation retained tail",File(app.noBackupFilesDir,"exports/$id/data").readText())
+        assertRegistered(id,"CANCELLED")
+    }
+    @Test fun explicitCancelCannotLoseActiveChooserOrLaunchAnotherBeforeResult() {
+        val id=begin();val exports=ExportOperations(app);val gate=PrivateFileMaintenance.forContext(app)
+        val held=gate.state().references.single { it.owner=="export-chooser:$id" }
+        val foreign=gate.acquire("foreign-owner-kept",PrivateCopyBackend.itemId("exports/$id"),CopyBlocker.RESTORE_SOURCE_IN_USE)
+        invoke("cancelPreparedExport");waitFor { exports.read(id).state=="CANCELLED" }
+        assertEquals(id,pending());assertFalse(exports.read(id).resultReceived);assertTrue(held in gate.state().references)
+        invoke("retryExport");shadowOf(Looper.getMainLooper()).idle();assertNull(shadowOf(controller.get()).nextStartedActivityForResult)
+        val writer:(java.io.OutputStream)->Unit={ it.write("No second preparation".toByteArray()) }
+        invoke("beginExport","application/json","not-launched.json",writer);assertEquals(id,pending())
+        result(null);assertTrue(exports.read(id).resultReceived);assertFalse(held in gate.state().references);assertTrue(foreign in gate.state().references)
+        assertRegistered(id,"CANCELLED")
+    }
+
 }

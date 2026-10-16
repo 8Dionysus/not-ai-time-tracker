@@ -210,6 +210,28 @@ class UiReviewRegressionTest {
         assertTrue(f.notices.none { it.text == Format.error(CoreError(ErrorCode.STALE,"stale")) })
     }
     @Test fun reviewP2QuickIgnoresLaterEmptyCanonical() = p2HistoryChoice(false,true)
+    private fun p3BoundedChoice(path: String,staleNote: Boolean = false) {
+        val f = fixture(FakeClock(10000),initial = reviewP3WindowFixture());val t = f.tracker
+        val view = t.view();val choices = view.choices();val entry = reviewP3Shown(choices,path)
+        val shown = Shown(entry,choices.reference(entry),view.snapshot().token)
+        assertEquals("p3-g1",entry.sourceSegmentId);assertEquals("Note A",entry.note)
+        if(staleNote) {
+            t.correctSession(t.snapshot().token,"p3-s1",listOf(Tracker.SegmentEdit("p3-g1",1000,2000,entry.selection)),"Unseen note")
+            f.synced()
+        }
+        val before = t.data();f.choose(shown,PickMode.START)
+        pump { t.snapshot().session != null || f.notices.isNotEmpty() }
+        if(staleNote) {
+            assertEquals(before,t.data());assertTrue(f.notices.any { it.text == Format.error(CoreError(ErrorCode.STALE,"stale")) })
+        } else {
+            assertNotNull(t.snapshot().session);assertEquals("Note A",t.snapshot().session!!.note)
+            assertEquals(entry.selection,t.snapshot().session!!.selection)
+            assertTrue(f.notices.none { it.text == Format.error(CoreError(ErrorCode.STALE,"stale")) })
+        }
+    }
+    @Test fun reviewP3BoundedFrequencyStartsShownSource() = p3BoundedChoice("bounded-frequent")
+    @Test fun reviewP3BoundedQuickStartsShownSource() = p3BoundedChoice("bounded-quick")
+    @Test fun reviewP3BoundedQuickKeepsStrictRevisionGuard() = p3BoundedChoice("bounded-quick",true)
     @Test fun reviewP2RecentIgnoresLaterEmptyCanonical() = p2HistoryChoice(false,false)
     @Test fun reviewP2QuickIgnoresLaterUncertainCanonical() = p2HistoryChoice(true,true)
     @Test fun reviewP2RecentIgnoresLaterUncertainCanonical() = p2HistoryChoice(true,false)

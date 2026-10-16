@@ -21,6 +21,7 @@ class TrackerView internal constructor(private val checked: CheckedState,private
             frozenList(Schedules.project(data,day.date.minusDays(7),day.date.plusDays(14),instant,deviceZone)),data.settings.schedule.nextDayBoundary(instant,deviceZone).toEpochMilli())
     }
     fun goalProgress(id: String,date: java.time.LocalDate? = null): GoalProgress = Goals.progress(data,clock.now(),id,date)
+    fun historyGaps(start: Long,end: Long): HistoryGapReview = HistoryGaps.inspect(data,clock.now(),start,end)
     fun report(start: Long,end: Long,filter: Filter = Filter()): Report = checked.report(clock.now(),start,end,filter,data.settings.reportZone)
     fun calendar(first: java.time.LocalDate,days: Int,filter: Filter = Filter(),zone: String = data.settings.reportZone): CalendarHistory =
         checked.calendar(clock.now(),first,days,filter,zone)

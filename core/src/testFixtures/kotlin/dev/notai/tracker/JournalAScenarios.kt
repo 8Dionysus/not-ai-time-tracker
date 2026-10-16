@@ -15,6 +15,15 @@ abstract class JournalAScenarioContract {
         val aliases=mutableListOf("Personal discovery")
         t.personalizeChoice(t.snapshot().token,ChoiceKind.CARD,a.id,ChoicePersonalization(aliases))
         aliases += "Should not leak"
+        val invalid=assertFailsWith<CoreError> { t.personalizeChoice(t.snapshot().token,ChoiceKind.CARD,a.id,ChoicePersonalization(listOf(" x ","X"))) }
+        assertEquals(ErrorReason.PERSONAL_CHOICE_INVALID,invalid.reason)
+        assertEquals(ErrorArgument.Identifier("DUPLICATE_ALIAS"),invalid.arguments["rule"])
+        t.saveFavorite(t.snapshot().token,Favorite("fa","Shared favorite A",a.classification()))
+        t.saveFavorite(t.snapshot().token,Favorite("fb","Shared favorite B",b.classification()))
+        t.personalizeChoice(t.snapshot().token,ChoiceKind.FAVORITE,"fa",ChoicePersonalization(listOf("Private favorite lookup")))
+        t.orderChoices(t.snapshot().token,ChoiceKind.FAVORITE,listOf("fb","fa"))
+        assertEquals(listOf("favorite:fb","favorite:fa"),t.choices().search(ChoiceQuery("Shared",setOf(ChoiceKind.FAVORITE))).items.map { it.entry.id })
+        assertEquals("favorite:fa",t.choices().search(ChoiceQuery("Private favorite lookup",setOf(ChoiceKind.FAVORITE))).items.single().entry.id)
         t.orderChoices(t.snapshot().token,ChoiceKind.CARD,listOf(b.id,a.id))
         assertEquals(listOf("card:b","card:a"),t.choices().search(ChoiceQuery("Shared",setOf(ChoiceKind.CARD))).items.map { it.entry.id })
         assertEquals(listOf("card:a"),t.choices().search(ChoiceQuery("Personal discovery",setOf(ChoiceKind.CARD))).items.map { it.entry.id })
@@ -49,6 +58,11 @@ abstract class JournalAScenarioContract {
         t.startFavorite(t.snapshot().token,"favorite")
         // Latest exact recorded identity can itself deliberately contain no note.
         assertNull(t.snapshot().session!!.note);assertEquals(measurements,t.data().measurements)
+        clock.advance(1000);t.stop(t.snapshot().token);clock.advance(1000)
+        t.manual(t.snapshot().token,clock.wall-500,clock.wall-100,card.classification(),"Latest reviewed source")
+        val favorite=t.choices().resolve("favorite:favorite")!!
+        t.startChoice(t.snapshot().timerTarget!!,t.choices().reference(favorite))
+        assertEquals("Latest reviewed source",t.snapshot().session!!.note);assertEquals(measurements,t.data().measurements)
     }
     @Test fun personalProfilesRoundTripFullAndSelectiveWithLegacyGuards() {
         val clock=FakeClock();val t=Tracker(createJournalStore(),clock)
@@ -69,6 +83,14 @@ abstract class JournalAScenarioContract {
         val operation=importer.apply(importer.preview(importer.plan(selective,selective.groups.map { it.id }.toSet())),"personal-import")
         assertTrue(operation.complete);assertEquals(t.data().cards,target.data().cards)
         assertFailsWith<CoreError> { importer.inspect(selective.copy(formatVersion=3,minimumReader=3)) }
+        val replay=importer.apply(importer.plan(selective,selective.groups.map { it.id }.toSet()),"personal-replay")
+        assertTrue(replay.groups.all { it.state==TransferGroupState.UNCHANGED })
+        val conflict=Tracker(createJournalStore(),clock)
+        conflict.saveCard(conflict.snapshot().token,Card("portable","Conflicting original"))
+        val copy=SelectiveTransfer(conflict)
+        val copied=copy.apply(copy.plan(selective,selective.groups.map { it.id }.toSet(),selective.groups.associate { it.id to TransferConflictPolicy.COPY }),"profile-copy")
+        assertTrue(copied.complete);assertEquals(2,conflict.data().cards.size)
+        assertEquals(t.data().cards.single().personal,conflict.data().cards.single { it.id!="portable" }.personal)
         val legacy=Backups.encode(Dataset(),clock.now()).replace("\"formatVersion\": 14","\"formatVersion\": 13")
         assertEquals(14,Backups.decode(legacy).formatVersion)
     }
@@ -121,4 +143,16 @@ abstract class JournalAScenarioContract {
         val replacement=t.previewMetadata(BatchMetadataRequest(ids,Classification(),MetadataFillPolicy.REPLACE,MetadataNoteEdit(null,MetadataFillPolicy.REPLACE)))
         t.applyMetadata(replacement);assertTrue(t.data().sessions.filter { it.id in ids }.all { it.selection==Classification() && it.note==null })
     }
+    @Test fun gapWindowsPartitionAcrossMidnightAndUnknownTimeDoesNotBecomeZero() {
+        val midnight=java.time.Instant.parse("2026-10-11T00:00:00Z").toEpochMilli()
+        val clock=FakeClock(wall=midnight+5000);val t=Tracker(createJournalStore(),clock)
+        t.manual(t.snapshot().token,midnight-2000,midnight+2000,Classification())
+        val before=t.historyGaps(midnight-5000,midnight);val after=t.view().historyGaps(midnight,midnight+10000)
+        assertEquals(listOf(midnight-5000 to midnight-2000),before.gaps.map { it.start to it.end })
+        assertEquals(listOf(midnight+2000 to midnight+5000),after.gaps.map { it.start to it.end })
+        val sums=before.gaps.sumOf { it.end-it.start }+after.gaps.sumOf { it.end-it.start }
+        assertEquals(6000L,sums)
+        assertEquals(4000L,t.view().report(midnight-5000,midnight+5000).rows.sumOf { it.durationMs })
+    }
+
 }

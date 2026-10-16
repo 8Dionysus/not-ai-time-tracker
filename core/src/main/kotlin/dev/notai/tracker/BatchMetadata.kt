@@ -12,20 +12,19 @@ class BatchMetadataPreview internal constructor(val expected: Token,val request:
     val changes: List<MetadataTargetChange>,internal val after: Dataset)
 internal fun previewBatchMetadata(data: Dataset,input: BatchMetadataRequest): BatchMetadataPreview {
     val request=input.copy(sessionIds=frozenList(input.sessionIds),selection=input.selection?.frozen())
-    ensure(request.sessionIds.isNotEmpty() && request.sessionIds.size<=10000 && request.sessionIds.distinct().size==request.sessionIds.size,"Choose distinct stable session IDs")
-    ensure(request.selection!=null || request.note!=null,"Choose metadata fields")
-    request.note?.value?.let { ensure(it.isNotBlank() && it.length<=16384,"Note must be null or 1..16384 characters") }
+    fun check(ok: Boolean,rule: String) = ensureReason(ok,ErrorReason.METADATA_BATCH_INVALID,arguments=mapOf("rule" to ErrorArgument.Identifier(rule),"recordCount" to ErrorArgument.Count(request.sessionIds.size.toLong())),fieldPath="metadataBatch")
+    check(request.sessionIds.isNotEmpty() && request.sessionIds.size<=10000 && request.sessionIds.distinct().size==request.sessionIds.size,"SESSION_IDS")
+    check(request.selection!=null || request.note!=null,"FIELDS_REQUIRED")
+    request.note?.value?.let { check(it.isNotBlank() && it.length<=16384,"NOTE_BOUNDS") }
     val selected=request.selection?.let { data.classify(it).frozen().also { value -> checkStartable(data,value) } }
     val ids=request.sessionIds.toSet();val sessions=data.sessions.filter { it.id in ids }
-    ensure(sessions.size==ids.size && sessions.all { it.status==SessionStatus.STOPPED },"All batch records must exist and be stopped")
+    check(sessions.size==ids.size && sessions.all { it.status==SessionStatus.STOPPED },"STOPPED_RECORDS_REQUIRED")
     fun selection(old: Classification)=if(selected!=null && (request.selectionPolicy==MetadataFillPolicy.REPLACE || old==Classification())) selected else old
     val changes=mutableListOf<MetadataTargetChange>()
     val after=data.copy(sessions=data.sessions.map { s ->
         if(s.id !in ids) s else {
             val next=selection(s.selection)
-            val note=request.note?.let { if(it.policy==MetadataFillPolicy.REPLACE || s.note.isNullOrBlank()) it.value else s.note } ?: s.note
-            // An explicit null replacement must remain distinguishable from no edit.
-            val actualNote=if(request.note!=null && (request.note.policy==MetadataFillPolicy.REPLACE || s.note.isNullOrBlank())) request.note.value else note
+            val actualNote=if(request.note!=null && (request.note.policy==MetadataFillPolicy.REPLACE || s.note.isNullOrBlank())) request.note.value else s.note
             if(next!=s.selection || actualNote!=s.note) changes += MetadataTargetChange(s.id,null,s.selection,next,s.note,actualNote)
             s.copy(selection=next,note=actualNote)
         }

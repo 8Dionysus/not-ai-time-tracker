@@ -342,14 +342,16 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun gapDraft(review: HistoryGapReview,gapId: String,selection: Classification = Classification(),note: String? = null): EntryDraft = storage {
         val d=data();checkToken(d,review.token,clock.now())
         val actual=HistoryGaps.inspect(d,review.asOf,review.start,review.requestedEnd)
-        val gap=actual.gaps.singleOrNull { it.id==gapId } ?: fail(ErrorCode.STALE,"Gap changed; review again")
-        ensure(gap.kind!=HistoryGapKind.RECOVERY_UNCERTAIN,"Resolve uncertain time before filling",ErrorCode.RECOVERY_REQUIRED)
+        val gap=actual.gaps.singleOrNull { it.id==gapId }
+        ensureReason(gap!=null,ErrorReason.HISTORY_GAP_CHANGED,ErrorCode.STALE,mapOf("gapId" to ErrorArgument.Identifier(gapId)),"historyGaps.gapId")
+        ensureReason(gap!!.kind!=HistoryGapKind.RECOVERY_UNCERTAIN,ErrorReason.HISTORY_GAP_UNCERTAIN,ErrorCode.RECOVERY_REQUIRED,mapOf("gapId" to ErrorArgument.Identifier(gapId)),"historyGaps.gapId")
         EntryDraft(selection.frozen(),note,DraftInterval(gap.start,gap.end),DraftSource.HISTORY_GAP).also { it.validateForApply() }
     }
     fun previewMetadata(input: BatchMetadataRequest): BatchMetadataPreview = storage { previewBatchMetadata(data(),input) }
     fun applyMetadata(preview: BatchMetadataPreview) = mutate(preview.expected,true) { d,_ ->
         val checked=previewBatchMetadata(d,preview.request)
-        ensure(checked.changes==preview.changes,"Metadata preview changed",ErrorCode.STALE)
+        ensureReason(checked.changes==preview.changes,ErrorReason.METADATA_BATCH_CHANGED,ErrorCode.STALE,fieldPath="metadataBatch")
+        ensureReason(checked.changes.isNotEmpty(),ErrorReason.METADATA_BATCH_INVALID,arguments=mapOf("rule" to ErrorArgument.Identifier("NO_CHANGES")),fieldPath="metadataBatch")
         checked.after
     }
     fun correctSession(expected: Token,sessionId: String,edits: List<SegmentEdit>,note: String?,reclassify: Boolean = false) = mutate(expected,true) { d,n ->

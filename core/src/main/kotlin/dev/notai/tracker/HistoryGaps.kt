@@ -11,7 +11,8 @@ class HistoryGapReview internal constructor(val token: Token,val asOf: Moment,va
 object HistoryGaps {
     fun inspect(data: Dataset,now: Moment,start: Long,end: Long): HistoryGapReview {
         validateMoment(now);validate(data)
-        ensure(start >= 0 && end > start && end <= MAX_TIME,"Invalid gap window",ErrorCode.INVALID_INTERVAL)
+        ensureReason(start >= 0 && end > start && end <= MAX_TIME,ErrorReason.HISTORY_GAP_INVALID,ErrorCode.INVALID_INTERVAL,
+            mapOf("start" to ErrorArgument.Count(start),"end" to ErrorArgument.Count(end)),"historyGaps.window")
         val finish = minOf(end,now.wall)
         if(finish <= start) return HistoryGapReview(token(data),now,start,end,finish,emptyList(),emptyList())
         data class Edge(val category: Int,val id: String,val sessionId: String,val delta: Int)

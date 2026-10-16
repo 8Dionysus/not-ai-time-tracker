@@ -8,9 +8,11 @@ import kotlinx.serialization.Serializable
     val notePolicy: ChoiceNotePolicy? = null)
 internal fun ChoicePersonalization.frozen() = copy(aliases = frozenList(aliases))
 internal fun validatePersonalChoice(value: ChoicePersonalization) {
-    ensure(value.order == null || value.order in 0..1_000_000,"Invalid personal order")
-    ensure(value.aliases.size <= 64 && value.aliases.all { it.isNotBlank() && it.length <= 256 },"Invalid personal search alias")
-    ensure(value.aliases.map(::normalizedChoiceText).distinct().size == value.aliases.size,"Duplicate personal search alias")
+    fun check(ok: Boolean,rule: String) = ensureReason(ok,ErrorReason.PERSONAL_CHOICE_INVALID,
+        arguments=mapOf("rule" to ErrorArgument.Identifier(rule),"aliasCount" to ErrorArgument.Count(value.aliases.size.toLong())),fieldPath="choice.personal")
+    check(value.order == null || value.order in 0..1_000_000,"ORDER_RANGE")
+    check(value.aliases.size <= 64 && value.aliases.all { it.isNotBlank() && it.length <= 256 },"ALIAS_BOUNDS")
+    check(value.aliases.map(::normalizedChoiceText).distinct().size == value.aliases.size,"DUPLICATE_ALIAS")
 }
 internal fun TransferContent.hasChoicePersonalization() = cards.any { it.personal != ChoicePersonalization() } || favorites.any { it.personal != ChoicePersonalization() }
 fun Dataset.hasChoicePersonalization(): Boolean = cards.any { it.personal != ChoicePersonalization() } || favorites.any { it.personal != ChoicePersonalization() } ||

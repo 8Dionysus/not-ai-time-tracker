@@ -66,6 +66,7 @@ internal class CatalogChoices(types: List<ActivityType>) {
 }
 internal class PersonalChoices(cards: List<Card>,favorites: List<Favorite>) {
     val cardsById = cards.associateBy { it.id }
+    val favoritesById = favorites.associateBy { it.id }
     val cardAliases = cards.associate { it.id to it.personal.aliases.map { alias -> ChoiceText(MatchField.PERSONAL_ALIAS,alias) } }
     val cardNames = cards.associate { it.id to ChoiceText(MatchField.CURRENT_CARD_NAME,it.name) }
     val records = cards.map { ChoiceRecord("card:${it.id}",ChoiceKind.CARD,it.id,it.name,it.classification(),listOf(ChoiceText(MatchField.NAME,it.name))+it.personal.aliases.map { alias -> ChoiceText(MatchField.PERSONAL_ALIAS,alias) }) } +
@@ -236,7 +237,7 @@ class ChoiceView private constructor(private val d: Dataset,private val cache: C
     }
     private fun personalOrder(r: ChoiceRecord): Int? = when(r.kind) {
         ChoiceKind.CARD -> personal.cardsById[r.sourceId]?.personal?.order
-        ChoiceKind.FAVORITE -> d.favorites.find { it.id == r.sourceId }?.personal?.order
+        ChoiceKind.FAVORITE -> personal.favoritesById[r.sourceId]?.personal?.order
         else -> null
     }
     private fun title(r: ChoiceRecord): String {

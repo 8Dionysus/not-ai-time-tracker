@@ -168,3 +168,28 @@ fun quantityQueryReferencesShareCopiedTypeAndAxis(create: ()->StateStore) {
     assertEquals(copied.facets.single().axisId,target.data().savedReports.single().groupKey)
     assertEquals(copied.id,target.data().subjects.cards.single().cardId)
 }
+
+fun quantityIndependentOriginsKeepReexportIdentity(create: ()->StateStore,reopen: (StateStore)->StateStore) {
+    val clock=FakeClock();val source=Tracker(create(),clock)
+    val cards=listOf(Card("origin-a","Same title"),Card("origin-b","Same title"))
+    cards.forEach { source.saveCard(source.snapshot().token,it);source.defineSubject(source.snapshot().token,CardSubject(it.id,"edition")) }
+    source.manual(source.snapshot().token,clock.wall-1000,clock.wall-500,cards.first().classification())
+    val roots=cards.map { SubjectRecordKey(SubjectRecordKind.CARD,it.id) }.toSet()
+    val pack=SelectiveTransfer(source).export(TransferSelection(subjectRecords=roots))
+    assertEquals(2,pack.groups.size);assertTrue(pack.groups.all { it.content.sessions.isEmpty() })
+    val target=Tracker(create(),clock);cards.forEach { target.saveCard(target.snapshot().token,it.copy(name="Local original")) }
+    val importer=SelectiveTransfer(target);val policies=pack.groups.associate { it.id to TransferConflictPolicy.COPY }
+    assertTrue(importer.apply(importer.plan(pack,pack.groups.map { it.id }.toSet(),policies),"independent-copy").complete)
+    assertEquals(4,target.data().cards.size);assertTrue(target.data().sessions.isEmpty())
+    fun exported(t: Tracker): SelectivePackage = SelectiveTransfer(t).export(TransferSelection(subjectRecords=t.data().subjects.recordKeys())).also {
+        SelectiveTransfer(t).inspect(it);assertEquals(2,it.groups.map { g -> g.originId }.toSet().size)
+        assertEquals(pack.groups.map { g -> g.hash }.toSet(),it.groups.map { g -> g.hash }.toSet())
+    }
+    exported(target)
+    val retention=target.previewTransferRetention(TransferRetentionSelection(operationIds=setOf("independent-copy")))
+    assertTrue(retention.canApply);target.applyTransferRetention(retention,"independent-prune",retention.requiredAcknowledgements)
+    val reopened=Tracker(reopen(target.store),clock);exported(reopened)
+    val again=SelectiveTransfer(reopened)
+    assertTrue(again.apply(again.plan(pack,pack.groups.map { it.id }.toSet(),policies),"independent-copy").payloadsPruned)
+    assertTrue(again.apply(again.plan(pack,pack.groups.map { it.id }.toSet()),"independent-repeat").groups.all { it.state == TransferGroupState.UNCHANGED })
+}

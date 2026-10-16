@@ -19,6 +19,7 @@ class MemoryRollback: RollbackStore {
 }
 /** The SAME three scenarios run on in-memory domain storage and on disk-backed Room/SQLite. */
 abstract class ScenarioContract {
+    @Test fun combinedQuantityIndependentOriginsKeepReexportIdentity() = quantityIndependentOriginsKeepReexportIdentity(::createStore,::reopen)
     @Test fun combinedQuantityQueryReferencesKeepCopiedTypeAndAxis() = quantityQueryReferencesShareCopiedTypeAndAxis(::createStore)
     @Test fun combinedQuantityReportUsesHistoricalIntervals() = quantityReportClassificationJoin(::createStore,::reopen)
     @Test fun combinedQuantityArchiveGuardsEveryRetainedSnapshot() = quantityArchiveAuditSnapshots(::createStore)

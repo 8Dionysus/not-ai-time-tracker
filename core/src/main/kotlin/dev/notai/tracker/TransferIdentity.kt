@@ -42,7 +42,7 @@ internal fun rewriteTransferIds(c: TransferContent,maps: Map<String,Map<String,S
 }
 internal fun originCatalogRoots(origin: TransferOrigin) = origin.compaction?.catalogRoots ?: origin.localGroup.catalogRoots
 internal fun originMemberIds(origin: TransferOrigin,kind: String): Set<String> = origin.compaction?.localEntities?.filter { it.kind == kind }?.map { it.sourceEntityId }?.toSet()
-    ?: transferIdentityIds(origin.localGroup).getValue(kind).toSet()
+    ?: if(kind == "subjectCard") origin.localGroup.subjects.cards.map { it.cardId }.toSet() else transferIdentityIds(origin.localGroup).getValue(kind).toSet()
 internal fun currentOriginContent(d: Dataset,origin: TransferOrigin): TransferContent {
     val capsule = origin.compaction ?: return SelectiveTransfer.currentContent(d,origin.localGroup)
     fun <T> pick(kind: String,values: List<T>,key: (T)->String): List<T> {

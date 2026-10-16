@@ -301,15 +301,15 @@ class TechnicalActivity: Activity() {
         t.configureFocusSignal(t.snapshot().token,enabled)
     }
     internal fun deliverTechnicalFocus(t: Tracker,focus: FocusSnapshot): Job = scope.launch {
-            try {
-                val result = withContext(Dispatchers.IO) { FocusSignals.deliverResult(this@TechnicalActivity,t) }
-                val current = result.focus
-                if(result.status == FocusDeliveryStatus.BLOCKED_BEFORE_POST && current?.mode == FocusMode.DUE && current.signalKey == focus.signalKey)
-                    AlertDialog.Builder(this@TechnicalActivity).setTitle("Focus").setMessage(current.safeLabel).setPositiveButton("OK",null).show()
-            } catch(e: Exception) {
-                if(e is CancellationException) throw e
-                status.text = dev.notai.tracker.android.ui.Format.error(e)
-            }
+        try {
+            val result = withContext(Dispatchers.IO) { FocusSignals.deliverResult(this@TechnicalActivity,t) }
+            val current = result.focus
+            if(result.status == FocusDeliveryStatus.BLOCKED_BEFORE_POST && current?.mode == FocusMode.DUE && current.signalKey == focus.signalKey)
+                AlertDialog.Builder(this@TechnicalActivity).setTitle("Focus").setMessage(current.safeLabel).setPositiveButton("OK",null).show()
+        } catch(e: Exception) {
+            if(e is CancellationException) throw e
+            status.text = dev.notai.tracker.android.ui.Format.error(e)
+        }
     }
     private fun buildCalendarControl() {
         button("Выбрать occurrence из календаря…") {

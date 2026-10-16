@@ -385,9 +385,9 @@ class TrackerViewModel internal constructor(private val app: Application,private
         viewModelScope.launch(Dispatchers.IO) {
             val result = try { Result.success(block(rt,shown)) }
             catch(e: Exception) { if(e is kotlinx.coroutines.CancellationException) throw e;Result.failure(e) }
+            completed?.invoke(result)
             result.fold(onSuccess = { change -> success?.invoke(change)?.let { notice(it,if(change.undoAvailable) change.state.token else null) } },
                 onFailure = { notice(Format.error(it)) })
-            completed?.invoke(result)
         }
     }
 

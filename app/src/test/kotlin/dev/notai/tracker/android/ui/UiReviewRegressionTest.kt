@@ -32,12 +32,14 @@ class UiReviewRegressionTest {
         override val changes = MutableStateFlow(initial)
         val attempts = AtomicInteger();val commits = AtomicInteger()
         @Volatile var rejectWrite: Int? = null
+        @Volatile var beforeCommit: (() -> Unit)? = null
         override fun read() = value
         @Synchronized override fun <T> transaction(block: (Dataset) -> Pair<Dataset,T>): T {
             val (next,result) = block(value);validate(next)
             if(next != value) {
                 val attempt = attempts.incrementAndGet()
                 if(attempt == rejectWrite) throw java.io.IOException("Synthetic before-commit fault")
+                val hook = beforeCommit;beforeCommit = null;hook?.invoke()
                 value = next;changes.value = next;commits.incrementAndGet()
             }
             return result
@@ -268,6 +270,22 @@ class UiReviewRegressionTest {
     @Test fun reviewP3FocusPreviousReceiptHasNoLocalDuplicate() = p3FocusDelivery("previous")
     @Test fun reviewP3FocusUnknownPostHasNoLocalDuplicate() = p3FocusDelivery("unknown")
     @Test fun reviewP3FocusBlockedBeforePostKeepsLocalCue() = p3FocusDelivery("blocked")
+    @Test fun reviewP3PendingEntrySaveCannotDuplicateOrCloseANewerForm() {
+        val f = fixture(FakeClock(10000))
+        val day = DayUi(LocalDate.ofEpochDay(0),0,86400000,0,false,emptyList(),emptyList(),emptyList())
+        f.vm.openEntryForm(null,day);val old = requireNotNull(f.vm.entryForm.value)
+        val entered = java.util.concurrent.CountDownLatch(1);val release = java.util.concurrent.CountDownLatch(1)
+        f.store.beforeCommit = { entered.countDown();check(release.await(10,java.util.concurrent.TimeUnit.SECONDS)) }
+        try {
+            f.vm.submitEntryForm(old.id,1000,2000,Classification(name = "First saved form"),"First form note",null)
+            pump { entered.count == 0L };assertTrue(f.vm.entryForm.value!!.saving)
+            f.vm.submitEntryForm(old.id,3000,4000,Classification(name = "Unrequested duplicate"),"Duplicate",null)
+            f.vm.closeEntryForm();f.vm.openEntryForm(null,day);val newer = requireNotNull(f.vm.entryForm.value)
+            release.countDown();pump { f.notices.any { it.text == "Запись добавлена" } }
+            assertEquals(newer,f.vm.entryForm.value);assertEquals(1,f.store.commits.get())
+            assertEquals("First form note",f.tracker.data().sessions.single().note)
+        } finally { release.countDown() }
+    }
     @Test fun reviewP2RecentIgnoresLaterEmptyCanonical() = p2HistoryChoice(false,false)
     @Test fun reviewP2QuickIgnoresLaterUncertainCanonical() = p2HistoryChoice(true,true)
     @Test fun reviewP2RecentIgnoresLaterUncertainCanonical() = p2HistoryChoice(true,false)

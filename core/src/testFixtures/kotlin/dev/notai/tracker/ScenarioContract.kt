@@ -19,6 +19,11 @@ class MemoryRollback: RollbackStore {
 }
 /** The SAME three scenarios run on in-memory domain storage and on disk-backed Room/SQLite. */
 abstract class ScenarioContract {
+    @Test fun reviewP1CsvDuration() = csvInterpretationConflict(::createStore,::reopen,"duration")
+    @Test fun reviewP1CsvNote() = csvInterpretationConflict(::createStore,::reopen,"note")
+    @Test fun reviewP1CsvActivity() = csvInterpretationConflict(::createStore,::reopen,"activity")
+    @Test fun reviewP1CsvCategory() = csvInterpretationConflict(::createStore,::reopen,"category")
+    @Test fun reviewP1CsvLegacyReplay() = csvLegacyInterpretationReplay(::createStore,::reopen)
     @Test fun reviewP1DeleteSubjectConsequences() = deletePreviewHasExactSubjectConsequences(::createStore,::reopen)
     @Test fun reviewP1ContentBoundedMetric() = boundedTypeDependenciesCloseFromContent(::createStore,::reopen,true)
     @Test fun reviewP1ContentBoundedUnit() = boundedTypeDependenciesCloseFromContent(::createStore,::reopen,false)

@@ -1,0 +1,341 @@
+{
+  "runtimeSource": "745c7ed709bd8aa7e0cf9562eb7b6d76aefed06b",
+  "coreTestSource": "745c7ed709bd8aa7e0cf9562eb7b6d76aefed06b",
+  "appTestSource": "745c7ed709bd8aa7e0cf9562eb7b6d76aefed06b",
+  "androidTestSource": "1ecd9a84238e44c06487a8eac4eae924a86eced6",
+  "androidFinalDeltaNotExecuted": [
+    "DatabaseRecovery missing-installed-DB completion guard",
+    "Catalog rights provenance gate and lazy bundled locale loader",
+    "Projection malformed/future wake disarm fix",
+    "Complete catalog aliases and selected-series exclusion validation",
+    "English/Spanish editorial candidate JVM fixtures; candidates remain outside Android assets/index",
+    "Malformed UTF-8 catalog refusal and CSV replay after selective COPY",
+    "Current-session confirmed prefix / Room10 / full12 / selective3",
+    "C v3 attention safety/portable preference integration, Room11/full13, ACCESS_NOTIFICATION_POLICY; host audio bridge is not Android Os/O_NONBLOCK/device execution"
+  ],
+  "tests": {
+    "core": {
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "app": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "lint": {
+    "Warning": 68,
+    "Hint": 1
+  },
+  "build": "BUILD SUCCESSFUL in 7m 24s",
+  "apk": {
+    "debug": {
+      "bytes": 13894773,
+      "sha256": "5c9ad038b11e765e189312ff66713c5c9827b33abec3c8bd760adbc99b7942f9",
+      "zipalign-16kExit": 0,
+      "signatureExit": 1,
+      "aapt-badgingExit": 0
+    },
+    "release": {
+      "bytes": 9065150,
+      "sha256": "95ffa0e1ae42ea9f3528fba18fb7a307f29856d002e820ecb22725f71853f9b5",
+      "zipalign-16kExit": 0,
+      "signatureExit": 1,
+      "aapt-badgingExit": 0
+    }
+  },
+  "native": [
+    {
+      "entry": "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "bytes": 10096,
+      "sha256": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6",
+      "readelf": "release-native/lib/arm64-v8a/libandroidx.graphics.path.readelf.txt"
+    },
+    {
+      "entry": "lib/arm64-v8a/libtracker_copy_io.so",
+      "bytes": 18048,
+      "sha256": "7b2bac30793d5098c26387dedcfd57b9c6f58777429882a62737c1002257c537",
+      "readelf": "release-native/lib/arm64-v8a/libtracker_copy_io.readelf.txt"
+    },
+    {
+      "entry": "lib/armeabi-v7a/libandroidx.graphics.path.so",
+      "bytes": 7252,
+      "sha256": "41399eba6fc2a60f6f14642375c1824f3cf25eb8fec7397d753730a3ceda3e2b",
+      "readelf": "release-native/lib/armeabi-v7a/libandroidx.graphics.path.readelf.txt"
+    },
+    {
+      "entry": "lib/armeabi-v7a/libtracker_copy_io.so",
+      "bytes": 10080,
+      "sha256": "b5d97101c42541f449b9c5ed59dd482c15870da5aed465e5872d478fd33c0e33",
+      "readelf": "release-native/lib/armeabi-v7a/libtracker_copy_io.readelf.txt"
+    },
+    {
+      "entry": "lib/x86/libandroidx.graphics.path.so",
+      "bytes": 9284,
+      "sha256": "eb0570b41fd3bff25d8204a967c03bd7550719e768b791f680cc40cbe35f29af",
+      "readelf": "release-native/lib/x86/libandroidx.graphics.path.readelf.txt"
+    },
+    {
+      "entry": "lib/x86/libtracker_copy_io.so",
+      "bytes": 16844,
+      "sha256": "6ce50684851e31837bdcc83dce66ab0b99a9354ccb267772ef75444bd1f68e79",
+      "readelf": "release-native/lib/x86/libtracker_copy_io.readelf.txt"
+    },
+    {
+      "entry": "lib/x86_64/libandroidx.graphics.path.so",
+      "bytes": 10760,
+      "sha256": "4e56c996f13670e70082658de7880c4020eabf4f25e43387f88ed78a713fc9f0",
+      "readelf": "release-native/lib/x86_64/libandroidx.graphics.path.readelf.txt"
+    },
+    {
+      "entry": "lib/x86_64/libtracker_copy_io.so",
+      "bytes": 18064,
+      "sha256": "3e220950ba6068458eed3e45a99e8d188dcfed00792b49c509bd76aa7cf18565",
+      "readelf": "release-native/lib/x86_64/libtracker_copy_io.readelf.txt"
+    }
+  ],
+  "manifestPermissions": [
+    "android.permission.ACCESS_NOTIFICATION_POLICY",
+    "android.permission.FOREGROUND_SERVICE",
+    "android.permission.FOREGROUND_SERVICE_SPECIAL_USE",
+    "android.permission.POST_NOTIFICATIONS",
+    "android.permission.READ_CALENDAR",
+    "android.permission.RECEIVE_BOOT_COMPLETED",
+    "android.permission.SYSTEM_ALERT_WINDOW",
+    "dev.notai.tracker.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+  ],
+  "usesSdk": {
+    "{http://schemas.android.com/apk/res/android}minSdkVersion": "26",
+    "{http://schemas.android.com/apk/res/android}targetSdkVersion": "36"
+  },
+  "nativeAnalysis": {
+    "diagnostics": 0,
+    "clang": "Android (16134705, +pgo, +bolt, +lto, +mlgo, based on r574158c) clang version 21.0.0 (https://android.googlesource.com/toolchain/llvm-project 9f872551d3c681d06fd303b36f16ed5c274735eb)",
+    "scope": "Host-target Clang21 static analyzer, current C; Android packaging independently builds four ABIs"
+  },
+  "nativeCBlob": "723f8051914992115b15b2bd7eee219ce1f011c9",
+  "hostFixtureLibrary": {
+    "sha256": "9f112742f3537f3c87ec35333b176980d12aebe6e67996549c40c3f24bdea9da"
+  },
+  "cleanupContextSessionBound": true,
+  "legacyUiWitnessPreserved": true,
+  "frontendCleanupAcceptance": false,
+  "device": {
+    "fixtureTag": "82d08882-ccea-421a-b3f1-fc99b0903e0d",
+    "source": "1ecd9a84238e44c06487a8eac4eae924a86eced6",
+    "commands": [
+      {
+        "name": "device-properties",
+        "argv": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+          "/workspace/tracker-runtime-preflight/adb-isolated",
+          "-s",
+          "emulator-5580",
+          "shell",
+          "getprop"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 0.867,
+        "log": "device-properties.log"
+      },
+      {
+        "name": "install-app",
+        "argv": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+          "/workspace/tracker-runtime-preflight/adb-isolated",
+          "-s",
+          "emulator-5580",
+          "install",
+          "-r",
+          "-t",
+          "--no-streaming",
+          "/workspace/tracker-runtime-preflight/backend-integration/app-debug-signed.apk"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 11.071,
+        "log": "install-app.log"
+      },
+      {
+        "name": "install-test",
+        "argv": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+          "/workspace/tracker-runtime-preflight/adb-isolated",
+          "-s",
+          "emulator-5580",
+          "install",
+          "-r",
+          "-t",
+          "--no-streaming",
+          "/workspace/tracker-runtime-preflight/backend-integration/test-debug-signed.apk"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 8.693,
+        "log": "install-test.log"
+      },
+      {
+        "name": "integration-create",
+        "argv": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+          "/workspace/tracker-runtime-preflight/adb-isolated",
+          "-s",
+          "emulator-5580",
+          "shell",
+          "am",
+          "instrument",
+          "-w",
+          "-r",
+          "-e",
+          "mode",
+          "backend-integration-create",
+          "-e",
+          "backendName",
+          "82d08882-ccea-421a-b3f1-fc99b0903e0d",
+          "dev.notai.tracker.test/dev.notai.tracker.android.BackendInstrumentation"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 74.191,
+        "log": "integration-create.log"
+      },
+      {
+        "name": "force-stop-own-package",
+        "argv": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+          "/workspace/tracker-runtime-preflight/adb-isolated",
+          "-s",
+          "emulator-5580",
+          "shell",
+          "am",
+          "force-stop",
+          "dev.notai.tracker"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 1.418,
+        "log": "force-stop-own-package.log"
+      },
+      {
+        "name": "integration-reopen",
+        "argv": [
+          "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+          "/workspace/tracker-runtime-preflight/adb-isolated",
+          "-s",
+          "emulator-5580",
+          "shell",
+          "am",
+          "instrument",
+          "-w",
+          "-r",
+          "-e",
+          "mode",
+          "backend-integration-reopen",
+          "-e",
+          "backendName",
+          "82d08882-ccea-421a-b3f1-fc99b0903e0d",
+          "dev.notai.tracker.test/dev.notai.tracker.android.BackendInstrumentation"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 47.026,
+        "log": "integration-reopen.log"
+      }
+    ],
+    "status": "passed",
+    "apk": {
+      "app": {
+        "file": "app-debug-signed.apk",
+        "bytes": 13270115,
+        "sha256": "8e99e70ffe53d978bc2942a2580d6edb6a87ab70b46308268da7fe773f2dbbf5"
+      },
+      "test": {
+        "file": "test-debug-signed.apk",
+        "bytes": 92063,
+        "sha256": "bd648c8e445397a3843e69e4cddacaa737bd9c08a01129922e8a9949f8aa8e8b"
+      }
+    },
+    "reusedExistingInstallation": false,
+    "reports": [
+      {
+        "schema": "tracker_android_backend_integration_v1",
+        "mode": "backend-integration-create",
+        "fixtureTag": "82d08882-ccea-421a-b3f1-fc99b0903e0d",
+        "processId": 5081,
+        "sdk": 36,
+        "roomVersion": 9,
+        "fullJsonFormat": 11,
+        "shortcutDisabledPersisted": true,
+        "shortcutCommandRefused": true,
+        "abi": "x86_64",
+        "privateRootMode": "40771",
+        "contextDescriptorBinding": true,
+        "liveDatasetUnchanged": true,
+        "liveDatasetDigest": "absent",
+        "indexedReceiptCount": 33,
+        "legacyBytesPreserved": true,
+        "duplicateReserveRejected": true,
+        "domainSha256": "3d85ae72d47a0a7401ca84e269029b658985b7795edaa9c00012de83200e9001",
+        "wall": 1792104247280,
+        "elapsed": 104000,
+        "roomReopen": false,
+        "cleanupPhase": "PARTIAL",
+        "unselectedBytesUnchanged": true,
+        "automaticDeleteOnReopen": false,
+        "selectiveCatalogClosure": true,
+        "fullReplacementVerifiedRollback": true
+      },
+      {
+        "schema": "tracker_android_backend_integration_v1",
+        "mode": "backend-integration-reopen",
+        "fixtureTag": "82d08882-ccea-421a-b3f1-fc99b0903e0d",
+        "processId": 5135,
+        "sdk": 36,
+        "roomVersion": 9,
+        "fullJsonFormat": 11,
+        "shortcutDisabledPersisted": true,
+        "shortcutCommandRefused": true,
+        "abi": "x86_64",
+        "privateRootMode": "40771",
+        "contextDescriptorBinding": true,
+        "liveDatasetUnchanged": true,
+        "liveDatasetDigest": "absent",
+        "indexedReceiptCount": 33,
+        "legacyBytesPreserved": true,
+        "duplicateReserveRejected": true,
+        "domainSha256": "3d85ae72d47a0a7401ca84e269029b658985b7795edaa9c00012de83200e9001",
+        "wall": 1792104247280,
+        "elapsed": 104000,
+        "roomReopen": true,
+        "cleanupPhase": "DONE",
+        "unselectedBytesUnchanged": true,
+        "automaticDeleteOnReopen": false,
+        "selectiveCatalogClosure": true,
+        "fullReplacementVerifiedRollback": true
+      }
+    ]
+  },
+  "roomVersion": 11,
+  "fullJsonFormat": 13,
+  "selectiveReaderFormats": [
+    1,
+    2,
+    3
+  ],
+  "receiptSqlSchema": 1,
+  "receiptAuthorityMarkerFormat": 2,
+  "archiveSealFormat": 1,
+  "recoveryJobFormat": 3,
+  "maintenanceFormat": 3,
+  "catalogSidecarSchema": 1,
+  "testScope": "Targeted affected paths only:16native core+5Android audio adapter; earlier full regression C949:130core/99app retained separately.",
+  "priorFullRegression": {
+    "source": "c949a8f202e143151e216a8932956a7a93b001bc",
+    "core": 130,
+    "app": 99,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "api26Support": "Native ABI constant getter in existing module retains one Os.open with atomic O_CLOEXEC|O_NOFOLLOW|O_NONBLOCK; unknown native capability fails closed; no Java API27 requirement",
+  "nativeSourceUnchanged": false
+}

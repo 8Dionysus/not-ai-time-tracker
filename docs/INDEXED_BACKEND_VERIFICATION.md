@@ -1,14 +1,13 @@
 # Backend verification and evidence boundaries
 
-Current A+B+C v3 runtime/build/test source: `c949a8f202e143151e216a8932956a7a93b001bc`.
-Full execution succeeded in5m31s: **130core / 99app**, zero failures/errors/skips;
-both unsigned APKs, release lint0errors/68warnings/1hint and inventory completed.
-Current Room11/fullJSON13/read1–13/selective1–3. Source-bound details, hashes,
-transport proof and remaining device/UI boundaries are in
-[ATTENTION_VERIFICATION_2026_10_16](ATTENTION_VERIFICATION_2026_10_16.md).
-F-Droid source scan0errors/1gzip warning and metadata lint0 use the same pinned runtime.
-New eleven-language payloads are handled only in a separate private local integration;
-this record does not advertise installed reviewed translations or whole-journal acceptance.
+Current production/APK source is `6fcc4c212a854f4da320e4911605a7beb5c6db52`.
+Room11/fullJSON13/read1–13/selective1–3 are unchanged. The accepted C949 full
+130core/99app result remains historical; subsequent affected checks are745c7ed
+16core/5app and6fcc4c2 7core/2Room, plus privateab0d1a5 1core/1app covering11packs.
+Both current unsigned APKs/lint/inventory pass. See [current follow-up verification](BACKEND_FOLLOWUP_VERIFICATION_2026_10_16.md)
+for exact commands, hashes, search matrix and scope. F-Droid source scan is pinned
+to C949, not falsely attributed to the later source. New translated payloads remain
+private; public code enables reviewed content without clearing publication rights.
 
 ## Prior A+B backfill verification (historical)
 

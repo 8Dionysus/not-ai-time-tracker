@@ -1,5 +1,7 @@
 # Prepared catalog candidates
 
+Historical checkpoint. Current readiness/search/API26 behavior and scoped verification supersede the corresponding older claims below: [follow-up verification](BACKEND_FOLLOWUP_VERIFICATION_2026_10_16.md). Original test/source evidence is retained.
+
 These source-bound files are under `catalog/editorial/<locale>`, outside the current Android asset/index path. They are not installed UI/content locales. Source rights remain pending, license null and nativeSpeakerQA=false. Preparation copies the supplied editorial text literally and verifies all source identities and field coverage; it does not translate, linguistically review or clear rights.
 
 | Locale | Retained quality | Payload bytes | labels.json SHA256 |

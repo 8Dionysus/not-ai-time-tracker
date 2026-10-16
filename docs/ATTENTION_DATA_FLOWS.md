@@ -26,4 +26,4 @@ SAF and Calendar interactions keep their separate permission/provider boundaries
 Device/OEM, permission flow, actual notification/DND/playback and accessibility
 acceptance remain open. No store privacy draft was published.
 
-Local music requires API27+ because the public O_CLOEXEC constant is API27. API26 returns UNSUPPORTED and the direct open helper refuses before opening a source; minSdk26 for the application is unchanged. [Android API](https://developer.android.com/reference/android/system/OsConstants#O_CLOEXEC).
+Local music supports API26 through the existing native module's compiled ABI O_CLOEXEC getter (745c7ed); API27+ uses the public constant. One atomic Os.open retains O_RDONLY/O_CLOEXEC/O_NOFOLLOW/O_NONBLOCK, followed by regular/nonempty fstat and retained descriptor. Missing native capability fails closed. This has host JNI/fixture and four-ABI build evidence; actual Android Os/audio/device execution remains unverified. See [current verification](BACKEND_FOLLOWUP_VERIFICATION_2026_10_16.md).

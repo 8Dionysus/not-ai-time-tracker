@@ -1,0 +1,56 @@
+{
+  "privateSourceCommit": "ab0d1a5d92c96beb7e4748d302ade4278f1106ba",
+  "productionRuntimeSource": "6fcc4c212a854f4da320e4911605a7beb5c6db52",
+  "publicPrerequisite": "89cc405830003a5a82ecffac459f9a9b1c0c32cb",
+  "productionAndBuildInputsIdentical": true,
+  "tests": {
+    "core": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "app": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "build": "BUILD SUCCESSFUL in3m22s",
+  "inputZipSha256": "6f0806c57a26a0ae35f4a2b8336ce6d97fbceb4eff2fed1933c2cd997625d944",
+  "locales": [
+    "en",
+    "es",
+    "fr",
+    "pt-BR",
+    "ar",
+    "zh-Hans",
+    "de",
+    "it",
+    "ja",
+    "ko",
+    "hi"
+  ],
+  "entries": 26235,
+  "fields": 74723,
+  "choiceTypesPerLocale": 1918,
+  "choiceAliasesPerLocale": 2490,
+  "allPrivatePayloadsInApkByteExact": true,
+  "allLabelsUnchangedFromInputPreparation": true,
+  "editorialQuality": "REVIEWED per accepted coordinator independent semantic receipt",
+  "nativeSpeakerQA": false,
+  "rightsStatus": "source_rights_review_pending",
+  "license": null,
+  "displayAndSearchReallyUseTranslatedText": true,
+  "canonicalFactsTokensJsonCsvUnchanged": true,
+  "personalNamesPreserved": true,
+  "hansHantCrossFallback": false,
+  "ancestorWordMatching": "NOT_IMPLEMENTED; localized path display and ID subtree scope are separate",
+  "publicTextPush": false,
+  "deviceExecution": false,
+  "apk": {
+    "bytes": 16399252,
+    "sha256": "5fceae5f349148bc4e626f32b8b78eddc049bb3a44bb72870d6d8f2fdb7bee55"
+  }
+}

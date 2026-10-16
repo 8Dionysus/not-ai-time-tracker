@@ -35,6 +35,8 @@ internal fun decodeBackupVersion(json: String): Backup {
     val root = codec.parseToJsonElement(json).jsonObject
     val version = root["formatVersion"]?.jsonPrimitive?.intOrNull
     ensure(version in 8..14 || listOf("schedule","transfer").none { it in root.getValue("data").jsonObject },"Schedule in legacy archive")
+    ensure(version == 14 || root.getValue("data").jsonObject.keys.none { it in setOf("subjects","savedReports") },
+        "New domain fields in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
     val backup = when(version) {
         8,9,10,11,12,13,14 -> {
             ensure(listOf("goals","focus","schedule","transfer").all { it in root.getValue("data").jsonObject },"Missing v8 backup fields")

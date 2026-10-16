@@ -34,7 +34,7 @@ effective definition revision; default NEXT_PERIOD preserves completed periods,
 CORRECT_CURRENT is explicit. Period/zone/boundary changes require a new goal ID.
 `goalDefinition`/`goalProgress` expose the effective definition and evidence.
 
-`saveReportQuery`/`removeReportQuery`, `savedReports`/`savedReport` persist stable-ID
+`saveReportQuery`/`deleteReportQuery`, `savedReports`/`savedReport` persist stable-ID
 filters, grouping, fixed or relative windows and their policy snapshot. Missing
 and archived references are exposed and never broaden a query. Queries and goal
 revision dependencies travel in existing full/selective archives.

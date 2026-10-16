@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream
 import java.time.Instant
 import java.time.LocalDate
 import kotlin.test.*
+import kotlinx.serialization.json.*
 
 fun quantityReportClassificationJoin(create: ()->StateStore,reopen: (StateStore)->StateStore) {
     fun time(s: String) = Instant.parse("2026-03-29T${s}:00Z").toEpochMilli()
@@ -81,7 +82,8 @@ fun quantityReportClassificationJoin(create: ()->StateStore,reopen: (StateStore)
     assertTrue(retention.canApply);copied.applyTransferRetention(retention,"joined-prune",retention.requiredAcknowledgements)
     val compacted=Tracker(reopen(copied.store),clock)
     assertEquals(Decimal("2"),compacted.view().savedQuantityReport(copiedQuery.id).quantities.totals().values.single())
-    val replay=SelectiveTransfer(compacted).apply(plan,"joined-copy")
+    val replayImporter=SelectiveTransfer(compacted)
+    val replay=replayImporter.apply(replayImporter.plan(pack,pack.groups.map { it.id }.toSet(),policies),"joined-copy")
     assertTrue(replay.payloadsPruned);assertTrue(replay.complete)
     val compactFull=Backups(compacted,MemoryRollback()).export()
     assertEquals(compacted.data().subjects,Backups.decode(compactFull).data.subjects)
@@ -92,6 +94,13 @@ fun quantityArchiveAuditSnapshots(create: ()->StateStore) {
     val subjects=SubjectData(cards=listOf(CardSubject("B","edition")),observations=listOf(StateObservation("o",ref,def,Decimal("100"),10,200,"manual")))
     val content=TransferContent(cards=listOf(Card("B","B")),metrics=listOf(Metric("pages","pages",numberKind=NumberKind.INTEGER,canonicalUnitId="page")),units=listOf(UnitDefinition("page","page","page")),subjects=subjects)
     val base=Dataset(datasetId="D",types=emptyList(),axes=emptyList(),metrics=emptyList(),units=emptyList())
+    // Both full readers reject new top-level fields under an old format label, even defaults.
+    val legacyRoot=codec.parseToJsonElement(codec.encodeToString(Backup(formatVersion=13,backupId="legacy-fields",asOf=100,data=base))).jsonObject
+    for((name,value) in mapOf("subjects" to JsonObject(emptyMap()),"savedReports" to JsonArray(emptyList()))) {
+        val wrong=JsonObject(legacyRoot+("data" to JsonObject(legacyRoot.getValue("data").jsonObject+(name to value)))).toString()
+        assertFailsWith<CoreError> { Backups.decode(wrong) }
+        assertFailsWith<CoreError> { StreamingBackup.read { wrong.byteInputStream() } }
+    }
     val group=SelectiveTransfer.group("G","O",0,content)
     val empty=SelectiveTransfer.group("empty","empty-origin",0,TransferContent())
     val origin=TransferOrigin("O",group.hash,content,group.hash)

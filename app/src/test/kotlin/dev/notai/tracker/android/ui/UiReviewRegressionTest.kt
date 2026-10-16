@@ -70,7 +70,7 @@ class UiReviewRegressionTest {
     private fun fixture(clock: FakeClock,settings: Settings = Settings("UTC")): Fixture {
         val store = Store(Dataset(settings = settings));val tracker = Tracker(store,clock)
         UiBackends.open = { Backend(tracker) }
-        val vm = TrackerViewModel(RuntimeEnvironment.getApplication<Application>())
+        val vm = TrackerViewModel(RuntimeEnvironment.getApplication())
         val scope = CoroutineScope(SupervisorJob()+Dispatchers.IO)
         val fixture = Fixture(clock,store,tracker,vm,scope);fixtures += fixture
         scope.launch(start = CoroutineStart.UNDISPATCHED) { vm.snapshot.collect { } }

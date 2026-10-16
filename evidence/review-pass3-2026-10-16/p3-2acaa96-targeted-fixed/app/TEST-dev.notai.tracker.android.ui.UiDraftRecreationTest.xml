@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.ui.UiDraftRecreationTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-16T11:40:11.090Z" hostname="69b2b5b46001" time="12.612">
+  <properties/>
+  <testcase name="secondProcessTextReplacesOnlyAfterExplicitAcceptanceAcrossRecreation" classname="dev.notai.tracker.android.ui.UiDraftRecreationTest" time="7.482"/>
+  <testcase name="correctionInputsSurviveAndPreviewRecomputesAgainstChangedData" classname="dev.notai.tracker.android.ui.UiDraftRecreationTest" time="1.007"/>
+  <testcase name="reviewP3OverlappingManualSaveRetainsDraftUntilExplicitCorrectedSave" classname="dev.notai.tracker.android.ui.UiDraftRecreationTest" time="0.649"/>
+  <testcase name="reviewP3EarlierInitialTimeKeepsSecondsWithinShortInterval" classname="dev.notai.tracker.android.ui.UiDraftRecreationTest" time="0.478"/>
+  <testcase name="reviewP3InvalidManualSaveRetainsDraftUntilExplicitCorrectedSave" classname="dev.notai.tracker.android.ui.UiDraftRecreationTest" time="0.778"/>
+  <testcase name="secondProcessTextKeepsFirstUntilExplicitRejectionAcrossRecreation" classname="dev.notai.tracker.android.ui.UiDraftRecreationTest" time="0.532"/>
+  <testcase name="reviewP3EarlierInitialTimeKeepsMillisecondsWithinSubsecondInterval" classname="dev.notai.tracker.android.ui.UiDraftRecreationTest" time="0.438"/>
+  <testcase name="reviewP3StaleCorrectionSaveRetainsDraftAndRefreshesPreview" classname="dev.notai.tracker.android.ui.UiDraftRecreationTest" time="0.667"/>
+  <testcase name="manualInputsAndTargetSurviveActivityRecreationWithoutAutosave" classname="dev.notai.tracker.android.ui.UiDraftRecreationTest" time="0.578"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

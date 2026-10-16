@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.CoreScenariosTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-16T11:38:32.539Z" hostname="69b2b5b46001" time="0.351">
+  <properties/>
+  <testcase name="reviewP3BoundedHistorySourceChange" classname="dev.notai.tracker.CoreScenariosTest" time="0.228"/>
+  <testcase name="reviewP3BoundedHistoryReference" classname="dev.notai.tracker.CoreScenariosTest" time="0.033"/>
+  <testcase name="reviewP3BoundedHistoryCompatibility" classname="dev.notai.tracker.CoreScenariosTest" time="0.03"/>
+  <testcase name="reviewP3BoundedHistoryApply" classname="dev.notai.tracker.CoreScenariosTest" time="0.059"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

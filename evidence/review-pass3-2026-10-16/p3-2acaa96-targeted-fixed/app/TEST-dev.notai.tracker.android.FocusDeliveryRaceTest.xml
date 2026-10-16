@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.FocusDeliveryRaceTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-16T11:40:23.739Z" hostname="69b2b5b46001" time="1.178">
+  <properties/>
+  <testcase name="staleAlarmWithoutStoreDoesNotBootstrapAnEmptyDatabase" classname="dev.notai.tracker.android.FocusDeliveryRaceTest" time="0.035"/>
+  <testcase name="resultRejectsMutationsAfterCapture" classname="dev.notai.tracker.android.FocusDeliveryRaceTest" time="0.349"/>
+  <testcase name="resultRejectsMutationsAfterPreparation" classname="dev.notai.tracker.android.FocusDeliveryRaceTest" time="0.276"/>
+  <testcase name="refreshRejectsMutationsAfterCapture" classname="dev.notai.tracker.android.FocusDeliveryRaceTest" time="0.295"/>
+  <testcase name="refreshRejectsMutationsAfterPreparation" classname="dev.notai.tracker.android.FocusDeliveryRaceTest" time="0.199"/>
+  <testcase name="unchangedPhasePostsOnceAndFailedPreparationNeverReplays" classname="dev.notai.tracker.android.FocusDeliveryRaceTest" time="0.022"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

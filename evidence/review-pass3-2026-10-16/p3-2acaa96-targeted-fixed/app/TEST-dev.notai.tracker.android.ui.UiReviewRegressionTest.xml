@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.ui.UiReviewRegressionTest" tests="28" skipped="0" failures="0" errors="0" timestamp="2026-10-16T11:40:32.265Z" hostname="69b2b5b46001" time="1.099">
+  <properties/>
+  <testcase name="reviewP3FocusPreviousReceiptHasNoLocalDuplicate" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.084"/>
+  <testcase name="reviewP3BoundedQuickKeepsStrictRevisionGuard" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.047"/>
+  <testcase name="reportDayUsesConfiguredBoundaryBeforeAndAfterFour" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.048"/>
+  <testcase name="reviewP2RowSwitchPreservesShownSegmentAndSourceNote" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.045"/>
+  <testcase name="idleHomeAndOverviewAdvanceAtReportBoundaryWithoutDatasetRevision" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.048"/>
+  <testcase name="reviewP2IncomingTextsQueueAndStaleDecisionsPreserveAllValuesUntilChoice" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.023"/>
+  <testcase name="reviewP3BoundedQuickStartsShownSource" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.026"/>
+  <testcase name="reviewP2RecentIgnoresLaterEmptyCanonical" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.031"/>
+  <testcase name="reportDayRetainsRealDstBoundaryLength" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.02"/>
+  <testcase name="reviewP2HistoryPickerStartsShownEarlySegment" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.038"/>
+  <testcase name="nextPeriodEnabledUsesEffectiveGoalAndDayUnit" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.063"/>
+  <testcase name="reviewP2HistoryPickerPreservesClearNotePolicy" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.037"/>
+  <testcase name="ribbonLabelsUseActualElapsedFractionsInExplicitReportZone" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.018"/>
+  <testcase name="shownFavoriteRenameCannotSilentlyRebase" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.036"/>
+  <testcase name="reviewP3FocusBlockedBeforePostKeepsLocalCue" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.024"/>
+  <testcase name="oneSegmentWithSubjectFactsRequiresReviewAndCancelledPreviewHasNoWrites" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.072"/>
+  <testcase name="failedDraftSwitchKeepsInputAndOriginalDataset" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.037"/>
+  <testcase name="reviewP2QuickIgnoresLaterEmptyCanonical" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.037"/>
+  <testcase name="reviewP2RowRepeatStartsShownEarlySegment" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.035"/>
+  <testcase name="reviewP2RowRepeatRejectsUnseenSourceNoteAtFreshRevision" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.038"/>
+  <testcase name="reviewP3FocusUnknownPostHasNoLocalDuplicate" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.021"/>
+  <testcase name="reviewP3FocusFirstDuePostsWithoutLocalDuplicate" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.033"/>
+  <testcase name="shownFavoriteClassificationCannotSilentlyRebase" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.044"/>
+  <testcase name="reviewP2QuickIgnoresLaterUncertainCanonical" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.038"/>
+  <testcase name="reviewP2RecentIgnoresLaterUncertainCanonical" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.036"/>
+  <testcase name="draftSwitchHasOneCommitWithNoteAndOneUndo" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.044"/>
+  <testcase name="reviewP3BoundedFrequencyStartsShownSource" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.034"/>
+  <testcase name="wholeAreaKeepsShownGuardsAndStartsWithTheReviewedParent" classname="dev.notai.tracker.android.ui.UiReviewRegressionTest" time="0.039"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

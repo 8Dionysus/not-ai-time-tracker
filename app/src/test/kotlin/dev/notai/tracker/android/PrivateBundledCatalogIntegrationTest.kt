@@ -44,6 +44,19 @@ class PrivateBundledCatalogIntegrationTest {
                 do { val page = view.search(query,cursor,100);hit = page.items.firstOrNull { it.entry.id=="type:${row.key.stableId}" };cursor=page.next } while(hit==null && cursor!=null)
                 assertNotNull(hit);assertEquals(row.text.label,hit!!.entry.title)
                 assertEquals(plain.reference(plain.resolve(hit.entry.id)!!),view.reference(hit.entry))
+                fun norm(value: String)=java.text.Normalizer.normalize(value,java.text.Normalizer.Form.NFKC).lowercase(java.util.Locale.ROOT).trim().replace(Regex("\\s+")," ")
+                val text=payload.entries.filter { it.key.kind==CatalogContentKind.TYPE }.associate { it.key.stableId to it.text }
+                val branch=before.types.first { child ->
+                    val parent=child.parentId?.let(text::get);val own=text[child.id]
+                    parent!=null && own!=null && parent.label.length<=256 &&
+                        (listOf(own.label)+own.aliases+listOf(child.name)+child.aliases).none { norm(it).contains(norm(parent.label)) }
+                }
+                val contextQuery=ChoiceQuery(text.getValue(branch.parentId!!).label,setOf(ChoiceKind.TYPE),includeArchived=true)
+                var contextCursor: ChoiceCursor?=null;var contextHit: ChoiceHit?=null
+                do { val page=view.search(contextQuery,contextCursor,100);contextHit=page.items.firstOrNull { it.entry.id=="type:${branch.id}" };contextCursor=page.next } while(contextHit==null && contextCursor!=null)
+                assertNotNull(contextHit)
+                assertTrue(contextHit!!.matches.any { it.field in setOf(MatchField.ANCESTOR_NAME,MatchField.ANCESTOR_ALIAS) && it.sourceTypeId in before.ancestorPath(branch.id).dropLast(1) && it.localeTag==tag })
+
             }
             assertEquals(expected,adapter.health().installedReviewedPacks);assertTrue(adapter.health().unverifiedBundledPacks.isEmpty());assertTrue(adapter.health().refusedPacks.isEmpty())
             assertEquals(before,tracker.data());assertEquals(beforeToken,tracker.snapshot().token)

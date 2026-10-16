@@ -56,6 +56,18 @@ class PrivateCatalogPackIntegrationTest {
             val hit = find(view,alias,"type:$aliasId")
             assertTrue(hit.matches.any { it.localeTag==tag })
             assertEquals(plain.reference(plain.resolve(hit.entry.id)!!),view.reference(hit.entry))
+            val typeText=types.associate { it.key.stableId to it.text }
+            val branch=before.types.first { child ->
+                val parent=child.parentId?.let(typeText::get)
+                val own=typeText[child.id]
+                parent!=null && own!=null && parent.label.length+own.label.length+1<=256 &&
+                    (listOf(own.label)+own.aliases+listOf(child.name)+child.aliases).none { normalized(it).contains(normalized(parent.label)) }
+            }
+            val parentText=typeText.getValue(branch.parentId!!).label
+            val branchHit=find(view,parentText,"type:${branch.id}")
+            assertTrue(branchHit.matches.any { it.field in setOf(MatchField.ANCESTOR_NAME,MatchField.ANCESTOR_ALIAS) && it.sourceTypeId in before.ancestorPath(branch.id).dropLast(1) && it.localeTag==tag })
+            assertEquals(plain.reference(plain.resolve(branchHit.entry.id)!!),view.reference(branchHit.entry))
+            find(view,typeText.getValue(branch.id).label+" "+parentText,"type:${branch.id}")
             val literal = CatalogPresentation("Personal unchanged",listOf("Personal alias"),"Personal definition")
             assertEquals(literal,packs.getLocalizedCatalogEntries("tracker.catalog",listOf(originals.first().key),tag,mapOf(originals.first().key to literal)).single().display)
         }

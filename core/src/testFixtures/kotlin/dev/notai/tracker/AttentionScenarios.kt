@@ -78,7 +78,7 @@ abstract class AttentionScenarioContract {
         t.start(t.snapshot().token);val id = t.data().sessions.single().id;val start = clock.wall
         val receipts = AttentionReminderStore();val platform = AttentionReminderPlatform()
         val checkin = LongRecordReminder(t,receipts,platform)
-        val original = checkin.configure(t.snapshot().token,LongRecordPreference(true,100,20)).ticket!!
+        val original = checkin.configure(t.snapshot().token,LongRecordPreference(true,100,20),receipts.value.revision).ticket!!
         clock.advance(20)
         t.applyStartBackfill(t.previewStartBackfill(t.snapshot().token,id,start-60))
         val afterPrefix = t.data();val earlier = checkin.synchronize().ticket!!
@@ -103,6 +103,46 @@ abstract class AttentionScenarioContract {
         assertEquals(restored,consumed.ticket)
         assertEquals(LongRecordOutcome.PREVIOUS_ATTEMPT,checkin.onAlarm(restored.hash).outcome)
         assertEquals(1,platform.posts);assertEquals(confirmed,t.data())
+    }
+    @Test fun unattemptedTimebaseLossDoesNotPermanentlyBlockAValidTimer() {
+        val clock = FakeClock();val t = Tracker(createAttentionStore(),clock)
+        t.start(t.snapshot().token)
+        val local = AttentionReminderStore();val platform = AttentionReminderPlatform()
+        val reminder = LongRecordReminder(t,local,platform)
+        val original = reminder.configure(t.snapshot().token,LongRecordPreference(true,100,20),local.value.revision).ticket!!
+        clock.advance(50)
+        val elapsed = clock.elapsed;val before = t.data();val target = t.snapshot().timerTarget
+        clock.elapsed = 0 // Temporary invalid elapsed observation; target and stored facts are exact.
+        assertEquals(Mode.RECOVERY,t.snapshot().mode);assertEquals(target,t.snapshot().timerTarget)
+        assertNull(reminder.synchronize().ticket);assertNull(platform.pending)
+        assertNull(local.value.attempt);assertEquals(before,t.data())
+        clock.elapsed = elapsed
+        val repaired = reminder.synchronize().ticket!!
+        assertEquals(target,repaired.target);assertTrue(reminder.synchronize().alarmAccepted)
+        clock.advance(50)
+        assertEquals(LongRecordOutcome.POST_ACCEPTED,reminder.onAlarm(repaired.hash).outcome)
+        assertEquals(1,platform.posts)
+        // A real new boot leaves the domain in RECOVERY until the user resolves it.
+        val second = Tracker(createAttentionStore(),clock);second.start(second.snapshot().token)
+        val receipts = AttentionReminderStore();val output = AttentionReminderPlatform()
+        val controller = LongRecordReminder(second,receipts,output)
+        val old = controller.configure(second.snapshot().token,LongRecordPreference(true,100,20),receipts.value.revision).ticket!!
+        clock.advance(50);val saved = second.data();val sameTarget = second.snapshot().timerTarget
+        clock.boot = "second-real-boot";clock.elapsed = 0
+        assertEquals(sameTarget,second.snapshot().timerTarget)
+        assertNull(controller.synchronize().ticket);assertNull(output.pending);assertNull(receipts.value.attempt)
+        assertEquals(LongRecordOutcome.STALE,controller.onAlarm(old.hash).outcome)
+        assertEquals(saved,second.data());assertEquals(0,output.posts)
+        val open = saved.segments.single()
+        second.resolveTail(second.snapshot().token,open.start,clock.wall)
+        second.start(second.snapshot().token)
+        val fresh = controller.synchronize().ticket!!
+        assertEquals(clock.boot,fresh.bootId);assertNotEquals(old.hash,fresh.hash)
+        assertEquals(LongRecordOutcome.STALE,controller.onAlarm(old.hash).outcome)
+        clock.advance(100)
+        assertEquals(LongRecordOutcome.POST_ACCEPTED,controller.onAlarm(fresh.hash).outcome)
+        assertEquals(1,output.posts)
+        assertNotEquals(original.target,fresh.target)
     }
     @Test fun ordinaryCheckinNeverInventsTimeAndReviewUsesExistingCorrection() {
         val clock = FakeClock();val t = Tracker(createAttentionStore(),clock)
@@ -145,6 +185,8 @@ abstract class AttentionScenarioContract {
         val id = newId();val choice = FocusEnvironmentChoice(true,true,"chosen-local")
         val started = effects.begin(t.snapshot().token,id,choice,state.value.revision)
         assertEquals(FocusEffectStatus.APPLY_ACCEPTED,started.distractions);assertEquals(1,audio.plays)
+        assertEquals(FocusEffectStatus.APPLY_ACCEPTED,effects.synchronize().distractions)
+        assertEquals(FocusEffectStatus.APPLY_ACCEPTED,state.value.dndStatus);assertEquals(1,dnd.activations)
         effects.begin(t.snapshot().token,id,choice,state.value.revision);assertEquals(1,dnd.activations);assertEquals(1,audio.plays)
         assertEquals(before,t.data());clock.advance(100)
         effects.onExpiry(id);assertEquals(1,dnd.releases);assertTrue(audio.stops > 0)

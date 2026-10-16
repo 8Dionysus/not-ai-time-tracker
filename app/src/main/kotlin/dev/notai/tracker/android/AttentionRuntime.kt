@@ -57,8 +57,10 @@ class AttentionRuntime(context: Context,tracker: Tracker) {
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_TIME_CHANGED);addAction(Intent.ACTION_TIMEZONE_CHANGED)
             addAction(NotificationManager.ACTION_NOTIFICATION_POLICY_ACCESS_GRANTED_CHANGED)
-            addAction(NotificationManager.ACTION_APP_BLOCK_STATE_CHANGED)
-            addAction(NotificationManager.ACTION_NOTIFICATION_CHANNEL_BLOCK_STATE_CHANGED)
+            if(Build.VERSION.SDK_INT >= 28) {
+                addAction(NotificationManager.ACTION_APP_BLOCK_STATE_CHANGED)
+                addAction(NotificationManager.ACTION_NOTIFICATION_CHANNEL_BLOCK_STATE_CHANGED)
+            }
         }
         try {
             if(Build.VERSION.SDK_INT >= 33) this.context.registerReceiver(receiver,filter,Context.RECEIVER_NOT_EXPORTED)

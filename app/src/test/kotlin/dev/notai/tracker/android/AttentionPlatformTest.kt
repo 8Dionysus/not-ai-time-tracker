@@ -79,12 +79,14 @@ class AttentionPlatformTest {
             "fixture-focus",0,"fixture-boot","fixture-process",1000,FocusEnvironmentChoice(distractions = true)) }
         try {
             assertEquals(FocusEffectStatus.READY,port.availability())
-            val lease = port.prepare(request())!!
+            val lease = port.prepare(request(),null).lease!!
             assertEquals(android.service.notification.Condition.STATE_FALSE,manager.getAutomaticZenRuleState(lease.ruleId))
             assertEquals(FocusEffectStatus.APPLY_ACCEPTED,port.activate(lease))
             assertEquals(android.service.notification.Condition.STATE_TRUE,manager.getAutomaticZenRuleState(lease.ruleId))
-            assertEquals(FocusEffectStatus.RELEASED,port.release(lease));assertNull(manager.getAutomaticZenRule(lease.ruleId))
-            val edited = port.prepare(request())!!;port.activate(edited)
+            assertEquals(FocusEffectStatus.RELEASED,port.release(lease))
+            assertNotNull(manager.getAutomaticZenRule(lease.ruleId))
+            assertEquals(android.service.notification.Condition.STATE_FALSE,manager.getAutomaticZenRuleState(lease.ruleId))
+            val edited = port.prepare(request(),lease).lease!!;port.activate(edited)
             val changed = manager.getAutomaticZenRule(edited.ruleId)!!;changed.name = "Explicit user edit"
             assertTrue(manager.updateAutomaticZenRule(edited.ruleId,changed))
             assertEquals(FocusEffectStatus.USER_CHANGED_RULE,port.release(edited))
@@ -104,7 +106,8 @@ class AttentionPlatformTest {
         assertNull(music.prepare(newId(),"unbound"))
         assertEquals(before,context.getSystemService(NotificationManager::class.java).currentInterruptionFilter)
     }
-    @Test fun localAudioPinsOpenedBytesAndRejectsASymlinkWithoutStartingAPlayer() {
+    @Test @Config(shadows = [HostFocusAudioOs::class])
+    fun localAudioPinsOpenedBytesAndRejectsASymlinkWithoutStartingAPlayer() {
         val context = RuntimeEnvironment.getApplication()
         val root = java.io.File(context.cacheDir,"attention-audio-${newId()}").apply { mkdirs() }
         val selected = java.io.File(root,"selected");val replacement = java.io.File(root,"replacement")

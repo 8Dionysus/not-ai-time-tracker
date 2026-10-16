@@ -82,21 +82,31 @@ fun startBackfillArchiveRoundTrip(createStore: ()->StateStore,reopen: (StateStor
     source.start(source.snapshot().token);val id = source.data().sessions.single().id
     source.applyStartBackfill(source.previewStartBackfill(source.snapshot().token,id,clock.wall-1000))
     clock.advance(1000);source.stop(source.snapshot().token)
+    source.settings(source.snapshot().token,source.data().settings.copy(longRecordReminder = LongRecordPreference(true,321,17)))
     val expected = source.data();val backups = Backups(source,MemoryRollback());val json = backups.export()
-    val decoded = Backups.decode(json);assertEquals(12,decoded.formatVersion)
+    val decoded = Backups.decode(json);assertEquals(13,decoded.formatVersion)
     assertEquals(expected.segments,decoded.data.segments)
+    assertEquals(LongRecordPreference(true,321,17),decoded.data.settings.longRecordReminder)
     val bytes = java.io.ByteArrayOutputStream();backups.write(bytes)
     assertEquals(decoded.data,StreamingBackup.read { bytes.toByteArray().inputStream() }.data)
     val target = Tracker(createStore(),clock);val restore = Backups(target,MemoryRollback())
     val preview = restore.prepare(json);assertTrue(target.data().sessions.isEmpty())
     restore.apply(preview);assertEquals(expected.segments,target.data().segments)
     assertEquals(expected.segments,reopen(target.store).read().segments)
-    for(v in 1..11) {
+    for(v in 1..12) {
         val root = codec.parseToJsonElement(json).jsonObject
         val downgraded = JsonObject(root+("formatVersion" to JsonPrimitive(v))).toString()
         assertEquals(ErrorCode.UNSUPPORTED_IMPORT,assertFailsWith<CoreError> { Backups.decode(downgraded) }.code)
         assertEquals(ErrorCode.UNSUPPORTED_IMPORT,assertFailsWith<CoreError> { StreamingBackup.read { downgraded.byteInputStream() } }.code)
     }
+    val legacyRoot = codec.parseToJsonElement(json).jsonObject
+    val legacyData = legacyRoot.getValue("data").jsonObject
+    val legacySettings = legacyData.getValue("settings").jsonObject.filterKeys { it != "longRecordReminder" }
+    val legacy12 = JsonObject(legacyRoot+("formatVersion" to JsonPrimitive(12))+
+        ("data" to JsonObject(legacyData+("settings" to JsonObject(legacySettings))))).toString()
+    assertEquals(expected.segments,Backups.decode(legacy12).data.segments)
+    assertEquals(expected.segments,StreamingBackup.read { legacy12.byteInputStream() }.data.segments)
+    assertEquals(LongRecordPreference(),Backups.decode(legacy12).data.settings.longRecordReminder)
     val future = expected.copy(segments = expected.segments.map { segment ->
         if(segment.manualConfirmation == null) segment else segment.copy(manualConfirmation = ManualTimeConfirmation(clock.wall+1))
     })

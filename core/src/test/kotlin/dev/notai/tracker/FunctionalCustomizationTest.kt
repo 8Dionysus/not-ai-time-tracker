@@ -81,8 +81,8 @@ class FunctionalCustomizationTest {
     @Test fun legacyArchiveCannotSmuggleNewSettingsOrCatalogRootReceipts() {
         val clock = FakeClock();val plain = Backups.encode(Dataset(),clock.now())
         fun asV9(text: String): String = JsonObject(codec.parseToJsonElement(text).jsonObject+("formatVersion" to JsonPrimitive(9))).toString()
-        assertEquals(12,Backups.decode(asV9(plain)).formatVersion)
-        assertEquals(12,StreamingBackup.read { asV9(plain).byteInputStream() }.formatVersion)
+        assertEquals(13,Backups.decode(asV9(plain)).formatVersion)
+        assertEquals(13,StreamingBackup.read { asV9(plain).byteInputStream() }.formatVersion)
         val settings = Settings(schedule = ScheduleSettings(ScheduleDayPolicy(boundary = "04:00"),true))
         val card = Card("owned-card","Заратустра");val content = TransferContent(cards = listOf(card),catalogRoots = TransferCatalogRoots(setOf(card.id)))
         val hash = SelectiveTransfer.contentHash(content)

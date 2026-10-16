@@ -41,6 +41,8 @@ class TechnicalActivity: Activity() {
     private var pendingSelectedText: String? = null
     private var inputDraft: EntryDraft? = null
     private var tracedReady = false
+    private val restoreReviews = RestoreReviewOwner<AutoCloseable> { CopyLifetimes.get(this).releasePreview(it) }
+    private var pendingRestoreDialog: AlertDialog? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         StartupTrace.mark(this,"activity-create")
@@ -429,10 +431,10 @@ class TechnicalActivity: Activity() {
         runAction { result.await().getOrThrow() }
     }
     private fun time(value: String): Long = Instant.parse(value).toEpochMilli()
-    private fun runAction(block: suspend ()->Unit) { scope.launch {
+    private fun runAction(block: suspend ()->Unit): Job = scope.launch {
         try { withContext(Dispatchers.IO) { block() } }
         catch (e: Exception) { if (e is CancellationException) throw e; AlertDialog.Builder(this@TechnicalActivity).setMessage("${(e as? CoreError)?.code ?: "Ошибка"}: ${e.message}").setPositiveButton("OK",null).show() }
-    } }
+    }
     override fun onStart() { super.onStart(); visible = true; observeWhileVisible() }
     override fun onStop() { visible = false; observation?.cancel(); observation = null; super.onStop() }
     private fun observeWhileVisible() {
@@ -490,21 +492,38 @@ class TechnicalActivity: Activity() {
         if(op.state in setOf("READY","CANCELLED")) showExportPicker(id) else status.text = "Экспорт ${op.state}: повторите подготовку; частичный файл сохранён"
     }
     private fun restoreSource(file: java.io.File) = runAction {
+        val request = restoreReviews.begin() ?: return@runAction
+        try {
         if(::runtime.isInitialized && !DatabaseRecovery.needsAttention(this@TechnicalActivity)) {
             val preview = runtime.backups.prepare { file.inputStream() }
+            if(restoreReviews.prepared(request,preview) == null) return@runAction
             withContext(Dispatchers.Main) {
-                AlertDialog.Builder(this@TechnicalActivity).setTitle("Подтвердить полную замену")
-                    .setMessage("${preview.consequence}\nСессий: ${preview.sessions}; сегментов: ${preview.segments}; целей: ${preview.goals}. Активный хвост: ${preview.unfinishedTail}; Focus: ${preview.unfinishedFocus}")
-                    .setNegativeButton("Отмена",null).setPositiveButton("Заменить") { _,_ -> runAction { val result = runtime.backups.apply(preview);withContext(Dispatchers.Main) {
+                showRestoreReview(preview,"Подтвердить полную замену",
+                    "${preview.consequence}\nСессий: ${preview.sessions}; сегментов: ${preview.segments}; целей: ${preview.goals}. Активный хвост: ${preview.unfinishedTail}; Focus: ${preview.unfinishedFocus}","Заменить") {
+                    val result = runtime.backups.apply(preview);withContext(Dispatchers.Main) {
                         status.text = "Восстановлено. Откатная копия: ${result.rollbackReference}"
-                    } } }.show()
+                    }
+                }
             }
         } else {
             val preview = DatabaseRecovery.prepare(file)
-            withContext(Dispatchers.Main) { AlertDialog.Builder(this@TechnicalActivity).setTitle("Восстановить недоступную базу")
-                .setMessage("Сессий: ${preview.sessions}; сегментов: ${preview.segments}. Текущие DB/WAL/SHM будут сохранены с проверенными хешами до замены. Старые копии сохраняются.")
-                .setNegativeButton("Отмена",null).setPositiveButton("Восстановить") { _,_ -> runAction { DatabaseRecovery.apply(this@TechnicalActivity,preview);withContext(Dispatchers.Main) { recreate() } } }.show() }
+            if(restoreReviews.prepared(request,preview) == null) return@runAction
+            withContext(Dispatchers.Main) { showRestoreReview(preview,"Восстановить недоступную базу",
+                "Сессий: ${preview.sessions}; сегментов: ${preview.segments}. Текущие DB/WAL/SHM будут сохранены с проверенными хешами до замены. Старые копии сохраняются.","Восстановить") {
+                    DatabaseRecovery.apply(this@TechnicalActivity,preview);withContext(Dispatchers.Main) { recreate() }
+                }
+            }
         }
+        } catch(e: Exception) { restoreReviews.cancel(request);throw e }
+    }
+    private fun showRestoreReview(preview: AutoCloseable,title: String,message: String,confirm: String,apply: suspend () -> Unit) {
+        pendingRestoreDialog?.dismiss()
+        val dialog = AlertDialog.Builder(this).setTitle(title).setMessage(message)
+            .setNegativeButton("Отмена",null).setPositiveButton(confirm) { _,_ ->
+                if(restoreReviews.claim(preview)) runAction(apply).invokeOnCompletion { CopyLifetimes.get(this).releasePreview(preview) }
+            }.create()
+        dialog.setOnDismissListener { restoreReviews.discard(preview);if(pendingRestoreDialog === dialog) pendingRestoreDialog = null }
+        pendingRestoreDialog = dialog;dialog.show()
     }
     private fun buildRecoveryControls() {
         button("Восстановить полный JSON…") { startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply { type = "application/json";addCategory(Intent.CATEGORY_OPENABLE) },2) }
@@ -543,5 +562,5 @@ class TechnicalActivity: Activity() {
             withContext(Dispatchers.Main) { restoreSource(file) }
         }
     }
-    override fun onDestroy() { scope.cancel(); super.onDestroy() }
+    override fun onDestroy() { pendingRestoreDialog?.dismiss();pendingRestoreDialog = null;restoreReviews.close();scope.cancel();super.onDestroy() }
 }

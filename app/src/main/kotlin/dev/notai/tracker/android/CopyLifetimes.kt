@@ -29,7 +29,9 @@ class CopyLifetimes private constructor(context: Context): RestoreLifecycle,Appl
     private fun gate() = PrivateFileMaintenance.forContext(context)
     private fun ownerIds(): Set<String> = synchronized(lock) { owners.values.toSet()+handoff }
     private fun valid(id: String) = id.matches(Regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))
-    private fun enqueue(block: () -> Unit) { queue.launch { try { block() } catch(_: Exception) { android.util.Log.w("PrivateCopies","Ownership completion pending; references preserved") } } }
+    private fun enqueue(block: () -> Unit): Job = queue.launch { try { block() } catch(_: Exception) { android.util.Log.w("PrivateCopies","Ownership completion pending; references preserved") } }
+    /** Exact preview release, on the existing process IO queue. This never removes source bytes. */
+    internal fun releasePreview(preview: AutoCloseable): Job = enqueue { preview.close() }
     fun activate(ownerId: String) { require(valid(ownerId));gate().activateLifetime(ownerId) }
     private fun takeUnclaimed(id: String): CopyReference? {
         val rows = requireNotNull(unclaimed.get());val item = PrivateCopyBackend.itemId("forms/$id.json")

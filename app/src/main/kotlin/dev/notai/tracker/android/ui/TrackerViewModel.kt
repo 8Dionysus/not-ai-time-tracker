@@ -11,6 +11,8 @@ import dev.notai.tracker.android.FocusSignals
 import dev.notai.tracker.android.SurfaceAction
 import dev.notai.tracker.android.TrackerRuntime
 import dev.notai.tracker.android.stageRestore
+import dev.notai.tracker.android.CopyLifetimes
+import dev.notai.tracker.android.RestoreReviewOwner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -94,6 +96,9 @@ internal object DocumentExportCoordination {
 @OptIn(ExperimentalCoroutinesApi::class)
 class TrackerViewModel internal constructor(private val app: Application,private val waitForBoundary: suspend (Long) -> Unit) : AndroidViewModel(app) {
     constructor(app: Application): this(app,{ delay(it) })
+    private val standaloneRestoreReviews = RestoreReviewOwner<RestorePreview>(::releaseRestorePreviewOnIo)
+    internal fun releaseRestorePreviewOnIo(preview: AutoCloseable) { CopyLifetimes.get(app).releasePreview(preview) }
+    override fun onCleared() { standaloneRestoreReviews.close();super.onCleared() }
     sealed interface Boot { data object Loading : Boot; data class Ready(val backend: UiBackend) : Boot; data class Failed(val message: String) : Boot }
 
     private val _boot = MutableStateFlow<Boot>(Boot.Loading)
@@ -735,19 +740,29 @@ class TrackerViewModel internal constructor(private val app: Application,private
         }
     }
 
-    suspend fun prepareRestore(uri: Uri): RestorePreview? = withContext(Dispatchers.IO) {
-        val rt = runtime ?: return@withContext null
+    suspend fun prepareRestore(uri: Uri,owner: RestoreReviewOwner<RestorePreview> = standaloneRestoreReviews): RestorePreview? {
+        val request = owner.begin() ?: return null
         try {
-            val file = app.contentResolver.openInputStream(uri)?.use { stageRestore(app, it) } ?: fail(ErrorCode.STORAGE, "Source unavailable")
-            rt.backups.prepare { file.inputStream() }
-        } catch (e: Exception) { notice(Format.error(e)); null }
+            return withContext(Dispatchers.IO) {
+                val rt = runtime ?: return@withContext null
+                val file = app.contentResolver.openInputStream(uri)?.use { stageRestore(app, it) } ?: fail(ErrorCode.STORAGE, "Source unavailable")
+                owner.prepared(request,rt.backups.prepare { file.inputStream() })
+            }
+        } catch(e: kotlinx.coroutines.CancellationException) { owner.cancel(request);throw e }
+        catch(e: Exception) { owner.cancel(request);notice(Format.error(e));return null }
     }
-    fun applyRestore(preview: RestorePreview) {
-        val rt = runtime ?: return
-        viewModelScope.launch(Dispatchers.IO) {
+    fun applyRestore(preview: RestorePreview,owner: RestoreReviewOwner<RestorePreview>? = null) {
+        if(owner != null && !owner.claim(preview)) { notice(Format.error(CoreError(ErrorCode.STALE,"Restore review changed or closed")));return }
+        if(owner == null) standaloneRestoreReviews.claim(preview)
+        val rt = runtime
+        if(rt == null) { releaseRestorePreviewOnIo(preview);notice(Format.error(CoreError(ErrorCode.STALE,"Restore backend changed")));return }
+        val applying = viewModelScope.launch(Dispatchers.IO) {
             try { rt.backups.apply(preview); notice("Данные восстановлены. Прежние сохранены отдельно") }
-            catch (e: Exception) { notice(Format.error(e)) }
+            catch (e: Exception) { if(e is kotlinx.coroutines.CancellationException) throw e;notice(Format.error(e)) }
         }
+        // Runs even when cancellation wins before the coroutine body starts. After claim,
+        // cancel/dispose/replacement no longer owns this preview or its active apply lease.
+        applying.invokeOnCompletion { releaseRestorePreviewOnIo(preview) }
     }
 
     suspend fun prepareCatalog(): CatalogPreview? = withContext(Dispatchers.IO) {

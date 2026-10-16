@@ -1,5 +1,7 @@
 package dev.notai.tracker.android.ui
 
+import dev.notai.tracker.android.RestoreReviewOwner
+
 import android.Manifest
 import android.app.Activity
 import android.content.Context
@@ -64,6 +66,10 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
     val last by vm.lastBackup.collectAsStateWithLifecycle()
     val exportPreparing by vm.exportPreparing.collectAsStateWithLifecycle()
     var restore by remember { mutableStateOf<RestorePreview?>(null) }
+    val restoreOwner = remember(vm) { RestoreReviewOwner<RestorePreview>(vm::releaseRestorePreviewOnIo) }
+    DisposableEffect(restoreOwner) { onDispose { restoreOwner.close() } }
+    val heldRestore = restore
+    DisposableEffect(heldRestore) { onDispose { heldRestore?.let(restoreOwner::discard) } }
     var catalog by remember { mutableStateOf<CatalogPreview?>(null) }
     var zoneConfirm by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
@@ -71,7 +77,10 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
 
     LaunchedEffect(Unit) { vm.refreshCapabilities() }
     val open = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) scope.launch { busy = true; restore = vm.prepareRestore(uri); busy = false }
+        if (uri != null) scope.launch {
+            busy = true;restore = null
+            try { restore = vm.prepareRestore(uri,restoreOwner) } finally { busy = false }
+        }
     }
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (!granted) notificationsDenied = true
@@ -226,7 +235,7 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 "${Format.plural(p.goals, "цель", "цели", "целей")}." +
                 (if (p.unfinishedTail || p.unfinishedFocus) " Незакрытая запись придёт как «время неизвестно», её нужно будет уточнить." else "") +
                 " Текущие данные будут сохранены отдельно перед заменой. Записи, сделанные после этой копии, исчезнут.",
-            "Заменить", { vm.applyRestore(p); restore = null }, { restore = null }, destructive = true)
+            "Заменить", { vm.applyRestore(p,restoreOwner); restore = null }, { restoreOwner.discard(p);restore = null }, destructive = true)
     }
     catalog?.let { p ->
         val r = p.report

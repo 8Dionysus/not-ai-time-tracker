@@ -2,6 +2,8 @@ package dev.notai.tracker.android.ui
 
 import android.content.Intent
 import androidx.compose.ui.test.*
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.lifecycle.ViewModelProvider
 import org.robolectric.Robolectric
@@ -61,13 +63,13 @@ class UiDraftRecreationTest {
         compose.waitForIdle()
     }
     private fun form(correction:Boolean) {
-        if(correction) compose.onNodeWithText("Original correction note").performScrollTo().performClick()
+        if(correction) compose.onNodeWithText("Original correction note",substring=true).performScrollTo().performClick()
         else compose.onNodeWithText("Добавить запись задним числом").performScrollTo().performClick()
         compose.onNodeWithText(if(correction) "Исправить запись" else "Добавить запись").assertExists()
         compose.onNodeWithContentDescription("Заметка").performTextReplacement("Typed retained note")
         compose.onNodeWithContentDescription("Начало позже на 5 минут").performClick()
         compose.onNodeWithContentDescription("Конец раньше на 5 минут").performClick()
-        compose.onNodeWithContentDescription("Изменить занятие").performClick()
+        compose.onNode(SemanticsMatcher("Activity chooser action") { it.config.getOrNull(SemanticsActions.OnClick)?.label=="Изменить занятие" }).performClick()
         compose.onAllNodesWithText("Draft selected activity").onFirst().performScrollTo().performClick()
         compose.waitForIdle()
         val before=t.data()

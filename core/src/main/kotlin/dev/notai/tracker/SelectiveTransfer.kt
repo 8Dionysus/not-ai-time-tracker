@@ -431,6 +431,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
 internal fun validateTransfer(d: Dataset) {
     ensure(d.transfer.origins.map { it.originId }.distinct().size == d.transfer.origins.size,"Duplicate transfer origins")
     ensure(d.transfer.operations.map { it.id }.distinct().size == d.transfer.operations.size,"Duplicate transfer operations")
+    val retainedOrigins=d.transfer.origins+d.transfer.operations.flatMap { op -> op.groups.mapNotNull { it.previousOrigin } }
     d.transfer.origins.forEach(::validateTransferOrigin)
     d.transfer.operations.forEach { op ->
         op.groups.forEach {
@@ -441,7 +442,10 @@ internal fun validateTransfer(d: Dataset) {
                 ensure(payloadHash(it.group.content) == it.group.hash && it.group.entities == SelectiveTransfer.entityManifest(it.group.content,it.group.sourceRevision,it.group.originId),"Transfer journal hash mismatch")
                 SelectiveTransfer.validateContent(it.group.content)
                 it.previousOrigin?.let(::validateTransferOrigin)
-                it.inserted?.let { delta -> validateInsertedSubjectChanges(delta,it.group.content) }
+                it.inserted?.let { delta ->
+                    val matching=retainedOrigins.filter { origin -> origin.compaction == null && origin.originId == it.group.originId && origin.hash == it.group.hash }.map { it.localGroup }
+                    validateInsertedSubjectChanges(delta,it.group.content,matching)
+                }
             }
         }
         ensure(op.id.isNotBlank() && op.hash.matches(Regex("[0-9a-f]{128}")) && op.nextRevision >= 0 && op.groups.map { it.group.id }.distinct().size == op.groups.size,"Invalid transfer journal")

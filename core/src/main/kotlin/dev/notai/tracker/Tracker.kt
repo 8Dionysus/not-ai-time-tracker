@@ -210,6 +210,8 @@ class Tracker(val store: StateStore, val clock: Clock) {
         val exerciseSetCount get() = before.subjects.sets.size-after.subjects.sets.size
         val eventQuantityCount get() = before.subjects.quantities.size-after.subjects.quantities.size
         val distanceTimeCount get() = before.subjects.distanceTimes.size-after.subjects.distanceTimes.size
+        val subjectCorrectionCount get() = before.subjects.sets.count { it.sessionId == sessionId && it.replacesId != null }+
+            before.subjects.quantities.count { it.sessionId == sessionId && it.replacesId != null }
         val hasDependentFacts get() = measurementCount > 0 || subjectLinkCount > 0 || exerciseSetCount > 0 || eventQuantityCount > 0 || distanceTimeCount > 0
         fun reports(start: Long,end: Long,filter: Filter = Filter()) = Reports.report(before,asOf,start,end,filter) to Reports.report(after,asOf,start,end,filter)
     }

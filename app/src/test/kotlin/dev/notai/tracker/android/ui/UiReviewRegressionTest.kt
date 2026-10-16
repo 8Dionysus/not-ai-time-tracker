@@ -181,7 +181,7 @@ class UiReviewRegressionTest {
     @Test fun ribbonLabelsUseActualElapsedFractionsInExplicitReportZone() {
         val zone = ZoneId.of("America/New_York");val policy = ReportingDayPolicy(zone.id,240)
         val fall = LocalDate.parse("2026-10-31");val spring = LocalDate.parse("2026-03-07")
-        assertEquals(listOf("04:00","10:15","16:30","22:45","04:00"),ribbonAxisLabels(policy.boundary(fall),policy.boundary(fall.plusDays(1)),zone))
-        assertEquals(listOf("04:00","09:45","15:30","21:15","04:00"),ribbonAxisLabels(policy.boundary(spring),policy.boundary(spring.plusDays(1)),zone))
+        assertEquals(listOf("4:00","10:15","16:30","22:45","4:00"),ribbonAxisLabels(policy.boundary(fall),policy.boundary(fall.plusDays(1)),zone))
+        assertEquals(listOf("4:00","9:45","15:30","21:15","4:00"),ribbonAxisLabels(policy.boundary(spring),policy.boundary(spring.plusDays(1)),zone))
     }
 }

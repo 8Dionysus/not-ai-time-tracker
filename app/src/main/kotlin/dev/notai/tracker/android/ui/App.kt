@@ -198,7 +198,7 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     }
     confirmDelete?.let { r ->
         val parts = r.consequences.joinToString(" и ")
-        val corrections = if(r.exerciseSets > 0 || r.eventQuantities > 0) " Включая сохранённые исправления этих данных." else ""
+        val corrections = if(r.subjectCorrections > 0) " В том числе ${Format.plural(r.subjectCorrections,"исправление","исправления","исправлений")} этих данных." else ""
         ConfirmDialog("Удалить запись целиком?", "${r.range}: вместе с записью удалятся $parts.$corrections Сразу после удаления можно отменить.",
             "Удалить", onConfirm = { vm.applyDeleteSession(r.preview); confirmDelete = null }, onDismiss = { confirmDelete = null }, destructive = true)
     }

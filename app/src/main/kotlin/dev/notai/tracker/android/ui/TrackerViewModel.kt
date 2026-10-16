@@ -71,6 +71,7 @@ sealed interface DeleteRequest {
         val exerciseSets get() = preview.exerciseSetCount
         val eventQuantities get() = preview.eventQuantityCount
         val distanceTimes get() = preview.distanceTimeCount
+        val subjectCorrections get() = preview.subjectCorrectionCount
         val consequences get() = buildList {
             if(segments > 1) add(Format.plural(segments,"отрезок","отрезка","отрезков")+" между паузами")
             if(measurements > 0) add(Format.plural(measurements,"измерение","измерения","измерений"))

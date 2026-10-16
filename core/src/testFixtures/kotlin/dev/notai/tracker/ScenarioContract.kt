@@ -19,6 +19,7 @@ class MemoryRollback: RollbackStore {
 }
 /** The SAME three scenarios run on in-memory domain storage and on disk-backed Room/SQLite. */
 abstract class ScenarioContract {
+    @Test fun reviewP1DeleteSubjectConsequences() = deletePreviewHasExactSubjectConsequences(::createStore,::reopen)
     @Test fun reviewP1ContentBoundedMetric() = boundedTypeDependenciesCloseFromContent(::createStore,::reopen,true)
     @Test fun reviewP1ContentBoundedUnit() = boundedTypeDependenciesCloseFromContent(::createStore,::reopen,false)
     @Test fun reviewP1ContentDependencyPersonalization() = dependencyOnlyPersonalizationClosesFromContent(::createStore,::reopen)

@@ -541,20 +541,33 @@ class Tracker(val store: StateStore, val clock: Clock) {
         ensure(earlier.elapsed >= seg.anchor!!.elapsedMs, "Boundary before monotonic start", ErrorCode.INVALID_INTERVAL)
         append(close(d,s,earlier,SessionStatus.STOPPED),selection,null,earlier)
     }
-    /** null interval excludes the unresolved tail. An explicit interval confirms/corrects it. */
+    /** null interval excludes unresolved time, not separately recorded facts. Referenced identities
+     * can retain an empty segment at their known start; it contributes no measured/confirmed time. */
     fun resolveTail(expected: Token, start: Long?, end: Long?) = mutate(expected,true) { d,n -> resolveTailData(d,n,start,end) }
     private fun resolveTailData(d: Dataset,n: Moment,start: Long?,end: Long?): Dataset {
         val s = current(d) ?: fail(ErrorCode.INVALID_INPUT, "No current session")
         val seg = d.segments.singleOrNull { it.sessionId == s.id && it.end == null } ?: fail(ErrorCode.INVALID_INPUT, "No open tail")
         ensure(snapshot(d,n).mode == Mode.RECOVERY, "Tail is not awaiting recovery")
         ensure((start == null) == (end == null), "Supply both boundaries or exclude")
-        val segments = if (start == null) d.segments.filterNot { it.id == seg.id } else {
+        val soleSegment = d.segments.none { it.sessionId == s.id && it.id != seg.id }
+        val sessionReferenced = d.subjects.links.any { it.sessionId == s.id } ||
+            d.subjects.sets.any { it.sessionId == s.id } || d.subjects.quantities.any { it.sessionId == s.id } ||
+            d.schedule.links.any { it.sessionId == s.id } || d.measurements.any { it.scope == Scope.SESSION && it.targetId == s.id }
+        // Distance/time bases depend on measurements as well. Keep the target and its facts;
+        // their existing target-match guard, not a fabricated interval, decides rate availability.
+        val segmentReferenced = d.measurements.any { it.scope == Scope.SEGMENT && it.targetId == seg.id }
+        val retainEmpty = start == null && (segmentReferenced || (soleSegment && sessionReferenced))
+        val segments = if (start == null) {
+            if(retainEmpty) d.segments.map { if(it.id == seg.id) it.copy(end = it.start,durationMs = 0,
+                anchor = null,uncertain = false,observedUntil = null,limitMs = null) else it }
+            else d.segments.filterNot { it.id == seg.id }
+        } else {
             interval(start,end!!,n)
             d.segments.map { if (it.id == seg.id) it.copy(start = start,end = end,durationMs = end-start,anchor = null,uncertain = false,observedUntil = null,limitMs = null) else it }
         }
         val keep = segments.any { it.sessionId == s.id }
         return d.copy(focus = null,segments = segments, sessions = if (keep) d.sessions.replace(s.copy(status = SessionStatus.STOPPED)) else d.sessions.filterNot { it.id == s.id },
-            measurements = d.measurements.filterNot { (it.scope == Scope.SEGMENT && it.targetId == seg.id && start == null) || (!keep && it.scope == Scope.SESSION && it.targetId == s.id) })
+            measurements = d.measurements.filterNot { (it.scope == Scope.SEGMENT && it.targetId == seg.id && start == null && !retainEmpty) || (!keep && it.scope == Scope.SESSION && it.targetId == s.id) })
     }
     @Synchronized fun canUndo(expected: Token): Boolean = undo?.first == expected
     @Synchronized fun undo(expected: Token): Change {

@@ -2,7 +2,7 @@ package dev.notai.tracker
 
 import kotlin.test.*
 
-enum class RecoveryReferenceCase { LINK, SET, EVENT_QUANTITY, FOCUS, SCHEDULE, CLOSED_RATE }
+enum class RecoveryReferenceCase { LINK, SET, EVENT_QUANTITY, FOCUS, SCHEDULE, CLOSED_RATE, SESSION_MEASUREMENT, SEGMENT_MEASUREMENT }
 
 /** All writes use ordinary commands on isolated stores; the same case runs in Memory and Room. */
 fun recoveryExclusionKeepsReferences(create: () -> StateStore,reopen: (StateStore) -> StateStore,kind: RecoveryReferenceCase) {
@@ -47,6 +47,11 @@ fun recoveryExclusionKeepsReferences(create: () -> StateStore,reopen: (StateStor
             t.pairDistanceTime(t.snapshot().token,DistanceTimeInput("recovery-rate",m.id,m.scope,m.targetId,
                 segment.start,segment.end!!,segment.durationMs,TimeBasis.RECORDED,"explicit pairing"))
             t.resume(t.snapshot().token)
+        }
+        RecoveryReferenceCase.SESSION_MEASUREMENT,RecoveryReferenceCase.SEGMENT_MEASUREMENT -> {
+            val scope = if(kind == RecoveryReferenceCase.SESSION_MEASUREMENT) Scope.SESSION else Scope.SEGMENT
+            val target = if(scope == Scope.SESSION) session.id else t.data().segments.single().id
+            t.measure(t.snapshot().token,Measurement("recovery-measurement","recovery-distance",1,"recovery-m",scope,target,Decimal("10")))
         }
         RecoveryReferenceCase.SCHEDULE -> Unit
     }
@@ -93,4 +98,26 @@ fun recoveryExclusionDropsUnreferencedEmptySession(create: () -> StateStore) {
     clock.advance(5000);clock.boot = "lost-anchor";clock.elapsed = 5
     t.resolveTail(t.snapshot().token,null,null)
     assertEquals(Mode.IDLE,t.snapshot().mode);assertTrue(t.data().sessions.isEmpty());assertTrue(t.data().segments.isEmpty())
+}
+
+fun recoveryEmptyIdentityHasNoIntervalOverlap(create: () -> StateStore,reopen: (StateStore) -> StateStore) {
+    val clock = FakeClock();val source = Tracker(create(),clock)
+    val card = Card("overlap-card","Identity only");source.saveCard(source.snapshot().token,card)
+    source.defineSubject(source.snapshot().token,CardSubject(card.id,"item"));source.start(source.snapshot().token)
+    val sessionId = source.snapshot().session!!.id;val start = source.data().segments.single().start
+    source.linkSubject(source.snapshot().token,SubjectSessionLink(subject = SubjectRef(SubjectKind.CARD,card.id),sessionId = sessionId))
+    clock.advance(5000);clock.boot = "lost-anchor";clock.elapsed = 5
+    // A portable unresolved snapshot has no live anchor; another manual fact may cover its start.
+    val t = Tracker(create(),clock);val restore = Backups(t,MemoryRollback())
+    restore.apply(restore.prepare(Backups(source,MemoryRollback()).export()))
+    t.manual(t.snapshot().token,start-100,start+100,Classification(),"Separate explicitly measured interval")
+    t.resolveTail(t.snapshot().token,null,null)
+    validate(t.data());assertEquals(Mode.IDLE,t.snapshot().mode)
+    assertEquals(2,t.data().sessions.size)
+    val empty = t.data().segments.single { it.sessionId == sessionId }
+    assertEquals(start,empty.end);assertEquals(0L,empty.durationMs);assertNull(empty.manualConfirmation)
+    val report = t.view().report(0,clock.wall+1)
+    assertEquals(200L,report.recordedMs);assertEquals(1,report.rows.size)
+    assertTrue(report.rows.none { it.sessionId == sessionId })
+    assertEquals(t.data(),Tracker(reopen(t.store),clock).data())
 }

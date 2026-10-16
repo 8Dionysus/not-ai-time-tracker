@@ -184,7 +184,8 @@ fun validate(data: Dataset) {
         ensure(open == if (s.status == SessionStatus.RUNNING || s.status == SessionStatus.RECOVERY) 1 else 0, "Inconsistent session state")
         ensure(own.isNotEmpty(), "Session without segments")
     }
-    val certain = data.segments.filter { !it.uncertain }.sortedBy { it.start }
+    // A closed empty identity segment contains no time and cannot overlap a real interval.
+    val certain = data.segments.filter { !it.uncertain && (it.end == null || it.end > it.start) }.sortedBy { it.start }
     certain.zipWithNext().forEach { (a,b) -> ensure(a.end != null && a.end <= b.start, "Intervals overlap", ErrorCode.OVERLAP) }
     data.measurements.forEach {
         ensure(it.fieldId.isNotBlank() && it.meaningVersion > 0 && it.unit.isNotBlank() && it.value.number.signum() >= 0, "Invalid measurement")

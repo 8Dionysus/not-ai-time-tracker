@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "catalogId": "tracker.catalog",
+  "catalogRevision": "0.9.1.3",
+  "catalogSha256": "9efaea5313b40ed2ae762437450f1a69759bfdd1e5fe1bb28e7ca2f8f5dc36b3",
+  "localeTag": "en",
+  "sourceLocaleTag": "ru",
+  "release": "coordinator-full-semantic-review-2026-10-16",
+  "quality": "REVIEWED",
+  "complete": true,
+  "fallbackTags": [],
+  "authority": "Dionysus coordinator private editorial package",
+  "license": null,
+  "rightsStatus": "source_rights_review_pending",
+  "translator": "Existing supplied translation; no retranslation by integrator",
+  "editor": "Coordinator accepted independent full semantic pass; compact package6f0806c5 and current system Page seq66 blockdc1d2a63",
+  "payload": {
+    "file": "labels.json",
+    "bytes": 1184934,
+    "sha256": "aee5fe5bb39498121f7367b78b6bec84ab62ed4005c7bbf062805cc056638fc8"
+  }
+}

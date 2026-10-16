@@ -156,7 +156,7 @@ def package(args):
     require((args.output / "labels.json").read_bytes() == raw, "Payload readback differs")
     return {**summary, "payload": metadata["payload"], "localeTag": args.locale,
             "quality": metadata["quality"], "rightsStatus": metadata["rightsStatus"],
-            "eligibleForDisplay": False, "installed": False}
+            "eligibleForDisplay": args.reviewed, "installed": False}
 
 
 def main():

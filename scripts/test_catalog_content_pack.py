@@ -62,7 +62,7 @@ class CatalogPackPreparationTest(unittest.TestCase):
             self.assertEqual({"file": "labels.json", "bytes": len(raw), "sha256": pack.digest(raw)}, metadata["payload"])
             self.assertIsNone(metadata["license"])
             self.assertEqual("source_rights_review_pending", metadata["rightsStatus"])
-            self.assertIn('"eligibleForDisplay": false', result.stdout)
+            self.assertIn('"eligibleForDisplay": true', result.stdout)
             self.assertIn('"installed": false', result.stdout)
             before = (target / "manifest.json").read_bytes()
             self.assertNotEqual(0, self.run_package(candidate, target).returncode)

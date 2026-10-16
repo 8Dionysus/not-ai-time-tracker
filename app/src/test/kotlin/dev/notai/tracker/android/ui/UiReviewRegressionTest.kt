@@ -68,8 +68,8 @@ class UiReviewRegressionTest {
             Thread.sleep(5)
         }
     }
-    private fun fixture(clock: FakeClock,settings: Settings = Settings("UTC"),waitBoundary: (suspend (Long) -> Unit)? = null): Fixture {
-        val store = Store(Dataset(settings = settings));val tracker = Tracker(store,clock)
+    private fun fixture(clock: FakeClock,settings: Settings = Settings("UTC"),initial: Dataset? = null,waitBoundary: (suspend (Long) -> Unit)? = null): Fixture {
+        val store = Store(initial ?: Dataset(settings = settings));val tracker = Tracker(store,clock)
         UiBackends.open = { Backend(tracker) }
         val vm = if(waitBoundary == null) TrackerViewModel(RuntimeEnvironment.getApplication()) else TrackerViewModel(RuntimeEnvironment.getApplication(),waitBoundary)
         val scope = CoroutineScope(SupervisorJob()+Dispatchers.IO)
@@ -148,6 +148,30 @@ class UiReviewRegressionTest {
     }
     @Test fun shownFavoriteRenameCannotSilentlyRebase() = staleFavorite(true)
     @Test fun shownFavoriteClassificationCannotSilentlyRebase() = staleFavorite(false)
+    private fun p2HistoryChoice(uncertain: Boolean,quick: Boolean) {
+        val clock = FakeClock();val f = fixture(clock,initial = reviewP2HistoryFixture(clock.wall,uncertain));val t = f.tracker
+        val before = t.data()
+        val shown = if(quick) {
+            f.scope.launch(start = CoroutineStart.UNDISPATCHED) { f.vm.home.collect { } }
+            pump { f.vm.home.value?.quick?.isNotEmpty() == true }
+            val q = f.vm.home.value!!.quick.single();Shown(q.entry,q.reference,q.expected)
+        } else {
+            val r = runBlocking { f.vm.pickerData() }.recents.single()
+            Shown(r.entry,requireNotNull(r.reference),requireNotNull(r.expected))
+        }
+        assertEquals(before,t.data());assertEquals(t.snapshot().token,shown.token)
+        assertEquals("p2-positive",shown.entry.sourceSegmentId);assertEquals("Original positive note",shown.entry.note)
+        f.choose(shown,PickMode.START);pump { t.snapshot().session != null || f.notices.isNotEmpty() }
+        assertNotNull(t.snapshot().session);assertEquals("Original positive note",t.snapshot().session!!.note)
+        assertEquals(shown.entry.selection,t.snapshot().session!!.selection)
+        assertEquals(before.sessions,t.data().sessions.filter { it.id in before.sessions.map { old -> old.id } })
+        assertEquals(before.segments,t.data().segments.filter { it.id in before.segments.map { old -> old.id } })
+        assertTrue(f.notices.none { it.text == Format.error(CoreError(ErrorCode.STALE,"stale")) })
+    }
+    @Test fun reviewP2QuickIgnoresLaterEmptyCanonical() = p2HistoryChoice(false,true)
+    @Test fun reviewP2RecentIgnoresLaterEmptyCanonical() = p2HistoryChoice(false,false)
+    @Test fun reviewP2QuickIgnoresLaterUncertainCanonical() = p2HistoryChoice(true,true)
+    @Test fun reviewP2RecentIgnoresLaterUncertainCanonical() = p2HistoryChoice(true,false)
     @Test fun wholeAreaKeepsShownGuardsAndStartsWithTheReviewedParent() {
         val f = fixture(FakeClock());val t = f.tracker
         t.saveType(t.snapshot().token,ActivityType("whole-parent","Parent"))

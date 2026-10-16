@@ -19,6 +19,10 @@ class MemoryRollback: RollbackStore {
 }
 /** The SAME three scenarios run on in-memory domain storage and on disk-backed Room/SQLite. */
 abstract class ScenarioContract {
+    @Test fun reviewP2EmptyReportOracle() = reviewP2EmptyReportIndex(::createStore,::reopen)
+    @Test fun reviewP2EmptyBackfill() = reviewP2EmptyBackfill(::createStore,::reopen)
+    @Test fun reviewP2HistoryEmptyCanonical() = reviewP2HistoryCanonical(::createStore,::reopen,false)
+    @Test fun reviewP2HistoryUncertainCanonical() = reviewP2HistoryCanonical(::createStore,::reopen,true)
     @Test fun reviewP1CsvDuration() = csvInterpretationConflict(::createStore,::reopen,"duration")
     @Test fun reviewP1CsvNote() = csvInterpretationConflict(::createStore,::reopen,"note")
     @Test fun reviewP1CsvActivity() = csvInterpretationConflict(::createStore,::reopen,"activity")

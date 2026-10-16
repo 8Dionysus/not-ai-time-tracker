@@ -114,7 +114,7 @@ class UiDraftRecreationTest {
         compose.onNodeWithText("Draft selected activity").performScrollTo().performClick();compose.waitForIdle()
         if(kind == "invalid") repeat(6) { compose.onNodeWithContentDescription("Конец раньше на 5 минут").performClick() }
         if(kind == "overlap") t.manual(t.snapshot().token,at("13:35"),at("13:45"),Classification(name = "Independent overlapping fact"),"Keep overlap fact")
-        compose.waitUntil(10000) { vm.view.value?.snapshot()?.token == t.snapshot().token }
+        compose.waitUntil(10000) { vm.view.value?.snapshot()?.token == t.snapshot().token && vm.snapshot.value?.token == t.snapshot().token }
         compose.waitUntil(10000) { compose.onAllNodes(hasText("Сохранить") and isEnabled()).fetchSemanticsNodes().isNotEmpty() }
         val store = t.store as Store;store.failure = null
         if(correction) store.beforeTransaction = {
@@ -152,11 +152,12 @@ class UiDraftRecreationTest {
         compose.waitUntil(10000) { vm.snapshot.value?.session?.id == original }
         compose.onNodeWithText("Указать когда").performScrollTo().performClick()
         compose.onNodeWithText("Когда ты переключился?").assertExists()
-        compose.onNodeWithText("Выбрать занятие").performScrollTo().performClick()
+        compose.onNodeWithText("Выбрать занятие").performClick()
         compose.onNodeWithContentDescription("Найти или создать занятие").performTextInput("Draft selected")
         compose.waitUntil(10000) { compose.onAllNodesWithText("Draft selected activity").fetchSemanticsNodes().size == 1 }
         compose.onNodeWithText("Draft selected activity").performScrollTo().performClick()
-        compose.waitUntil(10000) { t.snapshot().session?.id != original }
+        compose.waitUntil(10000) { t.snapshot().session?.id != original || (t.store as Store).failure?.code == ErrorCode.INVALID_INTERVAL }
+        assertNotEquals("Earlier form supplied an invalid initial boundary: ${(t.store as Store).failure}",original,t.snapshot().session?.id)
         assertEquals("p2-form-choice",t.snapshot().session!!.selection.cardId)
         val closed = t.data().segments.single { it.sessionId == original }
         assertEquals(start,closed.end);assertEquals(start,t.data().segments.single { it.end == null }.start)

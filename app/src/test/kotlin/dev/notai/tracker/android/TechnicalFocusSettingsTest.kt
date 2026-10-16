@@ -26,10 +26,12 @@ class TechnicalFocusSettingsTest {
     }
     @Test fun reviewP3TechnicalFocusToggleCannotOverwriteIndependentSettingsAfterRead() {
         val store = Store();val tracker = Tracker(store,FakeClock());var independentlySaved: Settings? = null
+        tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(widget = true,notification = true,overlay = true,shortcut = true)))
         store.afterRead = {
             val old = tracker.data().settings
             val next = old.copy(reportZone = "Asia/Tokyo",reportDayStartMinute = 240,
                 surfaces = old.surfaces.copy(widget = false,notification = false,overlay = false,shortcut = false),
+                schedule = old.schedule.copy(quietShadeEnabled = true),
                 longRecordReminder = old.longRecordReminder.copy(enabled = true))
             tracker.settings(tracker.snapshot().token,next);independentlySaved = tracker.data().settings
         }
@@ -38,6 +40,9 @@ class TechnicalFocusSettingsTest {
         val saved = requireNotNull(independentlySaved)
         assertEquals(saved.copy(surfaces = saved.surfaces.copy(focusSignal = tracker.data().settings.surfaces.focusSignal)),tracker.data().settings)
         assertEquals(Mode.IDLE,tracker.snapshot().mode)
+        TechnicalActivity().configureTechnicalFocusSignal(tracker,true)
+        assertTrue(tracker.data().settings.surfaces.focusSignal)
+        assertEquals(saved.copy(surfaces = saved.surfaces.copy(focusSignal = true)),tracker.data().settings)
     }
     @Test fun reviewP3TechnicalFocusToggleRejectsInterleavingAfterExpectedToken() {
         val store = Store();val tracker = Tracker(store,FakeClock())

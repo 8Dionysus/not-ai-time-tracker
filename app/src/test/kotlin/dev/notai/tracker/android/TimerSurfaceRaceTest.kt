@@ -111,10 +111,10 @@ class TimerSurfaceRaceTest {
         assertTrue(reads.get()>0);assertTrue(writes.get()>0)
     }
 
-    private fun skippedDisableInRuntimeObserver(overlay: Boolean) = runBlocking {
+    private fun skippedDisableInRuntimeObserver(overlay: Boolean,roomOnly: Boolean? = null) = runBlocking {
         val c = RuntimeEnvironment.getApplication()
         val widgets = shadowOf(AppWidgetManager.getInstance(c));widgets.bindAppWidgetId(809,ComponentName(c,TimerWidget::class.java))
-        for(room in listOf(false,true)) {
+        for(room in roomOnly?.let { listOf(it) } ?: listOf(false,true)) {
             val db = if(room) Room.inMemoryDatabaseBuilder(c,TrackerDatabase::class.java).allowMainThreadQueries().build() else null
             try {
                 while(shadowOf(c).nextStoppedService != null) { /* discard only fixture service requests */ }
@@ -151,5 +151,7 @@ class TimerSurfaceRaceTest {
     }
     @Test fun reviewP3RuntimeCollectorRetriesSkippedWidgetDisableWithoutForce() = skippedDisableInRuntimeObserver(false)
     @Test fun reviewP3RuntimeObserverRetainsOverlayStopRequestAfterSkippedTransition() = skippedDisableInRuntimeObserver(true)
+    @Test fun reviewP3RoomCollectorRetriesSkippedWidgetDisableWithoutForce() = skippedDisableInRuntimeObserver(false,true)
+    @Test fun reviewP3RoomObserverRetainsOverlayStopRequestAfterSkippedTransition() = skippedDisableInRuntimeObserver(true,true)
 
 }

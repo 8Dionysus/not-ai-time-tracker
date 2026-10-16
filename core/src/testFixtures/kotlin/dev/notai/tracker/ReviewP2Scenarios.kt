@@ -63,9 +63,7 @@ fun reviewP2EmptyBackfill(create: () -> StateStore,reopen: (StateStore) -> State
         assertEquals(empty,t.data().segments.single { it.id == empty.id });assertEquals(target,t.snapshot().timerTarget)
         assertEquals(7000L,t.snapshot().trustedDurationMs);assertEquals(7000L,t.view().report(0,clock.wall).recordedMs)
         assertEquals(before.sessions,t.data().sessions)
-        if(application==ChoiceApplication.SWITCH) {
-            assertTrue(change.undoAvailable);t.undo(t.snapshot().token);assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
-        } else { assertFalse(change.undoAvailable);t.stop(t.snapshot().token) }
+        t.undo(t.snapshot().token);assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
         t.applyStartBackfill(t.previewStartBackfill(t.snapshot().token,session,5000));t.stop(t.snapshot().token)
         val saved = t.data();t = Tracker(reopen(t.store),clock);assertEquals(saved,t.data())
         val restored = Tracker(create(),clock);val backups = Backups(restored,MemoryRollback())

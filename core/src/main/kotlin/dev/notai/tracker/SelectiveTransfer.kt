@@ -208,7 +208,9 @@ class SelectiveTransfer(private val tracker: Tracker) {
             return content
         }
         val initialContents=components.associateWith(::contentOf)
-        if(extended) {
+        // The package-wide reader contract is determined by actual dependency content,
+        // including bounded metrics and personalized cards reached only through roots.
+        if(initialContents.values.any { it.requiresSelectiveFormat4() }) {
             val dependencyOwners=mutableMapOf<Pair<String,String>,String>()
             initialContents.forEach { (component,content) ->
                 val node=component.first()
@@ -263,7 +265,7 @@ class SelectiveTransfer(private val tracker: Tracker) {
             if(wanted.discardLinks.isNotEmpty()) add("LINKS_EXPLICITLY_DISCARDED:${wanted.discardLinks.size}")
             if(wanted.excludedOverrides.isNotEmpty()) add("OVERRIDES_EXCLUDED:${wanted.excludedOverrides.size}")
         }
-        val format = if(groups.any { it.content.hasChoicePersonalization() || it.content.hasReportingExtensions() || !it.content.subjects.empty || it.content.metrics.any { m -> m.bounds != null } }) 4 else if(groups.any { g -> g.content.segments.any { it.manualConfirmation != null } }) 3 else if(wanted.cardIds.isEmpty() && wanted.typeIds.isEmpty()) 1 else 2
+        val format = if(groups.any { it.content.requiresSelectiveFormat4() }) 4 else if(groups.any { g -> g.content.segments.any { it.manualConfirmation != null } }) 3 else if(wanted.cardIds.isEmpty() && wanted.typeIds.isEmpty()) 1 else 2
         return SelectivePackage(formatVersion = format,minimumReader = format,sourceDatasetId = d.datasetId,groups = groups,losses = losses)
     }
     fun inspect(text: String): TransferInspection = try { inspect(codec.decodeFromString<SelectivePackage>(text)) }
@@ -466,3 +468,6 @@ fun TransferState.hasCatalogRoots(): Boolean {
 
 internal fun Goal.hasReportingExtensions() = metric == GoalMetric.DISTINCT_RECORDED_DAYS || dayStartMinute != 0 || revisions.isNotEmpty()
 internal fun TransferContent.hasReportingExtensions() = savedReports.isNotEmpty() || goals.any { it.hasReportingExtensions() }
+
+private fun TransferContent.requiresSelectiveFormat4(): Boolean = hasChoicePersonalization() ||
+    hasReportingExtensions() || !subjects.empty || metrics.any { it.bounds != null }

@@ -34,6 +34,7 @@ internal fun Dataset.frozen(base: Dataset? = null): Dataset {
     val selections = SelectionFreezer()
     fun capture(value: Classification) = selections.capture(value)
     return copy(
+    subjects = if(subjects === base?.subjects) subjects else subjects.frozen(),
     transfer = if(transfer === base?.transfer) transfer else transfer.copy(
         origins = frozenList(transfer.origins.map { it.frozenOrigin() }),
         compactions = frozenList(transfer.compactions.map { it.copy(targets = frozenList(it.targets),acknowledgements = frozenList(it.acknowledgements)) }),
@@ -41,7 +42,8 @@ internal fun Dataset.frozen(base: Dataset? = null): Dataset {
     schedule = if(schedule === base?.schedule) schedule else schedule.frozen(::capture),
     pendingAssignments = if(pendingAssignments === base?.pendingAssignments) pendingAssignments else frozenList(pendingAssignments),
     focus = if(focus === base?.focus) focus else focus?.copy(segmentIds = frozenList(focus.segmentIds)),
-    goals = if(goals === base?.goals) goals else frozenList(goals.map { it.copy(filter = it.filter.copy(details = frozenMap(it.filter.details),tags = frozenSet(it.filter.tags),facets = frozenList(it.filter.facets))) }),
+    goals = if(goals === base?.goals) goals else frozenList(goals.map { it.frozenGoal() }),
+    savedReports = if(savedReports === base?.savedReports) savedReports else frozenList(savedReports.map { it.copy(filter = it.filter.frozenFilter()) }),
     types = if(types === base?.types) types else frozenList(types.map { it.copy(aliases = frozenList(it.aliases),
         suggestedAxisIds = frozenSet(it.suggestedAxisIds),suggestedMetricIds = frozenSet(it.suggestedMetricIds),researchOrigins = frozenList(it.researchOrigins)) }),
     cards = if(cards === base?.cards) cards else frozenList(cards.map { it.copy(personal = it.personal.frozen(),details = frozenMap(it.details),tags = frozenSet(it.tags),facets = frozenList(it.facets)) }),
@@ -58,10 +60,10 @@ internal fun Dataset.frozen(base: Dataset? = null): Dataset {
 
 internal fun TransferContent.frozen(): TransferContent {
     val d = Dataset(types = types,cards = cards,axes = axes,metrics = metrics,units = units,sessions = sessions,segments = segments,measurements = measurements,
-        schedule = ScheduleData(series,overrides,links),focus = focus,goals = goals,favorites = favorites).frozen()
-    return copy(types = d.types,cards = d.cards,axes = d.axes,metrics = d.metrics,units = d.units,sessions = d.sessions,segments = d.segments,measurements = d.measurements,
+        schedule = ScheduleData(series,overrides,links),focus = focus,goals = goals,favorites = favorites,savedReports = savedReports,subjects = subjects).frozen()
+    return copy(subjects = d.subjects,types = d.types,cards = d.cards,axes = d.axes,metrics = d.metrics,units = d.units,sessions = d.sessions,segments = d.segments,measurements = d.measurements,
         series = d.schedule.series,overrides = d.schedule.overrides,links = d.schedule.links,focus = d.focus,goals = d.goals,favorites = d.favorites,
-        catalogRoots = catalogRoots.copy(cardIds = frozenSet(catalogRoots.cardIds),typeIds = frozenSet(catalogRoots.typeIds)))
+        savedReports = d.savedReports,catalogRoots = catalogRoots.copy(cardIds = frozenSet(catalogRoots.cardIds),typeIds = frozenSet(catalogRoots.typeIds)))
 }
 
 internal fun TransferOrigin.frozenOrigin() = copy(localGroup = localGroup.frozen(),compaction = compaction?.let { c ->

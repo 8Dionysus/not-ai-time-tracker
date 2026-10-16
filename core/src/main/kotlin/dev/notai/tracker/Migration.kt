@@ -64,5 +64,7 @@ internal fun decodeBackupVersion(json: String): Backup {
     ensure(version in 12..14 || !backup.data.hasManualTimeConfirmation(),"Manual confirmation in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
     ensure(version in 13..14 || backup.data.settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
     ensure(version == 14 || !backup.data.hasChoicePersonalization(),"Personal choices in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+    ensure(version == 14 || !backup.data.hasReportingExtensions(),"Reporting extensions in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+    ensure(version == 14 || !backup.data.hasSubjectQuantities(),"Quantity extension in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
     return backup.copy(formatVersion = 14)
 }

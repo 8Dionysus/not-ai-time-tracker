@@ -103,7 +103,7 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore,p
             validateMoment(n)
             validate(d)
             val frozen = d.copy(pendingAssignments = emptyList(),segments = d.segments.map { materialize(it,n).copy(anchor = null) },focus = Focus.freeze(d,n))
-            val json = codec.encodeToString(Backup(asOf = n.wall,data = frozen))
+            val json = codec.encodeToString(Backup(formatVersion = 14,asOf = n.wall,data = frozen))
             ensure(json.toByteArray(Charsets.UTF_8).size <= MAX_BACKUP_BYTES,
                 "Backup exceeds supported 10 MiB restore limit; no usable backup was produced",ErrorCode.INVALID_INPUT)
             // An export must pass the same temporal/reference checks as a future restore.
@@ -117,6 +117,8 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore,p
             ensure(b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
             try {
                 validate(b.data)
+                ensure(b.data.goalRevisionTimes().all { it <= b.asOf },"Goal revision after snapshot")
+                ensure(b.data.quantityRecordedTimes().all { it <= b.asOf },"Quantity audit time after snapshot")
                 ensure(b.data.manualTimeConfirmations().all { it.confirmedAt <= b.asOf },"Confirmation after snapshot")
                 ensure(b.data.focus?.breakAnchor == null,"Backup must not contain Focus anchors")
                 ensure(b.data.segments.all { it.anchor == null },"Backup must not contain device anchors")

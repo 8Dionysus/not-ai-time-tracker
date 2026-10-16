@@ -49,7 +49,10 @@ class Tracker(val store: StateStore, val clock: Clock) {
             val old = checked.data
             val now = clock.now()
             if(expected != null) checkToken(old, expected, now)
-            val edited = edit(old,now)
+            val proposed = edit(old,now)
+            val removedMeasurements = old.measurements.map { it.id }.toSet()-proposed.measurements.map { it.id }.toSet()
+            val edited = if(removedMeasurements.isEmpty()) proposed else proposed.copy(subjects = proposed.subjects.copy(
+                distanceTimes = proposed.subjects.distanceTimes.filterNot { it.measurementId in removedMeasurements }))
             val identityChanged = timerIdentity(old) != timerIdentity(edited)
             val next = edited.copy(revision = Math.addExact(old.revision,1),timerEpoch = if(identityChanged) Math.addExact(old.timerEpoch,1) else old.timerEpoch)
             checked.replace(next) { validated ->
@@ -94,6 +97,47 @@ class Tracker(val store: StateStore, val clock: Clock) {
             undo = if(change.undoAvailable) change.state.token to old else null
             change
         }
+    }
+    fun subjects(): SubjectRead = SubjectRead(data())
+    /** Snapshot, token, validation and Undo use the same transaction path as timer edits. */
+    fun defineSubject(expected: Token,card: CardSubject) = mutate(expected,true) { d,_ ->
+        ensure(d.cards.any { it.id == card.cardId && !it.archived },"Card missing/archived")
+        d.subjects.cards.find { it.cardId == card.cardId }?.let { ensure(it == card,"Subject kind is immutable") }
+        d.copy(subjects = d.subjects.copy(cards = d.subjects.cards.filterNot { it.cardId == card.cardId }+card))
+    }
+    fun saveSubjectEvent(expected: Token,event: SubjectEvent) = mutate(expected,true) { d,_ ->
+        d.subjects.events.find { it.id == event.id }?.let { ensure(it.copy(archived = event.archived) == event,"Event identity/meaning is immutable") }
+        d.copy(subjects = d.subjects.copy(events = d.subjects.events.filterNot { it.id == event.id }+event))
+    }
+    fun linkSubject(expected: Token,link: SubjectSessionLink) = mutate(expected,true) { d,_ ->
+        ensure(when(link.subject.kind) { SubjectKind.CARD -> d.cards.any { it.id == link.subject.id && !it.archived };SubjectKind.EVENT -> d.subjects.events.any { it.id == link.subject.id && !it.archived } },"Subject archived/missing")
+        ensure(d.subjects.links.none { it.id == link.id },"Link ID already exists")
+        d.copy(subjects = d.subjects.copy(links = d.subjects.links+link))
+    }
+    fun unlinkSubject(expected: Token,id: String) = mutate(expected,true) { d,_ ->
+        ensure(d.subjects.links.any { it.id == id },"Link missing")
+        d.copy(subjects = d.subjects.copy(links = d.subjects.links.filterNot { it.id == id }))
+    }
+    fun observeSubject(expected: Token,observation: StateObservation) = mutate(expected,true) { d,n ->
+        ensure(observation.recordedAt <= n.wall && d.subjects.observations.none { it.id == observation.id },"Observation ID exists or recorded in future")
+        d.copy(subjects = d.subjects.copy(observations = d.subjects.observations+observation))
+    }
+    fun recordSubjectChange(expected: Token,change: SubjectChange) = mutate(expected,true) { d,n ->
+        ensure(change.recordedAt <= n.wall && d.subjects.changes.none { it.id == change.id },"Change ID exists or recorded in future")
+        d.copy(subjects = d.subjects.copy(changes = d.subjects.changes+change))
+    }
+    fun recordSet(expected: Token,set: ExerciseSet) = mutate(expected,true) { d,n ->
+        ensure(set.recordedAt <= n.wall && d.subjects.sets.none { it.id == set.id },"Set ID exists or recorded in future")
+        d.copy(subjects = d.subjects.copy(sets = d.subjects.sets+set))
+    }
+    fun recordEventQuantity(expected: Token,quantity: EventQuantity) = mutate(expected,true) { d,n ->
+        ensure(quantity.recordedAt <= n.wall && d.subjects.quantities.none { it.id == quantity.id },"Quantity ID exists or recorded in future")
+        d.copy(subjects = d.subjects.copy(quantities = d.subjects.quantities+quantity))
+    }
+    fun pairDistanceTime(expected: Token,input: DistanceTimeInput) = mutate(expected,true) { d,_ ->
+        ensure(d.subjects.distanceTimes.none { it.id == input.id },"Rate input ID exists")
+        ensure(distanceTimeMatches(d,input),"Rate input differs from current target")
+        d.copy(subjects = d.subjects.copy(distanceTimes = d.subjects.distanceTimes+input))
     }
     fun timerCommand(target: TimerTarget,directive: TimerDirective,allowed: (Dataset)->Boolean = { true }): Change = timer(null,when(directive) {
         TimerDirective.START -> TimerAction.START;TimerDirective.PAUSE -> TimerAction.PAUSE
@@ -178,7 +222,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
                     "seriesId" to ErrorArgument.Identifier(link.key.seriesId),"originalDate" to ErrorArgument.Text(link.key.originalDate)))
         }
         val segmentIds = d.segments.filter { it.sessionId == id }.map { it.id }.toSet()
-        return d.copy(sessions = d.sessions.filterNot { it.id == id },segments = d.segments.filterNot { it.sessionId == id },
+        return d.copy(subjects = d.subjects.copy(links = d.subjects.links.filterNot { it.sessionId == id },sets = d.subjects.sets.filterNot { it.sessionId == id },quantities = d.subjects.quantities.filterNot { it.sessionId == id },distanceTimes = d.subjects.distanceTimes.filterNot { (it.scope == Scope.SESSION && it.targetId == id) || (it.scope == Scope.SEGMENT && it.targetId in segmentIds) }),sessions = d.sessions.filterNot { it.id == id },segments = d.segments.filterNot { it.sessionId == id },
             measurements = d.measurements.filterNot { (it.scope == Scope.SESSION && it.targetId == id) || (it.scope == Scope.SEGMENT && it.targetId in segmentIds) },
             pendingAssignments = d.pendingAssignments.filterNot { it.sessionId == id })
     }
@@ -201,11 +245,11 @@ class Tracker(val store: StateStore, val clock: Clock) {
             closed.copy(sessions = closed.sessions.replace(s.copy(selection = selected)), segments = closed.segments + open(s.id,selected,n))
         }
     }
-    fun repeat(expected: Token, sessionId: String) = mutate(expected) { d,n ->
+    fun repeat(expected: Token, sessionId: String,notePolicy: ChoiceNotePolicy? = null) = mutate(expected) { d,n ->
         ensure(current(d) == null, "Stop or switch current session first")
         val s = d.sessions.find { it.id == sessionId } ?: fail(ErrorCode.INVALID_INPUT, "Missing session")
         val lastSelection = d.segments.filter { it.sessionId == sessionId }.maxByOrNull { it.start }?.selection ?: s.selection
-        append(d,lastSelection,choiceStartNote(d,ChoiceKind.HISTORY,sessionId,lastSelection,s.note),n)
+        append(d,lastSelection,when(notePolicy) { ChoiceNotePolicy.CLEAR -> null;ChoiceNotePolicy.COPY_SOURCE -> s.note;null -> choiceStartNote(d,ChoiceKind.HISTORY,sessionId,lastSelection,s.note) },n)
     }
     fun startFavorite(expected: Token, favoriteId: String) = mutate(expected) { d,n ->
         ensure(current(d) == null, "Stop or switch current session first")
@@ -312,13 +356,23 @@ class Tracker(val store: StateStore, val clock: Clock) {
             d.copy(focus = null,sessions = d.sessions.map { if(it.id == f.sessionId) it.copy(status = SessionStatus.STOPPED) else it })
         }
     }
-    fun saveGoal(expected: Token,goal: Goal) = mutate(expected,true) { d,_ ->
-        d.copy(goals = if(d.goals.any { it.id == goal.id }) d.goals.map { if(it.id == goal.id) goal else it } else d.goals+goal)
+    fun saveGoal(expected: Token,goal: Goal,mode: GoalEditMode = GoalEditMode.NEXT_PERIOD) = mutate(expected,true) { d,n ->
+        Goals.save(d,n,goal,mode)
     }
     fun deleteGoal(expected: Token,id: String) = mutate(expected,true) { d,_ ->
         ensure(d.goals.any { it.id == id },"Missing goal"); d.copy(goals = d.goals.filterNot { it.id == id })
     }
     fun goalProgress(id: String,date: java.time.LocalDate? = null): GoalProgress = view().goalProgress(id,date)
+    fun configureReportingDay(expected: Token,policy: ReportingDayPolicy) = mutate(expected,true) { d,_ ->
+        policy.validate();d.copy(settings = d.settings.copy(reportZone = policy.zone,reportDayStartMinute = policy.startMinute))
+    }
+    fun saveReportQuery(expected: Token,query: SavedReportQuery) = mutate(expected,true) { d,_ ->
+        d.copy(savedReports = d.savedReports.filterNot { it.id == query.id }+query)
+    }
+    fun deleteReportQuery(expected: Token,id: String) = mutate(expected,true) { d,_ ->
+        ensure(d.savedReports.any { it.id == id },"Missing saved report")
+        d.copy(savedReports = d.savedReports.filterNot { it.id == id })
+    }
     fun settings(expected: Token, settings: Settings) = mutate(expected) { d,_ -> d.copy(settings = settings) }
     fun configureSchedule(expected: Token,value: ScheduleSettings) = mutate(expected) { d,_ ->
         d.copy(settings = d.settings.copy(schedule = value.canonical()))

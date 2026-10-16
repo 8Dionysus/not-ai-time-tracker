@@ -19,6 +19,19 @@ class MemoryRollback: RollbackStore {
 }
 /** The SAME three scenarios run on in-memory domain storage and on disk-backed Room/SQLite. */
 abstract class ScenarioContract {
+    @Test fun combinedQuantityReportUsesHistoricalIntervals() = quantityReportClassificationJoin(::createStore,::reopen)
+    @Test fun combinedQuantityArchiveGuardsEveryRetainedSnapshot() = quantityArchiveAuditSnapshots(::createStore)
+    @Test fun reportingDayAndVersionedGoals() = reportingDaysAndGoalVersions(::createStore,::reopen)
+    @Test fun savedReportPortability() = savedReportsAndPortableHistory(::createStore,::reopen)
+    @Test fun subjectsReuseCardIdentity() = subjectBooks(::createStore,::reopen)
+    @Test fun subjectStateIsLatestKnownNotSum() = subjectState(::createStore,::reopen)
+    @Test fun subjectEventsSpanStagesWithoutHiddenHistory() = subjectEvents(::createStore,::reopen)
+    @Test fun subjectSignedChangesRequireContinuousBasis() = subjectChanges(::createStore,::reopen)
+    @Test fun subjectSetsAndScaleBoundsHaveExplicitMeaning() = subjectSets(::createStore,::reopen)
+    @Test fun subjectQuantityWindowsKeepWholeTargetsSeparate() = subjectWindow(::createStore,::reopen)
+    @Test fun subjectRatesUseWeightedExplicitInputs() = subjectRates(::createStore,::reopen)
+    @Test fun subjectFieldsSurviveArchivesCopyReplayAndUndo() = subjectTransport(::createStore,::reopen)
+
     @Test fun backfillPreservesObservedTimeAndUndo() = startBackfillPreservesObservedTime(::createStore,::reopen)
     @Test fun backfillRefusalsAreAtomic() = startBackfillRefusalsAreAtomic(::createStore)
     @Test fun backfillArchiveRoundTripPreservesProvenance() = startBackfillArchiveRoundTrip(::createStore,::reopen)
@@ -1315,10 +1328,10 @@ abstract class ScenarioContract {
         val beforeBad = clean.data()
         expect(ErrorCode.UNSUPPORTED_IMPORT) { backups.prepare(malformed) }; assertEquals(beforeBad,clean.data())
         val disabled = duration.copy(enabled = false)
-        clean.saveGoal(clean.snapshot().token,disabled)
+        clean.saveGoal(clean.snapshot().token,disabled,GoalEditMode.CORRECT_CURRENT)
         assertFalse(clean.goalProgress(duration.id,day).goal.enabled); assertEquals(121_000,clean.goalProgress(duration.id,day).actual)
         clean.deleteGoal(clean.snapshot().token,duration.id); clean.undo(clean.snapshot().token)
-        assertEquals(disabled,clean.data().goals.single { it.id == duration.id })
+        assertEquals(disabled,clean.data().goals.single { it.id == duration.id }.copy(revisions = emptyList()))
         val week = Goals.window(duration.copy(period = GoalPeriod.WEEK),day)
         assertEquals(LocalDate.parse("2026-03-23").atStartOfDay(java.time.ZoneId.of("Europe/Berlin")).toInstant().toEpochMilli(),week.start)
         val month = Goals.window(duration.copy(period = GoalPeriod.MONTH),day)

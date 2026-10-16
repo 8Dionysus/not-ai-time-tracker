@@ -50,7 +50,7 @@ object HistoryGaps {
             val kind=when(category) { 1->HistoryGapKind.RECOVERY_UNCERTAIN;2->HistoryGapKind.PAUSE;else->HistoryGapKind.UNRECORDED }
             val source=if(category<3) active[category] else emptyMap()
             val ids=source.values.map { it.second }.distinct().sorted();val uncertain=if(category==1) source.keys.sorted() else emptyList()
-            fun gap(a: Long,b: Long)=HistoryGap(payloadHash(listOf(data.datasetId,a.toString(),b.toString(),kind.name)+ids+uncertain),a,b,kind,frozenList(ids),frozenList(uncertain))
+            fun gap(a: Long,b: Long)=HistoryGap(payloadHash(listOf(listOf(data.datasetId,a.toString(),b.toString(),kind.name),ids,uncertain)),a,b,kind,frozenList(ids),frozenList(uncertain))
             val previous=result.lastOrNull()
             if(previous?.end==at && previous.kind==kind && previous.sessionIds==ids && previous.uncertainSegmentIds==uncertain)
                 result[result.lastIndex]=gap(previous.start,next)

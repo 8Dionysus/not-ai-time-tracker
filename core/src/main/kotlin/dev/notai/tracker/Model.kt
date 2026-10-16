@@ -63,16 +63,19 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
 @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 @Serializable data class Settings(val reportZone: String = "UTC",val surfaces: SurfaceSettings = SurfaceSettings(),val focusPlan: FocusPlan = FocusPlan(),
     @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val schedule: ScheduleSettings = ScheduleSettings(),
-    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val longRecordReminder: LongRecordPreference = LongRecordPreference())
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val longRecordReminder: LongRecordPreference = LongRecordPreference(),
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val reportDayStartMinute: Int = 0)
 @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 @Serializable data class Dataset(@Required val datasetId: String = newId(), @Required val revision: Long = 0,
     @Required val types: List<ActivityType> = Catalog.types,
     @Required val cards: List<Card> = emptyList(), @Required val favorites: List<Favorite> = emptyList(),
     @Required val sessions: List<Session> = emptyList(), @Required val segments: List<Segment> = emptyList(),
     val schedule: ScheduleData = ScheduleData(),val transfer: TransferState = TransferState(),
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val savedReports: List<SavedReportQuery> = emptyList(),
     val goals: List<Goal> = emptyList(),val focus: FocusRun? = null,val catalogVersion: String? = null,
     val timerEpoch: Long = 0,val controlBarrier: String = "",
     @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val pendingAssignments: List<StoppedAssignment> = emptyList(),
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val subjects: SubjectData = SubjectData(),
     @Required val measurements: List<Measurement> = emptyList(), @Required val settings: Settings = Settings(),
     @Required val axes: List<Axis> = Catalog.vocabulary.axes, @Required val metrics: List<Metric> = Catalog.vocabulary.metrics, @Required val units: List<UnitDefinition> = Catalog.vocabulary.units)
 
@@ -134,12 +137,15 @@ fun validate(data: Dataset) {
     fun ids(values: List<String>) { ensure(values.all { it.isNotBlank() } && values.distinct().size == values.size, "Empty or duplicate ID") }
     ensure(data.datasetId.isNotBlank() && data.revision >= 0 && data.timerEpoch >= 0, "Invalid dataset metadata")
     try { ZoneId.of(data.settings.reportZone) } catch (_: Exception) { fail(ErrorCode.INVALID_INPUT, "Invalid report zone") }
+    data.settings.reportDayPolicy.validate()
+    validateSavedReports(data)
     validateScheduleSettings(data.settings.schedule)
     validateLongRecordPreference(data.settings.longRecordReminder)
     ids(data.types.map { it.id }); ids(data.cards.map { it.id }); ids(data.favorites.map { it.id }); ids(data.sessions.map { it.id })
     ids(data.segments.map { it.id }); ids(data.measurements.map { it.id })
     val typeIds = data.types.map { it.id }.toSet()
     validateVocabulary(data)
+    validateSubjects(data)
     validateGoals(data)
     validateFocus(data)
     validateAssignments(data)

@@ -6,6 +6,15 @@ package dev.notai.tracker
  */
 class TrackerView internal constructor(private val checked: CheckedState,private val clock: Clock,private val choiceCache: ChoiceCache) {
     private val choiceView by lazy { ChoiceView(data,choiceCache,checked.historyKey,::snapshot) }
+    fun subjects(): SubjectRead = SubjectRead(data)
+    fun quantityReport(start: Long,end: Long,filter: Filter = Filter()): QuantityReport {
+        val now = clock.now()
+        return QuantityReports.build(data,checked.report(now,start,end,filter,data.settings.reportZone))
+    }
+    fun savedQuantityReport(id: String): QuantityReport {
+        val now = clock.now()
+        return QuantityReports.build(data,SavedReports.open(data,now,id).report)
+    }
     fun choices(): ChoiceView = choiceView
     val data get() = checked.data
     fun snapshot(): Snapshot = checked.snapshot(clock.now())
@@ -20,13 +29,21 @@ class TrackerView internal constructor(private val checked: CheckedState,private
         return ScheduleViewState(checked.snapshot(now).token,data.controlBarrier,now.wall,day,data.settings.schedule,data.settings.surfaces,deviceZone.id,
             frozenList(Schedules.project(data,day.date.minusDays(7),day.date.plusDays(14),instant,deviceZone)),data.settings.schedule.nextDayBoundary(instant,deviceZone).toEpochMilli())
     }
+    fun savedReports(): List<SavedReportQuery> = data.savedReports
+    fun savedReport(id: String): SavedReportResult = SavedReports.open(data,clock.now(),id)
+    fun reportSummary(start: Long,end: Long,filter: Filter = Filter(),includeNotes: Boolean = false): String =
+        ReportText.build(report(start,end,filter),includeNotes)
+    fun goalDefinition(id: String,date: java.time.LocalDate? = null): Goal {
+        val g = data.goals.singleOrNull { it.id == id } ?: fail(ErrorCode.INVALID_INPUT,"Missing goal")
+        return Goals.effective(g,date ?: g.dayPolicy.dateAt(clock.now().wall))
+    }
     fun goalProgress(id: String,date: java.time.LocalDate? = null): GoalProgress = Goals.progress(data,clock.now(),id,date)
     fun historyGaps(start: Long,end: Long): HistoryGapReview = HistoryGaps.inspect(data,clock.now(),start,end)
     fun report(start: Long,end: Long,filter: Filter = Filter()): Report = checked.report(clock.now(),start,end,filter,data.settings.reportZone)
     fun calendar(first: java.time.LocalDate,days: Int,filter: Filter = Filter(),zone: String = data.settings.reportZone): CalendarHistory =
         checked.calendar(clock.now(),first,days,filter,zone)
     fun day(date: java.time.LocalDate,filter: Filter = Filter()): Report {
-        val (start,end) = Reports.calendarBounds(date,1,data.settings.reportZone)
+        val (start,end) = Reports.calendarBounds(date,1,data.settings.reportZone,data.settings.reportDayStartMinute)
         return report(start,end,filter)
     }
 }

@@ -141,12 +141,13 @@ class TechnicalExportLifecycleTest {
         }
         val clock = FakeClock();val t = Tracker(store,clock)
         t.configureFocusSignal(t.snapshot().token,true);t.startFocus(t.snapshot().token,plan = FocusPlan(1000,1000));clock.advance(1000)
-        val before = t.data();controller.get().deliverTechnicalFocus(t,t.snapshot().focus!!)
+        val before = t.data();val first = controller.get().deliverTechnicalFocus(t,t.snapshot().focus!!)
         waitFor { app.getSystemService(android.app.NotificationManager::class.java).activeNotifications.any { it.id == 43 } }
+        waitFor { first.isCompleted }
         assertEquals(before,t.data())
         shadowOf(app).denyPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
-        controller.get().deliverTechnicalFocus(t,t.snapshot().focus!!)
-        shadowOf(Looper.getMainLooper()).idle()
+        val previous = controller.get().deliverTechnicalFocus(t,t.snapshot().focus!!)
+        waitFor { previous.isCompleted }
         assertNull("A previous attempt cannot turn into a duplicate dialog after permission loss",org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog())
     }
 

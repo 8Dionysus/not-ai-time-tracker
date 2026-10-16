@@ -300,8 +300,7 @@ class TechnicalActivity: Activity() {
     internal fun configureTechnicalFocusSignal(t: Tracker,enabled: Boolean) {
         t.configureFocusSignal(t.snapshot().token,enabled)
     }
-    internal fun deliverTechnicalFocus(t: Tracker,focus: FocusSnapshot) {
-        scope.launch {
+    internal fun deliverTechnicalFocus(t: Tracker,focus: FocusSnapshot): Job = scope.launch {
             try {
                 val result = withContext(Dispatchers.IO) { FocusSignals.deliverResult(this@TechnicalActivity,t) }
                 val current = result.focus
@@ -309,9 +308,8 @@ class TechnicalActivity: Activity() {
                     AlertDialog.Builder(this@TechnicalActivity).setTitle("Focus").setMessage(current.safeLabel).setPositiveButton("OK",null).show()
             } catch(e: Exception) {
                 if(e is CancellationException) throw e
-                status.text = "${(e as? CoreError)?.code ?: "Ошибка"}: ${e.message}"
+                status.text = dev.notai.tracker.android.ui.Format.error(e)
             }
-        }
     }
     private fun buildCalendarControl() {
         button("Выбрать occurrence из календаря…") {

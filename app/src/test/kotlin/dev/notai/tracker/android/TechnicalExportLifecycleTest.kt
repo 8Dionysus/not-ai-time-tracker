@@ -100,7 +100,7 @@ class TechnicalExportLifecycleTest {
         val entered=java.util.concurrent.CountDownLatch(1);val release=java.util.concurrent.CountDownLatch(1)
         val writer:(java.io.OutputStream)->Unit={ out -> out.write("Before cancellation".toByteArray());entered.countDown();check(release.await(10,java.util.concurrent.TimeUnit.SECONDS));out.write(" retained tail".toByteArray()) }
         invoke("beginExport","application/json","cancel-preparing.json",writer)
-        val id=requireNotNull(pending());assertTrue(entered.await(10,java.util.concurrent.TimeUnit.SECONDS))
+        val id=requireNotNull(pending());waitFor { entered.count==0L }
         val exports=ExportOperations(app);val gate=PrivateFileMaintenance.forContext(app)
         try {
             invoke("cancelPreparedExport");waitFor { exports.read(id).state=="CANCELLED" }

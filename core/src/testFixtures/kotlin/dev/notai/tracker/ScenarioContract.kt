@@ -323,11 +323,11 @@ abstract class ScenarioContract {
         assertEquals(pack.groups,importer.export(TransferSelection(sessionIds = t.data().sessions.map { it.id }.toSet())).groups)
         val again = importer.plan(pack,pack.groups.map { it.id }.toSet());assertTrue(again.conflicts.isEmpty())
         assertEquals(TransferGroupState.UNCHANGED,importer.apply(again,"after-prune-dedupe").groups.single().state)
-        val json = Backups(t,MemoryRollback()).export();assertEquals(13,codec.parseToJsonElement(json).jsonObject.getValue("formatVersion").jsonPrimitive.int)
+        val json = Backups(t,MemoryRollback()).export();assertEquals(14,codec.parseToJsonElement(json).jsonObject.getValue("formatVersion").jsonPrimitive.int)
         assertEquals(t.data().transfer,Backups.decode(json).data.transfer)
         val bytes = java.io.ByteArrayOutputStream();Backups(t,MemoryRollback()).write(bytes)
         assertEquals(t.data().transfer,StreamingBackup.read { bytes.toByteArray().inputStream() }.data.transfer)
-        for(text in listOf(json.replace("\"formatVersion\": 13","\"formatVersion\": 8"),bytes.toString("UTF-8").replace("\"formatVersion\":13","\"formatVersion\":8"))) {
+        for(text in listOf(json.replace("\"formatVersion\": 14","\"formatVersion\": 8"),bytes.toString("UTF-8").replace("\"formatVersion\":14","\"formatVersion\":8"))) {
             expect(ErrorCode.UNSUPPORTED_IMPORT) { Backups.decode(text) };expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { text.byteInputStream() } }
         }
         val destination = Tracker(createStore(),clock);val backups = Backups(destination,MemoryRollback());backups.apply(backups.prepare(json))
@@ -540,7 +540,7 @@ abstract class ScenarioContract {
         val result = t.scheduleCommand(start);assertEquals(result,t.scheduleCommand(start));assertEquals(1,t.data().sessions.size)
         t = Tracker(reopen(t.store),clock);assertEquals(result,t.scheduleCommand(start));assertEquals(result.sessionId,t.data().schedule.links.single().sessionId)
         clock.advance(1000);t.stop(t.snapshot().token)
-        val backups = Backups(t,MemoryRollback());val backup = backups.export();assertEquals(13,Backups.decode(backup).formatVersion)
+        val backups = Backups(t,MemoryRollback());val backup = backups.export();assertEquals(14,Backups.decode(backup).formatVersion)
         val clean = Tracker(createStore(),clock);val restore = Backups(clean,MemoryRollback());val preview = restore.prepare(backup)
         assertEquals(1,preview.scheduleSeries);assertEquals(1,preview.scheduleLinks);restore.apply(preview)
         assertEquals(t.data().schedule,clean.data().schedule);assertEquals(t.data().sessions,clean.data().sessions)
@@ -1918,7 +1918,7 @@ abstract class ScenarioContract {
         assertTrue(Backups.decode(disk.read(result.rollbackReference)).data.sessions.isEmpty())
         val full = clean.data()
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.dropLast(7)) }; assertEquals(full,clean.data())
-        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 13","\"formatVersion\": 1099")) }; assertEquals(full,clean.data())
+        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 14","\"formatVersion\": 1099")) }; assertEquals(full,clean.data())
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"datasetId\": \"${raw.data.datasetId}\",", "")) }; assertEquals(full,clean.data())
         val broken = raw.copy(data = raw.data.copy(segments = raw.data.segments+raw.data.segments.first()))
         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(codec.encodeToString(broken)) }; assertEquals(full,clean.data())
@@ -1985,7 +1985,7 @@ abstract class ScenarioContract {
         val text = bytes.toString(Charsets.UTF_8)
         val malformed = text.substringBefore("Streamed note").toByteArray() + byteArrayOf(0xC3.toByte(),0x28) + text.substringAfter("Streamed note").toByteArray()
         for(bad in listOf(bytes.copyOf(bytes.size-2),malformed,
-            text.replaceFirst("\"formatVersion\":13","\"formatVersion\":10,\"formatVersion\":13").toByteArray(),bytes+byteArrayOf(1))) {
+            text.replaceFirst("\"formatVersion\":14","\"formatVersion\":10,\"formatVersion\":14").toByteArray(),bytes+byteArrayOf(1))) {
             expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { bad.inputStream() } }
         }
         expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { (byteArrayOf(0xFF.toByte())+bytes).inputStream() } }

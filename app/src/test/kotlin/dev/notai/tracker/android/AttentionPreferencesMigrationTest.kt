@@ -14,7 +14,7 @@ import org.junit.Assert.*
 @Config(sdk = [36])
 class AttentionPreferencesMigrationTest {
     private fun open(name: String) = Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name)
-        .addMigrations(TrackerDatabase.MIGRATION_10_11).allowMainThreadQueries().build()
+        .addMigrations(TrackerDatabase.MIGRATION_10_11,TrackerDatabase.MIGRATION_11_12).allowMainThreadQueries().build()
 
     @Test fun v10MetadataMigratesWithDisabledDefaultAndUnchangedHistory() {
         val context = RuntimeEnvironment.getApplication()
@@ -40,7 +40,7 @@ class AttentionPreferencesMigrationTest {
             try {
                 val after = RoomStore(migrated).read()
                 assertEquals(before,after);assertEquals(LongRecordPreference(),after.settings.longRecordReminder)
-                assertEquals(11,migrated.openHelper.readableDatabase.version)
+                assertEquals(TRACKER_DATABASE_VERSION,migrated.openHelper.readableDatabase.version)
             } finally { migrated.close() }
             val reopened = open(name)
             try { assertEquals(before,RoomStore(reopened).read()) }

@@ -19,7 +19,7 @@ fun Report.groupSimilar(): List<HistoryGroup> = frozenList(rows.distinctBy { it.
 data class DraftInterval(val start: Long,val end: Long) {
     init { ensure(start >= 0 && end > start && end <= MAX_TIME,"Invalid proposed interval",ErrorCode.INVALID_INTERVAL) }
 }
-enum class DraftSource { SELECTED_TEXT, CALENDAR_EVENT }
+enum class DraftSource { SELECTED_TEXT, CALENDAR_EVENT, HISTORY_GAP }
 /** Ephemeral form data, not a stored event or Session. Editing/discarding never writes history.
  * No time parsing, name matching, completion inference or external-provider access.
  */

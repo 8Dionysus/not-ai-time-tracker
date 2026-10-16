@@ -78,7 +78,18 @@ class DescriptorCopyFiles(root: String,library: String? = null): Closeable {
     }
 }
 private fun LongArray.identity() = FileIdentity(this[0],this[1],this[2],this[3],this[4],this[5])
+/** Native ABI constant only: API26 lacks the public Java O_CLOEXEC field. Passing
+ * this actual platform value to Os.open retains one atomic close-on-exec/no-follow
+ * open. No file, descriptor, maintenance authority or new IO engine is created here. */
+object DescriptorOpenFlags {
+    private var closeOnExec: Int? = null
+    @Synchronized fun closeOnExec(library: String? = null): Int = closeOnExec ?: run {
+        if(library == null) System.loadLibrary("tracker_copy_io") else System.load(library)
+        NativeCopyIo.closeOnExecFlag().also { check(it > 0);closeOnExec = it }
+    }
+}
 internal object NativeCopyIo {
+    external fun closeOnExecFlag(): Int
     external fun root(path: String): Long
     external fun close(fd: Long)
     external fun stat(root: Long,path: String): LongArray?

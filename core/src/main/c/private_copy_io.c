@@ -15,6 +15,11 @@
 #include <stdint.h>
 
 #define JNI(name) Java_dev_notai_tracker_NativeCopyIo_##name
+/* API26 has the native flag but no public Java OsConstants.O_CLOEXEC field.
+ * Return the compiled ABI value; Java still performs one guarded Os.open. */
+JNIEXPORT jint JNICALL JNI(closeOnExecFlag)(JNIEnv *e,jobject self) {
+    (void)e;(void)self;return O_CLOEXEC;
+}
 static void error(JNIEnv *e,const char *op) {
     int saved=errno;char message[256];snprintf(message,sizeof message,"%s: %s",op,strerror(saved));
     jclass type=(*e)->FindClass(e,"java/io/IOException");

@@ -15,7 +15,7 @@ enum class SuggestionOrder { RECENT_RECORDED, FREQUENT_RECORDED }
 data class HistoryWindow(val start: Long,val end: Long)
 data class SuggestionQuery(val enabled: Boolean = false,val order: SuggestionOrder = SuggestionOrder.RECENT_RECORDED,val window: HistoryWindow? = null)
 data class ChoicePath(val id: String,val name: String,val archived: Boolean,val selectable: Boolean)
-data class MatchEvidence(val field: MatchField,val text: String,val strength: MatchStrength)
+data class MatchEvidence(val field: MatchField,val text: String,val strength: MatchStrength,val localeTag: String? = null)
 data class SuggestionEvidence(val order: SuggestionOrder,val window: HistoryWindow?,val sessionCount: Int,val lastRecordedEnd: Long)
 data class ChoiceEntry(val id: String,val kind: ChoiceKind,val sourceId: String,val title: String,
     val path: List<ChoicePath>,val selection: Classification,val note: String?,val availability: ChoiceAvailability,
@@ -29,7 +29,7 @@ class ChoiceCursor internal constructor(internal val owner: ChoiceView,internal 
 data class ChoiceIndexStats(val catalogBuilds: Int,val personalBuilds: Int,val historyBuilds: Int,val historyScans: Int = 0)
 
 private fun normalized(value: String) = Normalizer.normalize(value,Normalizer.Form.NFKC).lowercase(Locale.ROOT).trim().replace(Regex("\\s+")," ")
-internal data class ChoiceText(val field: MatchField,val original: String,val normalized: String = normalized(original))
+internal data class ChoiceText(val field: MatchField,val original: String,val normalized: String = normalized(original),val localeTag: String? = null)
 internal data class ChoiceRecord(val id: String,val kind: ChoiceKind,val sourceId: String,val title: String,
     val selection: Classification,val fields: List<ChoiceText>,val sourceSessionId: String? = null,val sourceSegmentId: String? = null) {
     val sortName = normalized(title)
@@ -115,7 +115,9 @@ internal class ChoiceCache {
 }
 
 /** Keep this snapshot while paging or typing. A cursor belongs to this view and exact request. */
-class ChoiceView internal constructor(private val d: Dataset,private val cache: ChoiceCache,private val historyKey: Any? = null,private val state: ()->Snapshot) {
+class ChoiceView private constructor(private val d: Dataset,private val cache: ChoiceCache,private val historyKey: Any?,private val state: ()->Snapshot,
+    private val localized: ChoiceCatalogLabels?) {
+    internal constructor(d: Dataset,cache: ChoiceCache,historyKey: Any? = null,state: ()->Snapshot): this(d,cache,historyKey,state,null)
     val token: Token = token(d)
     private val catalog by lazy { cache.catalog(d) }
     private val personal by lazy { cache.personal(d) }
@@ -123,6 +125,13 @@ class ChoiceView internal constructor(private val d: Dataset,private val cache: 
     private val sessions by lazy { d.sessions.associateBy { it.id } }
     /** Diagnostic counters, not persisted analytics. Useful for integration/performance verification. */
     fun indexStats() = cache.stats()
+    /** A new immutable presentation view owns its own cursors. Stable references
+     * and canonical selections are unchanged and still resolve in the plain view. */
+    fun withCatalogLabels(labels: ChoiceCatalogLabels): ChoiceView {
+        ensure(labels.token == token && labels.barrier == d.controlBarrier && labels.typeSignature == payloadHash(d.types),
+            "Catalog labels belong to another dataset/type snapshot",ErrorCode.STALE)
+        return ChoiceView(d,cache,historyKey,state,labels)
+    }
     fun search(input: ChoiceQuery = ChoiceQuery(),cursor: ChoiceCursor? = null,pageSize: Int = 30): ChoicePage {
         val query = input.copy(kinds = frozenSet(input.kinds))
         ensure(pageSize in 1..100,"Page size must be 1..100")
@@ -216,11 +225,20 @@ class ChoiceView internal constructor(private val d: Dataset,private val cache: 
         }
         return ChoicePage(token,frozenList(rows),hits.size,if(end < hits.size) ChoiceCursor(this,request,hits,end) else null)
     }
-    private fun title(r: ChoiceRecord) = if(r.kind == ChoiceKind.HISTORY && r.selection.name == null)
-        r.selection.activityTypeId?.let { catalog.byId[it]?.name } ?: r.title else r.title
-    private fun sortName(r: ChoiceRecord) = if(r.kind == ChoiceKind.HISTORY && r.selection.name == null)
+    private fun title(r: ChoiceRecord): String {
+        if(r.kind == ChoiceKind.TYPE) return localized?.presentations?.get(r.sourceId)?.label ?: r.title
+        return if(r.kind == ChoiceKind.HISTORY && r.selection.name == null)
+            r.selection.activityTypeId?.let { localized?.presentations?.get(it)?.label ?: catalog.byId[it]?.name } ?: r.title else r.title
+    }
+    private fun sortName(r: ChoiceRecord) = if(r.kind == ChoiceKind.TYPE && localized?.typeFields?.containsKey(r.sourceId) == true)
+        localized.typeFields.getValue(r.sourceId).first().normalized
+        else if(r.kind == ChoiceKind.HISTORY && r.selection.name == null)
         r.selection.activityTypeId?.let { catalog.fields[it]?.firstOrNull()?.normalized } ?: r.sortName else r.sortName
-    private fun path(r: ChoiceRecord) = r.selection.activityTypeId?.let { catalog.paths[it] }.orEmpty()
+    private fun path(r: ChoiceRecord): List<ChoicePath> {
+        val nodes = r.selection.activityTypeId?.let { catalog.paths[it] }.orEmpty()
+        if(localized == null) return nodes
+        return nodes.map { node -> localized.presentations[node.id]?.let { node.copy(name = it.label) } ?: node }
+    }
     private fun inScope(r: ChoiceRecord,q: ChoiceQuery): Boolean {
         val type = r.selection.activityTypeId?.let(catalog.byId::get)
         return when(q.scope) {
@@ -240,11 +258,13 @@ class ChoiceView internal constructor(private val d: Dataset,private val cache: 
     private fun match(r: ChoiceRecord,text: String): RankedChoice? {
         if(text.isEmpty()) return RankedChoice(r)
         val fields = r.fields + (if(r.kind == ChoiceKind.TYPE) emptyList() else r.selection.activityTypeId?.let { catalog.fields[it] }.orEmpty()) +
-            listOfNotNull(r.selection.cardId?.let { personal.cardNames[it] })
+            listOfNotNull(r.selection.cardId?.let { personal.cardNames[it] }) +
+            (if(r.kind == ChoiceKind.TYPE) localized?.typeFields?.get(r.sourceId).orEmpty()
+                else r.selection.activityTypeId?.let { localized?.currentTypeFields?.get(it) }.orEmpty())
         fun evidence(field: ChoiceText,part: String): MatchEvidence? = when {
-            field.normalized == part -> MatchEvidence(field.field,field.original,MatchStrength.EXACT)
-            field.normalized.startsWith(part) -> MatchEvidence(field.field,field.original,MatchStrength.PREFIX)
-            field.normalized.contains(part) -> MatchEvidence(field.field,field.original,MatchStrength.CONTAINS)
+            field.normalized == part -> MatchEvidence(field.field,field.original,MatchStrength.EXACT,field.localeTag)
+            field.normalized.startsWith(part) -> MatchEvidence(field.field,field.original,MatchStrength.PREFIX,field.localeTag)
+            field.normalized.contains(part) -> MatchEvidence(field.field,field.original,MatchStrength.CONTAINS,field.localeTag)
             else -> null
         }
         val whole = fields.mapNotNull { evidence(it,text) }.minWithOrNull(compareBy({it.strength.ordinal},{it.field.ordinal},{it.text}))

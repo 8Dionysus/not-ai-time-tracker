@@ -106,20 +106,32 @@ class AttentionPlatformTest {
         assertNull(music.prepare(newId(),"unbound"))
         assertEquals(before,context.getSystemService(NotificationManager::class.java).currentInterruptionFilter)
     }
-    @Test @Config(sdk = [26]) fun api26AudioRefusesBeforeResolvingOrOpeningAnySource() {
+    @Test @Config(sdk = [26],shadows = [HostFocusAudioOs::class])
+    fun api26UsesNativeAbiFlagForTheSameAtomicNoFollowOpen() {
         val context = RuntimeEnvironment.getApplication()
+        val library = requireNotNull(System.getProperty("tracker.cleanup.library"))
+        assertTrue(DescriptorOpenFlags.closeOnExec(library)>0)
         val oldForeground = FocusEnvironmentBinding.foreground;val oldFile = FocusEnvironmentBinding.localFile
+        val root = java.io.File(context.cacheDir,"api26-audio-${newId()}").apply { mkdirs() }
         var lookups = 0
         try {
             FocusEnvironmentBinding.foreground = true
-            FocusEnvironmentBinding.localFile = { lookups++;error("must not resolve source") }
-            val port = AndroidFocusMusic(context)
-            assertEquals(FocusEffectStatus.UNSUPPORTED,port.availability("selected"))
-            assertNull(port.prepare(newId(),"selected"));assertEquals(0,lookups)
-            val absent = java.io.File(context.cacheDir,"never-created-${newId()}")
-            val failure = assertThrows(IllegalStateException::class.java) { openFocusAudioFile(absent) }
-            assertEquals("Secure local audio requires API27",failure.message);assertFalse(absent.exists())
-        } finally { FocusEnvironmentBinding.foreground = oldForeground;FocusEnvironmentBinding.localFile = oldFile }
+            val selected = java.io.File(root,"selected").apply { writeBytes(byteArrayOf(1,2,3)) }
+            FocusEnvironmentBinding.localFile = { lookups++;selected }
+            assertEquals(FocusEffectStatus.READY,AndroidFocusMusic(context).availability("selected"))
+            assertEquals(0,lookups) // capability read never resolves or opens the chosen file
+            openFocusAudioFile(selected).use { input ->
+                val replacement = java.io.File(root,"replacement").apply { writeBytes(byteArrayOf(9,8,7)) }
+                java.nio.file.Files.move(replacement.toPath(),selected.toPath(),StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING)
+                assertArrayEquals(byteArrayOf(1,2,3),input.readBytes())
+            }
+            val link = java.io.File(root,"link")
+            java.nio.file.Files.createSymbolicLink(link.toPath(),selected.toPath())
+            assertThrows(Exception::class.java) { openFocusAudioFile(link).use { } }
+            val empty = java.io.File(root,"empty").apply { writeBytes(byteArrayOf()) }
+            assertThrows(Exception::class.java) { openFocusAudioFile(empty).use { } }
+            assertEquals(0,lookups)
+        } finally { FocusEnvironmentBinding.foreground = oldForeground;FocusEnvironmentBinding.localFile = oldFile;root.deleteRecursively() }
     }
     @Test @Config(shadows = [HostFocusAudioOs::class])
     fun localAudioPinsOpenedBytesAndRejectsASymlinkWithoutStartingAPlayer() {

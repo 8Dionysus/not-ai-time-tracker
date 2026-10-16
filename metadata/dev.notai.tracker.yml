@@ -14,7 +14,7 @@ Builds:
   - versionName: 0.11.0
     versionCode: 12
     disable: Unreleased backend branch; integration, rights and device checks pending
-    commit: 0def529a610232f557530f7f74a2facf3507136f
+    commit: c949a8f202e143151e216a8932956a7a93b001bc
     ndk: 30.0.16248370
     rm:
       - docs/localization/tracker-localization-12-locales-editorial.zip

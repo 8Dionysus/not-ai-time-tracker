@@ -75,8 +75,21 @@ class CatalogContentPacks(private val catalogId: String,private val catalog: Rea
         return if(p == null) CatalogPackStatus(canonical,TranslationQuality.SOURCE_ONLY,PackAvailability.NOT_INSTALLED,false,0,null)
         else CatalogPackStatus(canonical,p.manifest.quality,PackAvailability.AVAILABLE_OFFLINE,p.manifest.complete,p.entries.size,p.manifest)
     }
-    private fun ready(m: CatalogContentManifest) = m.complete && m.quality == TranslationQuality.REVIEWED && m.rightsStatus == CatalogRightsStatus.CLEARED && !m.license.isNullOrBlank()
+    // Editorial readiness is distinct from the preserved rights metadata. The
+    // accepted current contract removes a general NOTICE-pending runtime veto;
+    // this never marks rights cleared or authorizes publication of the payload.
+    private fun ready(m: CatalogContentManifest) = m.complete && m.quality == TranslationQuality.REVIEWED
     fun installedReviewedLocales(): Set<String> = packs.filterValues { ready(it.manifest) }.keys.toSet()
+    /** One captured Dataset and display locale for the existing ChoiceView index.
+     * Foreign/custom identities remain literal; no translated strings enter Dataset. */
+    fun choiceLabels(data: Dataset,displayLocaleTag: String): ChoiceCatalogLabels {
+        val source = data.frozen()
+        val keys = source.types.mapNotNull { type ->
+            CatalogContentKey(CatalogContentKind.TYPE,type.id,type.meaningVersion).takeIf { it in originals }
+        }
+        return ChoiceCatalogLabels(token(source),source.controlBarrier,payloadHash(source.types),
+            localeTag(displayLocaleTag),getLocalizedCatalogEntries(catalogId,keys,displayLocaleTag,userOverrides(source)))
+    }
     /** Stable order/cardinality, one requested locale and one immutable installed-pack snapshot.
      * Overrides are literal presentation, including aliases/description; user names never enter a translator. */
     fun getLocalizedCatalogEntries(catalogId: String,stableIds: List<CatalogContentKey>,displayLocaleTag: String,

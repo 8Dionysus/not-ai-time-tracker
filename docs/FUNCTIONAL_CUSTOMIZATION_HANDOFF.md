@@ -89,7 +89,7 @@ contains the exact interface and RU/EN source drafts; editorial approval is pend
 
 ## Persistence and integration
 
-Current persistence is Room10/fullJSON12/read1–12, selective1–3. See
+Current persistence is Room11/fullJSON13/read1–13, selective1–3. See
 [the manual-time addition and migration9→10](START_BACKFILL_CONTRACT.md).
 The original functional extension introduced Room8/MIGRATION_7_8 over the prior chain. SQL entities and identity
 hash match Room7; only metadata defaults change. Sessions, IDs, active/uncertain
@@ -97,11 +97,11 @@ anchors and operational journals are preserved. Nondefault future settings/roots
 falsely labeled as v7 are rejected transactionally rather than normalized away.
 
 That functional extension introduced full portable format10/read1–10; current
-exports are format12/read1–12. The current archive carries preferences and
+exports are format13/read1–13. The current archive carries preferences and
 catalog-root source/provenance/capsules in one snapshot. Formats1–9 reject the new
 nondefault state. Old selective hashes and old archive semantics stay valid; full
 restore still requires preview/verified rollback and restores active time as RECOVERY.
-RestorePreview exposes immutable incoming settings and schedule for explicit review, including enabled reminder choices, without reparsing or granting edit authority. Current maintenance/recovery operational journals are format3, independent of Room10/full12. Reminder attempts use SQLite schema1 with a format2 authority marker; legacy attempt JSON is format1.
+RestorePreview exposes immutable incoming settings and schedule for explicit review, including enabled reminder choices, without reparsing or granting edit authority. Current maintenance/recovery operational journals are format3, independent of Room11/full13. Reminder attempts use SQLite schema1 with a format2 authority marker; legacy attempt JSON is format1.
 
 Opus must expose selection roots/dependency closure/conflicts and per-group results,
 persist the returned operation ID across uncertainty, and connect the settings to

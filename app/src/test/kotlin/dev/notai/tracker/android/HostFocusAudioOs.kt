@@ -3,6 +3,8 @@ package dev.notai.tracker.android
 import android.system.Os
 import android.system.OsConstants
 import android.system.StructStat
+import android.os.Build
+import dev.notai.tracker.DescriptorOpenFlags
 import java.io.FileDescriptor
 import java.nio.channels.FileChannel
 import java.nio.file.Files
@@ -25,7 +27,8 @@ class HostFocusAudioOs {
     companion object {
         private val channels = IdentityHashMap<FileDescriptor,FileChannel>()
         @JvmStatic @Implementation fun open(path: String,flags: Int,mode: Int): FileDescriptor {
-            assertEquals(OsConstants.O_RDONLY or OsConstants.O_CLOEXEC or OsConstants.O_NOFOLLOW or OsConstants.O_NONBLOCK,flags)
+            val cloexec = if(Build.VERSION.SDK_INT >= 27) OsConstants.O_CLOEXEC else DescriptorOpenFlags.closeOnExec()
+            assertEquals(OsConstants.O_RDONLY or cloexec or OsConstants.O_NOFOLLOW or OsConstants.O_NONBLOCK,flags)
             assertEquals(0,mode)
             val channel = FileChannel.open(Path.of(path),StandardOpenOption.READ,LinkOption.NOFOLLOW_LINKS)
             return try {

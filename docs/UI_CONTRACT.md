@@ -1,6 +1,6 @@
 # Контракт интеграции интерфейса
 
-Действующий контракт для Android-приложения 0.11.0 (основной интерфейс и техническая оболочка) и Kotlin-ядра. Room schema 10; JSON export 12 и read 1–12; selective formats 1–3. Новый backend-проход и точные точки интеграции: [BACKEND_PASS_2026_10](BACKEND_PASS_2026_10.md). CSV/inspection errors и warnings: [stable issue keys и typed arguments](IMPORT_ISSUES.md). Новые поверхности и локализация ещё не подключены к продуктовым экранам. Предыдущие схемы относятся к [истории реализации](history/ACCEPTANCE_GAPS_through_v15.md), а не к текущим инструкциям.
+Действующий контракт для Android-приложения 0.11.0 (основной интерфейс и техническая оболочка) и Kotlin-ядра. Room schema 11; JSON export 13 и read 1–13; selective formats 1–3. Новый backend-проход и точные точки интеграции: [BACKEND_PASS_2026_10](BACKEND_PASS_2026_10.md). CSV/inspection errors и warnings: [stable issue keys и typed arguments](IMPORT_ISSUES.md). Новые поверхности и локализация ещё не подключены к продуктовым экранам. Предыдущие схемы относятся к [истории реализации](history/ACCEPTANCE_GAPS_through_v15.md), а не к текущим инструкциям.
 
 ## Runtime, чтение и команды
 
@@ -69,7 +69,7 @@ Repeat создаёт новую сессию с параметрами посл
 
 ## Backup и файловый ввод
 
-`backups.export()` захватывает Dataset/Moment в короткой транзакции; сериализация и запись SAF происходят после неё. Корень JSON: `formatVersion=12`, `backupId`, `asOf`, `data`. Данные включают словари, карточки, Favorite, сессии, сегменты, измерения, настройки, Goals и Focus. В снимок также входят ScheduleSeries/Overrides/StartLinks/receipts и transfer provenance/journals. Reader принимает версии 1–12 и мигрирует 1–11 в текущую модель. Ненулевой `Segment.manualConfirmation` допустим только с формата12, включая retained transfer payloads; время подтверждения не может быть после `asOf`. Исследовательские исходники переносятся отдельно.
+`backups.export()` захватывает Dataset/Moment в короткой транзакции; сериализация и запись SAF происходят после неё. Корень JSON: `formatVersion=13`, `backupId`, `asOf`, `data`. Данные включают словари, карточки, Favorite, сессии, сегменты, измерения, настройки, Goals и Focus. В снимок также входят ScheduleSeries/Overrides/StartLinks/receipts и transfer provenance/journals. Reader принимает версии 1–13 и мигрирует 1–12 в текущую модель. Ненулевой `Segment.manualConfirmation` допустим только с формата12, включая retained transfer payloads; время подтверждения не может быть после `asOf`. В JSON13 переносится `settings.longRecordReminder`; nondefault значения в format≤12 отклоняются. `ordinaryReminderConfirmationRequired` в preview сообщает о необходимости отдельного device-local confirm после restore; operational activation/receipts не экспортируются. Исследовательские исходники переносятся отдельно.
 
 Ограниченный CSV-вход использует HistoryFiles.inspect: 10 MiB, строгий UTF-8 и BOM. Полный SAF restore использует потоковый Backups.prepare над private staged файлом без общего 10 MiB cap. Табличный текст требует явного сопоставления колонок, времени, зоны, единиц и классификации. [FILE_IMPORT](FILE_IMPORT.md) описывает полный путь.
 

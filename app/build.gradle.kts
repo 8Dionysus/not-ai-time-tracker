@@ -28,6 +28,7 @@ android {
             test.jvmArgs("--add-opens=java.base/jdk.internal.access=ALL-UNNAMED",
                 "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED")
             test.systemProperty("tracker.samples", rootProject.file("samples").absolutePath)
+            providers.gradleProperty("trackerCleanupLibrary").orNull?.let { test.systemProperty("tracker.cleanup.library",it) }
             test.systemProperty("tracker.artifacts", layout.buildDirectory.dir("test-artifacts").get().asFile.absolutePath)
             test.systemProperty("tracker.scale", providers.gradleProperty("trackerScale").getOrElse("false"))
             test.systemProperty("tracker.cold.profile", providers.gradleProperty("trackerColdProfile").getOrElse("false"))

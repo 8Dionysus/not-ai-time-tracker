@@ -41,6 +41,10 @@ class CatalogContentAdapter(context: Context,catalog: ReadyCatalog) {
     /** Headers/index do not prove payload integrity or review. Never eagerly read eleven payloads. */
     @Synchronized fun health() = CatalogContentHealth(packs.installedReviewedLocales(),refused.toSet(),bundled-attempted)
     fun status(locale: String): CatalogPackStatus { val tag = localeTag(locale);ensureLocale(tag);return packs.status(tag) }
+    fun choiceLabels(displayLocaleTag: String,data: Dataset): ChoiceCatalogLabels {
+        for(tag in localeFallbacks(displayLocaleTag)) { ensureLocale(tag);if(tag in packs.installedReviewedLocales()) break }
+        return packs.choiceLabels(data,displayLocaleTag)
+    }
     fun getLocalizedCatalogEntries(keys: List<CatalogContentKey>,displayLocaleTag: String,data: Dataset): List<CatalogDisplayEntry> {
         for(tag in localeFallbacks(displayLocaleTag)) { ensureLocale(tag);if(tag in packs.installedReviewedLocales()) break }
         return packs.getLocalizedCatalogEntries("tracker.catalog",keys,displayLocaleTag,packs.userOverrides(data))

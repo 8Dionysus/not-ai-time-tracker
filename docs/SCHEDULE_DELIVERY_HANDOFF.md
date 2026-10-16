@@ -1,9 +1,9 @@
 # Schedule delivery coordination: backend and caller contract
 
-Current follow-up: [saved controllers/lifetimes](BACKEND_WORKSPACES_HANDOFF.md), [catalog sidecars](CATALOG_CONTENT_PACKS.md), [21-family coverage](FUNCTIONAL_COVERAGE_2026_10_15.md). Current persistence is Room10/full JSON12/read1–12, selective1–3; maintenance/recovery operational format3. The baseline-specific text and evidence below remain historical unless superseded by these follow-ups.
+Current follow-up: [saved controllers/lifetimes](BACKEND_WORKSPACES_HANDOFF.md), [catalog sidecars](CATALOG_CONTENT_PACKS.md), [21-family coverage](FUNCTIONAL_COVERAGE_2026_10_15.md). Current persistence is Room11/full JSON13/read1–13, selective1–3; maintenance/recovery operational format3. The baseline-specific text and evidence below remain historical unless superseded by these follow-ups.
 15 October 2026. Initial delivery coordination used Room7/portable JSON9; the earlier
 [functional extension](FUNCTIONAL_CUSTOMIZATION_HANDOFF.md) introduced Room8/JSON10.
-The current [start-backfill contract](START_BACKFILL_CONTRACT.md) advances Room10/full12. Delivery state
+The current [start-backfill contract](START_BACKFILL_CONTRACT.md) introduced Room10/full12; current Room11/full13 also carries the optional ordinary check-in preference. Delivery state
 is separate operational state, not a fact/completion mark. The current
 [indexed journal](INDEXED_SCHEDULE_RECEIPTS.md) uses SQLite schema1 and a format2
 authority marker, with crash-safe import of the old format1 JSON. The v6 ceiling

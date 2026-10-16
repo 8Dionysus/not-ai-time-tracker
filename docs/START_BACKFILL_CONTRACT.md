@@ -40,10 +40,12 @@ it does not certify device observation, including for old manual/CSV facts.
 
 ## Persistence and portability
 
-- Room **10**, migration **9 → 10** adds nullable `segments.manualConfirmation` TEXT.
+- Current Room **11** retains migration **9 → 10**, which adds nullable `segments.manualConfirmation` TEXT.
   Existing facts, active/recovery anchors and metadata are preserved. The historical
   4 → 5 migration continues to use its original twelve columns before 9 → 10 runs.
-- Full archive **12**, readers **1–12**. Versions ≤11 cannot contain nonnull manual
+  The subsequent **10 → 11** migration adds only the default ordinary check-in preference
+  to metadata; existing manual provenance and anchors remain unchanged.
+- Current full archive **13**, readers **1–13**. Manual confirmation was introduced in **12**. Versions ≤11 cannot contain nonnull manual
   confirmation, including retained selective operation/origin payloads. Confirmation
   timestamps after archive `asOf` are rejected. Preview, verified rollback and explicit
   replacement remain the existing Backups flow.

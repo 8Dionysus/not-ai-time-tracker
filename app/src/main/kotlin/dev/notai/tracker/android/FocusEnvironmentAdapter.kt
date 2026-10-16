@@ -29,11 +29,9 @@ private val focusEnvironmentGates = mutableMapOf<String,Any>()
 /** Caller owns this stream until release. Open without waiting on a substituted FIFO, then
  * validate the opened inode rather than an earlier pathname observation. */
 internal fun openFocusAudioFile(file: File): FileInputStream {
-    // Public O_CLOEXEC is API27+. Do not weaken the descriptor contract or guess
-    // a native flag value on API26; this optional port fails closed there.
-    if(Build.VERSION.SDK_INT < 27) error("Secure local audio requires API27")
+    val closeOnExec = if(Build.VERSION.SDK_INT >= 27) OsConstants.O_CLOEXEC else DescriptorOpenFlags.closeOnExec()
     val input = FileInputStream(Os.open(file.absolutePath,
-        OsConstants.O_RDONLY or OsConstants.O_CLOEXEC or OsConstants.O_NOFOLLOW or OsConstants.O_NONBLOCK,0))
+        OsConstants.O_RDONLY or closeOnExec or OsConstants.O_NOFOLLOW or OsConstants.O_NONBLOCK,0))
     return try {
         val stat = Os.fstat(input.fd)
         check(OsConstants.S_ISREG(stat.st_mode) && stat.st_size > 0) { "Local audio must be a nonempty regular file" }
@@ -148,7 +146,9 @@ class AndroidFocusMusic(context: Context): FocusMusicPort {
     private var state = FocusEffectStatus.OFF
     private val attributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()
     @Synchronized override fun availability(localId: String?): FocusEffectStatus {
-        if(Build.VERSION.SDK_INT < 27) return FocusEffectStatus.UNSUPPORTED
+        if(Build.VERSION.SDK_INT < 27) try { DescriptorOpenFlags.closeOnExec() }
+        catch(_: LinkageError) { return FocusEffectStatus.UNSUPPORTED }
+        catch(_: SecurityException) { return FocusEffectStatus.UNSUPPORTED }
         if(!FocusEnvironmentBinding.foreground) return FocusEffectStatus.FOREGROUND_REQUIRED
         if(localId == null || FocusEnvironmentBinding.localFile == null) return FocusEffectStatus.SOURCE_REQUIRED
         if(manager.isMusicActive && player?.isPlaying != true) return FocusEffectStatus.OTHER_AUDIO_ACTIVE

@@ -1,5 +1,7 @@
 # Полный статический проход C
 
+Исторический source-review C на 16 октября 2026; исходная авторская среда. Текущая A-интеграция Room11/JSON13 и фактические исполнения описаны в [ATTENTION_VERIFICATION_2026_10_16](ATTENTION_VERIFICATION_2026_10_16.md). Старые projected Room10/JSON12 ниже были предложением C до сверки с main A, а не действующим контрактом.
+
 Срез: 16 октября 2026. Проверены все шесть новых production-модулей и обе owner-applied дельты. Это source review и структурные проверки, **не компиляция, исполнение Kotlin, Robolectric или проверка устройства**. JDK21 есть, Kotlin/Gradle/Android SDK отсутствуют; установка не предпринималась.
 
 Поставка v2 с commit `f6fcadff696198d1bb4d34d0207340da1c0ac850` получена root: SHA-256 `be48712c551cdb7f6e4a469deae9581d60efeba3a4df7bfabd50bbe18802a48e`, CRC совпали. Ранее указанный C tunnel403 не является оставшимся препятствием доставки **v2**. Последующая audit-поставка меняет исходники и имеет собственный hash/version.
@@ -41,7 +43,7 @@
 | Permission/channel/current DND/audio focus | Читается из ОС. Не подменяется portable preference или acknowledged device activation. |
 | FocusEnvironmentChoice | Явный выбор эффектов для **этого активного интервала**, а не введённая здесь глобальная пользовательская настройка. IDs локальных файлов и активные эффекты не переносимы. |
 
-## Полная shared-дельта для последовательного применения A
+## Историческая projected shared-дельта C до последовательного применения A
 
 `integration/attention-runtime.patch` по-прежнему затрагивает только `AndroidRuntime.kt` и manifest: lazy binding, существующий observer/refresh, close до retirement, три receivers и ACCESS_NOTIFICATION_POLICY declaration. Patch не является grant. Новые services/INTERNET permission не добавлены.
 

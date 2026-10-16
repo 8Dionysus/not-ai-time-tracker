@@ -17,10 +17,15 @@ class LocaleContractTest {
         assertEquals(2385,status.entries);assertTrue(status.complete)
         assertEquals(quality,status.quality)
         assertEquals(CatalogRightsStatus.SOURCE_RIGHTS_REVIEW_PENDING,status.manifest!!.rightsStatus)
-        assertNull(status.manifest!!.license);assertTrue(packs.installedReviewedLocales().isEmpty())
+        assertNull(status.manifest!!.license);assertEquals(if(quality==TranslationQuality.REVIEWED) setOf(locale) else emptySet(),packs.installedReviewedLocales())
         val shown = packs.getLocalizedCatalogEntries("tracker.catalog",originals.map { it.key },requested)
-        assertEquals(originals.map { it.text },shown.map { it.display })
-        assertTrue(shown.all { it.missing && it.resolvedLocaleTag == "ru" && it.provenance == status.manifest })
+        if(quality==TranslationQuality.REVIEWED) {
+            assertTrue(shown.all { !it.missing && it.resolvedLocaleTag==locale && it.provenance==status.manifest })
+            assertTrue(shown.any { it.display!=it.original })
+        } else {
+            assertEquals(originals.map { it.text },shown.map { it.display })
+            assertTrue(shown.all { it.missing && it.resolvedLocaleTag=="ru" && it.provenance==status.manifest })
+        }
         val custom = catalog.vocabulary.types.first().copy(name = "Personal original",aliases = listOf("Personal alias"),definition = "Personal definition")
         val data = Dataset(types = listOf(custom))
         val overridden = packs.getLocalizedCatalogEntries("tracker.catalog",listOf(originals.first().key),locale,packs.userOverrides(data)).single()
@@ -81,9 +86,9 @@ class LocaleContractTest {
         assertTrue(packs.getLocalizedCatalogEntries("fixture",original.map { it.key },"es-MX").all { it.missing && it.quality == TranslationQuality.DRAFT && it.availability == PackAvailability.AVAILABLE_OFFLINE })
         assertFailsWith<CoreError> { install(translated.dropLast(1),TranslationQuality.REVIEWED) }
         install(translated,TranslationQuality.REVIEWED,rights = CatalogRightsStatus.SOURCE_RIGHTS_REVIEW_PENDING,license = null)
-        assertTrue(packs.installedReviewedLocales().isEmpty())
+        assertEquals(setOf("es"),packs.installedReviewedLocales())
         val rightsPending = packs.getLocalizedCatalogEntries("fixture",values.map { it.key },"es")
-        assertTrue(rightsPending.all { it.missing && it.provenance!!.license == null && it.quality == TranslationQuality.REVIEWED && it.availability == PackAvailability.AVAILABLE_OFFLINE })
+        assertTrue(rightsPending.all { !it.missing && it.provenance!!.license == null && it.quality == TranslationQuality.REVIEWED && it.availability == PackAvailability.AVAILABLE_OFFLINE })
         install(translated,TranslationQuality.REVIEWED)
         val completeBeforeRefusal = packs.getLocalizedCatalogEntries("fixture",original.map { it.key },"es")
         assertFailsWith<CoreError> { install(translated.map { row -> if(row.key.kind == CatalogContentKind.TYPE) row.copy(text = row.text.copy(aliases = row.text.aliases.take(1))) else row },TranslationQuality.REVIEWED) }

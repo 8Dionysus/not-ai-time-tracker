@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.android.AttentionPlatformTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-16T02:13:24.194Z" hostname="69b2b5b46001" time="10.5">
+  <properties/>
+  <testcase name="dndAdapterChangesOnlyItsUnmodifiedRuleAndPreservesUserEdits" classname="dev.notai.tracker.android.AttentionPlatformTest" time="7.195"/>
+  <testcase name="ordinaryAlarmAndReceiptPersistWithoutTouchingTheDomain" classname="dev.notai.tracker.android.AttentionPlatformTest" time="0.27"/>
+  <testcase name="localAudioPinsOpenedBytesAndRejectsASymlinkWithoutStartingAPlayer" classname="dev.notai.tracker.android.AttentionPlatformTest" time="0.043"/>
+  <testcase name="unsupportedDndHasNoGlobalFallbackAndMusicHasNoDefaultSource" classname="dev.notai.tracker.android.AttentionPlatformTest" time="1.766"/>
+  <testcase name="api26AudioRefusesBeforeResolvingOrOpeningAnySource" classname="dev.notai.tracker.android.AttentionPlatformTest" time="1.201"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

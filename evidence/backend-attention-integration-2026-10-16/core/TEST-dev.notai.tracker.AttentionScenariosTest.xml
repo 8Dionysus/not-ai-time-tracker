@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.AttentionScenariosTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-16T02:10:45.156Z" hostname="69b2b5b46001" time="0.102">
+  <properties/>
+  <testcase name="unattemptedTimebaseLossDoesNotPermanentlyBlockAValidTimer" classname="dev.notai.tracker.AttentionScenariosTest" time="0.007"/>
+  <testcase name="observationsAreDerivedRetractableAndUnaffectedByFragmentCount" classname="dev.notai.tracker.AttentionScenariosTest" time="0.031"/>
+  <testcase name="confirmedPrefixAndUndoReplanOnlyUnattemptedCheckins" classname="dev.notai.tracker.AttentionScenariosTest" time="0.01"/>
+  <testcase name="focusEffectsAreExplicitAndLeaseRestorationDoesNotAdvanceTheTimer" classname="dev.notai.tracker.AttentionScenariosTest" time="0.007"/>
+  <testcase name="ordinaryCheckinNeverInventsTimeAndReviewUsesExistingCorrection" classname="dev.notai.tracker.AttentionScenariosTest" time="0.009"/>
+  <testcase name="portableReminderPreferencesRoundTripButRequireDeviceConfirmation" classname="dev.notai.tracker.AttentionScenariosTest" time="0.036"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

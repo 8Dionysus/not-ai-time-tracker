@@ -1,172 +1,22 @@
---- a/core/src/main/kotlin/dev/notai/tracker/Model.kt
-+++ b/core/src/main/kotlin/dev/notai/tracker/Model.kt
-@@ -53,7 +53,8 @@
-     val shortcut: Boolean = true) // Preserve the previously always-enabled launcher timer on legacy decode.
- @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
- @Serializable data class Settings(val reportZone: String = "UTC",val surfaces: SurfaceSettings = SurfaceSettings(),val focusPlan: FocusPlan = FocusPlan(),
--    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val schedule: ScheduleSettings = ScheduleSettings())
-+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val schedule: ScheduleSettings = ScheduleSettings(),
-+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val longRecordReminder: LongRecordPreference = LongRecordPreference())
- @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
- @Serializable data class Dataset(@Required val datasetId: String = newId(), @Required val revision: Long = 0,
-     @Required val types: List<ActivityType> = Catalog.types,
-@@ -121,6 +122,7 @@
-     ensure(data.datasetId.isNotBlank() && data.revision >= 0 && data.timerEpoch >= 0, "Invalid dataset metadata")
-     try { ZoneId.of(data.settings.reportZone) } catch (_: Exception) { fail(ErrorCode.INVALID_INPUT, "Invalid report zone") }
-     validateScheduleSettings(data.settings.schedule)
-+    validateLongRecordPreference(data.settings.longRecordReminder)
-     ids(data.types.map { it.id }); ids(data.cards.map { it.id }); ids(data.favorites.map { it.id }); ids(data.sessions.map { it.id })
-     ids(data.segments.map { it.id }); ids(data.measurements.map { it.id })
-     val typeIds = data.types.map { it.id }.toSet()
---- a/core/src/main/kotlin/dev/notai/tracker/Backup.kt
-+++ b/core/src/main/kotlin/dev/notai/tracker/Backup.kt
-@@ -6,7 +6,7 @@
- import java.io.OutputStream
- import java.io.ByteArrayOutputStream
-
--@Serializable data class Backup(@Required val formatVersion: Int = 11,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
-+@Serializable data class Backup(@Required val formatVersion: Int = 12,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
- /** Bounded whole-String convenience API only; streaming full backups have no total-file cap. */
- const val MAX_BACKUP_BYTES = 10*1024*1024
-
-@@ -36,6 +36,8 @@
-     }
-     @Synchronized override fun close() { if(!closed) { lease?.close();closed = true } }
-     val settings get() = backup.data.settings
-+    /** Portable intent is restored; delivery stays blocked until separate device confirmation. */
-+    val ordinaryReminderConfirmationRequired get() = settings.longRecordReminder.enabled
-     /** Inspect incoming reminder choices without a second parse or authority to edit the restore. */
-     val schedule: ScheduleData = backup.data.schedule.frozen()
-     val datasetId get() = backup.data.datasetId
-@@ -111,7 +113,7 @@
-         fun decode(json: String): Backup {
-             ensure(json.toByteArray(Charsets.UTF_8).size <= MAX_BACKUP_BYTES,"Backup exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
-             val b = try { decodeBackupVersion(json) } catch (_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed or unsupported JSON") }
--            ensure(b.formatVersion == 11,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
-+            ensure(b.formatVersion == 12,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
-             ensure(b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
-             try {
-                 validate(b.data)
---- a/core/src/main/kotlin/dev/notai/tracker/Migration.kt
-+++ b/core/src/main/kotlin/dev/notai/tracker/Migration.kt
-@@ -34,9 +34,9 @@
- internal fun decodeBackupVersion(json: String): Backup {
-     val root = codec.parseToJsonElement(json).jsonObject
-     val version = root["formatVersion"]?.jsonPrimitive?.intOrNull
--    ensure(version in 8..11 || listOf("schedule","transfer").none { it in root.getValue("data").jsonObject },"Schedule in legacy archive")
-+    ensure(version in 8..12 || listOf("schedule","transfer").none { it in root.getValue("data").jsonObject },"Schedule in legacy archive")
-     val backup = when(version) {
--        8,9,10,11 -> {
-+        8,9,10,11,12 -> {
-             ensure(listOf("goals","focus","schedule","transfer").all { it in root.getValue("data").jsonObject },"Missing v8 backup fields")
-             codec.decodeFromJsonElement<Backup>(root).also { ensure(version != 8 || !it.data.transfer.hasCompactionState(),"Compaction in v8 archive") }
-         }
-@@ -54,12 +54,13 @@
-         2 -> codec.decodeFromJsonElement<Backup>(root)
-         1 -> {
-             val migrated = migrateV1(root).jsonObject.toMutableMap()
--            migrated["formatVersion"] = JsonPrimitive(11)
-+            migrated["formatVersion"] = JsonPrimitive(12)
-             codec.decodeFromJsonElement<Backup>(JsonObject(migrated))
-         }
-         else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unsupported backup version")
-     }
--    ensure(version in 10..11 || (backup.data.settings.schedule == ScheduleSettings() && !backup.data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive")
--    ensure(version == 11 || backup.data.settings.surfaces.shortcut,"Shortcut preference in legacy archive")
--    return backup.copy(formatVersion = 11)
-+    ensure(version in 10..12 || (backup.data.settings.schedule == ScheduleSettings() && !backup.data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive")
-+    ensure(version in 11..12 || backup.data.settings.surfaces.shortcut,"Shortcut preference in legacy archive")
-+    ensure(version == 12 || backup.data.settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in legacy archive")
-+    return backup.copy(formatVersion = 12)
- }
---- a/core/src/main/kotlin/dev/notai/tracker/StreamingBackup.kt
-+++ b/core/src/main/kotlin/dev/notai/tracker/StreamingBackup.kt
-@@ -12,7 +12,7 @@
-
- internal const val MAX_BACKUP_RECORD_CHARS = 16*1024*1024
-
--/** Portable JSON 10 without a whole-file String/ByteArray/JSON tree. Only one record is decoded
-+/** Portable JSON 12 without a whole-file String/ByteArray/JSON tree. Only one record is decoded
-  * at a time; the resulting domain graph has the same size as a loaded store. Total file size
-  * is not capped by CSV's text limit. Re-openable inputs permit a bounded metadata first pass.
-  */
-@@ -67,7 +67,7 @@
-                 else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unknown backup field: $key")
-             } };json.finish()
-         }
--        ensure(version in 1..11 && !id.isNullOrBlank() && asOf != null && hasData,"Unsupported backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
-+        ensure(version in 1..12 && !id.isNullOrBlank() && asOf != null && hasData,"Unsupported backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
-         val format = version!!
-         val types = mutableListOf<ActivityType>();val axes = mutableListOf<Axis>();val metrics = mutableListOf<Metric>();val units = mutableListOf<UnitDefinition>()
-         val cards = mutableListOf<Card>();val favorites = mutableListOf<Favorite>();val sessions = mutableListOf<Session>();val segments = mutableListOf<Segment>()
-@@ -123,7 +123,8 @@
-         ensure(format >= 9 || !data.transfer.hasCompactionState(),"Compaction in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
-         ensure(format >= 10 || (data.settings.schedule == ScheduleSettings() && !data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
-         ensure(format >= 11 || data.settings.surfaces.shortcut,"Shortcut preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
--        Backup(formatVersion = 11,backupId = id!!,asOf = asOf!!,data = data.frozen()).also {
-+        ensure(format >= 12 || data.settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
-+        Backup(formatVersion = 12,backupId = id!!,asOf = asOf!!,data = data.frozen()).also {
-             validateBackup(it);onVerifiedSource(sourceHash.joinToString("") { byte -> (byte.toInt() and 255).toString(16).padStart(2,'0') })
-         }
-     } catch(e: CoreError) { if(e.code == ErrorCode.UNSUPPORTED_IMPORT) throw e else fail(ErrorCode.UNSUPPORTED_IMPORT,"Invalid backup: ${e.message}") }
-@@ -131,7 +132,7 @@
-     private fun reader(input: InputStream): Reader = InputStreamReader(input,Charsets.UTF_8.newDecoder()
-         .onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT)).buffered(64*1024)
-     internal fun validateBackup(b: Backup) {
--        ensure(b.formatVersion == 11 && b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
-+        ensure(b.formatVersion == 12 && b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
-         validate(b.data)
-         ensure(b.data.focus?.breakAnchor == null && b.data.segments.all { it.anchor == null },"Backup contains device anchors",ErrorCode.UNSUPPORTED_IMPORT)
-         ensure(b.data.segments.all { (it.start <= b.asOf || it.uncertain) && (it.end == null || it.end <= b.asOf || it.uncertain) &&
---- a/app/src/main/kotlin/dev/notai/tracker/android/TrackerDatabase.kt
-+++ b/app/src/main/kotlin/dev/notai/tracker/android/TrackerDatabase.kt
-@@ -64,7 +64,7 @@
-     @Query("DELETE FROM measurements WHERE id IN (:ids)") fun deleteMeasurements(ids: List<String>)
-     @Query("SELECT * FROM measurements WHERE id IN (:ids)") fun readMeasurements(ids: List<String>): List<MeasurementRow>
- }
--const val TRACKER_DATABASE_VERSION = 9
-+const val TRACKER_DATABASE_VERSION = 10
- @Database(entities = [TypeRow::class,MetaRow::class,CardRow::class,SessionRow::class,SegmentRow::class,FavoriteRow::class,MeasurementRow::class,GenerationRow::class,VocabularyRow::class,ClassificationRow::class],version = TRACKER_DATABASE_VERSION,exportSchema = true)
- abstract class TrackerDatabase: RoomDatabase() {
-     abstract fun dao(): TrackerDao
-@@ -168,6 +168,20 @@
-             }
-         }
-
-+        val MIGRATION_9_10 = object: androidx.room.migration.Migration(9,10) {
-+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
-+                readMetadataPayload(db)?.let { payload ->
-+                    val old = codec.parseToJsonElement(payload).jsonObject
-+                    val settings = codec.decodeFromJsonElement<Settings>(old["settings"] ?: fail(ErrorCode.STORAGE,"Missing legacy settings"))
-+                    ensure(settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in v9 metadata",ErrorCode.STORAGE)
-+                    // Only the portable preference default is new. No operational activation,
-+                    // receipt, live anchor, permission or DND lease enters domain metadata.
-+                    val next = JsonObject(old + ("settings" to codec.encodeToJsonElement(settings)))
-+                    db.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(next.toString()))
-+                }
-+            }
-+        }
-+
-         fun open(context: Context,name: String = "tracker.db"): TrackerDatabase {
-             val file = context.getDatabasePath(name)
-             val existing = DatabaseFiles.paths(context,name).filter { it.exists() }
-@@ -190,7 +204,7 @@
-                 ensure(validHeader,"Database header is damaged; originals preserved. Use explicit recovery",ErrorCode.STORAGE)
-             }
-             return Room.databaseBuilder(context,TrackerDatabase::class.java,name)
--            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5,MIGRATION_5_6,MIGRATION_6_7,MIGRATION_7_8,MIGRATION_8_9).openHelperFactory { configuration ->
-+            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5,MIGRATION_5_6,MIGRATION_6_7,MIGRATION_7_8,MIGRATION_8_9,MIGRATION_9_10).openHelperFactory { configuration ->
-                 val original = configuration.callback
-                 val guarded = object: androidx.sqlite.db.SupportSQLiteOpenHelper.Callback(original.version) {
-                     override fun onConfigure(db: androidx.sqlite.db.SupportSQLiteDatabase) = original.onConfigure(db)
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+index 3f7a3e9..195c72d 100644
+--- a/app/build.gradle.kts
++++ b/app/build.gradle.kts
+@@ -28 +28,2 @@ android {
+-            test.jvmArgs("--add-opens=java.base/jdk.internal.access=ALL-UNNAMED")
++            test.jvmArgs("--add-opens=java.base/jdk.internal.access=ALL-UNNAMED",
++                "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED")
+diff --git a/app/schemas/dev.notai.tracker.android.TrackerDatabase/11.json b/app/schemas/dev.notai.tracker.android.TrackerDatabase/11.json
+new file mode 100644
+index 0000000..afe9c32
 --- /dev/null
-+++ b/app/schemas/dev.notai.tracker.android.TrackerDatabase/10.json
-@@ -0,0 +1,451 @@
++++ b/app/schemas/dev.notai.tracker.android.TrackerDatabase/11.json
+@@ -0,0 +1,456 @@
 +{
 +  "formatVersion": 1,
 +  "database": {
-+    "version": 10,
-+    "identityHash": "cddb95fee7f57b976ad9aa187b0a208f",
++    "version": 11,
++    "identityHash": "5268745856d31c564a39b0181096e64f",
 +    "entities": [
 +      {
 +        "tableName": "activity_types",
@@ -334,7 +184,7 @@
 +      },
 +      {
 +        "tableName": "segments",
-+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `position` INTEGER NOT NULL, `sessionId` TEXT NOT NULL, `openSlot` INTEGER, `start` INTEGER NOT NULL, `end` INTEGER, `durationMs` INTEGER NOT NULL, `selectionId` TEXT NOT NULL, `anchor` TEXT, `uncertain` INTEGER NOT NULL, `observedUntil` INTEGER, `limitMs` INTEGER, PRIMARY KEY(`id`), FOREIGN KEY(`sessionId`) REFERENCES `sessions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`selectionId`) REFERENCES `history_classifications`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
++        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `position` INTEGER NOT NULL, `sessionId` TEXT NOT NULL, `openSlot` INTEGER, `start` INTEGER NOT NULL, `end` INTEGER, `durationMs` INTEGER NOT NULL, `selectionId` TEXT NOT NULL, `anchor` TEXT, `uncertain` INTEGER NOT NULL, `observedUntil` INTEGER, `limitMs` INTEGER, `manualConfirmation` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`sessionId`) REFERENCES `sessions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`selectionId`) REFERENCES `history_classifications`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
 +        "fields": [
 +          {
 +            "fieldPath": "id",
@@ -402,6 +252,11 @@
 +            "fieldPath": "limitMs",
 +            "columnName": "limitMs",
 +            "affinity": "INTEGER"
++          },
++          {
++            "fieldPath": "manualConfirmation",
++            "columnName": "manualConfirmation",
++            "affinity": "TEXT"
 +          }
 +        ],
 +        "primaryKey": {
@@ -609,74 +464,421 @@
 +    ],
 +    "setupQueries": [
 +      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cddb95fee7f57b976ad9aa187b0a208f')"
++      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5268745856d31c564a39b0181096e64f')"
 +    ]
 +  }
 +}
---- a/core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt
-+++ b/core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt
-@@ -320,11 +320,11 @@
-         assertEquals(pack.groups,importer.export(TransferSelection(sessionIds = t.data().sessions.map { it.id }.toSet())).groups)
-         val again = importer.plan(pack,pack.groups.map { it.id }.toSet());assertTrue(again.conflicts.isEmpty())
-         assertEquals(TransferGroupState.UNCHANGED,importer.apply(again,"after-prune-dedupe").groups.single().state)
--        val json = Backups(t,MemoryRollback()).export();assertEquals(11,codec.parseToJsonElement(json).jsonObject.getValue("formatVersion").jsonPrimitive.int)
-+        val json = Backups(t,MemoryRollback()).export();assertEquals(12,codec.parseToJsonElement(json).jsonObject.getValue("formatVersion").jsonPrimitive.int)
-         assertEquals(t.data().transfer,Backups.decode(json).data.transfer)
-         val bytes = java.io.ByteArrayOutputStream();Backups(t,MemoryRollback()).write(bytes)
-         assertEquals(t.data().transfer,StreamingBackup.read { bytes.toByteArray().inputStream() }.data.transfer)
--        for(text in listOf(json.replace("\"formatVersion\": 11","\"formatVersion\": 8"),bytes.toString("UTF-8").replace("\"formatVersion\":11","\"formatVersion\":8"))) {
-+        for(text in listOf(json.replace("\"formatVersion\": 12","\"formatVersion\": 8"),bytes.toString("UTF-8").replace("\"formatVersion\":12","\"formatVersion\":8"))) {
-             expect(ErrorCode.UNSUPPORTED_IMPORT) { Backups.decode(text) };expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { text.byteInputStream() } }
-         }
-         val destination = Tracker(createStore(),clock);val backups = Backups(destination,MemoryRollback());backups.apply(backups.prepare(json))
-@@ -537,7 +537,7 @@
-         val result = t.scheduleCommand(start);assertEquals(result,t.scheduleCommand(start));assertEquals(1,t.data().sessions.size)
-         t = Tracker(reopen(t.store),clock);assertEquals(result,t.scheduleCommand(start));assertEquals(result.sessionId,t.data().schedule.links.single().sessionId)
-         clock.advance(1000);t.stop(t.snapshot().token)
--        val backups = Backups(t,MemoryRollback());val backup = backups.export();assertEquals(11,Backups.decode(backup).formatVersion)
-+        val backups = Backups(t,MemoryRollback());val backup = backups.export();assertEquals(12,Backups.decode(backup).formatVersion)
-         val clean = Tracker(createStore(),clock);val restore = Backups(clean,MemoryRollback());val preview = restore.prepare(backup)
-         assertEquals(1,preview.scheduleSeries);assertEquals(1,preview.scheduleLinks);restore.apply(preview)
-         assertEquals(t.data().schedule,clean.data().schedule);assertEquals(t.data().sessions,clean.data().sessions)
-@@ -1914,7 +1914,7 @@
-         assertTrue(Backups.decode(disk.read(result.rollbackReference)).data.sessions.isEmpty())
-         val full = clean.data()
-         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.dropLast(7)) }; assertEquals(full,clean.data())
--        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 11","\"formatVersion\": 1099")) }; assertEquals(full,clean.data())
-+        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 12","\"formatVersion\": 1099")) }; assertEquals(full,clean.data())
-         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"datasetId\": \"${raw.data.datasetId}\",", "")) }; assertEquals(full,clean.data())
-         val broken = raw.copy(data = raw.data.copy(segments = raw.data.segments+raw.data.segments.first()))
-         expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(codec.encodeToString(broken)) }; assertEquals(full,clean.data())
-@@ -1981,7 +1981,7 @@
-         val text = bytes.toString(Charsets.UTF_8)
-         val malformed = text.substringBefore("Streamed note").toByteArray() + byteArrayOf(0xC3.toByte(),0x28) + text.substringAfter("Streamed note").toByteArray()
-         for(bad in listOf(bytes.copyOf(bytes.size-2),malformed,
--            text.replaceFirst("\"formatVersion\":11","\"formatVersion\":10,\"formatVersion\":11").toByteArray(),bytes+byteArrayOf(1))) {
-+            text.replaceFirst("\"formatVersion\":12","\"formatVersion\":10,\"formatVersion\":12").toByteArray(),bytes+byteArrayOf(1))) {
-             expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { bad.inputStream() } }
-         }
-         expect(ErrorCode.UNSUPPORTED_IMPORT) { StreamingBackup.read { (byteArrayOf(0xFF.toByte())+bytes).inputStream() } }
---- a/core/src/test/kotlin/dev/notai/tracker/FunctionalCustomizationTest.kt
-+++ b/core/src/test/kotlin/dev/notai/tracker/FunctionalCustomizationTest.kt
-@@ -76,8 +76,8 @@
-     @Test fun legacyArchiveCannotSmuggleNewSettingsOrCatalogRootReceipts() {
-         val clock = FakeClock();val plain = Backups.encode(Dataset(),clock.now())
-         fun asV9(text: String): String = JsonObject(codec.parseToJsonElement(text).jsonObject+("formatVersion" to JsonPrimitive(9))).toString()
--        assertEquals(11,Backups.decode(asV9(plain)).formatVersion)
--        assertEquals(11,StreamingBackup.read { asV9(plain).byteInputStream() }.formatVersion)
-+        assertEquals(12,Backups.decode(asV9(plain)).formatVersion)
-+        assertEquals(12,StreamingBackup.read { asV9(plain).byteInputStream() }.formatVersion)
-         val settings = Settings(schedule = ScheduleSettings(ScheduleDayPolicy(boundary = "04:00"),true))
-         val card = Card("owned-card","Заратустра");val content = TransferContent(cards = listOf(card),catalogRoots = TransferCatalogRoots(setOf(card.id)))
-         val hash = SelectiveTransfer.contentHash(content)
+\ No newline at end of file
+diff --git a/app/src/main/kotlin/dev/notai/tracker/android/AttentionRuntime.kt b/app/src/main/kotlin/dev/notai/tracker/android/AttentionRuntime.kt
+index 294fc60..c4f5007 100644
+--- a/app/src/main/kotlin/dev/notai/tracker/android/AttentionRuntime.kt
++++ b/app/src/main/kotlin/dev/notai/tracker/android/AttentionRuntime.kt
+@@ -60,2 +60,4 @@ class AttentionRuntime(context: Context,tracker: Tracker) {
+-            addAction(NotificationManager.ACTION_APP_BLOCK_STATE_CHANGED)
+-            addAction(NotificationManager.ACTION_NOTIFICATION_CHANNEL_BLOCK_STATE_CHANGED)
++            if(Build.VERSION.SDK_INT >= 28) {
++                addAction(NotificationManager.ACTION_APP_BLOCK_STATE_CHANGED)
++                addAction(NotificationManager.ACTION_NOTIFICATION_CHANNEL_BLOCK_STATE_CHANGED)
++            }
+diff --git a/app/src/main/kotlin/dev/notai/tracker/android/FocusEnvironmentAdapter.kt b/app/src/main/kotlin/dev/notai/tracker/android/FocusEnvironmentAdapter.kt
+index e0d3009..b4f8aa9 100644
+--- a/app/src/main/kotlin/dev/notai/tracker/android/FocusEnvironmentAdapter.kt
++++ b/app/src/main/kotlin/dev/notai/tracker/android/FocusEnvironmentAdapter.kt
+@@ -31,0 +32,3 @@ internal fun openFocusAudioFile(file: File): FileInputStream {
++    // Public O_CLOEXEC is API27+. Do not weaken the descriptor contract or guess
++    // a native flag value on API26; this optional port fails closed there.
++    if(Build.VERSION.SDK_INT < 27) error("Secure local audio requires API27")
+@@ -147,0 +151 @@ class AndroidFocusMusic(context: Context): FocusMusicPort {
++        if(Build.VERSION.SDK_INT < 27) return FocusEffectStatus.UNSUPPORTED
+diff --git a/app/src/main/kotlin/dev/notai/tracker/android/TrackerDatabase.kt b/app/src/main/kotlin/dev/notai/tracker/android/TrackerDatabase.kt
+index b0e0c2c..d1e1b21 100644
+--- a/app/src/main/kotlin/dev/notai/tracker/android/TrackerDatabase.kt
++++ b/app/src/main/kotlin/dev/notai/tracker/android/TrackerDatabase.kt
+@@ -67 +67 @@ data class SegmentRow(@PrimaryKey val id: String,val position: Int,val sessionId
+-const val TRACKER_DATABASE_VERSION = 10
++const val TRACKER_DATABASE_VERSION = 11
+@@ -181,0 +182,14 @@ abstract class TrackerDatabase: RoomDatabase() {
++        val MIGRATION_10_11 = object: androidx.room.migration.Migration(10,11) {
++            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
++                readMetadataPayload(db)?.let { payload ->
++                    val old = codec.parseToJsonElement(payload).jsonObject
++                    val settings = codec.decodeFromJsonElement<Settings>(old["settings"] ?: fail(ErrorCode.STORAGE,"Missing legacy settings"))
++                    ensure(settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in v10 metadata",ErrorCode.STORAGE)
++                    // Preserve schema10 manual confirmation, anchors and every history row.
++                    // Only the portable preference default is new; local activation is absent.
++                    val next = JsonObject(old + ("settings" to codec.encodeToJsonElement(settings)))
++                    db.execSQL("UPDATE metadata SET payload=? WHERE id=1",arrayOf(next.toString()))
++                }
++            }
++        }
++
+@@ -204 +218 @@ abstract class TrackerDatabase: RoomDatabase() {
+-            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5,MIGRATION_5_6,MIGRATION_6_7,MIGRATION_7_8,MIGRATION_8_9,MIGRATION_9_10).openHelperFactory { configuration ->
++            .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5,MIGRATION_5_6,MIGRATION_6_7,MIGRATION_7_8,MIGRATION_8_9,MIGRATION_9_10,MIGRATION_10_11).openHelperFactory { configuration ->
+diff --git a/app/src/test/kotlin/dev/notai/tracker/android/AttentionPlatformTest.kt b/app/src/test/kotlin/dev/notai/tracker/android/AttentionPlatformTest.kt
+index 59bcf3c..d47e633 100644
+--- a/app/src/test/kotlin/dev/notai/tracker/android/AttentionPlatformTest.kt
++++ b/app/src/test/kotlin/dev/notai/tracker/android/AttentionPlatformTest.kt
+@@ -82 +82 @@ class AttentionPlatformTest {
+-            val lease = port.prepare(request())!!
++            val lease = port.prepare(request(),null).lease!!
+@@ -86,2 +86,4 @@ class AttentionPlatformTest {
+-            assertEquals(FocusEffectStatus.RELEASED,port.release(lease));assertNull(manager.getAutomaticZenRule(lease.ruleId))
+-            val edited = port.prepare(request())!!;port.activate(edited)
++            assertEquals(FocusEffectStatus.RELEASED,port.release(lease))
++            assertNotNull(manager.getAutomaticZenRule(lease.ruleId))
++            assertEquals(android.service.notification.Condition.STATE_FALSE,manager.getAutomaticZenRuleState(lease.ruleId))
++            val edited = port.prepare(request(),lease).lease!!;port.activate(edited)
+@@ -107 +109,17 @@ class AttentionPlatformTest {
+-    @Test fun localAudioPinsOpenedBytesAndRejectsASymlinkWithoutStartingAPlayer() {
++    @Test @Config(sdk = [26]) fun api26AudioRefusesBeforeResolvingOrOpeningAnySource() {
++        val context = RuntimeEnvironment.getApplication()
++        val oldForeground = FocusEnvironmentBinding.foreground;val oldFile = FocusEnvironmentBinding.localFile
++        var lookups = 0
++        try {
++            FocusEnvironmentBinding.foreground = true
++            FocusEnvironmentBinding.localFile = { lookups++;error("must not resolve source") }
++            val port = AndroidFocusMusic(context)
++            assertEquals(FocusEffectStatus.UNSUPPORTED,port.availability("selected"))
++            assertNull(port.prepare(newId(),"selected"));assertEquals(0,lookups)
++            val absent = java.io.File(context.cacheDir,"never-created-${newId()}")
++            val failure = assertThrows(IllegalStateException::class.java) { openFocusAudioFile(absent) }
++            assertEquals("Secure local audio requires API27",failure.message);assertFalse(absent.exists())
++        } finally { FocusEnvironmentBinding.foreground = oldForeground;FocusEnvironmentBinding.localFile = oldFile }
++    }
++    @Test @Config(shadows = [HostFocusAudioOs::class])
++    fun localAudioPinsOpenedBytesAndRejectsASymlinkWithoutStartingAPlayer() {
+diff --git a/app/src/test/kotlin/dev/notai/tracker/android/AttentionPreferencesMigrationTest.kt b/app/src/test/kotlin/dev/notai/tracker/android/AttentionPreferencesMigrationTest.kt
+index eccecf0..548e7ea 100644
+--- a/app/src/test/kotlin/dev/notai/tracker/android/AttentionPreferencesMigrationTest.kt
++++ b/app/src/test/kotlin/dev/notai/tracker/android/AttentionPreferencesMigrationTest.kt
+@@ -2,0 +3,2 @@ package dev.notai.tracker.android
++import android.database.sqlite.SQLiteDatabase
++import androidx.room.Room
+@@ -14,5 +16,38 @@ class AttentionPreferencesMigrationTest {
+-    @Test fun v9MetadataMigratesWithDisabledDefaultAndUnchangedHistory() {
+-        val context = RuntimeEnvironment.getApplication();val name = "attention-v9-${newId()}.db"
+-        fun open() = androidx.room.Room.databaseBuilder(context,TrackerDatabase::class.java,name)
+-            .addMigrations(TrackerDatabase.MIGRATION_9_10).allowMainThreadQueries().build()
+-        val clock = FakeClock();val first = open();val tracker = Tracker(RoomStore(first),clock)
++    private fun open(name: String) = Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name)
++        .addMigrations(TrackerDatabase.MIGRATION_10_11).allowMainThreadQueries().build()
++
++    @Test fun v10MetadataMigratesWithDisabledDefaultAndUnchangedHistory() {
++        val context = RuntimeEnvironment.getApplication()
++        for(status in SessionStatus.entries) {
++            val name = "attention-v10-${newId()}.db";val clock = FakeClock()
++            val first = open(name);val store = RoomStore(first);val tracker = Tracker(store,clock)
++            tracker.start(tracker.snapshot().token)
++            tracker.applyStartBackfill(tracker.previewStartBackfill(tracker.snapshot().token,tracker.data().sessions.single().id,clock.wall-1000))
++            clock.advance(1000)
++            if(status == SessionStatus.PAUSED) tracker.pause(tracker.snapshot().token)
++            if(status == SessionStatus.STOPPED) tracker.stop(tracker.snapshot().token)
++            if(status == SessionStatus.RECOVERY) store.transaction { data ->
++                data.copy(sessions = data.sessions.map { it.copy(status = status) },segments = data.segments.map {
++                    if(it.anchor == null) it else it.copy(anchor = null,uncertain = true)
++                }) to Unit
++            }
++            val before = tracker.data();assertEquals(status,before.sessions.single().status)
++            assertEquals(1,before.segments.count { it.manualConfirmation != null });first.close()
++            // Schema10/11 have identical entity SQL/hash. The old fixture omits the new
++            // preference (default serialization omits it); existing manual provenance stays.
++            SQLiteDatabase.openDatabase(context.getDatabasePath(name).path,null,SQLiteDatabase.OPEN_READWRITE).use { it.version = 10 }
++            val migrated = open(name)
++            try {
++                val after = RoomStore(migrated).read()
++                assertEquals(before,after);assertEquals(LongRecordPreference(),after.settings.longRecordReminder)
++                assertEquals(11,migrated.openHelper.readableDatabase.version)
++            } finally { migrated.close() }
++            val reopened = open(name)
++            try { assertEquals(before,RoomStore(reopened).read()) }
++            finally { reopened.close();context.deleteDatabase(name) }
++        }
++    }
++
++    @Test fun futurePreferenceInV10IsRefusedAndMigrationTransactionKeepsOriginalBytes() {
++        val context = RuntimeEnvironment.getApplication();val name = "attention-v10-future-${newId()}.db"
++        val first = open(name);val clock = FakeClock();val tracker = Tracker(RoomStore(first),clock)
+@@ -20,5 +55,7 @@ class AttentionPreferencesMigrationTest {
+-        val before = tracker.data();first.close()
+-        // Entity SQL/hash are identical in Room9/10; only the metadata contract version changes.
+-        android.database.sqlite.SQLiteDatabase.openDatabase(context.getDatabasePath(name).absolutePath,null,
+-            android.database.sqlite.SQLiteDatabase.OPEN_READWRITE).use { it.execSQL("PRAGMA user_version=9") }
+-        val migrated = open()
++        tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(longRecordReminder = LongRecordPreference(true,321,17)))
++        val expected = tracker.data();first.close();val file = context.getDatabasePath(name)
++        val prior = SQLiteDatabase.openDatabase(file.path,null,SQLiteDatabase.OPEN_READWRITE).use { sql ->
++            sql.version = 10
++            sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> assertTrue(c.moveToFirst());c.getString(0) }
++        }
++        val rejected = open(name)
+@@ -26,4 +63,13 @@ class AttentionPreferencesMigrationTest {
+-            val after = RoomStore(migrated).read()
+-            assertEquals(before,after);assertEquals(LongRecordPreference(),after.settings.longRecordReminder)
+-            assertFalse(after.settings.longRecordReminder.enabled)
+-        } finally { migrated.close();context.deleteDatabase(name) }
++            val failure = assertThrows(Exception::class.java) { RoomStore(rejected).read() }
++            assertTrue(generateSequence(failure as Throwable?) { it.cause }.any {
++                it is CoreError && it.code == ErrorCode.STORAGE && it.message == "Ordinary reminder preference in v10 metadata"
++            }) // Proves this migration ran; a missing path/schema failure is insufficient.
++        } finally { rejected.close() }
++        SQLiteDatabase.openDatabase(file.path,null,SQLiteDatabase.OPEN_READWRITE).use { sql ->
++            assertEquals(10,sql.version)
++            sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> assertTrue(c.moveToFirst());assertEquals(prior,c.getString(0)) }
++            sql.version = 11 // Restore only this isolated fixture to inspect exact domain bytes.
++        }
++        val restored = open(name)
++        try { assertEquals(expected,RoomStore(restored).read()) }
++        finally { restored.close();context.deleteDatabase(name) }
+diff --git a/app/src/test/kotlin/dev/notai/tracker/android/HostFocusAudioOs.kt b/app/src/test/kotlin/dev/notai/tracker/android/HostFocusAudioOs.kt
+new file mode 100644
+index 0000000..f2a7fa0
+--- /dev/null
++++ b/app/src/test/kotlin/dev/notai/tracker/android/HostFocusAudioOs.kt
+@@ -0,0 +1,46 @@
++package dev.notai.tracker.android
++
++import android.system.Os
++import android.system.OsConstants
++import android.system.StructStat
++import java.io.FileDescriptor
++import java.nio.channels.FileChannel
++import java.nio.file.Files
++import java.nio.file.LinkOption
++import java.nio.file.Path
++import java.nio.file.StandardOpenOption
++import java.util.IdentityHashMap
++import org.junit.Assert.assertEquals
++import org.robolectric.annotation.Implementation
++import org.robolectric.annotation.Implements
++import org.robolectric.annotation.Resetter
++import org.robolectric.util.ReflectionHelpers
++
++/** Test-only host bridge: Robolectric4.17 ShadowLinux.fstat(fd) calls stat(null),
++ * losing mode/size, and its open ignores flags. Use NIO's actual NOFOLLOW open and
++ * /proc descriptor metadata for this file-fixture test. Required Android flags are
++ * checked; Android's O_NONBLOCK/Os implementation still needs device verification. */
++@Implements(Os::class)
++class HostFocusAudioOs {
++    companion object {
++        private val channels = IdentityHashMap<FileDescriptor,FileChannel>()
++        @JvmStatic @Implementation fun open(path: String,flags: Int,mode: Int): FileDescriptor {
++            assertEquals(OsConstants.O_RDONLY or OsConstants.O_CLOEXEC or OsConstants.O_NOFOLLOW or OsConstants.O_NONBLOCK,flags)
++            assertEquals(0,mode)
++            val channel = FileChannel.open(Path.of(path),StandardOpenOption.READ,LinkOption.NOFOLLOW_LINKS)
++            return try {
++                ReflectionHelpers.getField<FileDescriptor>(channel,"fd").also { channels[it] = channel }
++            } catch(e: Exception) { channel.close();throw e }
++        }
++        @JvmStatic @Implementation fun fstat(fd: FileDescriptor): StructStat {
++            check(channels.containsKey(fd))
++            val access = Class.forName("jdk.internal.access.SharedSecrets").getMethod("getJavaIOFileDescriptorAccess").invoke(null)
++            val number = Class.forName("jdk.internal.access.JavaIOFileDescriptorAccess").getMethod("get",FileDescriptor::class.java).invoke(access,fd) as Int
++            val attributes = Files.readAttributes(Path.of("/proc/self/fd/$number"),"unix:mode,size")
++            return StructStat(0,0,attributes.getValue("mode") as Int,1,0,0,0,attributes.getValue("size") as Long,0,0,0,0,0)
++        }
++        @JvmStatic @Resetter fun reset() {
++            channels.values.forEach { it.close() };channels.clear()
++        }
++    }
++}
+diff --git a/app/src/test/kotlin/dev/notai/tracker/android/RoomScenariosTest.kt b/app/src/test/kotlin/dev/notai/tracker/android/RoomScenariosTest.kt
+index 797b1af..10a7a30 100644
 --- a/app/src/test/kotlin/dev/notai/tracker/android/RoomScenariosTest.kt
 +++ b/app/src/test/kotlin/dev/notai/tracker/android/RoomScenariosTest.kt
-@@ -681,7 +681,7 @@
-     }
-     override fun createStore(): StateStore = open("test-${newId()}.db")
-     private fun open(name: String): StateStore {
--        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9).allowMainThreadQueries().build()
-+        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9,TrackerDatabase.MIGRATION_9_10).allowMainThreadQueries().build()
-         return try { RoomStore(db).also { databases[it] = name to db } } catch(e: Exception) { db.close();throw e }
-     }
-     override fun reopen(store: StateStore): StateStore {
+@@ -294 +294 @@ class RoomScenariosTest: ScenarioContract() {
+-            .addMigrations(fault).allowMainThreadQueries().build()
++            .addMigrations(fault,TrackerDatabase.MIGRATION_10_11).allowMainThreadQueries().build()
+@@ -483 +483 @@ class RoomScenariosTest: ScenarioContract() {
+-        val db = androidx.room.Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(fault,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9,TrackerDatabase.MIGRATION_9_10).allowMainThreadQueries().build()
++        val db = androidx.room.Room.databaseBuilder(context,TrackerDatabase::class.java,name).addMigrations(fault,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9,TrackerDatabase.MIGRATION_9_10,TrackerDatabase.MIGRATION_10_11).allowMainThreadQueries().build()
+@@ -735 +735 @@ class RoomScenariosTest: ScenarioContract() {
+-        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9,TrackerDatabase.MIGRATION_9_10).allowMainThreadQueries().build()
++        val db = androidx.room.Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name).addMigrations(TrackerDatabase.MIGRATION_1_2,TrackerDatabase.MIGRATION_2_3,TrackerDatabase.MIGRATION_3_4,TrackerDatabase.MIGRATION_4_5,TrackerDatabase.MIGRATION_5_6,TrackerDatabase.MIGRATION_6_7,TrackerDatabase.MIGRATION_7_8,TrackerDatabase.MIGRATION_8_9,TrackerDatabase.MIGRATION_9_10,TrackerDatabase.MIGRATION_10_11).allowMainThreadQueries().build()
+diff --git a/app/src/test/kotlin/dev/notai/tracker/android/ui/UiExportLifecycleTest.kt b/app/src/test/kotlin/dev/notai/tracker/android/ui/UiExportLifecycleTest.kt
+index 6944b73..39c5d62 100644
+--- a/app/src/test/kotlin/dev/notai/tracker/android/ui/UiExportLifecycleTest.kt
++++ b/app/src/test/kotlin/dev/notai/tracker/android/ui/UiExportLifecycleTest.kt
+@@ -147,0 +148 @@ class UiExportLifecycleTest {
++            waitFor { afterCancel.boot.value is TrackerViewModel.Boot.Ready }
+diff --git a/core/src/main/kotlin/dev/notai/tracker/Backup.kt b/core/src/main/kotlin/dev/notai/tracker/Backup.kt
+index ee16687..43d954b 100644
+--- a/core/src/main/kotlin/dev/notai/tracker/Backup.kt
++++ b/core/src/main/kotlin/dev/notai/tracker/Backup.kt
+@@ -9 +9 @@ import java.io.ByteArrayOutputStream
+-@Serializable data class Backup(@Required val formatVersion: Int = 12,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
++@Serializable data class Backup(@Required val formatVersion: Int = 13,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
+@@ -38,0 +39,2 @@ class RestorePreview internal constructor(internal val backup: Backup,internal v
++    /** Restored intent requires separate confirmation on this device before delivery. */
++    val ordinaryReminderConfirmationRequired get() = settings.longRecordReminder.enabled
+@@ -114 +116 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore,p
+-            ensure(b.formatVersion == 12,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
++            ensure(b.formatVersion == 13,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
+diff --git a/core/src/main/kotlin/dev/notai/tracker/Migration.kt b/core/src/main/kotlin/dev/notai/tracker/Migration.kt
+index 06b025b..4cdb63b 100644
+--- a/core/src/main/kotlin/dev/notai/tracker/Migration.kt
++++ b/core/src/main/kotlin/dev/notai/tracker/Migration.kt
+@@ -37 +37 @@ internal fun decodeBackupVersion(json: String): Backup {
+-    ensure(version in 8..12 || listOf("schedule","transfer").none { it in root.getValue("data").jsonObject },"Schedule in legacy archive")
++    ensure(version in 8..13 || listOf("schedule","transfer").none { it in root.getValue("data").jsonObject },"Schedule in legacy archive")
+@@ -39 +39 @@ internal fun decodeBackupVersion(json: String): Backup {
+-        8,9,10,11,12 -> {
++        8,9,10,11,12,13 -> {
+@@ -57 +57 @@ internal fun decodeBackupVersion(json: String): Backup {
+-            migrated["formatVersion"] = JsonPrimitive(12)
++            migrated["formatVersion"] = JsonPrimitive(13)
+@@ -62,4 +62,5 @@ internal fun decodeBackupVersion(json: String): Backup {
+-    ensure(version in 10..12 || (backup.data.settings.schedule == ScheduleSettings() && !backup.data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive")
+-    ensure(version in 11..12 || backup.data.settings.surfaces.shortcut,"Shortcut preference in legacy archive")
+-    ensure(version == 12 || !backup.data.hasManualTimeConfirmation(),"Manual confirmation in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+-    return backup.copy(formatVersion = 12)
++    ensure(version in 10..13 || (backup.data.settings.schedule == ScheduleSettings() && !backup.data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive")
++    ensure(version in 11..13 || backup.data.settings.surfaces.shortcut,"Shortcut preference in legacy archive")
++    ensure(version in 12..13 || !backup.data.hasManualTimeConfirmation(),"Manual confirmation in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
++    ensure(version == 13 || backup.data.settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
++    return backup.copy(formatVersion = 13)
+diff --git a/core/src/main/kotlin/dev/notai/tracker/Model.kt b/core/src/main/kotlin/dev/notai/tracker/Model.kt
+index 7b87032..ae098fd 100644
+--- a/core/src/main/kotlin/dev/notai/tracker/Model.kt
++++ b/core/src/main/kotlin/dev/notai/tracker/Model.kt
+@@ -61 +61,2 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
+-    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val schedule: ScheduleSettings = ScheduleSettings())
++    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val schedule: ScheduleSettings = ScheduleSettings(),
++    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val longRecordReminder: LongRecordPreference = LongRecordPreference())
+@@ -132,0 +134 @@ fun validate(data: Dataset) {
++    validateLongRecordPreference(data.settings.longRecordReminder)
+diff --git a/core/src/main/kotlin/dev/notai/tracker/StreamingBackup.kt b/core/src/main/kotlin/dev/notai/tracker/StreamingBackup.kt
+index c836619..20ff094 100644
+--- a/core/src/main/kotlin/dev/notai/tracker/StreamingBackup.kt
++++ b/core/src/main/kotlin/dev/notai/tracker/StreamingBackup.kt
+@@ -15 +15 @@ internal const val MAX_BACKUP_RECORD_CHARS = 16*1024*1024
+-/** Portable JSON 10 without a whole-file String/ByteArray/JSON tree. Only one record is decoded
++/** Portable JSON 13 without a whole-file String/ByteArray/JSON tree. Only one record is decoded
+@@ -43 +43 @@ object StreamingBackup {
+-        writer.write("{");field("formatVersion","12",true);field("backupId",codec.encodeToString(backup.backupId));field("asOf",backup.asOf.toString())
++        writer.write("{");field("formatVersion","13",true);field("backupId",codec.encodeToString(backup.backupId));field("asOf",backup.asOf.toString())
+@@ -70 +70 @@ object StreamingBackup {
+-        ensure(version in 1..12 && !id.isNullOrBlank() && asOf != null && hasData,"Unsupported backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
++        ensure(version in 1..13 && !id.isNullOrBlank() && asOf != null && hasData,"Unsupported backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
+@@ -127 +127,2 @@ object StreamingBackup {
+-        Backup(formatVersion = 12,backupId = id!!,asOf = asOf!!,data = data.frozen()).also {
++        ensure(format >= 13 || data.settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
++        Backup(formatVersion = 13,backupId = id!!,asOf = asOf!!,data = data.frozen()).also {
+@@ -135 +136 @@ object StreamingBackup {
+-        ensure(b.formatVersion == 12 && b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
++        ensure(b.formatVersion == 13 && b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
+diff --git a/core/src/test/kotlin/dev/notai/tracker/AttentionPreferenceArchiveTest.kt b/core/src/test/kotlin/dev/notai/tracker/AttentionPreferenceArchiveTest.kt
+index 7cec8f1..c8dda12 100644
+--- a/core/src/test/kotlin/dev/notai/tracker/AttentionPreferenceArchiveTest.kt
++++ b/core/src/test/kotlin/dev/notai/tracker/AttentionPreferenceArchiveTest.kt
+@@ -15 +15 @@ class AttentionPreferenceArchiveTest {
+-        assertEquals(12,root.getValue("formatVersion").jsonPrimitive.int)
++        assertEquals(13,root.getValue("formatVersion").jsonPrimitive.int)
+@@ -21 +21 @@ class AttentionPreferenceArchiveTest {
+-        val downgraded = JsonObject(root+("formatVersion" to JsonPrimitive(11))).toString()
++        val downgraded = JsonObject(root+("formatVersion" to JsonPrimitive(12))).toString()
+@@ -25 +25 @@ class AttentionPreferenceArchiveTest {
+-        val legacy = JsonObject(root+("formatVersion" to JsonPrimitive(11))+
++        val legacy = JsonObject(root+("formatVersion" to JsonPrimitive(12))+
+diff --git a/core/src/test/kotlin/dev/notai/tracker/FunctionalCustomizationTest.kt b/core/src/test/kotlin/dev/notai/tracker/FunctionalCustomizationTest.kt
+index 48cbbe9..79d6384 100644
+--- a/core/src/test/kotlin/dev/notai/tracker/FunctionalCustomizationTest.kt
++++ b/core/src/test/kotlin/dev/notai/tracker/FunctionalCustomizationTest.kt
+@@ -84,2 +84,2 @@ class FunctionalCustomizationTest {
+-        assertEquals(12,Backups.decode(asV9(plain)).formatVersion)
+-        assertEquals(12,StreamingBackup.read { asV9(plain).byteInputStream() }.formatVersion)
++        assertEquals(13,Backups.decode(asV9(plain)).formatVersion)
++        assertEquals(13,StreamingBackup.read { asV9(plain).byteInputStream() }.formatVersion)
+diff --git a/core/src/testFixtures/kotlin/dev/notai/tracker/AttentionScenarios.kt b/core/src/testFixtures/kotlin/dev/notai/tracker/AttentionScenarios.kt
+index 8b0b213..ce27f41 100644
+--- a/core/src/testFixtures/kotlin/dev/notai/tracker/AttentionScenarios.kt
++++ b/core/src/testFixtures/kotlin/dev/notai/tracker/AttentionScenarios.kt
+@@ -81 +81 @@ abstract class AttentionScenarioContract {
+-        val original = checkin.configure(t.snapshot().token,LongRecordPreference(true,100,20)).ticket!!
++        val original = checkin.configure(t.snapshot().token,LongRecordPreference(true,100,20),receipts.value.revision).ticket!!
+@@ -106,0 +107,40 @@ abstract class AttentionScenarioContract {
++    @Test fun unattemptedTimebaseLossDoesNotPermanentlyBlockAValidTimer() {
++        val clock = FakeClock();val t = Tracker(createAttentionStore(),clock)
++        t.start(t.snapshot().token)
++        val local = AttentionReminderStore();val platform = AttentionReminderPlatform()
++        val reminder = LongRecordReminder(t,local,platform)
++        val original = reminder.configure(t.snapshot().token,LongRecordPreference(true,100,20),local.value.revision).ticket!!
++        clock.advance(50)
++        val elapsed = clock.elapsed;val before = t.data();val target = t.snapshot().timerTarget
++        clock.elapsed = 0 // Temporary invalid elapsed observation; target and stored facts are exact.
++        assertEquals(Mode.RECOVERY,t.snapshot().mode);assertEquals(target,t.snapshot().timerTarget)
++        assertNull(reminder.synchronize().ticket);assertNull(platform.pending)
++        assertNull(local.value.attempt);assertEquals(before,t.data())
++        clock.elapsed = elapsed
++        val repaired = reminder.synchronize().ticket!!
++        assertEquals(target,repaired.target);assertTrue(reminder.synchronize().alarmAccepted)
++        clock.advance(50)
++        assertEquals(LongRecordOutcome.POST_ACCEPTED,reminder.onAlarm(repaired.hash).outcome)
++        assertEquals(1,platform.posts)
++        // A real new boot leaves the domain in RECOVERY until the user resolves it.
++        val second = Tracker(createAttentionStore(),clock);second.start(second.snapshot().token)
++        val receipts = AttentionReminderStore();val output = AttentionReminderPlatform()
++        val controller = LongRecordReminder(second,receipts,output)
++        val old = controller.configure(second.snapshot().token,LongRecordPreference(true,100,20),receipts.value.revision).ticket!!
++        clock.advance(50);val saved = second.data();val sameTarget = second.snapshot().timerTarget
++        clock.boot = "second-real-boot";clock.elapsed = 0
++        assertEquals(sameTarget,second.snapshot().timerTarget)
++        assertNull(controller.synchronize().ticket);assertNull(output.pending);assertNull(receipts.value.attempt)
++        assertEquals(LongRecordOutcome.STALE,controller.onAlarm(old.hash).outcome)
++        assertEquals(saved,second.data());assertEquals(0,output.posts)
++        val open = saved.segments.single()
++        second.resolveTail(second.snapshot().token,open.start,clock.wall)
++        second.start(second.snapshot().token)
++        val fresh = controller.synchronize().ticket!!
++        assertEquals(clock.boot,fresh.bootId);assertNotEquals(old.hash,fresh.hash)
++        assertEquals(LongRecordOutcome.STALE,controller.onAlarm(old.hash).outcome)
++        clock.advance(100)
++        assertEquals(LongRecordOutcome.POST_ACCEPTED,controller.onAlarm(fresh.hash).outcome)
++        assertEquals(1,output.posts)
++        assertNotEquals(original.target,fresh.target)
++    }
+@@ -147,0 +188,2 @@ abstract class AttentionScenarioContract {
++        assertEquals(FocusEffectStatus.APPLY_ACCEPTED,effects.synchronize().distractions)
++        assertEquals(FocusEffectStatus.APPLY_ACCEPTED,state.value.dndStatus);assertEquals(1,dnd.activations)
+diff --git a/core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt b/core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt
+index ff7d13f..ae9f2f2 100644
+--- a/core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt
++++ b/core/src/testFixtures/kotlin/dev/notai/tracker/ScenarioContract.kt
+@@ -326 +326 @@ abstract class ScenarioContract {
+-        val json = Backups(t,MemoryRollback()).export();assertEquals(12,codec.parseToJsonElement(json).jsonObject.getValue("formatVersion").jsonPrimitive.int)
++        val json = Backups(t,MemoryRollback()).export();assertEquals(13,codec.parseToJsonElement(json).jsonObject.getValue("formatVersion").jsonPrimitive.int)
+@@ -330 +330 @@ abstract class ScenarioContract {
+-        for(text in listOf(json.replace("\"formatVersion\": 12","\"formatVersion\": 8"),bytes.toString("UTF-8").replace("\"formatVersion\":12","\"formatVersion\":8"))) {
++        for(text in listOf(json.replace("\"formatVersion\": 13","\"formatVersion\": 8"),bytes.toString("UTF-8").replace("\"formatVersion\":13","\"formatVersion\":8"))) {
+@@ -543 +543 @@ abstract class ScenarioContract {
+-        val backups = Backups(t,MemoryRollback());val backup = backups.export();assertEquals(12,Backups.decode(backup).formatVersion)
++        val backups = Backups(t,MemoryRollback());val backup = backups.export();assertEquals(13,Backups.decode(backup).formatVersion)
+@@ -1921 +1921 @@ abstract class ScenarioContract {
+-        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 12","\"formatVersion\": 1099")) }; assertEquals(full,clean.data())
++        expect(ErrorCode.UNSUPPORTED_IMPORT) { restore.prepare(json.replace("\"formatVersion\": 13","\"formatVersion\": 1099")) }; assertEquals(full,clean.data())
+@@ -1988 +1988 @@ abstract class ScenarioContract {
+-            text.replaceFirst("\"formatVersion\":12","\"formatVersion\":10,\"formatVersion\":12").toByteArray(),bytes+byteArrayOf(1))) {
++            text.replaceFirst("\"formatVersion\":13","\"formatVersion\":10,\"formatVersion\":13").toByteArray(),bytes+byteArrayOf(1))) {
+diff --git a/core/src/testFixtures/kotlin/dev/notai/tracker/StartBackfillScenarios.kt b/core/src/testFixtures/kotlin/dev/notai/tracker/StartBackfillScenarios.kt
+index 5009905..81ac067 100644
+--- a/core/src/testFixtures/kotlin/dev/notai/tracker/StartBackfillScenarios.kt
++++ b/core/src/testFixtures/kotlin/dev/notai/tracker/StartBackfillScenarios.kt
+@@ -84,0 +85 @@ fun startBackfillArchiveRoundTrip(createStore: ()->StateStore,reopen: (StateStor
++    source.settings(source.snapshot().token,source.data().settings.copy(longRecordReminder = LongRecordPreference(true,321,17)))
+@@ -86 +87 @@ fun startBackfillArchiveRoundTrip(createStore: ()->StateStore,reopen: (StateStor
+-    val decoded = Backups.decode(json);assertEquals(12,decoded.formatVersion)
++    val decoded = Backups.decode(json);assertEquals(13,decoded.formatVersion)
+@@ -87,0 +89 @@ fun startBackfillArchiveRoundTrip(createStore: ()->StateStore,reopen: (StateStor
++    assertEquals(LongRecordPreference(true,321,17),decoded.data.settings.longRecordReminder)
+@@ -94 +96 @@ fun startBackfillArchiveRoundTrip(createStore: ()->StateStore,reopen: (StateStor
+-    for(v in 1..11) {
++    for(v in 1..12) {
+@@ -99,0 +102,8 @@ fun startBackfillArchiveRoundTrip(createStore: ()->StateStore,reopen: (StateStor
++    val legacyRoot = codec.parseToJsonElement(json).jsonObject
++    val legacyData = legacyRoot.getValue("data").jsonObject
++    val legacySettings = legacyData.getValue("settings").jsonObject.filterKeys { it != "longRecordReminder" }
++    val legacy12 = JsonObject(legacyRoot+("formatVersion" to JsonPrimitive(12))+
++        ("data" to JsonObject(legacyData+("settings" to JsonObject(legacySettings))))).toString()
++    assertEquals(expected.segments,Backups.decode(legacy12).data.segments)
++    assertEquals(expected.segments,StreamingBackup.read { legacy12.byteInputStream() }.data.segments)
++    assertEquals(LongRecordPreference(),Backups.decode(legacy12).data.settings.longRecordReminder)

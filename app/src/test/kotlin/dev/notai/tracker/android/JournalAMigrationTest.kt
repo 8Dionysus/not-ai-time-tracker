@@ -9,7 +9,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
-import kotlin.test.*
+import org.junit.Assert.*
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk=[36])
@@ -35,10 +35,14 @@ class JournalAMigrationTest {
             try {
                 val next=Tracker(RoomStore(migrated),clock);assertEquals(before,next.data())
                 assertEquals(12,migrated.openHelper.readableDatabase.version)
-                val backup=Backups(next,MemoryRollback()).export();val destination=Tracker(MemoryStore(),clock)
-                val restore=Backups(destination,MemoryRollback());restore.apply(restore.prepare(backup))
-                val expected=Backups.restoredData(Backups.decode(backup),destination.data().revision)
-                assertEquals(expected.copy(controlBarrier=destination.data().controlBarrier),destination.data())
+                val backup=Backups(next,MemoryRollback()).export()
+                val destinationDb=Room.inMemoryDatabaseBuilder(context,TrackerDatabase::class.java).allowMainThreadQueries().build()
+                try {
+                    val destination=Tracker(RoomStore(destinationDb),clock)
+                    val restore=Backups(destination,MemoryRollback());restore.apply(restore.prepare(backup))
+                    val expected=Backups.restoredData(Backups.decode(backup),destination.data().revision)
+                    assertEquals(expected.copy(controlBarrier=destination.data().controlBarrier),destination.data())
+                } finally { destinationDb.close() }
             } finally { migrated.close();context.deleteDatabase(name) }
         }
     }
@@ -49,7 +53,7 @@ class JournalAMigrationTest {
         sql(name) { it.version=11;before=contents(it) }
         val candidate=open(name)
         try {
-            val failure=assertFails { RoomStore(candidate).read() }
+            val failure=assertThrows(Exception::class.java) { RoomStore(candidate).read() }
             assertTrue(generateSequence(failure as Throwable?) { it.cause }.any { it is CoreError && it.code==ErrorCode.STORAGE && it.message=="Personal choices in v11 rows" })
         } finally { candidate.close() }
         sql(name) { assertEquals(11,it.version);assertEquals(before,contents(it)) }
@@ -69,7 +73,7 @@ class JournalAMigrationTest {
         }
         val interrupted=open(name,fault)
         try {
-            val failure=assertFails { RoomStore(interrupted).read() }
+            val failure=assertThrows(Exception::class.java) { RoomStore(interrupted).read() }
             assertTrue(generateSequence(failure as Throwable?) { it.cause }.any { it.message=="JOURNAL_MIGRATION_INTERRUPTION_FIXTURE" })
         } finally { interrupted.close() }
         sql(name) { assertEquals(11,it.version);assertEquals(before,contents(it)) }

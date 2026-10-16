@@ -168,4 +168,36 @@ abstract class JournalAScenarioContract {
         t.repeat(t.snapshot().token,id,ChoiceNotePolicy.COPY_SOURCE);assertEquals("Unclassified source note",t.snapshot().session!!.note)
     }
 
+    @Test fun personalProfilesSurviveCopiedOriginCompactionAndReplayWithoutFalseUndo() {
+        val clock=FakeClock();val source=Tracker(createJournalStore(),clock)
+        source.saveCard(source.snapshot().token,Card("profile-origin","Source"))
+        source.personalizeChoice(source.snapshot().token,ChoiceKind.CARD,"profile-origin",ChoicePersonalization(listOf("Private original alias"),0,ChoiceNotePolicy.CLEAR))
+        val pack=SelectiveTransfer(source).export(TransferSelection(cardIds=setOf("profile-origin")))
+        var receiver=Tracker(createJournalStore(),clock)
+        receiver.saveCard(receiver.snapshot().token,Card("profile-origin","Different local object"))
+        var importer=SelectiveTransfer(receiver)
+        val copied=importer.apply(importer.plan(pack,pack.groups.map { it.id }.toSet(),pack.groups.associate { it.id to TransferConflictPolicy.COPY }),"profile-copy-before-compaction")
+        assertEquals(TransferGroupState.APPLIED,copied.groups.single().state)
+        val id=receiver.data().cards.single { it.id!="profile-origin" }.id
+        val profile=receiver.data().cards.single { it.id==id }.personal
+        val before=receiver.data();val origin=receiver.data().transfer.origins.single()
+        val preview=receiver.previewTransferRetention(TransferRetentionSelection(originIds=setOf(origin.originId)))
+        assertTrue(preview.canApply)
+        receiver.applyTransferRetention(preview,"profile-compact",preview.requiredAcknowledgements)
+        assertEquals(before.cards,receiver.data().cards)
+        assertTrue(receiver.data().transfer.operations.single().payloadsPruned)
+        assertEquals(pack.groups,importer.export(TransferSelection(cardIds=setOf(id))).groups)
+        val backup=Backups.decode(Backups(receiver,MemoryRollback()).export())
+        assertEquals(profile,backup.data.cards.single { it.id==id }.personal)
+        receiver=Tracker(reopenJournalStore(receiver.store),clock);importer=SelectiveTransfer(receiver)
+        assertEquals(pack.groups,importer.export(TransferSelection(cardIds=setOf(id))).groups)
+        assertTrue(importer.apply(importer.plan(pack,pack.groups.map { it.id }.toSet()),"profile-copy-before-compaction").payloadsPruned)
+        val afterReplay=receiver.data()
+        val rejected=assertFailsWith<CoreError> { importer.undo("profile-copy-before-compaction",receiver.snapshot().token) }
+        assertEquals(ErrorReason.TRANSFER_PAYLOAD_PRUNED,rejected.reason);assertEquals(afterReplay,receiver.data())
+        val replay=importer.apply(importer.plan(pack,pack.groups.map { it.id }.toSet()),"profile-new-command-after-compaction")
+        assertEquals(TransferGroupState.UNCHANGED,replay.groups.single().state)
+        assertEquals(profile,receiver.data().cards.single { it.id==id }.personal);assertEquals(2,receiver.data().cards.size)
+    }
+
 }

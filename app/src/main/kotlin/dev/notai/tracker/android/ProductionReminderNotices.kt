@@ -29,8 +29,22 @@ internal object ProductionReminderNotices {
         val time = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM,FormatStyle.SHORT).withLocale(locale).format(planned)
         notice(context,AndroidScheduleDeliveryPlatform.CHANNEL,"$time (${planned.offset})")
     }
-    val longRecord = LongRecordNoticeFactory { context,_,snapshot ->
-        notice(context,AndroidLongRecordPlatform.CHANNEL,android.text.format.DateUtils.formatElapsedTime(snapshot.trustedDurationMs/1000))
+    /** Same quiet card, worded as a question, with the three answers that need no screen. The token captured
+     * at post time goes with each action, so a press after the timer changed is refused, never re-targeted. */
+    val longRecord = LongRecordNoticeFactory { context,ticket,snapshot ->
+        val minutes = snapshot.trustedDurationMs/60_000L
+        val elapsed = if(minutes >= 60) "${minutes/60} ч ${(minutes%60).toString().padStart(2,'0')} мин" else "$minutes мин"
+        val builder = Notification.Builder(context,AndroidLongRecordPlatform.CHANNEL).setSmallIcon(R.drawable.ic_stat_notai)
+            .setColor(context.getColor(R.color.widget_amber)).setContentTitle("Запись всё ещё идёт")
+            .setContentText("Уже $elapsed. Таймер не забыт?")
+            .setContentIntent(TimerSurfaces.open(context)).setShowWhen(false).setAutoCancel(true)
+            .setOnlyAlertOnce(true).setCategory(Notification.CATEGORY_REMINDER).setVisibility(Notification.VISIBILITY_PRIVATE)
+            .setPublicVersion(Notification.Builder(context,AndroidLongRecordPlatform.CHANNEL).setSmallIcon(R.drawable.ic_stat_notai)
+                .setContentTitle(context.getString(R.string.app_name)).setContentIntent(TimerSurfaces.open(context)).setShowWhen(false).build())
+        listOf(LongRecordAction.CONTINUE to "Продолжить",LongRecordAction.SNOOZE to "Позже",LongRecordAction.STOP to "Остановить").forEach { (action,title) ->
+            builder.addAction(Notification.Action.Builder(null,title,LongRecordActions.pending(context,ticket.hash,snapshot.token,action)).build())
+        }
+        builder.build()
     }
     fun scheduleConfiguration() = ScheduleNoticeConfiguration(schedule,R.string.app_name,NotificationManager.IMPORTANCE_LOW)
     fun longRecordChannel(context: Context) {

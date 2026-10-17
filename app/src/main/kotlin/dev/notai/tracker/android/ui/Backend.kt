@@ -17,6 +17,8 @@ interface UiBackend {
     val focusDue: FocusDueSignals
     /** Android surfaces (widget, notification, overlay) exist only with the real runtime. */
     val runtime: TrackerRuntime?
+    /** Optional ordinary-timer check-in. Exists only with the real runtime unless a test supplies one. */
+    val longRecord: dev.notai.tracker.LongRecordReminder? get() = runtime?.attention?.ordinary?.controller
     fun prepareCatalog(): CatalogPreview
     fun applyCatalog(preview: CatalogPreview): Tracker.Change
     fun submitShortcut(action: SurfaceAction): Deferred<Result<Tracker.Change>>

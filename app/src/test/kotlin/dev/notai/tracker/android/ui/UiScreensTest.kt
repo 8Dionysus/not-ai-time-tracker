@@ -504,6 +504,101 @@ class UiScreensTest {
         org.junit.Assert.assertFalse("paired buttons stack instead of cutting", overflow("Восстановить"))
     }
 
+    private fun plan(seed: Seed, card: String, time: String?) {
+        val t = seed.tracker
+        t.scheduleCommand(ScheduleCommand(newId(), t.snapshot().token, ScheduleAction.CREATE, newId(),
+            rule = ScheduleRule(t.selection(t.data().cards.first { it.name == card }.id), today.toString(), setOf(today.dayOfWeek.value), localTime = time),
+            deviceZone = ZoneId.systemDefault().id))
+    }
+
+    /** Today's plan while tracking, and the folded gaps of the day opened. */
+    @Test fun planAndGapsWhileRunning() {
+        val seed = seed()
+        plan(seed, "Тренировка", "19:00"); plan(seed, "Чтение", null)
+        val vm = render(seed)
+        waitText("Дальше по плану")
+        waitText("Начал раньше")
+        compose.onNodeWithText("2 промежутка без записи").performClick()
+        waitText("не записано")
+        shot("16-plan-gaps", vm)
+        // A gap opens the ordinary form on exactly that stretch and goes through the core's draft.
+        val before = seed.tracker.data().sessions.size
+        compose.onAllNodesWithText("13:40–14:05", substring = true).onFirst().performClick()
+        waitText("Записать промежуток")
+        compose.onNodeWithText("Сохранить").performClick()
+        compose.waitUntil(5_000) { seed.tracker.data().sessions.size == before + 1 }
+        val added = seed.tracker.data().segments.single { it.start == at(today, 13, 40) }
+        org.junit.Assert.assertEquals(at(today, 14, 5), added.end)
+    }
+
+    @Test fun planWhileIdle() {
+        val seed = seed(running = false)
+        plan(seed, "Тренировка", "19:00"); plan(seed, "Английский", null)
+        val vm = render(seed)
+        waitText("По плану на сегодня")
+        shot("17-plan-idle", vm)
+        compose.onNodeWithContentDescription("Тренировка, 19:00").performClick()
+        compose.waitUntil(5_000) { seed.tracker.data().schedule.links.size == 1 }
+        assertTrue("an ordinary running record", seed.tracker.snapshot().mode == Mode.RUNNING)
+    }
+
+    /** "Начал раньше": the core proposes the stretch from the previous record's end; Save adds it, marked as stated. */
+    @Test fun startEarlier() {
+        val seed = seed()
+        val vm = render(seed)
+        compose.onNodeWithText("Начал раньше").performClick()
+        waitText("С конца прошлой записи")
+        waitText("Добавится 25 мин")
+        shot("18-start-earlier", vm)
+        compose.onNodeWithText("Сохранить").performClick()
+        compose.waitUntil(5_000) { seed.tracker.data().segments.any { it.start == at(today, 13, 40) && it.manualConfirmation != null } }
+    }
+
+    @Test fun goalEditor() {
+        val seed = seed()
+        val t = seed.tracker
+        t.saveGoal(t.snapshot().token, Goal(name = "Тренировка", metric = GoalMetric.DISTINCT_RECORDED_DAYS, target = 3, period = GoalPeriod.WEEK,
+            zone = zone.id, filter = Filter(cardId = t.data().cards.first { it.name == "Тренировка" }.id)))
+        val vm = render(seed)
+        compose.onNodeWithText("Обзор").performClick()
+        waitText("от 3 дней в неделю")
+        waitText("с записями")
+        compose.onAllNodesWithText("Английский, от 30 мин в день", substring = true).onFirst().performClick()
+        waitText("Когда применить")
+        shot("19-goal-edit", vm)
+        compose.onNodeWithContentDescription("Больше").performClick()
+        compose.onNodeWithText("Сохранить").performClick()
+        compose.waitUntil(5_000) { t.data().goals.first { it.name == "Английский" }.revisions.isNotEmpty() }
+        val g = t.data().goals.first { it.name == "Английский" }
+        org.junit.Assert.assertEquals("next period keeps today", 30 * 60_000L, t.goalProgress(g.id).goal.target)
+        org.junit.Assert.assertEquals(45 * 60_000L, g.target)
+    }
+
+    @Test fun shareSummary() {
+        val vm = render(seed())
+        compose.onNodeWithText("Обзор").performClick()
+        waitText("По областям")
+        compose.onNodeWithContentDescription("Поделиться итогом").performClick()
+        waitText("Добавить заметки")
+        // The preview is produced off the main thread; let the looper deliver it.
+        repeat(10) { compose.waitForIdle(); org.robolectric.shadows.ShadowLooper.idleMainLooper(); Thread.sleep(150) }
+        waitText("Всего")
+        assertTrue("notes stay out until asked", compose.onAllNodesWithText("конспект", substring = true).fetchSemanticsNodes().isEmpty())
+        shot("20-share", vm)
+    }
+
+    @Config(qualifiers = "w400dp-h1960dp-xhdpi")
+    @Test fun planEditor() {
+        val seed = seed()
+        plan(seed, "Английский", "18:00")
+        val vm = render(seed)
+        compose.onNodeWithText("Настройки").performClick()
+        waitText("Добавить ещё")
+        compose.onNodeWithText("Добавить ещё").performClick()
+        waitText("По дням недели")
+        shot("21-plan-editor", vm)
+    }
+
     @Test fun recovery() {
         val seed = seed()
         seed.clock.boot = "boot:after-restart" // another boot: the open interval has no trusted end

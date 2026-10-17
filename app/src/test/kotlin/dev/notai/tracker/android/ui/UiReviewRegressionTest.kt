@@ -131,7 +131,7 @@ class UiReviewRegressionTest {
         val today = runBlocking { f.vm.overview(Period.DAY) }!!.goals
         assertEquals(1,today.size);assertTrue(today.single().name,today.single().name.startsWith("Active today"))
         assertFalse(today.single().name,today.single().name.contains("раз"))
-        assertTrue(today.single().name,today.single().name.contains("дн."))
+        assertTrue(today.single().name,Regex("\\d+ (день|дня|дней)").containsMatchIn(today.single().name))
         f.clock.wall = at("2026-10-11T12:00:00Z")
         val tomorrow = runBlocking { f.vm.overview(Period.DAY) }!!.goals
         assertEquals(1,tomorrow.size);assertTrue(tomorrow.single().name,tomorrow.single().name.startsWith("Inactive today"))

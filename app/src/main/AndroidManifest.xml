@@ -24,6 +24,7 @@
             android:theme="@android:style/Theme.Material.Light.NoActionBar" />
         <receiver android:name=".FocusAlarmReceiver" android:exported="false" />
         <receiver android:name=".LongRecordAlarmReceiver" android:exported="false" />
+        <receiver android:name=".LongRecordActionReceiver" android:exported="false" />
         <receiver android:name=".FocusEnvironmentExpiryReceiver" android:exported="false" />
         <receiver android:name=".FocusEnvironmentRecoveryReceiver" android:exported="false">
             <intent-filter>

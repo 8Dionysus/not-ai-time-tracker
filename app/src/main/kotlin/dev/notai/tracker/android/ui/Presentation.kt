@@ -46,6 +46,37 @@ object Format {
     fun period(first: LocalDate, last: LocalDate): String =
         if (first.month == last.month) "${first.dayOfMonth}–${last.format(dayMonth)}" else "${first.format(dayMonth)} – ${last.format(dayMonth)}"
 
+    /** Monday first, 1..7 like java.time. */
+    val weekdays = listOf("пн", "вт", "ср", "чт", "пт", "сб", "вс")
+    fun planRule(days: Set<Int>, date: LocalDate?, time: java.time.LocalTime?): String {
+        val `when` = when {
+            date != null -> date.format(dayMonth)
+            days.size == 7 -> "каждый день"
+            days == setOf(1, 2, 3, 4, 5) -> "по будням"
+            days == setOf(6, 7) -> "по выходным"
+            else -> days.sorted().joinToString(", ") { weekdays[it - 1] }
+        }
+        return `when` + (time?.let { ", ${it.hour}:${it.minute.toString().padStart(2, '0')}" } ?: "")
+    }
+
+    fun goalAmount(metric: dev.notai.tracker.GoalMetric, x: Long): String = when (metric) {
+        dev.notai.tracker.GoalMetric.DURATION_MS -> duration(x)
+        dev.notai.tracker.GoalMetric.SESSION_COUNT -> plural(x.toInt(), "раз", "раза", "раз")
+        dev.notai.tracker.GoalMetric.DISTINCT_RECORDED_DAYS -> plural(x.toInt(), "день", "дня", "дней")
+    }
+    fun goalRule(metric: dev.notai.tracker.GoalMetric, direction: dev.notai.tracker.GoalDirection, period: dev.notai.tracker.GoalPeriod, target: Long): String {
+        val per = when (period) { dev.notai.tracker.GoalPeriod.DAY -> " в день"; dev.notai.tracker.GoalPeriod.WEEK -> " в неделю"
+            dev.notai.tracker.GoalPeriod.MONTH -> " в месяц"; dev.notai.tracker.GoalPeriod.FIXED -> "" }
+        // "от"/"не больше" take the genitive: от 1 раза, от 3 раз, не больше 2 дней.
+        val n = target.toInt(); val one = n % 10 == 1 && n % 100 != 11
+        val amount = when (metric) {
+            dev.notai.tracker.GoalMetric.DURATION_MS -> duration(target)
+            dev.notai.tracker.GoalMetric.SESSION_COUNT -> "$n " + if (one) "раза" else "раз"
+            dev.notai.tracker.GoalMetric.DISTINCT_RECORDED_DAYS -> "$n " + if (one) "дня" else "дней"
+        }
+        return (if (direction == dev.notai.tracker.GoalDirection.MINIMUM) "от " else "не больше ") + amount + per
+    }
+
     /** Russian plural: 1 запись, 2 записи, 5 записей. */
     fun plural(n: Int, one: String, few: String, many: String): String {
         val m10 = n % 10; val m100 = n % 100

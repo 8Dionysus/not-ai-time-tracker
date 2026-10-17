@@ -45,6 +45,14 @@ private sealed interface Sheet {
     data class Picker(val mode: PickMode, val boundary: Long? = null) : Sheet
     data object Earlier : Sheet
     data object Resolve : Sheet
+    data object StartEarlier : Sheet
+}
+
+/** Editors opened from Overview and Settings; they borrow the activity picker like the entry form does. */
+private sealed interface Editor {
+    data class Plan(val existing: PlanSeriesUi?) : Editor
+    data class Goal(val draft: GoalDraft?) : Editor
+    data class Share(val period: Period) : Editor
 }
 
 /**
@@ -102,6 +110,7 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     var tab by rememberSaveable { mutableStateOf(Tab.TIMER) }
     var sheet by remember { mutableStateOf<Sheet?>(null) }
     var formPicker by remember { mutableStateOf<((Classification, Label) -> Unit)?>(null) }
+    var editor by remember { mutableStateOf<Editor?>(null) }
     val snapshot by vm.snapshot.collectAsStateWithLifecycle()
     val home by vm.home.collectAsStateWithLifecycle()
     val view by vm.view.collectAsStateWithLifecycle()
@@ -141,6 +150,8 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
             resolve = { sheet = Sheet.Resolve },
             toggleTheme = { vm.setTheme(if (dark) ThemeChoice.LIGHT else ThemeChoice.DARK) },
             delete = requestDelete,
+            startEarlier = { sheet = Sheet.StartEarlier },
+            fillGap = { g, d -> vm.openEntryForm(null, d, g) },
         )
     }
 
@@ -149,8 +160,9 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
             Crossfade(tab, label = "tab", animationSpec = tween(if (NotAi.reducedMotion) 0 else 200)) { t ->
                 when (t) {
                     Tab.TIMER -> TimerScreen(snapshot, home, vm, actions, dark)
-                    Tab.OVERVIEW -> OverviewScreen(vm, view)
-                    Tab.SETTINGS -> SettingsScreen(vm, view, theme, openTechnical)
+                    Tab.OVERVIEW -> OverviewScreen(vm, view, openGoal = { id -> editor = Editor.Goal(id?.let(vm::goalDraft)) },
+                        share = { p -> editor = Editor.Share(p) })
+                    Tab.SETTINGS -> SettingsScreen(vm, view, theme, openTechnical, openPlan = { editor = Editor.Plan(it) })
                 }
             }
             SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter).padding(12.dp)) { data ->
@@ -170,7 +182,7 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     val zone = home?.zone ?: java.time.ZoneId.systemDefault()
     entryForm?.let { target -> key(target.id) {
         EntrySheet(vm,zone,target.day,target.entry,onDismiss = vm::closeEntryForm,onPickActivity = { callback -> formPicker = callback },
-            onDelete = { e -> scope.launch { if(requestDelete(e) || confirmDelete != null) vm.closeEntryForm() } },targetId = target.id)
+            onDelete = { e -> scope.launch { if(requestDelete(e) || confirmDelete != null) vm.closeEntryForm() } },targetId = target.id,gap = target.gap)
     } }
     when (val s = sheet) {
         is Sheet.Picker -> {
@@ -186,6 +198,11 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
         Sheet.Resolve -> {
             val start = snapshot?.active?.start ?: home?.currentStart
             if (start != null) ResolveSheet(zone, start, remember { vm.now() }, onConfirm = vm::resolveTail, onDismiss = { sheet = null })
+            else LaunchedEffect(Unit) { sheet = null }
+        }
+        Sheet.StartEarlier -> {
+            val start = home?.currentStart
+            if (start != null && snapshot?.focus == null) StartEarlierSheet(vm, zone, start, onDismiss = { sheet = null })
             else LaunchedEffect(Unit) { sheet = null }
         }
         null -> Unit
@@ -207,6 +224,12 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     incomingDrafts.firstOrNull()?.let { incoming ->
         ConfirmDialog("Заменить черновик?", "Текущий текст: «${draft?.note.orEmpty()}»\nНовый текст: «${incoming.draft.note.orEmpty()}»",
             "Заменить",onConfirm = { vm.resolveIncomingDraft(incoming.id,true) },onDismiss = { vm.resolveIncomingDraft(incoming.id,false) })
+    }
+    when (val e = editor) {
+        is Editor.Plan -> PlanSheet(vm, e.existing, onPickActivity = { formPicker = it }, onDismiss = { editor = null })
+        is Editor.Goal -> GoalSheet(vm, e.draft, onPickActivity = { formPicker = it }, onDismiss = { editor = null })
+        is Editor.Share -> ShareSheet(vm, e.period, onDismiss = { editor = null })
+        null -> Unit
     }
     formPicker?.let { back ->
         PickerSheet(vm, PickMode.MANUAL, false, null, null, null, onDismiss = { formPicker = null }, onReturn = { sel, label -> back(sel, label) })

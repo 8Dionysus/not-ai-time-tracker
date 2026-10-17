@@ -113,6 +113,21 @@ class FloatingTimerService : Service() {
 
     private fun ComposeView.attach() { setViewTreeLifecycleOwner(owner); setViewTreeSavedStateRegistryOwner(owner) }
 
+    /** The saved place belongs to an earlier screen size: keep the button on the current screen, on its edge. */
+    private fun place(params: WindowManager.LayoutParams) {
+        val metrics = resources.displayMetrics
+        val size = params.width
+        val margin = (8 * metrics.density).toInt()
+        params.x = if (prefs.getBoolean("left", false)) margin else (metrics.widthPixels - size - margin).coerceAtLeast(0)
+        params.y = params.y.coerceIn(0, (metrics.heightPixels - size).coerceAtLeast(0))
+    }
+
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        val view = puck ?: return; val params = puckParams ?: return
+        place(params); runCatching { windows.updateViewLayout(view, params) }
+    }
+
     private fun showPuck() {
         if (puck != null) return
         val metrics = resources.displayMetrics
@@ -120,20 +135,22 @@ class FloatingTimerService : Service() {
         val margin = (8 * metrics.density).toInt()
         val params = overlayParams(size, size).apply {
             gravity = Gravity.TOP or Gravity.START
-            x = if (prefs.getBoolean("left", false)) margin else metrics.widthPixels - size - margin
             y = prefs.getInt("y", (metrics.heightPixels * 0.38f).toInt())
         }
+        place(params)
         puckParams = params
         val view = ComposeView(this).apply {
             attach()
             setContent {
                 Puck(snapshot.value, busy.value, onTap = ::tap, onDrag = { dx, dy ->
-                    params.x = (params.x + dx).toInt().coerceIn(0, metrics.widthPixels - size)
-                    params.y = (params.y + dy).toInt().coerceIn(0, metrics.heightPixels - size)
+                    val m = resources.displayMetrics
+                    params.x = (params.x + dx).toInt().coerceIn(0, (m.widthPixels - size).coerceAtLeast(0))
+                    params.y = (params.y + dy).toInt().coerceIn(0, (m.heightPixels - size).coerceAtLeast(0))
                     runCatching { windows.updateViewLayout(this, params) }
                 }, onDragEnd = {
-                    val left = params.x + size / 2 < metrics.widthPixels / 2
-                    params.x = if (left) margin else metrics.widthPixels - size - margin
+                    val m = resources.displayMetrics
+                    val left = params.x + size / 2 < m.widthPixels / 2
+                    params.x = if (left) margin else m.widthPixels - size - margin
                     runCatching { windows.updateViewLayout(this, params) }
                     prefs.edit().putBoolean("left", left).putInt("y", params.y).apply()
                 })

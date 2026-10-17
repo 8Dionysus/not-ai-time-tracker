@@ -54,8 +54,8 @@ private val EntryLabelSaver = mapSaver<Label>(
     save = { mapOf("title" to it.title,"detail" to it.detail,"slot" to it.slot,"unclassified" to it.unclassified,"glyph" to it.glyph) },
     restore = { Label(it["title"] as String,it["detail"] as String?,it["slot"] as Int?,it["unclassified"] as Boolean,it["glyph"] as Int) })
 
-private const val MINUTE = 60_000L
-private fun floorMinute(ms: Long) = ms - ms % MINUTE
+internal const val MINUTE = 60_000L
+internal fun floorMinute(ms: Long) = ms - ms % MINUTE
 
 /** A time of day with ±5 min steps and a dial on tap. The date stays the value's own local date. */
 @Composable
@@ -124,7 +124,7 @@ fun NoteField(value: String, onChange: (String) -> Unit, modifier: Modifier = Mo
 }
 
 @Composable
-private fun ActivityField(label: Label, onClick: () -> Unit) {
+internal fun ActivityField(label: Label, onClick: () -> Unit, action: String = "Изменить") {
     val c = NotAi.colors
     Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(RoundedCornerShape(14.dp)).background(c.sunk).pressable(onClick, label = "Изменить занятие")
         .padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -133,7 +133,7 @@ private fun ActivityField(label: Label, onClick: () -> Unit) {
             Text(label.title, style = NotAi.type.body, color = c.ink, maxLines = 1)
             label.detail?.let { Text(" $it", style = NotAi.type.body, color = c.ink2, maxLines = 1) }
         }
-        Text("Изменить", style = NotAi.type.bodySmall.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
+        Text(action, style = NotAi.type.bodySmall.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
     }
 }
 
@@ -189,7 +189,7 @@ private fun DrawScope.bracket(left: Float, isLeft: Boolean, color: androidx.comp
  */
 @Composable
 fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, onDismiss: () -> Unit, onPickActivity: ((Classification, Label) -> Unit) -> Unit,
-               onDelete: ((EntryUi) -> Unit)? = null,targetId: String) {
+               onDelete: ((EntryUi) -> Unit)? = null,targetId: String,gap: GapUi? = null) {
     val c = NotAi.colors
     val session = remember(entry) { entry?.let { vm.session(it.sessionId) } }
     val origStart = session?.second?.firstOrNull()?.start
@@ -197,8 +197,8 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
     val now = remember { vm.now() }
     val reportingDate by vm.reportingDate.collectAsState()
     val today = reportingDate ?: ReportingDayPolicy(zone.id,vm.view.value?.data?.settings?.reportDayStartMinute ?: 0).dateAt(vm.now())
-    var start by rememberSaveable { mutableLongStateOf(origStart ?: floorMinute(minOf(now, day.end) - 30 * MINUTE).coerceAtLeast(day.start)) }
-    var end by rememberSaveable { mutableLongStateOf(origEnd ?: floorMinute(minOf(now, day.end - 1))) }
+    var start by rememberSaveable { mutableLongStateOf(origStart ?: gap?.start ?: floorMinute(minOf(now, day.end) - 30 * MINUTE).coerceAtLeast(day.start)) }
+    var end by rememberSaveable { mutableLongStateOf(origEnd ?: gap?.end ?: floorMinute(minOf(now, day.end - 1))) }
     var selection by rememberSaveable(stateSaver = EntrySelectionSaver) { mutableStateOf<Classification?>(null) }
     val baseSelection = session?.first?.selection ?: Classification()
     var label by rememberSaveable(stateSaver = EntryLabelSaver) { mutableStateOf(entry?.label ?: Label("Без занятия", null, null, true)) }
@@ -217,11 +217,11 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
         pending = false
     }
     NotAiSheet(onDismiss) {
-        SheetHeader(if (entry != null) "Исправить запись" else "Добавить запись", onDismiss, extra = if (entry != null && onDelete != null) {
+        SheetHeader(when { entry != null -> "Исправить запись"; gap != null -> "Записать промежуток"; else -> "Добавить запись" }, onDismiss, extra = if (entry != null && onDelete != null) {
             { IconAction(Icon.Trash, "Удалить запись", { onDelete(entry) }, size = 19.dp) }
         } else null)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            ActivityField(label) { onPickActivity { sel, l -> selection = sel; label = l } }
+            ActivityField(label, { onPickActivity { sel, l -> selection = sel; label = l } })
             MiniTimeline(day, entry?.sessionId, start, end, origStart, origEnd, label.slot, zone)
             TimePair {
                 TimeField("Начало", start, zone, { start = it }, it, focused = origStart != null && start != origStart,
@@ -269,6 +269,52 @@ fun EarlierSheet(zone: ZoneId, segmentStart: Long, now: Long, onNext: (Long) -> 
                 hint = "между ${Format.clock(segmentStart, zone)} и сейчас")
             Text("Время до этого момента останется у текущего занятия, после него перейдёт к новому.", style = NotAi.type.bodySmall, color = NotAi.colors.ink2)
             PillButton("Выбрать занятие", { onNext(at) }, Modifier.fillMaxWidth().padding(bottom = 20.dp), ButtonKind.PRIMARY)
+        }
+    }
+}
+
+/**
+ * The current record began before Start was pressed. The core proposes the added stretch first (from the end of the
+ * previous record, or a chosen time); nothing changes until Save, and the added time is marked as stated by the person.
+ */
+@Composable
+fun StartEarlierSheet(vm: TrackerViewModel, zone: ZoneId, currentStart: Long, onDismiss: () -> Unit) {
+    val c = NotAi.colors
+    val previous by produceState<dev.notai.tracker.StartBackfillPreview?>(null) { value = vm.previewStartEarlier(null).getOrNull() }
+    var at by rememberSaveable { mutableLongStateOf(floorMinute(currentStart - 15 * MINUTE)) }
+    var touched by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(previous) { previous?.let { if (!touched) at = it.proposedSegment.start } }
+    val result by produceState<Result<dev.notai.tracker.StartBackfillPreview>?>(null, at, previous) {
+        delay(120); value = vm.previewStartEarlier(at)
+    }
+    NotAiSheet(onDismiss, fullHeight = false) {
+        SheetHeader("Когда ты начал?", onDismiss)
+        Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            previous?.let { p ->
+                val chosen = at == p.proposedSegment.start
+                Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(RoundedCornerShape(14.dp)).background(if (chosen) c.amberWash else c.sunk)
+                    .pressable({ at = p.proposedSegment.start; touched = true }, label = "С конца прошлой записи").padding(horizontal = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    M3Icon(if (chosen) Icon.Check else Icon.ChevronLeft, null, Modifier.size(18.dp), tint = if (chosen) c.amberInk else c.ink2)
+                    Text("С конца прошлой записи", Modifier.weight(1f), style = NotAi.type.body, color = c.ink)
+                    Text(Format.clock(p.proposedSegment.start, zone), style = NotAi.type.body, color = c.ink2)
+                }
+            }
+            TimeField("Начало", at, zone, { at = minOf(it, currentStart - MINUTE); touched = true }, focused = true,
+                hint = "раньше, чем ${Format.clock(currentStart, zone)}")
+            val r = result
+            val preview = r?.getOrNull()?.takeIf { it.proposedSegment.start == at }
+            when {
+                preview != null -> Note("Добавится ${Format.duration(preview.addedMs)} до ${Format.clock(currentStart, zone)}. " +
+                    "Это время отметится как указанное тобой, а не замеренное.", wash = true)
+                r?.exceptionOrNull() != null -> Note(when ((r.exceptionOrNull() as? dev.notai.tracker.CoreError)?.code) {
+                    dev.notai.tracker.ErrorCode.OVERLAP -> "Это время уже занято другой записью. Выбери начало позже."
+                    dev.notai.tracker.ErrorCode.RECOVERY_REQUIRED -> "Сначала уточни неизвестное время."
+                    else -> Format.error(r.exceptionOrNull()!!)
+                })
+            }
+            PillButton("Сохранить", { preview?.let { vm.applyStartEarlier(it) {} }; onDismiss() },
+                Modifier.fillMaxWidth().padding(bottom = 20.dp), ButtonKind.PRIMARY, enabled = preview != null)
         }
     }
 }

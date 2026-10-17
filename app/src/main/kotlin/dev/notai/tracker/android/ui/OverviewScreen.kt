@@ -23,7 +23,7 @@ import dev.notai.tracker.TrackerView
 
 /** Totals by area. Every number is a core report value; the screen only lays them out. */
 @Composable
-fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier = Modifier) {
+fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier = Modifier, openGoal: (String?) -> Unit = {}, share: (Period) -> Unit = {}) {
     val c = NotAi.colors
     var period by rememberSaveableEnum(Period.WEEK)
     val reportingDate by vm.reportingDate.collectAsState()
@@ -31,6 +31,7 @@ fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier 
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp)) {
         Row(Modifier.fillMaxWidth().height(64.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("Обзор", Modifier.weight(1f), style = NotAi.type.title, color = c.ink)
+            IconAction(Icon.Share, "Поделиться итогом", { share(period) })
         }
         Segmented(Period.entries.map { it to it.title }, period, { period = it }, Modifier.fillMaxWidth(), height = 36.dp)
         Spacer(Modifier.height(12.dp))
@@ -53,7 +54,7 @@ fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier 
         if (d.totalMs == 0L && d.areas.isEmpty() && d.unresolved == 0) {
             Note(if (d.period == Period.DAY) "Сегодня записей пока нет. Обзор соберётся сам, как только появится первая."
                 else "За эти дни записей нет. Обзор соберётся сам, как только они появятся.", Modifier.padding(top = 4.dp))
-            if (d.goals.isNotEmpty()) Goals(d.goals)
+            Goals(d.goals, openGoal)
             return@Column
         }
         if (d.period == Period.DAY) {
@@ -76,18 +77,25 @@ fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier 
                 }
             }
         }
-        if (d.goals.isNotEmpty()) Goals(d.goals)
+        Goals(d.goals, openGoal)
     }
 }
 
 @Composable
-private fun ColumnScope.Goals(goals: List<GoalUi>) {
+private fun ColumnScope.Goals(goals: List<GoalUi>, open: (String?) -> Unit) {
     val c = NotAi.colors
-    Text("Цели", Modifier.padding(top = 18.dp, bottom = 4.dp), style = NotAi.type.section, color = c.ink)
+    // Goals are optional: without any, a single quiet row instead of a section.
+    if (goals.isNotEmpty()) Text("Цели", Modifier.padding(top = 18.dp, bottom = 4.dp), style = NotAi.type.section, color = c.ink)
+    else Spacer(Modifier.height(14.dp))
     goals.forEach { g ->
-        ListRow(g.name, subtitle = "${g.value}, ${g.status}", leading = {
+        ListRow(g.name, subtitle = "${g.value}, ${g.status}", onClick = { open(g.id) }, leading = {
             M3Icon(if (g.ok) Icon.Check else Icon.Limit, null, Modifier.size(18.dp), tint = if (g.ok) c.areas[Areas.WORK] else c.ink2)
         })
+    }
+    Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).pressable({ open(null) }, label = "Поставить цель"),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        M3Icon(Icon.Plus, null, Modifier.size(18.dp), tint = c.ink2)
+        Text(if (goals.isEmpty()) "Поставить цель" else "Ещё цель", style = NotAi.type.bodySmall, color = c.ink2)
     }
 }
 

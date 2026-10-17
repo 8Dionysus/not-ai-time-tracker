@@ -73,6 +73,10 @@ class TimerActions(
     val toggleTheme: () -> Unit,
     /** Shared by swipe and the long-press menu. Returns true when the record is already gone. */
     val delete: suspend (EntryUi) -> Boolean = { false },
+    /** The current record actually began before Start was pressed. */
+    val startEarlier: () -> Unit = {},
+    /** An unrecorded stretch between two records: opens the ordinary entry form on exactly that stretch. */
+    val fillGap: (GapUi, DayUi) -> Unit = { _, _ -> },
 )
 
 private enum class HeroKind { LOADING, IDLE, ACTIVE, RECOVERY, FOCUS }
@@ -82,6 +86,8 @@ private data class HeroState(val kind: HeroKind,val snapshot: Snapshot?)
 fun TimerScreen(snapshot: Snapshot?, home: HomeData?, vm: TrackerViewModel, actions: TimerActions, dark: Boolean, modifier: Modifier = Modifier) {
     val c = NotAi.colors
     val zone = home?.zone ?: ZoneId.systemDefault()
+    // Gaps stay folded per day until asked for: visible, never nagging.
+    var openGaps by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(listOf<String>()) }
     LazyColumn(modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 24.dp)) {
         item(key = "top") {
             Row(Modifier.fillMaxWidth().height(60.dp).padding(start = 20.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -116,7 +122,7 @@ fun TimerScreen(snapshot: Snapshot?, home: HomeData?, vm: TrackerViewModel, acti
                 }
             }
         }
-        if (home != null) history(home, snapshot, vm, actions)
+        if (home != null) history(home, snapshot, vm, actions, openGaps) { d -> openGaps = if (d in openGaps) openGaps - d else openGaps + d }
     }
 }
 
@@ -142,6 +148,12 @@ private fun IdleHero(home: HomeData?, vm: TrackerViewModel, actions: TimerAction
         }
         Text("Время пойдёт сразу.\nЗанятие можно выбрать потом.", style = NotAi.type.bodySmall, color = c.ink2, textAlign = TextAlign.Center)
         Column(Modifier.fillMaxWidth().padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            val plan = home?.plan.orEmpty()
+            if (plan.isNotEmpty()) {
+                SectionLabel("По плану на сегодня")
+                PlanChips(plan, vm)
+                Spacer(Modifier.height(2.dp))
+            }
             val quick = home?.quick.orEmpty()
             val dismissed by vm.starterDismissed.collectAsStateWithLifecycle()
             // A new install has no favourites or history yet: invite a few own activities instead of an empty section.
@@ -218,10 +230,59 @@ private fun ActiveHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, actio
             else PillButton("Продолжить", haptic(HapticFeedbackType.ToggleOn, vm::resume), m, ButtonKind.AMBER, Icon.Play)
             PillButton("Стоп", haptic(HapticFeedbackType.Confirm, vm::stop), m, ButtonKind.PRIMARY, Icon.Stop)
         }
-        if (s.mode == Mode.RUNNING && "switchedEarlier" in s.actions) Row(Modifier.heightIn(min = 44.dp).pressable(actions.earlier).padding(horizontal = 12.dp),
-            verticalAlignment = Alignment.CenterVertically) {
-            Text("Забыл переключиться? ", style = NotAi.type.bodySmall, color = c.ink2)
-            Text("Указать когда", style = NotAi.type.bodySmall.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
+        // Two quiet fixes of the same kind: the record began before Start, or the switch happened before it was tapped.
+        val earlier = s.mode == Mode.RUNNING && "switchedEarlier" in s.actions
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+            TimeFix("Начал раньше", actions.startEarlier)
+            if (earlier) {
+                Text("·", style = NotAi.type.bodySmall, color = c.ink3)
+                TimeFix("Переключился раньше", actions.earlier)
+            }
+        }
+        val plan = home?.plan.orEmpty().filter { !it.started }
+        if (plan.isNotEmpty()) Column(Modifier.fillMaxWidth().padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            SectionLabel("Дальше по плану")
+            PlanChips(plan, vm)
+        }
+    }
+}
+
+@Composable
+private fun TimeFix(text: String, onClick: () -> Unit) {
+    Box(Modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp)).pressable(onClick, label = text).padding(horizontal = 10.dp),
+        contentAlignment = Alignment.Center) {
+        Text(text, style = NotAi.type.bodySmall.copy(fontWeight = FontWeight.Medium), color = NotAi.colors.amberInk)
+    }
+}
+
+/** Today's plan. A tap starts (or switches to) it; a long press can drop it for today. Done ones stay, quietly checked. */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun PlanChips(plan: List<PlanItem>, vm: TrackerViewModel) {
+    val c = NotAi.colors
+    val haptics = LocalHapticFeedback.current
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        plan.forEach { p ->
+            var menu by remember { mutableStateOf(false) }
+            Box {
+                Row(Modifier.heightIn(min = 40.dp).clip(RoundedCornerShape(50))
+                    .background(if (p.started) Color.Transparent else c.sunk)
+                    .then(if (p.started) Modifier.border(1.dp, c.rule, RoundedCornerShape(50)) else Modifier)
+                    .combinedClickable(enabled = !p.started, onClickLabel = "Начать по плану", onLongClickLabel = "Действия с планом",
+                        onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); menu = true }, onClick = { vm.startPlanned(p) })
+                    .semantics { contentDescription = p.title + (p.time?.let { ", $it" } ?: "") + if (p.started) ", уже начато" else "" }
+                    .padding(start = 11.dp, end = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+                    if (p.started) M3Icon(Icon.Check, null, Modifier.size(16.dp), tint = c.ink2) else ActivityGlyph(p.glyph, p.slot, size = 17.dp)
+                    Text(p.title, style = NotAi.type.bodySmall, color = if (p.started) c.ink2 else c.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    p.time?.let { Text(it, style = NotAi.type.bodySmall, color = c.ink2, maxLines = 1) }
+                }
+                DropdownMenu(menu, { menu = false }, shape = RoundedCornerShape(16.dp), containerColor = c.raised,
+                    border = BorderStroke(1.dp, c.rule), shadowElevation = 8.dp) {
+                    DropdownMenuItem(text = { Text("Убрать на сегодня", style = NotAi.type.body, color = c.ink) },
+                        onClick = { menu = false; vm.skipPlanned(p) }, leadingIcon = { M3Icon(Icon.Close, null, Modifier.size(18.dp), tint = c.ink2) })
+                }
+            }
         }
     }
 }
@@ -291,7 +352,8 @@ private fun FocusHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, action
     }
 }
 
-private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: TrackerViewModel, actions: TimerActions) {
+private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: TrackerViewModel, actions: TimerActions,
+                                   openGaps: List<String>, toggleGaps: (String) -> Unit) {
     home.days.forEach { day ->
         item(key = "day-${day.date}") {
             val c = NotAi.colors
@@ -305,14 +367,25 @@ private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: Track
                     val pieces = day.ribbon.map { RibbonPiece(it.start, it.end, it.slot?.let { s -> c.areas[s] } ?: c.none) } +
                         day.live.map { RibbonPiece(it.start, it.end, c.amber, live = true) }
                     DayRibbon(day.start, day.end, pieces,zone = home.zone)
+                    val fillable = day.gaps.count { it.kind == dev.notai.tracker.HistoryGapKind.UNRECORDED }
+                    if (fillable > 0) {
+                        val open = day.date.toString() in openGaps
+                        Text((if (open) "Скрыть промежутки" else Format.plural(fillable, "промежуток", "промежутка", "промежутков") + " без записи"),
+                            Modifier.padding(top = 6.dp).heightIn(min = 32.dp).pressable({ toggleGaps(day.date.toString()) },
+                                label = if (open) "Скрыть промежутки без записи" else "Показать промежутки без записи").padding(vertical = 6.dp),
+                            style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
+                    }
                 }
             }
         }
-        items(day.entries, key = { "${day.date}:${it.segmentId}" }) { e ->
-            SwipeToDelete(e, actions.delete, Modifier.animateItem()) {
-                EntryRow(e, home.zone, onOpen = { actions.edit(e, day) }, onRepeat = { vm.repeat(e) },
-                    onDelete = { actions.delete(e) }, modifier = Modifier.padding(horizontal = 20.dp))
-            }
+        // Newest first, gaps in their place between the two records around them.
+        val gaps = if (day.date.toString() in openGaps) day.gaps else emptyList()
+        val rows: List<Any> = (day.entries + gaps).sortedByDescending { if (it is EntryUi) it.start else (it as GapUi).start }
+        items(rows, key = { r -> if (r is EntryUi) "${day.date}:${r.segmentId}" else "${day.date}:gap:${(r as GapUi).start}" }) { r ->
+            if (r is EntryUi) SwipeToDelete(r, actions.delete, Modifier.animateItem()) {
+                EntryRow(r, home.zone, onOpen = { actions.edit(r, day) }, onRepeat = { vm.repeat(r) },
+                    onDelete = { actions.delete(r) }, modifier = Modifier.padding(horizontal = 20.dp))
+            } else GapRow(r as GapUi, home.zone, { actions.fillGap(r, day) }, Modifier.animateItem().padding(horizontal = 20.dp))
         }
         if (day.date == home.today) item(key = "manual") {
             Row(Modifier.padding(horizontal = 20.dp).fillMaxWidth().heightIn(min = 48.dp).pressable({ actions.manual(day) }),
@@ -383,6 +456,39 @@ fun EntryRow(e: EntryUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: () -> Unit,
             }
             Text(Format.duration(e.durationMs), style = NotAi.type.body.copy(fontSize = 15.sp), color = c.ink)
             IconAction(Icon.Repeat, "Повторить: ${e.label.title}", onRepeat, size = 16.dp)
+        }
+        Hairline()
+    }
+}
+
+/**
+ * A quiet row for a stretch without a record. Unrecorded time can be filled in one tap; a pause or unknown time is only named.
+ * No duration: the app does not measure what was not recorded.
+ */
+@Composable
+private fun GapRow(g: GapUi, zone: ZoneId, onFill: () -> Unit, modifier: Modifier = Modifier) {
+    val c = NotAi.colors
+    val fillable = g.kind == dev.notai.tracker.HistoryGapKind.UNRECORDED
+    val what = when (g.kind) {
+        dev.notai.tracker.HistoryGapKind.UNRECORDED -> "не записано"
+        dev.notai.tracker.HistoryGapKind.PAUSE -> "пауза"
+        dev.notai.tracker.HistoryGapKind.RECOVERY_UNCERTAIN -> "время неизвестно"
+    }
+    Column(modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).then(if (fillable) Modifier.pressable(onFill, label = "Записать промежуток") else Modifier)
+            .semantics(mergeDescendants = true) { contentDescription = "${Format.range(g.start, g.end, zone)}, $what" },
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            // An empty dashed ring in the icon column: a place where nothing was recorded.
+            androidx.compose.foundation.Canvas(Modifier.size(20.dp)) {
+                drawCircle(c.ink3, radius = 6.dp.toPx(), style = androidx.compose.ui.graphics.drawscope.Stroke(1.2.dp.toPx(),
+                    pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(2.dp.toPx(), 2.dp.toPx()))))
+            }
+            Text(Format.range(g.start, g.end, zone), style = NotAi.type.caption, color = c.ink2)
+            Text(what, Modifier.weight(1f), style = NotAi.type.caption, color = c.ink3)
+            if (fillable) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                M3Icon(Icon.Plus, null, Modifier.size(14.dp), tint = c.amberInk)
+                Text("Записать", style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
+            }
         }
         Hairline()
     }

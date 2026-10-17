@@ -53,7 +53,8 @@ import java.time.ZoneId
  * Every state line comes from SettingsCapabilities (actual OS observations); system prompts open only from a tap.
  */
 @Composable
-fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice, openTechnical: () -> Unit, modifier: Modifier = Modifier) {
+fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice, openTechnical: () -> Unit, modifier: Modifier = Modifier,
+                   openPlan: (PlanSeriesUi?) -> Unit = {}) {
     val c = NotAi.colors
     val context = LocalContext.current
     val activity = remember(context) { context.activity() }
@@ -75,7 +76,9 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
     var busy by remember { mutableStateOf(false) }
     var notificationsDenied by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) { vm.refreshCapabilities() }
+    LaunchedEffect(Unit) { vm.refreshCapabilities(); vm.refreshLongRecord() }
+    LaunchedEffect(settings?.longRecordReminder) { vm.refreshLongRecord() }
+    val longRecord by vm.longRecord.collectAsStateWithLifecycle()
     val open = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) scope.launch {
             busy = true;restore = null
@@ -166,7 +169,14 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 vm.setSurfaces { it.copy(focusSignal = on) }
                 if (on && f?.problem == SurfaceProblem.PERMISSION_REQUIRED) askNotifications()
             }
+            Divider()
+            SettingRow(rememberVectorPainter(Icon.TabTimer), "Ярлык на значке", status = "Долгое нажатие на значок приложения: старт и стоп",
+                warn = false, action = null, checked = surfaces?.shortcut == true) { on -> vm.setSurfaceEnabled(Surface.SHORTCUT, on) }
+            Divider()
+            settings?.longRecordReminder?.let { pref -> LongRecordRow(vm, pref, longRecord, ::askNotifications) { system(SurfaceSettingsAction.OPEN_NOTIFICATION_SETTINGS) } }
         }
+
+        PlanGroup(vm.planSeries(view), openPlan)
 
         settings?.focusPlan?.let { plan -> FocusGroup(vm, (plan.workMs / 60_000L).toInt(), (plan.breakMs / 60_000L).toInt()) }
 
@@ -178,13 +188,17 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 }
                 Segmented(listOf(ThemeChoice.SYSTEM to "Системная", ThemeChoice.LIGHT to "Светлая", ThemeChoice.DARK to "Тёмная"), theme, vm::setTheme)
             }
-            Divider()
+        }
+
+        Group("Дни в истории") {
             val device = ZoneId.systemDefault().id
             val differs = settings != null && settings.reportZone != device
-            NavRow(rememberVectorPainter(Icon.Globe), "Часовой пояс отчётов",
+            NavRow(rememberVectorPainter(Icon.Globe), "Часовой пояс",
                 note = settings?.reportZone.orEmpty().replace('_', ' ') +
                     if (differs) ". На телефоне сейчас ${device.replace('_', ' ')}, нажми, чтобы перейти" else ". По нему делятся дни в истории и обзоре",
                 onClick = if (differs) ({ zoneConfirm = device }) else null)
+            Divider()
+            settings?.reportDayStartMinute?.let { DayStartRow(vm, it) }
         }
 
         Group("Данные") {
@@ -220,7 +234,7 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
         }
 
         Group("Ещё") {
-            NavRow(painterResource(R.drawable.act_tools), "Техническая оболочка", note = "Цели, измерения, календарь, сопоставление CSV, восстановление базы",
+            NavRow(painterResource(R.drawable.act_tools), "Техническая оболочка", note = "Измерения, календарь, сопоставление CSV, восстановление базы",
                 onClick = openTechnical)
             Divider()
             val version = remember { runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() }
@@ -267,6 +281,74 @@ private fun surfaceStatus(cap: SurfaceCapability?, describe: String): String = w
     else -> describe
 }
 
+/** Night owls: records before this hour belong to the previous day. Applied after a short pause, like Focus steps. */
+@Composable
+private fun DayStartRow(vm: TrackerViewModel, minute: Int) {
+    val c = NotAi.colors
+    var hour by remember(minute) { mutableIntStateOf(minute / 60) }
+    LaunchedEffect(hour) { if (hour * 60 == minute) return@LaunchedEffect; delay(700); vm.setDayStart(hour * 60) }
+    Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 12.dp)) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+            M3Icon(Icon.Moon, null, Modifier.size(22.dp), tint = c.ink2)
+            Spacer(Modifier.width(14.dp))
+            Text("День начинается", Modifier.weight(1f), style = NotAi.type.body, color = c.ink)
+            IconAction(Icon.Minus, "Начало дня раньше", { hour = (hour - 1).coerceAtLeast(0) }, size = 16.dp, tint = c.ink)
+            Text("$hour:00", Modifier.widthIn(min = 56.dp).semantics { contentDescription = "День начинается в $hour:00" },
+                style = NotAi.type.body.copy(fontWeight = FontWeight.Medium), color = c.ink, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            IconAction(Icon.Plus, "Начало дня позже", { hour = (hour + 1).coerceAtMost(12) }, size = 16.dp, tint = c.ink)
+        }
+        Text(if (hour == 0) "В полночь, как в календаре" else "Записи до $hour:00 относятся к предыдущему дню. Сами записи не меняются",
+            Modifier.padding(start = 36.dp, end = 8.dp), style = NotAi.type.caption, color = c.ink2)
+    }
+}
+
+/** Off by default. The preference travels in copies; consent on this phone is separate and stated once. */
+@Composable
+private fun LongRecordRow(vm: TrackerViewModel, pref: dev.notai.tracker.LongRecordPreference, state: dev.notai.tracker.LongRecordState?,
+                          askNotifications: () -> Unit, openChannel: () -> Unit) {
+    val c = NotAi.colors
+    val hours = (pref.afterMs / 3_600_000L).coerceAtLeast(1).toInt()
+    var h by remember(hours) { mutableIntStateOf(hours) }
+    LaunchedEffect(h) { if (h == hours) return@LaunchedEffect; delay(700); vm.configureLongRecord(pref.copy(afterMs = h * 3_600_000L)) }
+    val blockers = state?.availability?.blockers.orEmpty()
+    val confirm = state?.confirmationRequired == true
+    val (status, warn, action) = when {
+        !pref.enabled -> Triple("Если запись идёт дольше $hours ч, тихо спросить в шторке, не забыт ли таймер", false, null)
+        confirm -> Triple("Включено в восстановленной копии. На этом телефоне нужно подтвердить", true, "Подтвердить" to vm::confirmLongRecord)
+        dev.notai.tracker.ScheduleDeliveryBlocker.PERMISSION in blockers -> Triple("Включено, но нет разрешения на уведомления", true, "Разрешить" to askNotifications)
+        dev.notai.tracker.ScheduleDeliveryBlocker.CHANNEL in blockers -> Triple("Включено, но уведомления выключены в настройках телефона", true, "Открыть настройки" to openChannel)
+        else -> Triple("Через $hours ч записи спросит в шторке: продолжить, отложить или остановить", false, null)
+    }
+    SettingRow(rememberVectorPainter(Icon.Bell), "Долгая запись", status, warn, action, pref.enabled) { on ->
+        vm.configureLongRecord(pref.copy(enabled = on))
+        if (on && dev.notai.tracker.ScheduleDeliveryBlocker.PERMISSION in blockers) askNotifications()
+    }
+    if (pref.enabled) StepRow(rememberVectorPainter(Icon.TabTimer), "Спросить через", h, { h = (h - 1).coerceAtLeast(1) }, { h = (h + 1).coerceAtMost(12) }, unit = "ч")
+}
+
+/** The optional plan for days. Each entry reads as one line; tapping opens it. */
+@Composable
+private fun PlanGroup(series: List<PlanSeriesUi>, open: (PlanSeriesUi?) -> Unit) {
+    val c = NotAi.colors
+    Group("План по дням") {
+        series.forEach { p ->
+            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).pressable({ open(p) }, label = p.label.title).padding(horizontal = 16.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                ActivityGlyph(p.label, size = 22.dp)
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(p.label.title, style = NotAi.type.body, color = c.ink, maxLines = 1)
+                    Text(p.summary, style = NotAi.type.caption, color = c.ink2)
+                }
+                M3Icon(Icon.ChevronRight, null, Modifier.size(16.dp), tint = c.ink3)
+            }
+            Divider()
+        }
+        NavRow(rememberVectorPainter(Icon.Plus), if (series.isEmpty()) "Добавить занятие в план" else "Добавить ещё",
+            note = if (series.isEmpty()) "Например, английский по понедельникам и средам. В эти дни он будет ждать на главном экране" else null,
+            onClick = { open(null) })
+    }
+}
+
 /** Work and break minutes. Steps apply after a short pause, so tapping through values writes once. */
 @Composable
 private fun FocusGroup(vm: TrackerViewModel, work: Int, rest: Int) {
@@ -285,14 +367,14 @@ private fun FocusGroup(vm: TrackerViewModel, work: Int, rest: Int) {
 }
 
 @Composable
-private fun StepRow(icon: Painter, title: String, minutes: Int, minus: () -> Unit, plus: () -> Unit) {
+private fun StepRow(icon: Painter, title: String, minutes: Int, minus: () -> Unit, plus: () -> Unit, unit: String = "мин") {
     val c = NotAi.colors
     Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = 16.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         M3Icon(icon, null, Modifier.size(22.dp), tint = c.ink2)
         Spacer(Modifier.width(14.dp))
         Text(title, Modifier.weight(1f), style = NotAi.type.body, color = c.ink)
         IconAction(Icon.Minus, "$title: меньше", minus, size = 16.dp, tint = c.ink)
-        Text("$minutes мин", Modifier.widthIn(min = 64.dp).semantics { contentDescription = "$title: $minutes минут" }, style = NotAi.type.body.copy(fontWeight = FontWeight.Medium),
+        Text("$minutes $unit", Modifier.widthIn(min = 64.dp).semantics { contentDescription = "$title: $minutes $unit" }, style = NotAi.type.body.copy(fontWeight = FontWeight.Medium),
             color = c.ink, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         IconAction(Icon.Plus, "$title: больше", plus, size = 16.dp, tint = c.ink)
     }

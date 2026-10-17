@@ -24,11 +24,21 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
+/** Shorter unrecorded stretches between two records are ordinary transitions, not worth a row. */
+internal const val GAP_MIN_MS = 15 * 60_000L
+
 /** What the picker does with the chosen activity. */
 enum class PickMode { START, SWITCH, LABEL, EARLIER, MANUAL, FOCUS }
 
 data class EntryFormTarget(val id: String,val entry: EntryUi?,val day: DayUi,
-    val saving: Boolean = false,val error: String? = null,val reviewNonce: Long = 0)
+    val saving: Boolean = false,val error: String? = null,val reviewNonce: Long = 0,val gap: GapUi? = null)
+/** A stretch of a day without a recording, between two recorded entries. Never a claim of inactivity. */
+data class GapUi(val start: Long,val end: Long,val kind: HistoryGapKind)
+/** Today's planned activity; starting it is an ordinary Start linked to this occurrence. */
+data class PlanItem(val key: OccurrenceKey,val seriesRevision: Long,val overrideRevision: Long?,val title: String,val glyph: Int,val slot: Int?,
+                    val time: String?,val started: Boolean)
+data class PlanSeriesUi(val id: String,val revision: Long,val label: Label,val selection: Classification,val weekdays: Set<Int>,val date: LocalDate?,
+                        val time: java.time.LocalTime?,val summary: String)
 data class IncomingDraft(val id: String,val draft: EntryDraft)
 
 data class Notice(val text: String, val undo: Token? = null, val id: Long = System.nanoTime())
@@ -36,10 +46,11 @@ data class Notice(val text: String, val undo: Token? = null, val id: Long = Syst
 data class EntryUi(val segmentId: String, val sessionId: String, val start: Long, val end: Long, val durationMs: Long,
                    val label: Label, val note: String?, val selection: Classification)
 data class DayUi(val date: LocalDate, val start: Long, val end: Long, val recordedMs: Long, val incomplete: Boolean, val entries: List<EntryUi>,
-                 val ribbon: List<RibbonSlot>, val live: List<RibbonSlot>)
+                 val ribbon: List<RibbonSlot>, val live: List<RibbonSlot>, val gaps: List<GapUi> = emptyList())
 data class QuickStart(val title: String, val slot: Int?, val entry: ChoiceEntry, val favorite: Boolean, val glyph: Int, val reference: ChoiceReference, val expected: Token)
 data class HomeData(val today: LocalDate, val zone: ZoneId, val days: List<DayUi>, val quick: List<QuickStart>,
-                    val currentLabel: Label?, val currentStart: Long?, val canLoadMore: Boolean, val focusMinutes: Long)
+                    val currentLabel: Label?, val currentStart: Long?, val canLoadMore: Boolean, val focusMinutes: Long,
+                    val plan: List<PlanItem> = emptyList())
 
 data class PickerItem(val entry: ChoiceEntry, val label: Label, val count: Int? = null, val whole: Boolean = false,
                       val reference: ChoiceReference? = null, val expected: Token? = null)
@@ -49,7 +60,10 @@ data class PickerData(val recents: List<PickerItem>, val favorites: List<PickerI
 enum class Period(val days: Int, val title: String) { DAY(1, "День"), WEEK(7, "7 дней"), MONTH(30, "30 дней") }
 data class AreaTotal(val name: String, val slot: Int?, val ms: Long, val glyph: Int = ActivityGlyphs.custom)
 data class DayColumn(val date: LocalDate, val parts: List<Pair<Int?, Long>>, val totalMs: Long, val incomplete: Boolean)
-data class GoalUi(val name: String, val value: String, val status: String, val ok: Boolean, val fraction: Float)
+data class GoalUi(val name: String, val value: String, val status: String, val ok: Boolean, val fraction: Float, val id: String = "")
+/** What the goal form edits. The calendar (period, zone, day start) is fixed once a goal exists. */
+data class GoalDraft(val id: String?,val name: String,val selection: Classification?,val label: Label?,val metric: GoalMetric,
+                     val direction: GoalDirection,val period: GoalPeriod,val target: Long)
 data class OverviewData(val period: Period, val first: LocalDate, val last: LocalDate, val totalMs: Long, val incomplete: Boolean,
                         val differenceMs: Long?, val previousMs: Long?, val previousFirst: LocalDate, val previousLast: LocalDate, val areas: List<AreaTotal>,
                         val columns: List<DayColumn>, val ribbon: List<RibbonSlot>, val dayStart: Long, val dayEnd: Long,
@@ -150,7 +164,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     // state; CorrectionPreview stays transient and is recomputed from current data.
     private val _entryForm = MutableStateFlow<EntryFormTarget?>(null)
     val entryForm: StateFlow<EntryFormTarget?> = _entryForm
-    fun openEntryForm(entry: EntryUi?,day: DayUi) { _entryForm.value = EntryFormTarget(newId(),entry,day) }
+    fun openEntryForm(entry: EntryUi?,day: DayUi,gap: GapUi? = null) { _entryForm.value = EntryFormTarget(newId(),entry,day,gap = gap) }
     fun closeEntryForm() { _entryForm.value = null }
     /** A result belongs to its form identity; an old completion cannot close a new editor. */
     fun submitEntryForm(id: String,start: Long,end: Long,selection: Classification,note: String?,preview: Tracker.CorrectionPreview?) {
@@ -163,7 +177,9 @@ class TrackerViewModel internal constructor(private val app: Application,private
                 else current.copy(saving = false,error = Format.error(requireNotNull(result.exceptionOrNull())),reviewNonce = current.reviewNonce+1)
             }
         }
-        if(target.entry == null) manual(start,end,selection,note,completed)
+        val gap = target.gap
+        if(target.entry == null && gap != null && gap.start == start && gap.end == end) recordGap(gap,selection,note,completed)
+        else if(target.entry == null) manual(start,end,selection,note,completed)
         else if(preview != null) applyCorrection(preview,completed)
         else completed(Result.failure(CoreError(ErrorCode.STALE,"Correction needs a current preview")))
     }
@@ -255,21 +271,112 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val calendar = v.calendar(today.minusDays(days - 1L), days)
         val open = current(d)
         val notes = d.sessions.associate { it.id to it.note }
+        // One review for the whole window. Only stretches between two recorded entries of the same day are offered:
+        // the night or the hours before the first record are not "missing", they are simply not recorded.
+        val review = calendar.days.firstOrNull()?.let { first -> runCatching { v.historyGaps(first.start, calendar.days.last().end) }.getOrNull() }
         val dayList = calendar.days.asReversed().mapNotNull { day ->
             val entries = day.rows.filter { it.sessionId != open?.id }.sortedByDescending { it.start }.map { r ->
                 EntryUi(r.segmentId, r.sessionId, r.start, r.end, r.durationMs, d.label(r.selection), r.note ?: notes[r.sessionId], r.selection)
             }
+            val lo = day.rows.minOfOrNull { it.start }; val hi = day.rows.maxOfOrNull { it.end }
+            val gaps = if (lo == null || hi == null) emptyList() else review?.gaps.orEmpty().filter { g ->
+                g.start >= lo && g.end <= hi && g.start >= day.start && g.end <= day.end &&
+                    (g.kind == HistoryGapKind.RECOVERY_UNCERTAIN || g.end - g.start >= GAP_MIN_MS)
+            }.map { GapUi(it.start, it.end, it.kind) }
             if (entries.isEmpty() && day.date != today && day.recordedMs == 0L) null
             else DayUi(day.date, day.start, day.end, day.recordedMs, day.incomplete, entries,
                 entries.map { RibbonSlot(it.start, it.end, it.label.slot) },
-                day.rows.filter { it.sessionId == open?.id }.map { RibbonSlot(it.start, it.end, null) })
+                day.rows.filter { it.sessionId == open?.id }.map { RibbonSlot(it.start, it.end, null) }, gaps)
         }
         // Same bounded source as the notification: favourites, then the most frequent of the last 30 days.
         val quick = quickChoices(v, 8).filter { it.entry.canStart && !d.label(it.entry.selection).unclassified }.take(5).map { q -> q.toQuickStart(d,v.snapshot().token) }
         return HomeData(today, zone, dayList, quick, open?.let { d.label(it.selection) }, open?.let { s -> d.segments.filter { it.sessionId == s.id }.minOfOrNull { it.start } },
             // Older days only when something older exists: a new install has nothing to load.
             days < 62 && (d.segments.minOfOrNull { it.start } ?: Long.MAX_VALUE) < (calendar.days.firstOrNull()?.start ?: Long.MIN_VALUE),
-            d.settings.focusPlan.workMs / 60_000L)
+            d.settings.focusPlan.workMs / 60_000L, todayPlan(v))
+    }
+
+    // ---------- plan for days ----------
+
+    private fun deviceZone(): ZoneId = ZoneId.systemDefault()
+
+    /** Today's occurrences only. Seeing the plan never creates a fact; skipped ones simply disappear. */
+    private fun todayPlan(v: TrackerView): List<PlanItem> {
+        if (v.data.schedule.series.none { it.state == ScheduleState.ACTIVE }) return emptyList()
+        val state = runCatching { v.scheduleState(deviceZone()) }.getOrNull() ?: return emptyList()
+        return state.occurrences.filter { it.date == state.day.date && it.state in setOf(OccurrenceState.TODAY, OccurrenceState.MOVED, OccurrenceState.STARTED) }
+            .map { p ->
+                val l = v.data.label(p.selection)
+                PlanItem(p.key, p.seriesRevision, p.overrideRevision, l.title, l.glyph, l.slot,
+                    p.localTime?.let { "${it.hour}:${it.minute.toString().padStart(2, '0')}" }, p.state == OccurrenceState.STARTED)
+            }
+    }
+
+    /** Every schedule change goes through the durable workspace when the app runtime exists (a lost reply repeats the same key). */
+    private fun schedule(rt: UiBackend, command: ScheduleCommand): ScheduleCommandResult {
+        val workspace = rt.runtime?.schedule ?: return rt.tracker.scheduleCommand(command)
+        val draft = workspace.prepare(command)
+        return workspace.execute(draft.id, draft.revision)
+    }
+    private fun planCommand(success: String?, block: (UiBackend, Snapshot) -> Unit) {
+        val rt = runtime ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            try { block(rt, rt.tracker.snapshot()); success?.let { notice(it) } }
+            catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice(Format.error(e)) }
+        }
+    }
+
+    /** Idle: an ordinary Start linked to the occurrence. Tracking: the current record ends now, then the planned one starts. */
+    fun startPlanned(item: PlanItem) = planCommand(null) { rt, s ->
+        ensure(s.focus == null, "Finish Focus first")
+        var token = s.token
+        if (s.mode != Mode.IDLE) token = rt.tracker.timerCommand(s.timerTarget ?: fail(ErrorCode.STALE, "Timer target unavailable"), TimerDirective.STOP).state.token
+        schedule(rt, ScheduleCommand(newId(), token, ScheduleAction.START, item.key.seriesId, item.seriesRevision,
+            occurrence = item.key, expectedOverrideRevision = item.overrideRevision, deviceZone = deviceZone().id))
+    }
+    fun skipPlanned(item: PlanItem) = planCommand("Убрано из плана на сегодня") { rt, s ->
+        schedule(rt, ScheduleCommand(newId(), s.token, ScheduleAction.OVERRIDE, item.key.seriesId, item.seriesRevision,
+            occurrence = item.key, override = OccurrenceOverride(item.key, OverrideOperation.SKIP), expectedOverrideRevision = item.overrideRevision,
+            deviceZone = deviceZone().id))
+    }
+
+    fun planSeries(v: TrackerView?): List<PlanSeriesUi> {
+        val d = v?.data ?: return emptyList()
+        return d.schedule.series.filter { it.state == ScheduleState.ACTIVE }.mapNotNull { s ->
+            val rule = s.revisions.lastOrNull()?.rule ?: return@mapNotNull null
+            val once = rule.weekdays.isEmpty() && rule.extraDates.size == 1
+            val date = if (once) LocalDate.parse(rule.extraDates.single()) else null
+            val time = rule.localTime?.let(java.time.LocalTime::parse)
+            PlanSeriesUi(s.id, s.revision, d.label(rule.selection), rule.selection, rule.weekdays, date, time, Format.planRule(rule.weekdays, date, time))
+        }.sortedWith(compareBy({ it.date ?: LocalDate.MIN }, { it.time ?: java.time.LocalTime.MAX }, { it.label.title }))
+    }
+    fun scheduleToday(): LocalDate = view.value?.scheduleDay(deviceZone())?.date ?: LocalDate.now(deviceZone())
+
+    /** Weekdays (1 = Monday) or one date; time is optional. A changed weekly plan applies from today on, earlier days keep their meaning. */
+    fun savePlan(existing: PlanSeriesUi?, selection: Classification, weekdays: Set<Int>, date: LocalDate?, time: java.time.LocalTime?) =
+        planCommand(if (existing == null) "Добавлено в план" else "План изменён") { rt, s ->
+            val zone = deviceZone(); val today = rt.tracker.scheduleDay(zone).date
+            val once = date != null
+            val start = (date ?: today).toString()
+            val rule = ScheduleRule(selection, start, if (once) emptySet() else weekdays, if (once) setOf(start) else emptySet(),
+                time?.toString(), until = if (once) start else null)
+            if (existing == null) { schedule(rt, ScheduleCommand(newId(), s.token, ScheduleAction.CREATE, newId(), rule = rule, deviceZone = zone.id)); return@planCommand }
+            val series = rt.tracker.data().schedule.series.single { it.id == existing.id }
+            val weekly = !once && existing.date == null
+            if (weekly) {
+                val from = maxOf(today, LocalDate.parse(series.revisions.last().effectiveFrom))
+                val kept = rule.copy(startDate = series.revisions.first().rule.startDate)
+                schedule(rt, ScheduleCommand(newId(), s.token, ScheduleAction.UPDATE_FUTURE, existing.id, existing.revision, rule = kept,
+                    effectiveFrom = from.toString(), deviceZone = zone.id))
+            } else {
+                // A single day moved or turned into a weekly plan: the old entry is archived, a new one starts.
+                val r = schedule(rt, ScheduleCommand(newId(), s.token, ScheduleAction.SET_STATE, existing.id, existing.revision, state = ScheduleState.ARCHIVED, deviceZone = zone.id))
+                val token = rt.tracker.snapshot().token.also { ensure(it.revision == r.datasetRevision, "Plan changed", ErrorCode.STALE) }
+                schedule(rt, ScheduleCommand(newId(), token, ScheduleAction.CREATE, newId(), rule = rule, deviceZone = zone.id))
+            }
+        }
+    fun removePlan(existing: PlanSeriesUi) = planCommand("Убрано из плана") { rt, s ->
+        schedule(rt, ScheduleCommand(newId(), s.token, ScheduleAction.SET_STATE, existing.id, existing.revision, state = ScheduleState.ARCHIVED, deviceZone = deviceZone().id))
     }
 
     /** Renderer-facing backend state; Compose screens are supplied separately by Claude. */
@@ -594,6 +701,27 @@ class TrackerViewModel internal constructor(private val app: Application,private
         rt.tracker.manual(s.token, start, end, selection, note?.takeIf { it.isNotBlank() })
     }
 
+    /** The unchanged gap goes through the core's own draft: a fresh review of exactly that stretch must still find it free. */
+    private fun recordGap(gap: GapUi,selection: Classification,note: String?,completed: (Result<Tracker.Change>) -> Unit) = command({ "Промежуток записан" },completed) { rt,s ->
+        val review = rt.tracker.historyGaps(gap.start,gap.end)
+        val found = review.gaps.singleOrNull { it.start == gap.start && it.end == gap.end && it.kind != HistoryGapKind.RECOVERY_UNCERTAIN }
+            ?: fail(ErrorCode.STALE,"The gap is no longer free")
+        rt.tracker.recordDraft(s.token,rt.tracker.gapDraft(review,found.id,selection,note?.takeIf { it.isNotBlank() }))
+    }
+
+    // ---------- the current record started earlier ----------
+
+    /** null asks for "from the end of the previous record". Nothing is written: the sheet shows the proposal first. */
+    suspend fun previewStartEarlier(start: Long?): Result<StartBackfillPreview> = withContext(Dispatchers.IO) {
+        runCatching {
+            val rt = runtime ?: fail(ErrorCode.STALE,"No backend")
+            val s = rt.tracker.snapshot();val id = s.session?.id ?: fail(ErrorCode.INVALID_INPUT,"No current record")
+            if(start == null) rt.tracker.previewStartAtPreviousEnd(s.token,id) else rt.tracker.previewStartBackfill(s.token,id,start)
+        }
+    }
+    fun applyStartEarlier(preview: StartBackfillPreview,completed: (Result<Tracker.Change>) -> Unit) =
+        command({ "Начало записи перенесено" },completed) { rt,_ -> rt.tracker.applyStartBackfill(preview) }
+
     fun session(sessionId: String): Pair<Session, List<Segment>>? {
         val d = view.value?.data ?: return null
         val s = d.sessions.firstOrNull { it.id == sessionId } ?: return null
@@ -627,6 +755,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val comparison = runCatching {
             Reports.compareCalendarDays(d, rt.tracker.clock.now(), first, first.minusDays(period.days.toLong()), period.days)
         }.getOrNull()
+        // The definition in effect for the shown period, not the stored head: a scheduled edit must not hide or relabel today.
         val goals = d.goals.mapNotNull { g -> runCatching { v.goalProgress(g.id) }.getOrNull()?.takeIf { it.goal.enabled }?.let(::goalUi) }
         val day = calendar.days.first()
         OverviewData(period, first, today, window.recordedMs, window.incomplete, comparison?.absoluteDifferenceMs, comparison?.previous?.recordedMs,
@@ -636,21 +765,72 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     private fun goalUi(p: GoalProgress): GoalUi {
         val g = p.goal
-        fun amount(x: Long) = when(g.metric) {
-            GoalMetric.DURATION_MS -> Format.duration(x)
-            GoalMetric.SESSION_COUNT -> "$x раз"
-            GoalMetric.DISTINCT_RECORDED_DAYS -> "$x дн."
-        }
-        val per = when (g.period) { GoalPeriod.DAY -> " в день"; GoalPeriod.WEEK -> " в неделю"; GoalPeriod.MONTH -> " в месяц"; GoalPeriod.FIXED -> "" }
-        val name = g.name + if (g.direction == GoalDirection.MINIMUM) ", от ${amount(g.target)}$per" else ", не больше ${amount(g.target)}$per"
+        fun amount(x: Long) = Format.goalAmount(g.metric, x)
+        val name = g.name + ", " + Format.goalRule(g.metric, g.direction, g.period, g.target)
         val (status, ok) = when (p.recordedStatus) {
             GoalStatus.MINIMUM_PENDING -> "осталось ${amount(p.remaining)}" to false
             GoalStatus.MINIMUM_REACHED -> "есть" to true
             GoalStatus.WITHIN_LIMIT -> "в пределах" to true
             GoalStatus.LIMIT_EXCEEDED -> "больше на ${amount(p.excess)}" to false
         }
-        return GoalUi(name, amount(p.actual), status + if (p.uncertain) ", есть неизвестное время" else "", ok,
-            if (g.target > 0) (p.actual.toFloat() / g.target).coerceIn(0f, 1f) else 0f)
+        val value = if (g.metric == GoalMetric.DISTINCT_RECORDED_DAYS) "${amount(p.actual)} с записями" else amount(p.actual)
+        return GoalUi(name, value, status + if (p.uncertain) ", есть неизвестное время" else "", ok,
+            if (g.target > 0) (p.actual.toFloat() / g.target).coerceIn(0f, 1f) else 0f, g.id)
+    }
+
+    // ---------- goals ----------
+
+    /** The definition in effect today, for the form. */
+    fun goalDraft(id: String): GoalDraft? {
+        val v = view.value ?: return null
+        val g = runCatching { v.goalDefinition(id) }.getOrNull() ?: return null
+        val selection = when { g.filter.cardId != null -> v.data.cards.firstOrNull { it.id == g.filter.cardId }?.classification()
+            g.filter.activityTypeId != null -> Classification(activityTypeId = g.filter.activityTypeId); else -> null }
+        return GoalDraft(g.id, g.name, selection, selection?.let { v.data.label(it) }, g.metric, g.direction, g.period, g.target)
+    }
+
+    /** A new goal takes the report day of today. An edit keeps its calendar and says when it applies. */
+    fun saveGoal(draft: GoalDraft, mode: GoalEditMode) = command({ if (draft.id == null) "Цель поставлена" else "Цель изменена" }) { rt, s ->
+        val d = rt.tracker.data()
+        val filter = when { draft.selection?.cardId != null -> Filter(cardId = draft.selection.cardId)
+            draft.selection?.activityTypeId != null -> Filter(activityTypeId = draft.selection.activityTypeId); else -> Filter() }
+        val stored = draft.id?.let { id -> d.goals.single { it.id == id } }
+        val goal = stored?.copy(name = draft.name.trim(), metric = draft.metric, direction = draft.direction, target = draft.target, filter = filter, revisions = stored.revisions)
+            ?: Goal(name = draft.name.trim(), metric = draft.metric, target = draft.target, direction = draft.direction, period = draft.period,
+                zone = d.settings.reportZone, filter = filter, dayStartMinute = d.settings.reportDayStartMinute)
+        rt.tracker.saveGoal(s.token, goal, mode)
+    }
+    fun deleteGoal(id: String) = command({ "Цель убрана" }) { rt, s -> rt.tracker.deleteGoal(s.token, id) }
+
+    // ---------- shareable summary ----------
+
+    /** Plain text from the same core report as the overview: totals by area, unknown time apart, notes only when asked. */
+    suspend fun summary(period: Period, notes: Boolean): String? = withContext(Dispatchers.IO) {
+        val v = view.value ?: return@withContext null
+        val d = v.data
+        val zone = ZoneId.of(d.settings.reportZone)
+        val today = ReportingDayPolicy(d.settings.reportZone, d.settings.reportDayStartMinute).dateAt(now())
+        val first = today.minusDays(period.days - 1L)
+        val report = v.calendar(first, period.days).window
+        val rootIds = d.types.filter { it.parentId == null }.map { it.id }.toSet()
+        val names = d.types.associate { it.id to it.name }
+        buildString {
+            append(if (period == Period.DAY) "Сегодня, ${Format.dayMonth(today)}" else Format.period(first, today)).append('\n')
+            append("Всего ").append(Format.duration(report.recordedMs)).append(if (report.incomplete) ", день ещё идёт" else "").append('\n')
+            val areas = report.byType().filter { (k, ms) -> ms > 0 && (k == null || k in rootIds) }.toList().sortedByDescending { it.second }
+            if (areas.isNotEmpty()) append('\n')
+            areas.forEach { (id, ms) -> append(id?.let { names[it] } ?: "Без области").append(" — ").append(Format.duration(ms)).append('\n') }
+            if (report.unresolved.isNotEmpty()) append('\n').append("Неизвестное время не входит в итог: ")
+                .append(Format.plural(report.unresolved.size, "отрезок", "отрезка", "отрезков")).append('\n')
+            if (notes) {
+                val noted = report.rows.filter { !it.note.isNullOrBlank() }.distinctBy { it.sessionId }.sortedBy { it.start }
+                if (noted.isNotEmpty()) append('\n').append("Заметки").append('\n')
+                noted.forEach { r ->
+                    val date = Instant.ofEpochMilli(r.start).atZone(zone).toLocalDate()
+                    append("• ").append(Format.dayMonth(date)).append(", ").append(d.label(r.selection).title).append(": ").append(r.note).append('\n')
+                }
+            }
+        }.trimEnd()
     }
 
     // ---------- data screen ----------
@@ -659,7 +839,44 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val d = rt.tracker.data(); rt.tracker.settings(s.token, d.settings.copy(surfaces = change(d.settings.surfaces)))
     }
     fun setReportZone(zone: String) = command({ "Часовой пояс отчётов: $zone" }) { rt, s ->
-        ZoneId.of(zone); val d = rt.tracker.data(); rt.tracker.settings(s.token, d.settings.copy(reportZone = zone))
+        ZoneId.of(zone); val d = rt.tracker.data(); rt.tracker.configureReportingDay(s.token, ReportingDayPolicy(zone, d.settings.reportDayStartMinute))
+    }
+    /** Only day labels move; recorded facts and existing goals keep their own boundaries. */
+    fun setDayStart(minute: Int) = command({ "День начинается в ${minute / 60}:${(minute % 60).toString().padStart(2, '0')}" }) { rt, s ->
+        rt.tracker.configureReportingDay(s.token, ReportingDayPolicy(rt.tracker.data().settings.reportZone, minute))
+    }
+
+    // ---------- long-record check-in ----------
+
+    private val _longRecord = MutableStateFlow<LongRecordState?>(null)
+    /** Null when this backend has no Android reminder runtime (then the row is read-only). */
+    val longRecord: StateFlow<LongRecordState?> = _longRecord
+    fun refreshLongRecord() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val controller = waitRuntime()?.longRecord ?: return@launch
+            _longRecord.value = runCatching { controller.synchronize() }.getOrNull()
+        }
+    }
+    fun configureLongRecord(value: LongRecordPreference) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val rt = waitRuntime() ?: return@launch
+            val controller = rt.longRecord ?: return@launch
+            try {
+                val current = _longRecord.value ?: controller.synchronize()
+                _longRecord.value = controller.configure(rt.tracker.snapshot().token, value, current.controlRevision)
+            } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice(Format.error(e)); refreshLongRecord() }
+        }
+    }
+    /** A restored copy carries the preference, not consent on this phone: one explicit tap confirms it here. */
+    fun confirmLongRecord() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val rt = waitRuntime() ?: return@launch
+            val controller = rt.longRecord ?: return@launch
+            try {
+                val current = _longRecord.value ?: controller.synchronize()
+                _longRecord.value = controller.confirm(rt.tracker.snapshot().token, current.controlRevision)
+            } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice(Format.error(e)); refreshLongRecord() }
+        }
     }
 
     private val exports by lazy { ExportOperations(app) }

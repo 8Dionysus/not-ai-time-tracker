@@ -1,0 +1,69 @@
+{
+  "schema": "preui_stream_performance_comparison_v1",
+  "baseline_source": "841448b8a3ff26111fce9bdf8418c170dbc7a622",
+  "accepted_candidate": "primitive whitespace/delimiter membership; Reader unchanged",
+  "rejected_candidate": "reader buffer/direct String path; median +21.82%, saved recoverably outside product source",
+  "samples_seconds": {
+    "before": [
+      29.100015053,
+      28.441309597,
+      29.49587366,
+      29.664203702,
+      30.581549054,
+      29.793993958,
+      30.944280289
+    ],
+    "after": [
+      36.136930177,
+      37.973531246,
+      34.588343865,
+      34.594302087,
+      33.981675141,
+      38.833264523,
+      39.291740646
+    ],
+    "delimiter": [
+      20.533900374,
+      21.081567938,
+      21.882796052,
+      22.308245009,
+      21.410060489,
+      20.12631684,
+      21.682778894
+    ]
+  },
+  "medians_seconds": {
+    "before": 29.664203702,
+    "after": 36.136930177,
+    "delimiter": 21.410060489
+  },
+  "accepted_median_reduction_percent": 27.82526473968183,
+  "same_canonical_output_sha256": true,
+  "canonical_output_sha256": "0b7fab0d31f4cef7a06c3ddd8db49bf91f1da15a5591371bfdf2f86ad75c83ed",
+  "input_bytes": 66840051,
+  "sessions": 73000,
+  "segments": 73000,
+  "total_duration_ms": 131400000000,
+  "new_product_limits": false,
+  "core_jvm_tests": 199,
+  "core_jvm_failures": 0,
+  "native_component_api": 35,
+  "raw_evidence_in_delivery": [
+    "stream-native-before.log",
+    "stream-native-after.log",
+    "stream-native-delimiter.log",
+    "core-delimiter-xml",
+    "jsonrecords-before-bytecode.txt",
+    "jsonrecords-delimiter-bytecode.txt",
+    "rejected-reader-buffer"
+  ],
+  "canonical_sdk36_build_at_capture": "not executed: SDK36/NDK30 and pinned app test dependencies absent; no install authorization",
+  "native_room_current_source_regression_at_capture": "pending next phase",
+  "currentCanonicalFollowup": {
+    "sourceCommit": "a0379138e38349d68347a8811920a27e36b692c3",
+    "core": 203,
+    "app": 243,
+    "evidence": "evidence/canonical-r4/summary.json",
+    "newTimedSeriesAfterHostReboot": false
+  }
+}

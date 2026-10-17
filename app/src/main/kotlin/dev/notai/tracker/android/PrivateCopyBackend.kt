@@ -71,11 +71,15 @@ object PrivateCopyBackend {
       catch(_: Exception) { PrivateCopyBackendInspection(null,null,setOf("PRIVATE_ROOT_OR_REGISTRY_UNAVAILABLE")) }
     internal fun registerRollback(context: Context,name: String) = bestEffort { catalog(context) { it.registerRollback(name) } }
     internal fun registerExport(context: Context,id: String) = bestEffort { catalog(context) { it.registerExport(id) } }
+    internal fun registerCompletedExport(context: Context,id: String) = bestEffort {
+        val maintenance = PrivateFileMaintenance.forContext(context)
+        root(context).use { PrivateCopyCatalog(it,maintenance).registerExportAfterHandoff(id) }
+    }
     internal fun registerForm(context: Context,id: String) = bestEffort { catalog(context) { it.registerForm("$id.json") { text -> codec.decodeFromString<FormState>(text) } } }
     internal fun registerRestoreInput(context: Context,name: String) = bestEffort { catalog(context) { it.registerRestoreInput(name) } }
     internal fun finalizeArchive(context: Context,id: String) = bestEffort { catalog(context) { c ->
         c.finalizeArchive(id)
-        check(itemId("database-archives/$id") in c.registerFinalizedArchives().registeredIds) { "Archive graph registration deferred" }
+        check(itemId("database-archives/$id") in c.registerFinalizedArchive(id).registeredIds) { "Archive graph registration deferred" }
     } }
     /** Lack of a verified native binding does not undo a successfully saved backup/export.
      * Its bytes stay unregistered/protected; inspect exposes the unavailable capability and retries.

@@ -18,13 +18,26 @@ import kotlinx.serialization.Serializable
 enum class WidgetPlacement { AVAILABLE, UNSUPPORTED, PENDING, PINNED, UNCONFIRMED, FAILED }
 enum class SurfaceProblem { PERMISSION_REQUIRED, CHANNEL_BLOCKED, FOREGROUND_REQUIRED, LAUNCHER_UNSUPPORTED, PLATFORM_FAILURE, RECEIPT_STORAGE }
 data class WidgetState(val supported: Boolean,val ids: List<Int>,val placement: WidgetPlacement,val requestId: String?,val problem: SurfaceProblem? = null)
-class WidgetPlacementController(private val context: Context) {
+/** Narrow platform port for deterministic native failure fixtures. Production construction
+ * always uses the real AppWidgetManager; durable receipt and foreground gates stay here. */
+internal interface WidgetPlacementPlatform {
+    val supported: Boolean
+    fun ids(provider: ComponentName): IntArray
+    fun request(provider: ComponentName,callback: PendingIntent): Boolean
+}
+private class AndroidWidgetPlacementPlatform(private val context: Context): WidgetPlacementPlatform {
     private val manager get() = AppWidgetManager.getInstance(context)
+    override val supported get() = manager.isRequestPinAppWidgetSupported
+    override fun ids(provider: ComponentName) = manager.getAppWidgetIds(provider)
+    override fun request(provider: ComponentName,callback: PendingIntent) = manager.requestPinAppWidget(provider,null,callback)
+}
+class WidgetPlacementController internal constructor(private val context: Context,private val platform: WidgetPlacementPlatform) {
+    constructor(context: Context): this(context,AndroidWidgetPlacementPlatform(context))
     private val provider get() = ComponentName(context,TimerWidget::class.java)
     private val prefs get() = context.getSharedPreferences("widget-placement",Context.MODE_PRIVATE)
     fun read(reconcileForeground: Boolean = false): WidgetState {
-        val supported = manager.isRequestPinAppWidgetSupported
-        val ids = manager.getAppWidgetIds(provider).sorted()
+        val supported = platform.supported
+        val ids = platform.ids(provider).sorted()
         val request = prefs.getString("request",null)
         var state = runCatching { WidgetPlacement.valueOf(prefs.getString("state",WidgetPlacement.AVAILABLE.name)!!) }.getOrDefault(WidgetPlacement.FAILED)
         state = when { ids.isNotEmpty() -> WidgetPlacement.PINNED; !supported -> WidgetPlacement.UNSUPPORTED
@@ -48,7 +61,7 @@ class WidgetPlacementController(private val context: Context) {
         // Immutable callback: don't rely on launcher fill-in extras, query actual IDs after callback instead.
         val pending = PendingIntent.getBroadcast(context,0,callback,PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         return try {
-            if(manager.requestPinAppWidget(provider,null,pending)) read()
+            if(platform.request(provider,pending)) read()
             else { prefs.edit().putString("state",WidgetPlacement.UNCONFIRMED.name).commit(); read().copy(problem = SurfaceProblem.LAUNCHER_UNSUPPORTED) }
         } catch(_: RuntimeException) {
             prefs.edit().putString("state",WidgetPlacement.FAILED.name).commit()
@@ -58,7 +71,7 @@ class WidgetPlacementController(private val context: Context) {
     fun callback(id: String?) {
         if(id == null || id != prefs.getString("request",null)) return
         // Callback is not assumed to imply placement; IDs remain the authoritative observation.
-        prefs.edit().putString("state",if(manager.getAppWidgetIds(provider).isNotEmpty()) WidgetPlacement.PINNED.name else WidgetPlacement.UNCONFIRMED.name).commit()
+        prefs.edit().putString("state",if(platform.ids(provider).isNotEmpty()) WidgetPlacement.PINNED.name else WidgetPlacement.UNCONFIRMED.name).commit()
     }
 }
 class WidgetPinReceiver: BroadcastReceiver() {

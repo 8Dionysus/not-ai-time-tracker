@@ -27,9 +27,11 @@ class MainActivity : ComponentActivity() {
     private var launchedDocumentExport: String? = null
     private var launchedDocumentExportOwner: String? = null
     private val saveExport = registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
+        val id = launchedDocumentExport
+        val owner = launchedDocumentExportOwner
         launchedDocumentExport = null
         launchedDocumentExportOwner = null
-        vm.documentExportId()?.let { vm.writeExport(it,uri) }
+        vm.receiveDocumentExportResult(id,owner,uri)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

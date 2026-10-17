@@ -1,4 +1,12 @@
-# Tracker backend handoff for Claude
+> Current r14 handoff: [полная карта остатка](BACKEND_COMPLETION_2026_10_17.md), [verified candidate](BACKEND_READINESS_2026_10_17.md). Accepted r12 retained; r14 coordinator acceptance pending. Typed Focus callers, atomic switchDraft, reporting-day/goal callers and shortcut preference controller are now connected. Old "caller remains open" wording below records earlier handoff state. CSV sourceLocale/mapping persistence, new forms/controls and real Focus DND/audio choices remain specific frontend/platform work. Application Schedule/ordinary notification composition is already closed by r12; current source/evidence boundaries are in the linked matrix.
+
+# Frontend handoff — принятый backend r12
+
+> Текущая backend-приёмка: [backend readiness](BACKEND_READINESS_2026_10_17.md), [acceptance status](ACCEPTANCE_GAPS.md), [native matrix](NATIVE_MATRIX_2026_10_16.md). Backend r12 принят в AOSP emulator scope; production composition, Application/channel/receiver wiring и B02 native QA4 закрыты. Точный QA4 APK b06,459тестов, cold AlarmManager/SIGKILL, lifecycle и восстановление прав подтверждены. Дизайн и новые экраны/consumer routes остаются Дионису/Opus; backend startup wiring не передаётся экрану как незавершённая работа.
+
+## Исторический handoff snapshot 2026-10-14/15
+
+Ниже сохранён прежний handoff с его source SHA/версиями. Его слова «Current», прежние readiness/binding ограничения и ссылки относятся к той дате и не переопределяют принятую r12 приёмку выше. Побайтный оригинал до этой маркировки сохранён в [history](history/pre-r12-documentation-2026-10-17/README.md).
 
 Current backend audit deltas, remaining UI findings and cleanup prerequisites: [BACKEND_AUDIT_HANDOFF.md](BACKEND_AUDIT_HANDOFF.md). This supersedes earlier readiness statements where explicitly noted.
 

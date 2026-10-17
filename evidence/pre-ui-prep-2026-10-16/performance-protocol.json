@@ -1,0 +1,47 @@
+{
+  "status": "not_executed",
+  "blockers": [
+    "STORAGE: write_permission=false for multi-GB QA scratch and 25 MB memory-only profile output",
+    "APK: current Library package prepared but bytes not materialized; helper unavailable",
+    "HARNESS_BUILD: archive has API35 and no NDK; accepted build pins compileSdk36/NDK30.0.16248370"
+  ],
+  "base": {
+    "generator": "RoomScenariosTest.realisticHistoryInput",
+    "sessions": 73000,
+    "segments": 73000,
+    "days": 3650,
+    "entries_per_day": 20,
+    "duration_ms_per_segment": 1800000,
+    "note_suffix_chars": 128,
+    "classifications": 3,
+    "catalog": "same accepted runtime-catalog.json; record actual type/axis counts and hashes at execution",
+    "user_data": "never used",
+    "db_copies": "one isolated synthetic fixture; do not delete existing archives"
+  },
+  "conditions": {
+    "native": "existing AOSP API35 AVD cloned into approved scratch; emulator only",
+    "source": "exact accepted source or reported local fix commit",
+    "qa_signer_sha256": "86e221956fd1ed4dab261a10c1baeac3537816d271601037b309f2ddf186c3cc",
+    "samples_per_start_mode": 7,
+    "cold": "force-stop app process; no OS page-cache eviction",
+    "warm": "same PID, new Activity; no store-open-start phase",
+    "data_hash": "same across before/after; record database, archive and domain hashes",
+    "before_after": "same AVD config, fixture, source/build flags, commands, warmups and sample count"
+  },
+  "stages": [
+    "fixture construction (excluded from startup samples)",
+    "cold/warm start: am start -W + StartupTrace raw phases",
+    "history-graph-ready from current Runtime trace",
+    "first and repeated fixed search queries with result digests",
+    "day/30-day/full-history reports with result digests",
+    "import inspect/plan/preview/apply and full restore preview/rollback/replacement separately",
+    "memory at idle/history/search/report/export: dumpsys meminfo (PSS), distinguish host/JVM heap from native Android",
+    "main-thread widget/export IO: StrictMode and Perfetto plus raw durations"
+  ],
+  "outputs": [
+    "raw command/logcat and UI XML per scenario",
+    "JSONL raw samples including failures; configuration and fixture hash",
+    "trace files only for named flows",
+    "before/after summary only if both sides actually measured"
+  ]
+}

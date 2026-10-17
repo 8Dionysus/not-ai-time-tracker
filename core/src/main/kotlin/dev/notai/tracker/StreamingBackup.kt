@@ -159,7 +159,9 @@ private class JsonRecords(private val reader: Reader,private val validateValues:
     init { if(peek() == 0xFEFF) take() }
     private fun peek(): Int { if(held == -2) held = reader.read();return held }
     private fun take(): Int { val c = peek();held = -2;return c }
-    private fun whitespace() { while(peek() in listOf(9,10,13,32)) take() }
+    // These tests run for every token/whitespace character; avoid allocating a
+    // boxed array/list in the scanner hot path. The accepted character set is exact.
+    private fun whitespace() { while(true) when(peek()) { 9,10,13,32 -> take();else -> return } }
     private fun expect(c: Char) { whitespace();ensure(take() == c.code,"Invalid JSON framing",ErrorCode.UNSUPPORTED_IMPORT) }
     fun members(read: (String)->Unit) {
         expect('{');whitespace();val keys = mutableSetOf<String>()
@@ -197,7 +199,7 @@ private class JsonRecords(private val reader: Reader,private val validateValues:
         while(true) {
             val c = peek()
             if(c < 0) { ensure(started && depth == 0 && !quoted,"Truncated JSON value",ErrorCode.UNSUPPORTED_IMPORT);break }
-            if(started && depth == 0 && !quoted && (c in listOf(','.code,'}'.code,']'.code,9,10,13,32))) break
+            if(started && depth == 0 && !quoted && when(c) { ','.code,'}'.code,']'.code,9,10,13,32 -> true;else -> false }) break
             take();out?.append(c.toChar());started = true
             ensure(out == null || out.length <= MAX_BACKUP_RECORD_CHARS,"Single JSON record exceeds 16 MiB characters",ErrorCode.UNSUPPORTED_IMPORT)
             if(quoted) { if(escaped) escaped = false else if(c == '\\'.code) escaped = true else if(c == '"'.code) quoted = false }

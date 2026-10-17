@@ -11,16 +11,10 @@ import java.io.File
 import java.time.ZoneId
 import kotlinx.coroutines.*
 
-/** Rendering/channel creation belongs to Opus. Install an application-scoped factory at process
- * startup, before receivers/runtime initialize; never retain an Activity in this binding. */
+/** Application-owned rendering only. TrackerApplication owns process startup/channel lifecycle;
+ * supply visual resources through ScheduleNoticeConfiguration. Never retain an Activity. */
 fun interface ScheduleNoticeFactory {
     fun create(context: Context,ticket: ScheduleReminderTicket,projection: ScheduleProjection): Notification
-}
-object ScheduleNoticeBinding {
-    @Volatile internal var factory: ScheduleNoticeFactory? = null
-    fun install(value: ScheduleNoticeFactory?) {
-        factory = value;TrackerRuntime.refreshExistingSchedule()
-    }
 }
 /** Same public backend port; the sidecar now uses an indexed SQLite journal. */
 class AndroidScheduleDeliveryStore(context: Context): ScheduleDeliveryStore by scheduleIndex(context)
@@ -32,7 +26,7 @@ private fun scheduleIndex(context: Context): IndexedScheduleDeliveryStore {
         PrivateFileMaintenance.metadata(File(root,"schedule-delivery.v1-source.json"))) { allowCreate -> AndroidScheduleReceiptSql(file,allowCreate) }
 }
 private val scheduleIndexGates = mutableMapOf<String,Any>()
-class AndroidScheduleDeliveryPlatform(context: Context,private val factory: ()->ScheduleNoticeFactory? = { ScheduleNoticeBinding.factory }): ScheduleDeliveryPlatform {
+class AndroidScheduleDeliveryPlatform(context: Context,private val factory: (() -> ScheduleNoticeFactory?)? = null): ScheduleDeliveryPlatform {
     private val context = context.applicationContext
     companion object {
         const val CHANNEL = "schedule_reminders"
@@ -42,13 +36,14 @@ class AndroidScheduleDeliveryPlatform(context: Context,private val factory: ()->
         private const val TAG = "schedule:"
         private const val NOTICE = 84
     }
+    private fun renderer() = if(factory == null) ScheduleNoticeBinding.factory else factory.invoke()
     private fun intent() = Intent(context,ScheduleAlarmReceiver::class.java).setAction(ACTION)
         .setData(Uri.Builder().scheme("notai").authority("schedule").appendPath("reminder").build())
     override fun availability(): ScheduleDeliveryAvailability = try {
         val manager = context.getSystemService(NotificationManager::class.java)
         val alarm = context.getSystemService(AlarmManager::class.java)
         val blockers = mutableSetOf<ScheduleDeliveryBlocker>()
-        if(factory() == null) blockers += ScheduleDeliveryBlocker.RENDERER_UNAVAILABLE
+        if(renderer() == null) blockers += ScheduleDeliveryBlocker.RENDERER_UNAVAILABLE
         if(manager == null || alarm == null) blockers += ScheduleDeliveryBlocker.PLATFORM_UNAVAILABLE
         if(Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED || manager?.areNotificationsEnabled() == false)
             blockers += ScheduleDeliveryBlocker.PERMISSION
@@ -73,16 +68,23 @@ class AndroidScheduleDeliveryPlatform(context: Context,private val factory: ()->
     }
     override fun prepare(ticket: ScheduleReminderTicket,projection: ScheduleProjection): PreparedScheduleNotice? {
         if(!availability().ready) return null
-        val render = factory() ?: return null
+        val installed = if(factory == null) ScheduleNoticeBinding.capture() else null
+        val render = (if(installed != null) installed.factory else renderer()) ?: return null
         val notification = render.create(context,ticket,projection)
         if(notification.channelId != CHANNEL) return null
         if(notification.extras == null) notification.extras = android.os.Bundle()
         notification.extras.putString(TICKET,codec.encodeToString(ticket))
         return PreparedScheduleNotice {
-            if(!availability().ready) false else {
-                context.getSystemService(NotificationManager::class.java).notify(TAG+ticket.identity,NOTICE,notification)
-                true // notify returned; not an OS/user visibility acknowledgement.
+            val post = {
+                if(!availability().ready) false else {
+                    context.getSystemService(NotificationManager::class.java).notify(TAG+ticket.identity,NOTICE,notification)
+                    true // notify returned; not an OS/user visibility acknowledgement.
+                }
             }
+            // A prepared notification belongs to one exact registration, including reinstalling
+            // the same factory object. Serialize production rebind with the final platform post.
+            if(installed != null) ScheduleNoticeBinding.publishIfCurrent(installed,post)
+            else renderer() === render && post() // Explicit fixture/custom supplier, no global binding.
         }
     }
     override fun visible(): List<ScheduleReminderTicket> = context.getSystemService(NotificationManager::class.java).activeNotifications.mapNotNull { n ->

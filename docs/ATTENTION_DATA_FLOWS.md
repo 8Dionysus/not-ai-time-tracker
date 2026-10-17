@@ -11,7 +11,7 @@ No UI, settings grant or user data operation is implied by this document.
 | Focus request/own-rule lease/creation intent | App-private noBackupFilesDir/focus-environment.json | No; remains tied to this device and own rule |
 | DND condition | Android NotificationManager, only a checked own AutomaticZenRule; policy access and actual configuration Activity required | OS capability, no grant by manifest or backup |
 | Selected local audio bytes | One no-follow/nonblocking opened regular FD, app-owned MediaPlayer after audio-focus acceptance and foreground check | No URI/network/account; no external player/volume control |
-| Ordinary notice | NotificationManager through Opus-supplied renderer and channel; permission/channel independently checked | Receipt records attempted outcome, not human display |
+| Ordinary notice | NotificationManager through Application-owned quiet system-card composition; exact binding, permission/channel independently checked | Receipt records attempted outcome, not human display |
 | Weekly observations | Existing captured Reports/Goals projection in memory with explicit zone | No new history, award ledger, external transmission or notifications |
 
 The manifest declares ACCESS_NOTIFICATION_POLICY for the optional DND port. The

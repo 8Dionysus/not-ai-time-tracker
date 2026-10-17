@@ -1,5 +1,7 @@
 # Полный статический проход C
 
+> Исторический аудит ниже относится к прежнему source-срезу. Текущая минимальная production composition напоминаний описана в [ATTENTION_BACKEND_HANDOFF](ATTENTION_BACKEND_HANDOFF.md); отсутствие factory/channel более не переносится на владельца UI.
+
 Исторический source-review C на 16 октября 2026; исходная авторская среда. Текущая A-интеграция Room11/JSON13 и фактические исполнения описаны в [ATTENTION_VERIFICATION_2026_10_16](ATTENTION_VERIFICATION_2026_10_16.md). Старые projected Room10/JSON12 ниже были предложением C до сверки с main A, а не действующим контрактом.
 
 Срез: 16 октября 2026. Проверены все шесть новых production-модулей и обе owner-applied дельты. Это source review и структурные проверки, **не компиляция, исполнение Kotlin, Robolectric или проверка устройства**. JDK21 есть, Kotlin/Gradle/Android SDK отсутствуют; установка не предпринималась.

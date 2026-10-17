@@ -45,6 +45,42 @@ class RegisteredCopyStorage(private val files: DescriptorCopyFiles,private val g
         else ensure(sameRegistration(old,captured),"Registered copy changed",ErrorCode.STALE)
         Unit
     }
+    /** Legacy terminal writer path: capture remains under the common gate, without hashing a
+     * second time after capture. The optional callback path below uses detached validation. */
+    internal fun registerValidatedExport(capture: () -> RegisteredCopy): String = maintenance {
+        mayRegister();val captured = capture()
+        ensure(captured.item.kind == CopyKind.EXPORT && captured.path.startsWith("exports/") && captured.directory &&
+            !captured.sealedArchive && captured.directories.isEmpty(),"Invalid export capture")
+        val before = gate.state();val matches = before.copies.filter { it.item.id == captured.item.id || it.path == captured.path }
+        ensure(matches.size <= 1,"Conflicting registered copy identity",ErrorCode.STALE)
+        val old = matches.singleOrNull()
+        if(old == null) gate.update { it.copy(copies = it.copies+captured) }
+        else ensure(sameRegistration(old,captured),"Registered copy changed",ErrorCode.STALE)
+        captured.item.id
+    }
+    /** The catalog already hashed this flat export under a durable protective reference.
+     * Revision + descriptor identity checks admit it atomically without payload I/O in the gate.
+     * Every cooperative writer first changes the same registry; a conflict stays unregistered. */
+    internal fun admitCapturedExport(captured: RegisteredCopy,reference: CopyReference,revision: Long) = maintenance {
+        mayRegister();val before = gate.state()
+        ensure(before.revision == revision && reference in before.references,"Registration snapshot changed",ErrorCode.STALE)
+        ensure(captured.item.kind == CopyKind.EXPORT && captured.path.startsWith("exports/") && captured.directory &&
+            !captured.sealedArchive && captured.directories.isEmpty() && reference.itemId == captured.item.id &&
+            reference.owner == "export-registration:${captured.path.substringAfter('/')}" && reference.blocker == CopyBlocker.IN_PROGRESS,"Invalid export capture")
+        ensure(files.names(captured.path) == captured.memberNames.values.sorted(),"Export children changed",ErrorCode.STALE)
+        val root = files.stat(captured.path) ?: fail(ErrorCode.STALE,"Export group missing")
+        ensure(root.sameFile(captured.identities.getValue("@group")),"Export group changed",ErrorCode.STALE)
+        captured.memberNames.forEach { (id,name) ->
+            val now = files.stat("${captured.path}/$name") ?: fail(ErrorCode.STALE,"Export member missing")
+            ensure(now.links == 1L && now.sameFile(captured.identities.getValue(id)),"Export member changed",ErrorCode.STALE)
+        }
+        val matches = before.copies.filter { it.item.id == captured.item.id || it.path == captured.path }
+        ensure(matches.size <= 1,"Conflicting registered copy identity",ErrorCode.STALE)
+        val old = matches.singleOrNull()
+        if(old == null) gate.update { it.copy(copies = it.copies+captured) }
+        else ensure(sameRegistration(old,captured),"Registered copy changed",ErrorCode.STALE)
+        Unit
+    }
     fun registerValidatedArchiveGraph(batch: List<ArchiveCopyManifest>) = maintenance {
         mayRegister();ensure(batch.isNotEmpty(),"Empty archive registration")
         val before = gate.state()

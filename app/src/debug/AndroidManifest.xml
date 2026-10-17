@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Self-instrumentation stays inside the already authorized primary debug package. -->
+    <instrumentation android:name="dev.notai.tracker.android.qa.BackendAcceptance" android:targetPackage="dev.notai.tracker" android:label="Backend QA" />
+    <application>
+        <!-- DUMP is already held by adb shell; ordinary apps cannot invoke this debug-only port. -->
+        <receiver android:name="dev.notai.tracker.android.qa.BackendColdQaReceiver" android:exported="true" android:permission="android.permission.DUMP" />
+    </application>
+</manifest>

@@ -79,13 +79,22 @@ object FocusSignals {
         if(focus.signalKey?.let { it in preferences(c).getStringSet("delivered",emptySet()).orEmpty() } == true)
             return FocusDeliveryResult(FocusDeliveryStatus.PREVIOUS_RECEIPT,focus)
         if(!permitted) {
-            c.getSystemService(NotificationManager::class.java).cancel(NOTICE);return FocusDeliveryResult(FocusDeliveryStatus.BLOCKED_BEFORE_POST,focus)
+            return blockedResult(c,tracker)
         }
         return deliverCurrent(c,tracker,view.data,focus)
     }
+    /** A blocked delivery can authorize a UI fallback. Resolve its state under the domain
+     * gate too: an earlier capture may already have been stopped or advanced during IO. */
+    private fun blockedResult(c: Context,tracker: Tracker): FocusDeliveryResult = tracker.store.checkedTransaction { checked ->
+        val current = checked.snapshot(tracker.clock.now()).focus
+        checked.replace(checked.data) {
+            c.getSystemService(NotificationManager::class.java).cancel(NOTICE)
+            FocusDeliveryResult(FocusDeliveryStatus.BLOCKED_BEFORE_POST,current)
+        }
+    }
     private fun deliverCurrent(c: Context,tracker: Tracker,captured: Dataset,focus: FocusSnapshot): FocusDeliveryResult {
         fun result(status: FocusDeliveryStatus) = FocusDeliveryResult(status,focus)
-        if(focus.mode != FocusMode.DUE || !allowed(c)) return result(FocusDeliveryStatus.BLOCKED_BEFORE_POST)
+        if(focus.mode != FocusMode.DUE || !allowed(c)) return blockedResult(c,tracker)
         val key = focus.signalKey ?: return result(FocusDeliveryStatus.NOT_DUE);val prefs = preferences(c)
         val delivered = prefs.getStringSet("delivered",emptySet()).orEmpty()
         if(key in delivered) return result(FocusDeliveryStatus.PREVIOUS_RECEIPT)

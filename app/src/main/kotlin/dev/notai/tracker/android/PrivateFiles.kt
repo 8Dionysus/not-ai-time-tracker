@@ -47,17 +47,21 @@ internal fun atomicBytes(file: File,bytes: ByteArray) {
     val bytes: Long = 0,val sha256: String? = null,val error: String? = null,val resultReceived: Boolean = false)
 data class ExportWriteResult(val bytes: Long,val verified: Boolean)
 /** File-backed jobs survive Activity recreation. The Bundle only carries the operation ID. */
-class ExportOperations(private val context: Context) {
+class ExportOperations private constructor(private val context: Context,private val completedRegistration: (Context,String) -> Unit,
+    private val handoffRegistration: (Context,String) -> Unit) {
+    internal constructor(context: Context,registration: (Context,String) -> Unit): this(context,registration,registration)
+    constructor(context: Context): this(context,{ c,id -> PrivateCopyBackend.registerExport(c,id);Unit },
+        { c,id -> PrivateCopyBackend.registerCompletedExport(c,id);Unit })
     private val directory = File(context.noBackupFilesDir,"exports").apply { mkdirs() }
     private fun dir(id: String): File { require(id.matches(Regex("[0-9a-f-]{36}")));return File(directory,id) }
     fun begin(mime: String,title: String): ExportOperation = PrivateFileMaintenance.writing(context,"export-begin") { beginUnsafe(mime,title) }
     private fun beginUnsafe(mime: String,title: String): ExportOperation {
         val operation = ExportOperation(newId(),mime,title);save(operation);return operation
     }
-    private fun save(operation: ExportOperation) {
+    private fun save(operation: ExportOperation,registerCompleted: Boolean = true) {
         PrivateFileMaintenance.invalidate(context,"exports/${operation.id}")
         atomicText(File(dir(operation.id),"operation.json"),codec.encodeToString(operation))
-        if(operation.state in setOf("COMPLETE","CANCELLED") && operation.resultReceived) PrivateCopyBackend.registerExport(context,operation.id)
+        if(registerCompleted && operation.state in setOf("COMPLETE","CANCELLED") && operation.resultReceived) completedRegistration(context,operation.id)
     }
     fun read(id: String): ExportOperation = codec.decodeFromString(File(dir(id),"operation.json").readText())
     fun latestPending(): ExportOperation? = directory.listFiles().orEmpty().filter { it.isDirectory }
@@ -89,12 +93,18 @@ class ExportOperations(private val context: Context) {
     /** Persist consumption of a chooser result (or explicit owner cancellation before any chooser).
      * The owner must keep an active chooser protected until its actual result arrives.
      * No destination URI or grant is retained: an interrupted write needs a fresh chooser. */
-    fun receiveResult(id: String,cancelled: Boolean) = PrivateFileMaintenance.writing(context,"export-result:$id") { receiveResultUnsafe(id,cancelled) }
-    private fun receiveResultUnsafe(id: String,cancelled: Boolean) {
+    fun receiveResult(id: String,cancelled: Boolean) {
+        val saved = PrivateFileMaintenance.writing(context,"export-result:$id") { receiveResultUnsafe(id,cancelled) }
+        if(saved.state in setOf("COMPLETE","CANCELLED") && saved.resultReceived)
+            CopyLifetimes.get(context).registerCompletedExport(id,handoffRegistration)
+    }
+    private fun receiveResultUnsafe(id: String,cancelled: Boolean): ExportOperation {
         val op = read(id)
-        save(op.copy(resultReceived = true,state = if(cancelled) "CANCELLED" else op.state))
+        val saved = op.copy(resultReceived = true,state = if(cancelled) "CANCELLED" else op.state)
+        save(saved,registerCompleted = false)
         val gate = PrivateFileMaintenance.forContext(context)
         gate.locked { gate.state().references.filter { it.owner == "export-chooser:$id" }.forEach(gate::release) }
+        return saved
     }
     fun awaitResult(id: String) = PrivateFileMaintenance.writing(context,"export-await:$id",CopyBlocker.CHOOSER_RESULT_PENDING) { awaitResultUnsafe(id) }
     private fun awaitResultUnsafe(id: String) {

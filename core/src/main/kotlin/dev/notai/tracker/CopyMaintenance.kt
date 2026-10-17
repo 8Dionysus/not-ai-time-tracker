@@ -28,6 +28,13 @@ interface CopyMetadata {
 class CopyMaintenance(private val metadata: CopyMetadata,private val maxMetadataBytes: Int = CopyMetadataBytes.MAX_BYTES) {
     init { require(maxMetadataBytes in 1..CopyMetadataBytes.MAX_BYTES) }
     private var poisoned = false
+    private val exportRegistration = Any()
+    /** Separate optional-reader serialization. Durable callbacks never take this monitor.
+     * Calling from the common maintenance gate would reverse lock order and is refused. */
+    internal fun <T> completingExport(block: () -> T): T {
+        check(!Thread.holdsLock(this)) { "Export registration must follow durable writer handoff" }
+        return synchronized(exportRegistration) { block() }
+    }
     @Synchronized fun <T> locked(block: ()->T): T { check(!poisoned) { "Maintenance persistence failed; reopen and inspect" };return block() }
     fun state(): CopyMaintenanceState = locked {
         (metadata.read()?.let { CopyMetadataBytes.check(it,maxMetadataBytes);codec.decodeFromString<CopyMaintenanceState>(it) } ?: CopyMaintenanceState()).also {

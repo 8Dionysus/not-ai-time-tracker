@@ -43,6 +43,23 @@ class ScheduleDeliveryTest {
         NotificationChannel(AndroidScheduleDeliveryPlatform.CHANNEL,"Fixture only",NotificationManager.IMPORTANCE_DEFAULT))
     private val renderer = ScheduleNoticeFactory { context,_,_ -> Notification.Builder(context,AndroidScheduleDeliveryPlatform.CHANNEL)
         .setSmallIcon(android.R.drawable.ic_menu_today).setContentTitle("Fixture reminder").setVisibility(Notification.VISIBILITY_PRIVATE).build() }
+    @Test fun reboundApplicationFactoryCannotPublishAnOldPreparedNotice() = fixture { context,t,clock ->
+        channel(context);shadowOf(context).grantPermissions(Manifest.permission.POST_NOTIFICATIONS)
+        val original = ScheduleNoticeBinding.factory
+        val replacement = ScheduleNoticeFactory { c,ticket,projection -> renderer.create(c,ticket,projection) }
+        val rebinding = ScheduleNoticeFactory { c,ticket,projection ->
+            ScheduleNoticeBinding.install(replacement)
+            renderer.create(c,ticket,projection)
+        }
+        try {
+            ScheduleNoticeBinding.install(rebinding)
+            val platform = AndroidScheduleDeliveryPlatform(context)
+            val delivery = ScheduleDelivery(t,AndroidScheduleDeliveryStore(context),platform) { ZoneId.of("UTC") }
+            val before = t.data();val batch = delivery.synchronize().next!!;clock.advance(30*60_000)
+            assertEquals(ScheduleAttemptStatus.NOT_POSTED,delivery.onAlarm(batch.hash).attempted.single().status)
+            assertTrue(platform.visible().isEmpty());assertEquals(before,t.data())
+        } finally { ScheduleNoticeBinding.install(original) }
+    }
     @Test fun unboundRendererAndPermissionNeverArmOrConsumeAnOccurrence() = fixture { context,t,_ ->
         val platform = AndroidScheduleDeliveryPlatform(context) { null };channel(context)
         shadowOf(context).grantPermissions(Manifest.permission.POST_NOTIFICATIONS)

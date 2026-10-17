@@ -151,6 +151,14 @@ class UiExportLifecycleTest {
             afterCancel.requestExport();waitFor { !afterCancel.exportPreparing.value && afterCancel.documentExportId() != null }
             val writeId = afterCancel.documentExportId()!!;val prepared = ExportOperations(app).read(writeId)
             assertTrue(runBlocking { afterCancel.claimDocumentExport(writeId,"write-result") })
+            // Native old-DocumentsUI cancellation reproduced mutation of a newer operation.
+            // Reject both a different operation and an old owner of the same staged bytes.
+            val guarded = ExportOperations(app).read(writeId)
+            assertFalse(afterCancel.receiveDocumentExportResult(cancelledId,"cancel-result",null))
+            assertFalse(afterCancel.receiveDocumentExportResult(writeId,"old-owner",null))
+            assertFalse(afterCancel.receiveDocumentExportResult(writeId,null,null))
+            assertEquals(guarded,ExportOperations(app).read(writeId))
+            assertEquals(writeId,afterCancel.documentExportId())
             val writeActivity = controller(writeId,"write-result")
             val destination = java.io.File(app.noBackupFilesDir,"callback-result.json")
             val uri = android.net.Uri.fromFile(destination)

@@ -87,6 +87,24 @@ class UiReviewRegressionTest {
     }
     private fun at(text: String) = Instant.parse(text).toEpochMilli()
 
+    @Test fun shortcutPreferenceControllerSupportsDisableAndReenableWithoutOtherChanges() {
+        val surfaces=SurfaceSettings(widget=true,notification=true,overlay=true,focusSignal=false,shortcut=true)
+        val f=fixture(FakeClock(),Settings("UTC",surfaces=surfaces));val t=f.tracker
+        t.start(t.snapshot().token);f.synced();val before=t.data()
+        f.vm.setSurfaceEnabled(Surface.SHORTCUT,false)
+        pump { !t.data().settings.surfaces.shortcut || f.notices.isNotEmpty() }
+        assertFalse("The existing controller must support the persisted shortcut preference",t.data().settings.surfaces.shortcut)
+        val disabled=t.data()
+        assertEquals(before.settings.copy(surfaces=surfaces.copy(shortcut=false)),disabled.settings)
+        assertEquals(before.sessions,disabled.sessions);assertEquals(before.segments,disabled.segments)
+        assertEquals(before.timerEpoch,disabled.timerEpoch);assertEquals(before.controlBarrier,disabled.controlBarrier)
+        assertEquals(before.revision+1,disabled.revision)
+        f.synced();f.vm.setSurfaceEnabled(Surface.SHORTCUT,true)
+        pump { t.data().settings.surfaces.shortcut }
+        assertEquals(before.settings,t.data().settings)
+        assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
+        assertEquals(before.timerEpoch,t.data().timerEpoch);assertEquals(before.revision+2,t.data().revision)
+    }
     @Test fun reportDayUsesConfiguredBoundaryBeforeAndAfterFour() {
         val f = fixture(FakeClock(at("2026-10-11T02:00:00Z")),Settings("UTC",reportDayStartMinute = 240))
         f.tracker.manual(f.tracker.snapshot().token,at("2026-10-10T22:00:00Z"),at("2026-10-10T23:00:00Z"),Classification())

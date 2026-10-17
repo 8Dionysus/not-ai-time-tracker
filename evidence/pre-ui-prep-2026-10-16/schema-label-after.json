@@ -1,0 +1,7 @@
+{
+  "kind": "static-source-contract-regression",
+  "database_schema_version": 12,
+  "annotation_and_diagnostic_share_constant": true,
+  "hardcoded_diagnostic_version": false,
+  "android_compile_and_native_verification": "pending missing API36/NDK30 toolchain"
+}

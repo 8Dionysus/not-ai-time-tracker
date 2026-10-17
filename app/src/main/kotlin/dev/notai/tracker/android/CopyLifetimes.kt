@@ -32,6 +32,10 @@ class CopyLifetimes private constructor(context: Context): RestoreLifecycle,Appl
     private fun enqueue(block: () -> Unit): Job = queue.launch { try { block() } catch(_: Exception) { android.util.Log.w("PrivateCopies","Ownership completion pending; references preserved") } }
     /** Exact preview release, on the existing process IO queue. This never removes source bytes. */
     internal fun releasePreview(preview: AutoCloseable): Job = enqueue { preview.close() }
+    /** Best-effort catalog work after the caller has released its durable writer/chooser refs.
+     * Process death before this job runs leaves unregistered bytes, never deletion authority. */
+    internal fun registerCompletedExport(id: String,registration: (Context,String) -> Unit): Job =
+        enqueue { registration(context,id) }
     fun activate(ownerId: String) { require(valid(ownerId));gate().activateLifetime(ownerId) }
     private fun takeUnclaimed(id: String): CopyReference? {
         val rows = requireNotNull(unclaimed.get());val item = PrivateCopyBackend.itemId("forms/$id.json")

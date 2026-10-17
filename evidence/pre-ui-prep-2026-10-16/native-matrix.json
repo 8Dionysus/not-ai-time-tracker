@@ -1,0 +1,1042 @@
+{
+  "source": "841448b8a3ff26111fce9bdf8418c170dbc7a622",
+  "scope": "r12 changed backend boundaries native-verified on own AOSP API35 emulator-5590. Prior migration/full JSON/selective/SAF/widget/Focus evidence retained with exact earlier source; not re-labelled as an entire new native matrix rerun. Full current207core+252app green. Production1534class files exact across debug QA1..QA4. No physical/OEM/power-loss/TalkBack claim.",
+  "scenarios": [
+    {
+      "id": "N01",
+      "scenario": "Fresh isolated QA installation and current schema",
+      "expected": "Room12; no user installation/database touched",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-final-canonical-contracts-v12.xml",
+        "fresh-install-outcome-after-reboots.json",
+        "native-fresh-install-result.json",
+        "fresh-install-recovery-result.json"
+      ],
+      "coverage": "Actual first debug suffix install UID10153, Room12 empty0/0; new process same Dataset UUID; no suffix grants; primary DB/WAL/SHM member hashes exact.",
+      "manual_latest": true,
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N02",
+      "scenario": "Start/pause/resume/stop; reopen a fresh process",
+      "expected": "Exact IDs, segments, durations, notes and classifications survive",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-current-v5-contracts.xml",
+        "native-ui/widget-live-fast.xml",
+        "native-ui/widget-paused-fast.xml",
+        "native-ui/widget-resumed-fast.xml",
+        "native-ui/widget-stopped-fast.xml",
+        "native-timer-create-v10.json",
+        "native-timer-reopen-v10.json",
+        "native-timer-process-summary.json"
+      ],
+      "coverage": "Real widget Start/Pause/Resume/Stop; ordinary timer session persists across different target PIDs10759→10795 with monotonic trusted duration. Exact IDs/counts asserted. No kill inside tiny timer commit injected.",
+      "manual_latest": true,
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "M01",
+      "scenario": "Room 1 to Room12 migration",
+      "expected": "Preserve rows/IDs/active and recovery state; validate current defaults",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-migrations-v5-closed.json",
+        "native-migrations-v5-open.json",
+        "native-migrations-v5-recovery.json",
+        "native-migrations-v9-active.json"
+      ],
+      "coverage": "Four fixtures for each Room1..11: closed, open/no-anchor RUNNING, RECOVERY, anchored active RUNNING. All fields exact and reopen exact; active anchor snapshot RUNNING/trusted1500ms checked in v9 source.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "M02",
+      "scenario": "Room 2 to Room12 migration",
+      "expected": "Preserve rows/IDs/active and recovery state; validate current defaults",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-migrations-v5-closed.json",
+        "native-migrations-v5-open.json",
+        "native-migrations-v5-recovery.json",
+        "native-migrations-v9-active.json"
+      ],
+      "coverage": "Four fixtures for each Room1..11: closed, open/no-anchor RUNNING, RECOVERY, anchored active RUNNING. All fields exact and reopen exact; active anchor snapshot RUNNING/trusted1500ms checked in v9 source.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "M03",
+      "scenario": "Room 3 to Room12 migration",
+      "expected": "Preserve rows/IDs/active and recovery state; validate current defaults",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-migrations-v5-closed.json",
+        "native-migrations-v5-open.json",
+        "native-migrations-v5-recovery.json",
+        "native-migrations-v9-active.json"
+      ],
+      "coverage": "Four fixtures for each Room1..11: closed, open/no-anchor RUNNING, RECOVERY, anchored active RUNNING. All fields exact and reopen exact; active anchor snapshot RUNNING/trusted1500ms checked in v9 source.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "M04",
+      "scenario": "Room 4 to Room12 migration",
+      "expected": "Preserve rows/IDs/active and recovery state; validate current defaults",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-migrations-v5-closed.json",
+        "native-migrations-v5-open.json",
+        "native-migrations-v5-recovery.json",
+        "native-migrations-v9-active.json"
+      ],
+      "coverage": "Four fixtures for each Room1..11: closed, open/no-anchor RUNNING, RECOVERY, anchored active RUNNING. All fields exact and reopen exact; active anchor snapshot RUNNING/trusted1500ms checked in v9 source.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "M05",
+      "scenario": "Room 5 to Room12 migration",
+      "expected": "Preserve rows/IDs/active and recovery state; validate current defaults",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-migrations-v5-closed.json",
+        "native-migrations-v5-open.json",
+        "native-migrations-v5-recovery.json",
+        "native-migrations-v9-active.json"
+      ],
+      "coverage": "Four fixtures for each Room1..11: closed, open/no-anchor RUNNING, RECOVERY, anchored active RUNNING. All fields exact and reopen exact; active anchor snapshot RUNNING/trusted1500ms checked in v9 source.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "M06",
+      "scenario": "Room 6 to Room12 migration",
+      "expected": "Preserve rows/IDs/active and recovery state; validate current defaults",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-migrations-v5-closed.json",
+        "native-migrations-v5-open.json",
+        "native-migrations-v5-recovery.json",
+        "native-migrations-v9-active.json"
+      ],
+      "coverage": "Four fixtures for each Room1..11: closed, open/no-anchor RUNNING, RECOVERY, anchored active RUNNING. All fields exact and reopen exact; active anchor snapshot RUNNING/trusted1500ms checked in v9 source.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "M07",
+      "scenario": "Room 7 to Room12 migration",
+      "expected": "Preserve rows/IDs/active and recovery state; validate current defaults",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-migrations-v5-closed.json",
+        "native-migrations-v5-open.json",
+        "native-migrations-v5-recovery.json",
+        "native-migrations-v9-active.json"
+      ],
+      "coverage": "Four fixtures for each Room1..11: closed, open/no-anchor RUNNING, RECOVERY, anchored active RUNNING. All fields exact and reopen exact; active anchor snapshot RUNNING/trusted1500ms checked in v9 source.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "M08",
+      "scenario": "Room 8 to Room12 migration",
+      "expected": "Preserve rows/IDs/active and recovery state; validate current defaults",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-migrations-v5-closed.json",
+        "native-migrations-v5-open.json",
+        "native-migrations-v5-recovery.json",
+        "native-migrations-v9-active.json"
+      ],
+      "coverage": "Four fixtures for each Room1..11: closed, open/no-anchor RUNNING, RECOVERY, anchored active RUNNING. All fields exact and reopen exact; active anchor snapshot RUNNING/trusted1500ms checked in v9 source.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "M09",
+      "scenario": "Room 9 to Room12 migration",
+      "expected": "Preserve rows/IDs/active and recovery state; validate current defaults",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-migrations-v5-closed.json",
+        "native-migrations-v5-open.json",
+        "native-migrations-v5-recovery.json",
+        "native-migrations-v9-active.json"
+      ],
+      "coverage": "Four fixtures for each Room1..11: closed, open/no-anchor RUNNING, RECOVERY, anchored active RUNNING. All fields exact and reopen exact; active anchor snapshot RUNNING/trusted1500ms checked in v9 source.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "M10",
+      "scenario": "Room 10 to Room12 migration",
+      "expected": "Preserve rows/IDs/active and recovery state; validate current defaults",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-migrations-v5-closed.json",
+        "native-migrations-v5-open.json",
+        "native-migrations-v5-recovery.json",
+        "native-migrations-v9-active.json"
+      ],
+      "coverage": "Four fixtures for each Room1..11: closed, open/no-anchor RUNNING, RECOVERY, anchored active RUNNING. All fields exact and reopen exact; active anchor snapshot RUNNING/trusted1500ms checked in v9 source.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "M11",
+      "scenario": "Room 11 to Room12 migration",
+      "expected": "Preserve rows/IDs/active and recovery state; validate current defaults",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-migrations-v5-closed.json",
+        "native-migrations-v5-open.json",
+        "native-migrations-v5-recovery.json",
+        "native-migrations-v9-active.json"
+      ],
+      "coverage": "Four fixtures for each Room1..11: closed, open/no-anchor RUNNING, RECOVERY, anchored active RUNNING. All fields exact and reopen exact; active anchor snapshot RUNNING/trusted1500ms checked in v9 source.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "F01",
+      "scenario": "Full JSON reader format 1",
+      "expected": "Preview without mutation; explicit atomic restore and verified rollback; preserve supported legacy semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history fixture + preview/apply/reopen, exact facts. Current feature semantics additionally covered by 78 shared native Room tests.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "F02",
+      "scenario": "Full JSON reader format 2",
+      "expected": "Preview without mutation; explicit atomic restore and verified rollback; preserve supported legacy semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history fixture + preview/apply/reopen, exact facts. Current feature semantics additionally covered by 78 shared native Room tests.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "F03",
+      "scenario": "Full JSON reader format 3",
+      "expected": "Preview without mutation; explicit atomic restore and verified rollback; preserve supported legacy semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history fixture + preview/apply/reopen, exact facts. Current feature semantics additionally covered by 78 shared native Room tests.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "F04",
+      "scenario": "Full JSON reader format 4",
+      "expected": "Preview without mutation; explicit atomic restore and verified rollback; preserve supported legacy semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history fixture + preview/apply/reopen, exact facts. Current feature semantics additionally covered by 78 shared native Room tests.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "F05",
+      "scenario": "Full JSON reader format 5",
+      "expected": "Preview without mutation; explicit atomic restore and verified rollback; preserve supported legacy semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history fixture + preview/apply/reopen, exact facts. Current feature semantics additionally covered by 78 shared native Room tests.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "F06",
+      "scenario": "Full JSON reader format 6",
+      "expected": "Preview without mutation; explicit atomic restore and verified rollback; preserve supported legacy semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history fixture + preview/apply/reopen, exact facts. Current feature semantics additionally covered by 78 shared native Room tests.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "F07",
+      "scenario": "Full JSON reader format 7",
+      "expected": "Preview without mutation; explicit atomic restore and verified rollback; preserve supported legacy semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history fixture + preview/apply/reopen, exact facts. Current feature semantics additionally covered by 78 shared native Room tests.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "F08",
+      "scenario": "Full JSON reader format 8",
+      "expected": "Preview without mutation; explicit atomic restore and verified rollback; preserve supported legacy semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history fixture + preview/apply/reopen, exact facts. Current feature semantics additionally covered by 78 shared native Room tests.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "F09",
+      "scenario": "Full JSON reader format 9",
+      "expected": "Preview without mutation; explicit atomic restore and verified rollback; preserve supported legacy semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history fixture + preview/apply/reopen, exact facts. Current feature semantics additionally covered by 78 shared native Room tests.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "F10",
+      "scenario": "Full JSON reader format 10",
+      "expected": "Preview without mutation; explicit atomic restore and verified rollback; preserve supported legacy semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history fixture + preview/apply/reopen, exact facts. Current feature semantics additionally covered by 78 shared native Room tests.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "F11",
+      "scenario": "Full JSON reader format 11",
+      "expected": "Preview without mutation; explicit atomic restore and verified rollback; preserve supported legacy semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history fixture + preview/apply/reopen, exact facts. Current feature semantics additionally covered by 78 shared native Room tests.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "F12",
+      "scenario": "Full JSON reader format 12",
+      "expected": "Preview without mutation; explicit atomic restore and verified rollback; preserve supported legacy semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history fixture + preview/apply/reopen, exact facts. Current feature semantics additionally covered by 78 shared native Room tests.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "F13",
+      "scenario": "Full JSON reader format 13",
+      "expected": "Preview without mutation; explicit atomic restore and verified rollback; preserve supported legacy semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history fixture + preview/apply/reopen, exact facts. Current feature semantics additionally covered by 78 shared native Room tests.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "F14",
+      "scenario": "Full JSON reader format 14",
+      "expected": "Preview without mutation; explicit atomic restore and verified rollback; preserve supported legacy semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history fixture + preview/apply/reopen, exact facts. Current feature semantics additionally covered by 78 shared native Room tests.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "S01",
+      "scenario": "Selective reader format 1",
+      "expected": "Dependency/conflict preview, explicit apply/resume and replay receipts",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history package + apply/reopen/replay.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "S02",
+      "scenario": "Selective reader format 2",
+      "expected": "Dependency/conflict preview, explicit apply/resume and replay receipts",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history package + apply/reopen/replay.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "S03",
+      "scenario": "Selective reader format 3",
+      "expected": "Dependency/conflict preview, explicit apply/resume and replay receipts",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history package + apply/reopen/replay.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "S04",
+      "scenario": "Selective reader format 4",
+      "expected": "Dependency/conflict preview, explicit apply/resume and replay receipts",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-formats.log",
+        "native-final-canonical-formats-v12.json"
+      ],
+      "coverage": "Compatible history package + apply/reopen/replay.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N03",
+      "scenario": "Large full JSON export/preview/restore >10 MiB",
+      "expected": "Streaming bytes/readback/hash; no truncation or arbitrary limit",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-current-canonical-restore.json",
+        "native-current-canonical-profile.json",
+        "current-performance-summary.json",
+        "native-saf-real-complete-after-death-final.json"
+      ],
+      "coverage": "Current canonical:73000/73000 large restore and106MB export/repreview. Actual SAF cancel/same-stage retry/chooser process death/COMPLETE/provider readback; large baseline input preserved.",
+      "manual_latest": true,
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N04",
+      "scenario": "Restore interruption before/after replacement commit",
+      "expected": "Old or new complete dataset; verified rollback; no mixed graph",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-restore-transaction-death.json",
+        "native-restore-transaction-death-create.log",
+        "native-restore-transaction-death-check.log",
+        "remaining-restore-check-r3-rollback.json",
+        "remaining-restore-check-r3-after-commit.json",
+        "remaining-restore-check-r3-after-return.json",
+        "remaining-restore-r3-after-commit-before-kill.json"
+      ],
+      "coverage": "Existing uncommitted WAL proof plus actual SIGKILL after rollback durable/before replace, after SQLite commit/before apply return, after return. Fresh process full Dataset exact for expected stage and rollback readable.",
+      "manual_latest": true,
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N05",
+      "scenario": "Unreadable DB/WAL/SHM recovery",
+      "expected": "No empty bootstrap; source-change refusal and preserved raw files",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-corruption.log",
+        "native-rescue-isolated-v10.json",
+        "remaining-rescue-check-r3-journal.json",
+        "remaining-rescue-check-r3-archive.json",
+        "remaining-rescue-check-r3-installed.json",
+        "remaining-rescue-check-r3-completion.json"
+      ],
+      "coverage": "Actual corrupt fresh-suffix main/WAL/SHM, real rescue SIGKILL after initial journal fsync, archived candidate journal, installed database directory fsync, durable completion. Resume exact restored domain/new barrier; raw main/WAL/SHM retained exact in archive+retired; source exact; completion reconciled without data replacement.",
+      "manual_latest": true,
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N06",
+      "scenario": "Process death while timer operation commits",
+      "expected": "One atomic state, no duplicate segments or invented elapsed time",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-timer-boundary-before.json",
+        "native-timer-boundary-before-reopen.json",
+        "native-timer-boundary-after.json",
+        "native-timer-boundary-after-reopen.json"
+      ],
+      "coverage": "Actual isolated Room transaction: SIGKILL inside checked transaction before row write preserves prior one-session Dataset exactly; SIGKILL after Tracker.start commit but before harness acknowledgement preserves exact two-session RUNNING Dataset. Deterministic FakeClock fixture; no power-loss claim.",
+      "manual_latest": true,
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N07",
+      "scenario": "Process death while export prepares/claims/writes/finishes",
+      "expected": "Durable operation state; no consumed-result resurrection; fresh chooser for interrupted output",
+      "status": "passed_current_changed_boundary_plus_retained_native",
+      "blockers": [],
+      "evidence": [
+        "native-write-during-destination.json",
+        "native-write-after-commit-kill-logcat.txt",
+        "native-write-reopen-after-two-deaths.json",
+        "QA_DRIVER_NOTES.md",
+        "native-saf-chooser-process-death.json",
+        "remaining-saf-midstream-result.json",
+        "remaining-saf-midstream-watcher.log",
+        "remaining-saf-check-r9-saf-after-death.json",
+        "r9-saf-complete-observed.xml",
+        "remaining-vm-check-r3-vm-claim.json",
+        "remaining-vm-check-r3-vm-result.json",
+        "remaining-vm-check-r3-vm-complete.json",
+        "remaining-vm-local-b02-r12-qa4-exact.json",
+        "b02-r12-qa4-vm/integrity.json",
+        "b02-r12-qa3b-native/callback-b02-r12-qa3b-callback.json",
+        "b02-r12-qa3b-native/deathcheck-b02-r12-qa3b-prequeue.json",
+        "b02-r12-qa3b-native/deathcheck-b02-r12-qa3b-worker.json"
+      ],
+      "coverage": "Actual PREPARING/chooser deaths retained; native ViewModel claim/result/COMPLETE deaths now verified. Actual ACTION_CREATE_DOCUMENT to observed Downloads, writer PID7458 killed after destination3,743,744bytes observed; retained final partial31,367,168/106,806,531bytes. New process real chooser/new destination writes same existing staged operation COMPLETE, provider readback and destination SHA exact. No new stage/database copy; partial retained. Native evidence above is installed3fc source; new1c97d72 candidate has unit/build proof only and is not native accepted. r12 continuation: exact installed QA4 primary passed existing unchanged r6 remaining-vm-local, including cleared-before-call/after-result-commit/open-output-failure, same-stage retry/hash and successor-owner protection. Separate real JNI callback contention and prequeue/worker SIGKILL passed. Old provider/SAF process-death cases remain explicitly earlier-source evidence.",
+      "manual_latest": true,
+      "candidateValidation": {
+        "commit": "1c97d72f2516e8b9b480c4abd635804db6695668",
+        "nativeInstalled": false,
+        "unitAndBuild": "backend-r11-full/summary.json:452green and successful APK builds",
+        "affectedBoundary": "Optional terminal-result catalog registration now dispatched only after durable callback handoff; native proof of new candidate requires B02 authorization",
+        "targeted": "backend-r11-targeted-green2/TEST-dev.notai.tracker.android.ExportCompletionDispatchTest.xml"
+      },
+      "evidenceLevel": "Current r12 changed boundary native + current459 regressions; earlier complete SAF/provider cases retained separately."
+    },
+    {
+      "id": "N08",
+      "scenario": "Export cancellation/retry and late Activity result",
+      "expected": "Only matching owner/operation changes; staged bytes retained for explicit retry",
+      "status": "passed_current_changed_boundary_plus_retained_native",
+      "blockers": [],
+      "evidence": [
+        "native-export-create.log",
+        "native-export-cancel.log",
+        "native-export-late.log",
+        "native-export-write.log",
+        "native-saf-real-cancel-receipt.json",
+        "native-saf-real-complete-after-death-final.json",
+        "native-saf-destination-sha256.txt",
+        "native-ui/native-saf-write-result.xml",
+        "remaining-export-late-r3-late-red.json",
+        "remaining-export-late-r4-late-distinct.json",
+        "remaining-export-late-r5-late-same-same-id.json",
+        "canonical-r4/app-xml/TEST-dev.notai.tracker.android.ui.UiExportLifecycleTest.xml",
+        "remaining-vm-local-b02-r12-qa4-exact.json",
+        "b02-r12-qa4-vm/integrity.json",
+        "b02-r12-qa3b-native/callback-b02-r12-qa3b-callback.json",
+        "b02-r12-qa3b-native/deathcheck-b02-r12-qa3b-prequeue.json",
+        "b02-r12-qa3b-native/deathcheck-b02-r12-qa3b-worker.json"
+      ],
+      "coverage": "Actual MainActivity + real DocumentsUI old cancellation: before fix newer operation READY→CANCELLED; after owner-pair guard newer operation/pointer/owner exact. Distinct newer ID and same staged ID/new owner both native green. Stage SHA exact; original UI preferences restored. Native evidence above is installed3fc source; new1c97d72 candidate has unit/build proof only and is not native accepted. r12 continuation: exact installed QA4 primary passed existing unchanged r6 remaining-vm-local, including cleared-before-call/after-result-commit/open-output-failure, same-stage retry/hash and successor-owner protection. Separate real JNI callback contention and prequeue/worker SIGKILL passed. Old provider/SAF process-death cases remain explicitly earlier-source evidence.",
+      "manual_latest": true,
+      "candidateValidation": {
+        "commit": "1c97d72f2516e8b9b480c4abd635804db6695668",
+        "nativeInstalled": false,
+        "unitAndBuild": "backend-r11-full/summary.json:452green and successful APK builds",
+        "affectedBoundary": "Optional terminal-result catalog registration now dispatched only after durable callback handoff; native proof of new candidate requires B02 authorization",
+        "targeted": "backend-r11-targeted-green2/TEST-dev.notai.tracker.android.ExportCompletionDispatchTest.xml"
+      },
+      "evidenceLevel": "Current r12 changed boundary native + current459 regressions; earlier complete SAF/provider cases retained separately."
+    },
+    {
+      "id": "N09",
+      "scenario": "Full restore then stale commands/previews",
+      "expected": "Restore barrier rejects old target/reference without write",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-current-v5-contracts.xml",
+        "remaining-restore-stale-surfaces-r3-stale.json"
+      ],
+      "coverage": "Real full restore retaining Dataset ID changes controlBarrier; actual old START/STOP PendingIntents return STALE, full Dataset exact. Old preview refused before extra rollback creation.",
+      "manual_latest": true,
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N10",
+      "scenario": "Repeated Start/Pause/Resume/Stop and delayed old Stop",
+      "expected": "No replay; old Stop cannot stop a later timer",
+      "status": "passed_native_ui_offered_commands",
+      "blockers": [],
+      "evidence": [
+        "native-current-v5-contracts.xml",
+        "native-ui/widget-stopped-fast.xml",
+        "native-surface-stale-v10.log",
+        "native-timer-process-summary.json",
+        "remaining-repeated-surfaces-r3-repeat.json",
+        "n10-followup-summary.json",
+        "n10-ui-r4-result.json",
+        "n10w3-ui-r3-result.json",
+        "n10-widget-real-pending-record-identity.json",
+        "n10w3-delayed-old-stop.log",
+        "n10-widget-cleanup-result.json",
+        "n10-widget-semantic-remove-result.json",
+        "n10-ui-widget-r3/final-dataset.sql-result.txt",
+        "n10-final-state-before-shutdown.json",
+        "n10-own-avd-shutdown.json",
+        "backend-r11-ui-completion.json",
+        "backend-r11d-surface-ui-result.json",
+        "backend-r11-assignment-cleanup-result.json",
+        "backend-r11-permission-restoration-verification.json",
+        "backend-r11-whole-window-integrity.json"
+      ],
+      "coverage": "On installed3fc APK: prior MainActivity/TechnicalActivity/Launcher3 widget12 physical pairs plus real SystemUI notification START/PAUSE/RESUME/STOP4 pairs and overlay offered START/STOP2 pairs; all successful pairs one transition. Original73010/73014 prefix hashes exact after all attempts and cleanup; own assignment consumed through existing UI, recorded time retained. Earlier receiver-boundary proof separate. No overlay PAUSE/RESUME or shortcut STOP control exists; no UI added.",
+      "manual_latest": true,
+      "scopeLimits": [
+        {
+          "surface": "overlay PAUSE/RESUME",
+          "state": "not_offered",
+          "owner": "future UI design",
+          "returnCondition": "Test only if such controls are deliberately supplied; current puck START/STOP passed."
+        },
+        {
+          "surface": "shortcut full four-command matrix",
+          "state": "Stop not offered",
+          "owner": "future UI design / QA",
+          "returnCondition": "Prior launcher menu/repeat proof retained; no Stop shortcut can be claimed without a designed control."
+        }
+      ],
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N11",
+      "scenario": "Stopped-record assignment after next Start and process death",
+      "expected": "Explicit fresh saved-record offer; current session and old measurements remain unchanged",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-assignment-create.log",
+        "native-assignment-reopen.log"
+      ],
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N12",
+      "scenario": "Assignment cancel/replay/stale nonce",
+      "expected": "No unintended assignment; consumed receipt stays consumed",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-assignment-create.log",
+        "native-assignment-reopen.log"
+      ],
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N13",
+      "scenario": "Foreground notification permission/app/channel change",
+      "expected": "Fresh capability state; opt-in and actual permission checked atomically",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "notification-ui-final-restored.json",
+        "native-post-overlay-default-capabilities.log",
+        "native-notification-actions-ui-result.json",
+        "remaining-channel-r7-result.json",
+        "remaining-channel-probe-remaining-channel-r7-app-blocked.json",
+        "remaining-channel-probe-remaining-channel-r7-channel-blocked.json",
+        "remaining-channel-probe-remaining-channel-r7-channel-restored.json",
+        "remaining-channel-r7-restore.json",
+        "remaining-channel-r7-before-dumpsys.txt",
+        "remaining-channel-r7-after-dumpsys.txt"
+      ],
+      "coverage": "Actual Android Settings app master toggle blocks publication and removes notice; re-enable restores. Actual timer_controls channel master off yields importance0/CHANNEL_BLOCKED/no notice, on restores importance2/permitted. Full Dataset exact at each probe. Original POST grant+flags and overlay default restored exactly. OS Settings retains channel mUserLockedFields4 (before0); channel metadata is not bit-identical and no hidden right was added to clear that QA marker.",
+      "manual_latest": true,
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N14",
+      "scenario": "Real notification action and choice PendingIntent",
+      "expected": "Direct Activity route; current target; replay refused",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-notification-actions-ui-result.json",
+        "notification-ui-final-restored.json"
+      ],
+      "coverage": "Real SystemUI shade START/PAUSE/RESUME/STOP, quick QA_CSV_entry choice and STOP. Published real PendingIntents delivered; native UI XML each stage. No Calendar/DND changes.",
+      "manual_latest": true,
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N15",
+      "scenario": "Widget enablement versus actual placement",
+      "expected": "Actual IDs authoritative; not called installed from request acceptance alone",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-widget-request.log",
+        "native-widget-installed-dumpsys.txt",
+        "native-widget-reconciled-receipt.xml"
+      ],
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N16",
+      "scenario": "Widget pin receipt main-thread IO and failure ordering",
+      "expected": "Measure write/commit and platform call; no request when checked receipt persistence fails",
+      "status": "passed_native_controller_fault_injection",
+      "blockers": [],
+      "evidence": [
+        "native-widget-request.log",
+        "native-main-io.json",
+        "remaining-widget-faults-r3-widget-faults.json",
+        "widget-port-targeted-xml/TEST-dev.notai.tracker.android.WidgetPlacementFailureTest.xml",
+        "n16-evidence-separation.json"
+      ],
+      "coverage": "Controller receipt/failure-order contract: native SharedPreferences and explicit WidgetPlacementPlatform fault port. unsupported/refuse/exception/commit=false are injected responses, not actual OS failures. Real AppWidgetManager supported/accepted requests and launcher dialogs/foreground reconciliation are separate positive OS evidence. No real OS unsupported/refusal/exception/disk failure was observed; no such coverage is claimed.",
+      "manual_latest": true,
+      "evidenceClasses": {
+        "schema": "n16_evidence_classes_v1",
+        "controllerContract": "Synchronous durable receipt before platform request; no platform request after failed checked receipt",
+        "actualPlatform": {
+          "realAppWidgetManager": true,
+          "isRequestPinAppWidgetSupportedObserved": true,
+          "actualSuccessfulRequests": "native-widget-request.log; remaining-widget-overlap-r5-widget-overlap.json:3 real accepted requests and launcher dialogs",
+          "actualForegroundReconciliation": "native-widget-reconciled-receipt.xml",
+          "observedOSRefusal": false,
+          "observedOSException": false,
+          "observedOSUnsupported": false,
+          "observedActualReceiptDiskFailure": false
+        },
+        "faultPortFixtures": {
+          "unsupported": "WidgetPlacementPlatform.supported=false, injected; no real OS unsupported event",
+          "receipt-false": "Editor proxy commit=false, injected; real controller prevented platform call; no actual storage failure claimed",
+          "refuse": "WidgetPlacementPlatform.request returnsfalse, injected; not an observed AppWidgetManager refusal",
+          "throw": "Explicit test RuntimeException in platform port, injected; not an observed OS exception",
+          "accept": "Platform port returnstrue, injected; real OS positive path exists separately"
+        },
+        "evidence": [
+          "remaining-widget-faults-r3-widget-faults.json",
+          "widget-port-targeted-xml/TEST-dev.notai.tracker.android.WidgetPlacementFailureTest.xml",
+          "remaining-widget-overlap-r5-widget-overlap.json",
+          "native-widget-request.log"
+        ],
+        "verdict": "Controller durability/failure-order contract verified with native fault injection; real OS positive path verified; actual OS failures unobserved",
+        "ownerAndReturnCondition": {
+          "owner": "QA operator / platform integration",
+          "condition": "Revisit actual OS failure rows when the existing platform naturally refuses/throws or an explicitly approved alternate launcher/storage-fault environment is available. This follow-up authorizes no new installs/system rights."
+        },
+        "newRuntimeWorkRequired": false
+      },
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N17",
+      "scenario": "Widget callback after foreground/retry/new request",
+      "expected": "Old callback does not overwrite new receipt; observe actual IDs",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-widget-request.log",
+        "native-widget-reconciled-receipt.xml",
+        "remaining-widget-overlap-r5-widget-overlap.json",
+        "remaining-harness-versions/r5/RemainingWidgetChecks.kt"
+      ],
+      "coverage": "Real AppWidgetManager from existing visible technical shell:3 actual pin dialogs cancelled, foreground reconciliation UNCONFIRMED, retry gets distinct request ID. Repeated pending request keeps ID; stale callback cannot replace newer request; current callback without actual installed widget stays UNCONFIRMED; default Dataset exact. All widget placement prefs restored to pre-scenario values.",
+      "manual_latest": true,
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N18",
+      "scenario": "Real widget Start/Pause/Resume/Stop",
+      "expected": "Existing current commands preserve checked target semantics",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-ui/widget-home-enabled.xml",
+        "native-ui/widget-live-fast.xml",
+        "native-ui/widget-paused-fast.xml",
+        "native-ui/widget-resumed-fast.xml",
+        "native-ui/widget-stopped-fast.xml"
+      ],
+      "coverage": "Real launcher widget START/PAUSE/RESUME/STOP on accepted841 APK, same surface source in current branch.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N19",
+      "scenario": "Real launcher shortcut including delayed/repeated delivery",
+      "expected": "Existing shortcut starts once; no silent target refresh",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-launcher-real-menu-result.json",
+        "native-launcher-real-menu-reopen-final.json",
+        "native-launcher-real-menu-final-stop.json",
+        "native-shortcut-current-canonical-v11.json"
+      ],
+      "coverage": "Actual app drawer physical long-press menu → Таймер: начать → RUNNING UI, new PID9677 confirms committed session; explicit final stop IDLE. Previous published ShortcutInfo+two duplicate OS MainActivity deliveries preserve Dataset. Late host/AVD boot IDs separated from benchmark. No physical-device claim.",
+      "manual_latest": true,
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N20",
+      "scenario": "Existing overlay primary action and permission revocation",
+      "expected": "START/STOP policy; durable assignment; permission rechecked",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-ui/positive-overlay-card-settled.xml",
+        "native-after-positive-overlay-state-v13.json",
+        "native-overlay-revocation-result.json",
+        "native-overlay-explicit-denial-result.json",
+        "overlay-explicit-denial-restored.json",
+        "native-final-capabilities-before-stop.log"
+      ],
+      "coverage": "Actual overlay START/STOP over Launcher and saved-time assignment card. Active puck+FGS observed; explicit same-op ignore removes window and service while POST_NOTIFICATIONS still granted; original default/runtime flags restored and fresh capability confirms overlay false. Separate default reset retained live window20seconds; not treated as equivalent to explicit deny and not counted as successful revoke. No claim of TalkBack.",
+      "manual_latest": true,
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N21",
+      "scenario": "Focus process reopen in same boot / changed boot",
+      "expected": "Monotonic trust boundary; at most one phase; uncertain time remains explicit",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-focus-create-v10.json",
+        "native-focus-same-boot-v10.json",
+        "native-focus-real-reboot.json",
+        "native-focus-changed-boot-v10.json",
+        "native-focus-after-reboot-cancel-v10.log",
+        "native-focus-explicit-resolve-v11.json"
+      ],
+      "coverage": "SDK35 diagnostic ee95681: sameboot process reopen RUNNING, real own AVD reboot boot1→2 RECOVERY/trusted0 without invented facts; cancel correctly refused. Canonical SDK36 e95f63d5: explicit null/null recovery resolution. No physical/OEM claim.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N22",
+      "scenario": "Background Schedule/ordinary production delivery after normal-process SIGKILL; Focus prior evidence retained",
+      "expected": "Observe actual callback/notification or record timeout; no OEM/exact-alarm claim",
+      "status": "passed_native_current_changed_boundary",
+      "blockers": [],
+      "evidence": [
+        "b02-r12-qa4-cold/result.json",
+        "b02-r12-qa4-cold/cold-normal-process-sigkill.json",
+        "b02-r12-qa4-cold/alarms-after-sigkill.txt",
+        "b02-r12-qa4-cold/actual-production-notifications.txt",
+        "b02-r12-qa4-cold/shell-coldcheck.json",
+        "b02-r12-qa4-cold/neutral-open-no-timer-mutation.json",
+        "b02-r12-qa4-cold/notifications-restored.txt"
+      ],
+      "coverage": "Production factories initialized by actual Application, real RTC schedule + elapsed ordinary AlarmManager alarms survived SIGKILL of normal app PID5750. Actual receiver process5996 posted one receipt each and visible PRIVATE cards84/85. Actual SystemUI schedule tap opened MainActivity without timer mutation. Temporary POST grant restored; no manual alarm broadcast. Earlier Focus technical-renderer evidence remains earlier source; no new Focus audio/DND/product UI claim.",
+      "manual_latest": true,
+      "evidenceLevel": "Current production native on official AOSP emulator only"
+    },
+    {
+      "id": "N23",
+      "scenario": "CSV mapping preview/apply/cancel/replay",
+      "expected": "Explicit columns/zone/classification; unchanged source on cancellation",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-csv-ui-result.json",
+        "native-csv-ui-first-75s-deadline-result.json",
+        "native-csv-ui-resume.log"
+      ],
+      "coverage": "Real DocumentsUI134B own CSV; explicit mapping namespacecsv:local/UTC/columns, preview+cancel preserves73002count/rev26. Same pending apply completed after protective full rollback verification:73003/rev27. Explicit replay0add/1duplicate preserves rev27 and rollback file list. Initial75s QA deadline preserved; import not repeated.",
+      "manual_latest": true,
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N24",
+      "scenario": "Current BackendIntegrationChecks create/reopen in separate processes",
+      "expected": "Isolated UUID roots; current full/selective/receipt state; live tracker.db digest unchanged",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-owner-final-summary.json",
+        "native-owner-final-create.log",
+        "native-owner-final-reopen.log"
+      ],
+      "coverage": "Canonical ba8e799: owner integration PID10924→10958, Android native Context descriptor binding true,33 indexed receipts, legacy exact, duplicate reserve rejected, selective closure, verified full replacement rollback. Default live Dataset digest unchanged across both phases.",
+      "manual_latest": true,
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N25",
+      "scenario": "Export lifecycle main-thread IO measurement",
+      "expected": "StrictMode plus bounded trace/sample timing; preserve durable order",
+      "status": "passed_current_changed_boundary_plus_retained_native",
+      "blockers": [],
+      "evidence": [
+        "native-main-io.json",
+        "remaining-vm-local-r3-local.json",
+        "remaining-vm-check-r3-vm-claim.json",
+        "remaining-vm-check-r3-vm-result.json",
+        "remaining-vm-check-r3-vm-complete.json",
+        "remaining-vm-local-b02-r12-qa4-exact.json",
+        "b02-r12-qa4-vm/integrity.json",
+        "b02-r12-qa3b-native/callback-b02-r12-qa3b-callback.json",
+        "b02-r12-qa3b-native/deathcheck-b02-r12-qa3b-prequeue.json",
+        "b02-r12-qa3b-native/deathcheck-b02-r12-qa3b-worker.json"
+      ],
+      "coverage": "Actual native ViewModel clear before call/after result commit/output-open refusal, successor owner race and actual process death claim/result/COMPLETE all recover exact staged hash and durable state. One main-thread functional call timing per branch distinct from old n7 main I/O measurement; JNI I/O not proven absent. Native evidence above is installed3fc source; new1c97d72 candidate has unit/build proof only and is not native accepted. r12 continuation: exact installed QA4 primary passed existing unchanged r6 remaining-vm-local, including cleared-before-call/after-result-commit/open-output-failure, same-stage retry/hash and successor-owner protection. Separate real JNI callback contention and prequeue/worker SIGKILL passed. Old provider/SAF process-death cases remain explicitly earlier-source evidence.",
+      "manual_latest": true,
+      "candidateValidation": {
+        "commit": "1c97d72f2516e8b9b480c4abd635804db6695668",
+        "nativeInstalled": false,
+        "unitAndBuild": "backend-r11-full/summary.json:452green and successful APK builds",
+        "affectedBoundary": "Optional terminal-result catalog registration now dispatched only after durable callback handoff; native proof of new candidate requires B02 authorization",
+        "targeted": "backend-r11-targeted-green2/TEST-dev.notai.tracker.android.ExportCompletionDispatchTest.xml"
+      },
+      "evidenceLevel": "Current r12 changed boundary native + current459 regressions; earlier complete SAF/provider cases retained separately."
+    },
+    {
+      "id": "N26",
+      "scenario": "Existing technical shell schema label",
+      "expected": "Displayed schema comes from TRACKER_DATABASE_VERSION after current build",
+      "status": "passed_native",
+      "blockers": [],
+      "evidence": [
+        "native-ui/technical-before-fix.xml",
+        "native-ui/technical-after-fix.xml",
+        "room-label-native-after.json"
+      ],
+      "coverage": "Room5 reproduced before; Room12 confirmed in current SDK35 ee95681 UI after fix.",
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "X01",
+      "scenario": "Physical phone/OEM idle delivery",
+      "expected": "Requires actual appropriate device/tool and observation",
+      "status": "outside_current_evidence",
+      "blockers": [
+        "NO_FACTUAL_RUN"
+      ],
+      "evidence": [],
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "X02",
+      "scenario": "Power-loss durability",
+      "expected": "Requires actual appropriate device/tool and observation",
+      "status": "outside_current_evidence",
+      "blockers": [
+        "NO_FACTUAL_RUN"
+      ],
+      "evidence": [],
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "X03",
+      "scenario": "TalkBack/RTL acceptance",
+      "expected": "Requires actual appropriate device/tool and observation",
+      "status": "outside_current_evidence",
+      "blockers": [
+        "NO_FACTUAL_RUN"
+      ],
+      "evidence": [],
+      "evidenceLevel": "Retained earlier native receipt; current unchanged contract/full regression. See each raw source/APK receipt; not a current full rerun."
+    },
+    {
+      "id": "N27",
+      "scenario": "Reject same-factory stale prepared Schedule/ordinary notification",
+      "expected": "Both stale preparations rejected; fresh actual Android notices visible; private/publicVersion/immutable neutral open/no timer actions.",
+      "status": "passed_native_current_changed_boundary",
+      "blockers": [],
+      "evidence": [
+        "b02-r12-qa3b-native/guards-b02-r12-qa3b-guards.json"
+      ],
+      "coverage": "Both stale preparations rejected; fresh actual Android notices visible; private/publicVersion/immutable neutral open/no timer actions.",
+      "evidenceLevel": "Current production native on official AOSP emulator; QA-only fixtures/ports labelled"
+    },
+    {
+      "id": "N28",
+      "scenario": "Next main callback proceeds while native optional descriptor validation is blocked",
+      "expected": "Real Android main looper + real descriptor capture; second callback returns before release, stale snapshot refused, foreign reference and bytes retained. Functional sample only.",
+      "status": "passed_native_current_changed_boundary",
+      "blockers": [],
+      "evidence": [
+        "b02-r12-qa3b-native/callback-b02-r12-qa3b-callback.json"
+      ],
+      "coverage": "Real Android main looper + real descriptor capture; second callback returns before release, stale snapshot refused, foreign reference and bytes retained. Functional sample only.",
+      "evidenceLevel": "Current production native on official AOSP emulator; QA-only fixtures/ports labelled"
+    },
+    {
+      "id": "N29",
+      "scenario": "SIGKILL before optional job / during descriptor validation",
+      "expected": "Both prequeue and worker modes real SIGKILL. Durable terminal receipt+hash preserved. Read lease remains only in worker case; explicit exact-owner retry revalidates/releases only own lease, no expiry.",
+      "status": "passed_native_current_changed_boundary",
+      "blockers": [],
+      "evidence": [
+        "b02-r12-qa3b-native/deathcheck-b02-r12-qa3b-worker.json"
+      ],
+      "coverage": "Both prequeue and worker modes real SIGKILL. Durable terminal receipt+hash preserved. Read lease remains only in worker case; explicit exact-owner retry revalidates/releases only own lease, no expiry.",
+      "evidenceLevel": "Current production native on official AOSP emulator; QA-only fixtures/ports labelled"
+    },
+    {
+      "id": "N30",
+      "scenario": "Final permission/data/channel restoration",
+      "expected": "Original73013/73018 and all73015/73020 final rows retained; revision83 IDLE, noFocus/noAssignments. Six permission/flag lines exact, POSTignore/overlaydefault, timer policy exact, schedule deleted/ownordinary deleted. Android channel tombstones retained.",
+      "status": "passed_native_current_changed_boundary",
+      "blockers": [],
+      "evidence": [
+        "b02-r12-qa4-vm/integrity.json"
+      ],
+      "coverage": "Original73013/73018 and all73015/73020 final rows retained; revision83 IDLE, noFocus/noAssignments. Six permission/flag lines exact, POSTignore/overlaydefault, timer policy exact, schedule deleted/ownordinary deleted. Android channel tombstones retained.",
+      "evidenceLevel": "Current production native on official AOSP emulator; QA-only fixtures/ports labelled"
+    }
+  ],
+  "statusCounts": {
+    "passed_native": 49,
+    "passed_current_changed_boundary_plus_retained_native": 3,
+    "passed_native_ui_offered_commands": 1,
+    "passed_native_controller_fault_injection": 1,
+    "passed_native_current_changed_boundary": 5,
+    "outside_current_evidence": 3
+  },
+  "updatedUTC": "2026-10-17T04:59:47.274006+00:00",
+  "installedNativeReference": {
+    "package": "dev.notai.tracker",
+    "APK": "b06fdafe37e57af36948e9133b43033815c1bdaf4d7cc8f64f86247bdcf2d10f",
+    "source": "8f939675f3c0d23817bef70e0c3e08d785aeb5d3",
+    "productionCommits": [
+      "cfa563f68610a6b094833acf17e09affe716b664",
+      "90c99f017bdab737eefe1221e2221bb325d6692d"
+    ],
+    "debugOnly": true,
+    "existingHelpersUnchanged": true
+  },
+  "candidateSource": "8f939675f3c0d23817bef70e0c3e08d785aeb5d3"
+}

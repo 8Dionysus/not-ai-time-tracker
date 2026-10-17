@@ -1,0 +1,23 @@
+{
+  "core_source_sha": "841448b8a3ff26111fce9bdf8418c170dbc7a622",
+  "core_sources_changed": false,
+  "full_baseline": {
+    "tests": 198,
+    "failures": 1,
+    "errors": 0,
+    "skipped": 0
+  },
+  "baseline_failure": "CoreScenariosTest.timerPath: harness redirected build directory, while fixture expected repo/build/choices-summary.json",
+  "targeted_after_harness_directory_fix": {
+    "test": "CoreScenariosTest.timerPath",
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "raw_xml_sha256": "ce2bd188196929a0790c6abd4db8837ab480aff6d2fc92bbae6543b7b9a7105b"
+  },
+  "claim": "197 first-run tests plus the one corrected-harness replay passed. This is not one fresh all-green aggregate invocation and not Android acceptance.",
+  "app_tests": "not_run: current Android toolchain unavailable",
+  "fresh_lint": "not_run: retained accepted XML only",
+  "app_build": "not_run_successfully: NDK configuration fails; API36 absent"
+}

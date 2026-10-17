@@ -346,7 +346,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         dev.notai.tracker.android.Surface.WIDGET -> settings.copy(widget = enabled)
         dev.notai.tracker.android.Surface.NOTIFICATION -> settings.copy(notification = enabled)
         dev.notai.tracker.android.Surface.OVERLAY -> settings.copy(overlay = enabled)
-        dev.notai.tracker.android.Surface.SHORTCUT -> fail(ErrorCode.INVALID_INPUT,"Shortcut has no enable preference")
+        dev.notai.tracker.android.Surface.SHORTCUT -> settings.copy(shortcut = enabled)
     } }
     suspend fun previewDeleteSession(id: String): Tracker.DeletePreview? = withContext(Dispatchers.IO) {
         val rt = waitRuntime() ?: return@withContext null
@@ -764,6 +764,15 @@ class TrackerViewModel internal constructor(private val app: Application,private
     }
     fun exportTitle(id: String) = exports.read(id).title
     fun exportMime(id: String) = exports.read(id).mime
+    /** Only the chooser that owns the durable claim may consume its result.
+     * A previous chooser can return after a retry claims the same staged bytes. */
+    fun receiveDocumentExportResult(id: String?,owner: String?,uri: Uri?): Boolean =
+        synchronized(DocumentExportCoordination.lock) {
+            if(id == null || owner == null || documentExportId() != id ||
+                prefs.getString("documentExportOwner",null) != owner ||
+                !prefs.getBoolean("documentExportLaunched",false)) false
+            else { writeExport(id,uri);true }
+        }
     fun writeExport(id: String, uri: Uri?) {
         synchronized(DocumentExportCoordination.lock) {
             if(!DocumentExportCoordination.writing.add(id)) return

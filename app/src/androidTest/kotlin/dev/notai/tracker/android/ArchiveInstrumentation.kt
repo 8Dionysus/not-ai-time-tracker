@@ -21,6 +21,15 @@ class ArchiveInstrumentation: Instrumentation() {
     override fun onStart() {
         try {
             val context = targetContext
+            if(mode.startsWith("remaining-")) {
+                val report = when {
+                    mode.startsWith("remaining-vm-") || mode == "remaining-export-late" -> RemainingVmChecks.run(this,context,mode,requireNotNull(backendName))
+                    mode.startsWith("remaining-widget-") -> RemainingWidgetChecks.run(this,context,mode,requireNotNull(backendName))
+                    mode.startsWith("remaining-schedule-") -> RemainingScheduleChecks.run(this,context,mode,requireNotNull(backendName))
+                    else -> RemainingNativeChecks.run(this,context,mode,requireNotNull(backendName))
+                }
+                finish(Activity.RESULT_OK,Bundle().apply { putString("report",report.toString()) });return
+            }
             if(mode.startsWith("backend-integration-")) {
                 val report = BackendIntegrationChecks.run(context,mode,requireNotNull(backendName))
                 finish(Activity.RESULT_OK,Bundle().apply { putString("report",report.toString()) });return

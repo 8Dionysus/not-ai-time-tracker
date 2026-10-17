@@ -15,13 +15,32 @@ import dev.notai.tracker.*
 import java.io.File
 import kotlinx.coroutines.*
 
-/** Opus owns text, channel creation and notification actions. The factory must be process-wide,
- * installed before cold receivers, with no Activity reference. No renderer means no delivery. */
+/** Application-owned system-card rendering. No Activity reference or implicit feature consent. */
 fun interface LongRecordNoticeFactory {
     fun create(context: Context,ticket: LongRecordTicket,snapshot: Snapshot): Notification
 }
 object LongRecordNoticeBinding {
-    @Volatile var factory: LongRecordNoticeFactory? = null
+    internal class Registration(val factory: LongRecordNoticeFactory?)
+    private val lock = Any()
+    @Volatile private var registration = Registration(null)
+    var factory: LongRecordNoticeFactory?
+        get() = registration.factory
+        set(value) {
+            synchronized(lock) { registration = Registration(value) }
+            TrackerRuntime.refreshExistingSchedule()
+        }
+    internal fun capture(): Registration = registration
+    internal fun publishIfCurrent(expected: Registration,post: () -> Boolean): Boolean = synchronized(lock) {
+        registration === expected && expected.factory != null && post()
+    }
+    internal fun initialize(context: Context) {
+        synchronized(lock) {
+            registration = Registration(null)
+            try { ProductionReminderNotices.longRecordChannel(context);registration = Registration(ProductionReminderNotices.longRecord) }
+            catch(_: Exception) { android.util.Log.w("LongRecordReminder","Application reminder binding unavailable; preference unchanged") }
+        }
+        TrackerRuntime.refreshExistingSchedule()
+    }
 }
 private val longRecordGates = mutableMapOf<String,Any>()
 class AndroidLongRecordStore(context: Context): LongRecordStore {
@@ -70,11 +89,14 @@ class AndroidLongRecordPlatform(context: Context): LongRecordPlatform {
     }
     override fun prepare(ticket: LongRecordTicket,snapshot: Snapshot): PreparedLongRecordNotice? {
         if(!availability().ready) return null
-        val notice = LongRecordNoticeBinding.factory?.create(context,ticket,snapshot) ?: return null
+        val registration = LongRecordNoticeBinding.capture()
+        val notice = registration.factory?.create(context,ticket,snapshot) ?: return null
         if(notice.channelId != CHANNEL) return null
         return PreparedLongRecordNotice {
-            if(!availability().ready) false else {
-                context.getSystemService(NotificationManager::class.java).notify(NOTICE,notice);true
+            LongRecordNoticeBinding.publishIfCurrent(registration) {
+                if(!availability().ready) false else {
+                    context.getSystemService(NotificationManager::class.java).notify(NOTICE,notice);true
+                }
             }
         }
     }

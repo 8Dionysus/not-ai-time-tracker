@@ -473,7 +473,7 @@ class TechnicalActivity: Activity() {
                         })
                     }
                     val focusText = s.focus?.let { "${it.safeLabel}: ${it.remainingMs} ms\n" }.orEmpty()
-                    status.text = "Техническая оболочка · Room 5\n${s.safeLabel}\n${s.trustedDurationMs} ms · ревизия ${s.token.revision}\n$focusText${s.session?.selection ?: ""}\n$reportText"
+                    status.text = "Техническая оболочка · Room ${TRACKER_DATABASE_VERSION}\n${s.safeLabel}\n${s.trustedDurationMs} ms · ревизия ${s.token.revision}\n$focusText${s.session?.selection ?: ""}\n$reportText"
                     runtime.focusDueSignals.consume(s.focus) { focus ->
                         deliverTechnicalFocus(runtime.tracker,focus)
                     }

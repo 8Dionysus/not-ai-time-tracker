@@ -1,3 +1,5 @@
+> Current r14 handoff: [полная карта остатка](BACKEND_COMPLETION_2026_10_17.md), [verified candidate](BACKEND_READINESS_2026_10_17.md). Accepted r12 retained; r14 coordinator acceptance pending. Typed Focus callers, atomic switchDraft, reporting-day/goal callers and shortcut preference controller are now connected. Old "caller remains open" wording below records earlier handoff state. CSV sourceLocale/mapping persistence, new forms/controls and real Focus DND/audio choices remain specific frontend/platform work. Application Schedule/ordinary notification composition is already closed by r12; current source/evidence boundaries are in the linked matrix.
+
 # Backend workspaces and lifecycle handoff
 
 Current accepted boundary: backend runtime/controllers, Application/manifest wiring and file adapters. Compose, MainActivity, TechnicalActivity, UI ViewModel, resources and surface rendering are unchanged by this pass. The separate caller patch is explicitly unaccepted and must be reviewed by Opus. No new timer, importer or Dataset store exists.
@@ -30,7 +32,7 @@ Application callbacks persist a UUID Activity lifetime through recreation. FormF
 
 Full restore previews and rescue previews are AutoCloseable. Cancel/replace a retained preview by closing it; apply protects it and closes only on success. Known private source compatibility readers use the same lifecycle adapter; external originals receive no cleanup authority. Recovery journal3 stores exact source references, writer references and archive IDs. After installed Room readback it durably records completed Dataset hash/session count BEFORE releasing any reference. Pending journal is deleted LAST and directory-synced. Crash reconciliation verifies the installed Dataset and releases only recorded matching tokens; completed resume never replaces the database again. A different source cannot overwrite an unfinished job. Missing/empty installed DB refuses before SQLite open; completion reconciliation uses allowInitialize=false and preserves the pending journal/source leases instead of creating an empty Dataset. Unknown legacy references are not released.
 
-## Backend deltas for Opus
+## Historical backend deltas for Opus (superseded caller status above)
 
 - Use `Tracker.configureFocusSignal(expected, enabled)` for a delta update preserving live timer/other settings; UI's old whole-settings update still needs migration.
 - Use typed `FocusSignals.deliverResult(context, tracker)` on IO. A durable attempted/unknown receipt is never an instruction to retry or auto-fallback. Receiver migrated; deprecated visible callers remain for Opus.

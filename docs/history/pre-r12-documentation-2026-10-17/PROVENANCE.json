@@ -1,0 +1,31 @@
+{
+  "role": "Historical unmodified pre-r12 documentation/source review; not current readiness",
+  "capturedFromCommit": "4369e4925e7890b73cc9892f98a0513efef30d0e",
+  "reason": "Current tracked readiness and pointers were stale v11 despite accepted r12 evidence; preserve exact bytes before correction",
+  "files": [
+    {
+      "sourceAt4369": "docs/BACKEND_READINESS_2026_10_17.md",
+      "historyPath": "docs/history/pre-r12-documentation-2026-10-17/BACKEND_READINESS_2026_10_17.original.md",
+      "sha256": "51e68063b51c17e0809756e5457b3a85e1ca9ab80313cf439384029d0a070b31",
+      "bytes": 15375
+    },
+    {
+      "sourceAt4369": "docs/ACCEPTANCE_GAPS.md",
+      "historyPath": "docs/history/pre-r12-documentation-2026-10-17/ACCEPTANCE_GAPS.original.md",
+      "sha256": "48775a6d74e8202ad9cbefef5384ea6d63114a8337252b0253a533d443fb8fe2",
+      "bytes": 8949
+    },
+    {
+      "sourceAt4369": "docs/FRONTEND_HANDOFF.md",
+      "historyPath": "docs/history/pre-r12-documentation-2026-10-17/FRONTEND_HANDOFF.original.md",
+      "sha256": "04a4b504785b724c5273776e51eacd9df32f3e442ccf7a2849969cca0484e426",
+      "bytes": 16858
+    },
+    {
+      "sourceAt4369": "delivery reports/B01_COMPOSITION_SOURCE_REVIEW_2026_10_17.md",
+      "historyPath": "docs/history/pre-r12-documentation-2026-10-17/B01_COMPOSITION_SOURCE_REVIEW_2026_10_17.original.md",
+      "sha256": "7f4f99f28979d15255e27a4afb570adb4c78954e423bc6ef43d18f3481ff5913",
+      "bytes": 19663
+    }
+  ]
+}

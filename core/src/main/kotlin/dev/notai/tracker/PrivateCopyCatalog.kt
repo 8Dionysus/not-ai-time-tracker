@@ -18,7 +18,9 @@ data class CopyRegistrationReport(val registeredIds: List<String>,val refused: L
  * finished. Registration may coexist with protective references; it never releases those refs.
  * A complete hardlink component is registered in one existing storage transaction.
  */
-class PrivateCopyCatalog(private val files: DescriptorCopyFiles,private val gate: CopyMaintenance) {
+class PrivateCopyCatalog internal constructor(private val files: DescriptorCopyFiles,private val gate: CopyMaintenance,
+    private val exportValidationStarted: () -> Unit) {
+    constructor(files: DescriptorCopyFiles,gate: CopyMaintenance): this(files,gate,{})
     /** Read-only cutover witness. Includes refused/unregistered names; never seals,
      * registers, releases a reference or resumes deletion. Unknown roots fail closed. */
     fun candidateIds(): Set<String> = gate.locked {
@@ -64,8 +66,8 @@ class PrivateCopyCatalog(private val files: DescriptorCopyFiles,private val gate
         val i = item(path,CopyKind.FORM,"VALIDATED",listOf(before),setOf(CopyWarning.FORM_DRAFT_WILL_BE_DISCARDED))
         storage.registerValidated(i,path,false,mapOf(before.opaqueId to name));i.id
     }
-    fun registerExport(operationId: String): String = gate.locked {
-        uuid(operationId);val path = "exports/$operationId"
+    private fun captureExport(operationId: String): RegisteredCopy {
+        uuid(operationId);exportValidationStarted();val path = "exports/$operationId"
         val names = files.children(path)
         ensure("operation.json" in names && names.all { it in setOf("data","data.part","operation.json") },"Unknown export group member")
         val op = codec.decodeFromString<StagedExportRecord>(text("$path/operation.json"))
@@ -80,7 +82,32 @@ class PrivateCopyCatalog(private val files: DescriptorCopyFiles,private val gate
             else -> setOf(CopyWarning.INCOMPLETE_EXPORT_STAGING)
         }
         val i = item(path,CopyKind.EXPORT,op.state,members,warnings)
-        storage.registerValidated(i,path,true,members.zip(names).associate { it.first.opaqueId to it.second });i.id
+        return CopyManifestFiles(files).capture(i,path,true,members.zip(names).associate { it.first.opaqueId to it.second },emptySet(),false)
+    }
+    fun registerExport(operationId: String): String = storage.registerValidatedExport { captureExport(operationId) }
+    /** Optional post-handoff registration: protect bytes under the common gate, then do all
+     * descriptor reads/hashes outside it. Any competing transaction refuses the snapshot.
+     * No retry loop, deletion, reference expiry or authority from a stale capture. */
+    fun registerExportAfterHandoff(operationId: String): String = gate.completingExport {
+        uuid(operationId);val itemId = id("exports/$operationId")
+        val (reference,revision) = gate.locked {
+            val before = gate.state()
+            ensure(before.journals.none { it.phase !in setOf(CleanupPhase.DONE,CleanupPhase.RESTORED) },"Cleanup interrupted")
+            val owner = "export-registration:$operationId"
+            val prior = before.references.filter { it.owner == owner }
+            ensure(prior.size <= 1 && prior.all { it.itemId == itemId && it.blocker == CopyBlocker.IN_PROGRESS && it.scopeItemIds == null },"Registration owner changed",ErrorCode.STALE)
+            val previous = prior.singleOrNull()
+            ensure(before.references.none { it != previous && it.protects(itemId) && it.blocker in setOf(CopyBlocker.IN_PROGRESS,CopyBlocker.EXPORT_WRITING) },"Export writer active",ErrorCode.STALE)
+            // Explicit owner retry revalidates under its exact surviving read lease. There is
+            // no process-age expiry or release of any writer/chooser/foreign owner.
+            val ref = previous ?: gate.acquire(owner,itemId,CopyBlocker.IN_PROGRESS)
+            ref to gate.state().revision
+        }
+        try {
+            val captured = captureExport(operationId)
+            storage.admitCapturedExport(captured,reference,revision)
+            itemId
+        } finally { gate.release(reference) }
     }
     /** Backend calls AFTER every original/retired member is installed and fsynced. Pending rescue
      * archives must be excluded by its durable job/ref registry. This only adds a seal manifest. */
@@ -134,6 +161,50 @@ class PrivateCopyCatalog(private val files: DescriptorCopyFiles,private val gate
             catch(_: Exception) { refused += batch.map { CopyRegistrationFailure(it.item.id,setOf(CopyBlocker.HARDLINK_GRAPH_INCOMPLETE)) } }
         }
         return CopyRegistrationReport(frozenList(registered),frozenList(refused))
+    }
+    /** Automatic completion verifies the requested archive and every connected hardlink alias.
+     * Discover the complete forest by descriptor identity first; unrelated archive bytes need
+     * no rehash/reseal here. Final storage admission still proves every selected forest/member
+     * and its actual link count, so an unsealed, unreadable or newly added alias fails closed.
+     * The explicit legacy registration below continues to inspect the entire forest. */
+    fun registerFinalizedArchive(archiveId: String): CopyRegistrationReport = gate.locked {
+        uuid(archiveId)
+        val root = "database-archives"
+        val target = id("$root/$archiveId")
+        val nodes = mutableMapOf<String,Set<Pair<Long,Long>>>()
+        if(files.inspect(root) != null) for(name in files.children(root)) try {
+            uuid(name);val path = "$root/$name"
+            if(files.inspect("$path/cleanup-seal.json") == null) continue
+            val identities = mutableSetOf<Pair<Long,Long>>()
+            for(child in files.children(path)) {
+                val memberPath = "$path/$child"
+                val entry = files.inspect(memberPath) ?: error("Archive child disappeared")
+                if(entry.directory) {
+                    ensure(child == "retired","Unknown archive directory")
+                    for(retired in files.children(memberPath)) {
+                        val member = files.inspect("$memberPath/$retired") ?: error("Retired child disappeared")
+                        ensure(member.regular,"Unsafe retired member");identities += member.node()
+                    }
+                } else { ensure(entry.regular,"Unsafe archive member");identities += entry.node() }
+            }
+            nodes[name] = identities
+        } catch(_: Exception) { /* No authority from an unreadable forest; link proof below refuses hidden aliases. */ }
+        val known = nodes[archiveId]?.toMutableSet()
+            ?: return@locked CopyRegistrationReport(emptyList(),listOf(CopyRegistrationFailure(target,setOf(CopyBlocker.UNKNOWN_FILE_OR_STATE))))
+        val selected = mutableSetOf(archiveId)
+        do {
+            var changed = false
+            for((name,aliases) in nodes) if(name !in selected && aliases.any { it in known }) {
+                selected += name;known += aliases;changed = true
+            }
+        } while(changed)
+        val failures = mutableListOf<CopyRegistrationFailure>()
+        val archives = selected.sorted().mapNotNull { name ->
+            try { sealedArchive(name) }
+            catch(_: Exception) { failures += CopyRegistrationFailure(id("$root/$name"),setOf(CopyBlocker.UNKNOWN_FILE_OR_STATE));null }
+        }
+        val result = registerComponents(archives)
+        result.copy(refused = frozenList(result.refused+failures))
     }
     fun registerFinalizedArchives(): CopyRegistrationReport = gate.locked {
         if(files.inspect("database-archives") == null) return@locked CopyRegistrationReport(emptyList(),emptyList())

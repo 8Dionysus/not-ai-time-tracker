@@ -132,6 +132,8 @@ class TechnicalExportLifecycleTest {
     @Test fun reviewP3TechnicalFocusUsesFreshTypedDelivery() {
         shadowOf(app).grantPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
         app.getSharedPreferences("focus-signals",0).edit().clear().commit()
+        // Require a fresh post from this attempt, not a notification left by another fixture.
+        app.getSystemService(android.app.NotificationManager::class.java).cancelAll()
         val store = object: StateStore {
             private var value = Dataset();override val changes = kotlinx.coroutines.flow.MutableStateFlow(value)
             override fun read() = value
@@ -145,10 +147,47 @@ class TechnicalExportLifecycleTest {
         waitFor { app.getSystemService(android.app.NotificationManager::class.java).activeNotifications.any { it.id == 43 } }
         waitFor { first.isCompleted }
         assertEquals(before,t.data())
+        assertTrue("The current Focus attempt has its own durable receipt",
+            t.snapshot().focus!!.signalKey in app.getSharedPreferences("focus-signals",0).getStringSet("delivered",emptySet()).orEmpty())
+        // Robolectric retains the latest AlertDialog even after dismissal. The contract is
+        // no new fallback for this consumed attempt, including after permission loss.
+        val dialogBeforeRetry = org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog()
         shadowOf(app).denyPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
         val previous = controller.get().deliverTechnicalFocus(t,t.snapshot().focus!!)
         waitFor { previous.isCompleted }
-        assertNull("A previous attempt cannot turn into a duplicate dialog after permission loss",org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog())
+        assertSame("A previous attempt cannot turn into a duplicate dialog after permission loss",
+            dialogBeforeRetry,org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog())
+    }
+
+    @Test fun previousDismissedDialogIsNotANewFocusFallback() {
+        android.app.AlertDialog.Builder(controller.get()).setTitle("Synthetic earlier dismissed dialog").show().dismiss()
+        reviewP3TechnicalFocusUsesFreshTypedDelivery()
+    }
+    @Test fun blockedFocusResultCannotShowFallbackAfterPhaseAdvancedDuringIO() {
+        val store = object: StateStore {
+            @Volatile private var value = Dataset()
+            override val changes = kotlinx.coroutines.flow.MutableStateFlow(value)
+            @Volatile var afterRead: (() -> Unit)? = null
+            override fun read(): Dataset {
+                val captured=value;val hook=afterRead;afterRead=null;hook?.invoke();return captured
+            }
+            @Synchronized override fun <T> transaction(block: (Dataset) -> Pair<Dataset,T>): T {
+                val (next,result)=block(value);validate(next);value=next;changes.value=next;return result
+            }
+        }
+        val clock=FakeClock();val tracker=Tracker(store,clock)
+        tracker.startFocus(tracker.snapshot().token,plan=FocusPlan(1000,1000));clock.advance(1000)
+        val due=checkNotNull(tracker.snapshot().focus);assertEquals(FocusMode.DUE,due.mode)
+        val beforeDialog=org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog()
+        // The IO operation captured DUE, then another valid command advances the phase.
+        // Notification opt-in is false; even a blocked result must recheck the phase.
+        store.afterRead={ tracker.focusNext(tracker.snapshot().token) }
+        val job=controller.get().deliverTechnicalFocus(tracker,due)
+        waitFor { job.isCompleted }
+        val live=checkNotNull(tracker.snapshot().focus)
+        assertEquals(FocusMode.RUNNING,live.mode);assertEquals(due.phaseIndex+1,live.phaseIndex)
+        assertSame("A stale blocked result must not show completion of a phase already advanced",
+            beforeDialog,org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog())
     }
 
 }

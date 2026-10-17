@@ -121,7 +121,7 @@ PreparedScheduleNotice is an internal backend protocol, not an independently usa
 UI capability. Terminal post must be short and must not render, mutate Tracker,
 read delivery state or reenter the coordinator. Only OS submission runs under the
 domain gate; a slow Binder can delay concurrent commands and needs device QA.
-ScheduleNoticeFactory and its Opus-owned rendering signature are unchanged.
+ScheduleNoticeFactory and its application-owned rendering signature are unchanged.
 The complete fresh projection must still equal the rendered projection. A changed
 day policy/relative-day caption therefore refuses post even without a series revision change.
 Factories must still avoid side effects; the guard handles the reviewed regression.
@@ -129,20 +129,26 @@ This serializes submission against domain commits. It cannot retract sound alrea
 accepted by Android before a later opt-out, nor make OS display/permission/clock
 changes part of the application transaction. POSTED remains submission acceptance.
 
-## Required Opus integration
+## Current production composition and remaining UI integration
 
-1. At **every process startup**, install an application-scoped
-   `ScheduleNoticeBinding.install(factory)`. The factory implements
-   `ScheduleNoticeFactory.create(context,ticket,projection)` and must not capture an
-   Activity or mutate Tracker. Without it the capability is RENDERER_UNAVAILABLE;
-   backend alarms/wake hooks stay disabled. Existing production UI has no factory.
-2. On contextual explicit opt-in, create the localized channel with stable ID
-   `AndroidScheduleDeliveryPlatform.CHANNEL`. Permission/channel denial does not
-   rewrite alertsEnabled or remove a plan. The factory owns localized notification
-   content, privacy/public-version handling, accessibility and a direct explicit
-   Activity route; tapping a notice must not start time automatically. Backend owns
-   ticket extras, unique notification tags and notify/cancel calls. DND is reported
-   as a system capability and remains Android-controlled.
+`TrackerApplication` now installs the stateless production factory on every process startup,
+including cold receivers. The existing system notification template uses `app_name`,
+`ic_stat_notai` and `widget_amber`. Content contains the resolved planned local date/time and
+offset (UTC is `Z`); it does not open Room or guess a classification name. The private card has a
+neutral public version and an immutable direct route to the existing MainActivity. It offers no
+automatic Start/Stop/Snooze action and introduces no screen, icon or product option.
+
+1. The backend creates the stable `schedule_reminders` channel metadata before publishing the
+   factory. Initial importance is **LOW**, following the existing quiet timer channel; no new
+   intrusive default is introduced. An existing channel object is reused with its actual
+   importance, sound, vibration and badge policy. Configuration refresh changes its label only.
+   Channel creation at Application startup is metadata setup, not opt-in or a permission grant.
+   This explicitly supersedes the earlier proposal to create the channel only at UI opt-in.
+2. Explicit series opt-in, OS permission, channel policy and fresh ticket/projection remain
+   independent requirements. Permission/channel denial does not rewrite `alertsEnabled` or
+   remove a plan. The backend owns ticket extras, unique tags and notify/cancel. DND stays
+   Android-controlled. A richer occurrence route or notification actions still need their actual
+   UI contract. Reinstalling even the same factory invalidates previously prepared notices.
 3. Call `runtime.scheduleDelivery.synchronize()` on IO after foreground return,
    permission/channel changes and binding changes. Runtime observation compares
    persisted schedule day/quiet preferences too. Runtime observation already
@@ -161,7 +167,7 @@ therefore a new manifest permission, while ordinary timer-only use keeps this
 receiver disabled. There is no timer FGS, periodic poll or per-second DB write.
 Background receivers refuse to initialize an empty replacement Dataset when its
 SQLite files are absent; retained delivery state remains for foreground review.
-Cold receivers still need the factory installed at Application startup. Force-stop,
+The production factory is installed at Application startup. Force-stop,
 OS delivery limits, broadcast budgets and OEM behavior need real device QA.
 The platform event choice follows [Android broadcast exceptions](https://developer.android.com/develop/background-work/background-tasks/broadcasts/broadcast-exceptions);
 alarms use the documented best-effort [setAndAllowWhileIdle API](https://developer.android.com/reference/android/app/AlarmManager#setAndAllowWhileIdle(int,%20long,%20android.app.PendingIntent)).

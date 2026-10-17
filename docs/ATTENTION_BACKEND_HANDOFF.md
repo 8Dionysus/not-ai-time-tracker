@@ -34,7 +34,7 @@ Production: `core/.../LongRecordReminder.kt`, `app/.../LongRecordReminders.kt`.
 
 Старый token не заменять новым для повтора прежней команды. Действия уведомления не должны передавать старую команду как новую без показа актуального состояния. UI должен различать запрос внимания, permission/channel blocker и результат попытки.
 
-Opus устанавливает process-wide `LongRecordNoticeBinding.factory`, создаёт канал `AndroidLongRecordPlatform.CHANNEL` и оформляет действия. Отсутствие renderer/channel — явный blocker; backend не придумывает тексты и не запрашивает permission. Уведомления должны открывать существующие контроллеры, а не писать строки базы.
+`TrackerApplication` устанавливает process-wide production factory и готовит стабильный канал `ordinary_timer_checkin`. Используются существующие app_name/ic_stat_notai/widget_amber и штатный private notification с нейтральной public version; содержание — штатное представление trusted elapsed duration. Initial importance LOW соответствует тихому timer_controls; фактическая пользовательская policy существующего канала сохраняется. Создание metadata не включает preference, не подтверждает восстановленный opt-in и не выдаёт permission. Карточка открывает существующую MainActivity без автоматического изменения таймера. Новые кнопки/экраны не добавлены. Подготовленное уведомление принадлежит точной регистрации factory; переустановка даже того же объекта запрещает stale post.
 
 ## Окружение существующего Focus
 
@@ -68,7 +68,7 @@ Production: `core/.../ObservationFacts.kt`.
 
 Файловый Robolectric-тест использует узкий host bridge: штатный ShadowLinux4.17 игнорирует flags и возвращает fstat(fd) как stat(null). Bridge проверяет переданные Android flags, использует NIO NOFOLLOW и metadata открытого descriptor через /proc. Это не выполнение Android Os/O_NONBLOCK и не device-проверка музыки.
 
-Opus подключает notification renderer/channel/actions, явное device confirmation, настоящий DND configuration Activity, чистый lookup выбранного локального файла и его lifetime, показ controlRevision/confirmationRequired/sourceAvailable/cleanupPending. Отсутствующий binding остаётся явным blocker. [Потоки данных](ATTENTION_DATA_FLOWS.md) описывают добавленную capability-границу.
+Минимальные production renderer/channel подключены backend. Opus подключает дополнительные notification actions при наличии отдельного UI-контракта, явное device confirmation, настоящий DND configuration Activity, чистый lookup выбранного локального файла и его lifetime, показ controlRevision/confirmationRequired/sourceAvailable/cleanupPending. Отсутствующий binding остаётся явным blocker. [Потоки данных](ATTENTION_DATA_FLOWS.md) описывают добавленную capability-границу.
 
 Физическое DND, audio focus/playback, actual delivery, background/OEM timing и доступность UI требуют отдельной приёмки. Фоновая музыка, внешние музыкальные интеграции и рисунок празднования остаются продуктовыми вариантами. JVM/Robolectric/APK/lint не закрывают эти пункты.
 

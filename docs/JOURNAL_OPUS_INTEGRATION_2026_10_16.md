@@ -1,3 +1,5 @@
+> Current r14 handoff: [полная карта остатка](BACKEND_COMPLETION_2026_10_17.md), [verified candidate](BACKEND_READINESS_2026_10_17.md). Accepted r12 retained; r14 coordinator acceptance pending. Typed Focus callers, atomic switchDraft, reporting-day/goal callers and shortcut preference controller are now connected. Old "caller remains open" wording below records earlier handoff state. CSV sourceLocale/mapping persistence, new forms/controls and real Focus DND/audio choices remain specific frontend/platform work. Application Schedule/ordinary notification composition is already closed by r12; current source/evidence boundaries are in the linked matrix.
+
 # Opus integration points for the combined fourteen-item backend
 
 Backend source adds no Compose, ViewModel, resource, TechnicalActivity or RemoteViews

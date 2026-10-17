@@ -81,6 +81,29 @@ class FocusDeliveryRaceTest {
     @Test fun resultRejectsMutationsAfterPreparation() = race(true,false)
     @Test fun refreshRejectsMutationsAfterCapture() = race(false,true)
     @Test fun refreshRejectsMutationsAfterPreparation() = race(true,true)
+    @Test fun blockedResultRechecksMemoryAndRoomBeforeFallback() {
+        val context = RuntimeEnvironment.getApplication()
+        for(room in listOf(false,true)) for(advance in listOf(false,true)) {
+            context.getSharedPreferences("focus-signals",0).edit().clear().commit()
+            val db = if(room) Room.inMemoryDatabaseBuilder(context,TrackerDatabase::class.java).allowMainThreadQueries().build() else null
+            try {
+                val clock = FakeClock();val store = CaptureStore(db?.let(::RoomStore) ?: memory());val tracker = Tracker(store,clock)
+                tracker.startFocus(tracker.snapshot().token,plan = FocusPlan(1000,1000));clock.advance(1000)
+                val due = tracker.snapshot().focus!!;var mutated: Dataset? = null
+                store.afterCapture = {
+                    if(advance) tracker.focusNext(tracker.snapshot().token) else tracker.stop(tracker.snapshot().token)
+                    mutated = tracker.data()
+                }
+                val result = FocusSignals.deliverResult(context,tracker)
+                assertEquals(FocusDeliveryStatus.BLOCKED_BEFORE_POST,result.status)
+                assertEquals(tracker.snapshot().focus,result.focus)
+                assertTrue(result.focus?.signalKey != due.signalKey)
+                assertEquals(mutated,tracker.data()) // The recheck is read-only, including revision.
+                assertTrue(context.getSystemService(NotificationManager::class.java).activeNotifications.none { it.id == 43 })
+                assertTrue(context.getSharedPreferences("focus-signals",0).getStringSet("delivered",emptySet()).orEmpty().isEmpty())
+            } finally { db?.close() }
+        }
+    }
     @Test fun unchangedPhasePostsOnceAndFailedPreparationNeverReplays() {
         val context = RuntimeEnvironment.getApplication();val manager = context.getSystemService(NotificationManager::class.java)
         shadowOf(context).grantPermissions(Manifest.permission.POST_NOTIFICATIONS)

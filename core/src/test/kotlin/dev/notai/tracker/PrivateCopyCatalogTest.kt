@@ -13,6 +13,52 @@ class PrivateCopyCatalogTest {
             val gate = CopyMaintenance(files.metadata());block(root,files,gate,PrivateCopyCatalog(files,gate))
         } } finally { root.deleteRecursively() }
     }
+    @Test fun optionalExportValidationDoesNotBlockNextDurableCallback() = fixture { root,files,gate,_ ->
+        val directory = File(root,"exports/$a").apply { mkdirs() }
+        File(directory,"data").writeText("isolated fixture")
+        File(directory,"operation.json").writeText("""{"id":"$a","mime":"text/plain","title":"fixture","state":"CANCELLED","bytes":16,"sha256":"${sha256("isolated fixture".toByteArray())}","resultReceived":true}""")
+        val entered = java.util.concurrent.CountDownLatch(1);val release = java.util.concurrent.CountDownLatch(1)
+        val returned = java.util.concurrent.CountDownLatch(1);val error = java.util.concurrent.atomic.AtomicReference<Throwable?>()
+        val catalog = PrivateCopyCatalog(files,gate) { entered.countDown();check(release.await(10,java.util.concurrent.TimeUnit.SECONDS)) }
+        val worker = Thread { try { catalog.registerExportAfterHandoff(a) } catch(t: Throwable) { error.set(t) } }.apply { start() }
+        var callback: Thread? = null
+        try {
+            assertTrue(entered.await(10,java.util.concurrent.TimeUnit.SECONDS))
+            callback = Thread { gate.writing("next-durable-callback") { };returned.countDown() }.apply { start() }
+            assertTrue(returned.await(500,java.util.concurrent.TimeUnit.MILLISECONDS),"Another callback must acquire/release while optional validation is blocked")
+        } finally { release.countDown();worker.join(10000);callback?.join(10000) }
+        // A competing transaction may refuse optional registration; it never creates deletion authority.
+        assertTrue(error.get() is CoreError,"Competing revision must refuse optional admission")
+        assertTrue(gate.state().copies.isEmpty());assertTrue(gate.state().references.isEmpty())
+        assertTrue(File(directory,"data").exists())
+        PrivateCopyCatalog(files,gate).registerExportAfterHandoff(a)
+        assertEquals(1,gate.state().copies.size);assertTrue(gate.state().references.isEmpty())
+        PrivateCopyCatalog(files,gate).registerExportAfterHandoff(a)
+        assertEquals(1,gate.state().copies.size)
+    }
+    @Test fun optionalExportRegistrationRefusesLiveWriterAndRetainsItExactly() = fixture { root,files,gate,catalog ->
+        val item = sha256("exports/$a".toByteArray())
+        val writer = gate.acquire("live-export-writer",item,CopyBlocker.EXPORT_WRITING)
+        val before = gate.state()
+        assertFailsWith<CoreError> { catalog.registerExportAfterHandoff(a) }
+        assertEquals(before,gate.state());assertFalse(File(root,"exports").exists())
+        gate.release(writer)
+    }
+    @Test fun explicitOptionalOwnerRetryRevalidatesSurvivingLeaseWithoutExpiringForeignOwners() = fixture { root,files,gate,catalog ->
+        val directory = File(root,"exports/$a").apply { mkdirs() }
+        File(directory,"operation.json").writeText("""{"id":"$a","mime":"text/plain","title":"fixture","state":"CANCELLED","resultReceived":true}""")
+        val item = sha256("exports/$a".toByteArray())
+        gate.acquire("export-registration:$a",item,CopyBlocker.IN_PROGRESS)
+        val foreign = gate.acquire("foreign-chooser",item,CopyBlocker.CHOOSER_RESULT_PENDING)
+        assertEquals(item,catalog.registerExportAfterHandoff(a))
+        assertEquals(listOf(foreign),gate.state().references);assertEquals(1,gate.state().copies.size)
+        assertTrue(CopyBlocker.CHOOSER_RESULT_PENDING in catalog.inventory().items.single().hardBlockers)
+    }
+    @Test fun optionalRegistrationRefusesReversedLockOrderBeforeAnyMutation() = fixture { _,_,gate,catalog ->
+        val before = gate.state()
+        gate.locked { assertFailsWith<IllegalStateException> { catalog.registerExportAfterHandoff(a) } }
+        assertEquals(before,gate.state())
+    }
     private fun archive(root: File,id: String,linked: File? = null,retired: Boolean = false): File {
         val dir = File(root,"database-archives/$id").apply { mkdirs() };val data = File(dir,"tracker.db")
         if(linked == null) data.writeText("isolated preserved SQLite fixture") else Files.createLink(data.toPath(),linked.toPath())
@@ -113,5 +159,39 @@ class PrivateCopyCatalogTest {
             p.items.flatMap { i -> i.confirmableWarnings.map { WarningAcknowledgement(i.id,it) } }.toSet(),emptySet(),"fixture-discard-refused-staging")
         assertEquals(CleanupPhase.DONE,cleanup.confirm(confirmed).phase)
         assertFalse(directory.exists());assertFalse(source.exists())
+    }
+
+    @Test fun targetedRegistrationVerifiesOnlyTheCompleteRequestedComponent() = fixture { root,_,gate,catalog ->
+        val data = archive(root,a);archive(root,b,data);archive(root,c)
+        listOf(a,b,c).forEach(catalog::finalizeArchive)
+        val report = catalog.registerFinalizedArchive(a)
+        val expected = setOf(a,b).map { sha256("database-archives/$it".toByteArray()) }.toSet()
+        assertEquals(expected,report.registeredIds.toSet());assertTrue(report.refused.isEmpty())
+        assertEquals(expected,gate.state().copies.map { it.item.id }.toSet())
+        assertTrue(File(root,"database-archives/$c/cleanup-seal.json").isFile)
+    }
+    @Test fun targetedRegistrationIncludesTransitiveRetiredHardlinks() = fixture { root,_,_,catalog ->
+        val data = archive(root,a);archive(root,b,data,true)
+        archive(root,c,File(root,"database-archives/$b/retired/tracker.db-wal"))
+        listOf(a,b,c).forEach(catalog::finalizeArchive)
+        val report = catalog.registerFinalizedArchive(a)
+        assertEquals(3,report.registeredIds.size);assertTrue(report.refused.isEmpty())
+    }
+    @Test fun targetedRegistrationCannotAdmitAnUnsealedHardlinkAlias() = fixture { root,_,gate,catalog ->
+        val data = archive(root,a);archive(root,b,data);catalog.finalizeArchive(a)
+        val refused = catalog.registerFinalizedArchive(a)
+        assertTrue(refused.registeredIds.isEmpty());assertTrue(gate.state().copies.isEmpty())
+        assertTrue(refused.refused.any { CopyBlocker.HARDLINK_GRAPH_INCOMPLETE in it.blockers })
+        catalog.finalizeArchive(b)
+        val complete = catalog.registerFinalizedArchive(a)
+        assertEquals(2,complete.registeredIds.size);assertTrue(complete.refused.isEmpty())
+    }
+    @Test fun targetedRegistrationCannotHideATamperedConnectedSeal() = fixture { root,_,gate,catalog ->
+        val data = archive(root,a);archive(root,b,data)
+        listOf(a,b).forEach(catalog::finalizeArchive)
+        File(root,"database-archives/$b/cleanup-seal.json").writeText("not a valid seal")
+        val refused = catalog.registerFinalizedArchive(a)
+        assertTrue(refused.registeredIds.isEmpty());assertTrue(gate.state().copies.isEmpty())
+        assertTrue(refused.refused.any { CopyBlocker.HARDLINK_GRAPH_INCOMPLETE in it.blockers })
     }
 }

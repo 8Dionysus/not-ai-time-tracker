@@ -356,4 +356,98 @@ class UiReviewRegressionTest {
         assertEquals(listOf("4:00","10:15","16:30","22:45","4:00"),ribbonAxisLabels(policy.boundary(fall),policy.boundary(fall.plusDays(1)),zone))
         assertEquals(listOf("4:00","9:45","15:30","21:15","4:00"),ribbonAxisLabels(policy.boundary(spring),policy.boundary(spring.plusDays(1)),zone))
     }
+    private fun pr3Plan(f: Fixture,weekly: Boolean = false): PlanItem {
+        val t = f.tracker
+        t.scheduleCommand(ScheduleCommand("pr3-create",t.snapshot().token,ScheduleAction.CREATE,"pr3-plan",
+            rule = ScheduleRule(Classification(name = "Planned"),"2026-10-10",weekdays = if(weekly) setOf(6) else emptySet(),
+                extraDates = if(weekly) emptySet() else setOf("2026-10-10"))))
+        return PlanItem(OccurrenceKey("pr3-plan","2026-10-10"),1,null,"Planned",0,null,null,false)
+    }
+    @Test fun pr3StalePlannedStartLeavesCurrentTimerUntouched() {
+        val f = fixture(FakeClock(at("2026-10-10T12:00:00Z")));val t = f.tracker;val item = pr3Plan(f)
+        t.start(t.snapshot().token,Classification(name = "Keep running"));f.clock.advance(1000)
+        t.scheduleCommand(ScheduleCommand("skip",t.snapshot().token,ScheduleAction.OVERRIDE,item.key.seriesId,1,
+            occurrence = item.key,override = OccurrenceOverride(item.key,OverrideOperation.SKIP)));f.synced()
+        val before = t.data();val attempts = f.store.attempts.get()
+        f.vm.startPlanned(item);pump { f.notices.isNotEmpty() }
+        assertEquals(before,t.data());assertEquals(attempts,f.store.attempts.get());assertEquals(Mode.RUNNING,t.snapshot().mode)
+    }
+    @Test fun pr3PlannedSwitchIsOneCommitAndStorageFailureKeepsCurrentTimer() {
+        val f = fixture(FakeClock(at("2026-10-10T12:00:00Z")));val t = f.tracker;val item = pr3Plan(f)
+        t.start(t.snapshot().token,Classification(name = "Keep running"));f.clock.advance(1000);f.synced()
+        val before = t.data();f.store.rejectWrite = f.store.attempts.get()+1
+        f.vm.startPlanned(item);pump { f.notices.isNotEmpty() }
+        assertEquals(before,t.data());assertEquals(Mode.RUNNING,t.snapshot().mode)
+        val attempts = f.store.attempts.get();f.store.rejectWrite = attempts+2
+        f.vm.startPlanned(item);pump { t.data().revision > before.revision }
+        assertEquals(attempts+1,f.store.attempts.get());assertEquals(before.revision+1,t.data().revision)
+        assertEquals("Planned",t.snapshot().session!!.selection.name);assertEquals(1,t.data().schedule.links.size)
+    }
+    @Test fun pr3PlanTypeReplacementKeepsOriginalOnFailureAndCommitsBothRowsOnce() {
+        for(weekly in listOf(false,true)) {
+            val f = fixture(FakeClock(at("2026-10-10T12:00:00Z")));val t = f.tracker;pr3Plan(f,!weekly);f.synced()
+            val original = f.vm.planSeries(f.vm.view.value).single();val before = t.data()
+            f.store.rejectWrite = f.store.attempts.get()+1
+            f.vm.savePlan(original,Classification(name = "New"),if(weekly) setOf(6) else emptySet(),if(weekly) null else LocalDate.parse("2026-10-10"),null)
+            pump { f.notices.isNotEmpty() };assertEquals(before,t.data());assertEquals(ScheduleState.ACTIVE,t.data().schedule.series.single().state)
+            val attempts = f.store.attempts.get();f.store.rejectWrite = attempts+2
+            f.vm.savePlan(original,Classification(name = "New"),if(weekly) setOf(6) else emptySet(),if(weekly) null else LocalDate.parse("2026-10-10"),null)
+            pump { t.data().revision > before.revision }
+            assertEquals(attempts+1,f.store.attempts.get());assertEquals(before.revision+1,t.data().revision)
+            assertEquals(ScheduleState.ARCHIVED,t.data().schedule.series.single { it.id == original.id }.state)
+            assertEquals(1,t.data().schedule.series.count { it.state == ScheduleState.ACTIVE })
+        }
+    }
+    @Test fun pr3ThresholdEditsPreserveUnsupportedFiltersAndHistory() {
+        val f = fixture(FakeClock(at("2026-10-10T12:00:00Z")));val t = f.tracker
+        t.saveType(t.snapshot().token,ActivityType("goal-type","Type"));t.saveCard(t.snapshot().token,Card("goal-card","Card",activityTypeId = "goal-type"))
+        t.saveAxis(t.snapshot().token,Axis("goal-axis","Context",valueKind = ValueKind.FREE_LABEL,cardinality = Cardinality.MULTIPLE))
+        val facets = listOf(Facet("goal-axis",text = "Study"),Facet("goal-axis",text = "Work"))
+        val filters = listOf(Filter(tags = setOf("intentional")),Filter(details = mapOf("subject" to "Kotlin")),
+            Filter(facets = facets,facetMatch = FacetMatch.ANY),Filter(cardId = "goal-card",activityTypeId = "goal-type",
+                details = mapOf("subject" to "Kotlin"),tags = setOf("intentional"),facets = facets,facetMatch = FacetMatch.ANY))
+        for((i,filter) in filters.withIndex()) {
+            val id = "complex-$i";t.saveGoal(t.snapshot().token,Goal(id,"Complex",GoalMetric.SESSION_COUNT,1,filter = filter));f.synced()
+            val draft = f.vm.goalDraft(id)!!;assertEquals(filter,draft.originalFilter)
+            f.vm.saveGoal(draft.copy(target = 2),GoalEditMode.CORRECT_CURRENT)
+            pump { t.data().goals.single { it.id == id }.target == 2L };f.synced()
+            val saved = t.data().goals.single { it.id == id }
+            assertEquals(filter,saved.filter);assertTrue(saved.revisions.all { it.definition.filter == filter })
+            // Explicitly reselecting even the same activity replaces the constraint.
+            f.vm.saveGoal(f.vm.goalDraft(id)!!.copy(target = 3,activityChanged = true),GoalEditMode.CORRECT_CURRENT)
+            pump { t.data().goals.single { it.id == id }.target == 3L };f.synced()
+            val edited = t.data().goals.single { it.id == id }
+            assertEquals(if(i == 3) Filter(cardId = "goal-card") else Filter(),edited.filter)
+            assertEquals(filter,edited.revisions.first().definition.filter)
+        }
+    }
+    @Test fun pr3GoalDraftKeepsTodayFilterWhenHeadIsEffectiveNextPeriod() {
+        val f = fixture(FakeClock(at("2026-10-10T12:00:00Z")));val t = f.tracker
+        val todayFilter = Filter(tags = setOf("today"));val futureFilter = Filter(details = mapOf("future" to "only"))
+        val goal = Goal("future-filter","Goal",GoalMetric.SESSION_COUNT,1,filter = todayFilter)
+        t.saveGoal(t.snapshot().token,goal)
+        t.saveGoal(t.snapshot().token,goal.copy(filter = futureFilter,target = 5),GoalEditMode.NEXT_PERIOD);f.synced()
+        val draft = f.vm.goalDraft(goal.id)!!;assertEquals(todayFilter,draft.originalFilter)
+        f.vm.saveGoal(draft.copy(target = 2),GoalEditMode.CORRECT_CURRENT)
+        pump { t.data().goals.single().target == 2L }
+        val saved = t.data().goals.single()
+        assertEquals(todayFilter,Goals.effective(saved,LocalDate.parse("2026-10-10")).filter)
+        assertEquals(futureFilter,Goals.effective(saved,LocalDate.parse("2026-10-11")).filter)
+    }
+    @Test fun pr3SharedNotesUseTheReportDateOnBothSidesOfBoundary() {
+        for((zone,first,second,now) in listOf(
+            listOf("UTC","2026-10-11T03:59:59Z","2026-10-11T04:00:00Z","2026-10-11T05:00:00Z"),
+            listOf("America/New_York","2026-11-01T08:59:59Z","2026-11-01T09:00:00Z","2026-11-01T10:00:00Z"))) {
+            val f = fixture(FakeClock(at(now)),Settings(zone,reportDayStartMinute = 240));val t = f.tracker
+            t.manual(t.snapshot().token,at(first),at(first)+500,Classification(name = "Before"),"Before boundary")
+            t.manual(t.snapshot().token,at(second),at(second)+500,Classification(name = "After"),"After boundary");f.synced()
+            val policy = ReportingDayPolicy(zone,240);val summary = runBlocking { f.vm.summary(Period.WEEK,true) }!!
+            assertTrue(summary,summary.contains("• ${Format.dayMonth(policy.dateAt(at(first)))}, Before: Before boundary"))
+            assertTrue(summary,summary.contains("• ${Format.dayMonth(policy.dateAt(at(second)))}, After: After boundary"))
+            val day = runBlocking { f.vm.summary(Period.DAY,true) }!!
+            assertFalse(day,day.contains("Before boundary"));assertTrue(day,day.contains("After boundary"))
+            assertFalse(runBlocking { f.vm.summary(Period.WEEK,false) }!!.contains("Before boundary"))
+        }
+    }
+
 }

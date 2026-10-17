@@ -1,0 +1,222 @@
+{
+  "source_input_sha256": "d8352305babc5a468bccaa487e111f2dacfcfc8334432f48138d4846d5d435b8",
+  "source_patch_sha256": "8ed3b426bb7d4d7bae0d67c4aae321c4cf62feae183bc258ea3140c44de579db",
+  "source_unchanged_during_final_run": true,
+  "full_suite_status": "NOT_ALL_GREEN",
+  "modules": {
+    "core": {
+      "tests": 214,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "app": {
+      "tests": 275,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "failed_cases": [
+    {
+      "module": "app",
+      "class": "dev.notai.tracker.android.ui.UiScreensTest",
+      "method": "deleteFromMenuAndSwipe",
+      "failure": true,
+      "error": false,
+      "skipped": false
+    }
+  ],
+  "regression21": {
+    "tests": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "run": "production-final full214+275",
+    "cases": [
+      {
+        "module": "core",
+        "class": "dev.notai.tracker.CoreScenariosTest",
+        "method": "pr3PlanReplacementRefusals",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "core",
+        "class": "dev.notai.tracker.CoreScenariosTest",
+        "method": "pr3PlannedStartRefusals",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "core",
+        "class": "dev.notai.tracker.CoreScenariosTest",
+        "method": "pr3PlannedStartOneCommit",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "core",
+        "class": "dev.notai.tracker.CoreScenariosTest",
+        "method": "pr3PlanReplacementStorageFailure",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "core",
+        "class": "dev.notai.tracker.CoreScenariosTest",
+        "method": "pr3PlanReplacementOneCommit",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "core",
+        "class": "dev.notai.tracker.CoreScenariosTest",
+        "method": "pr3PlannedStartStorageFailure",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "core",
+        "class": "dev.notai.tracker.ScheduleCommandCompatibilityTest",
+        "method": "existingPersistedCommandsKeepTheirCanonicalPayloadHash",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "app",
+        "class": "dev.notai.tracker.android.LongRecordActionsTest",
+        "method": "retainedActionsKeepTheirTicketAndTokenWhenNewActionsAreIssued",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "app",
+        "class": "dev.notai.tracker.android.LongRecordActionsTest",
+        "method": "oldStopAndSnoozeAreRejectedAfterTheNextCheckinInsteadOfRetargetingIt",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "app",
+        "class": "dev.notai.tracker.android.RoomScenariosTest",
+        "method": "pr3PlanReplacementRefusals",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "app",
+        "class": "dev.notai.tracker.android.RoomScenariosTest",
+        "method": "pr3PlannedStartRefusals",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "app",
+        "class": "dev.notai.tracker.android.RoomScenariosTest",
+        "method": "pr3PlannedStartOneCommit",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "app",
+        "class": "dev.notai.tracker.android.RoomScenariosTest",
+        "method": "pr3PlanReplacementStorageFailure",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "app",
+        "class": "dev.notai.tracker.android.RoomScenariosTest",
+        "method": "pr3PlanReplacementOneCommit",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "app",
+        "class": "dev.notai.tracker.android.RoomScenariosTest",
+        "method": "pr3PlannedStartStorageFailure",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "app",
+        "class": "dev.notai.tracker.android.ui.UiReviewRegressionTest",
+        "method": "pr3SharedNotesUseTheReportDateOnBothSidesOfBoundary",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "app",
+        "class": "dev.notai.tracker.android.ui.UiReviewRegressionTest",
+        "method": "pr3PlanTypeReplacementKeepsOriginalOnFailureAndCommitsBothRowsOnce",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "app",
+        "class": "dev.notai.tracker.android.ui.UiReviewRegressionTest",
+        "method": "pr3PlannedSwitchIsOneCommitAndStorageFailureKeepsCurrentTimer",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "app",
+        "class": "dev.notai.tracker.android.ui.UiReviewRegressionTest",
+        "method": "pr3StalePlannedStartLeavesCurrentTimerUntouched",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "app",
+        "class": "dev.notai.tracker.android.ui.UiReviewRegressionTest",
+        "method": "pr3ThresholdEditsPreserveUnsupportedFiltersAndHistory",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "module": "app",
+        "class": "dev.notai.tracker.android.ui.UiReviewRegressionTest",
+        "method": "pr3GoalDraftKeepsTodayFilterWhenHeadIsEffectiveNextPeriod",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      }
+    ],
+    "source_input_sha256": "d8352305babc5a468bccaa487e111f2dacfcfc8334432f48138d4846d5d435b8"
+  },
+  "lint": {
+    "task": ":app:lintRelease",
+    "status": "PASS",
+    "severity_counts": {
+      "Warning": 67,
+      "Hint": 1
+    },
+    "report_sha256": "64f4dac620d5a8c676f84b88286603d21354654f16be551a69cf09e3d4bd0350"
+  },
+  "ui_source_boundary": "PASS; run verify-ui-boundary.py",
+  "device_or_emulator_verification": false,
+  "old_aggregate_timeout_causes": "UNQUALIFIED",
+  "comparison": "original order mismatch INVALID; corrected main INCOMPLETE_RESOURCE_BOUND195 successes; corrected fix NOT_RUN",
+  "diagnostic_two_case": "PASS; observer-only; no causal attribution"
+}

@@ -144,6 +144,7 @@ fun GoalSheet(vm: TrackerViewModel, initial: GoalDraft?, onPickActivity: ((Class
     val editing = initial?.id != null
     var selection by remember { mutableStateOf(initial?.selection) }
     var label by remember { mutableStateOf(initial?.label) }
+    var activityChanged by remember { mutableStateOf(false) }
     var metric by rememberSaveable { mutableStateOf(initial?.metric ?: GoalMetric.DURATION_MS) }
     var direction by rememberSaveable { mutableStateOf(initial?.direction ?: GoalDirection.MINIMUM) }
     var period by rememberSaveable { mutableStateOf(initial?.period ?: GoalPeriod.DAY) }
@@ -164,9 +165,9 @@ fun GoalSheet(vm: TrackerViewModel, initial: GoalDraft?, onPickActivity: ((Class
             IconAction(Icon.Trash, "Убрать цель", { confirmRemove = true }, size = 19.dp)
         } } else null)
         Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            ActivityField(label ?: Label("Любое занятие", null, null, false, ActivityGlyphs.custom), { onPickActivity { sel, l -> selection = sel; label = l } },
+            ActivityField(label ?: Label("Любое занятие", null, null, false, ActivityGlyphs.custom), { onPickActivity { sel, l -> selection = sel; label = l; activityChanged = true } },
                 if (selection == null) "Выбрать" else "Изменить")
-            if (selection != null) Text("Считать любое занятие", Modifier.heightIn(min = 32.dp).pressable({ selection = null; label = null }).padding(top = 4.dp),
+            if (selection != null) Text("Считать любое занятие", Modifier.heightIn(min = 32.dp).pressable({ selection = null; label = null; activityChanged = true }).padding(top = 4.dp),
                 style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
             Field("Что считать") {
                 Segmented(listOf(GoalMetric.DURATION_MS to "Время", GoalMetric.SESSION_COUNT to "Записи", GoalMetric.DISTINCT_RECORDED_DAYS to "Дни"),
@@ -213,7 +214,7 @@ fun GoalSheet(vm: TrackerViewModel, initial: GoalDraft?, onPickActivity: ((Class
             }
         }
         PillButton("Сохранить", {
-            vm.saveGoal(GoalDraft(initial?.id, label?.title ?: "Всё время", selection, label, metric, direction, period, target),
+            vm.saveGoal(GoalDraft(initial?.id, label?.title ?: "Всё время", selection, label, metric, direction, period, target, initial?.originalFilter, activityChanged),
                 if (initial?.period == GoalPeriod.FIXED) GoalEditMode.CORRECT_CURRENT else mode)
             onDismiss()
         }, Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp), ButtonKind.PRIMARY, enabled = !daysInvalid)

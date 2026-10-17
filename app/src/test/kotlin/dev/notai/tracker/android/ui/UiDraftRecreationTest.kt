@@ -150,7 +150,7 @@ class UiDraftRecreationTest {
         t.start(t.snapshot().token,Classification(name = "Earlier source"));val original = t.snapshot().session!!.id
         val start = clock.wall;clock.advance(elapsed)
         compose.waitUntil(10000) { vm.snapshot.value?.session?.id == original }
-        compose.onNodeWithText("Указать когда").performScrollTo().performClick()
+        compose.onNodeWithText("Переключился раньше").performScrollTo().performClick()
         compose.onNodeWithText("Когда ты переключился?").assertExists()
         compose.onNodeWithText("Выбрать занятие").performClick()
         compose.onNodeWithContentDescription("Найти или создать занятие").performTextInput("Draft selected")

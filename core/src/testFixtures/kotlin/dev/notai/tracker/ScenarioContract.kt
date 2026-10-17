@@ -19,6 +19,13 @@ class MemoryRollback: RollbackStore {
 }
 /** The SAME three scenarios run on in-memory domain storage and on disk-backed Room/SQLite. */
 abstract class ScenarioContract {
+    @Test fun pr3PlannedStartRefusals() = pr3PlannedStartRefusals(::createStore,::reopen)
+    @Test fun pr3PlannedStartOneCommit() = pr3PlannedStartOneCommit(::createStore,::reopen)
+    @Test fun pr3PlannedStartStorageFailure() = pr3PlannedStartStorageFailure(::createStore,::reopen)
+    @Test fun pr3PlanReplacementRefusals() = pr3PlanReplacementRefusals(::createStore,::reopen)
+    @Test fun pr3PlanReplacementOneCommit() = pr3PlanReplacementOneCommit(::createStore,::reopen)
+    @Test fun pr3PlanReplacementStorageFailure() = pr3PlanReplacementStorageFailure(::createStore,::reopen)
+
     @Test fun reviewP2ExactSegmentRepeat() = reviewP2ExactSegmentRepeat(::createStore,::reopen)
     @Test fun reviewP3BoundedHistoryReference() = reviewP3WindowReference(::createStore,::reopen)
     @Test fun reviewP3BoundedHistoryApply() = reviewP3WindowApply(::createStore,::reopen)

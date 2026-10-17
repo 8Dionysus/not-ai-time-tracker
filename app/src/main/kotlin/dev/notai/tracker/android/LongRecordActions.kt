@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import dev.notai.tracker.LongRecordAction
 import dev.notai.tracker.Token
 import dev.notai.tracker.codec
@@ -19,9 +20,14 @@ object LongRecordActions {
     private const val ACTION = "dev.notai.tracker.LONG_RECORD_ANSWER"
     private const val HASH = "hash"; private const val TOKEN = "token"; private const val ANSWER = "answer"
     fun pending(context: Context,hash: String,token: Token,action: LongRecordAction): PendingIntent {
-        val intent = Intent(context,LongRecordActionReceiver::class.java).setAction(ACTION)
-            .putExtra(HASH,hash).putExtra(TOKEN,codec.encodeToString(token)).putExtra(ANSWER,action.name)
-        return PendingIntent.getBroadcast(context,100+action.ordinal,intent,PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        val encodedToken = codec.encodeToString(token)
+        // Extras do not participate in PendingIntent identity. Keep each displayed ticket/token
+        // bound to its original answer, including when the same ticket is rendered again.
+        val identity = Uri.Builder().scheme("notai").authority("long-record-answer")
+            .appendPath(hash).appendPath(action.name).appendQueryParameter(TOKEN,encodedToken).build()
+        val intent = Intent(context,LongRecordActionReceiver::class.java).setAction(ACTION).setData(identity)
+            .putExtra(HASH,hash).putExtra(TOKEN,encodedToken).putExtra(ANSWER,action.name)
+        return PendingIntent.getBroadcast(context,100+action.ordinal,intent,PendingIntent.FLAG_IMMUTABLE)
     }
     internal fun read(intent: Intent): Triple<String,Token,LongRecordAction>? {
         if(intent.action != ACTION) return null

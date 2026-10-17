@@ -168,10 +168,13 @@ internal fun validateSchedule(data: Dataset) {
     ensure(s.receipts.map { it.key }.distinct().size == s.receipts.size,"Duplicate receipt")
     s.receipts.forEach { ensure(it.key.isNotBlank() && it.hash.matches(Regex("[0-9a-f]{64}")) && it.result.datasetRevision > 0,"Invalid schedule receipt") }
 }
-@Serializable enum class ScheduleAction { CREATE, UPDATE_FUTURE, SET_STATE, OVERRIDE, START }
+@Serializable enum class ScheduleAction { CREATE, UPDATE_FUTURE, SET_STATE, OVERRIDE, START, START_OR_SWITCH, REPLACE }
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 @Serializable data class ScheduleCommand(val key: String,val expected: Token,val action: ScheduleAction,val seriesId: String,
     val expectedSeriesRevision: Long? = null,val rule: ScheduleRule? = null,val effectiveFrom: String? = null,val state: ScheduleState? = null,
-    val occurrence: OccurrenceKey? = null,val override: OccurrenceOverride? = null,val expectedOverrideRevision: Long? = null,val deviceZone: String = "UTC")
+    val occurrence: OccurrenceKey? = null,val override: OccurrenceOverride? = null,val expectedOverrideRevision: Long? = null,val deviceZone: String = "UTC",
+    // Omit the new default so persisted pre-existing command hashes remain replayable.
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val replacementSeriesId: String? = null)
 fun ScheduleCommand.canonicalCapture(): ScheduleCommand {
     val captured = codec.decodeFromString<ScheduleCommand>(codec.encodeToString(this))
     fun time(value: String?) = value?.let { scheduleTime(it).toString() }
@@ -193,7 +196,7 @@ fun Tracker.scheduleCommand(command: ScheduleCommand): ScheduleCommandResult = s
             return@checkedTransaction checked.replace(d) { receipt.result }
         }
         val now = clock.now();checkToken(d,c.expected,now);val zone = scheduleZone(c.deviceZone)
-        var next = d;var resultSession: String? = null
+        var next = d;var resultSession: String? = null;var resultSeries = c.seriesId
         val series = s.series.find { it.id == c.seriesId }
         if(c.action != ScheduleAction.CREATE) {
             ensureReason(series != null,ErrorReason.SERIES_NOT_FOUND,arguments = mapOf("seriesId" to ErrorArgument.Identifier(c.seriesId)))
@@ -205,6 +208,17 @@ fun Tracker.scheduleCommand(command: ScheduleCommand): ScheduleCommandResult = s
                 val rule = c.rule ?: fail(ErrorCode.INVALID_INPUT,"Missing rule");checkStartable(d,rule.selection)
                 val row = ScheduleSeries(c.seriesId,listOf(ScheduleRevision(rule.startDate,rule.copy(selection = d.classify(rule.selection)))))
                 next = d.copy(schedule = s.copy(series = s.series+row))
+            }
+            ScheduleAction.REPLACE -> {
+                ensure(series!!.state == ScheduleState.ACTIVE,"Series unavailable")
+                val id = c.replacementSeriesId ?: fail(ErrorCode.INVALID_INPUT,"Missing replacement series ID")
+                ensure(id.isNotBlank() && s.series.none { it.id == id },"Series already exists")
+                val rule = c.rule ?: fail(ErrorCode.INVALID_INPUT,"Missing rule");checkStartable(d,rule.selection)
+                val replacement = ScheduleSeries(id,listOf(ScheduleRevision(rule.startDate,rule.copy(selection = d.classify(rule.selection)))))
+                val archived = series.copy(revision = Math.addExact(series.revision,1),state = ScheduleState.ARCHIVED)
+                // Full validation and persistence cover both rows and the receipt in one commit.
+                next = d.copy(schedule = s.copy(series = s.series.map { if(it.id == archived.id) archived else it }+replacement))
+                resultSeries = id
             }
             ScheduleAction.UPDATE_FUTURE -> {
                 val from = scheduleDate(c.effectiveFrom ?: fail(ErrorCode.INVALID_INPUT,"Effective date required"))
@@ -218,7 +232,7 @@ fun Tracker.scheduleCommand(command: ScheduleCommand): ScheduleCommandResult = s
                 val row = series!!.copy(revision = Math.addExact(series.revision,1),state = c.state ?: fail(ErrorCode.INVALID_INPUT,"Missing state"))
                 next = d.copy(schedule = s.copy(series = s.series.map { if(it.id == row.id) row else it }))
             }
-            ScheduleAction.OVERRIDE,ScheduleAction.START -> {
+            ScheduleAction.OVERRIDE,ScheduleAction.START,ScheduleAction.START_OR_SWITCH -> {
                 val key = c.occurrence ?: fail(ErrorCode.INVALID_INPUT,"Missing occurrence")
                 ensure(key.seriesId == series!!.id && series.state == ScheduleState.ACTIVE,"Series unavailable")
                 val date = scheduleDate(key.originalDate);val rule = series.rule(date) ?: fail(ErrorCode.INVALID_INPUT,"OCCURRENCE_NOT_FOUND")
@@ -238,7 +252,8 @@ fun Tracker.scheduleCommand(command: ScheduleCommand): ScheduleCommandResult = s
                 } else {
                     ensure(old?.operation != OverrideOperation.SKIP && s.links.none { it.key == key },"Occurrence skipped or already started")
                     val selected = old?.selection ?: rule.selection
-                    val started = checked.timer(c.expected,TimerAction.START,now,selected,null) { state,_ -> state.data }.state
+                    val action = if(c.action == ScheduleAction.START_OR_SWITCH && checked.snapshot(now).session != null) TimerAction.SWITCH else TimerAction.START
+                    val started = checked.timer(c.expected,action,now,selected,null) { state,_ -> state.data }.state
                     resultSession = started.snapshot(now).session!!.id
                     val link = ScheduleStartLink(key,resultSession!!,now.wall,series.revision,c.key,hash)
                     next = started.data.copy(schedule = s.copy(links = s.links+link))
@@ -246,7 +261,7 @@ fun Tracker.scheduleCommand(command: ScheduleCommand): ScheduleCommandResult = s
             }
         }
         val revision = Math.addExact(d.revision,1)
-        val result = ScheduleCommandResult(revision,c.seriesId,c.occurrence,resultSession)
+        val result = ScheduleCommandResult(revision,resultSeries,c.occurrence,resultSession)
         next = next.copy(revision = revision,schedule = next.schedule.copy(receipts = s.receipts+ScheduleReceipt(c.key,hash,result)))
         checked.replace(next) { result }
     }

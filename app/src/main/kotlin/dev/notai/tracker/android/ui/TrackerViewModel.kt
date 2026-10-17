@@ -63,7 +63,8 @@ data class DayColumn(val date: LocalDate, val parts: List<Pair<Int?, Long>>, val
 data class GoalUi(val name: String, val value: String, val status: String, val ok: Boolean, val fraction: Float, val id: String = "")
 /** What the goal form edits. The calendar (period, zone, day start) is fixed once a goal exists. */
 data class GoalDraft(val id: String?,val name: String,val selection: Classification?,val label: Label?,val metric: GoalMetric,
-                     val direction: GoalDirection,val period: GoalPeriod,val target: Long)
+                     val direction: GoalDirection,val period: GoalPeriod,val target: Long,
+                     val originalFilter: Filter? = null,val activityChanged: Boolean = false)
 data class OverviewData(val period: Period, val first: LocalDate, val last: LocalDate, val totalMs: Long, val incomplete: Boolean,
                         val differenceMs: Long?, val previousMs: Long?, val previousFirst: LocalDate, val previousLast: LocalDate, val areas: List<AreaTotal>,
                         val columns: List<DayColumn>, val ribbon: List<RibbonSlot>, val dayStart: Long, val dayEnd: Long,
@@ -329,9 +330,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     /** Idle: an ordinary Start linked to the occurrence. Tracking: the current record ends now, then the planned one starts. */
     fun startPlanned(item: PlanItem) = planCommand(null) { rt, s ->
         ensure(s.focus == null, "Finish Focus first")
-        var token = s.token
-        if (s.mode != Mode.IDLE) token = rt.tracker.timerCommand(s.timerTarget ?: fail(ErrorCode.STALE, "Timer target unavailable"), TimerDirective.STOP).state.token
-        schedule(rt, ScheduleCommand(newId(), token, ScheduleAction.START, item.key.seriesId, item.seriesRevision,
+        schedule(rt, ScheduleCommand(newId(), s.token, ScheduleAction.START_OR_SWITCH, item.key.seriesId, item.seriesRevision,
             occurrence = item.key, expectedOverrideRevision = item.overrideRevision, deviceZone = deviceZone().id))
     }
     fun skipPlanned(item: PlanItem) = planCommand("Убрано из плана на сегодня") { rt, s ->
@@ -369,10 +368,9 @@ class TrackerViewModel internal constructor(private val app: Application,private
                 schedule(rt, ScheduleCommand(newId(), s.token, ScheduleAction.UPDATE_FUTURE, existing.id, existing.revision, rule = kept,
                     effectiveFrom = from.toString(), deviceZone = zone.id))
             } else {
-                // A single day moved or turned into a weekly plan: the old entry is archived, a new one starts.
-                val r = schedule(rt, ScheduleCommand(newId(), s.token, ScheduleAction.SET_STATE, existing.id, existing.revision, state = ScheduleState.ARCHIVED, deviceZone = zone.id))
-                val token = rt.tracker.snapshot().token.also { ensure(it.revision == r.datasetRevision, "Plan changed", ErrorCode.STALE) }
-                schedule(rt, ScheduleCommand(newId(), token, ScheduleAction.CREATE, newId(), rule = rule, deviceZone = zone.id))
+                // Archive and replacement share the same transaction and replay receipt.
+                schedule(rt, ScheduleCommand(newId(), s.token, ScheduleAction.REPLACE, existing.id, existing.revision,
+                    rule = rule, deviceZone = zone.id, replacementSeriesId = newId()))
             }
         }
     fun removePlan(existing: PlanSeriesUi) = planCommand("Убрано из плана") { rt, s ->
@@ -786,13 +784,13 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val g = runCatching { v.goalDefinition(id) }.getOrNull() ?: return null
         val selection = when { g.filter.cardId != null -> v.data.cards.firstOrNull { it.id == g.filter.cardId }?.classification()
             g.filter.activityTypeId != null -> Classification(activityTypeId = g.filter.activityTypeId); else -> null }
-        return GoalDraft(g.id, g.name, selection, selection?.let { v.data.label(it) }, g.metric, g.direction, g.period, g.target)
+        return GoalDraft(g.id, g.name, selection, selection?.let { v.data.label(it) }, g.metric, g.direction, g.period, g.target, originalFilter = g.filter)
     }
 
     /** A new goal takes the report day of today. An edit keeps its calendar and says when it applies. */
     fun saveGoal(draft: GoalDraft, mode: GoalEditMode) = command({ if (draft.id == null) "Цель поставлена" else "Цель изменена" }) { rt, s ->
         val d = rt.tracker.data()
-        val filter = when { draft.selection?.cardId != null -> Filter(cardId = draft.selection.cardId)
+        val filter = if (!draft.activityChanged && draft.originalFilter != null) draft.originalFilter else when { draft.selection?.cardId != null -> Filter(cardId = draft.selection.cardId)
             draft.selection?.activityTypeId != null -> Filter(activityTypeId = draft.selection.activityTypeId); else -> Filter() }
         val stored = draft.id?.let { id -> d.goals.single { it.id == id } }
         val goal = stored?.copy(name = draft.name.trim(), metric = draft.metric, direction = draft.direction, target = draft.target, filter = filter, revisions = stored.revisions)
@@ -808,8 +806,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     suspend fun summary(period: Period, notes: Boolean): String? = withContext(Dispatchers.IO) {
         val v = view.value ?: return@withContext null
         val d = v.data
-        val zone = ZoneId.of(d.settings.reportZone)
-        val today = ReportingDayPolicy(d.settings.reportZone, d.settings.reportDayStartMinute).dateAt(now())
+        val today = d.settings.reportDayPolicy.dateAt(now())
         val first = today.minusDays(period.days - 1L)
         val report = v.calendar(first, period.days).window
         val rootIds = d.types.filter { it.parentId == null }.map { it.id }.toSet()
@@ -826,7 +823,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
                 val noted = report.rows.filter { !it.note.isNullOrBlank() }.distinctBy { it.sessionId }.sortedBy { it.start }
                 if (noted.isNotEmpty()) append('\n').append("Заметки").append('\n')
                 noted.forEach { r ->
-                    val date = Instant.ofEpochMilli(r.start).atZone(zone).toLocalDate()
+                    val date = report.dayPolicy.dateAt(r.start)
                     append("• ").append(Format.dayMonth(date)).append(", ").append(d.label(r.selection).title).append(": ").append(r.note).append('\n')
                 }
             }

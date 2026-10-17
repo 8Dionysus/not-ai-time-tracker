@@ -1,0 +1,11 @@
+# Swipe test waits for the visible result before the next gesture
+
+The menu deletion commits asynchronously and emits its snackbar separately from the Home projection. The previous test waited for backend count and snackbar text, then immediately injected a swipe. In the reproduced62-test UI context the menu command committed revision34 successfully, but view34 was emitted during the next gesture; the target row had no observed EndToStart effect/callback/preview/command. This was upstream of backend refusal/cancellation. The actual gesture receiver was720×120px, so the unmerged text node's narrower bounds were not the cause.
+
+The test now waits (within5s) for the menu-deleted9:10–11:02 row to disappear from semantics and for composition/row movement to become idle. It then performs the same swipeLeft on8:30–8:55. Both original strict5s backend-count and final UI-absence assertions remain unchanged. Product code, UI rendering/navigation/styles/texts, gestures and fixture cleanup are unchanged.
+
+The original62-case context failed before the fix, with and without phase instrumentation. On the corrected production/test source, the complete Android275-case suite passes with0 failures/errors/skips, including swipe and shareSummary. Actual class/method order exactly equals the earlier failing275 run, including the62 UI prefix; fresh binary results avoid previous-failure priority. All14 new app regression cases from the five behavior fixes pass in this run. Source input is1d6a67ddc3e5410ba9997802e7b02a446437c321ab0496b3c4cd7a1a0285f47e, unchanged before/after.
+
+Core/product inputs are unchanged from the preceding214/214 core PASS; that complete core suite was not rerun in the Android-only qualification. This is host JVM/Robolectric evidence, not emulator/physical-device or performance evidence. Historical failed runs, invalid-order comparison and resource-bound incomplete correction remain preserved; this successful control does not retroactively qualify those comparisons or independently explain historical shareSummary timing.
+
+Raw phase/current-source manifests, exact order, XML, bounded traces and resource receipts are retained in the private task bundle. Removing the four added readiness lines restores the original UiScreensTest byte-for-byte; no observer is included in this commit.

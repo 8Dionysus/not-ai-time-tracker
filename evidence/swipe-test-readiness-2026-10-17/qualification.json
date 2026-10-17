@@ -1,0 +1,149 @@
+{
+  "status": "PASS_FULL_ANDROID275",
+  "totals": {
+    "tests": 275,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "actual_order_equals_original_failing_full275": true,
+  "same62_UI_context_order": true,
+  "source_input_sha256": "1d6a67ddc3e5410ba9997802e7b02a446437c321ab0496b3c4cd7a1a0285f47e",
+  "source_unchanged": true,
+  "regression14_app": {
+    "tests": 14,
+    "all_pass": true,
+    "cases": [
+      {
+        "className": "dev.notai.tracker.android.LongRecordActionsTest",
+        "method": "retainedActionsKeepTheirTicketAndTokenWhenNewActionsAreIssued",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "className": "dev.notai.tracker.android.LongRecordActionsTest",
+        "method": "oldStopAndSnoozeAreRejectedAfterTheNextCheckinInsteadOfRetargetingIt",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "className": "dev.notai.tracker.android.RoomScenariosTest",
+        "method": "pr3PlanReplacementRefusals",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "className": "dev.notai.tracker.android.RoomScenariosTest",
+        "method": "pr3PlannedStartRefusals",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "className": "dev.notai.tracker.android.RoomScenariosTest",
+        "method": "pr3PlannedStartOneCommit",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "className": "dev.notai.tracker.android.RoomScenariosTest",
+        "method": "pr3PlanReplacementStorageFailure",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "className": "dev.notai.tracker.android.RoomScenariosTest",
+        "method": "pr3PlanReplacementOneCommit",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "className": "dev.notai.tracker.android.RoomScenariosTest",
+        "method": "pr3PlannedStartStorageFailure",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "className": "dev.notai.tracker.android.ui.UiReviewRegressionTest",
+        "method": "pr3SharedNotesUseTheReportDateOnBothSidesOfBoundary",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "className": "dev.notai.tracker.android.ui.UiReviewRegressionTest",
+        "method": "pr3PlanTypeReplacementKeepsOriginalOnFailureAndCommitsBothRowsOnce",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "className": "dev.notai.tracker.android.ui.UiReviewRegressionTest",
+        "method": "pr3PlannedSwitchIsOneCommitAndStorageFailureKeepsCurrentTimer",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "className": "dev.notai.tracker.android.ui.UiReviewRegressionTest",
+        "method": "pr3StalePlannedStartLeavesCurrentTimerUntouched",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "className": "dev.notai.tracker.android.ui.UiReviewRegressionTest",
+        "method": "pr3ThresholdEditsPreserveUnsupportedFiltersAndHistory",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      },
+      {
+        "className": "dev.notai.tracker.android.ui.UiReviewRegressionTest",
+        "method": "pr3GoalDraftKeepsTodayFilterWhenHeadIsEffectiveNextPeriod",
+        "failure": false,
+        "error": false,
+        "skipped": false
+      }
+    ]
+  },
+  "swipe_case": {
+    "className": "dev.notai.tracker.android.ui.UiScreensTest",
+    "method": "deleteFromMenuAndSwipe",
+    "failure": false,
+    "error": false,
+    "skipped": false
+  },
+  "share_case": {
+    "className": "dev.notai.tracker.android.ui.UiScreensTest",
+    "method": "shareSummary",
+    "failure": false,
+    "error": false,
+    "skipped": false
+  },
+  "core214": "Previous PASS on unchanged core/product input; not rerun in this Android-only batch",
+  "change": "Only4-line visible row-absence + idle readiness gate; same swipeLeft, all original strict post-action5s checks unchanged",
+  "limits": "Before-fix phase trace localizes missing target callback and view emission during gesture. This control validates the readiness correction; it does not turn historical invalid/incomplete comparisons into causal proof or explain historical share timeout independently.",
+  "source_boundary": {
+    "status": "STATIC_PASS; runtime status recorded separately",
+    "only_new_source_change_from_main": "app/src/test/kotlin/dev/notai/tracker/android/ui/UiScreensTest.kt",
+    "original_gesture_assertions_post_action_5s_timeouts_restored_exactly": true,
+    "added_condition": "First menu-deleted row absent from semantics within5s; then waitForIdle before same swipeLeft",
+    "product_core_sources_unchanged_from_tested_main": true,
+    "new_source_input_sha256": "1d6a67ddc3e5410ba9997802e7b02a446437c321ab0496b3c4cd7a1a0285f47e",
+    "source_patch_sha256": "24a8ffc9ff599941c7afc97be6317e13a36461084c446424379ff892e4dc6591",
+    "production_files": {
+      "app/src/main/kotlin/dev/notai/tracker/android/LongRecordActions.kt": "eb0762716a3867af1cf7d1b2f5a5901f2b78dc34d2e3ef3f8fa335f124a18f48",
+      "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt": "7ca2ee7685d104f961b39f3ce8e25a252c03fec7fa2c561711271f6c25f2cc51",
+      "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt": "bdb2e1c09b18d08a64dc24f156a0c3a687f18bf814a6e274f5ba745fddb61fa8",
+      "core/src/main/kotlin/dev/notai/tracker/Schedule.kt": "3f950ba607bcf024e945cbd32ab8d3d9a96e0c95ec8e9c46c8cc59d9d345ec63"
+    }
+  }
+}

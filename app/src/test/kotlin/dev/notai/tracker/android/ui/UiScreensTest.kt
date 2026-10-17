@@ -362,6 +362,10 @@ class UiScreensTest {
         compose.onNodeWithText("Удалить").performClick()
         compose.waitUntil(5_000) { seed.tracker.data().sessions.size == before - 1 }
         waitText("Запись удалена")
+        // The commit/notice can arrive before Home's new projection. Inject the next gesture
+        // only after the removed row has left composition and the remaining rows have settled.
+        compose.waitUntil(5_000) { compose.onAllNodesWithText("9:10–11:02", substring = true).fetchSemanticsNodes().isEmpty() }
+        compose.waitForIdle()
         compose.onAllNodesWithText("8:30–8:55", substring = true).onFirst().performTouchInput { swipeLeft() }
         compose.waitUntil(5_000) { seed.tracker.data().sessions.size == before - 2 }
         compose.waitUntil(5_000) { compose.onAllNodesWithText("8:30–8:55", substring = true).fetchSemanticsNodes().isEmpty() }

@@ -381,9 +381,9 @@ class UiScreensTest {
         t.resume(t.snapshot().token); seed.clock.advance(10 * 60_000L)
         t.stop(t.snapshot().token)
         val vm = render(seed)
-        waitText("15:29–15:39")
+        waitText("15:29–15:54")
         val before = t.data().sessions.size
-        compose.onAllNodesWithText("15:29–15:39", substring = true).onFirst().performClick()
+        compose.onAllNodesWithText("15:29–15:54", substring = true, useUnmergedTree = true).onFirst().performClick()
         waitText("Исправить запись")
         compose.onNodeWithContentDescription("Удалить запись").performClick()
         waitText("Удалить запись целиком?")
@@ -602,6 +602,73 @@ class UiScreensTest {
         compose.onNodeWithText("Добавить ещё").performClick()
         waitText("По дням недели")
         shot("21-plan-editor", vm)
+    }
+
+    /** One theme only, for the extra themes (black, neon). */
+    private fun shotAs(name: String, vm: TrackerViewModel, theme: ThemeChoice) {
+        vm.setTheme(theme)
+        repeat(3) { compose.waitForIdle(); org.robolectric.shadows.ShadowLooper.idleMainLooper(); Thread.sleep(150) }
+        if (System.getProperty("tracker.screenshots") != "true") return
+        val views = windows(); val first = views.first()
+        val base = Bitmap.createBitmap(first.width, first.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(base); views.forEach { v -> drawWindow(canvas, first, v) }
+        save(base, name)
+    }
+
+    /** A record with pauses is one line; its mark unfolds the segments and the pauses between them. */
+    @Test fun recordWithPauses() {
+        val seed = seed(running = false)
+        val t = seed.tracker
+        t.start(t.snapshot().token, t.selection(t.data().cards.first { it.name == "Чтение" }.id)); seed.clock.advance(18 * 60_000L)
+        t.pause(t.snapshot().token); seed.clock.advance(7 * 60_000L)
+        t.resume(t.snapshot().token); seed.clock.advance(9 * 60_000L)
+        t.pause(t.snapshot().token); seed.clock.advance(5 * 60_000L)
+        t.resume(t.snapshot().token); seed.clock.advance(22 * 60_000L)
+        t.stop(t.snapshot().token)
+        val vm = render(seed)
+        waitText("2 паузы")
+        assertTrue("one line per record", compose.onAllNodesWithText("15:29–16:30", substring = true).fetchSemanticsNodes().size == 1)
+        compose.onNodeWithText("2 паузы").performClick()
+        waitText("пауза")
+        shot("22-record-pauses", vm)
+    }
+
+    @Test fun favoritesAndEditor() {
+        val seed = seed()
+        val t = seed.tracker
+        t.addFavorite(t.snapshot().token, Favorite(label = "Тренировка", selection = t.selection(t.data().cards.first { it.name == "Тренировка" }.id)))
+        val vm = render(seed)
+        vm.openFavorites(true)
+        waitText("Добавить в избранное")
+        shot("23-favorites", vm)
+        vm.openFavorites(false)
+        vm.openEditor(EditTarget.Card(t.data().cards.first { it.name == "Философия" }.id))
+        waitText("Своё занятие")
+        shot("24-activity-editor", vm)
+    }
+
+    @Test fun focusEditorFromLongPress() {
+        val vm = render(seed(running = false))
+        compose.onNodeWithText("Фокус: 25 мин работы").performTouchInput { longClick() }
+        waitText("Перерыв")
+        shot("25-focus-editor", vm)
+    }
+
+    @Test fun blackAndNeonThemes() {
+        val running = seed()
+        val vm = render(running)
+        waitText("1:24")
+        shotAs("26-neon-running", vm, ThemeChoice.NEON)
+        shotAs("27-amoled-running", vm, ThemeChoice.AMOLED)
+        vm.setAppearance { it.copy(accent = Accent.TEAL) }
+        shotAs("28-teal-light", vm, ThemeChoice.LIGHT)
+        vm.setAppearance { Appearance() }
+    }
+
+    @Test fun neonIdle() {
+        val vm = render(seed(running = false))
+        waitText("Начать")
+        shotAs("29-neon-idle", vm, ThemeChoice.NEON)
     }
 
     @Test fun recovery() {

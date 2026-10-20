@@ -185,13 +185,13 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 if (on && f?.problem == SurfaceProblem.PERMISSION_REQUIRED) askNotifications()
             }
             Divider()
-            SettingRow(rememberVectorPainter(Icon.TabTimer), "Ярлык на значке", status = "Долгое нажатие на значок приложения: старт и стоп",
+            SettingRow(rememberVectorPainter(Icon.TabTimer), "Ярлык на значке", status = "Долгое нажатие на значок: старт и стоп, выбор занятия и два первых избранных",
                 warn = false, action = null, checked = surfaces?.shortcut == true) { on -> vm.setSurfaceEnabled(Surface.SHORTCUT, on) }
             Divider()
             settings?.longRecordReminder?.let { pref -> LongRecordRow(vm, pref, longRecord, ::askNotifications) { system(SurfaceSettingsAction.OPEN_NOTIFICATION_SETTINGS) } }
         }
 
-        PlanGroup(vm.planSeries(view), openPlan)
+        PlanGroup(vm.planSeries(view), openPlan, favorites = view?.data?.favorites?.size ?: 0) { vm.openFavorites(true) }
 
         settings?.focusPlan?.let { plan -> FocusGroup(vm, (plan.workMs / 60_000L).toInt(), (plan.breakMs / 60_000L).toInt()) }
 
@@ -312,7 +312,7 @@ private fun AppearanceGroup(vm: TrackerViewModel, theme: ThemeChoice, more: () -
             }
         }
         Divider()
-        NavRow(rememberVectorPainter(Icon.Layers), "Шрифт, плотность и главный экран", note = "${a.font.title}, цифры ${a.digits.title.lowercase()}, " +
+        NavRow(rememberVectorPainter(Icon.Layers), "Шрифт и главный экран", note = "${a.font.title}, цифры ${a.digits.title.lowercase()}, " +
             (if (a.compact) "компактно" else "просторно"), onClick = more)
     }
 }
@@ -477,9 +477,12 @@ private fun LongRecordRow(vm: TrackerViewModel, pref: dev.notai.tracker.LongReco
 
 /** The optional plan for days. Each entry reads as one line; tapping opens it. */
 @Composable
-private fun PlanGroup(series: List<PlanSeriesUi>, open: (PlanSeriesUi?) -> Unit) {
+private fun PlanGroup(series: List<PlanSeriesUi>, open: (PlanSeriesUi?) -> Unit, favorites: Int, openFavorites: () -> Unit) {
     val c = NotAi.colors
-    Group("План по дням") {
+    Group("Занятия и план") {
+        NavRow(rememberVectorPainter(Icon.Star), "Избранное", value = if (favorites > 0) "$favorites" else null,
+            note = "Порядок, названия на кнопках, удаление повторов", onClick = openFavorites)
+        Divider()
         series.forEach { p ->
             Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).pressable({ open(p) }, label = p.label.title).padding(horizontal = 16.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {

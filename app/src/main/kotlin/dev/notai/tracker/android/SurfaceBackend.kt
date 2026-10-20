@@ -128,6 +128,11 @@ object SurfaceChoices {
         return if(route.assignmentId != null) tracker.assignStopped(route.assignmentId,choice,note,requestTarget = route.target) { allowed(context,it,source) }
         else tracker.applyChoice(route.target,choice,route.application) { allowed(context,it,source) }
     }
+    /** The original route gates catalog creation and application inside one Tracker transaction. */
+    fun createAndChoose(context: Context,tracker: Tracker,route: SurfacePickerRoute,expected: Token,card: Card): Tracker.Change {
+        val source = runCatching { Surface.valueOf(route.source) }.getOrElse { fail(ErrorCode.INVALID_INPUT,"Unknown picker source") }
+        return tracker.createCardForChoice(expected,route.target,card,route.application,route.assignmentId) { allowed(context,it,source) }
+    }
 }
 
 enum class SurfaceSettingsAction { REQUEST_NOTIFICATION_PERMISSION, OPEN_NOTIFICATION_SETTINGS, OPEN_TIMER_CHANNEL_SETTINGS, OPEN_OVERLAY_PERMISSION, ADD_WIDGET, RETRY_WIDGET, REFRESH }

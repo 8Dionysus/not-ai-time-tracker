@@ -181,11 +181,14 @@ class Tracker(val store: StateStore, val clock: Clock) {
         ensure(requestTarget == null || snapshot(d,n).timerTarget == requestTarget,"Picker timer target changed",ErrorCode.STALE)
         val offer = checkedOffer(d,id)
         val entry = ChoiceView(d,choiceCache) { snapshot(d,n) }.resolve(choice)
+        assignResolvedChoice(d,offer,entry,note)
+    }
+    private fun assignResolvedChoice(d: Dataset,offer: StoppedAssignment,entry: ChoiceEntry,note: String?): Dataset {
         checkStartable(d,entry.selection)
         val selected = d.classify(entry.selection)
-        d.copy(sessions = d.sessions.map { if(it.id == offer.sessionId) it.copy(selection = selected,note = note ?: it.note) else it },
+        return d.copy(sessions = d.sessions.map { if(it.id == offer.sessionId) it.copy(selection = selected,note = note ?: it.note) else it },
             segments = d.segments.map { if(it.sessionId == offer.sessionId) it.copy(selection = selected) else it },
-            pendingAssignments = d.pendingAssignments.filterNot { it.id == id })
+            pendingAssignments = d.pendingAssignments.filterNot { it.id == offer.id })
     }
     /** Fresh resolution and timer subject validation occur inside the same transaction. */
     fun startChoice(target: TimerTarget,choice: ChoiceReference,allowed: (Dataset)->Boolean = { true }) = applyChoice(target,choice,ChoiceApplication.START,allowed)
@@ -193,6 +196,9 @@ class Tracker(val store: StateStore, val clock: Clock) {
         ensure(allowed(d),"Surface disabled or permission denied")
         ensure(snapshot(d,n).timerTarget == target,"Timer target changed",ErrorCode.STALE)
         val entry = ChoiceView(d,choiceCache) { snapshot(d,n) }.resolve(choice)
+        applyResolvedChoice(d,n,entry,application)
+    }
+    private fun applyResolvedChoice(d: Dataset,n: Moment,entry: ChoiceEntry,application: ChoiceApplication): Dataset {
         checkStartable(d,entry.selection)
         val base = when(application) {
             ChoiceApplication.START -> { ensure(current(d) == null && d.focus == null,"Stop current session first"); d }
@@ -201,7 +207,20 @@ class Tracker(val store: StateStore, val clock: Clock) {
                 if(d.focus != null) FocusTransitions.cancel(d,n) else close(d,current(d) ?: fail(ErrorCode.INVALID_INPUT,"No current session"),n,SessionStatus.STOPPED)
             }
         }
-        append(base,entry.selection,choiceStartNote(d,entry.kind,entry.sourceId,entry.selection,entry.note),n)
+        return append(base,entry.selection,choiceStartNote(d,entry.kind,entry.sourceId,entry.selection,entry.note),n)
+    }
+    /** Create and apply under the original route/receipt in one transaction: failures leave no card. */
+    fun createCardForChoice(expected: Token,target: TimerTarget,card: Card,application: ChoiceApplication,
+        assignmentId: String? = null,allowed: (Dataset)->Boolean = { true }) = mutate(expected,assignmentId != null || application == ChoiceApplication.SWITCH) { d,n ->
+        ensure(allowed(d),"Surface disabled or permission denied")
+        ensure(snapshot(d,n).timerTarget == target,"Picker timer target changed",ErrorCode.STALE)
+        ensure(d.cards.none { it.id == card.id },"Card ID already exists")
+        validateCardParent(d,card)
+        val next = d.copy(cards = d.cards+card)
+        val entry = ChoiceView(next,choiceCache) { snapshot(next,n) }.resolve("card:${card.id}")
+            ?: fail(ErrorCode.INVALID_INPUT,"Created card unavailable")
+        if(assignmentId != null) assignResolvedChoice(next,checkedOffer(d,assignmentId),entry,null)
+        else applyResolvedChoice(next,n,entry,application)
     }
     class DeletePreview internal constructor(val expected: Token,val sessionId: String,val before: Dataset,val after: Dataset,val asOf: Moment) {
         val segmentCount get() = before.segments.count { it.sessionId == sessionId }
@@ -347,10 +366,13 @@ class Tracker(val store: StateStore, val clock: Clock) {
         d.copy(units = d.units.filterNot { it.id == unit.id } + unit)
     }
     fun saveCard(expected: Token, card: Card) = mutate(expected) { d,_ ->
+        validateCardParent(d,card)
+        d.copy(cards = d.cards.filterNot { it.id == card.id } + card.copy(personal = d.cards.find { it.id == card.id }?.personal ?: card.personal))
+    }
+    private fun validateCardParent(d: Dataset,card: Card) {
         val old = d.cards.find { it.id == card.id }
         if(card.activityTypeId != null && (old == null || old.activityTypeId != card.activityTypeId))
             ensure(d.types.any { it.id == card.activityTypeId && !it.archived },"Activity type missing or archived")
-        d.copy(cards = d.cards.filterNot { it.id == card.id } + card.copy(personal = d.cards.find { it.id == card.id }?.personal ?: card.personal))
     }
     /** Profile edits have a dedicated boundary: ordinary card/catalog saves preserve them. */
     fun personalizeChoice(expected: Token,kind: ChoiceKind,id: String,value: ChoicePersonalization) = mutate(expected,true) { d,_ ->

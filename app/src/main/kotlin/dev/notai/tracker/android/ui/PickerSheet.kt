@@ -78,7 +78,13 @@ fun SearchField(value: String, onChange: (String) -> Unit, placeholder: String, 
  */
 @Composable
 fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startClock: String?, boundaryClock: String?, boundary: Long?,
-                onDismiss: () -> Unit, surfaceRoute: dev.notai.tracker.android.SurfacePickerRoute? = null,
+                onDismiss: () -> Unit, onReturn: ((Classification, Label) -> Unit)? = null) =
+    PickerSheet(vm,mode,active,startClock,boundaryClock,boundary,onDismiss,surfaceRoute = null,onReturn = onReturn)
+
+/** A surface route keeps its own command semantics through full-catalog selection. */
+@Composable
+fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startClock: String?, boundaryClock: String?, boundary: Long?,
+                onDismiss: () -> Unit, surfaceRoute: dev.notai.tracker.android.SurfacePickerRoute?,
                 onReturn: ((Classification, Label) -> Unit)? = null) {
     val c = NotAi.colors
     var effective by remember { mutableStateOf(mode) }

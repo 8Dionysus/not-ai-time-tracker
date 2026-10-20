@@ -410,12 +410,8 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val trimmed = name.trim().replaceFirstChar { it.uppercase() }
         if(trimmed.isEmpty() || pickerRoute != route) return
         command({ "Занятие «$trimmed» создано" }) { rt,s ->
-            dev.notai.tracker.android.SurfaceChoices.read(rt.tracker,route)
             val card = Card(name = trimmed,activityTypeId = activityTypeId)
-            rt.tracker.saveCard(s.token,card)
-            val choices = rt.tracker.view().choices()
-            val entry = choices.resolve("card:${card.id}") ?: fail(ErrorCode.STALE,"Created card unavailable")
-            dev.notai.tracker.android.SurfaceChoices.choose(app,rt.tracker,route,choices.reference(entry)).also { clearSurfacePicker(route) }
+            dev.notai.tracker.android.SurfaceChoices.createAndChoose(app,rt.tracker,route,s.token,card).also { clearSurfacePicker(route) }
         }
     }
     fun cancelSurfacePicker() {

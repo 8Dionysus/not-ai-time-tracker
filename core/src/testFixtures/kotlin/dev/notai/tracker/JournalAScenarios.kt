@@ -8,6 +8,40 @@ import kotlinx.serialization.json.*
 abstract class JournalAScenarioContract {
     protected abstract fun createJournalStore(): StateStore
     protected open fun reopenJournalStore(store: StateStore): StateStore = store
+    @Test fun surfaceCardCreationAndApplicationAreOneTransactionIncludingRefusalsAndRetry() {
+        val clock = FakeClock();val t = Tracker(createJournalStore(),clock)
+        t.start(t.snapshot().token,Classification(name = "Original"));clock.advance(1000)
+        val stopped = t.stopForAssignment(t.snapshot().timerTarget!!)
+        val offer = requireNotNull(stopped.assignment);val target = requireNotNull(stopped.state.timerTarget)
+        val card = Card("atomic-surface-card","Created for saved record")
+        val before = t.data()
+        assertFailsWith<CoreError> { t.createCardForChoice(t.snapshot().token,target,card,ChoiceApplication.START,offer.id) { false } }
+        assertEquals(before,t.data())
+        assertFailsWith<CoreError> { t.createCardForChoice(t.snapshot().token,target,card,ChoiceApplication.START,"expired-receipt") }
+        assertEquals(before,t.data())
+        assertFailsWith<CoreError> { t.createCardForChoice(t.snapshot().token,target,card.copy(activityTypeId = "missing"),ChoiceApplication.START,offer.id) }
+        assertEquals(before,t.data())
+        // The exact same card/receipt can be retried after a refused attempt; nothing was partially saved.
+        t.createCardForChoice(t.snapshot().token,target,card,ChoiceApplication.START,offer.id)
+        val assigned = t.data()
+        assertEquals(before.sessions.size,assigned.sessions.size)
+        assertEquals(card.id,assigned.sessions.single { it.id == offer.sessionId }.selection.cardId)
+        assertEquals(listOf(card),assigned.cards)
+        assertEquals(Mode.IDLE,t.snapshot().mode)
+        assertFailsWith<CoreError> { t.createCardForChoice(t.snapshot().token,target,card.copy(id = "replayed-card"),ChoiceApplication.START,offer.id) }
+        assertEquals(assigned,t.data())
+        t.undo(t.snapshot().token)
+        assertEquals(before.cards,t.data().cards);assertEquals(before.sessions,t.data().sessions)
+        t.start(t.snapshot().token)
+        val afterNewTimer = t.data()
+        assertFailsWith<CoreError> { t.createCardForChoice(t.snapshot().token,target,card,ChoiceApplication.START,offer.id) }
+        assertEquals(afterNewTimer,t.data())
+        t.stop(t.snapshot().token)
+        val start = t.snapshot()
+        t.createCardForChoice(start.token,start.timerTarget!!,card,ChoiceApplication.START)
+        assertEquals(card.id,t.snapshot().session!!.selection.cardId)
+        assertEquals(1,t.data().cards.count { it.id == card.id })
+    }
     @Test fun bothBackupReadersKeepEveryLegacyVersionAndPresentationDefaults() {
         val directory = java.io.File(System.getProperty("tracker.samples"))
         val first = directory.resolve("history-v1.json").readText()

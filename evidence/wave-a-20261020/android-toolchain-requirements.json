@@ -1,7 +1,7 @@
 {
   "repository_url": "https://dl.google.com/android/repository/repository2-3.xml",
   "repository_sha256": "237eefe28e55619d3e63d730f8994cc1ae6d9c171096f07a6c147297145787e6",
-  "license_accepted_in_this_executor": false,
+  "license_accepted_in_this_executor": true,
   "packages": [
     {
       "package": "platforms;android-36",
@@ -36,5 +36,21 @@
       "license_sha256": "1f8729233617b193fd619213792ae16a41b95d2bbbf525dfe66998252ba68b16"
     }
   ],
-  "historical_authorization_scope": "docs/ANDROID_RUNTIME_PREFLIGHT.md: one official Emulator+AOSP preflight attempt on 2026-10-15, same license digest; no extension of that authorization assumed"
+  "agreement_title": "Android Software Development Kit License Agreement",
+  "agreement_date": "2019-01-16",
+  "official_source_element": "https://dl.google.com/android/repository/repository2-3.xml \u2014 <license id=\"android-sdk-license\" type=\"text\">",
+  "exact_text_file": "android-sdk-license-2019-01-16.txt",
+  "exact_text_size_bytes": 16962,
+  "current_terms_page_url": "https://developer.android.com/studio/terms",
+  "current_terms_page_date": "2026-04-28",
+  "current_terms_page_is_same_text": false,
+  "license_inventory_scope": "All uses-license references declared by the selected package metadata; package-internal third-party notices are separate and have not been inventoried without the archives.",
+  "authorization": {
+    "source_thread": "01a1566e-7e73-70b5-b93e-7acf50f99037",
+    "user_message": "Sentinel_1aa79ccda43c8191abb68bb1ffe27e03",
+    "user_message_date": "2026-10-11T05:13:16.175435+00:00",
+    "scope": "Explicit permission to accept Android SDK Agreement and install SDK packages for Tracker Cloud build; later direct Tracker Cloud development/build delegation remains active.",
+    "prior_acceptance_report": "Sentinel_4757e3f5185c8191bb96aedc1367ff8d, 2026-10-11T05:22:16.854831+00:00",
+    "package_text_comparison": "Selected android-sdk-license SHA256 exactly equals preserved prior installed-package license digest in evidence/android-runtime-preflight/verification.json; current official public terms page is a different 2026 text and is not substituted for the exact package text."
+  }
 }

@@ -95,3 +95,12 @@ Persisted writer A owns nullable privacy (null preserves legacy PRIVATE; non-nul
 A still needs to publish exact enum/property source before B binds it; current remote A branch was still the base when this adapter checkpoint was prepared. No shared files were changed by B.
 
 `WIDGET_ALPHA_BINDING.patch` is a concrete proposed narrow XML binding, NOT applied to the Opus-owned layout: existing shape becomes a background ImageView behind the unchanged padded row. `SurfaceViews.widgetBackgroundAlpha` accepts that view ID and percent, then uses setImageAlpha (0..255) on that background only. No bitmap allocation or universal theme engine. The layout owner/root must accept/apply the patch before the binding is invoked by widget().
+
+
+## Widget layout binding applied with root authorization
+
+The exact WIDGET_ALPHA_BINDING.patch is now applied to timer_widget.xml. SurfaceViews.widget(context,view,enabled,backgroundAlphaPercent=100) invokes the dedicated ImageView binding. Existing TimerSurfaces caller uses the default until A fields are present. No geometry or provider-size changes: original24dp GradientDrawable/color source, row XML, provider XML, include attributes and16/10/8/8dp content padding are unchanged. Static XML assertions passed. The added background ImageView is not clickable/focusable and is excluded from accessibility; existing row/actions remain foreground siblings. One focused RemoteViews regression checks background-only alpha and foreground/action preservation; not yet executed.
+
+Android12 launcher rounding is still system-controlled: no opt-out/clip flags, replacement radius, sizing or corner content was introduced. The shape retains its original corners and can still be cropped by the launcher. Transparent backgrounds can affect automatic background detection, so no OEM/host visual guarantee is claimed without a device. Sources: https://developer.android.com/about/versions/12/features/widgets and https://developer.android.com/develop/ui/views/appwidgets/enhance .
+
+The proposed-patch status above is historical; root explicitly authorized this exact narrow binding. Remaining A source bindings: privacy at notification caller; widget alpha percent at TimerSurfaces.widget; overlay chooser percent at AssignmentCard caller; quick(excludeSelection) before limit. Root retains A ownership of full-picker assignment routing.

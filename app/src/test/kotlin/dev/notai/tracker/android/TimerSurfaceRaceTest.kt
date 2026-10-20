@@ -58,7 +58,7 @@ class TimerSurfaceRaceTest {
                     }
                     refresh(c,t,t.view(),captured.data.settings.surfaces);expected=t.data()
                     newest=notifications.activeNotifications.singleOrNull { it.id==TimerSurfaces.CONTROL_ID }?.notification
-                    expectedShortcut=shortcuts.dynamicShortcuts.singleOrNull()?.intent?.let(TimerSurfaces::parse)
+                    expectedShortcut=shortcuts.dynamicShortcuts.singleOrNull { it.id == "timer_action" }?.intent?.let(TimerSurfaces::parse)
                     Unit
                 }
                 if(afterNotification) TimerSurfaces.notificationFactory={ context,view -> factory(context,view).also { change() } }
@@ -73,7 +73,7 @@ class TimerSurfaceRaceTest {
                     assertTrue(widget.findViewById<TextView>(R.id.surface_status).text.toString().contains("закончилась"))
                 } else assertEquals(if(action=="widget") "Виджет выключен" else "Shown timer",widget.findViewById<TextView>(R.id.surface_title).text.toString())
                 if(action=="pause") assertEquals("Продолжить",widget.findViewById<android.view.View>(R.id.surface_secondary).contentDescription)
-                assertEquals(expectedShortcut,shortcuts.dynamicShortcuts.singleOrNull()?.intent?.let(TimerSurfaces::parse))
+                assertEquals(expectedShortcut,shortcuts.dynamicShortcuts.singleOrNull { it.id == "timer_action" }?.intent?.let(TimerSurfaces::parse))
                 if(action=="shortcut") assertTrue(shortcuts.dynamicShortcuts.isEmpty())
                 // Every shown PendingIntent keeps its original immutable revision/target.
                 assertEquals(oldAction,TimerSurfaces.parse(shadowOf(oldPending).savedIntent))
@@ -96,7 +96,7 @@ class TimerSurfaceRaceTest {
         TimerSurfaces.notificationFactory={ _,_ -> throw IllegalStateException("Synthetic notification preparation failure") }
         refresh(c,t,t.view())
         assertEquals(before,t.data());assertEquals("Independent current",widgets.getViewFor(808).findViewById<TextView>(R.id.surface_title).text.toString())
-        assertEquals(t.snapshot().token,TimerSurfaces.parse(c.getSystemService(ShortcutManager::class.java).dynamicShortcuts.single().intent!!)?.token)
+        assertEquals(t.snapshot().token,TimerSurfaces.parse(c.getSystemService(ShortcutManager::class.java).dynamicShortcuts.single { it.id == "timer_action" }.intent!!)?.token)
         assertTrue(c.getSystemService(NotificationManager::class.java).activeNotifications.none { it.id==TimerSurfaces.CONTROL_ID })
     }
     @Test fun defaultViewReadAndTerminalStoreGateRunAwayFromCallerMainThread() {

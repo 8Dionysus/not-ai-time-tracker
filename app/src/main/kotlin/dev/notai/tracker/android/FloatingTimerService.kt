@@ -217,6 +217,19 @@ class FloatingTimerService : Service() {
         try { windows.addView(view, params); panel = view } catch (_: RuntimeException) { assignment.value = null }
     }
 
+    /** Bind to the chooser card's explicit "all activities" action; retain the original receipt/target.
+     * Opening the app transfers review, it does not leave/cancel the saved assignment.
+     */
+    internal fun openAssignmentChooser() {
+        val route = assignment.value?.route ?: return
+        try {
+            startActivity(SurfaceChoices.intent(this,route).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            hidePanel()
+        } catch (_: RuntimeException) {
+            Toast.makeText(this,"Открыть выбор не удалось. Запись сохранена",Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun choose(choice: OverlayChoice) {
         val a = assignment.value ?: return
         val t = tracker ?: return

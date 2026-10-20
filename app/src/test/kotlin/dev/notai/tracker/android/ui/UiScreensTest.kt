@@ -335,6 +335,9 @@ class UiScreensTest {
         waitText("По областям")
         waitText("Работа")
         shot("05-overview", vm)
+        compose.onAllNodesWithText("Работа").onFirst().performClick()
+        waitText("За 7 дней")
+        shot("34-overview-area", vm)
     }
 
     @Test fun settings() {

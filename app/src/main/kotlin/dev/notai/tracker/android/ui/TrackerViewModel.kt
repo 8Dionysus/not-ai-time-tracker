@@ -71,7 +71,9 @@ internal fun PickerItem.wholeArea() = copy(label = label.copy(title = "Вся о
 data class PickerData(val recents: List<PickerItem>, val favorites: List<PickerItem>, val areas: List<PickerItem>, val moreAreas: List<PickerItem>)
 
 enum class Period(val days: Int, val title: String) { DAY(1, "День"), WEEK(7, "7 дней"), MONTH(30, "30 дней") }
-data class AreaTotal(val name: String, val slot: Int?, val ms: Long, val glyph: Int = ActivityGlyphs.custom)
+data class AreaTotal(val name: String, val slot: Int?, val ms: Long, val glyph: Int = ActivityGlyphs.custom, val id: String? = null, val deeper: Boolean = false)
+/** One level of an area's time over the shown period: sections and activities below it, newest tree. */
+data class Breakdown(val title: String, val totalMs: Long, val parts: List<AreaTotal>)
 data class DayColumn(val date: LocalDate, val parts: List<Pair<Int?, Long>>, val totalMs: Long, val incomplete: Boolean)
 data class GoalUi(val name: String, val value: String, val status: String, val ok: Boolean, val fraction: Float, val id: String = "")
 /** What the goal form edits. The calendar (period, zone, day start) is fixed once a goal exists. */
@@ -852,7 +854,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val names = d.types.associate { it.id to it.name }
         val areas = areaParts(window).sortedByDescending { it.second }.map { (id, ms) ->
             AreaTotal(id?.let { names[it] } ?: "Без области", Areas.slot(id), ms,
-                id?.let { d.glyph(Classification(activityTypeId = it)) } ?: ActivityGlyphs.unclassified)
+                id?.let { d.glyph(Classification(activityTypeId = it)) } ?: ActivityGlyphs.unclassified, id, id != null)
         }
         val columns = if (period == Period.DAY) emptyList() else calendar.days.map { day ->
             val parts = areaParts(v.report(day.start, day.end)).map { Areas.slot(it.first) to it.second }
@@ -912,6 +914,36 @@ class TrackerViewModel internal constructor(private val app: Application,private
     // ---------- shareable summary ----------
 
     /** Plain text from the same core report as the overview: totals by area, unknown time apart, notes only when asked. */
+    /**
+     * What one area consists of over the period, one level at a time, by today's tree: a moved section brings its past
+     * time along. Below the last section, records are told apart by their own names. Durations are the core's per-row values.
+     */
+    suspend fun breakdown(period: Period, parentId: String): Breakdown? = withContext(Dispatchers.IO) {
+        val rt = runtime ?: return@withContext null
+        val v = view.value ?: rt.tracker.view()
+        val d = v.data
+        val today = ReportingDayPolicy(d.settings.reportZone, d.settings.reportDayStartMinute).dateAt(now())
+        val report = v.calendar(today.minusDays(period.days - 1L), period.days).window
+        val parents = d.types.associate { it.id to it.parentId }
+        fun chain(leaf: String?): List<String> { val out = ArrayList<String>(); var cur = leaf; var guard = 0
+            while (cur != null && guard++ < 64) { out.add(0, cur); cur = parents[cur] }; return out }
+        val rows = report.rows.distinctBy { it.segmentId }.mapNotNull { r ->
+            val c = chain(r.selection.activityTypeId ?: r.selection.ancestorPathAtWrite.lastOrNull())
+            val at = c.indexOf(parentId); if (at < 0) null else Triple(r, c.getOrNull(at + 1), c)
+        }
+        if (rows.isEmpty()) return@withContext Breakdown(d.types.find { it.id == parentId }?.name ?: "", 0, emptyList())
+        val names = d.types.associate { it.id to it.name }
+        val hasChildren = d.types.mapNotNull { it.parentId }.toSet()
+        val parts = rows.groupBy { (r, child, _) -> child?.let { "t:$it" } ?: "n:" + d.label(r.selection).title }.map { (key, group) ->
+            val ms = group.sumOf { it.first.durationMs }
+            if (key.startsWith("t:")) { val id = key.removePrefix("t:")
+                AreaTotal(names[id] ?: id, Areas.slot(group.first().third.first()), ms, d.glyph(Classification(activityTypeId = id)), id,
+                    id in hasChildren || group.map { d.label(it.first.selection).title }.distinct().size > 1)
+            } else AreaTotal(key.removePrefix("n:"), d.label(group.first().first.selection).slot, ms, d.glyph(group.first().first.selection))
+        }.sortedByDescending { it.ms }
+        Breakdown(names[parentId] ?: "", parts.sumOf { it.ms }, parts)
+    }
+
     suspend fun summary(period: Period, notes: Boolean): String? = withContext(Dispatchers.IO) {
         val v = view.value ?: return@withContext null
         val d = v.data

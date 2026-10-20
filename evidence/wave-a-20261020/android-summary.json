@@ -1,0 +1,316 @@
+{
+  "runs": [
+    {
+      "run": "initial",
+      "totals": {
+        "tests": 40,
+        "failures": 3,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "fix-confirmation",
+      "totals": {
+        "tests": 3,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "launcher-confirmation",
+      "totals": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "distinct_targeted_tests": 40,
+  "latest_status_failed": 0,
+  "latest_status_skipped": 0,
+  "tests": [
+    {
+      "class": "dev.notai.tracker.android.JournalAMigrationTest",
+      "test": "actualV11DefaultRowsKeepAllSessionStatesAndExportRestoreComparison",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.JournalAMigrationTest",
+      "test": "futureProfileInV11ReachesGuardAndKeepsEveryRowAndVersion",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.JournalAMigrationTest",
+      "test": "futureSubjectAndBoundsEachReachTheirV11GuardWithoutChangingRows",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.JournalAMigrationTest",
+      "test": "interruptionAfterMigrationWriteRollsBackWholeIsolatedDatabase",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "batchMetadataIsPreviewedAtomicVersionCheckedAndUndoable",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "bothBackupReadersKeepEveryLegacyVersionAndPresentationDefaults",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "categoryEditsKeepHistoricalTotalsAndRejectInvalidParents",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "explicitRepeatPolicyAlsoWorksWithoutAnyCardProfile",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "gapWindowsPartitionAcrossMidnightAndUnknownTimeDoesNotBecomeZero",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "gapsDistinguishPausesAndOnlyPrepareExplicitManualDrafts",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "personalProfilesPersistAndPinnedOrderDoesNotChangeWithSearchRank",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "personalProfilesRoundTripFullAndSelectiveWithLegacyGuards",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "personalProfilesSurviveCopiedOriginCompactionAndReplayWithoutFalseUndo",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "recoveryUncertaintyIsNotAnUnrecordedDraftAndFutureIsExcluded",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "repeatPolicyPreservesDefaultsAndNeverCopiesMeasurements",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "repeatedFavoriteAddPreservesVariantsLegacyIdsAndReopenedOrder",
+      "last_run": "fix-confirmation",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "sessionDayProjectionClipsMidnightPreservesMixedAndDoesNotInventUncertainPauses",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "sessionDayProjectionKeepsPausesOutOfWorkAndDoesNotMergeNames",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "surfaceCardCreationAndApplicationAreOneTransactionIncludingRefusalsAndRetry",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomJournalATest",
+      "test": "surfacePresentationPreferencesRoundTripAndLegacyDefaultsAreExplicit",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomScenariosTest",
+      "test": "backendPickerWidgetAndOverlayContracts",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomScenariosTest",
+      "test": "launcherChooserUsesExistingTargetAndRejectsReplayAfterNewTimer",
+      "last_run": "launcher-confirmation",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomScenariosTest",
+      "test": "lockScreenPolicyKeepsFullTimerOnlyForExplicitPublicPresentation",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomScenariosTest",
+      "test": "shortcutDisableWithdrawsMutableEntriesAndGatesRetainedActionsAfterReopen",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomScenariosTest",
+      "test": "timerChannelCapabilityObservesMinAndPreservesExistingChannel",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.RoomScenariosTest",
+      "test": "widgetOpacityFadesOnlyTheDedicatedBackground",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.TimerSurfaceRaceTest",
+      "test": "defaultViewReadAndTerminalStoreGateRunAwayFromCallerMainThread",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.TimerSurfaceRaceTest",
+      "test": "duePhaseWithoutRevisionChangeWinsAfterPreparation",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.TimerSurfaceRaceTest",
+      "test": "newestTimerControlsWinAfterCapturedView",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.TimerSurfaceRaceTest",
+      "test": "notificationOptOutWinsAfterActualNotificationRendering",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.TimerSurfaceRaceTest",
+      "test": "notificationOptOutWinsAfterCapturedView",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.TimerSurfaceRaceTest",
+      "test": "preparationFailureLeavesIndependentWidgetAndShortcutUsable",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.TimerSurfaceRaceTest",
+      "test": "replacementBarrierWinsAfterCapturedView",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.TimerSurfaceRaceTest",
+      "test": "reviewP3RoomCollectorRetriesSkippedWidgetDisableWithoutForce",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.TimerSurfaceRaceTest",
+      "test": "reviewP3RoomObserverRetainsOverlayStopRequestAfterSkippedTransition",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.TimerSurfaceRaceTest",
+      "test": "reviewP3RuntimeCollectorRetriesSkippedWidgetDisableWithoutForce",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.TimerSurfaceRaceTest",
+      "test": "reviewP3RuntimeObserverRetainsOverlayStopRequestAfterSkippedTransition",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.TimerSurfaceRaceTest",
+      "test": "shortcutOptOutWinsWithoutDisablingOtherSurfaces",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.TimerSurfaceRaceTest",
+      "test": "widgetOptOutWinsWithoutDisablingOtherSurfaces",
+      "last_run": "initial",
+      "failed": false,
+      "skipped": false
+    },
+    {
+      "class": "dev.notai.tracker.android.ui.UiDraftRecreationTest",
+      "test": "stoppedAssignmentFullCatalogKeepsReceiptAndNeverStartsAnotherTimer",
+      "last_run": "fix-confirmation",
+      "failed": false,
+      "skipped": false
+    }
+  ]
+}

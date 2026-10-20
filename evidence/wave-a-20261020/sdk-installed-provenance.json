@@ -1,0 +1,30 @@
+{
+  "packages": [
+    {
+      "package": "platforms;android-36",
+      "source_properties": "Pkg.Desc=Android SDK Platform 16\nPkg.UserSrc=false\nPlatform.Version=16\nPlatform.CodeName=\nPkg.Revision=2\nAndroidVersion.ApiLevel=36\nAndroidVersion.ExtensionLevel=17\nAndroidVersion.IsBaseSdk=true\nLayoutlib.Api=15\nLayoutlib.Revision=1\nPlatform.MinToolsRev=22\n"
+    },
+    {
+      "package": "ndk;30.0.16248370",
+      "source_properties": "Pkg.Desc = Android NDK\nPkg.Revision = 30.0.16248370\nPkg.BaseRevision = 30.0.16248370\nPkg.ReleaseName = r30\n"
+    },
+    {
+      "package": "build-tools;35.0.0",
+      "source_properties": "Pkg.UserSrc=false\nPkg.Revision=35.0.0\n#Pkg.Revision=35.0.0 rc4\n"
+    },
+    {
+      "package": "cmdline-tools;latest",
+      "source_properties": "Pkg.Revision=23.0\nPkg.Path=cmdline-tools;23.0\nPkg.Desc=Android SDK Command-line Tools\n"
+    },
+    {
+      "package": "platform-tools",
+      "source_properties": "Pkg.UserSrc=false\nPkg.Revision=37.0.1\n"
+    }
+  ],
+  "command_line_tools_archive_verified_size": 181052239,
+  "command_line_tools_archive_sha256": "0877a1d048fe4a24efe2eff536ca4223f7adeb58648bb81909d33c446918cfa8",
+  "other_archive_verification_scope": "Official installer consumed then removed completed archive cache entries; expected repository size/SHA1 recorded, no claim of subsequent independent archive-byte verification. Installed source.properties are captured.",
+  "installer": "Official sdkmanager delegated to Android CLI, exit0; AGP additionally installs platform-tools. No emulator, account, init skill or remote device operation.",
+  "sdk": "/workspace/toolchains/sdk",
+  "jdk": "/workspace/toolchains/jdk-21"
+}

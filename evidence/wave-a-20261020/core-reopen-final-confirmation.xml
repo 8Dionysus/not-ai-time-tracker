@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.JournalATest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-20T09:08:39.256Z" hostname="4af5929b67e8" time="0.128">
+  <properties/>
+  <testcase name="repeatedFavoriteAddPreservesVariantsLegacyIdsAndReopenedOrder" classname="dev.notai.tracker.JournalATest" time="0.128"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

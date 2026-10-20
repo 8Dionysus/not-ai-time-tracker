@@ -127,7 +127,8 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertThrows(CoreError::class.java) { SurfaceChoices.choose(context,tracker,route,choice) }
         org.junit.Assert.assertEquals(before,tracker.data())
         TimerSurfaces.shortcut(context,tracker.snapshot(),tracker.data().settings.surfaces)
-        val fresh = requireNotNull(SurfaceChoices.parse(manager.dynamicShortcuts.single { it.id == "timer_choose" }.intent!!))
+        // Robolectric stores a pinned dynamic shortcut only in its pinned map.
+        val fresh = requireNotNull(SurfaceChoices.parse(manager.pinnedShortcuts.single { it.id == "timer_choose" }.intent!!))
         tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(shortcut = false)))
         org.junit.Assert.assertThrows(CoreError::class.java) { SurfaceChoices.choose(context,tracker,fresh,choice) }
         tracker.stop(tracker.snapshot().token)
@@ -135,7 +136,9 @@ class RoomScenariosTest: ScenarioContract() {
         tracker.startFocus(tracker.snapshot().token)
         TimerSurfaces.shortcut(context,tracker.snapshot(),tracker.data().settings.surfaces)
         org.junit.Assert.assertEquals(listOf("timer_action"),manager.dynamicShortcuts.map { it.id })
-        org.junit.Assert.assertFalse(manager.pinnedShortcuts.single { it.id == "timer_choose" }.isEnabled)
+        // ShadowShortcutManager models disabled pinned entries through requestPinShortcut rejection, not ShortcutInfo flags.
+        val withdrawn = manager.pinnedShortcuts.single { it.id == "timer_choose" }
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) { manager.requestPinShortcut(withdrawn,null) }
         val focused = SurfaceChoices.route(Surface.SHORTCUT,tracker.snapshot())
         val beforeFocusTap = tracker.data()
         org.junit.Assert.assertThrows(CoreError::class.java) { SurfaceChoices.choose(context,tracker,focused,choice) }

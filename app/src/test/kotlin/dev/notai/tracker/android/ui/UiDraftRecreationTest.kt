@@ -75,7 +75,7 @@ class UiDraftRecreationTest {
             val id = requireNotNull(stopped.assignment).sessionId
             vm.receiveSurfacePicker(SurfaceChoices.route(Surface.SHORTCUT,stopped.state,stopped.assignment))
             compose.waitUntil(10000) { vm.surfacePicker.value != null }
-            compose.onNodeWithText("Все занятия").performClick()
+            compose.onNode(hasText("Все занятия") and hasAnyAncestor(isDialog())).performClick()
             compose.onNodeWithContentDescription("Найти или создать занятие").assertExists()
             return id
         }

@@ -151,7 +151,7 @@ abstract class JournalAScenarioContract {
         t.addFavorite(t.snapshot().token, Favorite("again", "First", selection))
         assertEquals(setOf("a", "b", "note", "legacy"), t.data().favorites.map { it.id }.toSet())
         t.orderChoices(t.snapshot().token, ChoiceKind.FAVORITE, listOf("b", "a", "note", "legacy"))
-        t = Tracker(reopenJournalStore(store), clock)
+        t = Tracker(reopenJournalStore(t.store), clock)
         val window = HistoryWindow(0, clock.wall + 1)
         assertEquals(listOf("b", "a"), t.choices().quick(window, 2).map { it.entry.sourceId })
         assertEquals(listOf("b"), t.choices().quick(window, 2, selection).map { it.entry.sourceId })
@@ -159,7 +159,7 @@ abstract class JournalAScenarioContract {
         t.removeFavorite(stale, "b")
         assertFailsWith<CoreError> { t.orderChoices(stale, ChoiceKind.FAVORITE, listOf("a")) }
         t.undo(t.snapshot().token)
-        t = Tracker(reopenJournalStore(store), clock)
+        t = Tracker(reopenJournalStore(t.store), clock)
         assertEquals("b", t.choices().quick(window, 1).single().entry.sourceId)
     }
 

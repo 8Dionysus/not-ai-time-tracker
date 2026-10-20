@@ -74,6 +74,9 @@ enum class Period(val days: Int, val title: String) { DAY(1, "День"), WEEK(7
 data class AreaTotal(val name: String, val slot: Int?, val ms: Long, val glyph: Int = ActivityGlyphs.custom, val id: String? = null, val deeper: Boolean = false)
 /** One level of an area's time over the shown period: sections and activities below it, newest tree. */
 data class Breakdown(val title: String, val totalMs: Long, val parts: List<AreaTotal>)
+/** A saved report as Overview lists it, and its opened result: total, window and one line per own activity. */
+data class SavedReportUi(val query: SavedReportQuery, val window: String, val totalMs: Long, val incomplete: Boolean,
+    val parts: List<Pair<String, Long>>, val missing: Boolean, val filterLabel: Label?)
 data class DayColumn(val date: LocalDate, val parts: List<Pair<Int?, Long>>, val totalMs: Long, val incomplete: Boolean)
 data class GoalUi(val name: String, val value: String, val status: String, val ok: Boolean, val fraction: Float, val id: String = "")
 /** What the goal form edits. The calendar (period, zone, day start) is fixed once a goal exists. */
@@ -943,6 +946,28 @@ class TrackerViewModel internal constructor(private val app: Application,private
         }.sortedByDescending { it.ms }
         Breakdown(names[parentId] ?: "", parts.sumOf { it.ms }, parts)
     }
+
+    suspend fun savedReports(): List<SavedReportUi> = withContext(Dispatchers.IO) {
+        val rt = runtime ?: return@withContext emptyList()
+        val v = view.value ?: rt.tracker.view(); val d = v.data; val now = rt.tracker.clock.now()
+        d.savedReports.mapNotNull { q -> runCatching {
+            val r = SavedReports.open(d, now, q.id)
+            val zone = ZoneId.of(r.report.zone)
+            val first = r.report.dayPolicy.dateAt(r.report.start); val last = r.report.dayPolicy.dateAt(r.report.end - 1)
+            val names = d.cards.associate { it.id to it.name }
+            val parts = r.groupedMs.filterValues { it > 0 }.map { (k, ms) -> (k?.let { names[it] } ?: "Без своего занятия") to ms }.sortedByDescending { it.second }
+            val filterSel = q.filter.cardId?.let { Classification(cardId = it) } ?: q.filter.activityTypeId?.let { Classification(activityTypeId = it) }
+            SavedReportUi(q, Format.period(first, last), r.report.recordedMs, r.report.incomplete, parts,
+                r.references.any { it.status != ReportReferenceStatus.AVAILABLE }, filterSel?.let { d.label(it) })
+        }.getOrNull() }.sortedBy { it.query.name.lowercase() }
+    }
+    fun saveReport(existing: SavedReportQuery?, name: String, selection: Classification?, window: ReportWindow) = command({ _ -> if (existing == null) "Отчёт сохранён" else "Отчёт изменён" }) { rt, s ->
+        val d = rt.tracker.data()
+        val filter = when { selection?.cardId != null -> Filter(cardId = selection.cardId); selection?.activityTypeId != null -> Filter(activityTypeId = selection.activityTypeId); else -> Filter() }
+        rt.tracker.saveReportQuery(s.token, (existing ?: SavedReportQuery(name = name)).copy(name = name, window = window, filter = filter,
+            grouping = ReportGrouping.CARD, groupKey = null, policy = d.settings.reportDayPolicy))
+    }
+    fun deleteReport(id: String) = command({ _ -> "Отчёт удалён" }) { rt, s -> rt.tracker.deleteReportQuery(s.token, id) }
 
     suspend fun summary(period: Period, notes: Boolean): String? = withContext(Dispatchers.IO) {
         val v = view.value ?: return@withContext null

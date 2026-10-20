@@ -439,6 +439,25 @@ class UiScreensTest {
         compose.waitUntil(5_000) { compose.onAllNodesWithText("8:30–8:55", substring = true).fetchSemanticsNodes().isEmpty() }
     }
 
+    /** A saved report follows its period: create «Прошлая неделя» for everything, open it, see the total. */
+    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
+    @Test fun savedReport() {
+        val seed = seed()
+        val vm = render(seed)
+        compose.onNodeWithText("Обзор").performClick()
+        waitText("Свой отчёт: занятие и период")
+        compose.onNodeWithText("Свой отчёт: занятие и период").performClick()
+        waitText("Что считать")
+        compose.onNodeWithText("Прошлая неделя").performClick()
+        shot("35-report-editor", vm)
+        compose.onNodeWithText("Сохранить").performClick()
+        compose.waitUntil(5_000) { seed.tracker.data().savedReports.size == 1 }
+        waitText("Все занятия, прошлая неделя")
+        compose.onNodeWithText("Все занятия, прошлая неделя").performClick()
+        waitText("Изменить")
+        shot("36-report", vm)
+    }
+
     /** «Выбрать несколько» from the menu, a second tap adds another, and one note goes to both after a confirmation. */
     @Test fun batchNote() {
         val seed = seed()

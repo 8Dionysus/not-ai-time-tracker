@@ -23,12 +23,17 @@ import dev.notai.tracker.TrackerView
 
 /** Totals by area. Every number is a core report value; the screen only lays them out. */
 @Composable
-fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier = Modifier, openGoal: (String?) -> Unit = {}, share: (Period) -> Unit = {}) {
+fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier = Modifier, openGoal: (String?) -> Unit = {}, share: (Period) -> Unit = {},
+                   pickActivity: ((dev.notai.tracker.Classification, Label) -> Unit) -> Unit = {}) {
     val c = NotAi.colors
     var period by rememberSaveableEnum(Period.WEEK)
     val reportingDate by vm.reportingDate.collectAsState()
     val data by produceState<OverviewData?>(null, period, view, reportingDate) { value = vm.overview(period) }
     var drill by remember { mutableStateOf(listOf<String>()) }
+    val reports by produceState(emptyList<SavedReportUi>(), view) { value = vm.savedReports() }
+    var openReport by remember { mutableStateOf<String?>(null) }
+    var editReport by remember { mutableStateOf<SavedReportUi?>(null) }
+    var newReport by remember { mutableStateOf(false) }
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp)) {
         Row(Modifier.fillMaxWidth().height(64.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("Обзор", Modifier.weight(1f), style = NotAi.type.title, color = c.ink)
@@ -56,6 +61,7 @@ fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier 
             Note(if (d.period == Period.DAY) "Сегодня записей пока нет. Обзор соберётся сам, как только появится первая."
                 else "За эти дни записей нет. Обзор соберётся сам, как только они появятся.", Modifier.padding(top = 4.dp))
             Goals(d.goals, openGoal)
+            SavedReportsSection(vm, reports, { openReport = it.query.id }, { newReport = true })
             return@Column
         }
         if (d.period == Period.DAY) {
@@ -68,7 +74,12 @@ fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier 
         val max = d.areas.maxOfOrNull { it.ms }?.coerceAtLeast(1) ?: 1
         d.areas.forEach { a -> AreaBar(a, max) { a.id?.let { drill = listOf(it) } } }
         Goals(d.goals, openGoal)
+        SavedReportsSection(vm, reports, { openReport = it.query.id }, { newReport = true })
     }
+    reports.firstOrNull { it.query.id == openReport }?.let { r ->
+        SavedReportSheet(r, onEdit = { openReport = null; editReport = r }, onDelete = { openReport = null; vm.deleteReport(r.query.id) }, onDismiss = { openReport = null })
+    }
+    if (newReport || editReport != null) SavedReportEditor(vm, editReport, pickActivity, onDismiss = { newReport = false; editReport = null })
     drill.lastOrNull()?.let { id -> BreakdownSheet(vm, period, drill, onOpen = { drill = drill + it }, onBack = { drill = drill.dropLast(1) }, onDismiss = { drill = emptyList() }) }
 }
 

@@ -167,7 +167,7 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
                 when (t) {
                     Tab.TIMER -> TimerScreen(snapshot, home, vm, actions, dark)
                     Tab.OVERVIEW -> OverviewScreen(vm, view, openGoal = { id -> editor = Editor.Goal(id?.let(vm::goalDraft)) },
-                        share = { p -> editor = Editor.Share(p) })
+                        share = { p -> editor = Editor.Share(p) }, pickActivity = { formPicker = it })
                     Tab.SETTINGS -> SettingsScreen(vm, view, theme, openTechnical, openPlan = { editor = Editor.Plan(it) })
                 }
             }

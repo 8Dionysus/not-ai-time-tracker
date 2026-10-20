@@ -107,12 +107,46 @@ class RoomScenariosTest: ScenarioContract() {
             sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> c.moveToFirst();org.junit.Assert.assertEquals(prior,c.getString(0)) }
         }
     }
+    @org.junit.Test fun launcherChooserUsesExistingTargetAndRejectsReplayAfterNewTimer() {
+        val context = RuntimeEnvironment.getApplication();val tracker = Tracker(createStore(),FakeClock())
+        val manager = context.getSystemService(android.content.pm.ShortcutManager::class.java)
+        val card = Card(id = "launcher-choice",name = "Launcher choice")
+        tracker.saveCard(tracker.snapshot().token,card)
+        tracker.saveFavorite(tracker.snapshot().token,Favorite(id = "launcher-favorite",label = "Launcher choice",selection = card.classification()))
+        TimerSurfaces.shortcut(context,tracker.snapshot(),tracker.data().settings.surfaces)
+        val route = requireNotNull(SurfaceChoices.parse(manager.dynamicShortcuts.single { it.id == "timer_choose" }.intent!!))
+        org.junit.Assert.assertEquals(Surface.SHORTCUT.name,route.source)
+        org.junit.Assert.assertEquals(route,SurfaceChoices.parse(SurfaceChoices.intent(context,route)))
+        val choices = SurfaceChoices.read(tracker,route)
+        val choice = choices.choices.first().reference
+        SurfaceChoices.choose(context,tracker,route,choice)
+        tracker.stop(tracker.snapshot().token);tracker.start(tracker.snapshot().token)
+        val before = tracker.data()
+        org.junit.Assert.assertThrows(CoreError::class.java) { SurfaceChoices.choose(context,tracker,route,choice) }
+        org.junit.Assert.assertEquals(before,tracker.data())
+        TimerSurfaces.shortcut(context,tracker.snapshot(),tracker.data().settings.surfaces)
+        val fresh = requireNotNull(SurfaceChoices.parse(manager.dynamicShortcuts.single { it.id == "timer_choose" }.intent!!))
+        tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(shortcut = false)))
+        org.junit.Assert.assertThrows(CoreError::class.java) { SurfaceChoices.choose(context,tracker,fresh,choice) }
+    }
+    @org.junit.Test fun timerChannelCapabilityObservesMinAndPreservesExistingChannel() {
+        val context = RuntimeEnvironment.getApplication()
+        val manager = context.getSystemService(android.app.NotificationManager::class.java)
+        manager.createNotificationChannel(android.app.NotificationChannel(TimerSurfaces.CONTROL_CHANNEL,"User channel",android.app.NotificationManager.IMPORTANCE_MIN))
+        TimerSurfaces.channels(context)
+        val capability = timerNotificationCapability(context)
+        org.junit.Assert.assertEquals(android.app.NotificationManager.IMPORTANCE_MIN,capability.importance)
+        org.junit.Assert.assertEquals(false,capability.statusBarIconRequested)
+        val intent = requireNotNull(SurfaceSettingsBackend.settingsIntent(context,capability.settingsAction))
+        org.junit.Assert.assertEquals(android.provider.Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS,intent.action)
+        org.junit.Assert.assertEquals(TimerSurfaces.CONTROL_CHANNEL,intent.getStringExtra(android.provider.Settings.EXTRA_CHANNEL_ID))
+    }
     @org.junit.Test fun shortcutDisableWithdrawsMutableEntriesAndGatesRetainedActionsAfterReopen() {
         val context = RuntimeEnvironment.getApplication();val tracker = Tracker(createStore(),FakeClock())
         val shown = tracker.snapshot();val oldAction = SurfaceAction(Surface.SHORTCUT,TimerCommand.START,shown.token,shown.timerTarget)
         val manager = context.getSystemService(android.content.pm.ShortcutManager::class.java)
         TimerSurfaces.shortcut(context,shown,tracker.data().settings.surfaces)
-        val published = manager.dynamicShortcuts.single();org.junit.Assert.assertEquals("timer_action",published.id)
+        val published = manager.dynamicShortcuts.single { it.id == "timer_action" };org.junit.Assert.assertEquals("timer_action",published.id)
         org.junit.Assert.assertTrue(manager.requestPinShortcut(published,null))
         val timer = tracker.snapshot().timerTarget
         tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(shortcut = false)))
@@ -918,7 +952,7 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertEquals(0,notification.actions?.size ?: 0) // buttons live in the custom row, visible collapsed
         org.junit.Assert.assertEquals(android.app.Notification.VISIBILITY_PRIVATE,notification.visibility)
         TimerSurfaces.shortcut(context,latest,tracker.data().settings.surfaces)
-        val launcher = context.getSystemService(android.content.pm.ShortcutManager::class.java).dynamicShortcuts.single()
+        val launcher = context.getSystemService(android.content.pm.ShortcutManager::class.java).dynamicShortcuts.single { it.id == "timer_action" }
         val launcherAction = requireNotNull(TimerSurfaces.parse(launcher.intent!!))
         org.junit.Assert.assertEquals(Surface.SHORTCUT,launcherAction.source)
         org.junit.Assert.assertEquals(latest.token,launcherAction.token)

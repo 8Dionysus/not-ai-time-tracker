@@ -101,7 +101,7 @@ object SurfaceViews {
                 val tint = l.slot?.let { areaColors[it] } ?: R.color.widget_ink2
                 Triple(q, if (q.entry.kind == ChoiceKind.FAVORITE) q.entry.title else l.title, l.glyph to tint)
             }
-        if (items.isEmpty()) return null
+        // Keep the full chooser reachable even when no compact suggestion is available.
         return Quick(route, if (route.application == ChoiceApplication.START) "Начать сразу" else "Переключиться на", items)
     }
 

@@ -120,17 +120,30 @@ object TimerSurfaces {
     fun shortcut(c: Context,s: Snapshot,settings: SurfaceSettings) { prepareShortcut(c,s,settings).invoke() }
     private fun prepareShortcut(c: Context,s: Snapshot,settings: SurfaceSettings): () -> Unit {
         val manager = c.getSystemService(android.content.pm.ShortcutManager::class.java)
-        if(!settings.shortcut) return { manager.disableShortcuts(listOf("timer_action"));manager.removeDynamicShortcuts(listOf("timer_action")) }
+        val ids = listOf("timer_action", "timer_choose")
+        // Withdraw the former static MAIN alias, including pinned copies retained by a launcher.
+        fun retireOpenAlias() { manager.disableShortcuts(listOf("open_timer")) }
+        if(!settings.shortcut) return { retireOpenAlias();manager.disableShortcuts(ids);manager.removeDynamicShortcuts(ids) }
         val command = primary(s)
         if(command == null) return {
-            manager.disableShortcuts(listOf("timer_action"),"Откройте приложение для уточнения времени")
-            manager.removeDynamicShortcuts(listOf("timer_action"))
+            retireOpenAlias()
+            manager.disableShortcuts(ids,"Откройте приложение для уточнения времени")
+            manager.removeDynamicShortcuts(ids)
         }
         val action = intent(c,SurfaceAction(Surface.SHORTCUT,command,s.token,s.timerTarget)).setClass(c,MainActivity::class.java)
         val info = android.content.pm.ShortcutInfo.Builder(c,"timer_action")
             .setShortLabel(label(command)).setLongLabel("Таймер: ${label(command).lowercase()}")
             .setIcon(android.graphics.drawable.Icon.createWithResource(c,R.drawable.ic_shortcut)).setIntent(action).build()
-        return { manager.enableShortcuts(listOf("timer_action"));manager.setDynamicShortcuts(listOf(info));Unit }
+        val chooser = android.content.pm.ShortcutInfo.Builder(c,"timer_choose")
+            .setShortLabel("Выбрать занятие").setLongLabel("Таймер: выбрать занятие")
+            .setIcon(android.graphics.drawable.Icon.createWithResource(c,R.drawable.ic_shortcut))
+            .setIntent(SurfaceChoices.intent(c,SurfaceChoices.route(Surface.SHORTCUT,s))).setRank(1).build()
+        return {
+            retireOpenAlias()
+            manager.enableShortcuts(ids)
+            manager.setDynamicShortcuts((listOf(info) + if(s.focus == null) listOf(chooser) else emptyList()).take(manager.maxShortcutCountPerActivity.coerceAtLeast(0)))
+            Unit
+        }
     }
     /** Prepare outside the store gate; publish only while the same shown revision/target is current.
      * The IO hop is inside this entry point, including the default view read. No global publication

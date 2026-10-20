@@ -164,11 +164,12 @@ object SurfaceViews {
         views.setInt(backgroundImageId,"setImageAlpha",(percent * 255 + 50) / 100)
     }
 
-    fun widget(c: Context, view: TrackerView, enabled: Boolean): RemoteViews = RemoteViews(c.packageName, R.layout.timer_widget).also { rv ->
+    fun widget(c: Context, view: TrackerView, enabled: Boolean, backgroundAlphaPercent: Int = 100): RemoteViews = RemoteViews(c.packageName, R.layout.timer_widget).also { rv ->
         val s = view.snapshot()
         val r = if (enabled) row(view.data, s)
             else Row(R.drawable.ic_stat_notai, R.color.widget_ink2, "Виджет выключен", "Включи его в настройках приложения", null, null, null)
         bind(c, rv, r, s, Surface.WIDGET)
+        widgetBackgroundAlpha(rv,R.id.widget_background,backgroundAlphaPercent)
     }
 }
 

@@ -158,6 +158,19 @@ class RoomScenariosTest: ScenarioContract() {
         }
         org.junit.Assert.assertEquals(view.data,tracker.data())
     }
+    @org.junit.Test fun widgetOpacityFadesOnlyTheDedicatedBackground() {
+        val context = RuntimeEnvironment.getApplication();val tracker = Tracker(createStore(),FakeClock())
+        for(percent in listOf(0,50,100)) {
+            val rendered = SurfaceViews.widget(context,tracker.view(),true,percent).apply(context,null)
+            val background = rendered.findViewById<android.widget.ImageView>(R.id.widget_background)
+            org.junit.Assert.assertEquals((percent * 255 + 50) / 100,background.imageAlpha)
+            org.junit.Assert.assertEquals(android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO,background.importantForAccessibility)
+            org.junit.Assert.assertFalse(background.isClickable);org.junit.Assert.assertFalse(background.isFocusable)
+            org.junit.Assert.assertEquals(1f,rendered.findViewById<android.view.View>(R.id.surface_title).alpha,0f)
+            org.junit.Assert.assertEquals(1f,rendered.findViewById<android.view.View>(R.id.surface_primary).alpha,0f)
+            org.junit.Assert.assertEquals(android.view.View.VISIBLE,rendered.findViewById<android.view.View>(R.id.surface_primary).visibility)
+        }
+    }
     @org.junit.Test fun timerChannelCapabilityObservesMinAndPreservesExistingChannel() {
         val context = RuntimeEnvironment.getApplication()
         val manager = context.getSystemService(android.app.NotificationManager::class.java)

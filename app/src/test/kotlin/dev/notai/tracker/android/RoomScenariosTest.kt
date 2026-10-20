@@ -142,26 +142,46 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertEquals(beforeFocusTap,tracker.data())
     }
     @org.junit.Test fun lockScreenPolicyKeepsFullTimerOnlyForExplicitPublicPresentation() {
-        val context = RuntimeEnvironment.getApplication();val tracker = Tracker(createStore(),FakeClock())
+        val context = RuntimeEnvironment.getApplication();val clock = FakeClock();var tracker = Tracker(createStore(),clock)
         tracker.start(tracker.snapshot().token,Classification(name = "Private activity"))
-        val view = tracker.view()
-        val privateNotice = SurfaceViews.notification(context,view)
-        org.junit.Assert.assertEquals(android.app.Notification.VISIBILITY_PRIVATE,privateNotice.visibility)
-        org.junit.Assert.assertNotNull(privateNotice.publicVersion)
-        org.junit.Assert.assertEquals("Учёт идёт",privateNotice.publicVersion.extras.getCharSequence(android.app.Notification.EXTRA_TITLE))
-        for(visibility in listOf(android.app.Notification.VISIBILITY_PUBLIC,android.app.Notification.VISIBILITY_SECRET)) {
-            val notice = SurfaceViews.notification(context,view,visibility)
-            org.junit.Assert.assertEquals(visibility,notice.visibility)
-            org.junit.Assert.assertNull(notice.publicVersion)
+        for(policy in listOf(null,NotificationPrivacy.PRIVATE,NotificationPrivacy.FULL,NotificationPrivacy.HIDDEN)) {
+            tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(notification = true,notificationPrivacy = policy)))
+            tracker = Tracker(reopen(tracker.store),clock)
+            val before = tracker.data();val view = tracker.view()
+            val notice = TimerSurfaces.notification(context,view)
+            val expected = when(policy) {
+                NotificationPrivacy.FULL -> android.app.Notification.VISIBILITY_PUBLIC
+                NotificationPrivacy.HIDDEN -> android.app.Notification.VISIBILITY_SECRET
+                else -> android.app.Notification.VISIBILITY_PRIVATE
+            }
+            org.junit.Assert.assertEquals(expected,notice.visibility)
+            if(expected == android.app.Notification.VISIBILITY_PRIVATE) {
+                org.junit.Assert.assertNotNull(notice.publicVersion)
+                org.junit.Assert.assertEquals("Учёт идёт",notice.publicVersion.extras.getCharSequence(android.app.Notification.EXTRA_TITLE))
+            } else org.junit.Assert.assertNull(notice.publicVersion)
             org.junit.Assert.assertNotNull(notice.contentView)
             org.junit.Assert.assertEquals(view.snapshot().safeLabel,notice.extras.getCharSequence(android.app.Notification.EXTRA_TEXT))
+            org.junit.Assert.assertEquals(before,tracker.data())
         }
-        org.junit.Assert.assertEquals(view.data,tracker.data())
+        // Explicit full content never bypasses the runtime notification permission gate.
+        tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(notification = true,notificationPrivacy = NotificationPrivacy.FULL)))
+        val app = org.robolectric.Shadows.shadowOf(context)
+        app.grantPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+        kotlinx.coroutines.runBlocking { TimerSurfaces.refresh(context,tracker) }
+        val manager = context.getSystemService(android.app.NotificationManager::class.java)
+        org.junit.Assert.assertTrue(manager.activeNotifications.any { it.id == TimerSurfaces.CONTROL_ID })
+        app.denyPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+        val beforeDeniedRefresh = tracker.data()
+        kotlinx.coroutines.runBlocking { TimerSurfaces.refresh(context,tracker) }
+        org.junit.Assert.assertTrue(manager.activeNotifications.none { it.id == TimerSurfaces.CONTROL_ID })
+        org.junit.Assert.assertEquals(beforeDeniedRefresh,tracker.data())
     }
     @org.junit.Test fun widgetOpacityFadesOnlyTheDedicatedBackground() {
-        val context = RuntimeEnvironment.getApplication();val tracker = Tracker(createStore(),FakeClock())
+        val context = RuntimeEnvironment.getApplication();val clock = FakeClock();var tracker = Tracker(createStore(),clock)
         for(percent in listOf(0,50,100)) {
-            val rendered = SurfaceViews.widget(context,tracker.view(),true,percent).apply(context,null)
+            tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(widget = true,widgetBackgroundAlphaPercent = percent)))
+            tracker = Tracker(reopen(tracker.store),clock)
+            val rendered = TimerSurfaces.widget(context,tracker.view(),true).apply(context,null)
             val background = rendered.findViewById<android.widget.ImageView>(R.id.widget_background)
             org.junit.Assert.assertEquals((percent * 255 + 50) / 100,background.imageAlpha)
             org.junit.Assert.assertEquals(android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO,background.importantForAccessibility)
@@ -754,7 +774,11 @@ class RoomScenariosTest: ScenarioContract() {
         val switchRoute = SurfaceChoices.route(Surface.NOTIFICATION,tracker.snapshot())
         org.junit.Assert.assertEquals(ChoiceApplication.SWITCH,switchRoute.application)
         val first = tracker.snapshot().session!!.id
-        SurfaceChoices.choose(context,tracker,switchRoute,SurfaceChoices.read(tracker,switchRoute).choices.single().reference)
+        org.junit.Assert.assertTrue(SurfaceChoices.read(tracker,switchRoute).choices.isEmpty())
+        // An explicit same-activity switch remains available through the full catalog.
+        val catalogChoices = tracker.view().choices()
+        val sameActivity = catalogChoices.search(ChoiceQuery(kinds = setOf(ChoiceKind.FAVORITE))).items.single().entry
+        SurfaceChoices.choose(context,tracker,switchRoute,catalogChoices.reference(sameActivity))
         org.junit.Assert.assertNotEquals(first,tracker.snapshot().session!!.id)
         clock.advance(1_000)
         val overlay = SurfaceAction(Surface.OVERLAY,TimerCommand.STOP,tracker.snapshot().token,tracker.snapshot().timerTarget)

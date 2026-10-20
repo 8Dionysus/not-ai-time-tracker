@@ -71,6 +71,7 @@ class FloatingTimerService : Service() {
     private val snapshot = mutableStateOf<Snapshot?>(null)
     private val assignment = mutableStateOf<OverlayAssignment?>(null)
     private val busy = mutableStateOf(false)
+    private val chooserBackgroundAlpha = mutableStateOf(1f)
     private val windows get() = getSystemService(WindowManager::class.java)
     private val prefs get() = getSharedPreferences("overlay", Context.MODE_PRIVATE)
     private val permissionWatcher = AppOpsManager.OnOpChangedListener { _, _ ->
@@ -98,6 +99,7 @@ class FloatingTimerService : Service() {
                 t.views.collect { view ->
                     if (!view.data.settings.surfaces.overlay || !TimerSurfaces.overlayAllowed(this@FloatingTimerService)) { stopSelf(); return@collect }
                     val s = view.snapshot()
+                    chooserBackgroundAlpha.value = view.data.settings.surfaces.overlayChooserBackgroundAlphaPercent / 100f
                     snapshot.value = s
                     // Any later timer transition invalidates the receipt; the card goes with it.
                     assignment.value?.let { a -> if (a.route.target != s.timerTarget) hidePanel() }
@@ -190,7 +192,7 @@ class FloatingTimerService : Service() {
         val zone = runCatching { java.time.ZoneId.of(d.settings.reportZone) }.getOrDefault(java.time.ZoneId.systemDefault())
         val segments = d.segments.filter { it.sessionId == session.id }
         val range = segments.minOfOrNull { it.start }?.let { a -> Format.range(a, segments.mapNotNull { it.end }.maxOrNull() ?: a, zone) }
-        val choices = state.choices.filter { it.entry.canStart && !d.label(it.entry.selection).unclassified }.take(6).map { q ->
+        val choices = state.choices.take(6).map { q ->
             val l = d.label(q.entry.selection)
             OverlayChoice(q, if (q.entry.kind == ChoiceKind.FAVORITE) q.entry.title else l.title, l.glyph, l.slot)
         }
@@ -207,7 +209,7 @@ class FloatingTimerService : Service() {
             setContent {
                 val theme = remember { runCatching { ThemeChoice.valueOf(getSharedPreferences("ui", Context.MODE_PRIVATE).getString("theme", "SYSTEM")!!) }.getOrDefault(ThemeChoice.SYSTEM) }
                 NotAiTheme(theme) {
-                    assignment.value?.let { a -> AssignmentCard(a, onChoose = ::choose, onLeave = { dismiss(leave = true) }) }
+                    assignment.value?.let { a -> AssignmentCard(a, onChoose = ::choose, onLeave = { dismiss(leave = true) }, backgroundAlpha = chooserBackgroundAlpha.value) }
                 }
             }
         }

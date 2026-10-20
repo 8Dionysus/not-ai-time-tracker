@@ -92,10 +92,9 @@ object SurfaceViews {
         if (s.focus != null || s.mode == Mode.RECOVERY) return null
         val route = runCatching { SurfaceChoices.route(Surface.NOTIFICATION, s) }.getOrNull() ?: return null
         val end = minOf(MAX_TIME, System.currentTimeMillis() + 1)
-        val current = s.session?.selection?.let(::selectionIdentity)
-        // An unlabelled record is not a choice: "start without activity" is the main button already.
-        val items = runCatching { view.choices().quick(HistoryWindow(maxOf(0L, end - 30L * 24 * 60 * 60 * 1000), end), 8) }.getOrDefault(emptyList())
-            .filter { it.entry.canStart && selectionIdentity(it.entry.selection) != current && !d.label(it.entry.selection).unclassified }.take(chips.size)
+        // Shared core projection excludes the current selection before the compact limit.
+        val excluded = if(route.application == ChoiceApplication.SWITCH) s.session?.selection else null
+        val items = runCatching { view.choices().quick(HistoryWindow(maxOf(0L, end - 30L * 24 * 60 * 60 * 1000), end), chips.size, excluded) }.getOrDefault(emptyList())
             .map { q ->
                 val l = d.label(q.entry.selection)
                 val tint = l.slot?.let { areaColors[it] } ?: R.color.widget_ink2
@@ -132,11 +131,17 @@ object SurfaceViews {
         return small to big
     }
 
-    /** Android presentation boundary; the persisted policy is mapped by the caller.
+    internal fun notificationVisibility(policy: NotificationPrivacy?): Int = when(policy) {
+        null, NotificationPrivacy.PRIVATE -> Notification.VISIBILITY_PRIVATE
+        NotificationPrivacy.FULL -> Notification.VISIBILITY_PUBLIC
+        NotificationPrivacy.HIDDEN -> Notification.VISIBILITY_SECRET
+    }
+
+    /** Android presentation boundary; the default comes from the saved surface policy.
      * PUBLIC retains the full row/actions/chronometer, PRIVATE supplies only a redacted public
      * version, SECRET requests no lock-screen content. System/user channel policy remains final.
      */
-    fun notification(c: Context, view: TrackerView, lockScreenVisibility: Int = Notification.VISIBILITY_PRIVATE): Notification {
+    fun notification(c: Context, view: TrackerView, lockScreenVisibility: Int = notificationVisibility(view.data.settings.surfaces.notificationPrivacy)): Notification {
         require(lockScreenVisibility in setOf(Notification.VISIBILITY_PUBLIC,Notification.VISIBILITY_PRIVATE,Notification.VISIBILITY_SECRET))
         TimerSurfaces.channels(c)
         val s = view.snapshot()
@@ -164,7 +169,7 @@ object SurfaceViews {
         views.setInt(backgroundImageId,"setImageAlpha",(percent * 255 + 50) / 100)
     }
 
-    fun widget(c: Context, view: TrackerView, enabled: Boolean, backgroundAlphaPercent: Int = 100): RemoteViews = RemoteViews(c.packageName, R.layout.timer_widget).also { rv ->
+    fun widget(c: Context, view: TrackerView, enabled: Boolean, backgroundAlphaPercent: Int = view.data.settings.surfaces.widgetBackgroundAlphaPercent): RemoteViews = RemoteViews(c.packageName, R.layout.timer_widget).also { rv ->
         val s = view.snapshot()
         val r = if (enabled) row(view.data, s)
             else Row(R.drawable.ic_stat_notai, R.color.widget_ink2, "Виджет выключен", "Включи его в настройках приложения", null, null, null)

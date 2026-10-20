@@ -1,106 +1,65 @@
-# Wave B Android checkpoint (2026-10-20)
+# Wave B final Android source bindings (2026-10-20)
 
-Base: `652a63ad332ccd64c82013bbb2a7f09c06c700b7`. Separate branch `wave-b-android-surfaces`.
-This is an independent platform checkpoint, not acceptance of the entire B package.
-No core, TrackerViewModel, manifest, layout XML, theme or Compose layout was changed.
-No `.agents/skills` directory exists in this checkout; repository AGENTS.md was read.
+Binding base: A checkpoint `9d90830800822891b21ea6b67f715737afa4d545`, which already incorporates B through `d6a26ac6d7a1b8398b3befd4572c0dccb882580e`. Original main base remains `652a63ad332ccd64c82013bbb2a7f09c06c700b7`.
 
-## Implemented
+Final B binding branch: `wave-b-android-bindings`, created directly from exact A checkpoint so the integrator can cherry-pick one binding commit. The older `wave-b-android-surfaces` remains the independent checkpoint history. No core, TrackerViewModel, archive, migration or manifest changes were made in this binding commit. No other repositories or AbyssPC were used; no additional agents were launched.
 
-- Static `open_timer` MAIN alias removed from shortcut metadata; refresh retires retained pinned copies. Ordinary application tap is unchanged.
-- Existing dynamic `timer_action` remains the only command path, with the original shown target/token. New `timer_choose` opens the existing SurfaceChoices route (no second command implementation), respects launcher count, shortcut opt-out and immutable timer target. Focus only offers the existing primary action and explicitly disables retained pinned chooser entries; recovery withdraws both actions. Entries omitted by launcher limits are also disabled, with timer_action first.
-- SurfaceChoices accepts SHORTCUT and gates application on the persisted shortcut preference and absence of Focus inside the existing Tracker action. Old routes do not retarget a new timer.
-- SurfaceSettingsBackend exposes `timerNotification`: observed importance, requested status-bar icon behavior and channel lock-screen visibility, plus `OPEN_TIMER_CHANNEL_SETTINGS` for the existing control channel. No channel migration, importance rewriting, icon substitution or overlay FGS suppression.
-- Notification full chooser remains available even when compact quick suggestions are empty.
-- FloatingTimerService exposes `openAssignmentChooser()`: explicit UI callback opens the existing route with the original assignment receipt/target, hides only the overlay panel, and does not cancel that receipt. Opus must bind its visible action.
-- BackupDocuments documents the actual full-copy/restore contract below.
+## Applied A contract
 
-## A integration contract pending (not implemented in this checkpoint)
+- `SurfaceSettings.notificationPrivacy: NotificationPrivacy?`: null and PRIVATE render Android PRIVATE with a redacted publicVersion; FULL renders PUBLIC with the complete existing row/actions/chronometer; HIDDEN renders SECRET without a publicVersion. Production `TimerSurfaces.notification` reaches this saved default through SurfaceViews; an explicit adapter argument remains available for previews.
+- `widgetBackgroundAlphaPercent` defaults100 and binds to the dedicated background ImageView through setImageAlpha. Text/buttons, row clicks and the rest of the widget remain opaque. Production TimerSurfaces.widget uses the saved default.
+- `overlayChooserBackgroundAlphaPercent / 100f` is observed from Tracker.views into Compose state. AssignmentCard applies it only to its existing raised background, so saved edits/reset update an open panel without fading text or the WindowManager window.
+- Core validates both integer percentages in0..100. Opus resets the three presentation fields through existing `vm.setSurfaces { it.copy(notificationPrivacy = null, widgetBackgroundAlphaPercent = 100, overlayChooserBackgroundAlphaPercent = 100) }`, retaining unrelated opt-ins/settings. No preferences sidecar or theme engine.
+- SurfaceViews notification quick choices and SurfaceChoices picker use the shared `quick(window, limit, excludeSelection)` order. Current selection is excluded BEFORE limit for SWITCH. START and stopped assignment pass null. Overlay assignment consumes the same ordered prefix without a second filter/ranking.
+- An explicit same-activity switch remains available in the full catalog; the existing Android contract regression now resolves its reference from full favorites instead of expecting the current activity in a compact switch list.
 
-A alone owns core and TrackerViewModel. No new core API was created here.
+A owns full JSON15 (`CURRENT_BACKUP_FORMAT`), old1–14 defaults, both-reader validation and roundtrip. Full copies retain presentation settings; restored values neither grant Android permissions nor rewrite system channels. Old user JSON documents are not rewritten. Old APKs are not promised to read JSON15. CSV is unchanged.
 
-Frozen root contract (supersedes initial proposal):
-- nullable privacy: null preserves legacy PRIVATE; explicit PRIVATE/FULL/HIDDEN.
-- widgetBackgroundAlphaPercent and overlayChooserBackgroundAlphaPercent: Int 0..100, defaults100. Reset only these presentation fields through Tracker.settings, preserving delivery opt-ins and unrelated settings.
-- No persisted status-icon flag: observe/control existing timer_controls via Android system settings. MIN requests drawer-only presentation; LOW requests status-bar icon. NONE blocks delivery; OEM/user policy remains final.
-- Full JSON explicitly advances to15. New readers retain1..14 with defaults; old documents are not rewritten. An old APK is not promised to read new15. CSV remains unchanged; no sidecar/new preferences store.
+## Inherited independent B platform work
 
-Exact A enum/property source is still pending. B's Android presentation adapters are ready: SurfaceViews.notification(context,view,visibility) accepts PUBLIC/PRIVATE/SECRET with PRIVATE default; AssignmentCard accepts validated backgroundAlpha=1f applied only to raised background. The eventual caller maps saved percentages to Float by /100f. No FGS for timer, fullscreen intent or per-second worker.
+- Static open_timer MAIN alias removed; retained pinned copies retired. Normal app tap unchanged.
+- Existing dynamic timer_action is the sole start/pause/resume command path. Dynamic timer_choose uses the existing SurfaceChoices target/route. Opt-out/recovery withdraw both. Focus and launcher-count omission explicitly disable retained pinned chooser copies; the transaction permission callback also rejects chooser application during Focus. timer_action is first when count is limited. No retargeting stale actions to a new timer.
+- SurfaceSettingsBackend exposes actual timer_controls importance, requested status-bar behavior and channel lock-screen visibility, plus OPEN_TIMER_CHANNEL_SETTINGS. MIN requests no status-bar icon while retaining a normal drawer notification. App/system permission and user channel settings remain final. No channel migration, locked-channel rewriting or transparent icon. Overlay FGS indicator remains separate and mandatory.
+- Notification full chooser remains reachable when compact suggestions are empty.
+- `FloatingTimerService.openAssignmentChooser()` transfers the original assignment route/receipt into the app and hides only the panel. A's full-picker routing retains that route and assignmentId; there is no ASSIGN enum and no conversion to generic START/SWITCH.
+- The exact root-authorized WIDGET_ALPHA_BINDING.patch is applied to timer_widget.xml. Existing24dp shape/color, provider sizes, row/actions and16/10/8/8dp content padding are unchanged. The background ImageView is noninteractive and excluded from accessibility. The patch remains as an applied recipe, not an outstanding task.
 
-A candidate `ChoiceView.quick(window, limit, excludeSelection: Classification? = null)` excludes current identity BEFORE limit, retaining shared favorite order. Still pending exact final API/source: replace SurfaceViews' current post-limit filtering and pass explicit current selection for switch pickers. Assignment-after-stop must not exclude the stopped activity. No separate ranking.
+## Existing full SAF copy and restore contract
 
-## Existing SAF full JSON contract (verified by reading current source)
+`requestExport(false)` -> prepareBackup -> private ExportOperations.prepare { Backups.write(it) } -> MainActivity CreateDocument -> owner-checked receiveDocumentExportResult -> ExportOperations.write(uri).
 
-`TrackerViewModel.requestExport(false)` -> `prepareBackup()` -> `ExportOperations.begin(application/json, not-ai-backup-DATE.json)` -> private `prepare { Backups.write(it) }` -> MainActivity CreateDocument -> owner-checked `receiveDocumentExportResult` -> ExportOperations.write(uri).
+Backups captures a complete portable Dataset at one moment. CSV is a report, not a full copy. Private staging/database archives/rollback disappear on uninstall and must not be described as surviving user backups. A successful user-selected external SAF document remains while the user/provider retains it.
 
-Backups.write captures the complete portable Dataset at one moment. CSV is a report, not a full backup. Private staged files, database recovery archives and verified rollback are app-private and disappear on uninstall; they must never be described as a surviving user backup.
+ExportOperations verifies staged size/hash before writing, closes/flushes output, compares SHA-256 readback when the provider supports it, and reports verified=false for write-only providers. Mismatches fail and preserve staged bytes for retry. BackupInfo records timestamp/bytes/verification only after successful JSON write; it cannot prove future provider retention. Existing chooser ownership/cancellation handling remains.
 
-ExportOperations checks staged length/hash before provider write, closes/flushes output, reads the document back when supported and compares SHA-256. A mismatched readback fails and retains staged bytes for retry. A provider refusing readback yields verified=false, not a claim of verification. Cancellation and stale chooser-owner handling already exist. Last BackupInfo stores timestamp, byte count and verified status after successful JSON export. It does not retain a destination URI, and cannot prove future existence/provider durability.
+Restore uses user OpenDocument -> bounded staging -> Backups.prepare -> RestorePreview -> explicit apply. Preview alone does not replace facts. Apply checks the original token, saves/verifies rollback, then replaces atomically. Preview exposes incoming settings/counts/asOf and replacement consequence. Existing RestoreReviewOwner handles lifecycle.
 
-Restore: user OpenDocument -> bounded stage -> Backups.prepare -> RestorePreview (asOf, IDs, counts, unfinished tail/focus, settings, replacement consequence) -> explicit apply. Preview alone does not mutate Dataset. Backups.apply validates the original token, saves/verifies rollback, then replaces atomically. Closed/stale previews reject. Existing RestoreReviewOwner handles UI lifecycle.
+allowBackup=false and extraction exclusions remain; no cloud service/account/INTERNET, automatic export or system backup was introduced. A SAF provider may itself sync under its own policy.
 
-`allowBackup=false` and data extraction exclusions remain. No cloud service/account/INTERNET or automatic export was introduced. A user-selected SAF provider may itself sync, under its own retention/access policy. A user-owned external document survives app uninstall only while its provider/user retains it.
+## Exact Opus remainder
 
-## Exact Opus handoff
+- Bind privacy selector, percent sliders/preview/reset to existing saved SurfaceSettings/vm.setSurfaces; display the real channel capability and open its settings. Explain system privacy/POST_NOTIFICATIONS/channel/OEM limits and reduced prominence at MIN.
+- Bind visible overlay "all activities" action to openAssignmentChooser. Preserve A's route/assignmentId handling in the full picker. The functional routing fix is already A scope, not deferred redesign.
+- Styling, colors/contrast, typography, redundant app glyph inside custom notification layout, labels and broader visual changes remain Opus scope. SystemUI outer notification card/header/icon alpha is outside app control.
+- Present external JSON copy separately from CSV/private archives, show timestamp/verification, and retain explicit full-replacement restore confirmation.
 
-- Add lock-screen privacy selector and concise OS/channel/permission explanation, after A publishes the above contract. Full content is conditional on system privacy, POST_NOTIFICATIONS, enabled app/channel and OEM lock-screen policy.
-- Bind `OPEN_TIMER_CHANNEL_SETTINGS`; display actual importance/capability. Explain MIN may reduce lock-screen prominence. Preserve mandatory overlay foreground-service indicator.
-- Bind alpha slider/preview/reset to A's settings; alter background only. Widget requires an owned background view/drawable ID: existing root shape cannot be faded with setAlpha without fading content. Opus owns that narrow visual binding/layout. Notification outer card/header/icon belong to SystemUI; remove redundant app glyph only inside custom layout if desired.
-- Bind overlay card "all activities" to `openAssignmentChooser()`. Preserve assignment route through full picker: current App.kt onAll cancels the surface picker and opens a general START/SWITCH picker, losing assignment ownership. Opus/A must carry route/ChoiceApplication.ASSIGN into full chooser and submit through SurfaceChoices.choose; never reinterpret assignment as START.
-- Labels/icons/layout remain Opus scope. Existing QuickPickSheet already provides full-picker entry for notification and launcher.
-- Present full external JSON backup separately from CSV/private archives; retain verification status and explain full replacement at restore preview. No new backend required for current SAF contract.
+## Checks and exact remaining verification
 
-## Checks and blockers
+Passed: git diff --check; widget/shortcut XML parsing; static widget assertions that original shape/color, include attrs, padding, row/action resource and provider dimensions are unchanged; source mapping/caller review against exact A fields/API. Background is not focusable/clickable and is excluded from accessibility.
 
-`git diff --check`: passed. Shortcut XML parsed as XML. Manual caller-chain review performed.
-Added three narrow existing RoomScenariosTest cases: launcher chooser replay/opt-out/Focus withdrawal; MIN channel observation/preservation; explicit PUBLIC/PRIVATE/SECRET notification presentation. Existing shortcut publication checks now select timer_action by ID, covering two entries without weakening state assertions.
+Four narrow existing RoomScenariosTest cases cover: launcher chooser replay/opt-out/Focus; real MIN channel preservation/capability; persisted privacy after Room reopen with FULL permission-denial fallback; persisted widget alpha after reopen with foreground/actions preserved. Existing TimerSurfaceRaceTest now selects timer_action by ID, retaining its state assertions. A's shared tests cover ordered core projection and archive persistence; they are not duplicated here.
 
-Compile/tests NOT RUN: default Gradle home is outside writable roots; retried with GRADLE_USER_HOME=/workspace/.gradle-wave-b. Wrapper cannot resolve services.gradle.org (UnknownHostException), no Gradle distribution or Android SDK was found in standard locations. No emulator/OEM/device claims. No lint/APK evidence.
+Android compile, Robolectric, lint, APK, emulator/OEM/TalkBack runtime checks NOT RUN by B. No SDK found in inspected standard paths; B's Gradle cache contains only the interrupted wrapper download (services.gradle.org DNS failure). A independently demonstrated Gradle/core execution using its environment proxy, but its normal project configuration also lacks SDK. No repeated unchanged download or network/security change was attempted. No tracked .github/workflows or other CI exists on verified main; main PR workflow lookup was empty.
 
-Required next checks in an equipped environment: :app:compileDebugKotlin; RoomScenariosTest.lockScreenPolicyKeepsFullTimerOnlyForExplicitPublicPresentation; RoomScenariosTest.launcherChooserUsesExistingTargetAndRejectsReplayAfterNewTimer; RoomScenariosTest.timerChannelCapabilityObservesMinAndPreservesExistingChannel; RoomScenariosTest.shortcutDisableWithdrawsMutableEntriesAndGatesRetainedActionsAfterReopen; RoomScenariosTest.surfaceActions; TimerSurfaceRaceTest. Add privacy/alpha persistence regression only after A freezes fields, and ordered quick regression in A's existing shared scenario.
+Equipped-environment verification path: Java21 + Gradle8.13 + SDK platform36/AGP8.11.1 and the repository's declared NDK30.0.16248370; run `:app:compileDebugKotlin`, then targeted RoomScenariosTest methods lockScreenPolicyKeepsFullTimerOnlyForExplicitPublicPresentation, widgetOpacityFadesOnlyTheDedicatedBackground, timerChannelCapabilityObservesMinAndPreservesExistingChannel, launcherChooserUsesExistingTargetAndRejectsReplayAfterNewTimer, backendPickerWidgetAndOverlayContracts, shortcutDisableWithdrawsMutableEntriesAndGatesRetainedActionsAfterReopen and TimerSurfaceRaceTest. Build/lint/APK scope remains distinct from JVM checks. A's full-picker routing regression remains its integration check.
+
+Android12 launcher rounding stays system-controlled. No opt-out/clip flags, geometry changes or new corner content were added; the original24dp shape can still be cropped by a launcher. Transparent backgrounds may affect host background detection. No device/OEM geometry guarantee is claimed.
 
 ## Official sources read
 
-- https://developer.android.com/develop/ui/compose/notifications/channels — immutable channel behavior after creation; user settings; MIN requests no status-bar appearance; channel settings intent.
-- https://developer.android.com/design/ui/mobile/guides/home-screen/notifications — system presentation and privacy constraints.
-- https://developer.android.com/develop/ui/views/notifications/custom-notification — decorated custom views retain system notification controls/header.
-- https://developer.android.com/training/data-storage/shared/documents-files — user-selected SAF document storage and one-shot access.
-- https://developer.android.com/training/data-storage/app-specific — app-specific files are removed on uninstall.
-
-
-## Follow-up source review after checkpoint
-
-The existing presentation theme is private SharedPreferences("ui"). It is not part of full JSON backup. The proposed privacy/alpha fields belong in existing serializable SurfaceSettings, not this private theme store. Validate finite Float values in 0f..1f in validate(Dataset); absent legacy fields default to PRIVATE/1f/1f. Backups already serializes Settings and RestorePreview.settings exposes the incoming values; explicit whole-copy restore can carry them. Reset only these fields via Tracker.settings, preserving delivery opt-ins and unrelated settings. Exact A field names/source remain pending.
-
-No tracked .github/workflows or alternate CI configuration exists on the verified main. No existing CI was available to dispatch. Compile requires a pre-provisioned Gradle 8.13 distribution and Android SDK36/declared NDK, then the previously listed Gradle commands; network/security settings were not changed and no repeated unchanged download was attempted.
-
-Root assigned the full-picker assignment routing fix exclusively to A, so the receipt loss is a required functional integration fix, not deferred visual redesign.
-
-
-## Prepared presentation adapters (persistence binding still pending A)
-
-SurfaceViews.notification(context, view, lockScreenVisibility) now accepts only Android PUBLIC/PRIVATE/SECRET values. PRIVATE is the legacy default and supplies the redacted publicVersion. PUBLIC uses the complete existing custom timer/actions/chronometer; SECRET requests hidden lock-screen content. This is not yet connected to persisted policy fields. Added one focused existing RoomScenariosTest case for the three presentation values; not run due the build dependency described above.
-
-AssignmentCard accepts backgroundAlpha=1f and applies it only to the current raised background color, with finite/range validation. Foreground content and WindowManager window alpha are unchanged. The caller awaits A's saved field. This is a single background binding, with no layout redesign.
-
-The widget currently has no background view ID. A foreground ImageView behind the existing row (owned by Opus) with setImageAlpha would allow RemoteViews alpha without fading text; the existing root drawable cannot be altered that way through RemoteViews. A narrow binding/resource change must be assigned before that source application can be completed.
-
-Because codec.encodeDefaults=true, use EncodeDefault(NEVER) for added defaulted fields to preserve legacy default JSON output; old archives default the absent fields, unknown enum/invalid alpha rejects rather than silently resetting. Whole-copy restore exposes values through RestorePreview.settings before confirmation.
-
-
-## Frozen root decision superseding the earlier proposal
-
-Persisted writer A owns nullable privacy (null preserves legacy PRIVATE; non-null PRIVATE/FULL/HIDDEN), widgetBackgroundAlphaPercent and overlayChooserBackgroundAlphaPercent as Int 0..100 with default100. Full archive advances explicitly to15; new readers retain1..14 defaults. Old JSON documents are not rewritten, CSV is unchanged. Do not claim an old APK can read new15. No rights/channel consent is restored by these values.
-
-A still needs to publish exact enum/property source before B binds it; current remote A branch was still the base when this adapter checkpoint was prepared. No shared files were changed by B.
-
-`WIDGET_ALPHA_BINDING.patch` is a concrete proposed narrow XML binding, NOT applied to the Opus-owned layout: existing shape becomes a background ImageView behind the unchanged padded row. `SurfaceViews.widgetBackgroundAlpha` accepts that view ID and percent, then uses setImageAlpha (0..255) on that background only. No bitmap allocation or universal theme engine. The layout owner/root must accept/apply the patch before the binding is invoked by widget().
-
-
-## Widget layout binding applied with root authorization
-
-The exact WIDGET_ALPHA_BINDING.patch is now applied to timer_widget.xml. SurfaceViews.widget(context,view,enabled,backgroundAlphaPercent=100) invokes the dedicated ImageView binding. Existing TimerSurfaces caller uses the default until A fields are present. No geometry or provider-size changes: original24dp GradientDrawable/color source, row XML, provider XML, include attributes and16/10/8/8dp content padding are unchanged. Static XML assertions passed. The added background ImageView is not clickable/focusable and is excluded from accessibility; existing row/actions remain foreground siblings. One focused RemoteViews regression checks background-only alpha and foreground/action preservation; not yet executed.
-
-Android12 launcher rounding is still system-controlled: no opt-out/clip flags, replacement radius, sizing or corner content was introduced. The shape retains its original corners and can still be cropped by the launcher. Transparent backgrounds can affect automatic background detection, so no OEM/host visual guarantee is claimed without a device. Sources: https://developer.android.com/about/versions/12/features/widgets and https://developer.android.com/develop/ui/views/appwidgets/enhance .
-
-The proposed-patch status above is historical; root explicitly authorized this exact narrow binding. Remaining A source bindings: privacy at notification caller; widget alpha percent at TimerSurfaces.widget; overlay chooser percent at AssignmentCard caller; quick(excludeSelection) before limit. Root retains A ownership of full-picker assignment routing.
+- https://developer.android.com/develop/ui/compose/notifications/channels — immutable channel behavior after creation, MIN, user control and channel settings intent.
+- https://developer.android.com/design/ui/mobile/guides/home-screen/notifications — presentation/privacy constraints.
+- https://developer.android.com/develop/ui/views/notifications/custom-notification — decorated custom views retain system notification presentation.
+- https://developer.android.com/training/data-storage/shared/documents-files — user-selected SAF documents.
+- https://developer.android.com/training/data-storage/app-specific — uninstall removes app-specific files.
+- https://developer.android.com/about/versions/12/features/widgets and https://developer.android.com/develop/ui/views/appwidgets/enhance — launcher rounding/presentation ownership.

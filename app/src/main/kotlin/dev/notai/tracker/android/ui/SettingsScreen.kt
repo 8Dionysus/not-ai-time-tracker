@@ -256,6 +256,36 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
 
         SettingsPage.FOCUS -> {
             settings?.focusPlan?.let { plan -> FocusGroup(vm, (plan.workMs / 60_000L).toInt(), (plan.breakMs / 60_000L).toInt()) }
+            val fx by vm.focusEffects.collectAsStateWithLifecycle()
+            val audio = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) vm.chooseFocusAudio(uri) }
+            val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current
+            DisposableEffect(lifecycle) {
+                val obs = androidx.lifecycle.LifecycleEventObserver { _, e -> if (e == androidx.lifecycle.Lifecycle.Event.ON_RESUME) vm.refreshFocusEffects() }
+                lifecycle.lifecycle.addObserver(obs); onDispose { lifecycle.lifecycle.removeObserver(obs) }
+            }
+            Group("Во время отрезка работы") {
+                val needAccess = fx.choice.dnd && !fx.dndAccess
+                SettingRow(rememberVectorPainter(Icon.Moon), "Не беспокоить",
+                    status = when {
+                        !fx.dndSupported -> "Нужен Android 10 или новее"
+                        needAccess -> "Включено, но телефон ещё не разрешил приложению режим «Не беспокоить»"
+                        else -> "Телефон затихнет на отрезок работы и вернётся сам, даже если приложение закрыто. Исключения — по твоим правилам «Не беспокоить»"
+                    }, warn = needAccess,
+                    action = if (needAccess) "Разрешить" to { runCatching { context.startActivity(android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) } } else null,
+                    checked = fx.choice.dnd && fx.dndSupported) { on ->
+                    if (!fx.dndSupported) return@SettingRow
+                    vm.setFocusEffects { it.copy(dnd = on) }
+                    if (on && !fx.dndAccess) runCatching { context.startActivity(android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) }
+                }
+                Divider()
+                SettingRow(rememberVectorPainter(Icon.Note), "Свой звук",
+                    status = fx.choice.musicName?.let { "«$it». Играет по кругу, пока приложение открыто" }
+                        ?: "Шум, дождь или музыка из твоего файла. Играет, пока приложение открыто",
+                    warn = false, action = (if (fx.choice.musicId == null) "Выбрать файл" else "Другой файл") to { audio.launch(arrayOf("audio/*")) },
+                    checked = fx.choice.music && fx.choice.musicId != null) { on ->
+                    if (on && fx.choice.musicId == null) audio.launch(arrayOf("audio/*")) else vm.setFocusEffects { it.copy(music = on) }
+                }
+            }
             Group("Сигналы") {
                 val f = caps?.focusSignal
                 SettingRow(painterResource(R.drawable.act_focus), "Сигнал Фокуса",

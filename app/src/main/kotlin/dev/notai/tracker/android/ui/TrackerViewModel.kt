@@ -1162,6 +1162,24 @@ class TrackerViewModel internal constructor(private val app: Application,private
         applying.invokeOnCompletion { releaseRestorePreviewOnIo(preview) }
     }
 
+    // What a Focus work interval does to the phone. Device-local; the core controller applies and releases it.
+    data class FocusEffectsUi(val choice: dev.notai.tracker.android.FocusEffects.Choice, val dndAccess: Boolean, val dndSupported: Boolean)
+    private val _focusEffects = MutableStateFlow(FocusEffectsUi(dev.notai.tracker.android.FocusEffects.read(app),
+        dev.notai.tracker.android.FocusEffects.dndAccess(app), dev.notai.tracker.android.FocusEffects.dndSupported()))
+    val focusEffects: StateFlow<FocusEffectsUi> = _focusEffects
+    fun refreshFocusEffects() { _focusEffects.value = FocusEffectsUi(dev.notai.tracker.android.FocusEffects.read(app),
+        dev.notai.tracker.android.FocusEffects.dndAccess(app), dev.notai.tracker.android.FocusEffects.dndSupported()) }
+    fun setFocusEffects(change: (dev.notai.tracker.android.FocusEffects.Choice) -> dev.notai.tracker.android.FocusEffects.Choice) {
+        dev.notai.tracker.android.FocusEffects.write(app, change(dev.notai.tracker.android.FocusEffects.read(app))); refreshFocusEffects()
+    }
+    fun chooseFocusAudio(uri: Uri) = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val name = runCatching { app.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)
+                ?.use { c -> if (c.moveToFirst()) c.getString(0) else null } }.getOrNull()
+            dev.notai.tracker.android.FocusEffects.importAudio(app, uri, name); refreshFocusEffects()
+        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice("Не удалось взять этот файл. Попробуй другой, до 64 МБ") }
+    }
+
     // Several records at once: choose them in the history, then give them one activity or note. Preview first, Undo after.
     private val _picked = MutableStateFlow<Set<String>>(emptySet())
     val picked: StateFlow<Set<String>> = _picked

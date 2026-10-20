@@ -233,8 +233,12 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 onClick = openTechnical)
             Divider()
             val types = view?.data?.types?.size ?: 0
-            NavRow(rememberVectorPainter(Icon.Layers), "Каталог занятий",
-                note = "${Format.plural(types, "занятие", "занятия", "занятий").replace(Regex("^(\\d)(\\d{3})"), "$1 $2")}, версия ${view?.data?.catalogVersion ?: "базовая"}. Нажми, чтобы проверить обновление",
+            val bundled by produceState<String?>(null) { value = vm.bundledCatalogVersion() }
+            val installed = view?.data?.catalogVersion
+            val update = bundled != null && installed != null && bundled != installed
+            NavRow(rememberVectorPainter(Icon.Layers), if (update) "Каталог занятий: есть обновление" else "Каталог занятий",
+                note = if (update) "Версия $bundled: понятные названия и разделы по местам. Твои названия и история останутся. Нажми, чтобы посмотреть"
+                    else "${Format.plural(types, "занятие", "занятия", "занятий").replace(Regex("^(\\d)(\\d{3})"), "$1 $2")}, версия ${installed ?: "базовая"}. Нажми, чтобы проверить обновление",
                 onClick = { scope.launch { busy = true; catalog = vm.prepareCatalog(); busy = false } })
         }
 
@@ -260,7 +264,8 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
         val r = p.report
         ConfirmDialog(if (r.added.isEmpty() && r.updated.isEmpty()) "Каталог уже актуален" else "Обновить каталог?",
             "Версия ${p.version}. Новых занятий: ${r.added.size}, уточнений: ${r.updated.size}" +
-                (if (r.conflicts.isNotEmpty()) ", расхождений со своими изменениями: ${r.conflicts.size}. Они требуют разбора в технической оболочке." else "."),
+                (if (r.conflicts.isNotEmpty()) ", расхождений со своими изменениями: ${r.conflicts.size}. Они требуют разбора в технической оболочке." else ".") +
+                (if (r.updated.isNotEmpty()) " Названия, которые ты менял сам, останутся твоими; прошлые записи не меняются." else ""),
             if (p.canApply && (r.added.isNotEmpty() || r.updated.isNotEmpty())) "Обновить" else null, { vm.applyCatalog(p); catalog = null }, { catalog = null })
     }
     if (appearanceSheet) AppearanceSheet(vm, onDismiss = { appearanceSheet = false })

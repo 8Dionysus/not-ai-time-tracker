@@ -19,6 +19,8 @@ interface UiBackend {
     val runtime: TrackerRuntime?
     /** Optional ordinary-timer check-in. Exists only with the real runtime unless a test supplies one. */
     val longRecord: dev.notai.tracker.LongRecordReminder? get() = runtime?.attention?.ordinary?.controller
+    /** The catalog this build ships with; null where no bundled catalog exists (screen tests). */
+    val bundledCatalogVersion: String? get() = runtime?.bundledCatalogVersion
     fun prepareCatalog(): CatalogPreview
     fun applyCatalog(preview: CatalogPreview): Tracker.Change
     fun submitShortcut(action: SurfaceAction): Deferred<Result<Tracker.Change>>

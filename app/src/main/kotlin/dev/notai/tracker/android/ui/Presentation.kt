@@ -120,8 +120,8 @@ object Areas {
 
     /** Everyday areas first, in this order; professional areas follow alphabetically. */
     val everyday = listOf(
-        "area.language_practice", "area.movement", "area.learning", "area.work", "area.reading", "area.writing", "area.media",
-        "area.creative", "area.leisure", "area.social", "area.household", "area.self_care", "area.food", "area.sleep",
+        "area.language_practice", "area.movement", "area.learning", "area.work", "area.reading", "area.writing", "area.media", "area.games",
+        "area.creative", "area.leisure", "area.outdoor_leisure", "area.social", "area.household", "area.self_care", "area.food", "area.sleep",
         "area.mobility", "area.errands", "area.caregiving", "area.civic_spiritual", "area.custom",
     )
 }

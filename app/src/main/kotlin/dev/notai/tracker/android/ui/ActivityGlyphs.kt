@@ -107,6 +107,7 @@ object ActivityGlyphs {
         "type:activity.mobility.waiting_in_trip:v1" to R.drawable.act_hourglass,
         "type:activity.mobility.walk_to_destination:v1" to R.drawable.act_steps,
         "type:activity.movement.cardio:v1" to R.drawable.act_cardio,
+        "type:activity.movement.exercise_snack:v1" to R.drawable.act_strength,
         "type:activity.movement.hike_training:v1" to R.drawable.act_mountain,
         "type:activity.movement.mobility:v1" to R.drawable.act_lotus,
         "type:activity.movement.sport_practice:v1" to R.drawable.act_ball,

@@ -108,7 +108,7 @@ class UiScreensTest {
         val work = card("Работа", "Сосредоточенная работа", "сосредоточенная")
         val sport = card("Тренировка", "Кардио", "кардио")
         val philosophy = card("Философия", "Сосредоточенная учёба", "чтение")
-        val reading = card("Чтение", "Читать книгу", "книга")
+        val reading = card("Чтение", "Книга", "книга")
         fun sel(c: Card, detail: String? = null) = t.selection(c.id).let { if (detail == null) it else it.copy(details = mapOf("activity" to detail)) }
         fun manual(d: LocalDate, h1: Int, m1: Int, h2: Int, m2: Int, s: Classification, note: String? = null) = t.manual(tok(), at(d, h1, m1), at(d, h2, m2), s, note)
         val week = listOf(
@@ -309,7 +309,7 @@ class UiScreensTest {
         val vm = render(seed())
         compose.onNodeWithText("Обзор").performClick()
         waitText("По областям")
-        waitText("Работа и проекты")
+        waitText("Работа")
         shot("05-overview", vm)
     }
 

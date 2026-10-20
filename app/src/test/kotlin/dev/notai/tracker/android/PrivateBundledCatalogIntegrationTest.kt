@@ -29,14 +29,14 @@ class PrivateBundledCatalogIntegrationTest {
             val captured = tracker.view();val plain = captured.choices()
             for((i,tag) in tags.withIndex()) {
                 val status = adapter.status(tag)
-                assertEquals(2385,status.entries);assertTrue(status.complete)
+                assertEquals(2386,status.entries);assertTrue(status.complete)
                 assertEquals(TranslationQuality.REVIEWED,status.quality);assertEquals(PackAvailability.AVAILABLE_OFFLINE,status.availability)
                 assertEquals(CatalogRightsStatus.SOURCE_RIGHTS_REVIEW_PENDING,status.manifest!!.rightsStatus);assertNull(status.manifest!!.license)
                 assertEquals(expected.size-i-1,adapter.health().unverifiedBundledPacks.size)
                 val payload = context.assets.open("catalog/locales/$tag/labels.json").bufferedReader().use { codec.decodeFromString<CatalogContentPayload>(it.readText()) }
                 val shown = adapter.getLocalizedCatalogEntries(keys,tag,captured.data)
                 assertEquals(payload.entries.map { it.text },shown.map { it.display });assertTrue(shown.all { !it.missing && !it.userOverride })
-                val labels = adapter.choiceLabels(tag,captured.data);assertEquals(1918,labels.translatedTypeCount);assertEquals(2490,labels.aliasCount)
+                val labels = adapter.choiceLabels(tag,captured.data);assertEquals(1919,labels.translatedTypeCount);assertEquals(2493,labels.aliasCount)
                 val view = plain.withCatalogLabels(labels)
                 val row = payload.entries.first { it.key.kind==CatalogContentKind.TYPE && it.text.label.length<=256 }
                 val query = ChoiceQuery(row.text.label,setOf(ChoiceKind.TYPE),includeArchived=true)

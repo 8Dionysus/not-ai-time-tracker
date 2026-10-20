@@ -2154,10 +2154,18 @@ abstract class ScenarioContract {
         val previous = java.util.zip.GZIPInputStream(requireNotNull(ScenarioContract::class.java.getResourceAsStream("/previous-runtime-catalog.json.gz")))
             .bufferedReader().use { codec.decodeFromString<VocabularyData>(it.readText()) }
         assertEquals(178,previous.types.zip(ready.vocabulary.types).count { (old,next) -> old.definition != next.definition })
-        assertEquals(3,previous.types.zip(ready.vocabulary.types).count { (old,next) -> old.name != next.name } +
-            previous.axes.zip(ready.vocabulary.axes).count { (old,next) -> old.name != next.name })
+        // Every renamed or moved entry is covered by an explicit reviewed step that accepts this older install.
+        val steps = codec.decodeFromString<List<CatalogEditorialRevision>>(java.io.File(System.getProperty("tracker.samples")).parentFile
+            .resolve("catalog/compatibility.json").readText()).associateBy { it.kind to it.id }
+        val renamed = previous.types.zip(ready.vocabulary.types).filter { (old,next) -> old.name != next.name }
+        assertTrue(renamed.size > 1800)
+        for((old,_) in renamed) assertTrue(sha256(old.name.toByteArray()) in steps.getValue("type" to old.id).let { listOfNotNull(it.previousDefaultNameSha256)+it.previousDefaultNameSha256s },old.id)
+        val moved = previous.types.zip(ready.vocabulary.types).filter { (old,next) -> old.parentId != next.parentId }
+        assertEquals(62,moved.size);assertTrue(moved.all { (old,_) -> steps.getValue("type" to old.id).parentMove })
+        assertEquals(1,previous.axes.zip(ready.vocabulary.axes).count { (old,next) -> old.name != next.name })
+        assertEquals(listOf("activity.movement.exercise_snack"),ready.vocabulary.types.drop(previous.types.size).map { it.id })
         for((old,next) in previous.types.zip(ready.vocabulary.types))
-            assertEquals(old,next.copy(name = old.name,definition = old.definition,researchOrigins = old.researchOrigins))
+            assertEquals(old,next.copy(name = old.name,definition = old.definition,parentId = old.parentId,researchOrigins = old.researchOrigins))
         for((old,next) in previous.axes.zip(ready.vocabulary.axes))
             assertEquals(old,next.copy(name = old.name,researchOrigins = old.researchOrigins))
         val legacy = Tracker(createStore(),clock)
@@ -2167,14 +2175,16 @@ abstract class ScenarioContract {
         legacy.saveFavorite(legacy.snapshot().token,Favorite(label = "Old favourite",selection = legacy.data().sessions.last().selection))
         legacy.saveType(legacy.snapshot().token,legacyType.copy(name = "My old title",archived = true,aliases = listOf("old local alias")))
         val oldData = legacy.data();val upgrade = CatalogImports(legacy) { ready }
-        val oldPreview = upgrade.prepare();assertTrue(oldPreview.canApply);assertTrue(oldPreview.report.added.isEmpty())
-        assertEquals(179,oldPreview.report.updated.size)
+        val oldPreview = upgrade.prepare();assertTrue(oldPreview.canApply)
+        assertEquals(listOf("activity.movement.exercise_snack"),oldPreview.report.added.map { it.id })
+        // The locally renamed type keeps its personal name, so its rename-only step leaves it as it is.
+        assertEquals(steps.size-1,oldPreview.report.updated.size)
         upgrade.apply(oldPreview)
         val expectedTypes = oldData.types.map { old ->
             val baseline = previous.types.find { it.id == old.id };val next = ready.vocabulary.types.find { it.id == old.id }
-            if(baseline == null || next == null) old else old.copy(definition = next.definition,
+            if(baseline == null || next == null) old else old.copy(definition = next.definition,parentId = next.parentId,
                 name = if(old.name == baseline.name) next.name else old.name)
-        }
+        }+ready.vocabulary.types.filter { next -> oldData.types.none { it.id == next.id } }
         val expectedAxes = oldData.axes.map { old ->
             val baseline = previous.axes.find { it.id == old.id };val next = ready.vocabulary.axes.find { it.id == old.id }
             if(baseline == null || next == null) old else old.copy(name = if(old.name == baseline.name) next.name else old.name)

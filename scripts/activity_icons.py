@@ -244,7 +244,7 @@ MAP = {
     "activity.software.database_work": "server", "activity.software.deploy": "server", "activity.software.incident": "shield",
     "activity.software.test_security": "shield", "activity.software.review_code": "code", "activity.software.specify": "article",
     # movement
-    "activity.movement.cardio": "cardio", "activity.movement.strength": "strength", "activity.movement.mobility": "lotus",
+    "activity.movement.cardio": "cardio", "activity.movement.strength": "strength", "activity.movement.exercise_snack": "strength", "activity.movement.mobility": "lotus",
     "activity.movement.hike_training": "mountain", "activity.movement.sport_practice": "ball",
     "group.leisure_sport.movement.a1.kardio_i_aerobnaya_rabota": "cardio",
     "group.leisure_sport.movement.a1.sila_i_fizpodgotovka": "strength",

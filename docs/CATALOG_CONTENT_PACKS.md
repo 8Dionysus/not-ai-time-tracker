@@ -10,8 +10,8 @@ Manifest fields (case-sensitive Kotlin enum names):
 {
   "schemaVersion": 1,
   "catalogId": "tracker.catalog",
-  "catalogRevision": "0.9.1.3",
-  "catalogSha256": "9efaea5313b40ed2ae762437450f1a69759bfdd1e5fe1bb28e7ca2f8f5dc36b3",
+  "catalogRevision": "0.9.2.0",
+  "catalogSha256": "aec8933181894f0c40679fe8a4b68b70083963d8b430785071efe275c03e156a",
   "localeTag": "es-419",
   "sourceLocaleTag": "ru",
   "release": "editorial-release-identifier",

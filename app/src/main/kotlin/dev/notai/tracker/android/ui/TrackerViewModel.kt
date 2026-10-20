@@ -747,7 +747,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         }.flatMap { it.items }.map { PickerItem(it.entry, d.label(it.entry.selection),reference = choices.reference(it.entry),expected = v.snapshot().token) }.toList()
         val roots = generateSequence(choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.ROOTS), pageSize = 100)) { p ->
             p.next?.let { choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.ROOTS), it, 100) }
-        }.flatMap { it.items }.filter { it.entry.availability == ChoiceAvailability.GROUP || d.types.any { t -> t.parentId == it.entry.sourceId } }.map { hit ->
+        }.flatMap { it.items }.filter { d.types.any { t -> t.parentId == it.entry.sourceId && !t.archived } }.map { hit ->
             val count = choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.CHILDREN, parentId = hit.entry.sourceId), pageSize = 1).total
             PickerItem(hit.entry, d.label(hit.entry.selection).copy(slot = Areas.slot(hit.entry.sourceId)), count,reference = choices.reference(hit.entry),expected = v.snapshot().token)
         }.toList()
@@ -847,7 +847,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val calendar = v.calendar(first, period.days)
         val window = calendar.window
         val rootIds = d.types.filter { it.parentId == null }.map { it.id }.toSet()
-        fun areaParts(report: Report): List<Pair<String?, Long>> = report.byType().filter { (k, ms) -> ms > 0 && (k == null || k in rootIds) }
+        fun areaParts(report: Report): List<Pair<String?, Long>> = report.byCurrentRoot(d.types).filter { (k, ms) -> ms > 0 && (k == null || k in rootIds) }
             .toList().sortedWith(compareBy({ Areas.slot(it.first) ?: 99 }, { it.first ?: "~" }))
         val names = d.types.associate { it.id to it.name }
         val areas = areaParts(window).sortedByDescending { it.second }.map { (id, ms) ->
@@ -923,7 +923,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         buildString {
             append(if (period == Period.DAY) "Сегодня, ${Format.dayMonth(today)}" else Format.period(first, today)).append('\n')
             append("Всего ").append(Format.duration(report.recordedMs)).append(if (report.incomplete) ", день ещё идёт" else "").append('\n')
-            val areas = report.byType().filter { (k, ms) -> ms > 0 && (k == null || k in rootIds) }.toList().sortedByDescending { it.second }
+            val areas = report.byCurrentRoot(d.types).filter { (k, ms) -> ms > 0 && (k == null || k in rootIds) }.toList().sortedByDescending { it.second }
             if (areas.isNotEmpty()) append('\n')
             areas.forEach { (id, ms) -> append(id?.let { names[it] } ?: "Без области").append(" — ").append(Format.duration(ms)).append('\n') }
             if (report.unresolved.isNotEmpty()) append('\n').append("Неизвестное время не входит в итог: ")
@@ -1162,6 +1162,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         applying.invokeOnCompletion { releaseRestorePreviewOnIo(preview) }
     }
 
+    suspend fun bundledCatalogVersion(): String? = withContext(Dispatchers.IO) { runCatching { runtime?.bundledCatalogVersion }.getOrNull() }
     suspend fun prepareCatalog(): CatalogPreview? = withContext(Dispatchers.IO) {
         try { runtime?.prepareCatalog() } catch (e: Exception) { notice(Format.error(e)); null }
     }

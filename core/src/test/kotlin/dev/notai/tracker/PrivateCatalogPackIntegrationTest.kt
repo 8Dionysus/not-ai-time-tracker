@@ -35,17 +35,17 @@ class PrivateCatalogPackIntegrationTest {
         val originalTerms = before.types.flatMap { listOf(it.name)+it.aliases }.map(::normalized).toSet()
         for(tag in tags) {
             val status = packs.load(tag) { root.resolve("catalog/locales/$tag/$it").inputStream() }
-            assertEquals(2385,status.entries);assertTrue(status.complete)
+            assertEquals(2386,status.entries);assertTrue(status.complete)
             assertEquals(TranslationQuality.REVIEWED,status.quality);assertEquals(PackAvailability.AVAILABLE_OFFLINE,status.availability)
             assertEquals(CatalogRightsStatus.SOURCE_RIGHTS_REVIEW_PENDING,status.manifest!!.rightsStatus);assertNull(status.manifest!!.license)
             val payload = codec.decodeFromString<CatalogContentPayload>(root.resolve("catalog/locales/$tag/labels.json").readText())
             assertEquals(originals.map { it.key },payload.entries.map { it.key })
-            assertEquals(6793,payload.entries.sumOf { 1+it.text.aliases.size+(if(it.text.description.isNotBlank()) 1 else 0) })
+            assertEquals(6798,payload.entries.sumOf { 1+it.text.aliases.size+(if(it.text.description.isNotBlank()) 1 else 0) })
             val displayed = packs.getLocalizedCatalogEntries("tracker.catalog",originals.map { it.key },tag)
             assertEquals(payload.entries.map { it.text },displayed.map { it.display })
             assertTrue(displayed.all { !it.missing && it.resolvedLocaleTag==tag })
             val labels = packs.choiceLabels(before,tag)
-            assertEquals(1918,labels.translatedTypeCount);assertEquals(2490,labels.aliasCount)
+            assertEquals(1919,labels.translatedTypeCount);assertEquals(2493,labels.aliasCount)
             val types = payload.entries.filter { it.key.kind==CatalogContentKind.TYPE }
             assertEquals(types.associate { it.key.stableId to listOf(it.text.label)+it.text.aliases },labels.typeFields.mapValues { (_,fields)->fields.map { it.original } })
             val view = plain.withCatalogLabels(labels)

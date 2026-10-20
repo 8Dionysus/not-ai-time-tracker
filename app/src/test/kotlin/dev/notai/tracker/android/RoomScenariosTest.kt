@@ -1413,7 +1413,7 @@ class RoomScenariosTest: ScenarioContract() {
         sql.query("SELECT table_name,operation,COUNT(*) FROM io_audit GROUP BY table_name,operation ORDER BY table_name,operation").use { c ->
             while(c.moveToNext()) rows += "${c.getString(0)} ${c.getString(1)} ${c.getLong(2)}"
         }
-        root.resolve("build/storage-workload.txt").writeText("Start + Pause; ${tracker.data().types.size} stored types / ${tracker.data().axes.size} axes (1918 imported types plus existing seed); Robolectric JVM, not device\nElapsed ns: $elapsed\n"+rows.joinToString("\n")+"\n")
+        root.resolve("build/storage-workload.txt").writeText("Start + Pause; ${tracker.data().types.size} stored types / ${tracker.data().axes.size} axes (1919 imported types plus existing seed); Robolectric JVM, not device\nElapsed ns: $elapsed\n"+rows.joinToString("\n")+"\n")
         for(table in listOf("activity_types","cards","sessions","segments","metadata","favorites","measurements","vocabulary","store_generation"))
             for(op in listOf("INSERT","UPDATE","DELETE")) sql.execSQL("DROP TRIGGER audit_${table}_${op}")
         org.junit.Assert.assertFalse(rows.any { it.startsWith("activity_types ") || it.startsWith("vocabulary ") })

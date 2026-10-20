@@ -62,6 +62,8 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
     val catalogImports = CatalogImports(tracker) { readyCatalog }
     /** Prepared vocabulary preview: no source parsing or research archiving on the phone. */
     fun prepareBundledCatalog(): CatalogPreview = catalogImports.prepare()
+    /** Version of the catalog inside this APK; an older installed one can be updated from Settings. */
+    val bundledCatalogVersion: String get() = readyCatalog.manifest.catalogVersion
     val calendarOccurrences = CalendarOccurrences(context.applicationContext)
     val focusDueSignals = FocusDueSignals()
     val scheduleDelivery = AndroidScheduleDelivery(context.applicationContext,tracker)

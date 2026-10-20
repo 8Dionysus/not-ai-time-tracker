@@ -14,7 +14,7 @@ class LocaleContractTest {
         val packs = CatalogContentPacks("tracker.catalog",catalog)
         val originals = packs.sourceEntries()
         val status = packs.load(locale) { root.resolve("catalog/editorial/$locale/$it").inputStream() }
-        assertEquals(2385,status.entries);assertTrue(status.complete)
+        assertEquals(2386,status.entries);assertTrue(status.complete)
         assertEquals(quality,status.quality)
         assertEquals(CatalogRightsStatus.SOURCE_RIGHTS_REVIEW_PENDING,status.manifest!!.rightsStatus)
         assertNull(status.manifest!!.license);assertEquals(if(quality==TranslationQuality.REVIEWED) setOf(locale) else emptySet(),packs.installedReviewedLocales())

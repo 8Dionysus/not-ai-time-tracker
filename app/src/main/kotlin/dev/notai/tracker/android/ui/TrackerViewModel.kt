@@ -1162,6 +1162,66 @@ class TrackerViewModel internal constructor(private val app: Application,private
         applying.invokeOnCompletion { releaseRestorePreviewOnIo(preview) }
     }
 
+    // Several records at once: choose them in the history, then give them one activity or note. Preview first, Undo after.
+    private val _picked = MutableStateFlow<Set<String>>(emptySet())
+    val picked: StateFlow<Set<String>> = _picked
+    fun togglePicked(sessionId: String) { _picked.value = _picked.value.let { if (sessionId in it) it - sessionId else it + sessionId } }
+    fun clearPicked() { _picked.value = emptySet() }
+    suspend fun previewBatch(selection: Classification?, note: MetadataNoteEdit?, replace: Boolean): Result<BatchMetadataPreview> = withContext(Dispatchers.IO) {
+        runCatching {
+            val rt = runtime ?: fail(ErrorCode.STALE, "No backend")
+            rt.tracker.previewMetadata(BatchMetadataRequest(_picked.value.toList(), selection,
+                if (replace) MetadataFillPolicy.REPLACE else MetadataFillPolicy.EMPTY_ONLY, note))
+        }
+    }
+    fun applyBatch(preview: BatchMetadataPreview) = command({ _ ->
+        val n = preview.changes.map { it.sessionId }.distinct().size
+        _picked.value = emptySet()
+        "Изменено ${Format.plural(n, "запись", "записи", "записей")}"
+    }) { rt, _ -> rt.tracker.applyMetadata(preview) }
+
+    // CSV history: inspect → confirm columns and time → map source activities → preview → append. Nothing is written before apply.
+    private val _csv = MutableStateFlow<CsvImportUi?>(null)
+    val csvImport: StateFlow<CsvImportUi?> = _csv
+    fun closeCsv() { _csv.value = null }
+    fun openCsv(uri: Uri) = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val name = runCatching { app.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)
+                ?.use { c -> if (c.moveToFirst()) c.getString(0) else null } }.getOrNull()
+            val bytes = app.contentResolver.openInputStream(uri)?.use { input ->
+                val out = java.io.ByteArrayOutputStream(); val buffer = ByteArray(8192)
+                while (out.size() <= MAX_CSV_BYTES) { val n = input.read(buffer, 0, minOf(buffer.size, MAX_CSV_BYTES + 1 - out.size())); if (n < 0) break; out.write(buffer, 0, n) }
+                out.toByteArray()
+            } ?: fail(ErrorCode.STORAGE, "Source unavailable")
+            val inspection = HistoryFiles.inspect(bytes)
+            when (inspection.format) {
+                ImportFormat.DELIMITED_TEXT -> _csv.value = CsvImportUi(inspection, name)
+                ImportFormat.BACKUP_JSON -> notice("Это файл резервной копии. Восстанови его в разделе «Резервная копия»")
+                ImportFormat.UNSUPPORTED -> notice("Этот файл не таблица CSV. ${inspection.problems.firstOrNull().orEmpty()}".trim())
+            }
+        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice(Format.importError(e)) }
+    }
+    /** Parse with the confirmed choices; the file's distinct activities come back for mapping. Errors stay inside the sheet. */
+    suspend fun parseCsv(ui: CsvImportUi, delimiter: Char, mapping: CsvMapping, durationFormat: DurationFormat?): Result<TransferFile> = withContext(Dispatchers.IO) {
+        runCatching { ui.inspection.confirmCsv(delimiter, mapping, CsvTimeChoice(mapping.localPattern, mapping.zone), durationFormat) }
+    }
+    fun launchParse(ui: CsvImportUi, delimiter: Char, mapping: CsvMapping, durationFormat: DurationFormat?, done: (Result<TransferFile>) -> Unit) =
+        viewModelScope.launch { done(parseCsv(ui, delimiter, mapping, durationFormat)) }
+    suspend fun previewCsv(file: TransferFile, targets: Map<SourceActivity, Classification>): Result<HistoryPreview> = withContext(Dispatchers.IO) {
+        runCatching {
+            val transfer = runtime?.historyTransfer ?: fail(ErrorCode.STORAGE, "History transfer unavailable")
+            transfer.preview(file, file.activities.associateWith { a -> targets[a] ?: Classification(name = a.activity.takeIf { it.isNotBlank() }) })
+        }
+    }
+    fun applyCsv(preview: HistoryPreview) = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val transfer = runtime?.historyTransfer ?: return@launch
+            val result = transfer.apply(preview)
+            _csv.value = null
+            notice("Добавлено ${Format.plural(result.added, "запись", "записи", "записей")}" + if (result.duplicates > 0) ", повторы пропущены" else "")
+        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice(Format.importError(e)) }
+    }
+
     // Automatic copies into a chosen folder. Status lives on this phone, outside the records; every call is on IO.
     private val _autoBackup = MutableStateFlow<AutoBackupUi?>(null)
     val autoBackup: StateFlow<AutoBackupUi?> = _autoBackup

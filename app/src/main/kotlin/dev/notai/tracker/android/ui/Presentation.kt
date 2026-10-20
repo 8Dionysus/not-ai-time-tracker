@@ -5,6 +5,9 @@ import dev.notai.tracker.Classification
 import dev.notai.tracker.CoreError
 import dev.notai.tracker.Dataset
 import dev.notai.tracker.ErrorCode
+import dev.notai.tracker.ErrorArgument
+import dev.notai.tracker.ImportIssue
+import dev.notai.tracker.ImportIssueCode
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -94,6 +97,34 @@ object Format {
         ErrorCode.INVALID_INPUT -> "Не получилось: ${e.message}"
         null -> "Не получилось: ${e.message ?: e.javaClass.simpleName}"
     }
+
+    /** A CSV problem in plain words, with the row when there is one. The English diagnostic stays for logs only. */
+    fun importIssue(i: ImportIssue): String {
+        val col = (i.arguments["column"] as? ErrorArgument.Text)?.value
+        val what = when (i.code) {
+            ImportIssueCode.TIMESTAMP_INVALID, ImportIssueCode.TIMESTAMP_PATTERN_INVALID -> "дата или время не читаются в выбранном формате" + (col?.let { " (колонка «$it»)" } ?: "")
+            ImportIssueCode.EXPLICIT_OFFSET_REQUIRED -> "у времени нет часового пояса: выбери формат без пояса"
+            ImportIssueCode.TIMESTAMP_RANGE, ImportIssueCode.INTERVAL_OVERFLOW -> "время вне допустимого диапазона"
+            ImportIssueCode.INTERVAL_INVALID -> "конец раньше начала"
+            ImportIssueCode.END_OR_DURATION_REQUIRED -> "нужна колонка конца или длительности"
+            ImportIssueCode.DURATION_ENDPOINT_MISMATCH -> "длительность не совпадает с началом и концом"
+            ImportIssueCode.DURATION_HMS_REQUIRED, ImportIssueCode.DURATION_COMPONENT_RANGE, ImportIssueCode.DURATION_NUMBER_INVALID,
+            ImportIssueCode.DURATION_PRECISION_OR_RANGE -> "длительность не читается в выбранном формате"
+            ImportIssueCode.DURATION_POSITIVE_REQUIRED -> "длительность должна быть больше нуля"
+            ImportIssueCode.LOCAL_TIME_GAP_OR_FOLD, ImportIssueCode.LOCAL_ZONE_DST_REJECTED -> "время попадает на перевод часов"
+            ImportIssueCode.FUTURE_INTERVAL -> "запись в будущем"
+            ImportIssueCode.ROW_COLUMN_COUNT -> "в строке другое число колонок"
+            ImportIssueCode.CSV_COLUMNS_MISSING -> "в файле нет колонки" + (col?.let { " «$it»" } ?: "")
+            ImportIssueCode.SOURCE_ID_CONFLICT, ImportIssueCode.SOURCE_ID_MISSING -> "повторяется или пропущен ID строки"
+            ImportIssueCode.CSV_ROW_LIMIT, ImportIssueCode.CSV_COLUMN_LIMIT, ImportIssueCode.CSV_SIZE_LIMIT -> "файл слишком большой"
+            ImportIssueCode.CSV_QUOTING_INVALID, ImportIssueCode.CSV_QUOTE_UNCLOSED -> "кавычки в строке не закрыты"
+            ImportIssueCode.BATCH_VALIDATION_FAILED -> "записи пересекаются друг с другом или с историей"
+            ImportIssueCode.APPLY_STALE -> "данные успели измениться: проверь ещё раз"
+            else -> i.diagnostic.ifBlank { i.code.name.lowercase() }
+        }
+        return (i.rowNumber?.let { "Строка $it: " } ?: "") + what
+    }
+    fun importError(e: Throwable): String = (e as? CoreError)?.importIssue?.let(::importIssue) ?: error(e)
 
     /** One plain sentence per automatic-copy problem; the action next to it says what to do. */
     fun backupProblem(e: dev.notai.tracker.android.AutomaticBackupError): String = when (e) {

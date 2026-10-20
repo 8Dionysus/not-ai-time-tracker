@@ -26,9 +26,14 @@ interface UiBackend {
     fun prepareCatalog(): CatalogPreview
     fun applyCatalog(preview: CatalogPreview): Tracker.Change
     fun submitShortcut(action: SurfaceAction): Deferred<Result<Tracker.Change>>
+    /** CSV history append with preview. Real runtime only, unless a test supplies one. */
+    val historyTransfer: dev.notai.tracker.HistoryTransfer? get() = runtime?.historyTransfer
     /** Automatic copies into a folder the user picked. Real runtime only, unless a test supplies one. */
     val autoBackup: AutoBackupBackend? get() = runtime?.automaticBackups?.let { RuntimeAutoBackup(it) }
 }
+
+/** A CSV file being imported: the inspection and the name shown in the sheet. */
+data class CsvImportUi(val inspection: dev.notai.tracker.ImportInspection, val fileName: String?)
 
 /** Automatic copy state for Settings, with the chosen folder's readable name resolved once. */
 data class AutoBackupUi(val state: AutomaticBackupState, val folder: String?)

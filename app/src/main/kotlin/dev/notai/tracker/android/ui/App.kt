@@ -182,7 +182,9 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
                 }
             }
         }
-        BottomBar(tab, { tab = it }, live = snapshot?.let { it.mode == Mode.RUNNING || it.focus != null } == true)
+        val picked by vm.picked.collectAsStateWithLifecycle()
+        if (tab == Tab.TIMER && picked.isNotEmpty()) BatchBar(vm, picked.size, pickActivity = { formPicker = it })
+        else BottomBar(tab, { tab = it }, live = snapshot?.let { it.mode == Mode.RUNNING || it.focus != null } == true)
     }
 
     val zone = home?.zone ?: java.time.ZoneId.systemDefault()
@@ -245,6 +247,8 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     if (favoritesOpen) FavoritesSheet(vm, onEdit = vm::openEditor, onAdd = { formPicker = { sel, label -> vm.saveFavorite(label.title, sel) } },
         onDismiss = { vm.openFavorites(false) })
     activityEditor?.let { t -> key(t) { ActivityEditorSheet(vm, t, onPick = { formPicker = it }, onDismiss = { vm.openEditor(null) }) } }
+    val csv by vm.csvImport.collectAsStateWithLifecycle()
+    csv?.let { ui -> key(ui) { CsvImportSheet(vm, ui, zone, onPickActivity = { formPicker = it }, onDismiss = vm::closeCsv) } }
     formPicker?.let { back ->
         PickerSheet(vm, PickMode.MANUAL, false, null, null, null, onDismiss = { formPicker = null }, onReturn = { sel, label -> back(sel, label) })
     }

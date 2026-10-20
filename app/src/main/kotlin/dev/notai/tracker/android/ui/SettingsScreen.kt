@@ -105,6 +105,7 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
             try { restore = vm.prepareRestore(uri,restoreOwner) } finally { busy = false }
         }
     }
+    val csvFile = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) vm.openCsv(uri) }
     val folder = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val uri = result.data?.data
         if (result.resultCode == Activity.RESULT_OK && uri != null) vm.chooseBackupFolder(uri, result.data?.flags ?: 0)
@@ -297,11 +298,11 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 Divider()
                 NavRow(rememberVectorPainter(Icon.Table), "Выгрузить в CSV", note = "Вся история для таблиц. Это не резервная копия", onClick = { vm.requestExport(csv = true) })
                 Divider()
-                NavRow(rememberVectorPainter(Icon.Upload), "Загрузить историю из CSV", note = "Из Toggl, Clockify или своей таблицы. Пока в технической оболочке",
-                    onClick = openTechnical)
+                NavRow(rememberVectorPainter(Icon.Upload), "Добавить историю из CSV", note = "Из Toggl, Clockify или своей таблицы. Сначала покажу, что добавится",
+                    onClick = { csvFile.launch(arrayOf("text/*", "application/csv", "text/csv", "*/*")) })
             }
             Group("О приложении") {
-                NavRow(painterResource(R.drawable.act_tools), "Техническая оболочка", note = "Измерения, календарь, сопоставление CSV, восстановление базы",
+                NavRow(painterResource(R.drawable.act_tools), "Техническая оболочка", note = "Измерения, календарь, восстановление базы",
                     onClick = openTechnical)
                 Divider()
                 val version = remember { runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() }

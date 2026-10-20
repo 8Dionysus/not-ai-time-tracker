@@ -92,6 +92,7 @@ fun TimerScreen(snapshot: Snapshot?, home: HomeData?, vm: TrackerViewModel, acti
     val zone = home?.zone ?: ZoneId.systemDefault()
     // Gaps stay folded per day until asked for: visible, never nagging.
     var openGaps by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(listOf<String>()) }
+    val picked by vm.picked.collectAsStateWithLifecycle()
     LazyColumn(modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 24.dp)) {
         item(key = "top") {
             Row(Modifier.fillMaxWidth().height(60.dp).padding(start = 20.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -126,7 +127,7 @@ fun TimerScreen(snapshot: Snapshot?, home: HomeData?, vm: TrackerViewModel, acti
                 }
             }
         }
-        if (home != null) history(home, snapshot, vm, actions, openGaps) { d -> openGaps = if (d in openGaps) openGaps - d else openGaps + d }
+        if (home != null) history(home, snapshot, vm, actions, openGaps, { d -> openGaps = if (d in openGaps) openGaps - d else openGaps + d }, picked)
     }
 }
 
@@ -407,7 +408,7 @@ private fun FocusHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, action
 }
 
 private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: TrackerViewModel, actions: TimerActions,
-                                   openGaps: List<String>, toggleGaps: (String) -> Unit) {
+                                   openGaps: List<String>, toggleGaps: (String) -> Unit, picked: Set<String> = emptySet()) {
     home.days.forEach { day ->
         item(key = "day-${day.date}") {
             val c = NotAi.colors
@@ -436,9 +437,11 @@ private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: Track
         val gaps = if (day.date.toString() in openGaps) day.gaps.filter { it.kind != dev.notai.tracker.HistoryGapKind.PAUSE } else emptyList()
         val rows: List<Any> = (day.records + gaps).sortedByDescending { if (it is RecordUi) it.start else (it as GapUi).start }
         items(rows, key = { r -> if (r is RecordUi) "${day.date}:${r.sessionId}" else "${day.date}:gap:${(r as GapUi).start}" }) { r ->
-            if (r is RecordUi) SwipeToDelete(r.entry, actions.delete, Modifier.animateItem()) {
+            if (r is RecordUi && picked.isNotEmpty()) RecordRow(r, home.zone, onOpen = { vm.togglePicked(r.sessionId) }, onRepeat = { vm.repeat(r.entry) },
+                modifier = Modifier.animateItem().padding(horizontal = 20.dp), picked = r.sessionId in picked, choosing = true)
+            else if (r is RecordUi) SwipeToDelete(r.entry, actions.delete, Modifier.animateItem()) {
                 RecordRow(r, home.zone, onOpen = { actions.edit(r.entry, day) }, onRepeat = { vm.repeat(r.entry) },
-                    onDelete = { actions.delete(r.entry) }, modifier = Modifier.padding(horizontal = 20.dp))
+                    onDelete = { actions.delete(r.entry) }, modifier = Modifier.padding(horizontal = 20.dp), onPickMany = { vm.togglePicked(r.sessionId) })
             } else GapRow(r as GapUi, home.zone, { actions.fillGap(r, day) }, Modifier.animateItem().padding(horizontal = 20.dp))
         }
         if (day.date == home.today) item(key = "manual") {
@@ -485,7 +488,8 @@ private fun SwipeToDelete(e: EntryUi, delete: suspend (EntryUi) -> Boolean, modi
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun EntryRow(e: EntryUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: () -> Unit, modifier: Modifier = Modifier, onDelete: (suspend () -> Unit)? = null) {
+fun EntryRow(e: EntryUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: () -> Unit, modifier: Modifier = Modifier, onDelete: (suspend () -> Unit)? = null,
+             onPickMany: (() -> Unit)? = null, picked: Boolean = false, choosing: Boolean = false) {
     val c = NotAi.colors
     var menu by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
@@ -493,13 +497,19 @@ fun EntryRow(e: EntryUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: () -> Unit,
     Column(modifier.fillMaxWidth()) {
         Box {
             EntryMenu(menu, onDismiss = { menu = false }, onOpen = onOpen, onRepeat = onRepeat,
-                onDelete = onDelete?.let { d -> { scope.launch { d() } } })
+                onDelete = onDelete?.let { d -> { scope.launch { d() } } }, onPickMany = onPickMany)
         }
         Row(Modifier.fillMaxWidth().heightIn(min = 60.dp)
-            .combinedClickable(onClickLabel = "Исправить запись", onLongClickLabel = "Действия с записью",
-                onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); menu = true }, onClick = onOpen),
+            .combinedClickable(onClickLabel = if (choosing) (if (picked) "Убрать из выбранных" else "Выбрать") else "Исправить запись",
+                onLongClickLabel = if (choosing) null else "Действия с записью",
+                onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); if (choosing) onOpen() else menu = true }, onClick = onOpen)
+            .semantics { if (choosing) selected = picked },
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            ActivityGlyph(e.label)
+            if (choosing) Box(Modifier.size(24.dp).clip(androidx.compose.foundation.shape.CircleShape)
+                .background(if (picked) c.ink else c.paper)
+                .border(if (picked) 0.dp else 1.5.dp, c.ink3, androidx.compose.foundation.shape.CircleShape), contentAlignment = Alignment.Center) {
+                if (picked) M3Icon(Icon.Check, null, Modifier.size(14.dp), tint = c.paper)
+            } else ActivityGlyph(e.label)
             Column(Modifier.weight(1f).padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 LabelText(e.label)
                 Text(Format.range(e.start, e.end, zone) + (e.note?.let { ", $it" } ?: ""), style = NotAi.type.caption, color = c.ink2,
@@ -528,7 +538,8 @@ fun LabelText(label: Label, maxLines: Int = 2, style: androidx.compose.ui.text.T
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun RecordRow(r: RecordUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: () -> Unit, modifier: Modifier = Modifier, onDelete: (suspend () -> Unit)? = null) {
+private fun RecordRow(r: RecordUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: () -> Unit, modifier: Modifier = Modifier, onDelete: (suspend () -> Unit)? = null,
+                      onPickMany: (() -> Unit)? = null, picked: Boolean = false, choosing: Boolean = false) {
     val c = NotAi.colors
     val e = r.entry
     var menu by remember { mutableStateOf(false) }
@@ -539,14 +550,20 @@ private fun RecordRow(r: RecordUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: (
     Column(modifier.fillMaxWidth().animateContentSize(tween(if (NotAi.reducedMotion) 0 else 220))) {
         Box {
             EntryMenu(menu, onDismiss = { menu = false }, onOpen = onOpen, onRepeat = onRepeat,
-                onDelete = onDelete?.let { d -> { scope.launch { d() } } })
+                onDelete = onDelete?.let { d -> { scope.launch { d() } } }, onPickMany = onPickMany)
         }
         val compact = NotAi.appearance.compact
         Row(Modifier.fillMaxWidth().heightIn(min = if (compact) 48.dp else 60.dp)
-            .combinedClickable(onClickLabel = "Исправить запись", onLongClickLabel = "Действия с записью",
-                onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); menu = true }, onClick = onOpen),
+            .combinedClickable(onClickLabel = if (choosing) (if (picked) "Убрать из выбранных" else "Выбрать") else "Исправить запись",
+                onLongClickLabel = if (choosing) null else "Действия с записью",
+                onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); if (choosing) onOpen() else menu = true }, onClick = onOpen)
+            .semantics { if (choosing) selected = picked },
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            ActivityGlyph(e.label)
+            if (choosing) Box(Modifier.size(24.dp).clip(androidx.compose.foundation.shape.CircleShape)
+                .background(if (picked) c.ink else c.paper)
+                .border(if (picked) 0.dp else 1.5.dp, c.ink3, androidx.compose.foundation.shape.CircleShape), contentAlignment = Alignment.Center) {
+                if (picked) M3Icon(Icon.Check, null, Modifier.size(14.dp), tint = c.paper)
+            } else ActivityGlyph(e.label)
             Column(Modifier.weight(1f).padding(vertical = if (compact) 4.dp else 8.dp), verticalArrangement = Arrangement.spacedBy(if (compact) 0.dp else 2.dp)) {
                 LabelText(e.label, maxLines = if (compact) 1 else 2)
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -562,9 +579,9 @@ private fun RecordRow(r: RecordUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: (
                 }
             }
             Text(Format.duration(r.recordedMs), style = NotAi.type.body.copy(fontSize = 15.sp), color = c.ink)
-            IconAction(Icon.Repeat, "Повторить: ${e.label.title}", onRepeat, size = 16.dp)
+            if (!choosing) IconAction(Icon.Repeat, "Повторить: ${e.label.title}", onRepeat, size = 16.dp)
         }
-        if (open) Column(Modifier.padding(start = 32.dp, bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        if (open && !choosing) Column(Modifier.padding(start = 32.dp, bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             // Chronological: segment, pause, segment… Durations are the core's per-segment values.
             val lines = (r.segments.map { it.start to it } + r.pauses.map { it.start to it }).sortedBy { it.first }
             lines.forEach { (_, item) ->
@@ -624,7 +641,7 @@ private fun GapRow(g: GapUi, zone: ZoneId, onFill: () -> Unit, modifier: Modifie
 
 /** Long press: the same three actions as elsewhere, delete last and in the danger colour. */
 @Composable
-private fun EntryMenu(open: Boolean, onDismiss: () -> Unit, onOpen: () -> Unit, onRepeat: () -> Unit, onDelete: (() -> Unit)?) {
+private fun EntryMenu(open: Boolean, onDismiss: () -> Unit, onOpen: () -> Unit, onRepeat: () -> Unit, onDelete: (() -> Unit)?, onPickMany: (() -> Unit)? = null) {
     val c = NotAi.colors
     DropdownMenu(open, onDismiss, offset = DpOffset(56.dp, 0.dp), shape = RoundedCornerShape(16.dp), containerColor = c.raised,
         border = BorderStroke(1.dp, c.rule), shadowElevation = 8.dp) {
@@ -633,6 +650,7 @@ private fun EntryMenu(open: Boolean, onDismiss: () -> Unit, onOpen: () -> Unit, 
             leadingIcon = { M3Icon(icon, null, Modifier.size(18.dp), tint = color) }, modifier = Modifier.widthIn(min = 196.dp))
         item("Исправить", Icon.Edit, c.ink, onOpen)
         item("Повторить", Icon.Repeat, c.ink, onRepeat)
+        if (onPickMany != null) item("Выбрать несколько", Icon.Check, c.ink, onPickMany)
         if (onDelete != null) item("Удалить", Icon.Trash, c.danger, onDelete)
     }
 }

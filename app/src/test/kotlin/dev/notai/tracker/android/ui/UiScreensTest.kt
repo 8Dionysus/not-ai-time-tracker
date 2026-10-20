@@ -24,6 +24,7 @@ import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.longClick
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -86,6 +87,7 @@ class UiScreensTest {
         override fun applyCatalog(preview: CatalogPreview) = CatalogImports(tracker) { catalog }.apply(preview)
         override fun submitShortcut(action: SurfaceAction) = CompletableDeferred<Result<Tracker.Change>>(Result.failure(IllegalStateException("no shortcuts")))
         override val autoBackup: AutoBackupBackend = FakeAutoBackup(tracker)
+        override val historyTransfer = HistoryTransfer(tracker, MemoryRollback())
     }
     /** A folder in a cloud app with three verified copies; actions only change the in-memory state. */
     private class FakeAutoBackup(private val tracker: Tracker) : AutoBackupBackend {
@@ -358,6 +360,28 @@ class UiScreensTest {
         shot("06c-settings-more", vm)
     }
 
+    /** A Toggl-style export: columns are suggested from headers, the time layout from the first row, then preview and append. */
+    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
+    @Test fun csvImport() {
+        val seed = seed()
+        val vm = render(seed)
+        val before = seed.tracker.data().sessions.size
+        val file = java.io.File.createTempFile("toggl", ".csv").apply {
+            writeText("Project,Client,Description,Start date,Start time,End date,End time,Duration\n" +
+                "Английский,Школа,Урок,2026-10-01,09:00:00,2026-10-01,09:45:00,00:45:00\n" +
+                "Чтение,,,2026-10-01,21:00:00,2026-10-01,21:30:00,00:30:00\n")
+        }
+        vm.openCsv(android.net.Uri.fromFile(file))
+        waitText("История из CSV")
+        waitText("2026-10-01 09:00:00")
+        shot("31-csv-columns", vm)
+        compose.onNodeWithText("Дальше").performClick()
+        waitText("Добавится 2 записи")
+        shot("32-csv-preview", vm)
+        compose.onNodeWithText("Добавить 2 записи").performClick()
+        compose.waitUntil(10_000) { seed.tracker.data().sessions.size == before + 2 }
+    }
+
     @Config(qualifiers = "w400dp-h1300dp-xhdpi")
     @Test fun backupPage() {
         val vm = render(seed())
@@ -410,6 +434,30 @@ class UiScreensTest {
         compose.onAllNodesWithText("8:30–8:55", substring = true).onFirst().performTouchInput { swipeLeft() }
         compose.waitUntil(5_000) { seed.tracker.data().sessions.size == before - 2 }
         compose.waitUntil(5_000) { compose.onAllNodesWithText("8:30–8:55", substring = true).fetchSemanticsNodes().isEmpty() }
+    }
+
+    /** «Выбрать несколько» from the menu, a second tap adds another, and one note goes to both after a confirmation. */
+    @Test fun batchNote() {
+        val seed = seed()
+        val vm = render(seed)
+        waitText("8:30–8:55")
+        compose.onAllNodesWithText("9:10–11:02", substring = true).onFirst().performTouchInput { longClick() }
+        waitText("Выбрать несколько")
+        compose.onNodeWithText("Выбрать несколько").performClick()
+        waitText("Выбрано: 1")
+        compose.onAllNodesWithText("8:30–8:55", substring = true).onFirst().performClick()
+        waitText("Выбрано: 2")
+        shot("33-batch", vm)
+        compose.onNodeWithText("Заметка").performClick()
+        waitText("Заметка для выбранных")
+        compose.onNode(androidx.compose.ui.test.hasSetTextAction()).performTextInput("проект Альфа")
+        compose.onNodeWithText("Заменить у всех").performClick()
+        compose.onNodeWithText("Дальше").performClick()
+        waitText("Изменить 2 записи?")
+        compose.onNodeWithText("Изменить").performClick()
+        compose.waitUntil(5_000) { seed.tracker.data().sessions.count { it.note == "проект Альфа" } == 2 }
+        waitText("Изменено 2 записи")
+        assertTrue(vm.picked.value.isEmpty())
     }
 
     /** A record split by a pause takes all its segments with it: one explicit confirmation first. */

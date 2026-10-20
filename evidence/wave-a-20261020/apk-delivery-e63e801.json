@@ -6,9 +6,6 @@
   "build_task": ":app:assembleDebug -PtrackerUnsigned=true",
   "production_source_commit": "5c050c41c10cd3e14e93aa467a0f86305c164523",
   "build_checkout_commit": "85a274a",
-  "library_file_id": "libfile_992cd6448c6881918d46d3976d9dd486",
-  "library_version": 0,
-  "library_file_id_internal": "file_00000000636481f5a8461563d558b825",
   "device_installed": false,
-  "visual_scope": "A+B backend/platform checkpoint; Opus controls/appearance/session-summary rendering remain pending."
+  "visual_scope": "Development build; interface controls, typography and session-summary rendering remain incomplete."
 }

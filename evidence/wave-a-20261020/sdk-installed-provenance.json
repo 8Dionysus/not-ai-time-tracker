@@ -24,7 +24,7 @@
   "command_line_tools_archive_verified_size": 181052239,
   "command_line_tools_archive_sha256": "0877a1d048fe4a24efe2eff536ca4223f7adeb58648bb81909d33c446918cfa8",
   "other_archive_verification_scope": "Official installer consumed then removed completed archive cache entries; expected repository size/SHA1 recorded, no claim of subsequent independent archive-byte verification. Installed source.properties are captured.",
-  "installer": "Official sdkmanager delegated to Android CLI, exit0; AGP additionally installs platform-tools. No emulator, account, init skill or remote device operation.",
+  "installer": "Official command-line tools sdkmanager delegated to Android CLI; install exited0. AGP additionally installed platform-tools.",
   "sdk": "/workspace/toolchains/sdk",
   "jdk": "/workspace/toolchains/jdk-21"
 }

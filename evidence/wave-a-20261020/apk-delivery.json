@@ -5,11 +5,7 @@
   "unsigned": true,
   "build_task": ":app:assembleDebug -PtrackerUnsigned=true",
   "production_source_commit": "8b15b9898082a0f486c33702b7c5d5b85d107fc4",
-  "library_file_id": "libfile_379fc811acb4819180bc0c544aaa2c3f",
-  "library_version": 0,
-  "library_file_id_internal": "file_00000000e01081f5ad34950f07244867",
   "device_installed": false,
-  "supersedes_library_file_id": "libfile_992cd6448c6881918d46d3976d9dd486",
   "previous_artifact_retained": true,
-  "visual_scope": "A+B checkpoint plus atomic ordinary create-and-choose family; Opus controls/appearance/session-summary rendering remain pending."
+  "visual_scope": "Development build; interface controls, typography and session-summary rendering remain incomplete."
 }

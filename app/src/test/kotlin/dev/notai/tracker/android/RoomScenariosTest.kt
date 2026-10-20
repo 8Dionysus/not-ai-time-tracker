@@ -141,6 +141,23 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertThrows(CoreError::class.java) { SurfaceChoices.choose(context,tracker,focused,choice) }
         org.junit.Assert.assertEquals(beforeFocusTap,tracker.data())
     }
+    @org.junit.Test fun lockScreenPolicyKeepsFullTimerOnlyForExplicitPublicPresentation() {
+        val context = RuntimeEnvironment.getApplication();val tracker = Tracker(createStore(),FakeClock())
+        tracker.start(tracker.snapshot().token,Classification(name = "Private activity"))
+        val view = tracker.view()
+        val privateNotice = SurfaceViews.notification(context,view)
+        org.junit.Assert.assertEquals(android.app.Notification.VISIBILITY_PRIVATE,privateNotice.visibility)
+        org.junit.Assert.assertNotNull(privateNotice.publicVersion)
+        org.junit.Assert.assertEquals("Учёт идёт",privateNotice.publicVersion.extras.getCharSequence(android.app.Notification.EXTRA_TITLE))
+        for(visibility in listOf(android.app.Notification.VISIBILITY_PUBLIC,android.app.Notification.VISIBILITY_SECRET)) {
+            val notice = SurfaceViews.notification(context,view,visibility)
+            org.junit.Assert.assertEquals(visibility,notice.visibility)
+            org.junit.Assert.assertNull(notice.publicVersion)
+            org.junit.Assert.assertNotNull(notice.contentView)
+            org.junit.Assert.assertEquals(view.snapshot().safeLabel,notice.extras.getCharSequence(android.app.Notification.EXTRA_TEXT))
+        }
+        org.junit.Assert.assertEquals(view.data,tracker.data())
+    }
     @org.junit.Test fun timerChannelCapabilityObservesMinAndPreservesExistingChannel() {
         val context = RuntimeEnvironment.getApplication()
         val manager = context.getSystemService(android.app.NotificationManager::class.java)

@@ -132,7 +132,12 @@ object SurfaceViews {
         return small to big
     }
 
-    fun notification(c: Context, view: TrackerView): Notification {
+    /** Android presentation boundary; the persisted policy is mapped by the caller.
+     * PUBLIC retains the full row/actions/chronometer, PRIVATE supplies only a redacted public
+     * version, SECRET requests no lock-screen content. System/user channel policy remains final.
+     */
+    fun notification(c: Context, view: TrackerView, lockScreenVisibility: Int = Notification.VISIBILITY_PRIVATE): Notification {
+        require(lockScreenVisibility in setOf(Notification.VISIBILITY_PUBLIC,Notification.VISIBILITY_PRIVATE,Notification.VISIBILITY_SECRET))
         TimerSurfaces.channels(c)
         val s = view.snapshot()
         val r = row(view.data, s)
@@ -142,8 +147,10 @@ object SurfaceViews {
             .setStyle(Notification.DecoratedCustomViewStyle()).setCustomContentView(small)
             .setContentTitle(r.title).setContentText(s.safeLabel).setContentIntent(TimerSurfaces.open(c))
             .setOnlyAlertOnce(true).setOngoing(true).setShowWhen(false).setCategory(Notification.CATEGORY_STATUS)
-            .setVisibility(Notification.VISIBILITY_PRIVATE)
-            .setPublicVersion(Notification.Builder(c, TimerSurfaces.CONTROL_CHANNEL).setSmallIcon(R.drawable.ic_stat_notai)
+            .setVisibility(lockScreenVisibility)
+        if (lockScreenVisibility == Notification.VISIBILITY_PRIVATE) builder.setPublicVersion(
+            Notification.Builder(c, TimerSurfaces.CONTROL_CHANNEL).setSmallIcon(R.drawable.ic_stat_notai)
+                .setVisibility(Notification.VISIBILITY_PUBLIC).setShowWhen(false)
                 .setColor(c.getColor(R.color.widget_amber)).setContentTitle(if (s.mode == Mode.IDLE && s.focus == null) "(not)AI Time" else "Учёт идёт").build())
         if (big != null) builder.setCustomBigContentView(big)
         return builder.build()

@@ -8,6 +8,35 @@ import kotlinx.serialization.json.*
 abstract class JournalAScenarioContract {
     protected abstract fun createJournalStore(): StateStore
     protected open fun reopenJournalStore(store: StateStore): StateStore = store
+    @Test fun bothBackupReadersKeepEveryLegacyVersionAndPresentationDefaults() {
+        val directory = java.io.File(System.getProperty("tracker.samples"))
+        val first = directory.resolve("history-v1.json").readText()
+        val second = directory.resolve("history-v2.json").readText()
+        val source = codec.parseToJsonElement(second).jsonObject
+        val expected = Backups.decode(first)
+        val t = Tracker(createJournalStore(),FakeClock());val backup = Backups(t,MemoryRollback())
+        val before = t.data()
+        for(version in 1..14) {
+            val text = if(version == 1) first else {
+                val data = source.getValue("data").jsonObject.toMutableMap()
+                if(version >= 6) data["goals"] = JsonArray(emptyList())
+                if(version >= 7) data["focus"] = JsonNull
+                if(version >= 8) {
+                    data["schedule"] = codec.encodeToJsonElement(ScheduleData())
+                    data["transfer"] = codec.encodeToJsonElement(TransferState())
+                }
+                JsonObject(source + mapOf("formatVersion" to JsonPrimitive(version),"data" to JsonObject(data))).toString()
+            }
+            val whole = Backups.decode(text)
+            assertEquals(expected,whole,"Whole reader version $version")
+            assertEquals(whole,StreamingBackup.read { text.byteInputStream() },"Streaming reader version $version")
+            assertNull(whole.data.settings.surfaces.notificationPrivacy)
+            assertEquals(100,whole.data.settings.surfaces.widgetBackgroundAlphaPercent)
+            assertEquals(100,whole.data.settings.surfaces.overlayChooserBackgroundAlphaPercent)
+            backup.prepare(text).close();backup.prepare { text.byteInputStream() }.close()
+            assertEquals(before,t.data(),"Preview cannot mutate version $version")
+        }
+    }
     @Test fun surfacePresentationPreferencesRoundTripAndLegacyDefaultsAreExplicit() {
         val clock = FakeClock(); val t = Tracker(createJournalStore(),clock)
         val legacy = Backups(t,MemoryRollback()).export().replace("\"formatVersion\": $CURRENT_BACKUP_FORMAT","\"formatVersion\": 14")

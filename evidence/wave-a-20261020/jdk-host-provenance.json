@@ -1,0 +1,9 @@
+{
+  "source": "https://deb.debian.org/debian/dists/trixie/main/binary-amd64/Packages.xz",
+  "package_url": "https://deb.debian.org/debian/pool/main/o/openjdk-21/openjdk-21-jdk-headless_21.0.12.1+1-1~deb13u1_amd64.deb",
+  "package_version": "21.0.12.1+1-1~deb13u1",
+  "package_sha256": "f3abafb6c644b03df042824e707cd211ea33254761d7f7b75be3f8dc0df97c7a",
+  "package_size_bytes": 83035048,
+  "use": "Workspace-only extraction of official Debian JDK headers matching the installed Java 21 runtime; own project host JNI built with existing GCC. No SDK license marker or system installation.",
+  "host_library_sha256": "9f112742f3537f3c87ec35333b176980d12aebe6e67996549c40c3f24bdea9da"
+}

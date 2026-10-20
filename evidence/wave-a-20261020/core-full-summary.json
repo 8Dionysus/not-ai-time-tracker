@@ -1,0 +1,226 @@
+{
+  "totals": {
+    "tests": 220,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "suites": [
+    {
+      "suite": "dev.notai.tracker.AttentionAuditRegressionTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "a735a919039dd5a45f5272b674c954487df6de40db3fa50bac117955b9b15414"
+    },
+    {
+      "suite": "dev.notai.tracker.AttentionPreferenceArchiveTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "4a9d4f5dc618f5e2341f046b5c805e69abe595749afbe5698919430333050c45"
+    },
+    {
+      "suite": "dev.notai.tracker.AttentionSafetyTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "876be85d8d241fe814ede2cf3ecacc9f85643af40ee1bcc4125a2424413e656e"
+    },
+    {
+      "suite": "dev.notai.tracker.AttentionScenariosTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "9fac0c487ba5db27344f727fb23fb4d1d52e1f81e03837114028850899ad6b06"
+    },
+    {
+      "suite": "dev.notai.tracker.BackupWriteLimitTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "a6ef29c3a4766c580906015b32acfd70a335f64b6ab5cd301f47aea2b2ce93b0"
+    },
+    {
+      "suite": "dev.notai.tracker.CatalogPackageEncodingTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "df65c726e53656a343ce7a1ebb302977809d1c9237ebfcb299961a3567ab3b44"
+    },
+    {
+      "suite": "dev.notai.tracker.ChoiceLocalizationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "cd9682423aa381782fcae1ccb4e793a610024317f899c9b72935853f55f37839"
+    },
+    {
+      "suite": "dev.notai.tracker.ChoiceWindowTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "c3565041679effae612401a2abec3698f1e946c00717c8d36e7a12d92a500da9"
+    },
+    {
+      "suite": "dev.notai.tracker.CleanupProtocolTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "59fe1b16d8a5d05a0eee50148d85e37b4484bc538cf29091b7b55c38bf8d66c1"
+    },
+    {
+      "suite": "dev.notai.tracker.CoreScenariosTest",
+      "tests": 84,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "0323bd3b6d3c547ef456a217f70b14b0d45152e54ea7dffd9fa64f04234033ff"
+    },
+    {
+      "suite": "dev.notai.tracker.CsvSourceLocaleTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "32771be84e063cf8a13235c861d2d05552c1dc17acdf9a03a1dd4b1b5b3c7729"
+    },
+    {
+      "suite": "dev.notai.tracker.DescriptorCleanupTest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "9221537c661a03924e5ce6757d5661731c02c3a7f5e1dced2d16186554c5a2f4"
+    },
+    {
+      "suite": "dev.notai.tracker.DescriptorOpenFlagsTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "c9fbd440771761906877f75f1eb89bb672aa0fca3f67048919faf0eb7fef364a"
+    },
+    {
+      "suite": "dev.notai.tracker.FunctionalCustomizationTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "ad8fad29ba68ca7a52fc1eea5e6a7e299f72e7cb970539e45d0c35f643e49761"
+    },
+    {
+      "suite": "dev.notai.tracker.GoalVersionsTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "9fe50bac0c124c984890cc26a3b39511ba6a254936882c9c55808c3ebfc1c0ba"
+    },
+    {
+      "suite": "dev.notai.tracker.HashCompatibilityTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "8d9ea3199d87b7d82b0b611d64f4fb14a0c83ba910072d5938f226afa7ecef19"
+    },
+    {
+      "suite": "dev.notai.tracker.ImportIssuesTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "8279a4fd96a62f830f8eac2833b7fc88ec632ce045c7b7b9c85b212b7b43cd53"
+    },
+    {
+      "suite": "dev.notai.tracker.JournalATest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "2908bb7e2e4b66884087598cc2c15ce660775426d619d2494461995bdfc8adff"
+    },
+    {
+      "suite": "dev.notai.tracker.LocaleContractTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "8bbe7c3a632100498f19a7b38258e1a4df328aa03cbe94c96a261b97c6375556"
+    },
+    {
+      "suite": "dev.notai.tracker.PrivateCatalogPackIntegrationTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "9d8f234e71b99eab3c85446d1370f0a469288eebed9f3eb82723a08bda8385d8"
+    },
+    {
+      "suite": "dev.notai.tracker.PrivateCopyCatalogTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "f49dfe352feade0468065d365139b52b63a3a0073bf88f3b8bfd7fbf042eb697"
+    },
+    {
+      "suite": "dev.notai.tracker.ReportingDayTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "eb25de84066276398c8d1a9185a74339354d56c738de5e54827646cce614bf55"
+    },
+    {
+      "suite": "dev.notai.tracker.ScheduleCommandCompatibilityTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "226a13dd6eda3de6ac363bb53d852db2118c0df37a16968aa0a9818ffbb9de75"
+    },
+    {
+      "suite": "dev.notai.tracker.ScheduleDeliveryTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "d9c2a8c92753a67a075f7eecb456c7b18bdabbc83cda00a82a97f56679655ffb"
+    },
+    {
+      "suite": "dev.notai.tracker.ScheduleReceiptIndexTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "b35da7c93cded0ce4a2b701040bdbc7e56063827664a8fce70de1896b6213df7"
+    },
+    {
+      "suite": "dev.notai.tracker.SealedArchiveGraphTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "560cbbe8159affe9ae75b99f7e54e85fff26670ff0cfee37b2ea0e423452ec84"
+    },
+    {
+      "suite": "dev.notai.tracker.StreamingDelimiterTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sha256": "8d6304d2e03abb13d4886b462bf5a215302dceea1921b96ec5f2e9fff2885b87"
+    }
+  ]
+}

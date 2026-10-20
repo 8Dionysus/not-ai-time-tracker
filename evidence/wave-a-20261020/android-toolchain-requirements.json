@@ -1,0 +1,40 @@
+{
+  "repository_url": "https://dl.google.com/android/repository/repository2-3.xml",
+  "repository_sha256": "237eefe28e55619d3e63d730f8994cc1ae6d9c171096f07a6c147297145787e6",
+  "license_accepted_in_this_executor": false,
+  "packages": [
+    {
+      "package": "platforms;android-36",
+      "url": "https://dl.google.com/android/repository/platform-36_r02.zip",
+      "size_bytes": 65878410,
+      "repository_sha1": "2c1a80dd4d9f7d0e6dd336ec603d9b5c55a6f576",
+      "license_id": "android-sdk-license",
+      "license_sha256": "1f8729233617b193fd619213792ae16a41b95d2bbbf525dfe66998252ba68b16"
+    },
+    {
+      "package": "ndk;30.0.16248370",
+      "url": "https://dl.google.com/android/repository/android-ndk-r30-linux.zip",
+      "size_bytes": 738633529,
+      "repository_sha1": "5107f898313790e449e87eee2183d9a20602dee9",
+      "license_id": "android-sdk-license",
+      "license_sha256": "1f8729233617b193fd619213792ae16a41b95d2bbbf525dfe66998252ba68b16"
+    },
+    {
+      "package": "build-tools;35.0.0",
+      "url": "https://dl.google.com/android/repository/build-tools_r35_linux.zip",
+      "size_bytes": 61958799,
+      "repository_sha1": "2cfaa0bbb2336e9ec18ed3ecea84fa2e2af607bc",
+      "license_id": "android-sdk-license",
+      "license_sha256": "1f8729233617b193fd619213792ae16a41b95d2bbbf525dfe66998252ba68b16"
+    },
+    {
+      "package": "cmdline-tools;latest",
+      "url": "https://dl.google.com/android/repository/commandlinetools-linux-16111833_latest.zip",
+      "size_bytes": 181052239,
+      "repository_sha1": "e025545c62a8e64c7559119566a569fb1dec5f60",
+      "license_id": "android-sdk-license",
+      "license_sha256": "1f8729233617b193fd619213792ae16a41b95d2bbbf525dfe66998252ba68b16"
+    }
+  ],
+  "historical_authorization_scope": "docs/ANDROID_RUNTIME_PREFLIGHT.md: one official Emulator+AOSP preflight attempt on 2026-10-15, same license digest; no extension of that authorization assumed"
+}

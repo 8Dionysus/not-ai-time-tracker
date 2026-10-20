@@ -52,15 +52,20 @@ object PlanSurfaces {
         return workspace.execute(draft.id,draft.revision)
     }
 
-    private const val TAP = "planTap"
-    fun pending(c: Context,choice: PlannedChoice,snapshot: Snapshot,index: Int): PendingIntent {
-        val tap = PlanTap(choice.key,choice.seriesRevision,choice.overrideRevision,snapshot.token)
-        val intent = Intent(c,PlanStartReceiver::class.java).setAction("dev.notai.tracker.PLAN_START")
-            .setData(Uri.Builder().scheme("notai").authority("plan").appendPath(choice.key.seriesId).appendPath(choice.key.originalDate).appendPath(index.toString()).build())
-            .putExtra(TAP,codec.encodeToString(tap))
-        return PendingIntent.getBroadcast(c,0,intent,PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+    private const val TAP = "tap"
+    fun pending(c: Context,choice: PlannedChoice,snapshot: Snapshot,index: Int): PendingIntent = pending(c,choice,snapshot.token,index)
+    /** Extras do not take part in PendingIntent identity, and the shade or widget may still show an older rendering. So the
+     * whole tap (occurrence, revisions and the token on screen) lives in the data URI: a newer rendering gets its own
+     * PendingIntent and can never rewrite what an older, still visible button sends. */
+    internal fun pending(c: Context,choice: PlannedChoice,token: Token,index: Int): PendingIntent {
+        val tap = PlanTap(choice.key,choice.seriesRevision,choice.overrideRevision,token)
+        val intent = Intent(c,PlanStartReceiver::class.java).setAction(ACTION)
+            .setData(Uri.Builder().scheme("notai").authority("plan").appendPath(index.toString())
+                .appendQueryParameter(TAP,codec.encodeToString(tap)).build())
+        return PendingIntent.getBroadcast(c,0,intent,PendingIntent.FLAG_IMMUTABLE)
     }
-    internal fun parse(intent: Intent): PlanTap? = intent.getStringExtra(TAP)?.takeIf { it.length <= 8192 }
+    private const val ACTION = "dev.notai.tracker.PLAN_START"
+    internal fun parse(intent: Intent): PlanTap? = intent.takeIf { it.action == ACTION }?.data?.getQueryParameter(TAP)?.takeIf { it.length <= 8192 }
         ?.let { runCatching { codec.decodeFromString<PlanTap>(it) }.getOrNull() }
 
     /** The widget is the only background plan surface: refresh it (and the shade with it) at the plan's day boundary. */

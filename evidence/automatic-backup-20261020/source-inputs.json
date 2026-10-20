@@ -1,0 +1,13 @@
+{
+  "app/src/main/AndroidManifest.xml": "9f9cb341a367da428eeadc14ced2a81336982ec6504959a341b249248f6d4ee5",
+  "app/src/main/kotlin/dev/notai/tracker/android/AndroidRuntime.kt": "60bb09469f7c7d1d6f980ae125dbedc467f93a24e4347d338a5f163279cc4c36",
+  "app/src/main/kotlin/dev/notai/tracker/android/AutomaticBackup.kt": "922b4ca9d7a6afd710825c0267c13a3377c5a1d6f17261b865049d62b044720a",
+  "app/src/main/kotlin/dev/notai/tracker/android/AutomaticBackupAndroid.kt": "c35f24247c3f1bbbacff68fdf4dbdd201627fc0d5225afe4b99ccd96aa88e2fc",
+  "app/src/main/kotlin/dev/notai/tracker/android/PrivateFiles.kt": "12cea43e312771775cc4eba116978f13b278c2ff5dcdbd1d4a7af712cb3766fc",
+  "app/src/test/kotlin/dev/notai/tracker/android/AutomaticBackupAndroidTest.kt": "b5ee82d1c44b35727365497b6ffa31e5bb3cfec476d0933fb78c355af1d9425c",
+  "app/src/test/kotlin/dev/notai/tracker/android/AutomaticBackupControllerTest.kt": "f7639b267c265cec254f12442b691a4bb93b0dea85d651132adb74d1505cb450",
+  "core/src/main/kotlin/dev/notai/tracker/Backup.kt": "9c48455644056a92b8552de966c1dea860b5e4f13b9b56685e49bb0091246612",
+  "core/src/main/kotlin/dev/notai/tracker/PrivateCopyCatalog.kt": "32fdd992fac1a593972660500894881e9ac224223a19d28f4204b5c3bff67389",
+  "core/src/test/kotlin/dev/notai/tracker/BackupSourceTest.kt": "bde926b98acd21150c3da24e024ec6bf3678e2099b5f200e18a875a463336f1f",
+  "core/src/test/kotlin/dev/notai/tracker/PrivateCopyCatalogTest.kt": "0210dc76fa01f1d5d23a1a59c2d6e743229ad6210b06ceb78ed4184b10b7e0dd"
+}

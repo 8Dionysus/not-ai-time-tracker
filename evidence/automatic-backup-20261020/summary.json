@@ -1,0 +1,98 @@
+{
+  "base_commit": "aec172013ef54ab163c9a810ff49b8b2a90d5a61",
+  "scope": "Targeted host/controller/native receipt checks; no live cloud/device/APK/lint/full suites",
+  "final_suites": [
+    {
+      "suite": "dev.notai.tracker.PrivateCopyCatalogTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "explicitOptionalOwnerRetryRevalidatesSurvivingLeaseWithoutExpiringForeignOwners",
+        "optionalExportValidationDoesNotBlockNextDurableCallback",
+        "automaticExportReceiptAcceptsOnlyExactOwnerAndKeepsLegacyReceiptCompatibility"
+      ]
+    },
+    {
+      "suite": "dev.notai.tracker.JournalATest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "bothBackupReadersKeepEveryLegacyVersionAndPresentationDefaults"
+      ]
+    },
+    {
+      "suite": "dev.notai.tracker.BackupSourceTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "streamingReceiptNamesTheCapturedRevisionEvenWhenHistoryChangesDuringSerialization"
+      ]
+    },
+    {
+      "suite": "dev.notai.tracker.android.AutomaticBackupAndroidTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "realExportFailureRetriesExactOwnedBytesOnSameDocumentAndManualFailureAdmissionIsUnchanged",
+        "actualGrantCapabilityAndAvailabilityAreRequiredNotJustUri",
+        "existingStreamingStagingProviderWriteAndRestorePreserveDatasetAndVersion15",
+        "deviceLocalJournalSurvivesNewControllerAndJobsAreOptInUniqueAndCancellable"
+      ]
+    },
+    {
+      "suite": "dev.notai.tracker.android.AutomaticBackupControllerTest",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "disableDuringUploadRevokesCompletionAndExplicitRetryReconcilesIt",
+        "interruptedWriteRestartsSameDocumentAndPreservesLastGoodUntilVerified",
+        "switchingDestinationImmediatelyBacksUpTheSameRevisionWithoutWritingTheOldFolder",
+        "automaticRetriesAreBoundedAndExplicitRetryKeepsTheSamePendingOperation",
+        "ambiguousCreationRequiresExplicitRecoveryAndDoesNotMultiplyUnknownFiles",
+        "deathAfterDurableSuccessRetainsAndReplaysExactPrivateCompletionWithoutAnotherUpload",
+        "explicitBackupRequestAllowsAnotherVerifiedVersionWithoutInventingARevision",
+        "newerRevisionDuringStageIsNotClaimedByOlderSnapshotAndQueueCoalesces",
+        "retentionFailureRetainsNewestSuccessAndOnlyRetriesOwnedVerifiedVersions",
+        "blockedProviderIoAllowsOptOutAndRefusesAnotherWorker",
+        "periodicIntervalIntentionallyRefreshesTheSameRevisionButDisplayTicksDoNot",
+        "tamperedOldDocumentIsNotDeletedAsAnOwnedBackup",
+        "exactPrivateCompletionCanBeRetriedAfterOptOutWithoutAnyExternalWrite",
+        "repeatedJobAndRestartAfterProviderWriteDoNotCreateOrWriteAgain",
+        "deathBetweenReservedStagingBeginAndSnapshotKeepsTheExactExportIdentity",
+        "revokedGrantOfflineAndUnsupportedDoNotLoseQueueOrLastSuccess",
+        "stopRequestedDuringProviderIoCannotPublishCompletionAndRetryReconcilesBytes",
+        "corruptOrUnavailableReadbackCannotCommitSuccessOrRetireGoodCopies"
+      ]
+    },
+    {
+      "suite": "dev.notai.tracker.android.ExportCompletionDispatchTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "durableResultAndChooserReleaseReturnWhileOptionalRegistrationIsBlocked"
+      ]
+    }
+  ],
+  "totals": {
+    "tests": 28,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "host_fixture": {
+    "kind": "Linux host JNI, not Android ABI or device evidence",
+    "sha256": "9f112742f3537f3c87ec35333b176980d12aebe6e67996549c40c3f24bdea9da"
+  }
+}

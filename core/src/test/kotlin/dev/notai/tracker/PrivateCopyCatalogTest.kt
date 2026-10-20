@@ -6,6 +6,22 @@ import org.junit.Test
 import kotlin.test.*
 
 class PrivateCopyCatalogTest {
+    @Test fun automaticExportReceiptAcceptsOnlyExactOwnerAndKeepsLegacyReceiptCompatibility() = fixture { root,_,gate,catalog ->
+        val own = newId();val legacy = newId();val wrong = newId()
+        fun receipt(id: String,owner: String?) {
+            val directory = File(root,"exports/$id").apply { mkdirs() }
+            val extra = owner?.let { ",\"automaticOwner\":\"$it\"" }.orEmpty()
+            File(directory,"operation.json").writeText("""{"id":"$id","mime":"application/json","title":"synthetic","state":"CANCELLED","resultReceived":true$extra}""")
+        }
+        receipt(own,own);receipt(legacy,null);receipt(wrong,own)
+        catalog.registerExportAfterHandoff(own);catalog.registerExportAfterHandoff(legacy)
+        val before = gate.state()
+        assertFailsWith<CoreError> { catalog.registerExportAfterHandoff(wrong) }
+        // Rejected admission may retain its exact registration witness; it must never register/delete bytes.
+        assertEquals(before.copies,gate.state().copies)
+        assertEquals(2,gate.state().copies.size)
+        assertTrue(File(root,"exports/$wrong/operation.json").exists())
+    }
     private fun fixture(block: (File,DescriptorCopyFiles,CopyMaintenance,PrivateCopyCatalog)->Unit) {
         val library = System.getProperty("tracker.cleanup.library");org.junit.Assume.assumeNotNull(library)
         val root = Files.createTempDirectory("tracker-private-catalog-").toFile()

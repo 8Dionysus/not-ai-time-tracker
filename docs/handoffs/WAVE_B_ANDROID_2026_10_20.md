@@ -8,8 +8,8 @@ No `.agents/skills` directory exists in this checkout; repository AGENTS.md was 
 ## Implemented
 
 - Static `open_timer` MAIN alias removed from shortcut metadata; refresh retires retained pinned copies. Ordinary application tap is unchanged.
-- Existing dynamic `timer_action` remains the only command path, with the original shown target/token. New `timer_choose` opens the existing SurfaceChoices route (no second command implementation), respects launcher count, shortcut opt-out and immutable timer target. Focus only offers the existing primary action; recovery withdraws actions.
-- SurfaceChoices accepts SHORTCUT and gates application on the persisted shortcut preference inside the existing Tracker action. Old routes do not retarget a new timer.
+- Existing dynamic `timer_action` remains the only command path, with the original shown target/token. New `timer_choose` opens the existing SurfaceChoices route (no second command implementation), respects launcher count, shortcut opt-out and immutable timer target. Focus only offers the existing primary action and explicitly disables retained pinned chooser entries; recovery withdraws both actions. Entries omitted by launcher limits are also disabled, with timer_action first.
+- SurfaceChoices accepts SHORTCUT and gates application on the persisted shortcut preference and absence of Focus inside the existing Tracker action. Old routes do not retarget a new timer.
 - SurfaceSettingsBackend exposes `timerNotification`: observed importance, requested status-bar icon behavior and channel lock-screen visibility, plus `OPEN_TIMER_CHANNEL_SETTINGS` for the existing control channel. No channel migration, importance rewriting, icon substitution or overlay FGS suppression.
 - Notification full chooser remains available even when compact quick suggestions are empty.
 - FloatingTimerService exposes `openAssignmentChooser()`: explicit UI callback opens the existing route with the original assignment receipt/target, hides only the overlay panel, and does not cancel that receipt. Opus must bind its visible action.
@@ -65,3 +65,12 @@ Required next checks in an equipped environment: :app:compileDebugKotlin; RoomSc
 - https://developer.android.com/develop/ui/views/notifications/custom-notification — decorated custom views retain system notification controls/header.
 - https://developer.android.com/training/data-storage/shared/documents-files — user-selected SAF document storage and one-shot access.
 - https://developer.android.com/training/data-storage/app-specific — app-specific files are removed on uninstall.
+
+
+## Follow-up source review after checkpoint
+
+The existing presentation theme is private SharedPreferences("ui"). It is not part of full JSON backup. The proposed privacy/alpha fields belong in existing serializable SurfaceSettings, not this private theme store. Validate finite Float values in 0f..1f in validate(Dataset); absent legacy fields default to PRIVATE/1f/1f. Backups already serializes Settings and RestorePreview.settings exposes the incoming values; explicit whole-copy restore can carry them. Reset only these fields via Tracker.settings, preserving delivery opt-ins and unrelated settings. Exact A field names/source remain pending.
+
+No tracked .github/workflows or alternate CI configuration exists on the verified main. No existing CI was available to dispatch. Compile requires a pre-provisioned Gradle 8.13 distribution and Android SDK36/declared NDK, then the previously listed Gradle commands; network/security settings were not changed and no repeated unchanged download was attempted.
+
+Root assigned the full-picker assignment routing fix exclusively to A, so the receipt loss is a required functional integration fix, not deferred visual redesign.

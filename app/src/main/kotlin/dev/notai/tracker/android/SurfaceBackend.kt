@@ -114,7 +114,8 @@ object SurfaceChoices {
         ensure(snapshot.timerTarget == route.target,"Picker timer target changed",ErrorCode.STALE)
         val offer = route.assignmentId?.let { id -> tracker.pendingAssignments().find { it.id == id } ?: fail(ErrorCode.STALE,"Assignment expired") }
         val end = minOf(MAX_TIME,tracker.clock.now().wall+1)
-        return SurfacePickerState(route,view.choices().quick(HistoryWindow(maxOf(0,end-30L*24*60*60*1000),end)),offer)
+        val excluded = if(route.assignmentId == null && route.application == ChoiceApplication.SWITCH) snapshot.session?.selection else null
+        return SurfacePickerState(route,view.choices().quick(HistoryWindow(maxOf(0,end-30L*24*60*60*1000),end),excludeSelection = excluded),offer)
     }
     /** User explicitly reopens a saved record; stale routes/nonces are not silently refreshed. */
     fun reopen(context: Context,tracker: Tracker,source: Surface,expected: Token,sessionId: String): SurfacePickerRoute {

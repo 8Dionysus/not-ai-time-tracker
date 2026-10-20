@@ -156,6 +156,14 @@ object SurfaceViews {
         return builder.build()
     }
 
+    /** Narrow RemoteViews binding for a dedicated background ImageView. The XML owner supplies
+     * its ID; using image alpha preserves the shape/corners and does not fade foreground content.
+     */
+    internal fun widgetBackgroundAlpha(views: RemoteViews, backgroundImageId: Int, percent: Int) {
+        require(percent in 0..100)
+        views.setInt(backgroundImageId,"setImageAlpha",(percent * 255 + 50) / 100)
+    }
+
     fun widget(c: Context, view: TrackerView, enabled: Boolean): RemoteViews = RemoteViews(c.packageName, R.layout.timer_widget).also { rv ->
         val s = view.snapshot()
         val r = if (enabled) row(view.data, s)

@@ -47,7 +47,19 @@ data class EntryUi(val segmentId: String, val sessionId: String, val start: Long
                    val label: Label, val note: String?, val selection: Classification)
 data class DayUi(val date: LocalDate, val start: Long, val end: Long, val recordedMs: Long, val incomplete: Boolean, val entries: List<EntryUi>,
                  val ribbon: List<RibbonSlot>, val live: List<RibbonSlot>, val gaps: List<GapUi> = emptyList(),
-                 val sessions: List<SessionDayRow> = emptyList())
+                 val sessions: List<SessionDayRow> = emptyList()) {
+    /** One line per record of the day: its segments (newest last) and the pauses between them, all from the core projection. */
+    val records: List<RecordUi> get() {
+        val bySession = entries.groupBy { it.sessionId }
+        return sessions.mapNotNull { row ->
+            val parts = bySession[row.sessionId]?.sortedBy { it.start } ?: return@mapNotNull null
+            RecordUi(row.sessionId, parts.last(), row.start, row.end, row.recordedMs, parts, row.pauses, row.mixedSelection)
+        }
+    }
+}
+/** [entry] is the latest segment: edit, repeat and delete act on the whole record through it, as before. */
+data class RecordUi(val sessionId: String, val entry: EntryUi, val start: Long, val end: Long, val recordedMs: Long,
+                    val segments: List<EntryUi>, val pauses: List<DraftInterval>, val mixed: Boolean)
 data class QuickStart(val title: String, val slot: Int?, val entry: ChoiceEntry, val favorite: Boolean, val glyph: Int, val reference: ChoiceReference, val expected: Token)
 data class HomeData(val today: LocalDate, val zone: ZoneId, val days: List<DayUi>, val quick: List<QuickStart>,
                     val currentLabel: Label?, val currentStart: Long?, val canLoadMore: Boolean, val focusMinutes: Long,
@@ -610,6 +622,11 @@ class TrackerViewModel internal constructor(private val app: Application,private
         if (s.focus != null) rt.tracker.resolveFocus(s.token, null, null) else rt.tracker.resolveTail(s.token, null, null)
     }
     fun startFocus() = command { rt, s -> rt.tracker.startFocus(s.token) }
+    /** Save the lengths, then start with the token that save returned: two explicit steps, never a guessed state. */
+    fun configureAndStartFocus(workMin: Int, breakMin: Int) = command { rt, s ->
+        val saved = rt.tracker.configureFocus(s.token, FocusPlan(workMin * 60_000L, breakMin * 60_000L))
+        rt.tracker.startFocus(saved.state.token)
+    }
     fun focusNext() = command { rt, s -> rt.tracker.focusNext(s.token) }
     fun focusSkip() = command { rt, s -> rt.tracker.focusSkip(s.token) }
     fun configureFocus(workMin: Int, breakMin: Int) = command({ "Отрезки изменены" }) { rt, s ->

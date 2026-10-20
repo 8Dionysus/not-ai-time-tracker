@@ -48,6 +48,8 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
@@ -167,8 +169,7 @@ private fun IdleHero(home: HomeData?, vm: TrackerViewModel, actions: TimerAction
                     Chip(if (quick.isEmpty()) "Начать с занятием" else "Все занятия", { actions.pick(PickMode.START) }, dashed = true, icon = Icon.Plus)
                 }
             }
-            PillButton("Фокус: ${home?.focusMinutes ?: 25} мин работы", vm::startFocus, kind = ButtonKind.TEXT, height = 44.dp,
-                modifier = Modifier.align(Alignment.Start).offset(x = (-18).dp))
+            FocusLink(home?.focusMinutes ?: 25, vm, Modifier.align(Alignment.Start).offset(x = (-12).dp))
         }
     }
 }
@@ -244,6 +245,19 @@ private fun ActiveHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, actio
             SectionLabel("Дальше по плану")
             PlanChips(plan, vm)
         }
+    }
+}
+
+/** Tap starts Focus, long press opens its lengths. Both are announced to accessibility services. */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun FocusLink(minutes: Long, vm: TrackerViewModel, modifier: Modifier = Modifier) {
+    val haptics = LocalHapticFeedback.current
+    Box(modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp))
+        .combinedClickable(onClickLabel = "Начать Фокус", onLongClickLabel = "Настроить Фокус",
+            onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); vm.openFocusEditor() }, onClick = vm::startFocus)
+        .padding(horizontal = 12.dp), contentAlignment = Alignment.Center) {
+        Text("Фокус: $minutes мин работы", style = NotAi.type.button, color = NotAi.colors.amberInk)
     }
 }
 
@@ -378,13 +392,13 @@ private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: Track
                 }
             }
         }
-        // Newest first, gaps in their place between the two records around them.
-        val gaps = if (day.date.toString() in openGaps) day.gaps else emptyList()
-        val rows: List<Any> = (day.entries + gaps).sortedByDescending { if (it is EntryUi) it.start else (it as GapUi).start }
-        items(rows, key = { r -> if (r is EntryUi) "${day.date}:${r.segmentId}" else "${day.date}:gap:${(r as GapUi).start}" }) { r ->
-            if (r is EntryUi) SwipeToDelete(r, actions.delete, Modifier.animateItem()) {
-                EntryRow(r, home.zone, onOpen = { actions.edit(r, day) }, onRepeat = { vm.repeat(r) },
-                    onDelete = { actions.delete(r) }, modifier = Modifier.padding(horizontal = 20.dp))
+        // One line per record, newest first; unrecorded gaps in their place. Pauses live inside their record.
+        val gaps = if (day.date.toString() in openGaps) day.gaps.filter { it.kind != dev.notai.tracker.HistoryGapKind.PAUSE } else emptyList()
+        val rows: List<Any> = (day.records + gaps).sortedByDescending { if (it is RecordUi) it.start else (it as GapUi).start }
+        items(rows, key = { r -> if (r is RecordUi) "${day.date}:${r.sessionId}" else "${day.date}:gap:${(r as GapUi).start}" }) { r ->
+            if (r is RecordUi) SwipeToDelete(r.entry, actions.delete, Modifier.animateItem()) {
+                RecordRow(r, home.zone, onOpen = { actions.edit(r.entry, day) }, onRepeat = { vm.repeat(r.entry) },
+                    onDelete = { actions.delete(r.entry) }, modifier = Modifier.padding(horizontal = 20.dp))
             } else GapRow(r as GapUi, home.zone, { actions.fillGap(r, day) }, Modifier.animateItem().padding(horizontal = 20.dp))
         }
         if (day.date == home.today) item(key = "manual") {
@@ -447,10 +461,7 @@ fun EntryRow(e: EntryUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: () -> Unit,
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             ActivityGlyph(e.label)
             Column(Modifier.weight(1f).padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Row {
-                    Text(e.label.title, style = NotAi.type.body, color = c.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    e.label.detail?.let { Text(" $it", style = NotAi.type.body, color = c.ink2, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false)) }
-                }
+                LabelText(e.label)
                 Text(Format.range(e.start, e.end, zone) + (e.note?.let { ", $it" } ?: ""), style = NotAi.type.caption, color = c.ink2,
                     maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
@@ -460,6 +471,82 @@ fun EntryRow(e: EntryUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: () -> Unit,
         Hairline()
     }
 }
+
+/** Title with its quiet detail as one text: long names wrap to a second line instead of cutting the detail. */
+@Composable
+fun LabelText(label: Label, maxLines: Int = 2, style: androidx.compose.ui.text.TextStyle = NotAi.type.body) {
+    val c = NotAi.colors
+    Text(androidx.compose.ui.text.buildAnnotatedString {
+        append(label.title)
+        label.detail?.let { withStyle(androidx.compose.ui.text.SpanStyle(color = c.ink2)) { append(" "); append(it) } }
+    }, style = style, color = c.ink, maxLines = maxLines, overflow = TextOverflow.Ellipsis)
+}
+
+/**
+ * One record of the day. A record split by pauses stays one line with a quiet "2 паузы" mark; that mark unfolds the
+ * segments and the pauses between them. Tap still opens the correction of the whole record, long press its menu.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun RecordRow(r: RecordUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: () -> Unit, modifier: Modifier = Modifier, onDelete: (suspend () -> Unit)? = null) {
+    val c = NotAi.colors
+    val e = r.entry
+    var menu by remember { mutableStateOf(false) }
+    var open by androidx.compose.runtime.saveable.rememberSaveable(r.sessionId) { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
+    val scope = rememberCoroutineScope()
+    val split = r.segments.size > 1
+    Column(modifier.fillMaxWidth().animateContentSize(tween(if (NotAi.reducedMotion) 0 else 220))) {
+        Box {
+            EntryMenu(menu, onDismiss = { menu = false }, onOpen = onOpen, onRepeat = onRepeat,
+                onDelete = onDelete?.let { d -> { scope.launch { d() } } })
+        }
+        Row(Modifier.fillMaxWidth().heightIn(min = 60.dp)
+            .combinedClickable(onClickLabel = "Исправить запись", onLongClickLabel = "Действия с записью",
+                onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); menu = true }, onClick = onOpen),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            ActivityGlyph(e.label)
+            Column(Modifier.weight(1f).padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                LabelText(e.label)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(Format.range(r.start, r.end, zone) + (e.note?.let { ", $it" } ?: ""), Modifier.weight(1f, fill = false), style = NotAi.type.caption, color = c.ink2,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (split || r.mixed) Row(Modifier.padding(start = 6.dp).heightIn(min = 28.dp).clip(RoundedCornerShape(14.dp))
+                        .pressable({ open = !open }, label = if (open) "Свернуть отрезки" else "Показать отрезки и паузы").padding(horizontal = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(if (r.pauses.isNotEmpty()) Format.plural(r.pauses.size, "пауза", "паузы", "пауз") else "разные занятия",
+                            style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk, maxLines = 1)
+                        M3Icon(Icon.ChevronDown, null, Modifier.size(12.dp).graphicsLayerRotate(if (open) 180f else 0f), tint = c.amberInk)
+                    }
+                }
+            }
+            Text(Format.duration(r.recordedMs), style = NotAi.type.body.copy(fontSize = 15.sp), color = c.ink)
+            IconAction(Icon.Repeat, "Повторить: ${e.label.title}", onRepeat, size = 16.dp)
+        }
+        if (open) Column(Modifier.padding(start = 32.dp, bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            // Chronological: segment, pause, segment… Durations are the core's per-segment values.
+            val lines = (r.segments.map { it.start to it } + r.pauses.map { it.start to it }).sortedBy { it.first }
+            lines.forEach { (_, item) ->
+                Row(Modifier.fillMaxWidth().heightIn(min = 28.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    if (item is EntryUi) {
+                        Box(Modifier.size(6.dp).clip(androidx.compose.foundation.shape.CircleShape).background(item.label.slot?.let { c.areas[it] } ?: c.none))
+                        Text(Format.range(item.start, item.end, zone), style = NotAi.type.caption, color = c.ink)
+                        Text(if (r.mixed) item.label.title else "", Modifier.weight(1f), style = NotAi.type.caption, color = c.ink2, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(Format.duration(item.durationMs), style = NotAi.type.caption, color = c.ink2)
+                    } else {
+                        val p = item as dev.notai.tracker.DraftInterval
+                        Box(Modifier.size(width = 6.dp, height = 2.dp).background(c.ink3))
+                        Text(Format.range(p.start, p.end, zone), style = NotAi.type.caption, color = c.ink3)
+                        Text("пауза", Modifier.weight(1f), style = NotAi.type.caption, color = c.ink3)
+                    }
+                }
+            }
+        }
+        Hairline()
+    }
+}
+
+private fun Modifier.graphicsLayerRotate(deg: Float) = this.then(Modifier.rotate(deg))
 
 /**
  * A quiet row for a stretch without a record. Unrecorded time can be filled in one tap; a pause or unknown time is only named.

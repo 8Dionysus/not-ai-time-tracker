@@ -135,7 +135,15 @@ fun Dataset.label(c: Classification): Label {
     val root = c.ancestorPathAtWrite.firstOrNull() ?: type?.let { rootOf(it.id) }
     val details = c.details.values.filter { it.isNotBlank() }.joinToString(", ").takeIf { it.isNotEmpty() }
     val rootName = root?.takeIf { it != c.activityTypeId }?.let { r -> types.firstOrNull { it.id == r }?.name?.lowercase() }
-    return Label(title ?: "Без занятия", details ?: rootName, Areas.slot(root), title == null && c.cardId == null, glyph(c))
+    val name = title ?: "Без занятия"
+    return Label(name, (details ?: rootName)?.takeUnless { repeats(name, it) }, Areas.slot(root), title == null && c.cardId == null, glyph(c))
+}
+
+/** "Силовая тренировка" + "тренировка и спорт" says the same twice: the quiet detail is dropped when it repeats a word of the title. */
+internal fun repeats(title: String, detail: String): Boolean {
+    fun stems(s: String) = s.lowercase().split(Regex("[^\\p{L}\\p{N}]+")).filter { it.length >= 4 }.map { it.take(5) }.toSet()
+    val t = stems(title)
+    return t.isNotEmpty() && stems(detail).any { it in t }
 }
 
 /** Icon through the core's semantic keys; a named choice without a type is "custom", never "unclassified". */

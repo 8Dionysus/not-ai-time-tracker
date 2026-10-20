@@ -241,6 +241,7 @@ class UiScreensTest {
         waitText("9:10–11:02")
         compose.onAllNodesWithText("9:10–11:02", substring = true).onFirst().performClick()
         waitText("Исправить запись")
+        vm.setCorrectionStepMinutes(5); compose.waitForIdle()
         compose.onAllNodesWithContentDescription("Начало раньше на 5 минут")[0].performClick()
         waitText("→ 6 ч 01 мин")
         shot("03-correction", vm)

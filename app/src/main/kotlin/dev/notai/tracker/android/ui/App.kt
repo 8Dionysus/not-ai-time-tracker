@@ -118,6 +118,8 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     val incomingDrafts by vm.incomingDrafts.collectAsStateWithLifecycle()
     val entryForm by vm.entryForm.collectAsStateWithLifecycle()
     val surfacePicker by vm.surfacePicker.collectAsStateWithLifecycle()
+    val step by vm.correctionStepMinutes.collectAsStateWithLifecycle()
+    val focusEditor by vm.focusEditor.collectAsStateWithLifecycle()
     var fullSurfacePickerId by remember { mutableStateOf<String?>(null) }
     val snackbar = remember { SnackbarHostState() }
     val dark = c.isDark
@@ -193,12 +195,14 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
         }
         Sheet.Earlier -> {
             val seg = snapshot?.active
-            if (seg != null) EarlierSheet(zone, seg.start, remember { vm.now() }, onNext = { at -> sheet = Sheet.Picker(PickMode.EARLIER, at) }, onDismiss = { sheet = null })
+            if (seg != null) EarlierSheet(zone, seg.start, remember { vm.now() }, onNext = { at -> sheet = Sheet.Picker(PickMode.EARLIER, at) }, onDismiss = { sheet = null },
+                step = step, onStep = vm::setCorrectionStepMinutes)
             else LaunchedEffect(Unit) { sheet = null }
         }
         Sheet.Resolve -> {
             val start = snapshot?.active?.start ?: home?.currentStart
-            if (start != null) ResolveSheet(zone, start, remember { vm.now() }, onConfirm = vm::resolveTail, onDismiss = { sheet = null })
+            if (start != null) ResolveSheet(zone, start, remember { vm.now() }, onConfirm = vm::resolveTail, onDismiss = { sheet = null },
+                step = step, onStep = vm::setCorrectionStepMinutes)
             else LaunchedEffect(Unit) { sheet = null }
         }
         Sheet.StartEarlier -> {
@@ -228,6 +232,7 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
         ConfirmDialog("Заменить черновик?", "Текущий текст: «${draft?.note.orEmpty()}»\nНовый текст: «${incoming.draft.note.orEmpty()}»",
             "Заменить",onConfirm = { vm.resolveIncomingDraft(incoming.id,true) },onDismiss = { vm.resolveIncomingDraft(incoming.id,false) })
     }
+    focusEditor?.let { plan -> FocusEditorSheet(vm, plan, snapshot?.focus != null, onDismiss = vm::closeFocusEditor) }
     when (val e = editor) {
         is Editor.Plan -> PlanSheet(vm, e.existing, onPickActivity = { formPicker = it }, onDismiss = { editor = null })
         is Editor.Goal -> GoalSheet(vm, e.draft, onPickActivity = { formPicker = it }, onDismiss = { editor = null })

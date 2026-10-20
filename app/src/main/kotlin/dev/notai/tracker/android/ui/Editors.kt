@@ -263,3 +263,39 @@ fun ShareSheet(vm: TrackerViewModel, initial: Period, onDismiss: () -> Unit) {
         }
     }
 }
+
+/** Focus lengths from a long press on Home. A running phase keeps the length it started with; the next one uses the new values. */
+@Composable
+fun FocusEditorSheet(vm: TrackerViewModel, plan: dev.notai.tracker.FocusPlan, running: Boolean, onDismiss: () -> Unit) {
+    val c = NotAi.colors
+    var work by rememberSaveable { mutableIntStateOf((plan.workMs / 60_000L).toInt()) }
+    var rest by rememberSaveable { mutableIntStateOf((plan.breakMs / 60_000L).toInt()) }
+    NotAiSheet(onDismiss, fullHeight = false) {
+        SheetHeader("Фокус", onDismiss)
+        Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            MinuteStepper("Работа", work, { work = (if (work > 10) work - 5 else work - 1).coerceAtLeast(5) }, { work = (if (work >= 10) work + 5 else work + 1).coerceAtMost(180) })
+            MinuteStepper("Перерыв", rest, { rest = (if (rest > 5) rest - 5 else rest - 1).coerceAtLeast(1) }, { rest = (if (rest >= 5) rest + 5 else rest + 1).coerceAtMost(60) })
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(25 to 5, 50 to 10, 90 to 15).forEach { (w, b) -> DateChip("$w / $b", work == w && rest == b) { work = w; rest = b } }
+            }
+            Text(if (running) "Текущий отрезок досчитается как начат, новые длительности — со следующего." else "Длительности сохранятся и для следующих раз.",
+                style = NotAi.type.caption, color = c.ink2)
+        }
+        ButtonPair(Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp)) { m ->
+            PillButton("Сохранить", { vm.configureFocus(work, rest); onDismiss() }, m, ButtonKind.TONAL)
+            if (!running) PillButton("Начать", { vm.configureAndStartFocus(work, rest); onDismiss() }, m, ButtonKind.PRIMARY)
+        }
+    }
+}
+
+@Composable
+private fun MinuteStepper(title: String, minutes: Int, minus: () -> Unit, plus: () -> Unit) {
+    val c = NotAi.colors
+    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(c.sunk).padding(start = 14.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(title, Modifier.weight(1f), style = NotAi.type.body, color = c.ink)
+        IconAction(Icon.Minus, "$title: меньше", minus, tint = c.ink, size = 16.dp)
+        Text("$minutes мин", Modifier.widthIn(min = 64.dp).semantics { contentDescription = "$title: $minutes минут" },
+            style = NotAi.type.body.copy(fontWeight = FontWeight.Medium), color = c.ink, textAlign = TextAlign.Center)
+        IconAction(Icon.Plus, "$title: больше", plus, tint = c.ink, size = 16.dp)
+    }
+}

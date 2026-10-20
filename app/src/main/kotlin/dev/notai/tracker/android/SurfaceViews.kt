@@ -56,11 +56,13 @@ object SurfaceViews {
             }
             s.mode == Mode.RUNNING -> Row(glyph, tint, name, null, Chrono(now - s.trustedDurationMs, true, false, null), TimerCommand.STOP, TimerCommand.PAUSE)
             s.mode == Mode.PAUSED -> Row(glyph, tint, name, null, Chrono(now - s.trustedDurationMs, false, false, "Пауза · %s"), TimerCommand.STOP, TimerCommand.RESUME)
-            else -> Row(R.drawable.ic_stat_notai, R.color.widget_ink2, "Учёт не идёт", "Начни сейчас, занятие выберешь потом", null, TimerCommand.START, null)
+            else -> Row(R.drawable.ic_stat_notai, R.color.widget_ink2, "Учёт не идёт", "Занятие выберешь потом", null, TimerCommand.START, null)
         }
     }
 
     private fun bind(c: Context, rv: RemoteViews, r: Row, s: Snapshot, source: Surface) {
+        // The shade already shows the app mark in its header: the row repeats only an activity icon, never the brand.
+        rv.setViewVisibility(R.id.surface_glyph, if (source == Surface.NOTIFICATION && r.glyph == R.drawable.ic_stat_notai) View.GONE else View.VISIBLE)
         rv.setImageViewResource(R.id.surface_glyph, r.glyph)
         rv.setInt(R.id.surface_glyph, "setColorFilter", c.getColor(r.tint))
         rv.setTextViewText(R.id.surface_title, r.title)

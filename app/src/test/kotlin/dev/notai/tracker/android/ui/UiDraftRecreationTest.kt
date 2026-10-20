@@ -110,6 +110,7 @@ class UiDraftRecreationTest {
     }
     private fun form(correction:Boolean) {
         val initial=t.data()
+        vm.setCorrectionStepMinutes(5) // these regressions were written for the former fixed 5-minute step
         if(correction) compose.onNodeWithText("Original correction note",substring=true).performScrollTo().performClick()
         else compose.onNodeWithText("Добавить запись задним числом").performScrollTo().performClick()
         compose.onNodeWithText(if(correction) "Исправить запись" else "Добавить запись").assertExists()
@@ -146,6 +147,7 @@ class UiDraftRecreationTest {
     @Test fun correctionInputsSurviveAndPreviewRecomputesAgainstChangedData()=form(true)
     private fun failedSave(kind: String) {
         val correction = kind == "stale"
+        vm.setCorrectionStepMinutes(5)
         if(correction) compose.onNodeWithText("Original correction note",substring = true).performScrollTo().performClick()
         else compose.onNodeWithText("Добавить запись задним числом").performScrollTo().performClick()
         compose.onNodeWithContentDescription("Заметка").performTextReplacement("Retain after refused Save")

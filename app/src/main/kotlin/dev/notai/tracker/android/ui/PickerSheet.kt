@@ -78,7 +78,8 @@ fun SearchField(value: String, onChange: (String) -> Unit, placeholder: String, 
  */
 @Composable
 fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startClock: String?, boundaryClock: String?, boundary: Long?,
-                onDismiss: () -> Unit, onReturn: ((Classification, Label) -> Unit)? = null) {
+                onDismiss: () -> Unit, surfaceRoute: dev.notai.tracker.android.SurfacePickerRoute? = null,
+                onReturn: ((Classification, Label) -> Unit)? = null) {
     val c = NotAi.colors
     var effective by remember { mutableStateOf(mode) }
     var query by remember { mutableStateOf("") }
@@ -97,10 +98,15 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
         // Areas with children open first; the area itself stays choosable as "Вся область" inside.
         if (!item.whole && (item.entry.availability == ChoiceAvailability.GROUP || (item.count ?: 0) > 0)) { stack = stack + item; query = ""; return }
         if (!item.entry.canStart) return
+        if (surfaceRoute != null) {
+            item.reference?.let { vm.chooseSurface(it,expectedRoute = surfaceRoute) }
+            return // The route closes only after a successful command; failures leave it reviewable.
+        }
         if (onReturn != null) onReturn(item.entry.selection, item.label) else vm.choose(item.entry, effective, boundary,item.reference,item.expected)
         onDismiss()
     }
     fun create(name: String) {
+        if (surfaceRoute != null) { vm.createSurfaceCard(surfaceRoute,name); return }
         if (onReturn != null) vm.createCard(name) { sel, label -> onReturn(sel, label) } else vm.createAndChoose(name, effective, boundary)
         onDismiss()
     }
@@ -116,7 +122,7 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
         SheetHeader(if (parent != null && query.isBlank()) parent.label.title else title, onDismiss,
             back = if (parent != null && query.isBlank()) ({ stack = stack.dropLast(1) }) else null)
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (active && (mode == PickMode.SWITCH || mode == PickMode.LABEL)) {
+            if (surfaceRoute == null && active && (mode == PickMode.SWITCH || mode == PickMode.LABEL)) {
                 Segmented(listOf(PickMode.SWITCH to "Начать новое", PickMode.LABEL to "Уточнить текущее"), effective, { effective = it })
                 Text(if (effective == PickMode.SWITCH) "Текущая запись закончится сейчас, новая начнётся с этой минуты."
                      else "Название получит уже идущая запись. Начало остаётся ${startClock ?: "прежним"}.",
@@ -124,7 +130,7 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
             }
             if (effective == PickMode.EARLIER && boundaryClock != null)
                 Text("До $boundaryClock остаётся текущее занятие, с $boundaryClock начнётся выбранное.", style = NotAi.type.caption, color = c.ink2)
-            draft?.note?.takeIf { onReturn == null && effective != PickMode.EARLIER }?.let { note ->
+            draft?.note?.takeIf { surfaceRoute == null && onReturn == null && effective != PickMode.EARLIER }?.let { note ->
                 Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(c.amberWash).padding(start = 14.dp, top = 4.dp, bottom = 4.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                     Text("Заметка: «$note»", Modifier.weight(1f), style = NotAi.type.bodySmall, color = c.ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
@@ -183,7 +189,7 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
                 }
             }
         }
-        if (effective == PickMode.START && onReturn == null) {
+        if (surfaceRoute == null && effective == PickMode.START && onReturn == null) {
             Hairline()
             PillButton(if (draft != null) "Начать без занятия, с заметкой" else "Начать без занятия", {
                 if (draft != null) vm.startDraftBlank() else vm.startBlank(); onDismiss()

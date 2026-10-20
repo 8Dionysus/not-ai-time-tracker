@@ -58,8 +58,17 @@ const val MAX_TIME = 253402300799999L // last millisecond of year 9999
     constructor(id: String = newId(), fieldId: String, meaningVersion: Int = 1, unit: String, scope: Scope, targetId: String, value: Long):
         this(id,fieldId,meaningVersion,unit,scope,targetId,Decimal(value.toString()))
 }
+@Serializable enum class NotificationPrivacy { PRIVATE, FULL, HIDDEN }
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 @Serializable data class SurfaceSettings(val widget: Boolean = false,val notification: Boolean = false,val overlay: Boolean = false,val focusSignal: Boolean = false,
-    val shortcut: Boolean = true) // Preserve the previously always-enabled launcher timer on legacy decode.
+    val shortcut: Boolean = true,
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val notificationPrivacy: NotificationPrivacy? = null,
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val widgetBackgroundAlphaPercent: Int = 100,
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val overlayChooserBackgroundAlphaPercent: Int = 100)
+internal fun SurfaceSettings.hasPresentationPreferences() = notificationPrivacy != null || widgetBackgroundAlphaPercent != 100 || overlayChooserBackgroundAlphaPercent != 100
+internal fun validateSurfaceSettings(value: SurfaceSettings) {
+    ensure(value.widgetBackgroundAlphaPercent in 0..100 && value.overlayChooserBackgroundAlphaPercent in 0..100,"Surface background alpha must be 0..100")
+}
 @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 @Serializable data class Settings(val reportZone: String = "UTC",val surfaces: SurfaceSettings = SurfaceSettings(),val focusPlan: FocusPlan = FocusPlan(),
     @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val schedule: ScheduleSettings = ScheduleSettings(),
@@ -142,6 +151,7 @@ fun validate(data: Dataset) {
     try { ZoneId.of(data.settings.reportZone) } catch (_: Exception) { fail(ErrorCode.INVALID_INPUT, "Invalid report zone") }
     data.settings.reportDayPolicy.validate()
     validateSavedReports(data)
+    validateSurfaceSettings(data.settings.surfaces)
     validateScheduleSettings(data.settings.schedule)
     validateLongRecordPreference(data.settings.longRecordReminder)
     ids(data.types.map { it.id }); ids(data.cards.map { it.id }); ids(data.favorites.map { it.id }); ids(data.sessions.map { it.id })

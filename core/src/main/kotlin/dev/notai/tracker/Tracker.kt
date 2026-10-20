@@ -284,9 +284,19 @@ class Tracker(val store: StateStore, val clock: Clock) {
         val f = d.favorites.find { it.id == favoriteId } ?: fail(ErrorCode.INVALID_INPUT, "Missing favorite")
         append(d,f.selection,choiceStartNote(d,ChoiceKind.FAVORITE,f.id,f.selection,null),n)
     }
-    fun removeFavorite(expected: Token, favoriteId: String) = mutate(expected) { d,_ ->
+    fun removeFavorite(expected: Token, favoriteId: String) = mutate(expected,true) { d,_ ->
         ensure(d.favorites.any { it.id == favoriteId }, "Missing favorite")
         d.copy(favorites = d.favorites.filterNot { it.id == favoriteId })
+    }
+    /** User add is idempotent by semantic selection and note policy. Explicit ID edits use saveFavorite.
+     * Existing duplicates and their identities are retained; adding never renames an existing favorite. */
+    fun addFavorite(expected: Token, favorite: Favorite) = mutate(expected,true) { d,_ ->
+        val same = d.favorites.any { selectionIdentity(it.selection) == selectionIdentity(favorite.selection) &&
+            (it.personal.notePolicy ?: ChoiceNotePolicy.CLEAR) == (favorite.personal.notePolicy ?: ChoiceNotePolicy.CLEAR) }
+        if(same) d else {
+            ensure(d.favorites.none { it.id == favorite.id },"Favorite ID already exists; use saveFavorite to edit")
+            d.copy(favorites = d.favorites + favorite)
+        }
     }
     fun saveFavorite(expected: Token, favorite: Favorite) = mutate(expected) { d,_ ->
         d.copy(favorites = d.favorites.filterNot { it.id == favorite.id } + favorite.copy(personal = d.favorites.find { it.id == favorite.id }?.personal ?: favorite.personal))
@@ -296,6 +306,9 @@ class Tracker(val store: StateStore, val clock: Clock) {
             ensure(old.meaningVersion == type.meaningVersion && old.definition == type.definition,
                 "A new type meaning/version/definition requires a new ID; existing history retains the old ID")
         }
+        val old = d.types.find { it.id == type.id }
+        if(type.parentId != null && (old == null || old.parentId != type.parentId))
+            ensure(d.types.any { it.id == type.parentId && !it.archived },"Parent missing or archived")
         d.copy(types = d.types.filterNot { it.id == type.id } + type)
     }
     /** Install absent definitions only; report every added, identical and conflicting key. */
@@ -334,6 +347,9 @@ class Tracker(val store: StateStore, val clock: Clock) {
         d.copy(units = d.units.filterNot { it.id == unit.id } + unit)
     }
     fun saveCard(expected: Token, card: Card) = mutate(expected) { d,_ ->
+        val old = d.cards.find { it.id == card.id }
+        if(card.activityTypeId != null && (old == null || old.activityTypeId != card.activityTypeId))
+            ensure(d.types.any { it.id == card.activityTypeId && !it.archived },"Activity type missing or archived")
         d.copy(cards = d.cards.filterNot { it.id == card.id } + card.copy(personal = d.cards.find { it.id == card.id }?.personal ?: card.personal))
     }
     /** Profile edits have a dedicated boundary: ordinary card/catalog saves preserve them. */

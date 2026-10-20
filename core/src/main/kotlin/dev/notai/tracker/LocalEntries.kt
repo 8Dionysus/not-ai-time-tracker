@@ -16,6 +16,27 @@ fun Report.groupSimilar(): List<HistoryGroup> = frozenList(rows.distinctBy { it.
             frozenList(items.sortedWith(compareBy({it.start},{it.segmentId}))),items.sumExact { it.durationMs },items.map { it.sessionId }.distinct().size)
     }.sortedWith(compareByDescending<HistoryGroup> { it.rows.maxOf { r -> r.end } }.thenBy { it.id }))
 
+/** One reporting-day row per session. Segments and accounting remain untouched. */
+data class SessionDayRow(val sessionId: String,val rows: List<ReportRow>,val recordedMs: Long,val pauses: List<DraftInterval>) {
+    val start get() = rows.first().start
+    val end get() = rows.maxOf { it.end }
+    val mixedSelection get() = rows.map { selectionIdentity(it.selection) }.distinct().size > 1
+}
+fun CalendarDay.sessionRows(data: Dataset): List<SessionDayRow> {
+    val segments = data.segments.groupBy { it.sessionId }
+    return frozenList(rows.groupBy { it.sessionId }.map { (id,items) ->
+        val ordered = items.sortedWith(compareBy({it.start},{it.segmentId}))
+        // Only gaps between actual segments of this session are pauses. Unresolved work is not a pause.
+        val pauses = segments[id].orEmpty().sortedBy { it.start }.zipWithNext().mapNotNull { (a,b) ->
+            if(a.uncertain || b.uncertain) return@mapNotNull null
+            val from = maxOf(a.end ?: return@mapNotNull null,start,ordered.first().start)
+            val until = minOf(b.start,end,ordered.last().end)
+            if(until > from) DraftInterval(from,until) else null
+        }
+        SessionDayRow(id,frozenList(ordered),items.sumExact { it.durationMs },frozenList(pauses))
+    }.sortedWith(compareByDescending<SessionDayRow> { it.start }.thenBy { it.sessionId }))
+}
+
 data class DraftInterval(val start: Long,val end: Long) {
     init { ensure(start >= 0 && end > start && end <= MAX_TIME,"Invalid proposed interval",ErrorCode.INVALID_INTERVAL) }
 }

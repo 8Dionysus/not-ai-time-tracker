@@ -6,7 +6,9 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.io.ByteArrayOutputStream
 
-@Serializable data class Backup(@Required val formatVersion: Int = 14,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
+const val CURRENT_BACKUP_FORMAT = 15
+
+@Serializable data class Backup(@Required val formatVersion: Int = CURRENT_BACKUP_FORMAT,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
 /** Bounded whole-String convenience API only; streaming full backups have no total-file cap. */
 const val MAX_BACKUP_BYTES = 10*1024*1024
 
@@ -103,7 +105,7 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore,p
             validateMoment(n)
             validate(d)
             val frozen = d.copy(pendingAssignments = emptyList(),segments = d.segments.map { materialize(it,n).copy(anchor = null) },focus = Focus.freeze(d,n))
-            val json = codec.encodeToString(Backup(formatVersion = 14,asOf = n.wall,data = frozen))
+            val json = codec.encodeToString(Backup(formatVersion = CURRENT_BACKUP_FORMAT,asOf = n.wall,data = frozen))
             ensure(json.toByteArray(Charsets.UTF_8).size <= MAX_BACKUP_BYTES,
                 "Backup exceeds supported 10 MiB restore limit; no usable backup was produced",ErrorCode.INVALID_INPUT)
             // An export must pass the same temporal/reference checks as a future restore.
@@ -113,7 +115,7 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore,p
         fun decode(json: String): Backup {
             ensure(json.toByteArray(Charsets.UTF_8).size <= MAX_BACKUP_BYTES,"Backup exceeds 10 MiB",ErrorCode.UNSUPPORTED_IMPORT)
             val b = try { decodeBackupVersion(json) } catch (_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed or unsupported JSON") }
-            ensure(b.formatVersion == 14,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
+            ensure(b.formatVersion == CURRENT_BACKUP_FORMAT,"Unsupported backup version",ErrorCode.UNSUPPORTED_IMPORT)
             ensure(b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
             try {
                 validate(b.data)

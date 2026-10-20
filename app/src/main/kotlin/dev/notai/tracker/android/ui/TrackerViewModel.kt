@@ -46,7 +46,8 @@ data class Notice(val text: String, val undo: Token? = null, val id: Long = Syst
 data class EntryUi(val segmentId: String, val sessionId: String, val start: Long, val end: Long, val durationMs: Long,
                    val label: Label, val note: String?, val selection: Classification)
 data class DayUi(val date: LocalDate, val start: Long, val end: Long, val recordedMs: Long, val incomplete: Boolean, val entries: List<EntryUi>,
-                 val ribbon: List<RibbonSlot>, val live: List<RibbonSlot>, val gaps: List<GapUi> = emptyList())
+                 val ribbon: List<RibbonSlot>, val live: List<RibbonSlot>, val gaps: List<GapUi> = emptyList(),
+                 val sessions: List<SessionDayRow> = emptyList())
 data class QuickStart(val title: String, val slot: Int?, val entry: ChoiceEntry, val favorite: Boolean, val glyph: Int, val reference: ChoiceReference, val expected: Token)
 data class HomeData(val today: LocalDate, val zone: ZoneId, val days: List<DayUi>, val quick: List<QuickStart>,
                     val currentLabel: Label?, val currentStart: Long?, val canLoadMore: Boolean, val focusMinutes: Long,
@@ -258,7 +259,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     /** Core quick source (favourites, then frequency in the trailing 30 days); the notification shows the same list. */
     private fun quickChoices(v: TrackerView, limit: Int = 6): List<QuickChoice> {
         val end = minOf(MAX_TIME, now() + 1)
-        return v.choices().quick(HistoryWindow(maxOf(0L, end - 30L * 24 * 60 * 60 * 1000), end), limit)
+        return v.choices().quick(HistoryWindow(maxOf(0L, end - 30L * 24 * 60 * 60 * 1000), end), limit, current(v.data)?.selection)
     }
     private fun QuickChoice.toQuickStart(d: Dataset,expected: Token): QuickStart {
         val l = d.label(entry.selection)
@@ -287,10 +288,11 @@ class TrackerViewModel internal constructor(private val app: Application,private
             if (entries.isEmpty() && day.date != today && day.recordedMs == 0L) null
             else DayUi(day.date, day.start, day.end, day.recordedMs, day.incomplete, entries,
                 entries.map { RibbonSlot(it.start, it.end, it.label.slot) },
-                day.rows.filter { it.sessionId == open?.id }.map { RibbonSlot(it.start, it.end, null) }, gaps)
+                day.rows.filter { it.sessionId == open?.id }.map { RibbonSlot(it.start, it.end, null) }, gaps,
+                day.copy(rows = day.rows.filter { it.sessionId != open?.id }).sessionRows(d))
         }
         // Same bounded source as the notification: favourites, then the most frequent of the last 30 days.
-        val quick = quickChoices(v, 8).filter { it.entry.canStart && !d.label(it.entry.selection).unclassified }.take(5).map { q -> q.toQuickStart(d,v.snapshot().token) }
+        val quick = quickChoices(v, 5).map { q -> q.toQuickStart(d,v.snapshot().token) }
         return HomeData(today, zone, dayList, quick, open?.let { d.label(it.selection) }, open?.let { s -> d.segments.filter { it.sessionId == s.id }.minOfOrNull { it.start } },
             // Older days only when something older exists: a new install has nothing to load.
             days < 62 && (d.segments.minOfOrNull { it.start } ?: Long.MAX_VALUE) < (calendar.days.firstOrNull()?.start ?: Long.MIN_VALUE),
@@ -396,10 +398,24 @@ class TrackerViewModel internal constructor(private val app: Application,private
     private fun clearSurfacePicker(route: dev.notai.tracker.android.SurfacePickerRoute?) = synchronized(pickerLock) {
         if(pickerRoute != route) false else { pickerRoute = null; _surfacePicker.value = null; true }
     }
-    fun chooseSurface(reference: ChoiceReference,note: String? = null) {
+    fun chooseSurface(reference: ChoiceReference,note: String? = null,expectedRoute: dev.notai.tracker.android.SurfacePickerRoute? = null) {
         val route = pickerRoute ?: return
+        if(expectedRoute != null && route != expectedRoute) { notice("Выбор занятия устарел"); return }
         command({ "Записано" }) { rt,_ ->
             dev.notai.tracker.android.SurfaceChoices.choose(app,rt.tracker,route,reference,note).also { clearSurfacePicker(route) }
+        }
+    }
+    /** Create in the same route: an assignment stays an assignment, never a new timer. */
+    fun createSurfaceCard(route: dev.notai.tracker.android.SurfacePickerRoute,name: String,activityTypeId: String? = null) {
+        val trimmed = name.trim().replaceFirstChar { it.uppercase() }
+        if(trimmed.isEmpty() || pickerRoute != route) return
+        command({ "Занятие «$trimmed» создано" }) { rt,s ->
+            dev.notai.tracker.android.SurfaceChoices.read(rt.tracker,route)
+            val card = Card(name = trimmed,activityTypeId = activityTypeId)
+            rt.tracker.saveCard(s.token,card)
+            val choices = rt.tracker.view().choices()
+            val entry = choices.resolve("card:${card.id}") ?: fail(ErrorCode.STALE,"Created card unavailable")
+            dev.notai.tracker.android.SurfaceChoices.choose(app,rt.tracker,route,choices.reference(entry)).also { clearSurfacePicker(route) }
         }
     }
     fun cancelSurfacePicker() {
@@ -541,25 +557,25 @@ class TrackerViewModel internal constructor(private val app: Application,private
     }
 
     /** A new personal activity: saved as a card, then used in the same action with the token that save returned. */
-    fun createAndChoose(name: String, mode: PickMode, earlierBoundary: Long? = null) {
+    fun createAndChoose(name: String, mode: PickMode, earlierBoundary: Long? = null, activityTypeId: String? = null) {
         val trimmed = name.trim().replaceFirstChar { it.uppercase() }
         if (trimmed.isEmpty()) return
         command({ "Занятие «$trimmed» создано" }) { rt, s ->
-            val card = Card(name = trimmed)
+            val card = Card(name = trimmed, activityTypeId = activityTypeId)
             val saved = rt.tracker.saveCard(s.token, card)
             applyChoice(rt, saved.state, card.classification(), null, mode, earlierBoundary)
         }
     }
 
     /** Saves a personal activity for a form that is still open; nothing is started. */
-    fun createCard(name: String, onCreated: (Classification, Label) -> Unit) {
+    fun createCard(name: String, activityTypeId: String? = null, onCreated: (Classification, Label) -> Unit) {
         val trimmed = name.trim().replaceFirstChar { it.uppercase() }
         if (trimmed.isEmpty()) return
         val rt = runtime ?: return
         val shown = snapshot.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val card = Card(name = trimmed)
+                val card = Card(name = trimmed, activityTypeId = activityTypeId)
                 val change = rt.tracker.saveCard(shown.token, card)
                 val label = change.data.label(card.classification())
                 withContext(Dispatchers.Main) { onCreated(card.classification(), label) }
@@ -595,9 +611,36 @@ class TrackerViewModel internal constructor(private val app: Application,private
     }
 
     fun saveFavorite(title: String, selection: Classification) = command({ "Добавлено в избранное" }) { rt, s ->
-        rt.tracker.saveFavorite(s.token, Favorite(label = title, selection = selection))
+        rt.tracker.addFavorite(s.token, Favorite(label = title, selection = selection))
     }
     fun removeFavorite(id: String) = command({ "Убрано из избранного" }) { rt, s -> rt.tracker.removeFavorite(s.token, id) }
+
+    /** The displayed revision is required: never silently apply a reorder/edit to a newer list. */
+    fun orderFavorites(expected: Token, ids: List<String>, completed: ((Result<Tracker.Change>) -> Unit)? = null) =
+        command({ "Порядок сохранён" }, completed) { rt,_ -> rt.tracker.orderChoices(expected, ChoiceKind.FAVORITE, ids) }
+    fun editFavorite(expected: Token, favorite: Favorite, completed: ((Result<Tracker.Change>) -> Unit)? = null) =
+        command({ "Избранное изменено" }, completed) { rt,_ ->
+            ensure(rt.tracker.data().favorites.any { it.id == favorite.id }, "Favorite no longer exists", ErrorCode.STALE)
+            rt.tracker.saveFavorite(expected, favorite)
+        }
+    fun saveCard(expected: Token, card: Card, completed: ((Result<Tracker.Change>) -> Unit)? = null) =
+        command({ "Занятие сохранено" }, completed) { rt,_ -> rt.tracker.saveCard(expected, card) }
+    fun saveType(expected: Token, type: ActivityType, completed: ((Result<Tracker.Change>) -> Unit)? = null) =
+        command({ "Категория сохранена" }, completed) { rt,_ -> rt.tracker.saveType(expected, type) }
+
+    private val _focusEditor = MutableStateFlow<FocusPlan?>(null)
+    val focusEditor: StateFlow<FocusPlan?> = _focusEditor.asStateFlow()
+    /** Defaults/next phase only; configureFocus preserves the current phase's duration. */
+    fun openFocusEditor() { _focusEditor.value = view.value?.data?.settings?.focusPlan }
+    fun closeFocusEditor() { _focusEditor.value = null }
+    private val _correctionStepMinutes = MutableStateFlow(1)
+    val correctionStepMinutes: StateFlow<Int> = _correctionStepMinutes.asStateFlow()
+    fun setCorrectionStepMinutes(minutes: Int) {
+        require(minutes in listOf(1, 5, 15))
+        _correctionStepMinutes.value = minutes
+    }
+    fun stepCorrectionTime(value: Long, forward: Boolean): Long =
+        (value + (if(forward) 1 else -1) * _correctionStepMinutes.value * 60_000L).coerceIn(0L, MAX_TIME)
 
     // ---------- first launch: a few own activities for one-tap start ----------
 
@@ -623,7 +666,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 var token = shown.token
-                picked.forEach { st -> token = rt.tracker.saveFavorite(token, Favorite(label = st.title, selection = st.entry.selection)).state.token }
+                picked.forEach { st -> token = rt.tracker.addFavorite(token, Favorite(label = st.title, selection = st.entry.selection)).state.token }
                 notice(if (picked.size == 1) "«${picked.single().title}» — теперь старт в одно касание" else "Готово: ${Format.plural(picked.size, "занятие", "занятия", "занятий")} для быстрого старта")
             } catch (e: Exception) { notice(Format.error(e)) }
         }
@@ -635,7 +678,10 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val v = view.value ?: runtime?.tracker?.view() ?: return@withContext PickerData(emptyList(), emptyList(), emptyList(), emptyList())
         val d = v.data; val choices = v.choices()
         val recents = choices.suggestions(SuggestionQuery(enabled = true), pageSize = 5).items.map { PickerItem(it.entry, d.label(it.entry.selection),reference = choices.reference(it.entry),expected = v.snapshot().token) }
-        val favorites = choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.FAVORITE)), pageSize = 30).items.map { PickerItem(it.entry, d.label(it.entry.selection),reference = choices.reference(it.entry),expected = v.snapshot().token) }
+        val favoriteQuery = ChoiceQuery(kinds = setOf(ChoiceKind.FAVORITE), includeArchived = true)
+        val favorites = generateSequence(choices.search(favoriteQuery, pageSize = 100)) { page ->
+            page.next?.let { choices.search(favoriteQuery, it, 100) }
+        }.flatMap { it.items }.map { PickerItem(it.entry, d.label(it.entry.selection),reference = choices.reference(it.entry),expected = v.snapshot().token) }.toList()
         val roots = generateSequence(choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.ROOTS), pageSize = 100)) { p ->
             p.next?.let { choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.ROOTS), it, 100) }
         }.flatMap { it.items }.filter { it.entry.availability == ChoiceAvailability.GROUP || d.types.any { t -> t.parentId == it.entry.sourceId } }.map { hit ->

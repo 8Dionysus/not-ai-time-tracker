@@ -41,7 +41,7 @@ fun retainedChangeCausality(create: ()->StateStore,reopen: (StateStore)->StateSt
         "operation.inserted.unrelatedOrigin" to journal(group(good),inserted=delta(copyChange)).let { d -> d.copy(transfer=d.transfer.copy(origins=listOf(copyOrigin.copy(originId="unrelated-origin")))) }
     )
     for((name,d) in negative) {
-        val backup=Backup(formatVersion=14,backupId=name,asOf=1000,data=d);val text=codec.encodeToString(backup)
+        val backup=Backup(formatVersion=CURRENT_BACKUP_FORMAT,backupId=name,asOf=1000,data=d);val text=codec.encodeToString(backup)
         assertFailsWith<CoreError>("whole $name") { Backups.decode(text) }
         assertFailsWith<CoreError>("stream $name") { StreamingBackup.read { text.byteInputStream() } }
         assertFailsWith<CoreError>("write $name") { StreamingBackup.write(backup,ByteArrayOutputStream()) }
@@ -58,7 +58,7 @@ fun retainedChangeCausality(create: ()->StateStore,reopen: (StateStore)->StateSt
         journal(group(good),inserted=delta(copyChange)).let { d -> d.copy(transfer=d.transfer.copy(operations=d.transfer.operations+operation(empty,previous=copyOrigin).copy(id="retained-snapshot-holder"))) }
     )
     for((index,d) in positive.withIndex()) {
-        val backup=Backup(formatVersion=14,backupId="valid-$index",asOf=1000,data=d);val bytes=ByteArrayOutputStream()
+        val backup=Backup(formatVersion=CURRENT_BACKUP_FORMAT,backupId="valid-$index",asOf=1000,data=d);val bytes=ByteArrayOutputStream()
         StreamingBackup.write(backup,bytes);assertEquals(backup,Backups.decode(bytes.toString("UTF-8")))
         assertEquals(backup,StreamingBackup.read { bytes.toByteArray().inputStream() })
         val store=create();store.transaction { d to Unit };assertEquals(d,reopen(store).read())
@@ -70,7 +70,7 @@ fun retainedChangeCausality(create: ()->StateStore,reopen: (StateStore)->StateSt
     val retention=t.previewTransferRetention(TransferRetentionSelection(originIds=setOf("retained-origin")))
     t.applyTransferRetention(retention,"retained-hashes",retention.requiredAcknowledgements)
     assertEquals(TransferContent(),t.data().transfer.origins.single().localGroup)
-    val compact=Backup(formatVersion=14,backupId="hash-only",asOf=100,data=t.data())
+    val compact=Backup(formatVersion=CURRENT_BACKUP_FORMAT,backupId="hash-only",asOf=100,data=t.data())
     val bytes=ByteArrayOutputStream();StreamingBackup.write(compact,bytes)
     assertEquals(compact,Backups.decode(bytes.toString("UTF-8")))
     assertEquals(compact,StreamingBackup.read { bytes.toByteArray().inputStream() })

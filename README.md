@@ -74,7 +74,7 @@ adb shell am start -n dev.notai.tracker/dev.notai.tracker.android.MainActivity
 
 Project-owned code is licensed under [Apache-2.0](LICENSE). The [NOTICE](NOTICE) preserves the separate Onest OFL and third-party/content boundaries. Catalog research and assets do not acquire new rights through this source-code license.
 
-Текущая backend-схема — Room12, полный архив — JSON14 (read1–14), selective4 (read1–4), operational maintenance/recovery journal3. [BACKEND_PASS_2026_10](docs/BACKEND_PASS_2026_10.md) фиксирует новые API и незакрытые границы; пользовательское подключение private-copy cleanup и полноценная локализация не объявлены готовыми.
+Текущая backend-схема — Room12, полный архив — JSON15 (read1–15), selective4 (read1–4), operational maintenance/recovery journal3. [BACKEND_PASS_2026_10](docs/BACKEND_PASS_2026_10.md) фиксирует новые API и незакрытые границы; пользовательское подключение private-copy cleanup и полноценная локализация не объявлены готовыми.
 
 Явная compaction текущих SQLite operational snapshots: [TRANSFER_RETENTION](docs/TRANSFER_RETENTION.md). Typed CSV issue contract: [IMPORT_ISSUES](docs/IMPORT_ISSUES.md). Нативные dependency/source ограничения: [NATIVE_LICENSE_EVIDENCE](docs/NATIVE_LICENSE_EVIDENCE.md).
 

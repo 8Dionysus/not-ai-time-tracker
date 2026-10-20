@@ -179,7 +179,7 @@ fun subjectTransport(create: ()->StateStore,reopen: (StateStore)->StateStore) {
     f.t.measure(f.t.snapshot().token,Measurement("bounded-value","bounded",1,f.page.unitId,Scope.SESSION,session,Decimal("3")))
     f.reopen()
     val json = Backups(f.t,MemoryRollback()).export();val decoded = Backups.decode(json)
-    assertEquals(14,decoded.formatVersion);assertEquals(f.t.data().subjects,decoded.data.subjects)
+    assertEquals(CURRENT_BACKUP_FORMAT,decoded.formatVersion);assertEquals(f.t.data().subjects,decoded.data.subjects)
     val bytes = ByteArrayOutputStream();Backups(f.t,MemoryRollback()).write(bytes)
     assertEquals(decoded.data,StreamingBackup.read { bytes.toByteArray().inputStream() }.data)
     val destination = Tracker(create(),f.clock);val full = Backups(destination,MemoryRollback());full.apply(full.prepare(json));assertEquals(f.t.data().subjects,destination.data().subjects)

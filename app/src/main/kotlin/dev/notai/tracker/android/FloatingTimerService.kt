@@ -337,11 +337,12 @@ internal fun Puck(s: Snapshot?, busy: Boolean, onTap: () -> Unit, onDrag: (Float
 
 /** After STOP: the saved record and up to six quick choices. Nothing here changes the stopped time. */
 @Composable
-internal fun AssignmentCard(a: OverlayAssignment, onChoose: (OverlayChoice) -> Unit, onLeave: () -> Unit) {
+internal fun AssignmentCard(a: OverlayAssignment, onChoose: (OverlayChoice) -> Unit, onLeave: () -> Unit, backgroundAlpha: Float = 1f) {
+    require(backgroundAlpha.isFinite() && backgroundAlpha in 0f..1f)
     val c = NotAi.colors
     Box(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), contentAlignment = Alignment.BottomCenter) {
         Column(Modifier.widthIn(max = 420.dp).fillMaxWidth().shadow(16.dp, RoundedCornerShape(24.dp)).clip(RoundedCornerShape(24.dp))
-            .background(c.raised).border(1.dp, c.rule, RoundedCornerShape(24.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            .background(c.raised.copy(alpha = c.raised.alpha * backgroundAlpha)).border(1.dp, c.rule, RoundedCornerShape(24.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text("Чем ты был занят?", style = NotAi.type.sheetTitle, color = c.ink)
                 Text(listOfNotNull(a.range, "время уже сохранено").joinToString(" · "), style = NotAi.type.caption, color = c.ink2)

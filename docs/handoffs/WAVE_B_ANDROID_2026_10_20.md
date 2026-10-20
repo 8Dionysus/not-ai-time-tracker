@@ -74,3 +74,14 @@ The existing presentation theme is private SharedPreferences("ui"). It is not pa
 No tracked .github/workflows or alternate CI configuration exists on the verified main. No existing CI was available to dispatch. Compile requires a pre-provisioned Gradle 8.13 distribution and Android SDK36/declared NDK, then the previously listed Gradle commands; network/security settings were not changed and no repeated unchanged download was attempted.
 
 Root assigned the full-picker assignment routing fix exclusively to A, so the receipt loss is a required functional integration fix, not deferred visual redesign.
+
+
+## Prepared presentation adapters (persistence binding still pending A)
+
+SurfaceViews.notification(context, view, lockScreenVisibility) now accepts only Android PUBLIC/PRIVATE/SECRET values. PRIVATE is the legacy default and supplies the redacted publicVersion. PUBLIC uses the complete existing custom timer/actions/chronometer; SECRET requests hidden lock-screen content. This is not yet connected to persisted policy fields. Added one focused existing RoomScenariosTest case for the three presentation values; not run due the build dependency described above.
+
+AssignmentCard accepts backgroundAlpha=1f and applies it only to the current raised background color, with finite/range validation. Foreground content and WindowManager window alpha are unchanged. The caller awaits A's saved field. This is a single background binding, with no layout redesign.
+
+The widget currently has no background view ID. A foreground ImageView behind the existing row (owned by Opus) with setImageAlpha would allow RemoteViews alpha without fading text; the existing root drawable cannot be altered that way through RemoteViews. A narrow binding/resource change must be assigned before that source application can be completed.
+
+Because codec.encodeDefaults=true, use EncodeDefault(NEVER) for added defaulted fields to preserve legacy default JSON output; old archives default the absent fields, unknown enum/invalid alpha rejects rather than silently resetting. Whole-copy restore exposes values through RestorePreview.settings before confirmation.

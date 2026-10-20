@@ -19,12 +19,13 @@ No `.agents/skills` directory exists in this checkout; repository AGENTS.md was 
 
 A alone owns core and TrackerViewModel. No new core API was created here.
 
-Proposed minimum fields on existing SurfaceSettings (exact names to be frozen by A):
-- notification lock-screen policy: PRIVATE (legacy default), FULL, HIDDEN.
-- widgetBackgroundAlpha and overlayChooserBackgroundAlpha: finite 0..1, legacy default 1, reset by copying defaults. Apply only to owned background, never text/buttons or WindowManager.LayoutParams.alpha.
-- No persisted status-icon flag is needed for the chosen system-settings path: observe/control the existing channel through Android settings. MIN requests drawer-only presentation; LOW requests a status-bar icon. NONE disables delivery. OEM/system policy remains authoritative.
+Frozen root contract (supersedes initial proposal):
+- nullable privacy: null preserves legacy PRIVATE; explicit PRIVATE/FULL/HIDDEN.
+- widgetBackgroundAlphaPercent and overlayChooserBackgroundAlphaPercent: Int 0..100, defaults100. Reset only these presentation fields through Tracker.settings, preserving delivery opt-ins and unrelated settings.
+- No persisted status-icon flag: observe/control existing timer_controls via Android system settings. MIN requests drawer-only presentation; LOW requests status-bar icon. NONE blocks delivery; OEM/user policy remains final.
+- Full JSON explicitly advances to15. New readers retain1..14 with defaults; old documents are not rewritten. An old APK is not promised to read new15. CSV remains unchanged; no sidecar/new preferences store.
 
-After A publishes exact source: bind privacy in SurfaceViews.notification (PRIVATE + redacted publicVersion; FULL + PUBLIC full content; HIDDEN + SECRET); preserve existing custom chronometer/actions and permission fallback. No FGS for timer, no fullscreen intent or per-second worker.
+Exact A enum/property source is still pending. B's Android presentation adapters are ready: SurfaceViews.notification(context,view,visibility) accepts PUBLIC/PRIVATE/SECRET with PRIVATE default; AssignmentCard accepts validated backgroundAlpha=1f applied only to raised background. The eventual caller maps saved percentages to Float by /100f. No FGS for timer, fullscreen intent or per-second worker.
 
 A candidate `ChoiceView.quick(window, limit, excludeSelection: Classification? = null)` excludes current identity BEFORE limit, retaining shared favorite order. Still pending exact final API/source: replace SurfaceViews' current post-limit filtering and pass explicit current selection for switch pickers. Assignment-after-stop must not exclude the stopped activity. No separate ranking.
 
@@ -42,7 +43,7 @@ Restore: user OpenDocument -> bounded stage -> Backups.prepare -> RestorePreview
 
 ## Exact Opus handoff
 
-- Add lock-screen privacy selector and concise OS/channel/permission explanation, after A persists the above contract. Full content is conditional on system privacy, POST_NOTIFICATIONS, enabled app/channel and OEM lock-screen policy.
+- Add lock-screen privacy selector and concise OS/channel/permission explanation, after A publishes the above contract. Full content is conditional on system privacy, POST_NOTIFICATIONS, enabled app/channel and OEM lock-screen policy.
 - Bind `OPEN_TIMER_CHANNEL_SETTINGS`; display actual importance/capability. Explain MIN may reduce lock-screen prominence. Preserve mandatory overlay foreground-service indicator.
 - Bind alpha slider/preview/reset to A's settings; alter background only. Widget requires an owned background view/drawable ID: existing root shape cannot be faded with setAlpha without fading content. Opus owns that narrow visual binding/layout. Notification outer card/header/icon belong to SystemUI; remove redundant app glyph only inside custom layout if desired.
 - Bind overlay card "all activities" to `openAssignmentChooser()`. Preserve assignment route through full picker: current App.kt onAll cancels the surface picker and opens a general START/SWITCH picker, losing assignment ownership. Opus/A must carry route/ChoiceApplication.ASSIGN into full chooser and submit through SurfaceChoices.choose; never reinterpret assignment as START.
@@ -52,11 +53,11 @@ Restore: user OpenDocument -> bounded stage -> Backups.prepare -> RestorePreview
 ## Checks and blockers
 
 `git diff --check`: passed. Shortcut XML parsed as XML. Manual caller-chain review performed.
-Added two narrow existing RoomScenariosTest cases: launcher chooser replay/opt-out; MIN channel observation/preservation. Existing shortcut publication checks now select timer_action by ID, covering two entries without weakening state assertions.
+Added three narrow existing RoomScenariosTest cases: launcher chooser replay/opt-out/Focus withdrawal; MIN channel observation/preservation; explicit PUBLIC/PRIVATE/SECRET notification presentation. Existing shortcut publication checks now select timer_action by ID, covering two entries without weakening state assertions.
 
 Compile/tests NOT RUN: default Gradle home is outside writable roots; retried with GRADLE_USER_HOME=/workspace/.gradle-wave-b. Wrapper cannot resolve services.gradle.org (UnknownHostException), no Gradle distribution or Android SDK was found in standard locations. No emulator/OEM/device claims. No lint/APK evidence.
 
-Required next checks in an equipped environment: :app:compileDebugKotlin; RoomScenariosTest.launcherChooserUsesExistingTargetAndRejectsReplayAfterNewTimer; RoomScenariosTest.timerChannelCapabilityObservesMinAndPreservesExistingChannel; RoomScenariosTest.shortcutDisableWithdrawsMutableEntriesAndGatesRetainedActionsAfterReopen; RoomScenariosTest.surfaceActions; TimerSurfaceRaceTest. Add privacy/alpha persistence regression only after A freezes fields, and ordered quick regression in A's existing shared scenario.
+Required next checks in an equipped environment: :app:compileDebugKotlin; RoomScenariosTest.lockScreenPolicyKeepsFullTimerOnlyForExplicitPublicPresentation; RoomScenariosTest.launcherChooserUsesExistingTargetAndRejectsReplayAfterNewTimer; RoomScenariosTest.timerChannelCapabilityObservesMinAndPreservesExistingChannel; RoomScenariosTest.shortcutDisableWithdrawsMutableEntriesAndGatesRetainedActionsAfterReopen; RoomScenariosTest.surfaceActions; TimerSurfaceRaceTest. Add privacy/alpha persistence regression only after A freezes fields, and ordered quick regression in A's existing shared scenario.
 
 ## Official sources read
 
@@ -85,3 +86,12 @@ AssignmentCard accepts backgroundAlpha=1f and applies it only to the current rai
 The widget currently has no background view ID. A foreground ImageView behind the existing row (owned by Opus) with setImageAlpha would allow RemoteViews alpha without fading text; the existing root drawable cannot be altered that way through RemoteViews. A narrow binding/resource change must be assigned before that source application can be completed.
 
 Because codec.encodeDefaults=true, use EncodeDefault(NEVER) for added defaulted fields to preserve legacy default JSON output; old archives default the absent fields, unknown enum/invalid alpha rejects rather than silently resetting. Whole-copy restore exposes values through RestorePreview.settings before confirmation.
+
+
+## Frozen root decision superseding the earlier proposal
+
+Persisted writer A owns nullable privacy (null preserves legacy PRIVATE; non-null PRIVATE/FULL/HIDDEN), widgetBackgroundAlphaPercent and overlayChooserBackgroundAlphaPercent as Int 0..100 with default100. Full archive advances explicitly to15; new readers retain1..14 defaults. Old JSON documents are not rewritten, CSV is unchanged. Do not claim an old APK can read new15. No rights/channel consent is restored by these values.
+
+A still needs to publish exact enum/property source before B binds it; current remote A branch was still the base when this adapter checkpoint was prepared. No shared files were changed by B.
+
+`WIDGET_ALPHA_BINDING.patch` is a concrete proposed narrow XML binding, NOT applied to the Opus-owned layout: existing shape becomes a background ImageView behind the unchanged padded row. `SurfaceViews.widgetBackgroundAlpha` accepts that view ID and percent, then uses setImageAlpha (0..255) on that background only. No bitmap allocation or universal theme engine. The layout owner/root must accept/apply the patch before the binding is invoked by widget().

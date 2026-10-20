@@ -1,0 +1,16 @@
+--- a/app/src/main/res/layout/timer_widget.xml
++++ b/app/src/main/res/layout/timer_widget.xml
+@@ -1,5 +1,9 @@
+-<!-- Home-screen widget: the shared timer row on the (not)AI surface. Colours follow the system theme. -->
+-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent"
+-    android:background="@drawable/widget_background" android:paddingStart="16dp" android:paddingEnd="10dp" android:paddingTop="8dp" android:paddingBottom="8dp">
+-    <include layout="@layout/surface_timer_row" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center_vertical" />
++<!-- Existing appearance retained; background alpha is independent of text and controls. -->
++<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent">
++    <ImageView android:id="@+id/widget_background" android:layout_width="match_parent" android:layout_height="match_parent"
++        android:src="@drawable/widget_background" android:scaleType="fitXY" android:importantForAccessibility="no" />
++    <FrameLayout android:layout_width="match_parent" android:layout_height="match_parent"
++        android:paddingStart="16dp" android:paddingEnd="10dp" android:paddingTop="8dp" android:paddingBottom="8dp">
++        <include layout="@layout/surface_timer_row" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center_vertical" />
++    </FrameLayout>
+ </FrameLayout>

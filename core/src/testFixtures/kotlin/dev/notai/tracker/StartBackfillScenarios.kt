@@ -84,7 +84,7 @@ fun startBackfillArchiveRoundTrip(createStore: ()->StateStore,reopen: (StateStor
     clock.advance(1000);source.stop(source.snapshot().token)
     source.settings(source.snapshot().token,source.data().settings.copy(longRecordReminder = LongRecordPreference(true,321,17)))
     val expected = source.data();val backups = Backups(source,MemoryRollback());val json = backups.export()
-    val decoded = Backups.decode(json);assertEquals(14,decoded.formatVersion)
+    val decoded = Backups.decode(json);assertEquals(CURRENT_BACKUP_FORMAT,decoded.formatVersion)
     assertEquals(expected.segments,decoded.data.segments)
     assertEquals(LongRecordPreference(true,321,17),decoded.data.settings.longRecordReminder)
     val bytes = java.io.ByteArrayOutputStream();backups.write(bytes)

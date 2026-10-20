@@ -122,7 +122,7 @@ fun quantityArchiveAuditSnapshots(create: ()->StateStore) {
         base.copy(transfer=TransferState(operations=listOf(operation(empty,inserted=content)))),
         base.copy(transfer=TransferState(operations=listOf(operation(empty,previous=origin)))))
     variants.forEachIndexed { index,d ->
-        val backup=Backup(formatVersion=14,backupId="audit-$index",asOf=100,data=d)
+        val backup=Backup(formatVersion=CURRENT_BACKUP_FORMAT,backupId="audit-$index",asOf=100,data=d)
         val text=codec.encodeToString(backup)
         assertFailsWith<CoreError>("whole $index") { Backups.decode(text) }
         assertFailsWith<CoreError>("stream $index") { StreamingBackup.read { text.byteInputStream() } }
@@ -136,7 +136,7 @@ fun quantityArchiveAuditSnapshots(create: ()->StateStore) {
     val retention=compacted.previewTransferRetention(TransferRetentionSelection(originIds=setOf("O")))
     compacted.applyTransferRetention(retention,"compact-audit",retention.requiredAcknowledgements)
     assertEquals(TransferContent(),compacted.data().transfer.origins.single().localGroup)
-    val compactBackup=Backup(formatVersion=14,backupId="compacted-audit",asOf=100,data=compacted.data())
+    val compactBackup=Backup(formatVersion=CURRENT_BACKUP_FORMAT,backupId="compacted-audit",asOf=100,data=compacted.data())
     val compactText=codec.encodeToString(compactBackup)
     assertEquals(compactBackup,Backups.decode(compactText))
     val compactBytes=ByteArrayOutputStream();StreamingBackup.write(compactBackup,compactBytes)

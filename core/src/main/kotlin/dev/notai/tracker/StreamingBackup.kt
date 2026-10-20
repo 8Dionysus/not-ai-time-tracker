@@ -12,14 +12,14 @@ import kotlinx.serialization.json.*
 
 internal const val MAX_BACKUP_RECORD_CHARS = 16*1024*1024
 
-/** Portable JSON 14 without a whole-file String/ByteArray/JSON tree. Only one record is decoded
+/** Portable JSON 15 without a whole-file String/ByteArray/JSON tree. Only one record is decoded
  * at a time; the resulting domain graph has the same size as a loaded store. Total file size
  * is not capped by CSV's text limit. Re-openable inputs permit a bounded metadata first pass.
  */
 object StreamingBackup {
     fun portable(data: Dataset,now: Moment): Backup {
         validateMoment(now);validate(data)
-        return Backup(formatVersion = 14,asOf = now.wall,data = data.copy(pendingAssignments = emptyList(),segments = data.segments.map { materialize(it,now).copy(anchor = null) },
+        return Backup(formatVersion = CURRENT_BACKUP_FORMAT,asOf = now.wall,data = data.copy(pendingAssignments = emptyList(),segments = data.segments.map { materialize(it,now).copy(anchor = null) },
             focus = Focus.freeze(data,now)))
     }
     fun write(backup: Backup,output: OutputStream) {
@@ -40,7 +40,7 @@ object StreamingBackup {
             }
             writer.write("]")
         }
-        writer.write("{");field("formatVersion","14",true);field("backupId",codec.encodeToString(backup.backupId));field("asOf",backup.asOf.toString())
+        writer.write("{");field("formatVersion",CURRENT_BACKUP_FORMAT.toString(),true);field("backupId",codec.encodeToString(backup.backupId));field("asOf",backup.asOf.toString())
         writer.write(",\"data\":{");val d = backup.data
         field("datasetId",codec.encodeToString(d.datasetId),true);field("revision",d.revision.toString())
         if(!d.subjects.empty) field("subjects",codec.encodeToString(d.subjects))
@@ -68,7 +68,7 @@ object StreamingBackup {
                 else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unknown backup field: $key")
             } };json.finish()
         }
-        ensure(version in 1..14 && !id.isNullOrBlank() && asOf != null && hasData,"Unsupported backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(version in 1..CURRENT_BACKUP_FORMAT && !id.isNullOrBlank() && asOf != null && hasData,"Unsupported backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
         val format = version!!
         val types = mutableListOf<ActivityType>();val axes = mutableListOf<Axis>();val metrics = mutableListOf<Metric>();val units = mutableListOf<UnitDefinition>()
         val cards = mutableListOf<Card>();val favorites = mutableListOf<Favorite>();val sessions = mutableListOf<Session>();val segments = mutableListOf<Segment>()
@@ -131,8 +131,9 @@ object StreamingBackup {
         ensure(format >= 13 || data.settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format >= 14 || !data.hasChoicePersonalization(),"Personal choices in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format >= 14 || !data.hasReportingExtensions(),"Reporting extensions in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(format >= 15 || !data.settings.surfaces.hasPresentationPreferences(),"Surface presentation preferences in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format >= 14 || !data.hasSubjectQuantities(),"Quantity extension in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
-        Backup(formatVersion = 14,backupId = id!!,asOf = asOf!!,data = data.frozen()).also {
+        Backup(formatVersion = CURRENT_BACKUP_FORMAT,backupId = id!!,asOf = asOf!!,data = data.frozen()).also {
             validateBackup(it);onVerifiedSource(sourceHash.joinToString("") { byte -> (byte.toInt() and 255).toString(16).padStart(2,'0') })
         }
     } catch(e: CoreError) { if(e.code == ErrorCode.UNSUPPORTED_IMPORT) throw e else fail(ErrorCode.UNSUPPORTED_IMPORT,"Invalid backup: ${e.message}") }
@@ -140,7 +141,7 @@ object StreamingBackup {
     private fun reader(input: InputStream): Reader = InputStreamReader(input,Charsets.UTF_8.newDecoder()
         .onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT)).buffered(64*1024)
     internal fun validateBackup(b: Backup) {
-        ensure(b.formatVersion == 14 && b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(b.formatVersion == CURRENT_BACKUP_FORMAT && b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
         validate(b.data)
         ensure(b.data.goalRevisionTimes().all { it <= b.asOf },"Goal revision after snapshot",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(b.data.quantityRecordedTimes().all { it <= b.asOf },"Quantity audit time after snapshot",ErrorCode.UNSUPPORTED_IMPORT)

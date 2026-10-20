@@ -107,12 +107,111 @@ class RoomScenariosTest: ScenarioContract() {
             sql.rawQuery("SELECT payload FROM metadata WHERE id=1",null).use { c -> c.moveToFirst();org.junit.Assert.assertEquals(prior,c.getString(0)) }
         }
     }
+    @org.junit.Test fun launcherChooserUsesExistingTargetAndRejectsReplayAfterNewTimer() {
+        val context = RuntimeEnvironment.getApplication();val tracker = Tracker(createStore(),FakeClock())
+        val manager = context.getSystemService(android.content.pm.ShortcutManager::class.java)
+        val card = Card(id = "launcher-choice",name = "Launcher choice")
+        tracker.saveCard(tracker.snapshot().token,card)
+        tracker.saveFavorite(tracker.snapshot().token,Favorite(id = "launcher-favorite",label = "Launcher choice",selection = card.classification()))
+        TimerSurfaces.shortcut(context,tracker.snapshot(),tracker.data().settings.surfaces)
+        val publishedChooser = manager.dynamicShortcuts.single { it.id == "timer_choose" }
+        org.junit.Assert.assertTrue(manager.requestPinShortcut(publishedChooser,null))
+        val route = requireNotNull(SurfaceChoices.parse(publishedChooser.intent!!))
+        org.junit.Assert.assertEquals(Surface.SHORTCUT.name,route.source)
+        org.junit.Assert.assertEquals(route,SurfaceChoices.parse(SurfaceChoices.intent(context,route)))
+        val choices = SurfaceChoices.read(tracker,route)
+        val choice = choices.choices.first().reference
+        SurfaceChoices.choose(context,tracker,route,choice)
+        tracker.stop(tracker.snapshot().token);tracker.start(tracker.snapshot().token)
+        val before = tracker.data()
+        org.junit.Assert.assertThrows(CoreError::class.java) { SurfaceChoices.choose(context,tracker,route,choice) }
+        org.junit.Assert.assertEquals(before,tracker.data())
+        TimerSurfaces.shortcut(context,tracker.snapshot(),tracker.data().settings.surfaces)
+        // Robolectric stores a pinned dynamic shortcut only in its pinned map.
+        val fresh = requireNotNull(SurfaceChoices.parse(manager.pinnedShortcuts.single { it.id == "timer_choose" }.intent!!))
+        tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(shortcut = false)))
+        org.junit.Assert.assertThrows(CoreError::class.java) { SurfaceChoices.choose(context,tracker,fresh,choice) }
+        tracker.stop(tracker.snapshot().token)
+        tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(shortcut = true)))
+        tracker.startFocus(tracker.snapshot().token)
+        TimerSurfaces.shortcut(context,tracker.snapshot(),tracker.data().settings.surfaces)
+        org.junit.Assert.assertEquals(listOf("timer_action"),manager.dynamicShortcuts.map { it.id })
+        // ShadowShortcutManager models disabled pinned entries through requestPinShortcut rejection, not ShortcutInfo flags.
+        val withdrawn = manager.pinnedShortcuts.single { it.id == "timer_choose" }
+        org.junit.Assert.assertThrows(IllegalArgumentException::class.java) { manager.requestPinShortcut(withdrawn,null) }
+        val focused = SurfaceChoices.route(Surface.SHORTCUT,tracker.snapshot())
+        val beforeFocusTap = tracker.data()
+        org.junit.Assert.assertThrows(CoreError::class.java) { SurfaceChoices.choose(context,tracker,focused,choice) }
+        org.junit.Assert.assertEquals(beforeFocusTap,tracker.data())
+    }
+    @org.junit.Test fun lockScreenPolicyKeepsFullTimerOnlyForExplicitPublicPresentation() {
+        val context = RuntimeEnvironment.getApplication();val clock = FakeClock();var tracker = Tracker(createStore(),clock)
+        tracker.start(tracker.snapshot().token,Classification(name = "Private activity"))
+        for(policy in listOf(null,NotificationPrivacy.PRIVATE,NotificationPrivacy.FULL,NotificationPrivacy.HIDDEN)) {
+            tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(notification = true,notificationPrivacy = policy)))
+            tracker = Tracker(reopen(tracker.store),clock)
+            val before = tracker.data();val view = tracker.view()
+            val notice = TimerSurfaces.notification(context,view)
+            val expected = when(policy) {
+                NotificationPrivacy.FULL -> android.app.Notification.VISIBILITY_PUBLIC
+                NotificationPrivacy.HIDDEN -> android.app.Notification.VISIBILITY_SECRET
+                else -> android.app.Notification.VISIBILITY_PRIVATE
+            }
+            org.junit.Assert.assertEquals(expected,notice.visibility)
+            if(expected == android.app.Notification.VISIBILITY_PRIVATE) {
+                org.junit.Assert.assertNotNull(notice.publicVersion)
+                org.junit.Assert.assertEquals("Учёт идёт",notice.publicVersion.extras.getCharSequence(android.app.Notification.EXTRA_TITLE))
+            } else org.junit.Assert.assertNull(notice.publicVersion)
+            org.junit.Assert.assertNotNull(notice.contentView)
+            org.junit.Assert.assertEquals(view.snapshot().safeLabel,notice.extras.getCharSequence(android.app.Notification.EXTRA_TEXT))
+            org.junit.Assert.assertEquals(before,tracker.data())
+        }
+        // Explicit full content never bypasses the runtime notification permission gate.
+        tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(notification = true,notificationPrivacy = NotificationPrivacy.FULL)))
+        val app = org.robolectric.Shadows.shadowOf(context)
+        app.grantPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+        kotlinx.coroutines.runBlocking { TimerSurfaces.refresh(context,tracker) }
+        val manager = context.getSystemService(android.app.NotificationManager::class.java)
+        org.junit.Assert.assertTrue(manager.activeNotifications.any { it.id == TimerSurfaces.CONTROL_ID })
+        app.denyPermissions(android.Manifest.permission.POST_NOTIFICATIONS)
+        val beforeDeniedRefresh = tracker.data()
+        kotlinx.coroutines.runBlocking { TimerSurfaces.refresh(context,tracker) }
+        org.junit.Assert.assertTrue(manager.activeNotifications.none { it.id == TimerSurfaces.CONTROL_ID })
+        org.junit.Assert.assertEquals(beforeDeniedRefresh,tracker.data())
+    }
+    @org.junit.Test fun widgetOpacityFadesOnlyTheDedicatedBackground() {
+        val context = RuntimeEnvironment.getApplication();val clock = FakeClock();var tracker = Tracker(createStore(),clock)
+        for(percent in listOf(0,50,100)) {
+            tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(widget = true,widgetBackgroundAlphaPercent = percent)))
+            tracker = Tracker(reopen(tracker.store),clock)
+            val rendered = TimerSurfaces.widget(context,tracker.view(),true).apply(context,null)
+            val background = rendered.findViewById<android.widget.ImageView>(R.id.widget_background)
+            org.junit.Assert.assertEquals((percent * 255 + 50) / 100,background.imageAlpha)
+            org.junit.Assert.assertEquals(android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO,background.importantForAccessibility)
+            org.junit.Assert.assertFalse(background.isClickable);org.junit.Assert.assertFalse(background.isFocusable)
+            org.junit.Assert.assertEquals(1f,rendered.findViewById<android.view.View>(R.id.surface_title).alpha,0f)
+            org.junit.Assert.assertEquals(1f,rendered.findViewById<android.view.View>(R.id.surface_primary).alpha,0f)
+            org.junit.Assert.assertEquals(android.view.View.VISIBLE,rendered.findViewById<android.view.View>(R.id.surface_primary).visibility)
+        }
+    }
+    @org.junit.Test fun timerChannelCapabilityObservesMinAndPreservesExistingChannel() {
+        val context = RuntimeEnvironment.getApplication()
+        val manager = context.getSystemService(android.app.NotificationManager::class.java)
+        manager.createNotificationChannel(android.app.NotificationChannel(TimerSurfaces.CONTROL_CHANNEL,"User channel",android.app.NotificationManager.IMPORTANCE_MIN))
+        TimerSurfaces.channels(context)
+        val capability = timerNotificationCapability(context)
+        org.junit.Assert.assertEquals(android.app.NotificationManager.IMPORTANCE_MIN,capability.importance)
+        org.junit.Assert.assertEquals(false,capability.statusBarIconRequested)
+        val intent = requireNotNull(SurfaceSettingsBackend.settingsIntent(context,capability.settingsAction))
+        org.junit.Assert.assertEquals(android.provider.Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS,intent.action)
+        org.junit.Assert.assertEquals(TimerSurfaces.CONTROL_CHANNEL,intent.getStringExtra(android.provider.Settings.EXTRA_CHANNEL_ID))
+    }
     @org.junit.Test fun shortcutDisableWithdrawsMutableEntriesAndGatesRetainedActionsAfterReopen() {
         val context = RuntimeEnvironment.getApplication();val tracker = Tracker(createStore(),FakeClock())
         val shown = tracker.snapshot();val oldAction = SurfaceAction(Surface.SHORTCUT,TimerCommand.START,shown.token,shown.timerTarget)
         val manager = context.getSystemService(android.content.pm.ShortcutManager::class.java)
         TimerSurfaces.shortcut(context,shown,tracker.data().settings.surfaces)
-        val published = manager.dynamicShortcuts.single();org.junit.Assert.assertEquals("timer_action",published.id)
+        val published = manager.dynamicShortcuts.single { it.id == "timer_action" };org.junit.Assert.assertEquals("timer_action",published.id)
         org.junit.Assert.assertTrue(manager.requestPinShortcut(published,null))
         val timer = tracker.snapshot().timerTarget
         tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(shortcut = false)))
@@ -678,7 +777,11 @@ class RoomScenariosTest: ScenarioContract() {
         val switchRoute = SurfaceChoices.route(Surface.NOTIFICATION,tracker.snapshot())
         org.junit.Assert.assertEquals(ChoiceApplication.SWITCH,switchRoute.application)
         val first = tracker.snapshot().session!!.id
-        SurfaceChoices.choose(context,tracker,switchRoute,SurfaceChoices.read(tracker,switchRoute).choices.single().reference)
+        org.junit.Assert.assertTrue(SurfaceChoices.read(tracker,switchRoute).choices.isEmpty())
+        // An explicit same-activity switch remains available through the full catalog.
+        val catalogChoices = tracker.view().choices()
+        val sameActivity = catalogChoices.search(ChoiceQuery(kinds = setOf(ChoiceKind.FAVORITE))).items.single().entry
+        SurfaceChoices.choose(context,tracker,switchRoute,catalogChoices.reference(sameActivity))
         org.junit.Assert.assertNotEquals(first,tracker.snapshot().session!!.id)
         clock.advance(1_000)
         val overlay = SurfaceAction(Surface.OVERLAY,TimerCommand.STOP,tracker.snapshot().token,tracker.snapshot().timerTarget)
@@ -918,7 +1021,7 @@ class RoomScenariosTest: ScenarioContract() {
         org.junit.Assert.assertEquals(0,notification.actions?.size ?: 0) // buttons live in the custom row, visible collapsed
         org.junit.Assert.assertEquals(android.app.Notification.VISIBILITY_PRIVATE,notification.visibility)
         TimerSurfaces.shortcut(context,latest,tracker.data().settings.surfaces)
-        val launcher = context.getSystemService(android.content.pm.ShortcutManager::class.java).dynamicShortcuts.single()
+        val launcher = context.getSystemService(android.content.pm.ShortcutManager::class.java).dynamicShortcuts.single { it.id == "timer_action" }
         val launcherAction = requireNotNull(TimerSurfaces.parse(launcher.intent!!))
         org.junit.Assert.assertEquals(Surface.SHORTCUT,launcherAction.source)
         org.junit.Assert.assertEquals(latest.token,launcherAction.token)

@@ -67,6 +67,47 @@ class UiDraftRecreationTest {
         assertSame(vm,ViewModelProvider(controller.get())[TrackerViewModel::class.java])
         compose.waitForIdle()
     }
+    @Test fun stoppedAssignmentFullCatalogKeepsReceiptAndNeverStartsAnotherTimer() {
+        fun openAssignment(): String {
+            t.start(t.snapshot().token,Classification(name="Saved before chooser"))
+            (t.clock as FakeClock).advance(60_000)
+            val stopped = t.stopForAssignment(t.snapshot().timerTarget!!)
+            val id = requireNotNull(stopped.assignment).sessionId
+            vm.receiveSurfacePicker(SurfaceChoices.route(Surface.SHORTCUT,stopped.state,stopped.assignment))
+            compose.waitUntil(10000) { vm.surfacePicker.value != null }
+            compose.onNode(hasText("Все занятия") and hasAnyAncestor(isDialog())).performClick()
+            compose.onNodeWithContentDescription("Найти или создать занятие").assertExists()
+            return id
+        }
+        val assigned = openAssignment()
+        val count = t.data().sessions.size
+        compose.onNodeWithContentDescription("Найти или создать занятие").performTextInput("Draft selected")
+        compose.waitUntil(10000) { compose.onAllNodesWithText("Draft selected activity").fetchSemanticsNodes().size==1 }
+        compose.onNodeWithText("Draft selected activity").performClick()
+        compose.waitUntil(10000) { vm.surfacePicker.value == null }
+        assertEquals(count,t.data().sessions.size)
+        assertEquals("p2-form-choice",t.data().sessions.single { it.id==assigned }.selection.cardId)
+        assertEquals(Mode.IDLE,t.snapshot().mode)
+
+        val created = openAssignment()
+        val countBeforeCreate = t.data().sessions.size
+        compose.onNodeWithContentDescription("Найти или создать занятие").performTextInput("New assigned activity")
+        compose.onNodeWithText("Создать занятие «New assigned activity»").performClick()
+        compose.waitUntil(10000) { vm.surfacePicker.value == null }
+        assertEquals(countBeforeCreate,t.data().sessions.size)
+        val card = t.data().cards.single { it.name=="New assigned activity" }
+        assertEquals(card.id,t.data().sessions.single { it.id==created }.selection.cardId)
+        assertEquals(Mode.IDLE,t.snapshot().mode)
+
+        val cancelled = openAssignment()
+        val beforeCancel = t.data()
+        compose.onNodeWithContentDescription("Закрыть").performClick()
+        compose.waitUntil(10000) { vm.surfacePicker.value == null }
+        assertEquals(beforeCancel.sessions,t.data().sessions)
+        assertEquals(beforeCancel.segments,t.data().segments)
+        assertTrue(t.data().sessions.any { it.id==cancelled })
+        assertEquals(Mode.IDLE,t.snapshot().mode)
+    }
     private fun form(correction:Boolean) {
         val initial=t.data()
         if(correction) compose.onNodeWithText("Original correction note",substring=true).performScrollTo().performClick()

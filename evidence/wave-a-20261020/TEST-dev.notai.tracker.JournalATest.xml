@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.notai.tracker.JournalATest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-10-20T08:30:22.016Z" hostname="4af5929b67e8" time="0.116">
+  <properties/>
+  <testcase name="gapsDistinguishPausesAndOnlyPrepareExplicitManualDrafts" classname="dev.notai.tracker.JournalATest" time="0.009"/>
+  <testcase name="personalProfilesRoundTripFullAndSelectiveWithLegacyGuards" classname="dev.notai.tracker.JournalATest" time="0.044"/>
+  <testcase name="personalProfilesPersistAndPinnedOrderDoesNotChangeWithSearchRank" classname="dev.notai.tracker.JournalATest" time="0.006"/>
+  <testcase name="explicitRepeatPolicyAlsoWorksWithoutAnyCardProfile" classname="dev.notai.tracker.JournalATest" time="0.001"/>
+  <testcase name="batchMetadataIsPreviewedAtomicVersionCheckedAndUndoable" classname="dev.notai.tracker.JournalATest" time="0.004"/>
+  <testcase name="gapWindowsPartitionAcrossMidnightAndUnknownTimeDoesNotBecomeZero" classname="dev.notai.tracker.JournalATest" time="0.001"/>
+  <testcase name="categoryEditsKeepHistoricalTotalsAndRejectInvalidParents" classname="dev.notai.tracker.JournalATest" time="0.001"/>
+  <testcase name="surfacePresentationPreferencesRoundTripAndLegacyDefaultsAreExplicit" classname="dev.notai.tracker.JournalATest" time="0.009"/>
+  <testcase name="sessionDayProjectionClipsMidnightPreservesMixedAndDoesNotInventUncertainPauses" classname="dev.notai.tracker.JournalATest" time="0.002"/>
+  <testcase name="sessionDayProjectionKeepsPausesOutOfWorkAndDoesNotMergeNames" classname="dev.notai.tracker.JournalATest" time="0.0"/>
+  <testcase name="repeatedFavoriteAddPreservesVariantsLegacyIdsAndReopenedOrder" classname="dev.notai.tracker.JournalATest" time="0.003"/>
+  <testcase name="personalProfilesSurviveCopiedOriginCompactionAndReplayWithoutFalseUndo" classname="dev.notai.tracker.JournalATest" time="0.03"/>
+  <testcase name="recoveryUncertaintyIsNotAnUnrecordedDraftAndFutureIsExcluded" classname="dev.notai.tracker.JournalATest" time="0.001"/>
+  <testcase name="repeatPolicyPreservesDefaultsAndNeverCopiesMeasurements" classname="dev.notai.tracker.JournalATest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

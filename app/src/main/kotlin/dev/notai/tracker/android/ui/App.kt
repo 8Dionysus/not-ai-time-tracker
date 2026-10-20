@@ -118,6 +118,7 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     val incomingDrafts by vm.incomingDrafts.collectAsStateWithLifecycle()
     val entryForm by vm.entryForm.collectAsStateWithLifecycle()
     val surfacePicker by vm.surfacePicker.collectAsStateWithLifecycle()
+    var fullSurfacePickerId by remember { mutableStateOf<String?>(null) }
     val snackbar = remember { SnackbarHostState() }
     val dark = c.isDark
     if (snapshot != null) SideEffect(onActionReady)
@@ -210,10 +211,12 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     // Opened from the notification ("Все занятия") or a saved stopped record: the same quick choices, applied by route.
     surfacePicker?.let { state ->
         val d = view?.data
-        if (d != null) QuickPickSheet(state, d, onChoose = { vm.chooseSurface(it) }, onDismiss = vm::cancelSurfacePicker, onAll = {
-            val switch = state.route.application == dev.notai.tracker.ChoiceApplication.SWITCH
-            vm.cancelSurfacePicker(); tab = Tab.TIMER; sheet = Sheet.Picker(if (switch) PickMode.SWITCH else PickMode.START)
-        })
+        if (fullSurfacePickerId == state.route.id) key(state.route.id) {
+            PickerSheet(vm, PickMode.MANUAL, false, null, null, null,
+                onDismiss = vm::cancelSurfacePicker, surfaceRoute = state.route)
+        } else if (d != null) QuickPickSheet(state, d,
+            onChoose = { vm.chooseSurface(it,expectedRoute = state.route) },
+            onDismiss = vm::cancelSurfacePicker, onAll = { fullSurfacePickerId = state.route.id })
     }
     confirmDelete?.let { r ->
         val parts = r.consequences.joinToString(" и ")
@@ -278,8 +281,8 @@ private fun QuickPickSheet(state: dev.notai.tracker.android.SurfacePickerState, 
                     leading = { ActivityGlyph(l) })
             }
             if (state.choices.isEmpty()) Text("Частых занятий пока нет.", style = NotAi.type.body, color = c.ink2)
-            if (!assignment) PillButton("Все занятия", onAll, Modifier.fillMaxWidth().padding(top = 8.dp), ButtonKind.TONAL, height = 48.dp)
-            else PillButton("Оставить без занятия", onDismiss, Modifier.fillMaxWidth().padding(top = 8.dp), ButtonKind.TONAL, height = 48.dp)
+            PillButton("Все занятия", onAll, Modifier.fillMaxWidth().padding(top = 8.dp), ButtonKind.TONAL, height = 48.dp)
+            if (assignment) PillButton("Оставить без занятия", onDismiss, Modifier.fillMaxWidth().padding(top = 8.dp), ButtonKind.TONAL, height = 48.dp)
         }
     }
 }

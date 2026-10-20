@@ -230,12 +230,15 @@ class ChoiceView private constructor(private val d: Dataset,private val cache: C
         return entry
     }
     /** Bounded favorites first, followed by recorded frequency within an explicit window. */
-    fun quick(window: HistoryWindow,limit: Int = 6): List<QuickChoice> {
+    fun quick(window: HistoryWindow,limit: Int = 6,excludeSelection: Classification? = null): List<QuickChoice> {
         ensure(limit in 1..20,"Quick choice limit must be 1..20")
         val favorites = personal.records.filter { it.kind == ChoiceKind.FAVORITE }.sortedWith(compareBy({personalOrder(it) ?: Int.MAX_VALUE},{it.sortName},{it.id}))
             .mapNotNull { resolve(it.id)?.takeIf { entry -> entry.canStart } }
         val frequent = suggestions(SuggestionQuery(true,SuggestionOrder.FREQUENT_RECORDED,window),pageSize = 100).items.map { it.entry }
-        return frozenList((favorites+frequent).distinctBy { selectionIdentity(it.selection) }.take(limit).map {
+        val excluded = excludeSelection?.let(::selectionIdentity)
+        return frozenList((favorites+frequent).filter { selectionIdentity(it.selection) != excluded &&
+            (it.selection.cardId != null || it.selection.activityTypeId != null || !it.selection.name.isNullOrBlank()) }
+            .distinctBy { selectionIdentity(it.selection) }.take(limit).map {
             QuickChoice(it,reference(it),ActivityIcons.resolve(d,it.selection))
         })
     }

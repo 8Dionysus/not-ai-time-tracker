@@ -71,6 +71,7 @@ class FloatingTimerService : Service() {
     private val snapshot = mutableStateOf<Snapshot?>(null)
     private val assignment = mutableStateOf<OverlayAssignment?>(null)
     private val busy = mutableStateOf(false)
+    private val chooserBackgroundAlpha = mutableStateOf(1f)
     private val windows get() = getSystemService(WindowManager::class.java)
     private val prefs get() = getSharedPreferences("overlay", Context.MODE_PRIVATE)
     private val permissionWatcher = AppOpsManager.OnOpChangedListener { _, _ ->
@@ -98,6 +99,7 @@ class FloatingTimerService : Service() {
                 t.views.collect { view ->
                     if (!view.data.settings.surfaces.overlay || !TimerSurfaces.overlayAllowed(this@FloatingTimerService)) { stopSelf(); return@collect }
                     val s = view.snapshot()
+                    chooserBackgroundAlpha.value = view.data.settings.surfaces.overlayChooserBackgroundAlphaPercent / 100f
                     snapshot.value = s
                     // Any later timer transition invalidates the receipt; the card goes with it.
                     assignment.value?.let { a -> if (a.route.target != s.timerTarget) hidePanel() }
@@ -190,7 +192,7 @@ class FloatingTimerService : Service() {
         val zone = runCatching { java.time.ZoneId.of(d.settings.reportZone) }.getOrDefault(java.time.ZoneId.systemDefault())
         val segments = d.segments.filter { it.sessionId == session.id }
         val range = segments.minOfOrNull { it.start }?.let { a -> Format.range(a, segments.mapNotNull { it.end }.maxOrNull() ?: a, zone) }
-        val choices = state.choices.filter { it.entry.canStart && !d.label(it.entry.selection).unclassified }.take(6).map { q ->
+        val choices = state.choices.take(6).map { q ->
             val l = d.label(q.entry.selection)
             OverlayChoice(q, if (q.entry.kind == ChoiceKind.FAVORITE) q.entry.title else l.title, l.glyph, l.slot)
         }
@@ -207,7 +209,7 @@ class FloatingTimerService : Service() {
             setContent {
                 val theme = remember { runCatching { ThemeChoice.valueOf(getSharedPreferences("ui", Context.MODE_PRIVATE).getString("theme", "SYSTEM")!!) }.getOrDefault(ThemeChoice.SYSTEM) }
                 NotAiTheme(theme) {
-                    assignment.value?.let { a -> AssignmentCard(a, onChoose = ::choose, onLeave = { dismiss(leave = true) }) }
+                    assignment.value?.let { a -> AssignmentCard(a, onChoose = ::choose, onLeave = { dismiss(leave = true) }, backgroundAlpha = chooserBackgroundAlpha.value) }
                 }
             }
         }
@@ -215,6 +217,19 @@ class FloatingTimerService : Service() {
             gravity = Gravity.BOTTOM; y = (56 * resources.displayMetrics.density).toInt()
         }
         try { windows.addView(view, params); panel = view } catch (_: RuntimeException) { assignment.value = null }
+    }
+
+    /** Bind to the chooser card's explicit "all activities" action; retain the original receipt/target.
+     * Opening the app transfers review, it does not leave/cancel the saved assignment.
+     */
+    internal fun openAssignmentChooser() {
+        val route = assignment.value?.route ?: return
+        try {
+            startActivity(SurfaceChoices.intent(this,route).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            hidePanel()
+        } catch (_: RuntimeException) {
+            Toast.makeText(this,"Открыть выбор не удалось. Запись сохранена",Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun choose(choice: OverlayChoice) {
@@ -324,11 +339,12 @@ internal fun Puck(s: Snapshot?, busy: Boolean, onTap: () -> Unit, onDrag: (Float
 
 /** After STOP: the saved record and up to six quick choices. Nothing here changes the stopped time. */
 @Composable
-internal fun AssignmentCard(a: OverlayAssignment, onChoose: (OverlayChoice) -> Unit, onLeave: () -> Unit) {
+internal fun AssignmentCard(a: OverlayAssignment, onChoose: (OverlayChoice) -> Unit, onLeave: () -> Unit, backgroundAlpha: Float = 1f) {
+    require(backgroundAlpha.isFinite() && backgroundAlpha in 0f..1f)
     val c = NotAi.colors
     Box(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), contentAlignment = Alignment.BottomCenter) {
         Column(Modifier.widthIn(max = 420.dp).fillMaxWidth().shadow(16.dp, RoundedCornerShape(24.dp)).clip(RoundedCornerShape(24.dp))
-            .background(c.raised).border(1.dp, c.rule, RoundedCornerShape(24.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            .background(c.raised.copy(alpha = c.raised.alpha * backgroundAlpha)).border(1.dp, c.rule, RoundedCornerShape(24.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text("Чем ты был занят?", style = NotAi.type.sheetTitle, color = c.ink)
                 Text(listOfNotNull(a.range, "время уже сохранено").joinToString(" · "), style = NotAi.type.caption, color = c.ink2)

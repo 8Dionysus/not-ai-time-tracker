@@ -8,6 +8,246 @@ import kotlinx.serialization.json.*
 abstract class JournalAScenarioContract {
     protected abstract fun createJournalStore(): StateStore
     protected open fun reopenJournalStore(store: StateStore): StateStore = store
+    @Test fun ordinaryCardCreationRollsBackRefusedModesAndPreservesDraftLabelEarlierAndFocus() {
+        val clock = FakeClock(10000);val t = Tracker(createJournalStore(),clock)
+        val card = Card("ordinary-created","Ordinary created")
+        val initial = t.data()
+        assertFailsWith<CoreError> { t.createCardForEarlierSwitch(t.snapshot().token,card,9000) }
+        assertEquals(initial,t.data())
+        assertFailsWith<CoreError> { t.createCardForLabel(t.snapshot().token,card,"Keep note") }
+        assertEquals(initial,t.data())
+        assertFailsWith<CoreError> { t.createCardForFocus(t.snapshot().token,card.copy(activityTypeId = "missing")) }
+        assertEquals(initial,t.data())
+        val stale = t.snapshot()
+        t.saveCard(stale.token,Card("concurrent-card","Concurrent"))
+        val afterConcurrent = t.data()
+        assertFailsWith<CoreError> { t.createCardForChoice(stale.token,stale.timerTarget!!,card,ChoiceApplication.START) }
+        assertEquals(afterConcurrent,t.data())
+        val start = t.snapshot()
+        t.createCardForChoice(start.token,start.timerTarget!!,card,ChoiceApplication.START,draft = EntryDrafts.selectedText("Retained draft note"))
+        val running = t.data();val sessionId = t.snapshot().session!!.id
+        assertEquals("Retained draft note",t.snapshot().session!!.note)
+        assertFailsWith<CoreError> { t.createCardForChoice(t.snapshot().token,t.snapshot().timerTarget!!,Card("refused-start","Refused"),ChoiceApplication.START) }
+        assertEquals(running,t.data())
+        t.createCardForLabel(t.snapshot().token,Card("label-created","Label created"),t.snapshot().session!!.note)
+        assertEquals(sessionId,t.snapshot().session!!.id)
+        assertEquals("label-created",t.snapshot().session!!.selection.cardId)
+        assertEquals("Retained draft note",t.snapshot().session!!.note)
+        clock.advance(2000)
+        val beforeEarlier = t.data()
+        assertFailsWith<CoreError> { t.createCardForEarlierSwitch(t.snapshot().token,Card("refused-earlier","Refused"),clock.wall+1) }
+        assertEquals(beforeEarlier,t.data())
+        t.createCardForEarlierSwitch(t.snapshot().token,Card("earlier-created","Earlier created"),11000)
+        assertEquals(11000L,t.data().segments.single { it.end == null }.start)
+        assertNotEquals(sessionId,t.snapshot().session!!.id)
+        t.stop(t.snapshot().token)
+        t.createCardForFocus(t.snapshot().token,Card("focus-created","Focus created"))
+        assertNotNull(t.snapshot().focus)
+        assertEquals("focus-created",t.snapshot().session!!.selection.cardId)
+        val focused = t.data()
+        assertFailsWith<CoreError> { t.createCardForFocus(t.snapshot().token,Card("refused-focus","Refused")) }
+        assertEquals(focused,t.data())
+        t.createCardForChoice(t.snapshot().token,t.snapshot().timerTarget!!,Card("switch-created","Switch created"),ChoiceApplication.SWITCH,
+            draft = EntryDrafts.selectedText("Switch draft note"))
+        assertNull(t.snapshot().focus)
+        assertEquals("Switch draft note",t.snapshot().session!!.note)
+        assertEquals("switch-created",t.snapshot().session!!.selection.cardId)
+    }
+    @Test fun surfaceCardCreationAndApplicationAreOneTransactionIncludingRefusalsAndRetry() {
+        val clock = FakeClock();val t = Tracker(createJournalStore(),clock)
+        t.start(t.snapshot().token,Classification(name = "Original"));clock.advance(1000)
+        val stopped = t.stopForAssignment(t.snapshot().timerTarget!!)
+        val offer = requireNotNull(stopped.assignment);val target = requireNotNull(stopped.state.timerTarget)
+        val card = Card("atomic-surface-card","Created for saved record")
+        val before = t.data()
+        assertFailsWith<CoreError> { t.createCardForChoice(t.snapshot().token,target,card,ChoiceApplication.START,offer.id) { false } }
+        assertEquals(before,t.data())
+        assertFailsWith<CoreError> { t.createCardForChoice(t.snapshot().token,target,card,ChoiceApplication.START,"expired-receipt") }
+        assertEquals(before,t.data())
+        assertFailsWith<CoreError> { t.createCardForChoice(t.snapshot().token,target,card.copy(activityTypeId = "missing"),ChoiceApplication.START,offer.id) }
+        assertEquals(before,t.data())
+        // The exact same card/receipt can be retried after a refused attempt; nothing was partially saved.
+        t.createCardForChoice(t.snapshot().token,target,card,ChoiceApplication.START,offer.id)
+        val assigned = t.data()
+        assertEquals(before.sessions.size,assigned.sessions.size)
+        assertEquals(card.id,assigned.sessions.single { it.id == offer.sessionId }.selection.cardId)
+        assertEquals(listOf(card),assigned.cards)
+        assertEquals(Mode.IDLE,t.snapshot().mode)
+        assertFailsWith<CoreError> { t.createCardForChoice(t.snapshot().token,target,card.copy(id = "replayed-card"),ChoiceApplication.START,offer.id) }
+        assertEquals(assigned,t.data())
+        t.undo(t.snapshot().token)
+        assertEquals(before.cards,t.data().cards);assertEquals(before.sessions,t.data().sessions)
+        t.start(t.snapshot().token)
+        val afterNewTimer = t.data()
+        assertFailsWith<CoreError> { t.createCardForChoice(t.snapshot().token,target,card,ChoiceApplication.START,offer.id) }
+        assertEquals(afterNewTimer,t.data())
+        t.stop(t.snapshot().token)
+        val start = t.snapshot()
+        t.createCardForChoice(start.token,start.timerTarget!!,card,ChoiceApplication.START)
+        assertEquals(card.id,t.snapshot().session!!.selection.cardId)
+        assertEquals(1,t.data().cards.count { it.id == card.id })
+    }
+    @Test fun bothBackupReadersKeepEveryLegacyVersionAndPresentationDefaults() {
+        val directory = java.io.File(System.getProperty("tracker.samples"))
+        val first = directory.resolve("history-v1.json").readText()
+        val second = directory.resolve("history-v2.json").readText()
+        val source = codec.parseToJsonElement(second).jsonObject
+        val expected = Backups.decode(first)
+        val t = Tracker(createJournalStore(),FakeClock());val backup = Backups(t,MemoryRollback())
+        val before = t.data()
+        for(version in 1..14) {
+            val text = if(version == 1) first else {
+                val data = source.getValue("data").jsonObject.toMutableMap()
+                if(version >= 6) data["goals"] = JsonArray(emptyList())
+                if(version >= 7) data["focus"] = JsonNull
+                if(version >= 8) {
+                    data["schedule"] = codec.encodeToJsonElement(ScheduleData())
+                    data["transfer"] = codec.encodeToJsonElement(TransferState())
+                }
+                JsonObject(source + mapOf("formatVersion" to JsonPrimitive(version),"data" to JsonObject(data))).toString()
+            }
+            val whole = Backups.decode(text)
+            assertEquals(expected,whole,"Whole reader version $version")
+            assertEquals(whole,StreamingBackup.read { text.byteInputStream() },"Streaming reader version $version")
+            assertNull(whole.data.settings.surfaces.notificationPrivacy)
+            assertEquals(100,whole.data.settings.surfaces.widgetBackgroundAlphaPercent)
+            assertEquals(100,whole.data.settings.surfaces.overlayChooserBackgroundAlphaPercent)
+            backup.prepare(text).close();backup.prepare { text.byteInputStream() }.close()
+            assertEquals(before,t.data(),"Preview cannot mutate version $version")
+        }
+    }
+    @Test fun surfacePresentationPreferencesRoundTripAndLegacyDefaultsAreExplicit() {
+        val clock = FakeClock(); val t = Tracker(createJournalStore(),clock)
+        val legacy = Backups(t,MemoryRollback()).export().replace("\"formatVersion\": $CURRENT_BACKUP_FORMAT","\"formatVersion\": 14")
+        val oldWhole = Backups.decode(legacy)
+        assertEquals(oldWhole,StreamingBackup.read { legacy.byteInputStream() })
+        assertNull(oldWhole.data.settings.surfaces.notificationPrivacy)
+        assertEquals(100,oldWhole.data.settings.surfaces.widgetBackgroundAlphaPercent)
+        val preference = SurfaceSettings(notificationPrivacy = NotificationPrivacy.FULL,
+            widgetBackgroundAlphaPercent = 37,overlayChooserBackgroundAlphaPercent = 0)
+        t.settings(t.snapshot().token,t.data().settings.copy(surfaces = preference))
+        val before = t.data()
+        val copy = Backups(t,MemoryRollback()); val json = copy.export()
+        val decoded = Backups.decode(json)
+        assertEquals(CURRENT_BACKUP_FORMAT,decoded.formatVersion)
+        assertEquals(preference,decoded.data.settings.surfaces)
+        assertEquals(decoded,StreamingBackup.read { json.byteInputStream() })
+        val bytes = ByteArrayOutputStream();StreamingBackup.write(decoded,bytes)
+        assertEquals(decoded,Backups.decode(bytes.toString("UTF-8")))
+        val target = Tracker(createJournalStore(),clock);val restore = Backups(target,MemoryRollback())
+        restore.apply(restore.prepare(json))
+        assertEquals(preference,Tracker(reopenJournalStore(target.store),clock).data().settings.surfaces)
+        // A future version and new settings mislabeled as old data are rejected by both readers.
+        for(version in listOf(14,CURRENT_BACKUP_FORMAT+1)) {
+            val bad = json.replace("\"formatVersion\": $CURRENT_BACKUP_FORMAT","\"formatVersion\": $version")
+            assertFailsWith<CoreError> { copy.prepare(bad) }
+            assertFailsWith<CoreError> { copy.prepare { bad.byteInputStream() } }
+            assertEquals(before,t.data())
+        }
+        for(alpha in listOf(-1,101)) {
+            assertFailsWith<CoreError> { t.settings(t.snapshot().token,t.data().settings.copy(surfaces = preference.copy(widgetBackgroundAlphaPercent = alpha))) }
+            assertFailsWith<CoreError> { t.settings(t.snapshot().token,t.data().settings.copy(surfaces = preference.copy(overlayChooserBackgroundAlphaPercent = alpha))) }
+            assertEquals(before,t.data())
+        }
+    }
+
+    @Test fun sessionDayProjectionClipsMidnightPreservesMixedAndDoesNotInventUncertainPauses() {
+        val midnight = java.time.Instant.parse("2026-10-20T00:00:00Z").toEpochMilli()
+        val clock = FakeClock(midnight-2000);val t = Tracker(createJournalStore(),clock)
+        val selection = Classification(name = "Same",details = mapOf("variant" to "first"))
+        t.start(t.snapshot().token,selection);clock.advance(4000)
+        t.changeDetails(t.snapshot().token,selection.copy(details = mapOf("variant" to "second")))
+        clock.advance(1000);t.pause(t.snapshot().token);clock.advance(1000)
+        t.resume(t.snapshot().token);clock.advance(1000);t.stop(t.snapshot().token)
+        val calendar = t.view().calendar(java.time.LocalDate.of(2026,10,19),2)
+        val before = t.data()
+        val first = calendar.days[0].sessionRows(before).single()
+        val second = calendar.days[1].sessionRows(before).single()
+        assertEquals(midnight,first.end);assertEquals(midnight,second.start)
+        assertFalse(first.mixedSelection);assertTrue(second.mixedSelection)
+        assertEquals(6000L,first.recordedMs+second.recordedMs)
+        assertEquals(1000L,second.pauses.single().let { it.end-it.start })
+        assertEquals(calendar.window.recordedMs,first.recordedMs+second.recordedMs)
+        assertEquals(before,t.data())
+        val id = "uncertain-session"
+        val own = listOf(
+            Segment("certain-first",id,midnight,midnight+1000,1000,selection),
+            Segment("uncertain-middle",id,midnight+1000,midnight+3000,0,selection,uncertain = true),
+            Segment("certain-last",id,midnight+5000,midnight+6000,1000,selection))
+        val data = Dataset(sessions = listOf(Session(id,SessionStatus.STOPPED,selection)),segments = own)
+        val day = Reports.calendar(data,FakeClock(midnight+10000).now(),java.time.LocalDate.of(2026,10,20),1).days.single()
+        val summary = day.sessionRows(data).single()
+        assertEquals(2000L,summary.recordedMs)
+        assertTrue(summary.pauses.isEmpty()) // Unknown work ending at 3000 cannot establish a certain pause.
+        val unknownOnly = day.copy(rows = emptyList())
+        assertTrue(unknownOnly.sessionRows(data).isEmpty())
+    }
+    @Test fun repeatedFavoriteAddPreservesVariantsLegacyIdsAndReopenedOrder() {
+        val store = createJournalStore(); val clock = FakeClock(); var t = Tracker(store, clock)
+        val selection = Classification(name = "Same", details = mapOf("variant" to "a"))
+        t.addFavorite(t.snapshot().token, Favorite("a", "First", selection))
+        t.addFavorite(t.snapshot().token, Favorite("repeat", "Other label", selection))
+        assertEquals(listOf("a"), t.data().favorites.map { it.id })
+        t.addFavorite(t.snapshot().token, Favorite("b", "First", selection.copy(details = mapOf("variant" to "b"))))
+        t.addFavorite(t.snapshot().token, Favorite("note", "First", selection,
+            ChoicePersonalization(notePolicy = ChoiceNotePolicy.COPY_SOURCE)))
+        // Explicit save/import is allowed to retain old duplicate identities.
+        t.saveFavorite(t.snapshot().token, Favorite("legacy", "Legacy", selection))
+        t.addFavorite(t.snapshot().token, Favorite("again", "First", selection))
+        assertEquals(setOf("a", "b", "note", "legacy"), t.data().favorites.map { it.id }.toSet())
+        t.orderChoices(t.snapshot().token, ChoiceKind.FAVORITE, listOf("b", "a", "note", "legacy"))
+        t = Tracker(reopenJournalStore(t.store), clock)
+        val window = HistoryWindow(0, clock.wall + 1)
+        assertEquals(listOf("b", "a"), t.choices().quick(window, 2).map { it.entry.sourceId })
+        assertEquals(listOf("b"), t.choices().quick(window, 2, selection).map { it.entry.sourceId })
+        val stale = t.snapshot().token
+        t.removeFavorite(stale, "b")
+        assertFailsWith<CoreError> { t.orderChoices(stale, ChoiceKind.FAVORITE, listOf("a")) }
+        t.undo(t.snapshot().token)
+        t = Tracker(reopenJournalStore(t.store), clock)
+        assertEquals("b", t.choices().quick(window, 1).single().entry.sourceId)
+    }
+
+    @Test fun sessionDayProjectionKeepsPausesOutOfWorkAndDoesNotMergeNames() {
+        val clock = FakeClock(); val t = Tracker(createJournalStore(), clock)
+        val selection = Classification(name = "Same")
+        t.start(t.snapshot().token, selection); clock.advance(60_000)
+        t.pause(t.snapshot().token); clock.advance(30_000)
+        t.resume(t.snapshot().token); clock.advance(60_000); t.stop(t.snapshot().token)
+        t.start(t.snapshot().token, selection); clock.advance(10_000); t.stop(t.snapshot().token)
+        val data = t.data(); val report = t.view().report(0, clock.wall + 1)
+        val day = CalendarDay(java.time.LocalDate.of(2026,1,1), 0, clock.wall + 1, report.rows, report.recordedMs, false)
+        val rows = day.sessionRows(data)
+        assertEquals(2, rows.size)
+        val paused = rows.single { it.rows.size == 2 }
+        assertEquals(120_000L, paused.recordedMs)
+        assertEquals(30_000L, paused.pauses.single().let { it.end - it.start })
+        assertEquals(report.recordedMs, rows.sumOf { it.recordedMs })
+        val boundary = paused.rows.last().start
+        val secondDay = day.copy(start = boundary, rows = report.rows.filter { it.start >= boundary })
+        assertTrue(secondDay.sessionRows(data).all { it.pauses.isEmpty() })
+        assertEquals(data, t.data())
+    }
+
+    @Test fun categoryEditsKeepHistoricalTotalsAndRejectInvalidParents() {
+        val clock = FakeClock(); val t = Tracker(createJournalStore(), clock)
+        t.saveType(t.snapshot().token, ActivityType("root-a", "Root", selectable = false))
+        t.saveType(t.snapshot().token, ActivityType("child-a", "Child", parentId = "root-a"))
+        t.saveCard(t.snapshot().token, Card("own-a", "Own", activityTypeId = "child-a"))
+        t.start(t.snapshot().token, t.selection("own-a")); clock.advance(60_000); t.stop(t.snapshot().token)
+        val facts = t.data().segments
+        val total = t.view().report(0, clock.wall + 1, Filter(activityTypeId = "root-a")).recordedMs
+        t.saveType(t.snapshot().token, t.data().types.single { it.id == "child-a" }.copy(name = "Renamed"))
+        assertEquals(total, t.view().report(0, clock.wall + 1, Filter(activityTypeId = "root-a")).recordedMs)
+        assertEquals(facts, t.data().segments)
+        assertFailsWith<CoreError> { t.saveType(t.snapshot().token, ActivityType("root-a", "Root", parentId = "child-a")) }
+        assertFailsWith<CoreError> { t.saveType(t.snapshot().token, ActivityType("missing-child", "Child", parentId = "missing")) }
+        t.saveType(t.snapshot().token, ActivityType("archived-parent", "Archived", archived = true))
+        assertFailsWith<CoreError> { t.saveType(t.snapshot().token, ActivityType("bad-child", "Child", parentId = "archived-parent")) }
+        assertFailsWith<CoreError> { t.saveCard(t.snapshot().token, Card("bad-card", "Own", activityTypeId = "archived-parent")) }
+        assertEquals(facts, t.data().segments)
+    }
+
     @Test fun personalProfilesPersistAndPinnedOrderDoesNotChangeWithSearchRank() {
         val clock=FakeClock();var t=Tracker(createJournalStore(),clock)
         val a=Card("a","Shared exact");val b=Card("b","Shared prefix suffix")
@@ -70,10 +310,10 @@ abstract class JournalAScenarioContract {
         t.saveCard(t.snapshot().token,Card("portable","Portable"))
         t.personalizeChoice(t.snapshot().token,ChoiceKind.CARD,"portable",ChoicePersonalization(listOf("Own alias"),0,ChoiceNotePolicy.CLEAR))
         val backups=Backups(t,MemoryRollback());val text=backups.export();val decoded=Backups.decode(text)
-        assertEquals(14,decoded.formatVersion);assertEquals(t.data().cards,decoded.data.cards)
+        assertEquals(CURRENT_BACKUP_FORMAT,decoded.formatVersion);assertEquals(t.data().cards,decoded.data.cards)
         val bytes=ByteArrayOutputStream();StreamingBackup.write(decoded,bytes)
         assertEquals(decoded,StreamingBackup.read { bytes.toByteArray().inputStream() })
-        val old=text.replace("\"formatVersion\": 14","\"formatVersion\": 13")
+        val old=text.replace("\"formatVersion\": $CURRENT_BACKUP_FORMAT","\"formatVersion\": 13")
         assertEquals(ErrorCode.UNSUPPORTED_IMPORT,assertFailsWith<CoreError> { Backups.decode(old) }.code)
         assertFailsWith<CoreError> { StreamingBackup.read { old.byteInputStream() } }
         val destination=Tracker(createJournalStore(),clock);val restore=Backups(destination,MemoryRollback())
@@ -92,8 +332,8 @@ abstract class JournalAScenarioContract {
         val copied=copy.apply(copy.plan(selective,selective.groups.map { it.id }.toSet(),selective.groups.associate { it.id to TransferConflictPolicy.COPY }),"profile-copy")
         assertTrue(copied.complete);assertEquals(2,conflict.data().cards.size)
         assertEquals(t.data().cards.single().personal,conflict.data().cards.single { it.id!="portable" }.personal)
-        val legacy=Backups.encode(Dataset(),clock.now()).replace("\"formatVersion\": 14","\"formatVersion\": 13")
-        assertEquals(14,Backups.decode(legacy).formatVersion)
+        val legacy=Backups.encode(Dataset(),clock.now()).replace("\"formatVersion\": $CURRENT_BACKUP_FORMAT","\"formatVersion\": 13")
+        assertEquals(CURRENT_BACKUP_FORMAT,Backups.decode(legacy).formatVersion)
     }
     @Test fun gapsDistinguishPausesAndOnlyPrepareExplicitManualDrafts() {
         val clock=FakeClock(wall=10000);val t=Tracker(createJournalStore(),clock)

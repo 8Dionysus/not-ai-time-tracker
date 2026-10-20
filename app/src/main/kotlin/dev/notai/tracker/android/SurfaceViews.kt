@@ -92,16 +92,15 @@ object SurfaceViews {
         if (s.focus != null || s.mode == Mode.RECOVERY) return null
         val route = runCatching { SurfaceChoices.route(Surface.NOTIFICATION, s) }.getOrNull() ?: return null
         val end = minOf(MAX_TIME, System.currentTimeMillis() + 1)
-        val current = s.session?.selection?.let(::selectionIdentity)
-        // An unlabelled record is not a choice: "start without activity" is the main button already.
-        val items = runCatching { view.choices().quick(HistoryWindow(maxOf(0L, end - 30L * 24 * 60 * 60 * 1000), end), 8) }.getOrDefault(emptyList())
-            .filter { it.entry.canStart && selectionIdentity(it.entry.selection) != current && !d.label(it.entry.selection).unclassified }.take(chips.size)
+        // Shared core projection excludes the current selection before the compact limit.
+        val excluded = if(route.application == ChoiceApplication.SWITCH) s.session?.selection else null
+        val items = runCatching { view.choices().quick(HistoryWindow(maxOf(0L, end - 30L * 24 * 60 * 60 * 1000), end), chips.size, excluded) }.getOrDefault(emptyList())
             .map { q ->
                 val l = d.label(q.entry.selection)
                 val tint = l.slot?.let { areaColors[it] } ?: R.color.widget_ink2
                 Triple(q, if (q.entry.kind == ChoiceKind.FAVORITE) q.entry.title else l.title, l.glyph to tint)
             }
-        if (items.isEmpty()) return null
+        // Keep the full chooser reachable even when no compact suggestion is available.
         return Quick(route, if (route.application == ChoiceApplication.START) "Начать сразу" else "Переключиться на", items)
     }
 
@@ -132,7 +131,18 @@ object SurfaceViews {
         return small to big
     }
 
-    fun notification(c: Context, view: TrackerView): Notification {
+    internal fun notificationVisibility(policy: NotificationPrivacy?): Int = when(policy) {
+        null, NotificationPrivacy.PRIVATE -> Notification.VISIBILITY_PRIVATE
+        NotificationPrivacy.FULL -> Notification.VISIBILITY_PUBLIC
+        NotificationPrivacy.HIDDEN -> Notification.VISIBILITY_SECRET
+    }
+
+    /** Android presentation boundary; the default comes from the saved surface policy.
+     * PUBLIC retains the full row/actions/chronometer, PRIVATE supplies only a redacted public
+     * version, SECRET requests no lock-screen content. System/user channel policy remains final.
+     */
+    fun notification(c: Context, view: TrackerView, lockScreenVisibility: Int = notificationVisibility(view.data.settings.surfaces.notificationPrivacy)): Notification {
+        require(lockScreenVisibility in setOf(Notification.VISIBILITY_PUBLIC,Notification.VISIBILITY_PRIVATE,Notification.VISIBILITY_SECRET))
         TimerSurfaces.channels(c)
         val s = view.snapshot()
         val r = row(view.data, s)
@@ -142,18 +152,29 @@ object SurfaceViews {
             .setStyle(Notification.DecoratedCustomViewStyle()).setCustomContentView(small)
             .setContentTitle(r.title).setContentText(s.safeLabel).setContentIntent(TimerSurfaces.open(c))
             .setOnlyAlertOnce(true).setOngoing(true).setShowWhen(false).setCategory(Notification.CATEGORY_STATUS)
-            .setVisibility(Notification.VISIBILITY_PRIVATE)
-            .setPublicVersion(Notification.Builder(c, TimerSurfaces.CONTROL_CHANNEL).setSmallIcon(R.drawable.ic_stat_notai)
+            .setVisibility(lockScreenVisibility)
+        if (lockScreenVisibility == Notification.VISIBILITY_PRIVATE) builder.setPublicVersion(
+            Notification.Builder(c, TimerSurfaces.CONTROL_CHANNEL).setSmallIcon(R.drawable.ic_stat_notai)
+                .setVisibility(Notification.VISIBILITY_PUBLIC).setShowWhen(false)
                 .setColor(c.getColor(R.color.widget_amber)).setContentTitle(if (s.mode == Mode.IDLE && s.focus == null) "(not)AI Time" else "Учёт идёт").build())
         if (big != null) builder.setCustomBigContentView(big)
         return builder.build()
     }
 
-    fun widget(c: Context, view: TrackerView, enabled: Boolean): RemoteViews = RemoteViews(c.packageName, R.layout.timer_widget).also { rv ->
+    /** Narrow RemoteViews binding for a dedicated background ImageView. The XML owner supplies
+     * its ID; using image alpha preserves the shape/corners and does not fade foreground content.
+     */
+    internal fun widgetBackgroundAlpha(views: RemoteViews, backgroundImageId: Int, percent: Int) {
+        require(percent in 0..100)
+        views.setInt(backgroundImageId,"setImageAlpha",(percent * 255 + 50) / 100)
+    }
+
+    fun widget(c: Context, view: TrackerView, enabled: Boolean, backgroundAlphaPercent: Int = view.data.settings.surfaces.widgetBackgroundAlphaPercent): RemoteViews = RemoteViews(c.packageName, R.layout.timer_widget).also { rv ->
         val s = view.snapshot()
         val r = if (enabled) row(view.data, s)
             else Row(R.drawable.ic_stat_notai, R.color.widget_ink2, "Виджет выключен", "Включи его в настройках приложения", null, null, null)
         bind(c, rv, r, s, Surface.WIDGET)
+        widgetBackgroundAlpha(rv,R.id.widget_background,backgroundAlphaPercent)
     }
 }
 

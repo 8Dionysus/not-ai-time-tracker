@@ -181,11 +181,14 @@ class Tracker(val store: StateStore, val clock: Clock) {
         ensure(requestTarget == null || snapshot(d,n).timerTarget == requestTarget,"Picker timer target changed",ErrorCode.STALE)
         val offer = checkedOffer(d,id)
         val entry = ChoiceView(d,choiceCache) { snapshot(d,n) }.resolve(choice)
+        assignResolvedChoice(d,offer,entry,note)
+    }
+    private fun assignResolvedChoice(d: Dataset,offer: StoppedAssignment,entry: ChoiceEntry,note: String?): Dataset {
         checkStartable(d,entry.selection)
         val selected = d.classify(entry.selection)
-        d.copy(sessions = d.sessions.map { if(it.id == offer.sessionId) it.copy(selection = selected,note = note ?: it.note) else it },
+        return d.copy(sessions = d.sessions.map { if(it.id == offer.sessionId) it.copy(selection = selected,note = note ?: it.note) else it },
             segments = d.segments.map { if(it.sessionId == offer.sessionId) it.copy(selection = selected) else it },
-            pendingAssignments = d.pendingAssignments.filterNot { it.id == id })
+            pendingAssignments = d.pendingAssignments.filterNot { it.id == offer.id })
     }
     /** Fresh resolution and timer subject validation occur inside the same transaction. */
     fun startChoice(target: TimerTarget,choice: ChoiceReference,allowed: (Dataset)->Boolean = { true }) = applyChoice(target,choice,ChoiceApplication.START,allowed)
@@ -193,6 +196,10 @@ class Tracker(val store: StateStore, val clock: Clock) {
         ensure(allowed(d),"Surface disabled or permission denied")
         ensure(snapshot(d,n).timerTarget == target,"Timer target changed",ErrorCode.STALE)
         val entry = ChoiceView(d,choiceCache) { snapshot(d,n) }.resolve(choice)
+        applyResolvedChoice(d,n,entry,application)
+    }
+    private fun applyResolvedChoice(d: Dataset,n: Moment,entry: ChoiceEntry,application: ChoiceApplication,
+        note: String? = choiceStartNote(d,entry.kind,entry.sourceId,entry.selection,entry.note)): Dataset {
         checkStartable(d,entry.selection)
         val base = when(application) {
             ChoiceApplication.START -> { ensure(current(d) == null && d.focus == null,"Stop current session first"); d }
@@ -201,7 +208,35 @@ class Tracker(val store: StateStore, val clock: Clock) {
                 if(d.focus != null) FocusTransitions.cancel(d,n) else close(d,current(d) ?: fail(ErrorCode.INVALID_INPUT,"No current session"),n,SessionStatus.STOPPED)
             }
         }
-        append(base,entry.selection,choiceStartNote(d,entry.kind,entry.sourceId,entry.selection,entry.note),n)
+        return append(base,entry.selection,note,n)
+    }
+    /** Create and apply under the original route/receipt in one transaction: failures leave no card. */
+    fun createCardForChoice(expected: Token,target: TimerTarget,card: Card,application: ChoiceApplication,
+        assignmentId: String? = null,draft: EntryDraft? = null,allowed: (Dataset)->Boolean = { true }) = mutate(expected,assignmentId != null || application == ChoiceApplication.SWITCH) { d,n ->
+        ensure(allowed(d),"Surface disabled or permission denied")
+        ensure(snapshot(d,n).timerTarget == target,"Picker timer target changed",ErrorCode.STALE)
+        ensure(assignmentId == null || draft == null,"Stopped assignment cannot consume an incoming draft")
+        draft?.copy(selection = card.classification())?.validateForApply()
+        val next = withCreatedCard(d,card)
+        val entry = ChoiceView(next,choiceCache) { snapshot(next,n) }.resolve("card:${card.id}")
+            ?: fail(ErrorCode.INVALID_INPUT,"Created card unavailable")
+        if(assignmentId != null) assignResolvedChoice(next,checkedOffer(d,assignmentId),entry,null)
+        else if(draft != null) applyResolvedChoice(next,n,entry,application,draft.note)
+        else applyResolvedChoice(next,n,entry,application)
+    }
+    private fun withCreatedCard(d: Dataset,card: Card): Dataset {
+        ensure(d.cards.none { it.id == card.id },"Card ID already exists")
+        validateCardParent(d,card)
+        return d.copy(cards = d.cards+card)
+    }
+    fun createCardForFocus(expected: Token,card: Card) = mutate(expected) { d,n ->
+        FocusTransitions.start(withCreatedCard(d,card),n,d.settings.focusPlan,card.classification())
+    }
+    fun createCardForLabel(expected: Token,card: Card,note: String?) = mutate(expected,true) { d,_ ->
+        labelledCurrent(withCreatedCard(d,card),card.classification(),note)
+    }
+    fun createCardForEarlierSwitch(expected: Token,card: Card,boundary: Long) = mutate(expected,true) { d,n ->
+        switchedEarlierData(withCreatedCard(d,card),n,boundary,card.classification())
     }
     class DeletePreview internal constructor(val expected: Token,val sessionId: String,val before: Dataset,val after: Dataset,val asOf: Moment) {
         val segmentCount get() = before.segments.count { it.sessionId == sessionId }
@@ -235,9 +270,12 @@ class Tracker(val store: StateStore, val clock: Clock) {
     }
     /** Explicit late labeling applies to the entire current session, including its earlier segments. */
     fun labelCurrent(expected: Token, selection: Classification, note: String? = null) = mutate(expected, true) { d,_ ->
+        labelledCurrent(d,selection,note)
+    }
+    private fun labelledCurrent(d: Dataset,selection: Classification,note: String?): Dataset {
         val selected = d.classify(selection)
         val s = current(d) ?: fail(ErrorCode.INVALID_INPUT, "No current session")
-        d.copy(sessions = d.sessions.replace(s.copy(selection = selected, note = note)),
+        return d.copy(sessions = d.sessions.replace(s.copy(selection = selected, note = note)),
             segments = d.segments.map { if (it.sessionId == s.id) it.copy(selection = selected) else it })
     }
     /** Change details from now; preserves session-scoped measurements without copying them. */
@@ -284,9 +322,19 @@ class Tracker(val store: StateStore, val clock: Clock) {
         val f = d.favorites.find { it.id == favoriteId } ?: fail(ErrorCode.INVALID_INPUT, "Missing favorite")
         append(d,f.selection,choiceStartNote(d,ChoiceKind.FAVORITE,f.id,f.selection,null),n)
     }
-    fun removeFavorite(expected: Token, favoriteId: String) = mutate(expected) { d,_ ->
+    fun removeFavorite(expected: Token, favoriteId: String) = mutate(expected,true) { d,_ ->
         ensure(d.favorites.any { it.id == favoriteId }, "Missing favorite")
         d.copy(favorites = d.favorites.filterNot { it.id == favoriteId })
+    }
+    /** User add is idempotent by semantic selection and note policy. Explicit ID edits use saveFavorite.
+     * Existing duplicates and their identities are retained; adding never renames an existing favorite. */
+    fun addFavorite(expected: Token, favorite: Favorite) = mutate(expected,true) { d,_ ->
+        val same = d.favorites.any { selectionIdentity(it.selection) == selectionIdentity(favorite.selection) &&
+            (it.personal.notePolicy ?: ChoiceNotePolicy.CLEAR) == (favorite.personal.notePolicy ?: ChoiceNotePolicy.CLEAR) }
+        if(same) d else {
+            ensure(d.favorites.none { it.id == favorite.id },"Favorite ID already exists; use saveFavorite to edit")
+            d.copy(favorites = d.favorites + favorite)
+        }
     }
     fun saveFavorite(expected: Token, favorite: Favorite) = mutate(expected) { d,_ ->
         d.copy(favorites = d.favorites.filterNot { it.id == favorite.id } + favorite.copy(personal = d.favorites.find { it.id == favorite.id }?.personal ?: favorite.personal))
@@ -296,6 +344,9 @@ class Tracker(val store: StateStore, val clock: Clock) {
             ensure(old.meaningVersion == type.meaningVersion && old.definition == type.definition,
                 "A new type meaning/version/definition requires a new ID; existing history retains the old ID")
         }
+        val old = d.types.find { it.id == type.id }
+        if(type.parentId != null && (old == null || old.parentId != type.parentId))
+            ensure(d.types.any { it.id == type.parentId && !it.archived },"Parent missing or archived")
         d.copy(types = d.types.filterNot { it.id == type.id } + type)
     }
     /** Install absent definitions only; report every added, identical and conflicting key. */
@@ -334,7 +385,13 @@ class Tracker(val store: StateStore, val clock: Clock) {
         d.copy(units = d.units.filterNot { it.id == unit.id } + unit)
     }
     fun saveCard(expected: Token, card: Card) = mutate(expected) { d,_ ->
+        validateCardParent(d,card)
         d.copy(cards = d.cards.filterNot { it.id == card.id } + card.copy(personal = d.cards.find { it.id == card.id }?.personal ?: card.personal))
+    }
+    private fun validateCardParent(d: Dataset,card: Card) {
+        val old = d.cards.find { it.id == card.id }
+        if(card.activityTypeId != null && (old == null || old.activityTypeId != card.activityTypeId))
+            ensure(d.types.any { it.id == card.activityTypeId && !it.archived },"Activity type missing or archived")
     }
     /** Profile edits have a dedicated boundary: ordinary card/catalog saves preserve them. */
     fun personalizeChoice(expected: Token,kind: ChoiceKind,id: String,value: ChoicePersonalization) = mutate(expected,true) { d,_ ->
@@ -560,6 +617,9 @@ class Tracker(val store: StateStore, val clock: Clock) {
     }
     /** Correct a forgotten switch inside the current uninterrupted segment in one transaction. */
     fun switchedEarlier(expected: Token, boundary: Long, selection: Classification) = mutate(expected,true) { d,n ->
+        switchedEarlierData(d,n,boundary,selection)
+    }
+    private fun switchedEarlierData(d: Dataset,n: Moment,boundary: Long,selection: Classification): Dataset {
         ensure(d.focus == null,"Finish Focus before a retrospective switch")
         checkStartable(d,selection)
         val s = running(d,n); val seg = d.segments.single { it.sessionId == s.id && it.end == null }
@@ -567,7 +627,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
         ensure(!measured.uncertain && boundary in seg.start..n.wall, "Boundary outside certain active interval", ErrorCode.INVALID_INTERVAL)
         val earlier = n.copy(wall = boundary, elapsed = n.elapsed - (n.wall-boundary))
         ensure(earlier.elapsed >= seg.anchor!!.elapsedMs, "Boundary before monotonic start", ErrorCode.INVALID_INTERVAL)
-        append(close(d,s,earlier,SessionStatus.STOPPED),selection,null,earlier)
+        return append(close(d,s,earlier,SessionStatus.STOPPED),selection,null,earlier)
     }
     /** null interval excludes unresolved time, not separately recorded facts. Referenced identities
      * can retain an empty segment at their known start; it contributes no measured/confirmed time. */

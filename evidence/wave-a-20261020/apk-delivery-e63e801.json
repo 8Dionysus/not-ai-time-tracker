@@ -1,0 +1,11 @@
+{
+  "file_name": "not-ai-time-tracker-wave-a-b-20261020-unsigned.apk",
+  "size_bytes": 16009953,
+  "sha256": "53d8762351a6a154dd41677af093ca7ce70249d24b0aacf58b5523af19e0f409",
+  "unsigned": true,
+  "build_task": ":app:assembleDebug -PtrackerUnsigned=true",
+  "production_source_commit": "5c050c41c10cd3e14e93aa467a0f86305c164523",
+  "build_checkout_commit": "85a274a",
+  "device_installed": false,
+  "visual_scope": "Development build; interface controls, typography and session-summary rendering remain incomplete."
+}

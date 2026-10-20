@@ -12,7 +12,7 @@ class AttentionPreferenceArchiveTest {
         controller.configure(t.snapshot().token,preference,local.value.revision)
         val backups = Backups(t,MemoryRollback());val text = backups.export()
         val root = codec.parseToJsonElement(text).jsonObject
-        assertEquals(14,root.getValue("formatVersion").jsonPrimitive.int)
+        assertEquals(CURRENT_BACKUP_FORMAT,root.getValue("formatVersion").jsonPrimitive.int)
         assertEquals(preference,Backups.decode(text).data.settings.longRecordReminder)
         val settings = root.getValue("data").jsonObject.getValue("settings").jsonObject
         assertEquals(setOf("enabled","afterMs","snoozeMs"),settings.getValue("longRecordReminder").jsonObject.keys)

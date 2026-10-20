@@ -8,6 +8,9 @@ import java.io.ByteArrayOutputStream
 
 const val CURRENT_BACKUP_FORMAT = 15
 
+/** Identity of the exact committed revision serialized by a streaming export. Not a restore token. */
+data class BackupSource(val datasetId: String,val revision: Long,val asOf: Long)
+
 @Serializable data class Backup(@Required val formatVersion: Int = CURRENT_BACKUP_FORMAT,@Required val backupId: String = newId(),val asOf: Long,val data: Dataset)
 /** Bounded whole-String convenience API only; streaming full backups have no total-file cap. */
 const val MAX_BACKUP_BYTES = 10*1024*1024
@@ -66,9 +69,11 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore,p
         encode(captured.first,captured.second) // serialization/validation never holds the DB transaction
     }
     /** Full-size portable export: no whole-file text or byte buffer. Caller owns the stream. */
-    fun write(output: OutputStream) = storage {
+    fun write(output: OutputStream) { writeSnapshot(output) }
+    fun writeSnapshot(output: OutputStream): BackupSource = storage {
         val captured = tracker.store.transaction { d -> d to (d to tracker.clock.now()) }
         StreamingBackup.write(StreamingBackup.portable(captured.first,captured.second),output)
+        BackupSource(captured.first.datasetId,captured.first.revision,captured.second.wall)
     }
     private fun <T> reading(block: () -> T): T = lifecycle?.reading(block) ?: block()
     fun prepare(json: String): RestorePreview = reading { RestorePreview(decode(json),tracker.snapshot().token,lifecycle?.acquire(sha256(json.toByteArray(Charsets.UTF_8)))) }

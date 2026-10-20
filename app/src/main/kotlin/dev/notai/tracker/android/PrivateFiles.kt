@@ -43,9 +43,12 @@ internal fun atomicBytes(file: File,bytes: ByteArray) {
     DirectoryDurability.rename(part,file);syncDirectory(file.parentFile!!);file.parentFile?.parentFile?.let(::syncDirectory)
 }
 
+@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
 @Serializable data class ExportOperation(val id: String,val mime: String,val title: String,val state: String = "PREPARING",
-    val bytes: Long = 0,val sha256: String? = null,val error: String? = null,val resultReceived: Boolean = false)
+    val bytes: Long = 0,val sha256: String? = null,val error: String? = null,val resultReceived: Boolean = false,
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val automaticOwner: String? = null)
 data class ExportWriteResult(val bytes: Long,val verified: Boolean)
+internal class ExportVerificationFailure: java.io.IOException("Written document failed readback verification")
 /** File-backed jobs survive Activity recreation. The Bundle only carries the operation ID. */
 class ExportOperations private constructor(private val context: Context,private val completedRegistration: (Context,String) -> Unit,
     private val handoffRegistration: (Context,String) -> Unit) {
@@ -58,6 +61,12 @@ class ExportOperations private constructor(private val context: Context,private 
     private fun beginUnsafe(mime: String,title: String): ExportOperation {
         val operation = ExportOperation(newId(),mime,title);save(operation);return operation
     }
+    /** Caller durably reserves this exact ID before creating any staging bytes. Idempotent after death. */
+    internal fun beginOwned(id: String,mime: String,title: String): ExportOperation = PrivateFileMaintenance.writing(context,"export-begin:$id") {
+        val file = File(dir(id),"operation.json")
+        if(file.exists()) read(id).also { ensure(it.id == id && it.automaticOwner == id && it.mime == mime && it.title == title,"Wrong automatic export owner",ErrorCode.STALE) }
+        else ExportOperation(id,mime,title,automaticOwner = id).also(::save)
+    }
     private fun save(operation: ExportOperation,registerCompleted: Boolean = true) {
         PrivateFileMaintenance.invalidate(context,"exports/${operation.id}")
         atomicText(File(dir(operation.id),"operation.json"),codec.encodeToString(operation))
@@ -66,7 +75,7 @@ class ExportOperations private constructor(private val context: Context,private 
     fun read(id: String): ExportOperation = codec.decodeFromString(File(dir(id),"operation.json").readText())
     fun latestPending(): ExportOperation? = directory.listFiles().orEmpty().filter { it.isDirectory }
         .sortedByDescending { File(it,"operation.json").lastModified() }.firstNotNullOfOrNull { folder ->
-            runCatching { read(folder.name) }.getOrNull()?.takeIf { it.state in setOf("READY","FAILED","PREPARING","CANCELLED") }
+            runCatching { read(folder.name) }.getOrNull()?.takeIf { it.automaticOwner == null && it.state in setOf("READY","FAILED","PREPARING","CANCELLED") }
         }
     fun prepare(id: String,write: (OutputStream)->Unit): ExportOperation = PrivateFileMaintenance.writing(context,"export-prepare:$id",CopyBlocker.EXPORT_WRITING) { prepareUnsafe(id,write) }
     private fun prepareUnsafe(id: String,write: (OutputStream)->Unit): ExportOperation {
@@ -116,14 +125,25 @@ class ExportOperations private constructor(private val context: Context,private 
         }
     }
     fun write(id: String,uri: Uri): ExportWriteResult = PrivateFileMaintenance.writing(context,"export-write:$id",CopyBlocker.EXPORT_WRITING) { writeUnsafe(id,uri) }
-    private fun writeUnsafe(id: String,uri: Uri): ExportWriteResult {
+    /** Automatic backups may reconcile/retry a known pending document after a completed provider write. */
+    internal fun retryWrite(id: String,uri: Uri,expectedBytes: Long,expectedSha256: String): ExportWriteResult = PrivateFileMaintenance.writing(context,"export-write:$id",CopyBlocker.EXPORT_WRITING) {
+        val op = read(id)
+        ensure(op.id == id && op.automaticOwner == id && op.bytes == expectedBytes && op.sha256 == expectedSha256,"Wrong automatic export receipt",ErrorCode.STALE)
+        writeUnsafe(id,uri,true)
+    }
+    private fun writeUnsafe(id: String,uri: Uri,allowCompleted: Boolean = false): ExportWriteResult {
         val op = read(id);val data = File(dir(id),"data")
-        ensure(op.state in setOf("READY","CANCELLED") && data.exists() && data.length() == op.bytes && fileHash(data) == op.sha256,
+        ensure((op.state in setOf("READY","CANCELLED") || (allowCompleted && op.state in setOf("COMPLETE","FAILED"))) && data.exists() && data.length() == op.bytes && fileHash(data) == op.sha256,
             "Export is not ready or the private staged file is damaged",ErrorCode.STORAGE)
+        if(allowCompleted && op.state == "FAILED") {
+            // Only this exact owned staging group, after validating the retained immutable payload.
+            if(java.nio.file.Files.deleteIfExists(File(dir(id),"data.part").toPath())) syncDirectory(dir(id))
+        }
         try {
             val output = context.contentResolver.openOutputStream(uri,"wt") ?: throw java.io.IOException("Destination unavailable")
             output.use { out -> data.inputStream().use { input -> input.copyTo(out,64*1024) };out.flush() }
             val remoteHash = try { context.contentResolver.openInputStream(uri)?.use(::streamHash) } catch(_: Exception) { null }
+            if(allowCompleted && remoteHash != null && remoteHash != op.sha256) throw ExportVerificationFailure()
             ensure(remoteHash == null || remoteHash == op.sha256,"Written document failed readback verification",ErrorCode.STORAGE)
             save(op.copy(state = "COMPLETE",error = if(remoteHash == null) "Provider does not allow readback" else null))
             return ExportWriteResult(op.bytes,remoteHash != null)

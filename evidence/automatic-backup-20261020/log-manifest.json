@@ -1,0 +1,14 @@
+{
+  "android-confirmation-2.log": {
+    "bytes": 4277,
+    "sha256": "40de0a89545f24107fc7c5a918832b0e41d79e6044ca0df4624c18b101091d30"
+  },
+  "core-final.log": {
+    "bytes": 1165,
+    "sha256": "7b91c1c973bfaf0c4a99861436601f9f33ec48bc5b25555c5932bcf761c5a748"
+  },
+  "host-native-build.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

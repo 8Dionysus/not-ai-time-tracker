@@ -9,7 +9,8 @@ import kotlinx.serialization.Serializable
 @Serializable private data class DatabaseArchiveSeal(@Required val format: Int = 1,val archiveId: String,
     val sourceManifestSha256: String,val members: List<ArchiveSealMember>,val directories: Set<String>)
 @Serializable private data class StagedExportRecord(val id: String,val mime: String,val title: String,val state: String = "PREPARING",
-    val bytes: Long = 0,val sha256: String? = null,val error: String? = null,val resultReceived: Boolean = false)
+    val bytes: Long = 0,val sha256: String? = null,val error: String? = null,val resultReceived: Boolean = false,
+    val automaticOwner: String? = null)
 data class CopyRegistrationFailure(val itemId: String,val blockers: Set<CopyBlocker>)
 data class CopyRegistrationReport(val registeredIds: List<String>,val refused: List<CopyRegistrationFailure>)
 
@@ -71,6 +72,7 @@ class PrivateCopyCatalog internal constructor(private val files: DescriptorCopyF
         val names = files.children(path)
         ensure("operation.json" in names && names.all { it in setOf("data","data.part","operation.json") },"Unknown export group member")
         val op = codec.decodeFromString<StagedExportRecord>(text("$path/operation.json"))
+        ensure(op.automaticOwner == null || op.automaticOwner == operationId,"Wrong automatic staging owner",ErrorCode.STALE)
         ensure(op.id == operationId && op.state in setOf("COMPLETE","CANCELLED") && op.resultReceived,"Export or chooser is still active")
         val members = names.map { member("$path/$it") }
         val data = members.zip(names).singleOrNull { it.second == "data" }?.first

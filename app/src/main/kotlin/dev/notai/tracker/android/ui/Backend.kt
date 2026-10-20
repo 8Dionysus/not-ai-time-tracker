@@ -26,6 +26,8 @@ interface UiBackend {
     fun prepareCatalog(): CatalogPreview
     fun applyCatalog(preview: CatalogPreview): Tracker.Change
     fun submitShortcut(action: SurfaceAction): Deferred<Result<Tracker.Change>>
+    /** Events of the phone's calendar, read only after an explicit tap. Real runtime only. */
+    val calendar: dev.notai.tracker.android.CalendarOccurrences? get() = runtime?.calendarOccurrences
     /** CSV history append with preview. Real runtime only, unless a test supplies one. */
     val historyTransfer: dev.notai.tracker.HistoryTransfer? get() = runtime?.historyTransfer
     /** Automatic copies into a folder the user picked. Real runtime only, unless a test supplies one. */

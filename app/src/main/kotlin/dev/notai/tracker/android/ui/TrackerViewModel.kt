@@ -1219,6 +1219,12 @@ class TrackerViewModel internal constructor(private val app: Application,private
         applying.invokeOnCompletion { releaseRestorePreviewOnIo(preview) }
     }
 
+    val calendarAvailable: Boolean get() = runtime?.calendar != null
+    /** Timed events of one reporting day, for filling a new record. Nothing is stored; all-day events are left out. */
+    suspend fun calendarEvents(from: Long, until: Long): dev.notai.tracker.android.CalendarPage? = withContext(Dispatchers.IO) {
+        runCatching { runtime?.calendar?.list(from, until, enabled = true, limit = 50) }.getOrNull()
+    }
+
     // What a Focus work interval does to the phone. Device-local; the core controller applies and releases it.
     data class FocusEffectsUi(val choice: dev.notai.tracker.android.FocusEffects.Choice, val dndAccess: Boolean, val dndSupported: Boolean)
     private val _focusEffects = MutableStateFlow(FocusEffectsUi(dev.notai.tracker.android.FocusEffects.read(app),

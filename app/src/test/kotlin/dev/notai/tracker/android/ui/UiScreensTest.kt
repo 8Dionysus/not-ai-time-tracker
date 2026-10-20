@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.performScrollToIndex
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.longClick
@@ -88,6 +89,15 @@ class UiScreensTest {
         override fun submitShortcut(action: SurfaceAction) = CompletableDeferred<Result<Tracker.Change>>(Result.failure(IllegalStateException("no shortcuts")))
         override val autoBackup: AutoBackupBackend = FakeAutoBackup(tracker)
         override val historyTransfer = HistoryTransfer(tracker, MemoryRollback())
+        /** One timed meeting today 16:00–16:45 and an all-day event that must not become an interval. */
+        override val calendar = dev.notai.tracker.android.CalendarOccurrences({ true }, { _: android.net.Uri, cols: Array<String>, _: String, _: Array<String>, _: String? ->
+            val day = LocalDate.of(2026, 10, 13)
+            fun ms(h: Int, m: Int) = day.atTime(h, m).atZone(ZoneId.of("America/Mexico_City")).toInstant().toEpochMilli()
+            android.database.MatrixCursor(cols).apply {
+                addRow(arrayOf<Any?>(7L, ms(0, 0), ms(23, 59), "Отпуск коллеги", 1))
+                addRow(arrayOf<Any?>(9L, ms(16, 0), ms(16, 45), "Созвон с командой", 0))
+            }
+        })
     }
     /** A folder in a cloud app with three verified copies; actions only change the in-memory state. */
     private class FakeAutoBackup(private val tracker: Tracker) : AutoBackupBackend {
@@ -437,6 +447,21 @@ class UiScreensTest {
         compose.onAllNodesWithText("8:30–8:55", substring = true).onFirst().performTouchInput { swipeLeft() }
         compose.waitUntil(5_000) { seed.tracker.data().sessions.size == before - 2 }
         compose.waitUntil(5_000) { compose.onAllNodesWithText("8:30–8:55", substring = true).fetchSemanticsNodes().isEmpty() }
+    }
+
+    /** A new record can take its times from a calendar event; all-day events are not offered. */
+    @Test fun calendarFill() {
+        org.robolectric.Shadows.shadowOf(ApplicationProvider.getApplicationContext<android.app.Application>()).grantPermissions(android.Manifest.permission.READ_CALENDAR)
+        val seed = seed()
+        val vm = render(seed)
+        compose.onNodeWithText("Добавить запись задним числом").performScrollTo().performClick()
+        waitText("Из календаря")
+        compose.onNodeWithText("Из календаря").performClick()
+        waitText("Созвон с командой")
+        assertTrue(compose.onAllNodesWithText("Отпуск коллеги").fetchSemanticsNodes().isEmpty())
+        shot("37-calendar", vm)
+        compose.onNodeWithText("Созвон с командой").performClick()
+        waitText("16:45")
     }
 
     /** A saved report follows its period: create «Прошлая неделя» for everything, open it, see the total. */

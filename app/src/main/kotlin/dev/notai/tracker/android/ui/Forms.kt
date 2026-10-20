@@ -226,6 +226,10 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
         } else null)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             ActivityField(label, { onPickActivity { sel, l -> selection = sel; label = l } })
+            if (entry == null && vm.calendarAvailable) CalendarLink(vm, day, zone) { e ->
+                start = e.reference.begin.coerceIn(day.start, day.end); end = e.reference.end.coerceIn(day.start, day.end)
+                if (note.isBlank()) e.title?.takeIf { it.isNotBlank() }?.let { note = it }
+            }
             MiniTimeline(day, entry?.sessionId, start, end, origStart, origEnd, label.slot, zone)
             TimePair {
                 TimeField("Начало", start, zone, { start = it }, it, focused = origStart != null && start != origStart, step = step,
@@ -360,6 +364,45 @@ fun ResolveSheet(zone: ZoneId, knownStart: Long, now: Long, onConfirm: (Long, Lo
             Text("Запись закроется с этими границами. Если занятие ещё идёт, начни новую запись после сохранения.",
                 style = NotAi.type.bodySmall, color = NotAi.colors.ink2)
             PillButton("Сохранить", { onConfirm(start, end); onDismiss() }, Modifier.fillMaxWidth().padding(bottom = 20.dp), ButtonKind.AMBER, enabled = end > start)
+        }
+    }
+}
+
+/** «Из календаря»: the day's timed events; picking one fills the times and, if empty, the note. Permission is asked on tap. */
+@Composable
+private fun CalendarLink(vm: TrackerViewModel, day: DayUi, zone: ZoneId, onPick: (dev.notai.tracker.android.CalendarOccurrence) -> Unit) {
+    val c = NotAi.colors
+    var open by remember { mutableStateOf(false) }
+    var denied by remember { mutableStateOf(false) }
+    val permission = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { ok ->
+        if (ok) open = true else denied = true
+    }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    Row(Modifier.heightIn(min = 40.dp).pressable({
+        if (context.checkSelfPermission(android.Manifest.permission.READ_CALENDAR) == android.content.pm.PackageManager.PERMISSION_GRANTED) open = true
+        else permission.launch(android.Manifest.permission.READ_CALENDAR)
+    }, label = "Взять время из календаря"), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        M3Icon(Icon.Calendar, null, Modifier.size(16.dp), tint = c.amberInk)
+        Text(if (denied) "Календарь недоступен без разрешения" else "Из календаря", style = NotAi.type.bodySmall.copy(fontWeight = FontWeight.Medium),
+            color = if (denied) c.ink2 else c.amberInk)
+    }
+    if (open) {
+        val page by produceState<dev.notai.tracker.android.CalendarPage?>(null, day.start) { value = vm.calendarEvents(day.start, day.end) }
+        NotAiSheet({ open = false }, fullHeight = false) {
+            SheetHeader("Календарь: ${Format.dayMonth(day.date)}", { open = false })
+            Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 20.dp)) {
+                val p = page
+                val events = p?.occurrences.orEmpty().filter { !it.allDay }
+                when {
+                    p == null -> Spacer(Modifier.height(80.dp))
+                    p.issue != null -> Text("Календарь сейчас не отвечает.", style = NotAi.type.bodySmall, color = c.ink2)
+                    events.isEmpty() -> Text("В этот день в календаре нет событий со временем.", style = NotAi.type.bodySmall, color = c.ink2)
+                    else -> events.forEach { e ->
+                        ListRow(e.title?.takeIf { it.isNotBlank() } ?: "Без названия", subtitle = Format.range(e.reference.begin, e.reference.end, zone),
+                            onClick = { onPick(e); open = false })
+                    }
+                }
+            }
         }
     }
 }

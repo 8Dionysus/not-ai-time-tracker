@@ -148,7 +148,17 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     private val _theme = MutableStateFlow(runCatching { ThemeChoice.valueOf(prefs.getString("theme", "SYSTEM")!!) }.getOrDefault(ThemeChoice.SYSTEM))
     val theme: StateFlow<ThemeChoice> = _theme
-    fun setTheme(choice: ThemeChoice) { prefs.edit().putString("theme", choice.name).apply(); _theme.value = choice }
+    fun setTheme(choice: ThemeChoice) {
+        val edit = prefs.edit().putString("theme", choice.name)
+        if (choice in setOf(ThemeChoice.DARK, ThemeChoice.AMOLED, ThemeChoice.NEON)) edit.putString("lastDark", choice.name)
+        edit.apply(); _theme.value = choice
+    }
+    /** The header moon/sun: back to the dark variant the person chose last (black or neon stay theirs). */
+    fun toggleTheme(darkNow: Boolean) = setTheme(if (darkNow) ThemeChoice.LIGHT
+        else runCatching { ThemeChoice.valueOf(prefs.getString("lastDark", "DARK")!!) }.getOrDefault(ThemeChoice.DARK))
+    private val _appearance = MutableStateFlow(Appearance.read(prefs))
+    val appearance: StateFlow<Appearance> = _appearance
+    fun setAppearance(change: (Appearance) -> Appearance) { val next = change(_appearance.value); next.write(prefs); _appearance.value = next }
 
     private val _draft = MutableStateFlow<EntryDraft?>(null)
     /** Text another app explicitly sent. Nothing is written until the person picks and confirms. */
@@ -304,7 +314,8 @@ class TrackerViewModel internal constructor(private val app: Application,private
                 day.copy(rows = day.rows.filter { it.sessionId != open?.id }).sessionRows(d))
         }
         // Same bounded source as the notification: favourites, then the most frequent of the last 30 days.
-        val quick = quickChoices(v, 5).map { q -> q.toQuickStart(d,v.snapshot().token) }
+        // Every favourite (up to twelve) plus frequent ones to a minimum of five.
+        val quick = quickChoices(v, d.favorites.size.coerceIn(5, 12)).map { q -> q.toQuickStart(d,v.snapshot().token) }
         return HomeData(today, zone, dayList, quick, open?.let { d.label(it.selection) }, open?.let { s -> d.segments.filter { it.sessionId == s.id }.minOfOrNull { it.start } },
             // Older days only when something older exists: a new install has nothing to load.
             days < 62 && (d.segments.minOfOrNull { it.start } ?: Long.MAX_VALUE) < (calendar.days.firstOrNull()?.start ?: Long.MIN_VALUE),
@@ -416,6 +427,11 @@ class TrackerViewModel internal constructor(private val app: Application,private
         command({ "Записано" }) { rt,_ ->
             dev.notai.tracker.android.SurfaceChoices.choose(app,rt.tracker,route,reference,note).also { clearSurfacePicker(route) }
         }
+    }
+    /** Launcher favourite: the route is taken without loading the picker; the choice applies once with that route's target. */
+    fun chooseFromShortcut(route: dev.notai.tracker.android.SurfacePickerRoute, reference: ChoiceReference) {
+        synchronized(pickerLock) { pickerRoute = route; _surfacePicker.value = null }
+        chooseSurface(reference, expectedRoute = route)
     }
     /** Create in the same route: an assignment stays an assignment, never a new timer. */
     fun createSurfaceCard(route: dev.notai.tracker.android.SurfacePickerRoute,name: String,activityTypeId: String? = null) {
@@ -637,6 +653,30 @@ class TrackerViewModel internal constructor(private val app: Application,private
         rt.tracker.addFavorite(s.token, Favorite(label = title, selection = selection))
     }
     fun removeFavorite(id: String) = command({ "Убрано из избранного" }) { rt, s -> rt.tracker.removeFavorite(s.token, id) }
+
+    /** Favourites in their saved order (personal order first, then as added). */
+    fun favorites(v: TrackerView?): List<FavoriteUi> {
+        val d = v?.data ?: return emptyList()
+        return d.favorites.withIndex().sortedWith(compareBy({ it.value.personal.order ?: Int.MAX_VALUE }, { it.index })).map { (_, f) ->
+            FavoriteUi(f.id, f.label, d.label(f.selection), f.selection)
+        }
+    }
+    /** Every favourite pointing at this activity: one tap on a filled star removes them all (old duplicates included). */
+    fun favoriteIds(selection: Classification): List<String> {
+        val key = selectionIdentity(selection)
+        return view.value?.data?.favorites.orEmpty().filter { selectionIdentity(it.selection) == key }.map { it.id }
+    }
+    fun removeFavorites(ids: List<String>) = command({ if (ids.size > 1) "Убрано из избранного вместе с повторами" else "Убрано из избранного" }) { rt, s ->
+        var token = s.token; var last: Tracker.Change? = null
+        ids.forEach { id -> last = rt.tracker.removeFavorite(token, id).also { token = it.state.token } }
+        last ?: fail(ErrorCode.STALE, "Nothing to remove")
+    }
+    private val _editor = MutableStateFlow<EditTarget?>(null)
+    val editor: StateFlow<EditTarget?> = _editor
+    fun openEditor(target: EditTarget?) { _editor.value = target }
+    private val _favoritesOpen = MutableStateFlow(false)
+    val favoritesOpen: StateFlow<Boolean> = _favoritesOpen
+    fun openFavorites(open: Boolean) { _favoritesOpen.value = open }
 
     /** The displayed revision is required: never silently apply a reorder/edit to a newer list. */
     fun orderFavorites(expected: Token, ids: List<String>, completed: ((Result<Tracker.Change>) -> Unit)? = null) =

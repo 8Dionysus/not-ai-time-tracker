@@ -5,6 +5,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -124,7 +125,12 @@ fun ActivityDot(slot: Int?, modifier: Modifier = Modifier, size: Dp = 10.dp, unc
 fun ActivityGlyph(glyph: Int, slot: Int?, modifier: Modifier = Modifier, size: Dp = 20.dp, unclassified: Boolean = false) {
     val c = NotAi.colors
     val tint = when { unclassified -> c.amberInk; slot != null -> c.areas[slot]; else -> c.ink2 }
-    M3Icon(painterResource(if (unclassified) ActivityGlyphs.unclassified else glyph), null, modifier.size(size), tint = tint)
+    // Neon: a faint halo of the icon's own colour, painted behind it in the same box.
+    val halo = if (c.glow && !unclassified) Modifier.drawBehind {
+        drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(tint.copy(alpha = 0.35f), tint.copy(alpha = 0f)), center, this.size.minDimension * 0.8f),
+            radius = this.size.minDimension * 0.8f)
+    } else Modifier
+    M3Icon(painterResource(if (unclassified) ActivityGlyphs.unclassified else glyph), null, modifier.size(size).then(halo), tint = tint)
 }
 
 @Composable
@@ -209,12 +215,17 @@ fun NotAiSwitch(checked: Boolean, onChange: (Boolean) -> Unit, description: Stri
 
 /** A plain list row: hairline below, 44 dp+ target, title with optional quiet detail. */
 @Composable
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 fun ListRow(title: String, modifier: Modifier = Modifier, detail: String? = null, subtitle: String? = null, onClick: (() -> Unit)? = null,
-            leading: (@Composable () -> Unit)? = null, trailing: (@Composable RowScope.() -> Unit)? = null, divider: Boolean = true, minHeight: Dp = 52.dp) {
+            leading: (@Composable () -> Unit)? = null, trailing: (@Composable RowScope.() -> Unit)? = null, divider: Boolean = true, minHeight: Dp = 52.dp,
+            onLongClick: (() -> Unit)? = null, longClickLabel: String? = null) {
     val c = NotAi.colors
     Column(modifier.fillMaxWidth()) {
         Row(
-            Modifier.fillMaxWidth().heightIn(min = minHeight).then(if (onClick != null) Modifier.pressable(onClick) else Modifier),
+            Modifier.fillMaxWidth().heightIn(min = if (NotAi.appearance.compact) minOf(minHeight, 44.dp) else minHeight).then(when {
+                onLongClick != null -> Modifier.combinedClickable(onLongClickLabel = longClickLabel, onLongClick = onLongClick, onClick = onClick ?: {})
+                onClick != null -> Modifier.pressable(onClick)
+                else -> Modifier }),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             leading?.invoke()
@@ -232,13 +243,15 @@ fun ListRow(title: String, modifier: Modifier = Modifier, detail: String? = null
 }
 
 @Composable
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 fun Chip(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, slot: Int? = null, dashed: Boolean = false, icon: ImageVector? = null,
-         glyph: Int? = null) {
+         glyph: Int? = null, onLongClick: (() -> Unit)? = null) {
     val c = NotAi.colors
     Row(
         modifier.heightIn(min = 40.dp).clip(RoundedCornerShape(50))
             .then(if (dashed) Modifier.dashedBorder(c.ink3) else Modifier.background(c.raised).border(BorderStroke(1.dp, c.rule), RoundedCornerShape(50)))
-            .pressable(onClick).padding(start = if (icon != null || slot != null || glyph != null) 11.dp else 14.dp, end = 14.dp),
+            .then(if (onLongClick != null) Modifier.combinedClickable(onLongClickLabel = "Действия", onLongClick = onLongClick, onClick = onClick) else Modifier.pressable(onClick))
+            .padding(start = if (icon != null || slot != null || glyph != null) 11.dp else 14.dp, end = 14.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp),
     ) {
         if (icon != null) M3Icon(icon, null, Modifier.size(14.dp), tint = c.ink2)

@@ -31,6 +31,9 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.semantics.selected
+import androidx.compose.foundation.shape.CircleShape
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.notai.tracker.CatalogPreview
 import dev.notai.tracker.RestorePreview
@@ -75,6 +78,7 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
     var zoneConfirm by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     var notificationsDenied by rememberSaveable { mutableStateOf(false) }
+    var appearanceSheet by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { vm.refreshCapabilities(); vm.refreshLongRecord() }
     LaunchedEffect(settings?.longRecordReminder) { vm.refreshLongRecord() }
@@ -110,6 +114,8 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
             Text("Настройки", style = NotAi.type.title, color = c.ink)
         }
 
+        AppearanceGroup(vm, theme) { appearanceSheet = true }
+
         Group("Таймер вне приложения") {
             val n = caps?.notification
             SettingRow(rememberVectorPainter(Icon.Bell), "Уведомление",
@@ -124,6 +130,9 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 vm.setSurfaceEnabled(Surface.NOTIFICATION, on)
                 if (on && n?.problem == SurfaceProblem.PERMISSION_REQUIRED) askNotifications()
             }
+            if (surfaces?.notification == true) NotificationDetails(surfaces, caps?.timerNotification, { p -> vm.setSurfaces { it.copy(notificationPrivacy = p) } }) {
+                system(SurfaceSettingsAction.OPEN_TIMER_CHANNEL_SETTINGS)
+            }
             Divider()
             val o = caps?.overlay
             SettingRow(rememberVectorPainter(Icon.Floating), "Плавающая кнопка",
@@ -133,6 +142,9 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 checked = surfaces?.overlay == true) { on ->
                 vm.setSurfaceEnabled(Surface.OVERLAY, on)
                 if (on && o?.permitted == false) system(SurfaceSettingsAction.OPEN_OVERLAY_PERMISSION)
+            }
+            if (surfaces?.overlay == true) AlphaRow("Фон окна выбора после стопа", surfaces.overlayChooserBackgroundAlphaPercent) { v ->
+                vm.setSurfaces { it.copy(overlayChooserBackgroundAlphaPercent = v) }
             }
             Divider()
             val w = caps?.widgetPlacement
@@ -154,6 +166,9 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 checked = surfaces?.widget == true) { on ->
                 vm.setSurfaceEnabled(Surface.WIDGET, on)
                 if (on && placement == WidgetPlacement.AVAILABLE) addWidget()
+            }
+            if (surfaces?.widget == true) AlphaRow("Фон виджета", surfaces.widgetBackgroundAlphaPercent) { v ->
+                vm.setSurfaces { it.copy(widgetBackgroundAlphaPercent = v) }
             }
             Divider()
             val f = caps?.focusSignal
@@ -179,16 +194,6 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
         PlanGroup(vm.planSeries(view), openPlan)
 
         settings?.focusPlan?.let { plan -> FocusGroup(vm, (plan.workMs / 60_000L).toInt(), (plan.breakMs / 60_000L).toInt()) }
-
-        Group("Вид") {
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    M3Icon(if (c.isDark) Icon.Moon else Icon.Sun, null, Modifier.size(22.dp), tint = c.ink2)
-                    Text("Тема", style = NotAi.type.body, color = c.ink)
-                }
-                Segmented(listOf(ThemeChoice.SYSTEM to "Системная", ThemeChoice.LIGHT to "Светлая", ThemeChoice.DARK to "Тёмная"), theme, vm::setTheme)
-            }
-        }
 
         Group("Дни в истории") {
             val device = ZoneId.systemDefault().id
@@ -258,6 +263,7 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 (if (r.conflicts.isNotEmpty()) ", расхождений со своими изменениями: ${r.conflicts.size}. Они требуют разбора в технической оболочке." else "."),
             if (p.canApply && (r.added.isNotEmpty() || r.updated.isNotEmpty())) "Обновить" else null, { vm.applyCatalog(p); catalog = null }, { catalog = null })
     }
+    if (appearanceSheet) AppearanceSheet(vm, onDismiss = { appearanceSheet = false })
     zoneConfirm?.let { z ->
         ConfirmDialog("Сменить часовой пояс отчётов на $z?",
             "Изменятся границы дней в истории и обзоре. Сами записи и зоны целей не меняются.", "Сменить",
@@ -279,6 +285,149 @@ private fun surfaceStatus(cap: SurfaceCapability?, describe: String): String = w
     cap.problem == SurfaceProblem.CHANNEL_BLOCKED -> "Включено, но уведомления выключены в настройках телефона"
     cap.problem == SurfaceProblem.PLATFORM_FAILURE -> "Телефон не дал включить. Попробуй ещё раз"
     else -> describe
+}
+
+/** Theme swatches first: that is what most people come here for. Accent and size follow; the rest is one tap deeper. */
+@Composable
+private fun AppearanceGroup(vm: TrackerViewModel, theme: ThemeChoice, more: () -> Unit) {
+    val c = NotAi.colors
+    val a by vm.appearance.collectAsStateWithLifecycle()
+    Group("Вид") {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                ThemeChoice.entries.forEach { t -> ThemeSwatch(t, t == theme, a.accent) { vm.setTheme(t) } }
+            }
+            if (theme != ThemeChoice.NEON) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("Акцент", Modifier.weight(1f), style = NotAi.type.body, color = c.ink)
+                Accent.entries.forEach { ac ->
+                    val set = accentSet(ac, c.isDark); val on = ac == a.accent
+                    Box(Modifier.size(36.dp).clip(CircleShape).border(if (on) 2.dp else 1.dp, if (on) c.ink else c.rule, CircleShape).padding(5.dp)
+                        .clip(CircleShape).background(set.accent).semantics { selected = on }
+                        .pressable({ vm.setAppearance { it.copy(accent = ac) } }, role = androidx.compose.ui.semantics.Role.RadioButton, label = ac.title))
+                }
+            } else Text("Неон — экспериментальная тема со своими цветами и мягким свечением.", style = NotAi.type.caption, color = c.ink2)
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Размер текста", style = NotAi.type.body, color = c.ink)
+                Segmented(Appearance.textScales, a.textScale, { s -> vm.setAppearance { it.copy(textScale = s) } }, Modifier.fillMaxWidth())
+            }
+        }
+        Divider()
+        NavRow(rememberVectorPainter(Icon.Layers), "Шрифт, плотность и главный экран", note = "${a.font.title}, цифры ${a.digits.title.lowercase()}, " +
+            (if (a.compact) "компактно" else "просторно"), onClick = more)
+    }
+}
+
+@Composable
+private fun ThemeSwatch(t: ThemeChoice, on: Boolean, accent: Accent, onClick: () -> Unit) {
+    val c = NotAi.colors
+    val sys = androidx.compose.foundation.isSystemInDarkTheme()
+    val colors = when (t) { ThemeChoice.SYSTEM -> if (sys) DarkColors else LightColors; ThemeChoice.LIGHT -> LightColors
+        ThemeChoice.DARK -> DarkColors; ThemeChoice.AMOLED -> AmoledColors; ThemeChoice.NEON -> NeonColors }
+    val dot = if (t == ThemeChoice.NEON) colors.amber else accentSet(accent, colors.isDark).accent
+    Column(Modifier.widthIn(min = 52.dp).semantics(mergeDescendants = true) { selected = on }
+        .pressable(onClick, role = androidx.compose.ui.semantics.Role.RadioButton, label = "Тема: ${t.title}"),
+        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Box(Modifier.size(46.dp).clip(RoundedCornerShape(14.dp)).border(if (on) 2.dp else 1.dp, if (on) c.ink else c.rule, RoundedCornerShape(14.dp))
+            .padding(3.dp).clip(RoundedCornerShape(11.dp)).background(
+                if (t == ThemeChoice.SYSTEM) androidx.compose.ui.graphics.Brush.linearGradient(listOf(LightColors.paper, LightColors.paper, DarkColors.paper, DarkColors.paper))
+                else androidx.compose.ui.graphics.SolidColor(colors.paper)), contentAlignment = Alignment.Center) {
+            // The mark itself, in the theme's own ink and running colour.
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                Bracket(true, dot, width = 7.dp, height = 22.dp, stroke = 1.6.dp, glow = colors.glow)
+                Box(Modifier.size(5.dp).clip(CircleShape).background(colors.ink2))
+                Bracket(false, dot, width = 7.dp, height = 22.dp, stroke = 1.6.dp, glow = colors.glow)
+            }
+        }
+        Text(t.title, style = NotAi.type.micro.copy(fontSize = 12.sp, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal), color = if (on) c.ink else c.ink2)
+    }
+}
+
+/** The deeper half of appearance, with a small live sample so a change is seen before leaving. */
+@Composable
+private fun AppearanceSheet(vm: TrackerViewModel, onDismiss: () -> Unit) {
+    val c = NotAi.colors
+    val a by vm.appearance.collectAsStateWithLifecycle()
+    NotAiSheet(onDismiss, fullHeight = false) {
+        SheetHeader("Вид подробнее", onDismiss)
+        Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(c.sunk).padding(vertical = 14.dp), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    IntervalFrame(IntervalState.RUNNING, bracketWidth = 14.dp, bracketHeight = 60.dp, stroke = 1.8.dp, gap = 10.dp, opening = false) {
+                        Text("1:24", style = NotAi.type.timer.copy(fontSize = 44.sp, lineHeight = 48.sp), color = c.ink)
+                    }
+                    Text("Английский · с 14:05", style = NotAi.type.caption, color = c.ink2)
+                }
+            }
+            Labeled("Шрифт") { Segmented(FontChoice.entries.map { it to it.title }, a.font, { f -> vm.setAppearance { it.copy(font = f) } }, Modifier.fillMaxWidth()) }
+            Labeled("Цифры таймера") { Segmented(TimerDigits.entries.map { it to it.title }, a.digits, { d -> vm.setAppearance { it.copy(digits = d) } }, Modifier.fillMaxWidth()) }
+            Labeled("Плотность списков") { Segmented(listOf(false to "Просторно", true to "Компактно"), a.compact, { v -> vm.setAppearance { it.copy(compact = v) } }, Modifier.fillMaxWidth()) }
+            Labeled("Главный экран") {
+                Toggle("Приглашение на «Начать»", "Скобки медленно дышат, пока учёт не идёт", a.pulse) { v -> vm.setAppearance { it.copy(pulse = v) } }
+                Toggle("Кнопка Фокуса", "Под быстрым стартом. Долгое нажатие — длительности", a.showFocus) { v -> vm.setAppearance { it.copy(showFocus = v) } }
+                Toggle("Лента дня", "Полоска из отрезков над записями каждого дня", a.showRibbon) { v -> vm.setAppearance { it.copy(showRibbon = v) } }
+            }
+            PillButton("Вернуть как было", { vm.setAppearance { Appearance() } }, Modifier.fillMaxWidth(), ButtonKind.TONAL, height = 44.dp)
+        }
+    }
+}
+
+@Composable
+private fun Labeled(title: String, content: @Composable ColumnScope.() -> Unit) = Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Text(title, style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = NotAi.colors.ink2); content()
+}
+
+@Composable
+private fun Toggle(title: String, note: String, checked: Boolean, onChange: (Boolean) -> Unit) {
+    val c = NotAi.colors
+    Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).pressable({ onChange(!checked) }, label = title), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(title, style = NotAi.type.body, color = c.ink); Text(note, style = NotAi.type.caption, color = c.ink2)
+        }
+        NotAiSwitch(checked, onChange, title)
+    }
+}
+
+/** Lock screen and status bar for the timer card. Android and the phone maker have the last word; this asks, it cannot force. */
+@Composable
+private fun NotificationDetails(surfaces: dev.notai.tracker.SurfaceSettings, timer: dev.notai.tracker.android.TimerNotificationCapability?,
+                                setPrivacy: (dev.notai.tracker.NotificationPrivacy) -> Unit, openChannel: () -> Unit) {
+    val c = NotAi.colors
+    Column(Modifier.fillMaxWidth().padding(start = 52.dp, end = 16.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text("На экране блокировки", style = NotAi.type.caption, color = c.ink2)
+        val p = surfaces.notificationPrivacy ?: dev.notai.tracker.NotificationPrivacy.PRIVATE
+        Segmented(listOf(dev.notai.tracker.NotificationPrivacy.FULL to "Полностью", dev.notai.tracker.NotificationPrivacy.PRIVATE to "Кратко",
+            dev.notai.tracker.NotificationPrivacy.HIDDEN to "Скрыть"), p, setPrivacy, Modifier.fillMaxWidth(), height = 34.dp)
+        Text(when (p) { dev.notai.tracker.NotificationPrivacy.FULL -> "Занятие, время и кнопки видны без разблокировки"
+            dev.notai.tracker.NotificationPrivacy.PRIVATE -> "Без разблокировки видно только, что учёт идёт"
+            dev.notai.tracker.NotificationPrivacy.HIDDEN -> "На заблокированном экране карточки нет" }, style = NotAi.type.caption, color = c.ink2)
+        val icon = timer?.statusBarIconRequested
+        Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).pressable(openChannel, label = "Значок в строке состояния"), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(if (icon == false) "Значок в строке состояния скрыт" else "Значок в строке состояния", style = NotAi.type.bodySmall, color = c.ink)
+                Text("Чтобы скрыть его и оставить карточку в шторке, включи «Свернуть» или «Без значка» в настройках этого уведомления",
+                    style = NotAi.type.caption, color = c.ink2)
+            }
+            Text("Открыть", style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk, modifier = Modifier.padding(start = 8.dp))
+        }
+    }
+}
+
+/** Background opacity in tens; text and buttons stay solid. Written after a short pause, like other steppers. */
+@Composable
+private fun AlphaRow(title: String, percent: Int, onChange: (Int) -> Unit) {
+    val c = NotAi.colors
+    var v by remember(percent) { mutableIntStateOf(percent) }
+    LaunchedEffect(v) { if (v == percent) return@LaunchedEffect; delay(500); onChange(v) }
+    Column(Modifier.fillMaxWidth().padding(start = 52.dp, end = 16.dp, bottom = 12.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(title, Modifier.weight(1f), style = NotAi.type.caption, color = c.ink2)
+            Text(if (v == 100) "непрозрачный" else "$v %", style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.ink)
+        }
+        androidx.compose.material3.Slider(v.toFloat(), { v = (Math.round(it / 10f) * 10) }, valueRange = 0f..100f, steps = 9,
+            modifier = Modifier.semantics { contentDescription = "$title: $v процентов" },
+            colors = androidx.compose.material3.SliderDefaults.colors(thumbColor = c.ink, activeTrackColor = c.ink2, inactiveTrackColor = c.sunk,
+                activeTickColor = c.ink3, inactiveTickColor = c.rule))
+    }
 }
 
 /** Night owls: records before this hour belong to the previous day. Applied after a short pause, like Focus steps. */

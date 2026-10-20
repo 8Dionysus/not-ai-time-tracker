@@ -61,7 +61,8 @@ private sealed interface Editor {
 @Composable
 fun TrackerApp(vm: TrackerViewModel, openTechnical: () -> Unit, reducedMotion: Boolean? = null, onActionReady: () -> Unit = {}) {
     val theme by vm.theme.collectAsStateWithLifecycle()
-    NotAiTheme(theme, reducedMotion) {
+    val appearance by vm.appearance.collectAsStateWithLifecycle()
+    NotAiTheme(theme, reducedMotion, appearance) {
         val c = NotAi.colors
         val view = LocalView.current
         if (!view.isInEditMode) SideEffect {
@@ -120,6 +121,8 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     val surfacePicker by vm.surfacePicker.collectAsStateWithLifecycle()
     val step by vm.correctionStepMinutes.collectAsStateWithLifecycle()
     val focusEditor by vm.focusEditor.collectAsStateWithLifecycle()
+    val activityEditor by vm.editor.collectAsStateWithLifecycle()
+    val favoritesOpen by vm.favoritesOpen.collectAsStateWithLifecycle()
     var fullSurfacePickerId by remember { mutableStateOf<String?>(null) }
     val snackbar = remember { SnackbarHostState() }
     val dark = c.isDark
@@ -151,7 +154,7 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
             manual = { d -> vm.openEntryForm(null,d) },
             earlier = { sheet = Sheet.Earlier },
             resolve = { sheet = Sheet.Resolve },
-            toggleTheme = { vm.setTheme(if (dark) ThemeChoice.LIGHT else ThemeChoice.DARK) },
+            toggleTheme = { vm.toggleTheme(dark) },
             delete = requestDelete,
             startEarlier = { sheet = Sheet.StartEarlier },
             fillGap = { g, d -> vm.openEntryForm(null, d, g) },
@@ -239,6 +242,9 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
         is Editor.Share -> ShareSheet(vm, e.period, onDismiss = { editor = null })
         null -> Unit
     }
+    if (favoritesOpen) FavoritesSheet(vm, onEdit = vm::openEditor, onAdd = { formPicker = { sel, label -> vm.saveFavorite(label.title, sel) } },
+        onDismiss = { vm.openFavorites(false) })
+    activityEditor?.let { t -> key(t) { ActivityEditorSheet(vm, t, onPick = { formPicker = it }, onDismiss = { vm.openEditor(null) }) } }
     formPicker?.let { back ->
         PickerSheet(vm, PickMode.MANUAL, false, null, null, null, onDismiss = { formPicker = null }, onReturn = { sel, label -> back(sel, label) })
     }

@@ -48,6 +48,8 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -113,7 +115,7 @@ fun TimerScreen(snapshot: Snapshot?, home: HomeData?, vm: TrackerViewModel, acti
                 if (reduced) fadeIn(tween(0)) togetherWith fadeOut(tween(0))
                 else (fadeIn(tween(260, 90)) + slideInVertically(tween(320)) { it / 12 }) togetherWith fadeOut(tween(120))
             }, label = "hero") { state ->
-                Box(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 12.dp, bottom = 8.dp), contentAlignment = Alignment.TopCenter) {
+                Box(Modifier.fillMaxWidth().neonGlow().padding(horizontal = 20.dp).padding(top = 12.dp, bottom = 8.dp), contentAlignment = Alignment.TopCenter) {
                     when (state.kind) {
                         HeroKind.LOADING -> Spacer(Modifier.height(300.dp))
                         HeroKind.IDLE -> IdleHero(home, vm, actions)
@@ -125,6 +127,24 @@ fun TimerScreen(snapshot: Snapshot?, home: HomeData?, vm: TrackerViewModel, acti
             }
         }
         if (home != null) history(home, snapshot, vm, actions, openGaps) { d -> openGaps = if (d in openGaps) openGaps - d else openGaps + d }
+    }
+}
+
+/** Neon-wave only: a slow wash of two neon colours behind the hero. Static when animations are off. */
+@Composable
+private fun Modifier.neonGlow(): Modifier {
+    val c = NotAi.colors
+    if (!c.glow) return this
+    val shift = if (NotAi.reducedMotion) 0.5f else {
+        val t = androidx.compose.animation.core.rememberInfiniteTransition(label = "neon")
+        t.animateFloat(0f, 1f, androidx.compose.animation.core.infiniteRepeatable(tween(9000), androidx.compose.animation.core.RepeatMode.Reverse), label = "neonShift").value
+    }
+    return this.drawBehind {
+        val a = c.amber.copy(alpha = 0.16f); val b = c.areas[1].copy(alpha = 0.12f)
+        drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(a, a.copy(alpha = 0f)),
+            androidx.compose.ui.geometry.Offset(size.width * (0.25f + 0.2f * shift), size.height * 0.35f), size.width * 0.55f), radius = size.width)
+        drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(b, b.copy(alpha = 0f)),
+            androidx.compose.ui.geometry.Offset(size.width * (0.8f - 0.2f * shift), size.height * 0.55f), size.width * 0.5f), radius = size.width)
     }
 }
 
@@ -144,7 +164,7 @@ private fun IdleHero(home: HomeData?, vm: TrackerViewModel, actions: TimerAction
         Box(Modifier.height(128.dp).widthIn(min = 280.dp).clip(RoundedCornerShape(64.dp))
             .pressable(haptic(HapticFeedbackType.Confirm, vm::startBlank), label = "Начать учёт времени").semantics { contentDescription = "Начать учёт времени" },
             contentAlignment = Alignment.Center) {
-            IntervalFrame(IntervalState.IDLE, bracketWidth = 26.dp, bracketHeight = 104.dp, gap = 22.dp, opening = false) {
+            IntervalFrame(IntervalState.IDLE, bracketWidth = 26.dp, bracketHeight = 104.dp, gap = 22.dp, opening = false, invite = NotAi.appearance.pulse) {
                 Text("Начать", style = NotAi.type.start, color = c.ink)
             }
         }
@@ -163,13 +183,11 @@ private fun IdleHero(home: HomeData?, vm: TrackerViewModel, actions: TimerAction
             else {
                 if (quick.isNotEmpty()) SectionLabel("Начать сразу")
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    quick.forEach { q ->
-                        Chip(q.title, { vm.choose(q.entry, PickMode.START,reference = q.reference,expected = q.expected) }, slot = q.slot, glyph = q.glyph)
-                    }
+                    quick.forEach { q -> QuickChip(q, vm) }
                     Chip(if (quick.isEmpty()) "Начать с занятием" else "Все занятия", { actions.pick(PickMode.START) }, dashed = true, icon = Icon.Plus)
                 }
             }
-            FocusLink(home?.focusMinutes ?: 25, vm, Modifier.align(Alignment.Start).offset(x = (-12).dp))
+            if (NotAi.appearance.showFocus) FocusLink(home?.focusMinutes ?: 25, vm, Modifier.align(Alignment.Start).offset(x = (-12).dp))
         }
     }
 }
@@ -258,6 +276,28 @@ private fun FocusLink(minutes: Long, vm: TrackerViewModel, modifier: Modifier = 
             onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); vm.openFocusEditor() }, onClick = vm::startFocus)
         .padding(horizontal = 12.dp), contentAlignment = Alignment.Center) {
         Text("Фокус: $minutes мин работы", style = NotAi.type.button, color = NotAi.colors.amberInk)
+    }
+}
+
+/** A quick-start chip. Long press: edit, star/unstar, and the full ordered list of favourites. */
+@Composable
+private fun QuickChip(q: QuickStart, vm: TrackerViewModel) {
+    val c = NotAi.colors
+    var menu by remember { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
+    Box {
+        Chip(q.title, { vm.choose(q.entry, PickMode.START, reference = q.reference, expected = q.expected) }, slot = q.slot, glyph = q.glyph,
+            onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); menu = true })
+        DropdownMenu(menu, { menu = false }, shape = RoundedCornerShape(16.dp), containerColor = c.raised, border = BorderStroke(1.dp, c.rule), shadowElevation = 8.dp) {
+            @Composable fun item(text: String, icon: ImageVector, action: () -> Unit) = DropdownMenuItem(text = { Text(text, style = NotAi.type.body, color = c.ink) },
+                onClick = { menu = false; action() }, leadingIcon = { M3Icon(icon, null, Modifier.size(18.dp), tint = c.ink2) }, modifier = Modifier.widthIn(min = 210.dp))
+            val card = q.entry.selection.cardId
+            if (q.favorite) item("Изменить", Icon.Edit) { vm.openEditor(EditTarget.Fav(q.entry.sourceId)) }
+            else if (card != null) item("Изменить занятие", Icon.Edit) { vm.openEditor(EditTarget.Card(card)) }
+            if (q.favorite) item("Убрать из избранного", Icon.StarLine) { vm.removeFavorites(vm.favoriteIds(q.entry.selection)) }
+            else item("В избранное", Icon.Star) { vm.saveFavorite(q.title, q.entry.selection) }
+            item("Порядок и всё избранное", Icon.Grip) { vm.openFavorites(true) }
+        }
     }
 }
 
@@ -380,7 +420,7 @@ private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: Track
                 else {
                     val pieces = day.ribbon.map { RibbonPiece(it.start, it.end, it.slot?.let { s -> c.areas[s] } ?: c.none) } +
                         day.live.map { RibbonPiece(it.start, it.end, c.amber, live = true) }
-                    DayRibbon(day.start, day.end, pieces,zone = home.zone)
+                    if (NotAi.appearance.showRibbon) DayRibbon(day.start, day.end, pieces,zone = home.zone)
                     val fillable = day.gaps.count { it.kind == dev.notai.tracker.HistoryGapKind.UNRECORDED }
                     if (fillable > 0) {
                         val open = day.date.toString() in openGaps
@@ -501,13 +541,14 @@ private fun RecordRow(r: RecordUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: (
             EntryMenu(menu, onDismiss = { menu = false }, onOpen = onOpen, onRepeat = onRepeat,
                 onDelete = onDelete?.let { d -> { scope.launch { d() } } })
         }
-        Row(Modifier.fillMaxWidth().heightIn(min = 60.dp)
+        val compact = NotAi.appearance.compact
+        Row(Modifier.fillMaxWidth().heightIn(min = if (compact) 48.dp else 60.dp)
             .combinedClickable(onClickLabel = "Исправить запись", onLongClickLabel = "Действия с записью",
                 onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); menu = true }, onClick = onOpen),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             ActivityGlyph(e.label)
-            Column(Modifier.weight(1f).padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                LabelText(e.label)
+            Column(Modifier.weight(1f).padding(vertical = if (compact) 4.dp else 8.dp), verticalArrangement = Arrangement.spacedBy(if (compact) 0.dp else 2.dp)) {
+                LabelText(e.label, maxLines = if (compact) 1 else 2)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(Format.range(r.start, r.end, zone) + (e.note?.let { ", $it" } ?: ""), Modifier.weight(1f, fill = false), style = NotAi.type.caption, color = c.ink2,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)

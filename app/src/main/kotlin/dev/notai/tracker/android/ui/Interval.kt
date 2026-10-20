@@ -38,7 +38,7 @@ enum class IntervalState { IDLE, RUNNING, PAUSED, UNKNOWN }
 /** One parenthesis drawn from the design path (viewBox 26×120). */
 @Composable
 fun Bracket(left: Boolean, color: Color, modifier: Modifier = Modifier, width: Dp = 28.dp, height: Dp = 120.dp,
-            stroke: Dp = 2.2.dp, dotted: Boolean = false) {
+            stroke: Dp = 2.2.dp, dotted: Boolean = false, glow: Boolean = false) {
     val density = LocalDensity.current
     Canvas(modifier.size(width, height)) {
         val sx = size.width / 26f; val sy = size.height / 120f
@@ -48,6 +48,11 @@ fun Bracket(left: Boolean, color: Color, modifier: Modifier = Modifier, width: D
         }
         val w = with(density) { stroke.toPx() }
         val effect = if (dotted) PathEffect.dashPathEffect(floatArrayOf(0.1f, w * 4.2f)) else null
+        // Neon: two wide, faint strokes under the line read as light, without blur or extra layers.
+        if (glow && !dotted) {
+            drawPath(path, color.copy(alpha = color.alpha * 0.10f), style = Stroke(width = w * 6f, cap = StrokeCap.Round))
+            drawPath(path, color.copy(alpha = color.alpha * 0.22f), style = Stroke(width = w * 2.8f, cap = StrokeCap.Round))
+        }
         drawPath(path, color, style = Stroke(width = if (dotted) w * 1.2f else w, cap = StrokeCap.Round, pathEffect = effect))
     }
 }
@@ -58,7 +63,7 @@ fun Bracket(left: Boolean, color: Color, modifier: Modifier = Modifier, width: D
  */
 @Composable
 fun IntervalFrame(state: IntervalState, modifier: Modifier = Modifier, bracketWidth: Dp = 28.dp, bracketHeight: Dp = 120.dp,
-                  stroke: Dp = 2.2.dp, gap: Dp = 18.dp, opening: Boolean = true, breathe: Dp = 4.dp,
+                  stroke: Dp = 2.2.dp, gap: Dp = 18.dp, opening: Boolean = true, breathe: Dp = 4.dp, invite: Boolean = false,
                   content: @Composable RowScope.() -> Unit) {
     val c = NotAi.colors
     val reduced = NotAi.reducedMotion
@@ -71,19 +76,22 @@ fun IntervalFrame(state: IntervalState, modifier: Modifier = Modifier, bracketWi
     val open = remember { Animatable(if (opening && !reduced) 1f else 0f) }
     LaunchedEffect(Unit) { if (open.value > 0f) open.animateTo(0f, spring(dampingRatio = 0.62f, stiffness = Spring.StiffnessLow)) }
     val breathing = state == IntervalState.RUNNING && !reduced
-    val phase = if (breathing) {
+    // Idle invitation: slower, inward, half as deep as running, so the two never read alike.
+    val inviting = invite && state == IntervalState.IDLE && !reduced
+    val phase = if (breathing || inviting) {
         val t = rememberInfiniteTransition(label = "breath")
-        t.animateFloat(0f, 1f, infiniteRepeatable(tween(2100, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "breathPhase").value
+        t.animateFloat(0f, 1f, infiniteRepeatable(tween(if (inviting) 2800 else 2100, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "breathPhase").value
     } else 0f
     val density = LocalDensity.current
-    val shiftPx = with(density) { breathe.toPx() } * phase
+    val shiftPx = with(density) { breathe.toPx() } * phase * (if (inviting) -0.75f else 1f)
+    val fade = if (inviting) 0.3f else 0.55f
     val openPx = with(density) { 54.dp.toPx() } * open.value
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(gap), verticalAlignment = Alignment.CenterVertically) {
-        Bracket(true, color, Modifier.graphicsLayer { translationX = openPx - shiftPx; alpha = (1f - 0.55f * phase) * (1f - open.value) },
-            width = bracketWidth, height = bracketHeight, stroke = stroke)
+        Bracket(true, color, Modifier.graphicsLayer { translationX = openPx - shiftPx; alpha = (1f - fade * phase) * (1f - open.value) },
+            width = bracketWidth, height = bracketHeight, stroke = stroke, glow = c.glow)
         content()
         Bracket(false, if (state == IntervalState.UNKNOWN) c.ink3 else color,
-            Modifier.graphicsLayer { translationX = -openPx + shiftPx; alpha = (1f - 0.55f * phase) * (1f - open.value) },
-            width = bracketWidth, height = bracketHeight, stroke = stroke, dotted = state == IntervalState.UNKNOWN)
+            Modifier.graphicsLayer { translationX = -openPx + shiftPx; alpha = (1f - fade * phase) * (1f - open.value) },
+            width = bracketWidth, height = bracketHeight, stroke = stroke, dotted = state == IntervalState.UNKNOWN, glow = c.glow)
     }
 }

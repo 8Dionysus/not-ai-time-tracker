@@ -1,0 +1,24 @@
+{
+  "source_commit": "8b15b9898082a0f486c33702b7c5d5b85d107fc4",
+  "scope": "One new shared scenario, existing surface atomicity, existing core history and Compose stopped-assignment regression; no expanded suite or emulator.",
+  "runs": [
+    {
+      "run": "core",
+      "totals": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "run": "android",
+      "totals": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  ]
+}

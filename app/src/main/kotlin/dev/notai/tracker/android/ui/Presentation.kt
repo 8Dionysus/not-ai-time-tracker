@@ -94,6 +94,21 @@ object Format {
         ErrorCode.INVALID_INPUT -> "Не получилось: ${e.message}"
         null -> "Не получилось: ${e.message ?: e.javaClass.simpleName}"
     }
+
+    /** One plain sentence per automatic-copy problem; the action next to it says what to do. */
+    fun backupProblem(e: dev.notai.tracker.android.AutomaticBackupError): String = when (e) {
+        dev.notai.tracker.android.AutomaticBackupError.REQUIRES_SELECTION -> "Нужно выбрать папку заново"
+        dev.notai.tracker.android.AutomaticBackupError.UNSUPPORTED -> "В эту папку нельзя сохранять копии. Выбери другую"
+        dev.notai.tracker.android.AutomaticBackupError.GRANT_REVOKED -> "Доступ к папке пропал. Выбери её снова"
+        dev.notai.tracker.android.AutomaticBackupError.PROVIDER_UNAVAILABLE -> "Папка сейчас недоступна: нет сети или приложение облака не отвечает. Повторю сам"
+        dev.notai.tracker.android.AutomaticBackupError.READBACK_UNAVAILABLE -> "Не удалось перечитать записанную копию. Повторю сам"
+        dev.notai.tracker.android.AutomaticBackupError.CORRUPT_READBACK -> "Записанная копия не совпала с данными. Повторю сам"
+        dev.notai.tracker.android.AutomaticBackupError.INTERRUPTED -> "Копия прервалась. Продолжу сам"
+        dev.notai.tracker.android.AutomaticBackupError.CREATION_UNCERTAIN -> "Неясно, появился ли файл в папке. Повтори или пропусти эту копию"
+        dev.notai.tracker.android.AutomaticBackupError.RETENTION_FAILED -> "Новая копия сохранена, а старые убрать не вышло"
+        dev.notai.tracker.android.AutomaticBackupError.SCHEDULING_FAILED -> "Телефон не дал запланировать копию. Нажми «Сохранить сейчас»"
+        dev.notai.tracker.android.AutomaticBackupError.STORAGE -> "Не хватило места или памяти на телефоне. Повторю сам"
+    }
 }
 
 /** Fixed colour slots for activity areas. Index into NotAiColors.areas; null means neutral. */

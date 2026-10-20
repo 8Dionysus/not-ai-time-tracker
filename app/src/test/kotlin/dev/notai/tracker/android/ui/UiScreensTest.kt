@@ -85,6 +85,28 @@ class UiScreensTest {
         override fun prepareCatalog() = CatalogImports(tracker) { catalog }.prepare()
         override fun applyCatalog(preview: CatalogPreview) = CatalogImports(tracker) { catalog }.apply(preview)
         override fun submitShortcut(action: SurfaceAction) = CompletableDeferred<Result<Tracker.Change>>(Result.failure(IllegalStateException("no shortcuts")))
+        override val autoBackup: AutoBackupBackend = FakeAutoBackup(tracker)
+    }
+    /** A folder in a cloud app with three verified copies; actions only change the in-memory state. */
+    private class FakeAutoBackup(private val tracker: Tracker) : AutoBackupBackend {
+        private val tree = "content://com.example.cloud/tree/not-ai"
+        private fun version(i: Int, at: Long) = dev.notai.tracker.android.ExternalBackupVersion("op$i", tree, "$tree/document/$i",
+            dev.notai.tracker.android.StagedBackup("op$i", dev.notai.tracker.android.BackupRevision("d", i.toLong()), at, 180_000L + i * 4_000L, "0".repeat(64)), at + 40_000)
+        var state: dev.notai.tracker.android.AutomaticBackupState = run {
+            val now = tracker.clock.now().wall
+            val v = listOf(version(1, now - 2 * 86_400_000L), version(2, now - 86_400_000L), version(3, now - 3_600_000L))
+            dev.notai.tracker.android.AutomaticBackupState(enabled = true, destination = tree, versions = v, lastSuccess = v.last())
+        }
+        override fun status() = state
+        override fun folderName(tree: String) = "Облако · not-ai"
+        override fun selectionIntent() = android.content.Intent(android.content.Intent.ACTION_OPEN_DOCUMENT_TREE)
+        override fun select(uri: android.net.Uri, returnedFlags: Int, policy: dev.notai.tracker.android.BackupPolicy) = state
+        override fun enable(tree: String, policy: dev.notai.tracker.android.BackupPolicy) = state.copy(enabled = true, policy = policy).also { state = it }
+        override fun disable() = state.copy(enabled = false).also { state = it }
+        override fun retry() {}
+        override fun requestBackup() { state = state.copy(requested = true) }
+        override fun abandonPending(operationId: String) {}
+        override fun prepareRestore(operationId: String): RestorePreview = error("not in screen tests")
     }
 
     private val zone = ZoneId.of("America/Mexico_City")
@@ -316,18 +338,36 @@ class UiScreensTest {
     @Test fun settings() {
         val vm = render(seed())
         compose.onNodeWithText("Настройки").performClick()
-        waitText("Таймер вне приложения")
-        waitText("Резервная копия")
+        waitText("Разделы")
+        waitText("Автокопия ")
         shot("06-settings", vm)
     }
 
-    /** The whole settings page at once (tall window) for review. */
-    @Config(qualifiers = "w400dp-h1960dp-xhdpi")
+    /** Each section is its own page; back returns to the short root. */
+    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
     @Test fun settingsFullPage() {
         val vm = render(seed())
         compose.onNodeWithText("Настройки").performClick()
+        compose.onNodeWithText("Таймер вне приложения").performClick()
+        waitText("Плавающая кнопка")
+        shot("06b-settings-surfaces", vm)
+        compose.onNodeWithContentDescription("Назад к настройкам").performClick()
+        waitText("Разделы")
+        compose.onNodeWithText("Ещё").performClick()
         waitText("Техническая оболочка")
-        shot("06b-settings-full", vm)
+        shot("06c-settings-more", vm)
+    }
+
+    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
+    @Test fun backupPage() {
+        val vm = render(seed())
+        compose.onNodeWithText("Настройки").performClick()
+        compose.onNodeWithText("Резервная копия").performClick()
+        waitText("Копии в папке")
+        waitText("Облако · not-ai")
+        shot("30-backup", vm)
+        compose.onNodeWithText("Сохранить сейчас").performClick()
+        compose.waitUntil(5_000) { vm.autoBackup.value?.state?.requested == true }
     }
 
     /** A new install: no history, no favourites. The first screen a person sees. */
@@ -598,6 +638,7 @@ class UiScreensTest {
         plan(seed, "Английский", "18:00")
         val vm = render(seed)
         compose.onNodeWithText("Настройки").performClick()
+        compose.onNodeWithText("Занятия и план").performClick()
         waitText("Добавить ещё")
         compose.onNodeWithText("Добавить ещё").performClick()
         waitText("По дням недели")

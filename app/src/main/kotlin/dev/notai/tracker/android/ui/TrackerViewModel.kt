@@ -1162,6 +1162,48 @@ class TrackerViewModel internal constructor(private val app: Application,private
         applying.invokeOnCompletion { releaseRestorePreviewOnIo(preview) }
     }
 
+    // Automatic copies into a chosen folder. Status lives on this phone, outside the records; every call is on IO.
+    private val _autoBackup = MutableStateFlow<AutoBackupUi?>(null)
+    val autoBackup: StateFlow<AutoBackupUi?> = _autoBackup
+    private val autoBackend get() = runtime?.autoBackup
+    private suspend fun autoAction(block: (AutoBackupBackend) -> Unit) = withContext(Dispatchers.IO) {
+        val b = autoBackend ?: return@withContext
+        try { block(b) } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice(autoBackupError(e)) }
+        refreshAutoBackupNow()
+    }
+    private fun refreshAutoBackupNow() {
+        val b = autoBackend ?: run { _autoBackup.value = null; return }
+        val state = runCatching { b.status() }.getOrNull() ?: return
+        _autoBackup.value = AutoBackupUi(state, state.destination?.let { d -> _autoBackup.value?.takeIf { it.state.destination == d }?.folder ?: b.folderName(d) })
+    }
+    suspend fun refreshAutoBackup() = withContext(Dispatchers.IO) { refreshAutoBackupNow() }
+    fun backupFolderIntent(): android.content.Intent? = autoBackend?.selectionIntent()
+    fun chooseBackupFolder(uri: Uri, flags: Int) = viewModelScope.launch {
+        autoAction { b -> b.select(uri, flags, b.status().policy) }
+        if (_autoBackup.value?.state?.enabled == true) notice("Папка выбрана. Первая копия появится через пару минут")
+    }
+    fun setAutoBackup(on: Boolean) = viewModelScope.launch {
+        autoAction { b -> val s = b.status(); if (on) s.destination?.let { b.enable(it, s.policy) } else b.disable() }
+    }
+    fun setBackupRetention(keep: Int) = viewModelScope.launch {
+        autoAction { b -> val s = b.status(); val d = s.destination; if (s.enabled && d != null) b.enable(d, s.policy.copy(retain = keep.coerceIn(1, 100))) }
+    }
+    fun backupNow() = viewModelScope.launch { autoAction { it.requestBackup() } }
+    fun retryAutoBackup() = viewModelScope.launch { autoAction { it.retry() } }
+    fun skipUncertainBackup(operationId: String) = viewModelScope.launch { autoAction { it.abandonPending(operationId) } }
+    suspend fun prepareRestoreVersion(operationId: String, owner: RestoreReviewOwner<RestorePreview>): RestorePreview? {
+        val request = owner.begin() ?: return null
+        try {
+            return withContext(Dispatchers.IO) {
+                val b = autoBackend ?: return@withContext null
+                owner.prepared(request, b.prepareRestore(operationId))
+            }
+        } catch (e: kotlinx.coroutines.CancellationException) { owner.cancel(request); throw e }
+        catch (e: Exception) { owner.cancel(request); notice(autoBackupError(e)); return null }
+    }
+    private fun autoBackupError(e: Exception): String =
+        (e as? dev.notai.tracker.android.BackupDestinationException)?.reason?.let { Format.backupProblem(it) } ?: Format.error(e)
+
     suspend fun bundledCatalogVersion(): String? = withContext(Dispatchers.IO) { runCatching { runtime?.bundledCatalogVersion }.getOrNull() }
     suspend fun prepareCatalog(): CatalogPreview? = withContext(Dispatchers.IO) {
         try { runtime?.prepareCatalog() } catch (e: Exception) { notice(Format.error(e)); null }

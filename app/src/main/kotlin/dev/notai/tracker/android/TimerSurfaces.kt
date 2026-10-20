@@ -138,10 +138,16 @@ object TimerSurfaces {
             .setShortLabel("Выбрать занятие").setLongLabel("Таймер: выбрать занятие")
             .setIcon(android.graphics.drawable.Icon.createWithResource(c,R.drawable.ic_shortcut))
             .setIntent(SurfaceChoices.intent(c,SurfaceChoices.route(Surface.SHORTCUT,s))).setRank(1).build()
+        val entries = (listOf(info) + if(s.focus == null) listOf(chooser) else emptyList())
+            .take(manager.maxShortcutCountPerActivity.coerceAtLeast(0))
+        val shownIds = entries.map { it.id }
         return {
             retireOpenAlias()
-            manager.enableShortcuts(ids)
-            manager.setDynamicShortcuts((listOf(info) + if(s.focus == null) listOf(chooser) else emptyList()).take(manager.maxShortcutCountPerActivity.coerceAtLeast(0)))
+            // Removing a dynamic entry alone leaves pinned copies enabled. Withdraw those too.
+            val withdrawn = ids - shownIds
+            if(withdrawn.isNotEmpty()) manager.disableShortcuts(withdrawn,"Откройте приложение для выбора занятия")
+            if(shownIds.isNotEmpty()) manager.enableShortcuts(shownIds)
+            manager.setDynamicShortcuts(entries)
             Unit
         }
     }

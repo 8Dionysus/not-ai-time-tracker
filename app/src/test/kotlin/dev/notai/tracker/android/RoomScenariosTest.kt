@@ -114,7 +114,9 @@ class RoomScenariosTest: ScenarioContract() {
         tracker.saveCard(tracker.snapshot().token,card)
         tracker.saveFavorite(tracker.snapshot().token,Favorite(id = "launcher-favorite",label = "Launcher choice",selection = card.classification()))
         TimerSurfaces.shortcut(context,tracker.snapshot(),tracker.data().settings.surfaces)
-        val route = requireNotNull(SurfaceChoices.parse(manager.dynamicShortcuts.single { it.id == "timer_choose" }.intent!!))
+        val publishedChooser = manager.dynamicShortcuts.single { it.id == "timer_choose" }
+        org.junit.Assert.assertTrue(manager.requestPinShortcut(publishedChooser,null))
+        val route = requireNotNull(SurfaceChoices.parse(publishedChooser.intent!!))
         org.junit.Assert.assertEquals(Surface.SHORTCUT.name,route.source)
         org.junit.Assert.assertEquals(route,SurfaceChoices.parse(SurfaceChoices.intent(context,route)))
         val choices = SurfaceChoices.read(tracker,route)
@@ -128,6 +130,16 @@ class RoomScenariosTest: ScenarioContract() {
         val fresh = requireNotNull(SurfaceChoices.parse(manager.dynamicShortcuts.single { it.id == "timer_choose" }.intent!!))
         tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(shortcut = false)))
         org.junit.Assert.assertThrows(CoreError::class.java) { SurfaceChoices.choose(context,tracker,fresh,choice) }
+        tracker.stop(tracker.snapshot().token)
+        tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(shortcut = true)))
+        tracker.startFocus(tracker.snapshot().token)
+        TimerSurfaces.shortcut(context,tracker.snapshot(),tracker.data().settings.surfaces)
+        org.junit.Assert.assertEquals(listOf("timer_action"),manager.dynamicShortcuts.map { it.id })
+        org.junit.Assert.assertFalse(manager.pinnedShortcuts.single { it.id == "timer_choose" }.isEnabled)
+        val focused = SurfaceChoices.route(Surface.SHORTCUT,tracker.snapshot())
+        val beforeFocusTap = tracker.data()
+        org.junit.Assert.assertThrows(CoreError::class.java) { SurfaceChoices.choose(context,tracker,focused,choice) }
+        org.junit.Assert.assertEquals(beforeFocusTap,tracker.data())
     }
     @org.junit.Test fun timerChannelCapabilityObservesMinAndPreservesExistingChannel() {
         val context = RuntimeEnvironment.getApplication()

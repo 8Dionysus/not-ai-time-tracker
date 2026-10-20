@@ -106,7 +106,7 @@ object SurfaceChoices {
     private fun allowed(context: Context,d: Dataset,source: Surface) = TimerSurfaces.enabled(d.settings.surfaces,source) && when(source) {
         Surface.NOTIFICATION -> TimerSurfaces.notificationsAllowed(context)
         Surface.OVERLAY -> TimerSurfaces.overlayAllowed(context)
-        Surface.SHORTCUT -> true
+        Surface.SHORTCUT -> d.focus == null
         else -> false
     }
     fun read(tracker: Tracker,route: SurfacePickerRoute): SurfacePickerState {
@@ -149,8 +149,11 @@ object SurfaceSettingsBackend {
     }
     fun settingsIntent(context: Context,action: SurfaceSettingsAction): Intent? = when(action) {
         SurfaceSettingsAction.OPEN_NOTIFICATION_SETTINGS -> Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE,context.packageName)
-        SurfaceSettingsAction.OPEN_TIMER_CHANNEL_SETTINGS -> Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
-            .putExtra(Settings.EXTRA_APP_PACKAGE,context.packageName).putExtra(Settings.EXTRA_CHANNEL_ID,TimerSurfaces.CONTROL_CHANNEL)
+        SurfaceSettingsAction.OPEN_TIMER_CHANNEL_SETTINGS -> {
+            TimerSurfaces.channels(context) // Ensure a settings destination even before the first notification.
+            Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_APP_PACKAGE,context.packageName).putExtra(Settings.EXTRA_CHANNEL_ID,TimerSurfaces.CONTROL_CHANNEL)
+        }
         SurfaceSettingsAction.OPEN_OVERLAY_PERMISSION -> Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,Uri.parse("package:${context.packageName}"))
         else -> null // runtime permission and foreground widget request require their corresponding platform API
     }

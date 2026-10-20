@@ -552,14 +552,24 @@ class TrackerViewModel internal constructor(private val app: Application,private
         }
     }
 
-    /** A new personal activity: saved as a card, then used in the same action with the token that save returned. */
+    /** Create and apply atomically; a refused Start/Switch/Label/Focus/Earlier leaves no card. */
     fun createAndChoose(name: String, mode: PickMode, earlierBoundary: Long? = null, activityTypeId: String? = null) {
         val trimmed = name.trim().replaceFirstChar { it.uppercase() }
         if (trimmed.isEmpty()) return
         command({ "Занятие «$trimmed» создано" }) { rt, s ->
             val card = Card(name = trimmed, activityTypeId = activityTypeId)
-            val saved = rt.tracker.saveCard(s.token, card)
-            applyChoice(rt, saved.state, card.classification(), null, mode, earlierBoundary)
+            val t = rt.tracker
+            when(mode) {
+                PickMode.EARLIER -> t.createCardForEarlierSwitch(s.token,card,earlierBoundary ?: fail(ErrorCode.INVALID_INPUT,"Boundary missing"))
+                PickMode.FOCUS -> t.createCardForFocus(s.token,card)
+                PickMode.LABEL -> t.createCardForLabel(s.token,card,s.session?.note)
+                else -> {
+                    val input = readDraft()
+                    val application = if(s.mode == Mode.IDLE && s.focus == null) ChoiceApplication.START else ChoiceApplication.SWITCH
+                    t.createCardForChoice(s.token,s.timerTarget ?: fail(ErrorCode.STALE,"Timer target unavailable"),card,application,draft = input?.draft)
+                        .also { input?.let { consumeDraft(it.id) } }
+                }
+            }
         }
     }
 

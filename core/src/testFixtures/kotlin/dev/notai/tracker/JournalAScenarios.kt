@@ -8,6 +8,51 @@ import kotlinx.serialization.json.*
 abstract class JournalAScenarioContract {
     protected abstract fun createJournalStore(): StateStore
     protected open fun reopenJournalStore(store: StateStore): StateStore = store
+    @Test fun ordinaryCardCreationRollsBackRefusedModesAndPreservesDraftLabelEarlierAndFocus() {
+        val clock = FakeClock(10000);val t = Tracker(createJournalStore(),clock)
+        val card = Card("ordinary-created","Ordinary created")
+        val initial = t.data()
+        assertFailsWith<CoreError> { t.createCardForEarlierSwitch(t.snapshot().token,card,9000) }
+        assertEquals(initial,t.data())
+        assertFailsWith<CoreError> { t.createCardForLabel(t.snapshot().token,card,"Keep note") }
+        assertEquals(initial,t.data())
+        assertFailsWith<CoreError> { t.createCardForFocus(t.snapshot().token,card.copy(activityTypeId = "missing")) }
+        assertEquals(initial,t.data())
+        val stale = t.snapshot()
+        t.saveCard(stale.token,Card("concurrent-card","Concurrent"))
+        val afterConcurrent = t.data()
+        assertFailsWith<CoreError> { t.createCardForChoice(stale.token,stale.timerTarget!!,card,ChoiceApplication.START) }
+        assertEquals(afterConcurrent,t.data())
+        val start = t.snapshot()
+        t.createCardForChoice(start.token,start.timerTarget!!,card,ChoiceApplication.START,draft = EntryDrafts.selectedText("Retained draft note"))
+        val running = t.data();val sessionId = t.snapshot().session!!.id
+        assertEquals("Retained draft note",t.snapshot().session!!.note)
+        assertFailsWith<CoreError> { t.createCardForChoice(t.snapshot().token,t.snapshot().timerTarget!!,Card("refused-start","Refused"),ChoiceApplication.START) }
+        assertEquals(running,t.data())
+        t.createCardForLabel(t.snapshot().token,Card("label-created","Label created"),t.snapshot().session!!.note)
+        assertEquals(sessionId,t.snapshot().session!!.id)
+        assertEquals("label-created",t.snapshot().session!!.selection.cardId)
+        assertEquals("Retained draft note",t.snapshot().session!!.note)
+        clock.advance(2000)
+        val beforeEarlier = t.data()
+        assertFailsWith<CoreError> { t.createCardForEarlierSwitch(t.snapshot().token,Card("refused-earlier","Refused"),clock.wall+1) }
+        assertEquals(beforeEarlier,t.data())
+        t.createCardForEarlierSwitch(t.snapshot().token,Card("earlier-created","Earlier created"),11000)
+        assertEquals(11000L,t.data().segments.single { it.end == null }.start)
+        assertNotEquals(sessionId,t.snapshot().session!!.id)
+        t.stop(t.snapshot().token)
+        t.createCardForFocus(t.snapshot().token,Card("focus-created","Focus created"))
+        assertNotNull(t.snapshot().focus)
+        assertEquals("focus-created",t.snapshot().session!!.selection.cardId)
+        val focused = t.data()
+        assertFailsWith<CoreError> { t.createCardForFocus(t.snapshot().token,Card("refused-focus","Refused")) }
+        assertEquals(focused,t.data())
+        t.createCardForChoice(t.snapshot().token,t.snapshot().timerTarget!!,Card("switch-created","Switch created"),ChoiceApplication.SWITCH,
+            draft = EntryDrafts.selectedText("Switch draft note"))
+        assertNull(t.snapshot().focus)
+        assertEquals("Switch draft note",t.snapshot().session!!.note)
+        assertEquals("switch-created",t.snapshot().session!!.selection.cardId)
+    }
     @Test fun surfaceCardCreationAndApplicationAreOneTransactionIncludingRefusalsAndRetry() {
         val clock = FakeClock();val t = Tracker(createJournalStore(),clock)
         t.start(t.snapshot().token,Classification(name = "Original"));clock.advance(1000)

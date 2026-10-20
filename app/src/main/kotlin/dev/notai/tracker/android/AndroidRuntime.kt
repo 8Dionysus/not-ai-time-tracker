@@ -53,6 +53,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
     },allowInitialize = newStore,onLoadPhase = StartupTrace.loadObserver(context)),AndroidClock(context))
     private val rollback = PrivateRollbackStore(context)
     val backups = Backups(tracker,rollback,CopyLifetimes.get(context))
+    val automaticBackups = AutomaticBackups(context.applicationContext,this)
     val historyTransfer = HistoryTransfer(tracker,rollback)
     val selectiveTransfer = SelectiveTransfer(tracker)
     val selectiveDocuments = SelectiveDocuments(context.applicationContext,tracker,selectiveTransfer)
@@ -100,6 +101,7 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
                 if(e is CancellationException) throw e
                 android.util.Log.w("TimerSurfaces","Store observation unavailable; open recovery controls")
             }.collect { view ->
+                try { automaticBackups.changed(view) } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("AutomaticBackup","Backup queue refresh unavailable") }
                 try { attention.synchronize() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("AttentionRuntime","Optional refresh pending") }
                 try { scheduleProjection.synchronize() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("ScheduleProjection","Projection refresh pending") }
                 try { surfaceObserver.refresh(view);FocusSignals.refresh(context,tracker) }

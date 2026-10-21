@@ -32,11 +32,13 @@ object SurfaceViews {
 
     private class Chrono(val base: Long, val running: Boolean, val countDown: Boolean, val format: String?)
     private class Row(val glyph: Int, val tint: Int, val title: String, val status: String?, val chrono: Chrono?,
-                      val primary: TimerCommand?, val secondary: TimerCommand?)
-    private class Quick(val route: SurfacePickerRoute, val label: String, val items: List<Triple<QuickChoice, String, Pair<Int, Int>>>)
+                      val primary: TimerCommand?, val secondary: TimerCommand?, val planned: PlannedChoice? = null)
+    /** A compact chip: a quick choice (applied through the route) or an occurrence of today's plan. */
+    private class ChipItem(val title: String, val glyph: Int, val tint: Int, val pending: (Context, Int) -> PendingIntent)
+    private class Quick(val route: SurfacePickerRoute, val label: String, val items: List<ChipItem>)
 
     /** Simple START/STOP is the main button everywhere outside the app; pause/resume sits beside it. */
-    private fun row(d: Dataset, s: Snapshot): Row {
+    private fun row(d: Dataset, s: Snapshot, plan: List<PlannedChoice> = emptyList()): Row {
         val label = s.session?.let { d.label(it.selection) }
         val name = label?.let { l -> listOfNotNull(l.title, l.detail).joinToString(" ") } ?: "Без занятия"
         val glyph = when { label == null -> R.drawable.act_unclassified; label.unclassified -> R.drawable.act_unclassified; else -> label.glyph }
@@ -56,11 +58,18 @@ object SurfaceViews {
             }
             s.mode == Mode.RUNNING -> Row(glyph, tint, name, null, Chrono(now - s.trustedDurationMs, true, false, null), TimerCommand.STOP, TimerCommand.PAUSE)
             s.mode == Mode.PAUSED -> Row(glyph, tint, name, null, Chrono(now - s.trustedDurationMs, false, false, "Пауза · %s"), TimerCommand.STOP, TimerCommand.RESUME)
-            else -> Row(R.drawable.ic_stat_notai, R.color.widget_ink2, "Учёт не идёт", "Начни сейчас, занятие выберешь потом", null, TimerCommand.START, null)
+            else -> {
+                // Idle with a plan: the next planned activity is named, and the widget gets a button for it.
+                val next = plan.firstOrNull()
+                Row(R.drawable.ic_stat_notai, R.color.widget_ink2, "Учёт не идёт",
+                    next?.let { "По плану: ${it.title}" + (it.time?.let { t -> ", $t" } ?: "") } ?: "Занятие выберешь потом", null, TimerCommand.START, null, next)
+            }
         }
     }
 
     private fun bind(c: Context, rv: RemoteViews, r: Row, s: Snapshot, source: Surface) {
+        // The shade already shows the app mark in its header: the row repeats only an activity icon, never the brand.
+        rv.setViewVisibility(R.id.surface_glyph, if (source == Surface.NOTIFICATION && r.glyph == R.drawable.ic_stat_notai) View.GONE else View.VISIBLE)
         rv.setImageViewResource(R.id.surface_glyph, r.glyph)
         rv.setInt(R.id.surface_glyph, "setColorFilter", c.getColor(r.tint))
         rv.setTextViewText(R.id.surface_title, r.title)
@@ -75,7 +84,14 @@ object SurfaceViews {
             rv.setTextViewText(R.id.surface_status, r.status.orEmpty())
         }
         button(c, rv, R.id.surface_primary, r.primary, s, source)
-        button(c, rv, R.id.surface_secondary, r.secondary, s, source)
+        val planned = r.planned
+        if (planned != null && source == Surface.WIDGET) {
+            rv.setViewVisibility(R.id.surface_secondary, View.VISIBLE)
+            rv.setImageViewResource(R.id.surface_secondary, planned.glyph)
+            rv.setInt(R.id.surface_secondary, "setColorFilter", c.getColor(planned.slot?.let { areaColors[it] } ?: R.color.widget_ink))
+            rv.setContentDescription(R.id.surface_secondary, "Начать по плану: ${planned.title}")
+            rv.setOnClickPendingIntent(R.id.surface_secondary, PlanSurfaces.pending(c, planned, s, 9))
+        } else button(c, rv, R.id.surface_secondary, r.secondary, s, source)
         rv.setOnClickPendingIntent(R.id.surface_row, TimerSurfaces.open(c))
     }
 
@@ -98,10 +114,17 @@ object SurfaceViews {
             .map { q ->
                 val l = d.label(q.entry.selection)
                 val tint = l.slot?.let { areaColors[it] } ?: R.color.widget_ink2
-                Triple(q, if (q.entry.kind == ChoiceKind.FAVORITE) q.entry.title else l.title, l.glyph to tint)
+                ChipItem(if (q.entry.kind == ChoiceKind.FAVORITE) q.entry.title else l.title, l.glyph, tint) { ctx, i -> QuickChoiceReceiver.pending(ctx, route, q.reference, i) }
             }
+        // Today's open plan comes first; the remaining places keep the favourites and frequent choices.
+        val plan = PlanSurfaces.open(view).map { p ->
+            ChipItem(p.title + (p.time?.let { " $it" } ?: ""), p.glyph, p.slot?.let { areaColors[it] } ?: R.color.widget_ink2) { ctx, i -> PlanSurfaces.pending(ctx, p, s, i) }
+        }
+        val merged = (plan + items).take(chips.size)
+        val label = when { plan.isEmpty() -> if (route.application == ChoiceApplication.START) "Начать сразу" else "Переключиться на"
+            plan.size >= merged.size -> "По плану на сегодня"; else -> "По плану и часто" }
         // Keep the full chooser reachable even when no compact suggestion is available.
-        return Quick(route, if (route.application == ChoiceApplication.START) "Начать сразу" else "Переключиться на", items)
+        return Quick(route, label, merged)
     }
 
     private fun bindQuick(c: Context, rv: RemoteViews, q: Quick) {
@@ -111,13 +134,12 @@ object SurfaceViews {
         chips.forEachIndexed { i, (box, icon, text) ->
             val item = q.items.getOrNull(i)
             if (item == null) { rv.setViewVisibility(box, if (i < 2 || q.items.size > 2) View.INVISIBLE else View.GONE); return@forEachIndexed }
-            val (choice, title, look) = item
             rv.setViewVisibility(box, View.VISIBLE)
-            rv.setImageViewResource(icon, look.first)
-            rv.setInt(icon, "setColorFilter", c.getColor(look.second))
-            rv.setTextViewText(text, title)
-            rv.setContentDescription(box, "${q.label}: $title")
-            rv.setOnClickPendingIntent(box, QuickChoiceReceiver.pending(c, q.route, choice.reference, i))
+            rv.setImageViewResource(icon, item.glyph)
+            rv.setInt(icon, "setColorFilter", c.getColor(item.tint))
+            rv.setTextViewText(text, item.title)
+            rv.setContentDescription(box, "${q.label}: ${item.title}")
+            rv.setOnClickPendingIntent(box, item.pending(c, i))
         }
         if (q.items.size <= 2) chips.drop(2).forEach { (box, _, _) -> rv.setViewVisibility(box, View.GONE) }
     }
@@ -125,7 +147,7 @@ object SurfaceViews {
     /** Collapsed and (when there are quick choices) expanded custom views. Also used to render previews in tests. */
     internal fun notificationViews(c: Context, view: TrackerView): Pair<RemoteViews, RemoteViews?> {
         val d = view.data; val s = view.snapshot()
-        val r = row(d, s)
+        val r = row(d, s, PlanSurfaces.open(view))
         val small = RemoteViews(c.packageName, R.layout.notification_timer).also { bind(c, it, r, s, Surface.NOTIFICATION) }
         val big = quick(d, view, s)?.let { q -> RemoteViews(c.packageName, R.layout.notification_timer_big).also { bind(c, it, r, s, Surface.NOTIFICATION); bindQuick(c, it, q) } }
         return small to big
@@ -145,7 +167,7 @@ object SurfaceViews {
         require(lockScreenVisibility in setOf(Notification.VISIBILITY_PUBLIC,Notification.VISIBILITY_PRIVATE,Notification.VISIBILITY_SECRET))
         TimerSurfaces.channels(c)
         val s = view.snapshot()
-        val r = row(view.data, s)
+        val r = row(view.data, s, PlanSurfaces.open(view))
         val (small, big) = notificationViews(c, view)
         val builder = Notification.Builder(c, TimerSurfaces.CONTROL_CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_notai).setColor(c.getColor(R.color.widget_amber))
@@ -171,7 +193,7 @@ object SurfaceViews {
 
     fun widget(c: Context, view: TrackerView, enabled: Boolean, backgroundAlphaPercent: Int = view.data.settings.surfaces.widgetBackgroundAlphaPercent): RemoteViews = RemoteViews(c.packageName, R.layout.timer_widget).also { rv ->
         val s = view.snapshot()
-        val r = if (enabled) row(view.data, s)
+        val r = if (enabled) row(view.data, s, PlanSurfaces.open(view))
             else Row(R.drawable.ic_stat_notai, R.color.widget_ink2, "Виджет выключен", "Включи его в настройках приложения", null, null, null)
         bind(c, rv, r, s, Surface.WIDGET)
         widgetBackgroundAlpha(rv,R.id.widget_background,backgroundAlphaPercent)

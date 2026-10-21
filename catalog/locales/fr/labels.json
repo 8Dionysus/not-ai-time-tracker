@@ -30384,6 +30384,24 @@
     },
     {
       "key": {
+        "kind": "TYPE",
+        "stableId": "activity.movement.exercise_snack",
+        "meaningVersion": 1,
+        "parentId": null,
+        "parentMeaningVersion": null
+      },
+      "text": {
+        "label": "Pause active",
+        "aliases": [
+          "Exercise snack",
+          "Mini-séance",
+          "Pause mouvement"
+        ],
+        "description": "Quelques minutes de mouvement au milieu de la journée : squats, escaliers ou quelques exercices pour couper une longue position assise."
+      }
+    },
+    {
+      "key": {
         "kind": "AXIS",
         "stableId": "facet.proposed.arisf.arisf_001",
         "meaningVersion": 1,

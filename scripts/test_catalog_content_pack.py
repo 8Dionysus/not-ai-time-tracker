@@ -19,12 +19,12 @@ class CatalogPackPreparationTest(unittest.TestCase):
 
     def test_pinned_source_counts_and_parent_qualified_values(self):
         summary = pack.validate_payload(self.original, self.original)
-        self.assertEqual({"entries": 2385, "kinds": {"AXIS": 337, "TYPE": 1918, "VALUE": 130},
-                          "aliases": 2490, "descriptions": 1918, "textFields": 6793}, summary)
+        self.assertEqual({"entries": 2386, "kinds": {"AXIS": 337, "TYPE": 1919, "VALUE": 130},
+                          "aliases": 2493, "descriptions": 1919, "textFields": 6798}, summary)
         values = [row["key"] for row in self.original["entries"] if row["key"]["kind"] == "VALUE"]
         self.assertEqual(53, len({key["stableId"] for key in values}))
         self.assertEqual(130, len({pack.identity(key) for key in values}))
-        self.assertEqual("9efaea5313b40ed2ae762437450f1a69759bfdd1e5fe1bb28e7ca2f8f5dc36b3", self.manifest["sha256"])
+        self.assertEqual("aec8933181894f0c40679fe8a4b68b70083963d8b430785071efe275c03e156a", self.manifest["sha256"])
 
     def test_partial_aliases_and_unknown_or_duplicate_identities_refuse(self):
         for mutation in ("alias", "missing", "duplicate", "parent", "version", "schema"):

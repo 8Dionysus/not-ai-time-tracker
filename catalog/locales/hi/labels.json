@@ -30384,6 +30384,24 @@
     },
     {
       "key": {
+        "kind": "TYPE",
+        "stableId": "activity.movement.exercise_snack",
+        "meaningVersion": 1,
+        "parentId": null,
+        "parentMeaningVersion": null
+      },
+      "text": {
+        "label": "छोटा व्यायाम",
+        "aliases": [
+          "एक्सरसाइज़ स्नैक",
+          "मिनी वर्कआउट",
+          "हलचल का ब्रेक"
+        ],
+        "description": "दिन के बीच कुछ मिनट की हलचल: स्क्वैट, सीढ़ियाँ या कुछ व्यायाम, ताकि लंबे समय तक बैठे रहना टूटे।"
+      }
+    },
+    {
+      "key": {
         "kind": "AXIS",
         "stableId": "facet.proposed.arisf.arisf_001",
         "meaningVersion": 1,

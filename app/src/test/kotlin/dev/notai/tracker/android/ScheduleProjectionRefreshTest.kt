@@ -23,6 +23,31 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [36])
 class ScheduleProjectionRefreshTest {
+    @Test fun notificationPlanHasBoundaryWakeWithoutWidgetOrQuietShadeOptIn() {
+        val context = RuntimeEnvironment.getApplication();val sync = DirectoryDurability.sync;val rename = DirectoryDurability.rename
+        val old = ScheduleProjectionBinding.consumers
+        try {
+            DirectoryDurability.sync = { d -> java.nio.channels.FileChannel.open(d.toPath(),java.nio.file.StandardOpenOption.READ).use { it.force(true) } }
+            DirectoryDurability.rename = { a,b -> java.nio.file.Files.move(a.toPath(),b.toPath(),java.nio.file.StandardCopyOption.ATOMIC_MOVE,java.nio.file.StandardCopyOption.REPLACE_EXISTING);Unit }
+            val store = object: StateStore {
+                private var data = Dataset();override val changes = MutableStateFlow(data)
+                override fun read() = data
+                override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T { val (next,result)=block(data);validate(next);data=next;changes.value=next;return result }
+            }
+            val tracker = Tracker(store,FakeClock())
+            tracker.settings(tracker.snapshot().token,tracker.data().settings.copy(surfaces = SurfaceSettings(notification = true,widget = false)))
+            shadowOf(context).grantPermissions(Manifest.permission.POST_NOTIFICATIONS);TimerSurfaces.channels(context)
+            PlanSurfaces.install(context)
+            var refreshes = 0
+            ScheduleProjectionBinding.install(ScheduleProjectionBinding.consumers.map { consumer -> object: ScheduleProjectionConsumer by consumer {
+                override fun invalidate(value: ScheduleSurfaceState,projectionKey: String) { refreshes++ }
+            } })
+            val projection = ScheduleProjectionRefresh(context,tracker,ScheduleWorkspace(context,tracker) { ZoneId.of("UTC") })
+            val before = tracker.data();val result = projection.synchronize()
+            assertEquals(setOf("timer-notification-plan"),result.connectedConsumers)
+            assertNotNull(result.nextRefreshAt);assertEquals(1,refreshes);assertEquals(before,tracker.data())
+        } finally { ScheduleProjectionRefresh.disarm(context);ScheduleProjectionBinding.install(old);DirectoryDurability.sync=sync;DirectoryDurability.rename=rename }
+    }
     @Test fun corruptOrFutureWakeJournalDisarmsWithoutReplacingItOrChangingFacts() {
         val context = RuntimeEnvironment.getApplication()
         val sync = DirectoryDurability.sync

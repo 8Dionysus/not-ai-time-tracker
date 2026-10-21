@@ -21,9 +21,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.performScrollToIndex
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.longClick
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -85,6 +92,38 @@ class UiScreensTest {
         override fun prepareCatalog() = CatalogImports(tracker) { catalog }.prepare()
         override fun applyCatalog(preview: CatalogPreview) = CatalogImports(tracker) { catalog }.apply(preview)
         override fun submitShortcut(action: SurfaceAction) = CompletableDeferred<Result<Tracker.Change>>(Result.failure(IllegalStateException("no shortcuts")))
+        override val autoBackup: AutoBackupBackend = FakeAutoBackup(tracker)
+        override val historyTransfer = HistoryTransfer(tracker, MemoryRollback())
+        /** One timed meeting today 16:00–16:45 and an all-day event that must not become an interval. */
+        override val calendar = dev.notai.tracker.android.CalendarOccurrences({ true }, { _: android.net.Uri, cols: Array<String>, _: String, _: Array<String>, _: String? ->
+            val day = LocalDate.of(2026, 10, 13)
+            fun ms(h: Int, m: Int) = day.atTime(h, m).atZone(ZoneId.of("America/Mexico_City")).toInstant().toEpochMilli()
+            android.database.MatrixCursor(cols).apply {
+                addRow(arrayOf<Any?>(7L, ms(0, 0), ms(23, 59), "Отпуск коллеги", 1))
+                addRow(arrayOf<Any?>(9L, ms(16, 0), ms(16, 45), "Созвон с командой", 0))
+            }
+        })
+    }
+    /** A folder in a cloud app with three verified copies; actions only change the in-memory state. */
+    private class FakeAutoBackup(private val tracker: Tracker) : AutoBackupBackend {
+        private val tree = "content://com.example.cloud/tree/not-ai"
+        private fun version(i: Int, at: Long) = dev.notai.tracker.android.ExternalBackupVersion("op$i", tree, "$tree/document/$i",
+            dev.notai.tracker.android.StagedBackup("op$i", dev.notai.tracker.android.BackupRevision("d", i.toLong()), at, 180_000L + i * 4_000L, "0".repeat(64)), at + 40_000)
+        var state: dev.notai.tracker.android.AutomaticBackupState = run {
+            val now = tracker.clock.now().wall
+            val v = listOf(version(1, now - 2 * 86_400_000L), version(2, now - 86_400_000L), version(3, now - 3_600_000L))
+            dev.notai.tracker.android.AutomaticBackupState(enabled = true, destination = tree, versions = v, lastSuccess = v.last())
+        }
+        override fun status() = state
+        override fun folderName(tree: String) = "Облако · not-ai"
+        override fun selectionIntent() = android.content.Intent(android.content.Intent.ACTION_OPEN_DOCUMENT_TREE)
+        override fun select(uri: android.net.Uri, returnedFlags: Int, policy: dev.notai.tracker.android.BackupPolicy) = state
+        override fun enable(tree: String, policy: dev.notai.tracker.android.BackupPolicy) = state.copy(enabled = true, policy = policy).also { state = it }
+        override fun disable() = state.copy(enabled = false).also { state = it }
+        override fun retry() {}
+        override fun requestBackup() { state = state.copy(requested = true) }
+        override fun abandonPending(operationId: String) {}
+        override fun prepareRestore(operationId: String): RestorePreview = error("not in screen tests")
     }
 
     private val zone = ZoneId.of("America/Mexico_City")
@@ -108,7 +147,7 @@ class UiScreensTest {
         val work = card("Работа", "Сосредоточенная работа", "сосредоточенная")
         val sport = card("Тренировка", "Кардио", "кардио")
         val philosophy = card("Философия", "Сосредоточенная учёба", "чтение")
-        val reading = card("Чтение", "Читать книгу", "книга")
+        val reading = card("Чтение", "Книга", "книга")
         fun sel(c: Card, detail: String? = null) = t.selection(c.id).let { if (detail == null) it else it.copy(details = mapOf("activity" to detail)) }
         fun manual(d: LocalDate, h1: Int, m1: Int, h2: Int, m2: Int, s: Classification, note: String? = null) = t.manual(tok(), at(d, h1, m1), at(d, h2, m2), s, note)
         val week = listOf(
@@ -241,6 +280,7 @@ class UiScreensTest {
         waitText("9:10–11:02")
         compose.onAllNodesWithText("9:10–11:02", substring = true).onFirst().performClick()
         waitText("Исправить запись")
+        vm.setCorrectionStepMinutes(5); compose.waitForIdle()
         compose.onAllNodesWithContentDescription("Начало раньше на 5 минут")[0].performClick()
         waitText("→ 6 ч 01 мин")
         shot("03-correction", vm)
@@ -308,25 +348,92 @@ class UiScreensTest {
         val vm = render(seed())
         compose.onNodeWithText("Обзор").performClick()
         waitText("По областям")
-        waitText("Работа и проекты")
+        waitText("Работа")
         shot("05-overview", vm)
+        compose.onAllNodesWithText("Работа").onFirst().performClick()
+        waitText("За 7 дней")
+        shot("34-overview-area", vm)
     }
 
     @Test fun settings() {
         val vm = render(seed())
         compose.onNodeWithText("Настройки").performClick()
-        waitText("Таймер вне приложения")
-        waitText("Резервная копия")
+        waitText("Разделы")
+        waitText("Автокопия ")
         shot("06-settings", vm)
     }
 
-    /** The whole settings page at once (tall window) for review. */
-    @Config(qualifiers = "w400dp-h1960dp-xhdpi")
+    /** Each section is its own page; back returns to the short root. */
+    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
     @Test fun settingsFullPage() {
         val vm = render(seed())
         compose.onNodeWithText("Настройки").performClick()
+        compose.onNodeWithText("Таймер вне приложения").performClick()
+        waitText("Плавающая кнопка")
+        shot("06b-settings-surfaces", vm)
+        compose.onNodeWithContentDescription("Назад к настройкам").performClick()
+        waitText("Разделы")
+        compose.onNodeWithText("Ещё").performClick()
         waitText("Техническая оболочка")
-        shot("06b-settings-full", vm)
+        shot("06c-settings-more", vm)
+    }
+
+    /** A Toggl-style export: columns are suggested from headers, the time layout from the first row, then preview and append. */
+    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
+    @Test fun csvImport() {
+        val seed = seed()
+        val vm = render(seed)
+        val before = seed.tracker.data().sessions.size
+        listOf("account:a","account:b").forEachIndexed { index,source ->
+            val day = if(index==0) "2026-10-01" else "2026-10-02"
+            val file = java.io.File.createTempFile("toggl", ".csv").apply {
+                writeText("ID,Project,Client,Description,Start date,Start time,End date,End time,Duration\n" +
+                    "same-id-1,Английский,Школа,Урок,$day,09:00:00,$day,09:45:00,00:45:00\n" +
+                    "same-id-2,Чтение,,,$day,21:00:00,$day,21:30:00,00:30:00\n")
+            }
+            assertTrue("Synthetic CSV must be inspectable",HistoryFiles.inspect(file.readBytes()).format == ImportFormat.DELIMITED_TEXT)
+            vm.openCsv(android.net.Uri.fromFile(file));waitText("История из CSV")
+            compose.onNodeWithContentDescription("Источник CSV (сервис и аккаунт)").performTextReplacement(source)
+            if(index==0) shot("31-csv-columns",vm)
+            compose.onNodeWithText("Дальше").performClick();waitText("Добавится 2 записи")
+            if(index==0) shot("32-csv-preview",vm)
+            compose.onNodeWithText("Добавить 2 записи").performClick()
+            compose.waitUntil(10_000) { seed.tracker.data().sessions.size == before + (index+1)*2 && vm.csvImport.value == null }
+        }
+    }
+    @Test fun csvBackDuringSuspendedPreviewDoesNotLeaveContinueBusy() {
+        val s = seed();UiBackends.open = { TestBackend(s.tracker,s.catalog) }
+        val vm = TrackerViewModel(ApplicationProvider.getApplicationContext())
+        val file = CsvImportUi(HistoryFiles.inspect("Activity,Start,End\nStudy,2026-10-01T09:00:00Z,2026-10-01T10:00:00Z\n".toByteArray()),"synthetic.csv")
+        val entered = java.util.concurrent.atomic.AtomicInteger()
+        val cancelled = java.util.concurrent.atomic.AtomicInteger()
+        val release = CompletableDeferred<Result<HistoryPreview>>()
+        compose.setContent { NotAiTheme { CsvImportSheet(vm,file,ZoneId.of("UTC"),{}, {},previewCsv = { _,_ ->
+            entered.incrementAndGet()
+            try { release.await() } finally { if(kotlinx.coroutines.currentCoroutineContext()[kotlinx.coroutines.Job]?.isCancelled == true) cancelled.incrementAndGet() }
+        }) } }
+        compose.onNodeWithContentDescription("Источник CSV (сервис и аккаунт)").performTextReplacement("account:cancel")
+        compose.onNodeWithText("Дальше").performClick();waitText("Занятия и проверка")
+        compose.mainClock.advanceTimeBy(500);compose.waitUntil(10000) { entered.get()>=1 }
+        val firstCalls = entered.get()
+        compose.onNodeWithContentDescription("Назад").performClick()
+        compose.waitUntil(10000) { cancelled.get()>=1 }
+        compose.onNodeWithText("Дальше").assertIsEnabled().performClick()
+        waitText("Занятия и проверка");compose.mainClock.advanceTimeBy(500)
+        compose.waitUntil(10000) { entered.get()>firstCalls }
+        release.complete(Result.failure(java.io.IOException("synthetic preview failure")))
+    }
+
+    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
+    @Test fun backupPage() {
+        val vm = render(seed())
+        compose.onNodeWithText("Настройки").performClick()
+        compose.onNodeWithText("Резервная копия").performClick()
+        waitText("Копии в папке")
+        waitText("Облако · not-ai")
+        shot("30-backup", vm)
+        compose.onNodeWithText("Сохранить сейчас").performClick()
+        compose.waitUntil(5_000) { vm.autoBackup.value?.state?.requested == true }
     }
 
     /** A new install: no history, no favourites. The first screen a person sees. */
@@ -371,6 +478,64 @@ class UiScreensTest {
         compose.waitUntil(5_000) { compose.onAllNodesWithText("8:30–8:55", substring = true).fetchSemanticsNodes().isEmpty() }
     }
 
+    /** A new record can take its times from a calendar event; all-day events are not offered. */
+    @Test fun calendarFill() {
+        org.robolectric.Shadows.shadowOf(ApplicationProvider.getApplicationContext<android.app.Application>()).grantPermissions(android.Manifest.permission.READ_CALENDAR)
+        val seed = seed()
+        val vm = render(seed)
+        compose.onNodeWithText("Добавить запись задним числом").performScrollTo().performClick()
+        waitText("Из календаря")
+        compose.onNodeWithText("Из календаря").performClick()
+        waitText("Созвон с командой")
+        assertTrue(compose.onAllNodesWithText("Отпуск коллеги").fetchSemanticsNodes().isEmpty())
+        shot("37-calendar", vm)
+        compose.onNodeWithText("Созвон с командой").performClick()
+        waitText("16:45")
+    }
+
+    /** A saved report follows its period: create «Прошлая неделя» for everything, open it, see the total. */
+    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
+    @Test fun savedReport() {
+        val seed = seed()
+        val vm = render(seed)
+        compose.onNodeWithText("Обзор").performClick()
+        waitText("Свой отчёт: занятие и период")
+        compose.onNodeWithText("Свой отчёт: занятие и период").performClick()
+        waitText("Что считать")
+        compose.onNodeWithText("Прошлая неделя").performClick()
+        shot("35-report-editor", vm)
+        compose.onNodeWithText("Сохранить").performClick()
+        compose.waitUntil(5_000) { seed.tracker.data().savedReports.size == 1 }
+        waitText("Все занятия, прошлая неделя")
+        compose.onNodeWithText("Все занятия, прошлая неделя").performClick()
+        waitText("Изменить")
+        shot("36-report", vm)
+    }
+
+    /** «Выбрать несколько» from the menu, a second tap adds another, and one note goes to both after a confirmation. */
+    @Test fun batchNote() {
+        val seed = seed()
+        val vm = render(seed)
+        waitText("8:30–8:55")
+        compose.onAllNodesWithText("9:10–11:02", substring = true).onFirst().performTouchInput { longClick() }
+        waitText("Выбрать несколько")
+        compose.onNodeWithText("Выбрать несколько").performClick()
+        waitText("Выбрано: 1")
+        compose.onAllNodesWithText("8:30–8:55", substring = true).onFirst().performClick()
+        waitText("Выбрано: 2")
+        shot("33-batch", vm)
+        compose.onNodeWithText("Заметка").performClick()
+        waitText("Заметка для выбранных")
+        compose.onNode(androidx.compose.ui.test.hasSetTextAction()).performTextInput("проект Альфа")
+        compose.onNodeWithText("Заменить у всех").performClick()
+        compose.onNodeWithText("Дальше").performClick()
+        waitText("Изменить 2 записи?")
+        compose.onNodeWithText("Изменить").performClick()
+        compose.waitUntil(5_000) { seed.tracker.data().sessions.count { it.note == "проект Альфа" } == 2 }
+        waitText("Изменено 2 записи")
+        assertTrue(vm.picked.value.isEmpty())
+    }
+
     /** A record split by a pause takes all its segments with it: one explicit confirmation first. */
     @Test fun deleteMultiSegmentAsksFirstAndSheetIcon() {
         val seed = seed(running = false)
@@ -380,9 +545,9 @@ class UiScreensTest {
         t.resume(t.snapshot().token); seed.clock.advance(10 * 60_000L)
         t.stop(t.snapshot().token)
         val vm = render(seed)
-        waitText("15:29–15:39")
+        waitText("15:29–15:54")
         val before = t.data().sessions.size
-        compose.onAllNodesWithText("15:29–15:39", substring = true).onFirst().performClick()
+        compose.onAllNodesWithText("15:29–15:54", substring = true, useUnmergedTree = true).onFirst().performClick()
         waitText("Исправить запись")
         compose.onNodeWithContentDescription("Удалить запись").performClick()
         waitText("Удалить запись целиком?")
@@ -597,10 +762,95 @@ class UiScreensTest {
         plan(seed, "Английский", "18:00")
         val vm = render(seed)
         compose.onNodeWithText("Настройки").performClick()
+        compose.onNodeWithText("Занятия и план").performClick()
         waitText("Добавить ещё")
         compose.onNodeWithText("Добавить ещё").performClick()
         waitText("По дням недели")
         shot("21-plan-editor", vm)
+    }
+
+    /** One theme only, for the extra themes (black, neon). */
+    private fun shotAs(name: String, vm: TrackerViewModel, theme: ThemeChoice) {
+        vm.setTheme(theme)
+        repeat(3) { compose.waitForIdle(); org.robolectric.shadows.ShadowLooper.idleMainLooper(); Thread.sleep(150) }
+        if (System.getProperty("tracker.screenshots") != "true") return
+        val views = windows(); val first = views.first()
+        val base = Bitmap.createBitmap(first.width, first.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(base); views.forEach { v -> drawWindow(canvas, first, v) }
+        save(base, name)
+    }
+
+    /** A record with pauses is one line; its mark unfolds the segments and the pauses between them. */
+    @Test fun recordWithPauses() {
+        val seed = seed(running = false)
+        val t = seed.tracker
+        t.start(t.snapshot().token, t.selection(t.data().cards.first { it.name == "Чтение" }.id)); seed.clock.advance(18 * 60_000L)
+        t.pause(t.snapshot().token); seed.clock.advance(7 * 60_000L)
+        t.resume(t.snapshot().token); seed.clock.advance(9 * 60_000L)
+        t.pause(t.snapshot().token); seed.clock.advance(5 * 60_000L)
+        t.resume(t.snapshot().token); seed.clock.advance(22 * 60_000L)
+        t.stop(t.snapshot().token)
+        val vm = render(seed)
+        waitText("2 паузы")
+        assertTrue("one line per record", compose.onAllNodesWithText("15:29–16:30", substring = true).fetchSemanticsNodes().size == 1)
+        compose.onNodeWithText("2 паузы").performClick()
+        waitText("пауза")
+        shot("22-record-pauses", vm)
+    }
+
+    @Test fun favoritesAndEditor() {
+        val seed = seed()
+        val t = seed.tracker
+        t.addFavorite(t.snapshot().token, Favorite(label = "Тренировка", selection = t.selection(t.data().cards.first { it.name == "Тренировка" }.id)))
+        val vm = render(seed)
+        vm.openFavorites(true)
+        waitText("Добавить в избранное")
+        shot("23-favorites", vm)
+        vm.openFavorites(false)
+        vm.openEditor(EditTarget.Card(t.data().cards.first { it.name == "Философия" }.id))
+        waitText("Своё занятие")
+        shot("24-activity-editor", vm)
+    }
+    @Test fun draggingFavoriteCommitsTheDisplayedOrderAndKeepsItWhenReopened() {
+        val s = seed(running = false);val tracker = s.tracker
+        listOf("A drag" to "Работа","B drag" to "Тренировка","C drag" to "Философия").forEach { (label,name) ->
+            tracker.addFavorite(tracker.snapshot().token,Favorite(label=label,selection=tracker.selection(tracker.data().cards.first { it.name==name }.id)))
+        }
+        val vm = render(s);vm.openFavorites(true);waitText("Добавить в избранное")
+        val before = vm.favorites(vm.view.value).map { it.id };val index = vm.favorites(vm.view.value).indexOfFirst { it.title=="B drag" }
+        val expected = before.toMutableList().apply { add(index-1,removeAt(index)) }
+        compose.onNode(hasText("B drag") and hasAnyAncestor(isDialog())).performTouchInput {
+            down(center);advanceEventTime(700);moveBy(androidx.compose.ui.geometry.Offset(0f,-140f));advanceEventTime(32);up()
+        }
+        compose.waitUntil(10000) { vm.favorites(vm.view.value).map { it.id } == expected }
+        vm.openFavorites(false);compose.waitForIdle();vm.openFavorites(true);waitText("Добавить в избранное")
+        val first = compose.onNode(hasText("B drag") and hasAnyAncestor(isDialog())).fetchSemanticsNode().boundsInRoot.top
+        val second = compose.onNode(hasText("A drag") and hasAnyAncestor(isDialog())).fetchSemanticsNode().boundsInRoot.top
+        assertTrue("Saved drag order must survive reopening",first < second)
+    }
+
+    @Test fun focusEditorFromLongPress() {
+        val vm = render(seed(running = false))
+        compose.onNodeWithText("Фокус: 25 мин работы").performTouchInput { longClick() }
+        waitText("Перерыв")
+        shot("25-focus-editor", vm)
+    }
+
+    @Test fun blackAndNeonThemes() {
+        val running = seed()
+        val vm = render(running)
+        waitText("1:24")
+        shotAs("26-neon-running", vm, ThemeChoice.NEON)
+        shotAs("27-amoled-running", vm, ThemeChoice.AMOLED)
+        vm.setAppearance { it.copy(accent = Accent.TEAL) }
+        shotAs("28-teal-light", vm, ThemeChoice.LIGHT)
+        vm.setAppearance { Appearance() }
+    }
+
+    @Test fun neonIdle() {
+        val vm = render(seed(running = false))
+        waitText("Начать")
+        shotAs("29-neon-idle", vm, ThemeChoice.NEON)
     }
 
     @Test fun recovery() {

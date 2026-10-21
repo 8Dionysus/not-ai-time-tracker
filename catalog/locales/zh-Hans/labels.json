@@ -30384,6 +30384,24 @@
     },
     {
       "key": {
+        "kind": "TYPE",
+        "stableId": "activity.movement.exercise_snack",
+        "meaningVersion": 1,
+        "parentId": null,
+        "parentMeaningVersion": null
+      },
+      "text": {
+        "label": "微运动",
+        "aliases": [
+          "运动零食",
+          "迷你锻炼",
+          "活动休息"
+        ],
+        "description": "在一天中抽出几分钟活动身体：深蹲、爬楼梯或做几个动作，打断长时间久坐。"
+      }
+    },
+    {
+      "key": {
         "kind": "AXIS",
         "stableId": "facet.proposed.arisf.arisf_001",
         "meaningVersion": 1,

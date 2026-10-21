@@ -47,7 +47,19 @@ data class EntryUi(val segmentId: String, val sessionId: String, val start: Long
                    val label: Label, val note: String?, val selection: Classification)
 data class DayUi(val date: LocalDate, val start: Long, val end: Long, val recordedMs: Long, val incomplete: Boolean, val entries: List<EntryUi>,
                  val ribbon: List<RibbonSlot>, val live: List<RibbonSlot>, val gaps: List<GapUi> = emptyList(),
-                 val sessions: List<SessionDayRow> = emptyList())
+                 val sessions: List<SessionDayRow> = emptyList()) {
+    /** One line per record of the day: its segments (newest last) and the pauses between them, all from the core projection. */
+    val records: List<RecordUi> get() {
+        val bySession = entries.groupBy { it.sessionId }
+        return sessions.mapNotNull { row ->
+            val parts = bySession[row.sessionId]?.sortedBy { it.start } ?: return@mapNotNull null
+            RecordUi(row.sessionId, parts.last(), row.start, row.end, row.recordedMs, parts, row.pauses, row.mixedSelection)
+        }
+    }
+}
+/** [entry] is the latest segment: edit, repeat and delete act on the whole record through it, as before. */
+data class RecordUi(val sessionId: String, val entry: EntryUi, val start: Long, val end: Long, val recordedMs: Long,
+                    val segments: List<EntryUi>, val pauses: List<DraftInterval>, val mixed: Boolean)
 data class QuickStart(val title: String, val slot: Int?, val entry: ChoiceEntry, val favorite: Boolean, val glyph: Int, val reference: ChoiceReference, val expected: Token)
 data class HomeData(val today: LocalDate, val zone: ZoneId, val days: List<DayUi>, val quick: List<QuickStart>,
                     val currentLabel: Label?, val currentStart: Long?, val canLoadMore: Boolean, val focusMinutes: Long,
@@ -59,7 +71,12 @@ internal fun PickerItem.wholeArea() = copy(label = label.copy(title = "Вся о
 data class PickerData(val recents: List<PickerItem>, val favorites: List<PickerItem>, val areas: List<PickerItem>, val moreAreas: List<PickerItem>)
 
 enum class Period(val days: Int, val title: String) { DAY(1, "День"), WEEK(7, "7 дней"), MONTH(30, "30 дней") }
-data class AreaTotal(val name: String, val slot: Int?, val ms: Long, val glyph: Int = ActivityGlyphs.custom)
+data class AreaTotal(val name: String, val slot: Int?, val ms: Long, val glyph: Int = ActivityGlyphs.custom, val id: String? = null, val deeper: Boolean = false)
+/** One level of an area's time over the shown period: sections and activities below it, newest tree. */
+data class Breakdown(val title: String, val totalMs: Long, val parts: List<AreaTotal>)
+/** A saved report as Overview lists it, and its opened result: total, window and one line per own activity. */
+data class SavedReportUi(val query: SavedReportQuery, val window: String, val totalMs: Long, val incomplete: Boolean,
+    val parts: List<Pair<String, Long>>, val missing: Boolean, val filterLabel: Label?)
 data class DayColumn(val date: LocalDate, val parts: List<Pair<Int?, Long>>, val totalMs: Long, val incomplete: Boolean)
 data class GoalUi(val name: String, val value: String, val status: String, val ok: Boolean, val fraction: Float, val id: String = "")
 /** What the goal form edits. The calendar (period, zone, day start) is fixed once a goal exists. */
@@ -136,7 +153,17 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     private val _theme = MutableStateFlow(runCatching { ThemeChoice.valueOf(prefs.getString("theme", "SYSTEM")!!) }.getOrDefault(ThemeChoice.SYSTEM))
     val theme: StateFlow<ThemeChoice> = _theme
-    fun setTheme(choice: ThemeChoice) { prefs.edit().putString("theme", choice.name).apply(); _theme.value = choice }
+    fun setTheme(choice: ThemeChoice) {
+        val edit = prefs.edit().putString("theme", choice.name)
+        if (choice in setOf(ThemeChoice.DARK, ThemeChoice.AMOLED, ThemeChoice.NEON)) edit.putString("lastDark", choice.name)
+        edit.apply(); _theme.value = choice
+    }
+    /** The header moon/sun: back to the dark variant the person chose last (black or neon stay theirs). */
+    fun toggleTheme(darkNow: Boolean) = setTheme(if (darkNow) ThemeChoice.LIGHT
+        else runCatching { ThemeChoice.valueOf(prefs.getString("lastDark", "DARK")!!) }.getOrDefault(ThemeChoice.DARK))
+    private val _appearance = MutableStateFlow(Appearance.read(prefs))
+    val appearance: StateFlow<Appearance> = _appearance
+    fun setAppearance(change: (Appearance) -> Appearance) { val next = change(_appearance.value); next.write(prefs); _appearance.value = next }
 
     private val _draft = MutableStateFlow<EntryDraft?>(null)
     /** Text another app explicitly sent. Nothing is written until the person picks and confirms. */
@@ -292,7 +319,8 @@ class TrackerViewModel internal constructor(private val app: Application,private
                 day.copy(rows = day.rows.filter { it.sessionId != open?.id }).sessionRows(d))
         }
         // Same bounded source as the notification: favourites, then the most frequent of the last 30 days.
-        val quick = quickChoices(v, 5).map { q -> q.toQuickStart(d,v.snapshot().token) }
+        // Every favourite (up to twelve) plus frequent ones to a minimum of five.
+        val quick = quickChoices(v, d.favorites.size.coerceIn(5, 12)).map { q -> q.toQuickStart(d,v.snapshot().token) }
         return HomeData(today, zone, dayList, quick, open?.let { d.label(it.selection) }, open?.let { s -> d.segments.filter { it.sessionId == s.id }.minOfOrNull { it.start } },
             // Older days only when something older exists: a new install has nothing to load.
             days < 62 && (d.segments.minOfOrNull { it.start } ?: Long.MAX_VALUE) < (calendar.days.firstOrNull()?.start ?: Long.MIN_VALUE),
@@ -404,6 +432,11 @@ class TrackerViewModel internal constructor(private val app: Application,private
         command({ "Записано" }) { rt,_ ->
             dev.notai.tracker.android.SurfaceChoices.choose(app,rt.tracker,route,reference,note).also { clearSurfacePicker(route) }
         }
+    }
+    /** Launcher favourite: the route is taken without loading the picker; the choice applies once with that route's target. */
+    fun chooseFromShortcut(route: dev.notai.tracker.android.SurfacePickerRoute, reference: ChoiceReference) {
+        synchronized(pickerLock) { pickerRoute = route; _surfacePicker.value = null }
+        chooseSurface(reference, expectedRoute = route)
     }
     /** Create in the same route: an assignment stays an assignment, never a new timer. */
     fun createSurfaceCard(route: dev.notai.tracker.android.SurfacePickerRoute,name: String,activityTypeId: String? = null) {
@@ -610,6 +643,11 @@ class TrackerViewModel internal constructor(private val app: Application,private
         if (s.focus != null) rt.tracker.resolveFocus(s.token, null, null) else rt.tracker.resolveTail(s.token, null, null)
     }
     fun startFocus() = command { rt, s -> rt.tracker.startFocus(s.token) }
+    /** Save the lengths, then start with the token that save returned: two explicit steps, never a guessed state. */
+    fun configureAndStartFocus(workMin: Int, breakMin: Int) = command { rt, s ->
+        val saved = rt.tracker.configureFocus(s.token, FocusPlan(workMin * 60_000L, breakMin * 60_000L))
+        rt.tracker.startFocus(saved.state.token)
+    }
     fun focusNext() = command { rt, s -> rt.tracker.focusNext(s.token) }
     fun focusSkip() = command { rt, s -> rt.tracker.focusSkip(s.token) }
     fun configureFocus(workMin: Int, breakMin: Int) = command({ "Отрезки изменены" }) { rt, s ->
@@ -620,6 +658,30 @@ class TrackerViewModel internal constructor(private val app: Application,private
         rt.tracker.addFavorite(s.token, Favorite(label = title, selection = selection))
     }
     fun removeFavorite(id: String) = command({ "Убрано из избранного" }) { rt, s -> rt.tracker.removeFavorite(s.token, id) }
+
+    /** Favourites in their saved order (personal order first, then as added). */
+    fun favorites(v: TrackerView?): List<FavoriteUi> {
+        val d = v?.data ?: return emptyList()
+        return d.favorites.withIndex().sortedWith(compareBy({ it.value.personal.order ?: Int.MAX_VALUE }, { it.index })).map { (_, f) ->
+            FavoriteUi(f.id, f.label, d.label(f.selection), f.selection)
+        }
+    }
+    /** Every favourite pointing at this activity: one tap on a filled star removes them all (old duplicates included). */
+    fun favoriteIds(selection: Classification): List<String> {
+        val key = selectionIdentity(selection)
+        return view.value?.data?.favorites.orEmpty().filter { selectionIdentity(it.selection) == key }.map { it.id }
+    }
+    fun removeFavorites(ids: List<String>) = command({ if (ids.size > 1) "Убрано из избранного вместе с повторами" else "Убрано из избранного" }) { rt, s ->
+        var token = s.token; var last: Tracker.Change? = null
+        ids.forEach { id -> last = rt.tracker.removeFavorite(token, id).also { token = it.state.token } }
+        last ?: fail(ErrorCode.STALE, "Nothing to remove")
+    }
+    private val _editor = MutableStateFlow<EditTarget?>(null)
+    val editor: StateFlow<EditTarget?> = _editor
+    fun openEditor(target: EditTarget?) { _editor.value = target }
+    private val _favoritesOpen = MutableStateFlow(false)
+    val favoritesOpen: StateFlow<Boolean> = _favoritesOpen
+    fun openFavorites(open: Boolean) { _favoritesOpen.value = open }
 
     /** The displayed revision is required: never silently apply a reorder/edit to a newer list. */
     fun orderFavorites(expected: Token, ids: List<String>, completed: ((Result<Tracker.Change>) -> Unit)? = null) =
@@ -690,7 +752,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         }.flatMap { it.items }.map { PickerItem(it.entry, d.label(it.entry.selection),reference = choices.reference(it.entry),expected = v.snapshot().token) }.toList()
         val roots = generateSequence(choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.ROOTS), pageSize = 100)) { p ->
             p.next?.let { choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.ROOTS), it, 100) }
-        }.flatMap { it.items }.filter { it.entry.availability == ChoiceAvailability.GROUP || d.types.any { t -> t.parentId == it.entry.sourceId } }.map { hit ->
+        }.flatMap { it.items }.filter { d.types.any { t -> t.parentId == it.entry.sourceId && !t.archived } }.map { hit ->
             val count = choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.CHILDREN, parentId = hit.entry.sourceId), pageSize = 1).total
             PickerItem(hit.entry, d.label(hit.entry.selection).copy(slot = Areas.slot(hit.entry.sourceId)), count,reference = choices.reference(hit.entry),expected = v.snapshot().token)
         }.toList()
@@ -790,12 +852,12 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val calendar = v.calendar(first, period.days)
         val window = calendar.window
         val rootIds = d.types.filter { it.parentId == null }.map { it.id }.toSet()
-        fun areaParts(report: Report): List<Pair<String?, Long>> = report.byType().filter { (k, ms) -> ms > 0 && (k == null || k in rootIds) }
+        fun areaParts(report: Report): List<Pair<String?, Long>> = report.byCurrentRoot(d.types).filter { (k, ms) -> ms > 0 && (k == null || k in rootIds) }
             .toList().sortedWith(compareBy({ Areas.slot(it.first) ?: 99 }, { it.first ?: "~" }))
         val names = d.types.associate { it.id to it.name }
         val areas = areaParts(window).sortedByDescending { it.second }.map { (id, ms) ->
             AreaTotal(id?.let { names[it] } ?: "Без области", Areas.slot(id), ms,
-                id?.let { d.glyph(Classification(activityTypeId = it)) } ?: ActivityGlyphs.unclassified)
+                id?.let { d.glyph(Classification(activityTypeId = it)) } ?: ActivityGlyphs.unclassified, id, id != null)
         }
         val columns = if (period == Period.DAY) emptyList() else calendar.days.map { day ->
             val parts = areaParts(v.report(day.start, day.end)).map { Areas.slot(it.first) to it.second }
@@ -855,6 +917,58 @@ class TrackerViewModel internal constructor(private val app: Application,private
     // ---------- shareable summary ----------
 
     /** Plain text from the same core report as the overview: totals by area, unknown time apart, notes only when asked. */
+    /**
+     * What one area consists of over the period, one level at a time, by today's tree: a moved section brings its past
+     * time along. Below the last section, records are told apart by their own names. Durations are the core's per-row values.
+     */
+    suspend fun breakdown(period: Period, parentId: String): Breakdown? = withContext(Dispatchers.IO) {
+        val rt = runtime ?: return@withContext null
+        val v = view.value ?: rt.tracker.view()
+        val d = v.data
+        val today = ReportingDayPolicy(d.settings.reportZone, d.settings.reportDayStartMinute).dateAt(now())
+        val report = v.calendar(today.minusDays(period.days - 1L), period.days).window
+        val parents = d.types.associate { it.id to it.parentId }
+        fun chain(leaf: String?): List<String> { val out = ArrayList<String>(); var cur = leaf; var guard = 0
+            while (cur != null && guard++ < 64) { out.add(0, cur); cur = parents[cur] }; return out }
+        val rows = report.rows.distinctBy { it.segmentId }.mapNotNull { r ->
+            val c = chain(r.selection.activityTypeId ?: r.selection.ancestorPathAtWrite.lastOrNull())
+            val at = c.indexOf(parentId); if (at < 0) null else Triple(r, c.getOrNull(at + 1), c)
+        }
+        if (rows.isEmpty()) return@withContext Breakdown(d.types.find { it.id == parentId }?.name ?: "", 0, emptyList())
+        val names = d.types.associate { it.id to it.name }
+        val hasChildren = d.types.mapNotNull { it.parentId }.toSet()
+        val parts = rows.groupBy { (r, child, _) -> child?.let { "t:$it" } ?: "n:" + d.label(r.selection).title }.map { (key, group) ->
+            val ms = group.sumOf { it.first.durationMs }
+            if (key.startsWith("t:")) { val id = key.removePrefix("t:")
+                AreaTotal(names[id] ?: id, Areas.slot(group.first().third.first()), ms, d.glyph(Classification(activityTypeId = id)), id,
+                    id in hasChildren || group.map { d.label(it.first.selection).title }.distinct().size > 1)
+            } else AreaTotal(key.removePrefix("n:"), d.label(group.first().first.selection).slot, ms, d.glyph(group.first().first.selection))
+        }.sortedByDescending { it.ms }
+        Breakdown(names[parentId] ?: "", parts.sumOf { it.ms }, parts)
+    }
+
+    suspend fun savedReports(): List<SavedReportUi> = withContext(Dispatchers.IO) {
+        val rt = runtime ?: return@withContext emptyList()
+        val v = view.value ?: rt.tracker.view(); val d = v.data; val now = rt.tracker.clock.now()
+        d.savedReports.mapNotNull { q -> runCatching {
+            val r = SavedReports.open(d, now, q.id)
+            val zone = ZoneId.of(r.report.zone)
+            val first = r.report.dayPolicy.dateAt(r.report.start); val last = r.report.dayPolicy.dateAt(r.report.end - 1)
+            val names = d.cards.associate { it.id to it.name }
+            val parts = r.groupedMs.filterValues { it > 0 }.map { (k, ms) -> (k?.let { names[it] } ?: "Без своего занятия") to ms }.sortedByDescending { it.second }
+            val filterSel = q.filter.cardId?.let { Classification(cardId = it) } ?: q.filter.activityTypeId?.let { Classification(activityTypeId = it) }
+            SavedReportUi(q, Format.period(first, last), r.report.recordedMs, r.report.incomplete, parts,
+                r.references.any { it.status != ReportReferenceStatus.AVAILABLE }, filterSel?.let { d.label(it) })
+        }.getOrNull() }.sortedBy { it.query.name.lowercase() }
+    }
+    fun saveReport(existing: SavedReportQuery?, name: String, selection: Classification?, window: ReportWindow) = command({ _ -> if (existing == null) "Отчёт сохранён" else "Отчёт изменён" }) { rt, s ->
+        val d = rt.tracker.data()
+        val filter = when { selection?.cardId != null -> Filter(cardId = selection.cardId); selection?.activityTypeId != null -> Filter(activityTypeId = selection.activityTypeId); else -> Filter() }
+        rt.tracker.saveReportQuery(s.token, (existing ?: SavedReportQuery(name = name)).copy(name = name, window = window, filter = filter,
+            grouping = ReportGrouping.CARD, groupKey = null, policy = d.settings.reportDayPolicy))
+    }
+    fun deleteReport(id: String) = command({ _ -> "Отчёт удалён" }) { rt, s -> rt.tracker.deleteReportQuery(s.token, id) }
+
     suspend fun summary(period: Period, notes: Boolean): String? = withContext(Dispatchers.IO) {
         val v = view.value ?: return@withContext null
         val d = v.data
@@ -866,7 +980,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         buildString {
             append(if (period == Period.DAY) "Сегодня, ${Format.dayMonth(today)}" else Format.period(first, today)).append('\n')
             append("Всего ").append(Format.duration(report.recordedMs)).append(if (report.incomplete) ", день ещё идёт" else "").append('\n')
-            val areas = report.byType().filter { (k, ms) -> ms > 0 && (k == null || k in rootIds) }.toList().sortedByDescending { it.second }
+            val areas = report.byCurrentRoot(d.types).filter { (k, ms) -> ms > 0 && (k == null || k in rootIds) }.toList().sortedByDescending { it.second }
             if (areas.isNotEmpty()) append('\n')
             areas.forEach { (id, ms) -> append(id?.let { names[it] } ?: "Без области").append(" — ").append(Format.duration(ms)).append('\n') }
             if (report.unresolved.isNotEmpty()) append('\n').append("Неизвестное время не входит в итог: ")
@@ -1105,6 +1219,133 @@ class TrackerViewModel internal constructor(private val app: Application,private
         applying.invokeOnCompletion { releaseRestorePreviewOnIo(preview) }
     }
 
+    val calendarAvailable: Boolean get() = runtime?.calendar != null
+    /** Timed events of one reporting day, for filling a new record. Nothing is stored; all-day events are left out. */
+    suspend fun calendarEvents(from: Long, until: Long): dev.notai.tracker.android.CalendarPage? = withContext(Dispatchers.IO) {
+        runCatching { runtime?.calendar?.list(from, until, enabled = true, limit = 50) }.getOrNull()
+    }
+
+    // What a Focus work interval does to the phone. Device-local; the core controller applies and releases it.
+    data class FocusEffectsUi(val choice: dev.notai.tracker.android.FocusEffects.Choice, val dndAccess: Boolean, val dndSupported: Boolean)
+    private val _focusEffects = MutableStateFlow(FocusEffectsUi(dev.notai.tracker.android.FocusEffects.read(app),
+        dev.notai.tracker.android.FocusEffects.dndAccess(app), dev.notai.tracker.android.FocusEffects.dndSupported()))
+    val focusEffects: StateFlow<FocusEffectsUi> = _focusEffects
+    fun refreshFocusEffects() { _focusEffects.value = FocusEffectsUi(dev.notai.tracker.android.FocusEffects.read(app),
+        dev.notai.tracker.android.FocusEffects.dndAccess(app), dev.notai.tracker.android.FocusEffects.dndSupported()) }
+    fun setFocusEffects(change: (dev.notai.tracker.android.FocusEffects.Choice) -> dev.notai.tracker.android.FocusEffects.Choice) {
+        dev.notai.tracker.android.FocusEffects.write(app, change(dev.notai.tracker.android.FocusEffects.read(app))); refreshFocusEffects()
+    }
+    fun chooseFocusAudio(uri: Uri) = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val name = runCatching { app.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)
+                ?.use { c -> if (c.moveToFirst()) c.getString(0) else null } }.getOrNull()
+            dev.notai.tracker.android.FocusEffects.importAudio(app, uri, name); refreshFocusEffects()
+        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice("Не удалось взять этот файл. Попробуй другой, до 64 МБ") }
+    }
+
+    // Several records at once: choose them in the history, then give them one activity or note. Preview first, Undo after.
+    private val _picked = MutableStateFlow<Set<String>>(emptySet())
+    val picked: StateFlow<Set<String>> = _picked
+    fun togglePicked(sessionId: String) { _picked.value = _picked.value.let { if (sessionId in it) it - sessionId else it + sessionId } }
+    fun clearPicked() { _picked.value = emptySet() }
+    suspend fun previewBatch(selection: Classification?, note: MetadataNoteEdit?, replace: Boolean): Result<BatchMetadataPreview> = withContext(Dispatchers.IO) {
+        runCatching {
+            val rt = runtime ?: fail(ErrorCode.STALE, "No backend")
+            rt.tracker.previewMetadata(BatchMetadataRequest(_picked.value.toList(), selection,
+                if (replace) MetadataFillPolicy.REPLACE else MetadataFillPolicy.EMPTY_ONLY, note))
+        }
+    }
+    fun applyBatch(preview: BatchMetadataPreview) = command({ _ ->
+        val n = preview.changes.map { it.sessionId }.distinct().size
+        _picked.value = emptySet()
+        "Изменено ${Format.plural(n, "запись", "записи", "записей")}"
+    }) { rt, _ -> rt.tracker.applyMetadata(preview) }
+
+    // CSV history: inspect → confirm columns and time → map source activities → preview → append. Nothing is written before apply.
+    private val _csv = MutableStateFlow<CsvImportUi?>(null)
+    val csvImport: StateFlow<CsvImportUi?> = _csv
+    fun closeCsv() { _csv.value = null }
+    fun openCsv(uri: Uri) = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val name = runCatching { app.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)
+                ?.use { c -> if (c.moveToFirst()) c.getString(0) else null } }.getOrNull()
+            val bytes = app.contentResolver.openInputStream(uri)?.use { input ->
+                val out = java.io.ByteArrayOutputStream(); val buffer = ByteArray(8192)
+                while (out.size() <= MAX_CSV_BYTES) { val n = input.read(buffer, 0, minOf(buffer.size, MAX_CSV_BYTES + 1 - out.size())); if (n < 0) break; out.write(buffer, 0, n) }
+                out.toByteArray()
+            } ?: fail(ErrorCode.STORAGE, "Source unavailable")
+            val inspection = HistoryFiles.inspect(bytes)
+            when (inspection.format) {
+                ImportFormat.DELIMITED_TEXT -> _csv.value = CsvImportUi(inspection, name)
+                ImportFormat.BACKUP_JSON -> notice("Это файл резервной копии. Восстанови его в разделе «Резервная копия»")
+                ImportFormat.UNSUPPORTED -> notice("Этот файл не таблица CSV. ${inspection.problems.firstOrNull().orEmpty()}".trim())
+            }
+        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice(Format.importError(e)) }
+    }
+    /** Parse with the confirmed choices; the file's distinct activities come back for mapping. Errors stay inside the sheet. */
+    suspend fun parseCsv(ui: CsvImportUi, delimiter: Char, mapping: CsvMapping, durationFormat: DurationFormat?): Result<TransferFile> = withContext(Dispatchers.IO) {
+        runCatching { ui.inspection.confirmCsv(delimiter, mapping, CsvTimeChoice(mapping.localPattern, mapping.zone), durationFormat) }
+    }
+    fun launchParse(ui: CsvImportUi, delimiter: Char, mapping: CsvMapping, durationFormat: DurationFormat?, done: (Result<TransferFile>) -> Unit) =
+        viewModelScope.launch { done(parseCsv(ui, delimiter, mapping, durationFormat)) }
+    suspend fun previewCsv(file: TransferFile, targets: Map<SourceActivity, Classification>): Result<HistoryPreview> = withContext(Dispatchers.IO) {
+        runCatching {
+            val transfer = runtime?.historyTransfer ?: fail(ErrorCode.STORAGE, "History transfer unavailable")
+            transfer.preview(file, file.activities.associateWith { a -> targets[a] ?: Classification(name = a.activity.takeIf { it.isNotBlank() }) })
+        }
+    }
+    fun applyCsv(preview: HistoryPreview) = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val transfer = runtime?.historyTransfer ?: return@launch
+            val result = transfer.apply(preview)
+            _csv.value = null
+            notice("Добавлено ${Format.plural(result.added, "запись", "записи", "записей")}" + if (result.duplicates > 0) ", повторы пропущены" else "")
+        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice(Format.importError(e)) }
+    }
+
+    // Automatic copies into a chosen folder. Status lives on this phone, outside the records; every call is on IO.
+    private val _autoBackup = MutableStateFlow<AutoBackupUi?>(null)
+    val autoBackup: StateFlow<AutoBackupUi?> = _autoBackup
+    private val autoBackend get() = runtime?.autoBackup
+    private suspend fun autoAction(block: (AutoBackupBackend) -> Unit) = withContext(Dispatchers.IO) {
+        val b = autoBackend ?: return@withContext
+        try { block(b) } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice(autoBackupError(e)) }
+        refreshAutoBackupNow()
+    }
+    private fun refreshAutoBackupNow() {
+        val b = autoBackend ?: run { _autoBackup.value = null; return }
+        val state = runCatching { b.status() }.getOrNull() ?: return
+        _autoBackup.value = AutoBackupUi(state, state.destination?.let { d -> _autoBackup.value?.takeIf { it.state.destination == d }?.folder ?: b.folderName(d) })
+    }
+    suspend fun refreshAutoBackup() = withContext(Dispatchers.IO) { refreshAutoBackupNow() }
+    fun backupFolderIntent(): android.content.Intent? = autoBackend?.selectionIntent()
+    fun chooseBackupFolder(uri: Uri, flags: Int) = viewModelScope.launch {
+        autoAction { b -> b.select(uri, flags, b.status().policy) }
+        if (_autoBackup.value?.state?.enabled == true) notice("Папка выбрана. Первая копия появится через пару минут")
+    }
+    fun setAutoBackup(on: Boolean) = viewModelScope.launch {
+        autoAction { b -> val s = b.status(); if (on) s.destination?.let { b.enable(it, s.policy) } else b.disable() }
+    }
+    fun setBackupRetention(keep: Int) = viewModelScope.launch {
+        autoAction { b -> val s = b.status(); val d = s.destination; if (s.enabled && d != null) b.enable(d, s.policy.copy(retain = keep.coerceIn(1, 100))) }
+    }
+    fun backupNow() = viewModelScope.launch { autoAction { it.requestBackup() } }
+    fun retryAutoBackup() = viewModelScope.launch { autoAction { it.retry() } }
+    fun skipUncertainBackup(operationId: String) = viewModelScope.launch { autoAction { it.abandonPending(operationId) } }
+    suspend fun prepareRestoreVersion(operationId: String, owner: RestoreReviewOwner<RestorePreview>): RestorePreview? {
+        val request = owner.begin() ?: return null
+        try {
+            return withContext(Dispatchers.IO) {
+                val b = autoBackend ?: return@withContext null
+                owner.prepared(request, b.prepareRestore(operationId))
+            }
+        } catch (e: kotlinx.coroutines.CancellationException) { owner.cancel(request); throw e }
+        catch (e: Exception) { owner.cancel(request); notice(autoBackupError(e)); return null }
+    }
+    private fun autoBackupError(e: Exception): String =
+        (e as? dev.notai.tracker.android.BackupDestinationException)?.reason?.let { Format.backupProblem(it) } ?: Format.error(e)
+
+    suspend fun bundledCatalogVersion(): String? = withContext(Dispatchers.IO) { runCatching { runtime?.bundledCatalogVersion }.getOrNull() }
     suspend fun prepareCatalog(): CatalogPreview? = withContext(Dispatchers.IO) {
         try { runtime?.prepareCatalog() } catch (e: Exception) { notice(Format.error(e)); null }
     }

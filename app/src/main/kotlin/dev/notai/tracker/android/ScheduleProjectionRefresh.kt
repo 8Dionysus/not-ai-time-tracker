@@ -11,7 +11,7 @@ import java.io.File
 import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
 
-enum class ScheduleDataSurface { HOME, WIDGET, QUIET_SHADE }
+enum class ScheduleDataSurface { HOME, WIDGET, QUIET_SHADE, TIMER_NOTIFICATION }
 /** Application-scoped data invalidation only. Opus supplies rendering; a quiet shade
  * consumer names its already created silent low-importance channel. No Start/post here. */
 interface ScheduleProjectionConsumer {
@@ -48,6 +48,7 @@ class ScheduleProjectionRefresh(context: Context,private val tracker: Tracker,pr
             ScheduleDataSurface.HOME -> true
             ScheduleDataSurface.WIDGET -> value.surfaces.widget && context.getSystemService(AppWidgetManager::class.java)
                 .getAppWidgetIds(ComponentName(context,TimerWidget::class.java)).isNotEmpty()
+            ScheduleDataSurface.TIMER_NOTIFICATION -> value.surfaces.notification && TimerSurfaces.notificationsAllowed(context)
             ScheduleDataSurface.QUIET_SHADE -> {
                 val manager = context.getSystemService(NotificationManager::class.java)
                 val channel = c.channelId?.let(manager::getNotificationChannel)

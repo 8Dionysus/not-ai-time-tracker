@@ -19,7 +19,7 @@
                 <ImageView android:id="@+id/surface_chip_0_icon" android:layout_width="16dp" android:layout_height="16dp" android:layout_marginEnd="8dp"
                     android:importantForAccessibility="no" />
                 <TextView android:id="@+id/surface_chip_0_text" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:textColor="@color/widget_ink" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+                    android:textColor="@color/widget_ink" android:textSize="13sp" android:maxLines="2" android:lineSpacingMultiplier="0.92" android:ellipsize="end" />
             </LinearLayout>
             <LinearLayout android:id="@+id/surface_chip_1" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1"
                 android:layout_marginStart="6dp" android:background="@drawable/surface_chip" android:orientation="horizontal" android:gravity="center_vertical"
@@ -27,7 +27,7 @@
                 <ImageView android:id="@+id/surface_chip_1_icon" android:layout_width="16dp" android:layout_height="16dp" android:layout_marginEnd="8dp"
                     android:importantForAccessibility="no" />
                 <TextView android:id="@+id/surface_chip_1_text" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:textColor="@color/widget_ink" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+                    android:textColor="@color/widget_ink" android:textSize="13sp" android:maxLines="2" android:lineSpacingMultiplier="0.92" android:ellipsize="end" />
             </LinearLayout>
         </LinearLayout>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"
@@ -38,7 +38,7 @@
                 <ImageView android:id="@+id/surface_chip_2_icon" android:layout_width="16dp" android:layout_height="16dp" android:layout_marginEnd="8dp"
                     android:importantForAccessibility="no" />
                 <TextView android:id="@+id/surface_chip_2_text" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:textColor="@color/widget_ink" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+                    android:textColor="@color/widget_ink" android:textSize="13sp" android:maxLines="2" android:lineSpacingMultiplier="0.92" android:ellipsize="end" />
             </LinearLayout>
             <LinearLayout android:id="@+id/surface_chip_3" android:layout_width="0dp" android:layout_height="40dp" android:layout_weight="1"
                 android:layout_marginStart="6dp" android:background="@drawable/surface_chip" android:orientation="horizontal" android:gravity="center_vertical"
@@ -46,7 +46,7 @@
                 <ImageView android:id="@+id/surface_chip_3_icon" android:layout_width="16dp" android:layout_height="16dp" android:layout_marginEnd="8dp"
                     android:importantForAccessibility="no" />
                 <TextView android:id="@+id/surface_chip_3_text" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:textColor="@color/widget_ink" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+                    android:textColor="@color/widget_ink" android:textSize="13sp" android:maxLines="2" android:lineSpacingMultiplier="0.92" android:ellipsize="end" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

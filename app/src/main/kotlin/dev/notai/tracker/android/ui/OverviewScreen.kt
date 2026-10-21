@@ -23,11 +23,17 @@ import dev.notai.tracker.TrackerView
 
 /** Totals by area. Every number is a core report value; the screen only lays them out. */
 @Composable
-fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier = Modifier, openGoal: (String?) -> Unit = {}, share: (Period) -> Unit = {}) {
+fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier = Modifier, openGoal: (String?) -> Unit = {}, share: (Period) -> Unit = {},
+                   pickActivity: ((dev.notai.tracker.Classification, Label) -> Unit) -> Unit = {}) {
     val c = NotAi.colors
     var period by rememberSaveableEnum(Period.WEEK)
     val reportingDate by vm.reportingDate.collectAsState()
     val data by produceState<OverviewData?>(null, period, view, reportingDate) { value = vm.overview(period) }
+    var drill by remember { mutableStateOf(listOf<String>()) }
+    val reports by produceState(emptyList<SavedReportUi>(), view) { value = vm.savedReports() }
+    var openReport by remember { mutableStateOf<String?>(null) }
+    var editReport by remember { mutableStateOf<SavedReportUi?>(null) }
+    var newReport by remember { mutableStateOf(false) }
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp)) {
         Row(Modifier.fillMaxWidth().height(64.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("Обзор", Modifier.weight(1f), style = NotAi.type.title, color = c.ink)
@@ -55,6 +61,7 @@ fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier 
             Note(if (d.period == Period.DAY) "Сегодня записей пока нет. Обзор соберётся сам, как только появится первая."
                 else "За эти дни записей нет. Обзор соберётся сам, как только они появятся.", Modifier.padding(top = 4.dp))
             Goals(d.goals, openGoal)
+            SavedReportsSection(vm, reports, { openReport = it.query.id }, { newReport = true })
             return@Column
         }
         if (d.period == Period.DAY) {
@@ -65,19 +72,52 @@ fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier 
         Text("По областям", Modifier.padding(top = 20.dp, bottom = 4.dp), style = NotAi.type.section, color = c.ink)
         if (d.areas.isEmpty()) Text("За этот период записей нет.", style = NotAi.type.bodySmall, color = c.ink2)
         val max = d.areas.maxOfOrNull { it.ms }?.coerceAtLeast(1) ?: 1
-        d.areas.forEach { a ->
-            Column(Modifier.fillMaxWidth().padding(vertical = 5.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    ActivityGlyph(a.glyph, a.slot, size = 18.dp)
-                    Text(a.name, Modifier.weight(1f), style = NotAi.type.bodySmall, color = c.ink)
-                    Text(Format.duration(a.ms), style = NotAi.type.bodySmall, color = c.ink)
-                }
-                Box(Modifier.padding(start = 19.dp).fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(c.sunk)) {
-                    Box(Modifier.fillMaxWidth(a.ms.toFloat() / max).fillMaxHeight().clip(RoundedCornerShape(2.dp)).background(a.slot?.let { c.areas[it] } ?: c.none))
-                }
-            }
-        }
+        d.areas.forEach { a -> AreaBar(a, max) { a.id?.let { drill = listOf(it) } } }
         Goals(d.goals, openGoal)
+        SavedReportsSection(vm, reports, { openReport = it.query.id }, { newReport = true })
+    }
+    reports.firstOrNull { it.query.id == openReport }?.let { r ->
+        SavedReportSheet(r, onEdit = { openReport = null; editReport = r }, onDelete = { openReport = null; vm.deleteReport(r.query.id) }, onDismiss = { openReport = null })
+    }
+    if (newReport || editReport != null) SavedReportEditor(vm, editReport, pickActivity, onDismiss = { newReport = false; editReport = null })
+    drill.lastOrNull()?.let { id -> BreakdownSheet(vm, period, drill, onOpen = { drill = drill + it }, onBack = { drill = drill.dropLast(1) }, onDismiss = { drill = emptyList() }) }
+}
+
+/** One line per part: glyph, name, time and a thin bar against the largest. Parts with something inside open deeper. */
+@Composable
+private fun AreaBar(a: AreaTotal, max: Long, onOpen: () -> Unit) {
+    val c = NotAi.colors
+    Column(Modifier.fillMaxWidth().then(if (a.deeper) Modifier.pressable(onOpen, label = "${a.name}: из чего состоит") else Modifier).padding(vertical = 5.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            ActivityGlyph(a.glyph, a.slot, size = 18.dp)
+            Text(a.name, Modifier.weight(1f), style = NotAi.type.bodySmall, color = c.ink)
+            Text(Format.duration(a.ms), style = NotAi.type.bodySmall, color = c.ink)
+            if (a.deeper) M3Icon(Icon.ChevronRight, null, Modifier.size(14.dp), tint = c.ink3)
+        }
+        Box(Modifier.padding(start = 19.dp).fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(c.sunk)) {
+            Box(Modifier.fillMaxWidth(a.ms.toFloat() / max).fillMaxHeight().clip(RoundedCornerShape(2.dp)).background(a.slot?.let { c.areas[it] } ?: c.none))
+        }
+    }
+}
+
+/** An area opened up: its sections and activities for the same period; a section with more inside opens further. */
+@Composable
+private fun BreakdownSheet(vm: TrackerViewModel, period: Period, stack: List<String>, onOpen: (String) -> Unit, onBack: () -> Unit, onDismiss: () -> Unit) {
+    val c = NotAi.colors
+    val id = stack.last()
+    val view by vm.view.collectAsState()
+    val data by produceState<Breakdown?>(null, id, period, view) { value = vm.breakdown(period, id) }
+    NotAiSheet(onDismiss, fullHeight = false) {
+        SheetHeader(data?.title ?: "", onDismiss, back = if (stack.size > 1) onBack else null)
+        Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            val b = data ?: run { Spacer(Modifier.height(120.dp)); return@Column }
+            Text("${if (period == Period.DAY) "Сегодня" else "За ${period.title}"}: ${Format.duration(b.totalMs)}", Modifier.padding(bottom = 8.dp),
+                style = NotAi.type.bodySmall, color = c.ink2)
+            if (b.parts.isEmpty()) Text("За этот период здесь записей нет.", style = NotAi.type.bodySmall, color = c.ink2)
+            val max = b.parts.maxOfOrNull { it.ms }?.coerceAtLeast(1) ?: 1
+            b.parts.forEach { a -> AreaBar(a, max) { a.id?.let(onOpen) } }
+        }
     }
 }
 

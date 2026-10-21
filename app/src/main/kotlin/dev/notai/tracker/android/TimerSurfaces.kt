@@ -10,6 +10,7 @@ import android.os.Build
 import android.provider.Settings
 import android.widget.RemoteViews
 import dev.notai.tracker.*
+import dev.notai.tracker.android.ui.label
 import kotlinx.coroutines.*
 
 /** An action carries the revision that the user actually saw. No retries with a newer token. */
@@ -117,10 +118,23 @@ object TimerSurfaces {
     }
     fun widget(c: Context,view: TrackerView,enabled: Boolean): RemoteViews = SurfaceViews.widget(c,view,enabled)
     /** Launcher may throttle updates. A retained/pinned old shortcut fails STALE, never replays. */
-    fun shortcut(c: Context,s: Snapshot,settings: SurfaceSettings) { prepareShortcut(c,s,settings).invoke() }
-    private fun prepareShortcut(c: Context,s: Snapshot,settings: SurfaceSettings): () -> Unit {
+    fun shortcut(c: Context,s: Snapshot,settings: SurfaceSettings,view: TrackerView? = null) { prepareShortcut(c,view,s,settings).invoke() }
+    private fun favouriteShortcuts(c: Context,view: TrackerView,s: Snapshot): List<android.content.pm.ShortcutInfo> {
+        val end = minOf(MAX_TIME,System.currentTimeMillis()+1)
+        val excluded = if(s.mode == Mode.IDLE) null else s.session?.selection
+        return view.choices().quick(HistoryWindow(maxOf(0L,end-30L*24*60*60*1000),end),2,excluded).filter { it.entry.kind == ChoiceKind.FAVORITE }
+            .mapIndexed { i,q ->
+                val route = SurfaceChoices.route(Surface.SHORTCUT,s)
+                val title = q.entry.title.ifBlank { view.data.label(q.entry.selection).title }
+                android.content.pm.ShortcutInfo.Builder(c,"timer_favorite_$i").setShortLabel(title.take(24)).setLongLabel((if(s.mode == Mode.IDLE) "Начать: " else "Переключиться: ")+title)
+                    .setIcon(android.graphics.drawable.Icon.createWithResource(c,R.drawable.ic_shortcut))
+                    .setIntent(SurfaceChoices.intent(c,route).putExtra(QuickChoiceReceiver.EXTRA_CHOICE,codec.encodeToString(ChoiceReference.serializer(),q.reference)))
+                    .setRank(2+i).build()
+            }
+    }
+    private fun prepareShortcut(c: Context,view: TrackerView?,s: Snapshot,settings: SurfaceSettings): () -> Unit {
         val manager = c.getSystemService(android.content.pm.ShortcutManager::class.java)
-        val ids = listOf("timer_action", "timer_choose")
+        val ids = listOf("timer_action", "timer_choose", "timer_favorite_0", "timer_favorite_1")
         // Withdraw the former static MAIN alias, including pinned copies retained by a launcher.
         fun retireOpenAlias() { manager.disableShortcuts(listOf("open_timer")) }
         if(!settings.shortcut) return { retireOpenAlias();manager.disableShortcuts(ids);manager.removeDynamicShortcuts(ids) }
@@ -138,8 +152,10 @@ object TimerSurfaces {
             .setShortLabel("Выбрать занятие").setLongLabel("Таймер: выбрать занятие")
             .setIcon(android.graphics.drawable.Icon.createWithResource(c,R.drawable.ic_shortcut))
             .setIntent(SurfaceChoices.intent(c,SurfaceChoices.route(Surface.SHORTCUT,s))).setRank(1).build()
-        val entries = (listOf(info) + if(s.focus == null) listOf(chooser) else emptyList())
-            .take(manager.maxShortcutCountPerActivity.coerceAtLeast(0))
+        // The first favourites in their saved order, each a one-tap Start (or Switch) through the same stale-safe route.
+        val favourites = if(s.focus != null || view == null) emptyList() else runCatching { favouriteShortcuts(c,view,s) }.getOrDefault(emptyList())
+        val entries = (listOf(info) + (if(s.focus == null) listOf(chooser) else emptyList()) + favourites)
+            .take(manager.maxShortcutCountPerActivity.coerceAtLeast(0).coerceAtMost(4))
         val shownIds = entries.map { it.id }
         return {
             retireOpenAlias()
@@ -164,7 +180,7 @@ object TimerSurfaces {
         fun effect(surface: Surface,block: () -> Unit): Boolean = try { block();true } catch(_: RuntimeException) {
             android.util.Log.w("TimerSurfaces","$surface publication unavailable");false
         }
-        val launcher = prepare(Surface.SHORTCUT) { prepareShortcut(c,shown,settings) }
+        val launcher = prepare(Surface.SHORTCUT) { prepareShortcut(c,captured,shown,settings) }
         // Disabled is a current policy, not a transition that observation may lose.
         // Also repair installed widgets when another publisher or conflation skipped a view.
         val preparedWidget = prepare(Surface.WIDGET) {

@@ -33,6 +33,15 @@ data class Report(val start: Long, val end: Long, val asOf: Long, val zone: Stri
     fun byType(): Map<String?,Long> = rows.distinctBy { it.segmentId }.flatMap { row ->
         row.selection.ancestorPathAtWrite.ifEmpty { listOf(null) }.map { it to row }
     }.groupBy({ it.first },{ it.second }).mapValues { (_,segments) -> segments.sumExact { it.durationMs } }
+    /** Each row once, under the CURRENT top-level area of the area it was recorded in. A moved area brings its past
+     * time along to where it lives now; the row's own classification and path at write are unchanged. Disjoint: safe to sum. */
+    fun byCurrentRoot(types: List<ActivityType>): Map<String?,Long> {
+        val parents = types.associate { it.id to it.parentId }
+        fun root(id: String): String { var cur = id; var guard = 0
+            while(guard++ < 64) { cur = parents[cur] ?: return cur }; return cur }
+        return rows.distinctBy { it.segmentId }.groupBy { it.selection.ancestorPathAtWrite.firstOrNull()?.let(::root) }
+            .mapValues { (_,segments) -> segments.sumExact { it.durationMs } }
+    }
     fun byFacet(axisId: String): Map<Facet?,Long> = rows.distinctBy { it.segmentId }.flatMap { row ->
         row.selection.facets.filter { it.axisId == axisId }.ifEmpty { listOf(null) }.map { it to row }
     }.groupBy({ it.first },{ it.second }).mapValues { (_,segments) -> segments.sumExact { it.durationMs } }

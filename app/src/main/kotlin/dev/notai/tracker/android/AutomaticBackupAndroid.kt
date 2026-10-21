@@ -115,7 +115,7 @@ class SafBackupDestination(private val context: Context): BackupDestination {
 }
 
 /** Commands run on IO. Exposed from TrackerRuntime; no Activity/ViewModel lifetime dependency. */
-class AutomaticBackups internal constructor(private val context: Context,private val runtime: TrackerRuntime) {
+class AutomaticBackups internal constructor(internal val context: Context,private val runtime: TrackerRuntime) {
     private val saf = SafBackupDestination(context)
     private val exports = ExportOperations(context)
     internal val controller = AutomaticBackupController(AndroidBackupJournal(context),saf,object: BackupStaging {

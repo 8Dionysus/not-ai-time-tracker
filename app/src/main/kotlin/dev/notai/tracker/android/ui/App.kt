@@ -61,7 +61,8 @@ private sealed interface Editor {
 @Composable
 fun TrackerApp(vm: TrackerViewModel, openTechnical: () -> Unit, reducedMotion: Boolean? = null, onActionReady: () -> Unit = {}) {
     val theme by vm.theme.collectAsStateWithLifecycle()
-    NotAiTheme(theme, reducedMotion) {
+    val appearance by vm.appearance.collectAsStateWithLifecycle()
+    NotAiTheme(theme, reducedMotion, appearance) {
         val c = NotAi.colors
         val view = LocalView.current
         if (!view.isInEditMode) SideEffect {
@@ -118,6 +119,10 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     val incomingDrafts by vm.incomingDrafts.collectAsStateWithLifecycle()
     val entryForm by vm.entryForm.collectAsStateWithLifecycle()
     val surfacePicker by vm.surfacePicker.collectAsStateWithLifecycle()
+    val step by vm.correctionStepMinutes.collectAsStateWithLifecycle()
+    val focusEditor by vm.focusEditor.collectAsStateWithLifecycle()
+    val activityEditor by vm.editor.collectAsStateWithLifecycle()
+    val favoritesOpen by vm.favoritesOpen.collectAsStateWithLifecycle()
     var fullSurfacePickerId by remember { mutableStateOf<String?>(null) }
     val snackbar = remember { SnackbarHostState() }
     val dark = c.isDark
@@ -149,7 +154,7 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
             manual = { d -> vm.openEntryForm(null,d) },
             earlier = { sheet = Sheet.Earlier },
             resolve = { sheet = Sheet.Resolve },
-            toggleTheme = { vm.setTheme(if (dark) ThemeChoice.LIGHT else ThemeChoice.DARK) },
+            toggleTheme = { vm.toggleTheme(dark) },
             delete = requestDelete,
             startEarlier = { sheet = Sheet.StartEarlier },
             fillGap = { g, d -> vm.openEntryForm(null, d, g) },
@@ -162,7 +167,7 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
                 when (t) {
                     Tab.TIMER -> TimerScreen(snapshot, home, vm, actions, dark)
                     Tab.OVERVIEW -> OverviewScreen(vm, view, openGoal = { id -> editor = Editor.Goal(id?.let(vm::goalDraft)) },
-                        share = { p -> editor = Editor.Share(p) })
+                        share = { p -> editor = Editor.Share(p) }, pickActivity = { formPicker = it })
                     Tab.SETTINGS -> SettingsScreen(vm, view, theme, openTechnical, openPlan = { editor = Editor.Plan(it) })
                 }
             }
@@ -177,7 +182,9 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
                 }
             }
         }
-        BottomBar(tab, { tab = it }, live = snapshot?.let { it.mode == Mode.RUNNING || it.focus != null } == true)
+        val picked by vm.picked.collectAsStateWithLifecycle()
+        if (tab == Tab.TIMER && picked.isNotEmpty()) BatchBar(vm, picked.size, pickActivity = { formPicker = it })
+        else BottomBar(tab, { tab = it }, live = snapshot?.let { it.mode == Mode.RUNNING || it.focus != null } == true)
     }
 
     val zone = home?.zone ?: java.time.ZoneId.systemDefault()
@@ -193,12 +200,14 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
         }
         Sheet.Earlier -> {
             val seg = snapshot?.active
-            if (seg != null) EarlierSheet(zone, seg.start, remember { vm.now() }, onNext = { at -> sheet = Sheet.Picker(PickMode.EARLIER, at) }, onDismiss = { sheet = null })
+            if (seg != null) EarlierSheet(zone, seg.start, remember { vm.now() }, onNext = { at -> sheet = Sheet.Picker(PickMode.EARLIER, at) }, onDismiss = { sheet = null },
+                step = step, onStep = vm::setCorrectionStepMinutes)
             else LaunchedEffect(Unit) { sheet = null }
         }
         Sheet.Resolve -> {
             val start = snapshot?.active?.start ?: home?.currentStart
-            if (start != null) ResolveSheet(zone, start, remember { vm.now() }, onConfirm = vm::resolveTail, onDismiss = { sheet = null })
+            if (start != null) ResolveSheet(zone, start, remember { vm.now() }, onConfirm = vm::resolveTail, onDismiss = { sheet = null },
+                step = step, onStep = vm::setCorrectionStepMinutes)
             else LaunchedEffect(Unit) { sheet = null }
         }
         Sheet.StartEarlier -> {
@@ -228,12 +237,18 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
         ConfirmDialog("Заменить черновик?", "Текущий текст: «${draft?.note.orEmpty()}»\nНовый текст: «${incoming.draft.note.orEmpty()}»",
             "Заменить",onConfirm = { vm.resolveIncomingDraft(incoming.id,true) },onDismiss = { vm.resolveIncomingDraft(incoming.id,false) })
     }
+    focusEditor?.let { plan -> FocusEditorSheet(vm, plan, snapshot?.focus != null, onDismiss = vm::closeFocusEditor) }
     when (val e = editor) {
         is Editor.Plan -> PlanSheet(vm, e.existing, onPickActivity = { formPicker = it }, onDismiss = { editor = null })
         is Editor.Goal -> GoalSheet(vm, e.draft, onPickActivity = { formPicker = it }, onDismiss = { editor = null })
         is Editor.Share -> ShareSheet(vm, e.period, onDismiss = { editor = null })
         null -> Unit
     }
+    if (favoritesOpen) FavoritesSheet(vm, onEdit = vm::openEditor, onAdd = { formPicker = { sel, label -> vm.saveFavorite(label.title, sel) } },
+        onDismiss = { vm.openFavorites(false) })
+    activityEditor?.let { t -> key(t) { ActivityEditorSheet(vm, t, onPick = { formPicker = it }, onDismiss = { vm.openEditor(null) }) } }
+    val csv by vm.csvImport.collectAsStateWithLifecycle()
+    csv?.let { ui -> key(ui) { CsvImportSheet(vm, ui, zone, onPickActivity = { formPicker = it }, onDismiss = vm::closeCsv) } }
     formPicker?.let { back ->
         PickerSheet(vm, PickMode.MANUAL, false, null, null, null, onDismiss = { formPicker = null }, onReturn = { sel, label -> back(sel, label) })
     }

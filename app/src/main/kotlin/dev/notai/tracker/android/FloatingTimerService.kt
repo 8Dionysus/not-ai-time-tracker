@@ -208,8 +208,9 @@ class FloatingTimerService : Service() {
             attach()
             setContent {
                 val theme = remember { runCatching { ThemeChoice.valueOf(getSharedPreferences("ui", Context.MODE_PRIVATE).getString("theme", "SYSTEM")!!) }.getOrDefault(ThemeChoice.SYSTEM) }
-                NotAiTheme(theme) {
-                    assignment.value?.let { a -> AssignmentCard(a, onChoose = ::choose, onLeave = { dismiss(leave = true) }, backgroundAlpha = chooserBackgroundAlpha.value) }
+                val appearance = remember { dev.notai.tracker.android.ui.Appearance.read(getSharedPreferences("ui", Context.MODE_PRIVATE)) }
+                NotAiTheme(theme, appearance = appearance) {
+                    assignment.value?.let { a -> AssignmentCard(a, onChoose = ::choose, onLeave = { dismiss(leave = true) }, backgroundAlpha = chooserBackgroundAlpha.value, onAll = ::openAssignmentChooser) }
                 }
             }
         }
@@ -339,11 +340,12 @@ internal fun Puck(s: Snapshot?, busy: Boolean, onTap: () -> Unit, onDrag: (Float
 
 /** After STOP: the saved record and up to six quick choices. Nothing here changes the stopped time. */
 @Composable
-internal fun AssignmentCard(a: OverlayAssignment, onChoose: (OverlayChoice) -> Unit, onLeave: () -> Unit, backgroundAlpha: Float = 1f) {
+internal fun AssignmentCard(a: OverlayAssignment, onChoose: (OverlayChoice) -> Unit, onLeave: () -> Unit, backgroundAlpha: Float = 1f, onAll: (() -> Unit)? = null) {
     require(backgroundAlpha.isFinite() && backgroundAlpha in 0f..1f)
     val c = NotAi.colors
     Box(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), contentAlignment = Alignment.BottomCenter) {
-        Column(Modifier.widthIn(max = 420.dp).fillMaxWidth().shadow(16.dp, RoundedCornerShape(24.dp)).clip(RoundedCornerShape(24.dp))
+        // A see-through card drops its shadow: a shadow under glass reads as a smudge.
+        Column(Modifier.widthIn(max = 420.dp).fillMaxWidth().then(if (backgroundAlpha >= 0.95f) Modifier.shadow(16.dp, RoundedCornerShape(24.dp)) else Modifier).clip(RoundedCornerShape(24.dp))
             .background(c.raised.copy(alpha = c.raised.alpha * backgroundAlpha)).border(1.dp, c.rule, RoundedCornerShape(24.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text("Чем ты был занят?", style = NotAi.type.sheetTitle, color = c.ink)
@@ -356,14 +358,18 @@ internal fun AssignmentCard(a: OverlayAssignment, onChoose: (OverlayChoice) -> U
                             .pressable({ onChoose(choice) }, label = choice.title).padding(horizontal = 12.dp),
                             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                             ActivityGlyph(choice.glyph, choice.slot, size = 18.dp)
-                            Text(choice.title, style = NotAi.type.bodySmall, color = c.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(choice.title, style = NotAi.type.bodySmall, color = c.ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
                         }
                     }
                     if (pair.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
             if (a.choices.isEmpty()) Text("Частых занятий пока нет. Выбрать можно в приложении, в истории.", style = NotAi.type.bodySmall, color = c.ink2)
-            PillButton("Оставить без занятия", onLeave, Modifier.align(Alignment.End), ButtonKind.TEXT, height = 40.dp)
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                if (onAll != null) PillButton("Все занятия", onAll, kind = ButtonKind.TEXT, height = 40.dp)
+                Spacer(Modifier.weight(1f))
+                PillButton("Без занятия", onLeave, kind = ButtonKind.TEXT, height = 40.dp)
+            }
         }
     }
 }

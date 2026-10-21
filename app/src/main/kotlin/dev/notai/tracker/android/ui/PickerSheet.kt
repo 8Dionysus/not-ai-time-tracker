@@ -86,6 +86,16 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
 fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startClock: String?, boundaryClock: String?, boundary: Long?,
                 onDismiss: () -> Unit, surfaceRoute: dev.notai.tracker.android.SurfacePickerRoute?,
                 onReturn: ((Classification, Label) -> Unit)? = null) {
+    val favoriteKeys = remember(vm.view.collectAsStateWithLifecycle().value) {
+        vm.view.value?.data?.favorites.orEmpty().map { dev.notai.tracker.selectionIdentity(it.selection) }.toSet()
+    }
+    fun starred(item: PickerItem) = dev.notai.tracker.selectionIdentity(item.entry.selection) in favoriteKeys
+    /** Long press edits favourites and own activities; catalog entries have nothing personal to edit. */
+    fun editAction(item: PickerItem): (() -> Unit)? = when {
+        item.entry.kind == dev.notai.tracker.ChoiceKind.FAVORITE -> ({ vm.openEditor(EditTarget.Fav(item.entry.sourceId)) })
+        item.entry.selection.cardId != null -> ({ vm.openEditor(EditTarget.Card(item.entry.selection.cardId!!)) })
+        else -> null
+    }
     val c = NotAi.colors
     var effective by remember { mutableStateOf(mode) }
     var query by remember { mutableStateOf("") }
@@ -111,9 +121,11 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
         if (onReturn != null) onReturn(item.entry.selection, item.label) else vm.choose(item.entry, effective, boundary,item.reference,item.expected)
         onDismiss()
     }
+    // Created inside an open section, a new activity belongs to it: its time is summed with the section's.
+    val section = parent?.takeIf { it.entry.kind == dev.notai.tracker.ChoiceKind.TYPE }?.entry?.sourceId
     fun create(name: String) {
-        if (surfaceRoute != null) { vm.createSurfaceCard(surfaceRoute,name); return }
-        if (onReturn != null) vm.createCard(name) { sel, label -> onReturn(sel, label) } else vm.createAndChoose(name, effective, boundary)
+        if (surfaceRoute != null) { vm.createSurfaceCard(surfaceRoute,name,section); return }
+        if (onReturn != null) vm.createCard(name, section) { sel, label -> onReturn(sel, label) } else vm.createAndChoose(name, effective, boundary, section)
         onDismiss()
     }
 
@@ -149,12 +161,13 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
             when {
                 query.isNotBlank() -> {
                     item { SectionLabel(if (results.isEmpty()) "Ничего не нашлось" else "Найдено", Modifier.padding(top = 14.dp, bottom = 4.dp)) }
-                    items(results, key = { "r-" + it.entry.id }) { r -> ChoiceRow(r, ::pick) }
+                    items(results, key = { "r-" + it.entry.id }) { r -> ChoiceRow(r, ::pick, onEdit = editAction(r)) }
                     item {
                         Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).pressable({ create(query) }), verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             M3Icon(Icon.Plus, null, Modifier.size(16.dp), tint = c.amberInk)
-                            Text("Создать занятие «${query.trim()}»", style = NotAi.type.body.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
+                            Text(if (parent != null && section != null) "Создать «${query.trim()}» в разделе «${parent.label.title}»" else "Создать занятие «${query.trim()}»",
+                                style = NotAi.type.body.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
                         }
                     }
                 }
@@ -162,7 +175,10 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
                     if (parent.entry.canStart) item(key = "whole") {
                         ChoiceRow(parent.wholeArea(), ::pick)
                     }
-                    items(children, key = { "c-" + it.entry.id }) { ch -> ChoiceRow(ch, ::pick) }
+                    items(children, key = { "c-" + it.entry.id }) { ch -> ChoiceRow(ch, ::pick, onEdit = editAction(ch)) }
+                    if (section != null) item(key = "own") {
+                        Text("Своё занятие в этом разделе: начни вводить название в поиске", Modifier.padding(vertical = 14.dp), style = NotAi.type.caption, color = c.ink2)
+                    }
                 }
                 else -> {
                     val d = data
@@ -170,13 +186,23 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
                         if (d.recents.isNotEmpty()) {
                             item { SectionLabel("Недавние", Modifier.padding(top = 14.dp, bottom = 4.dp)) }
                             items(d.recents, key = { "h-" + it.entry.id }) { r ->
-                                ChoiceRow(r, ::pick, trailing = { IconAction(Icon.StarLine, "В избранное", { vm.saveFavorite(r.label.title, r.entry.selection) }, size = 16.dp) })
+                                val on = starred(r)
+                                ChoiceRow(r, ::pick, onEdit = editAction(r), trailing = {
+                                    if (on) IconAction(Icon.Star, "Убрать из избранного", { vm.removeFavorites(vm.favoriteIds(r.entry.selection)) }, tint = c.amber, size = 16.dp)
+                                    else IconAction(Icon.StarLine, "В избранное", { vm.saveFavorite(r.label.title, r.entry.selection) }, size = 16.dp)
+                                })
                             }
                         }
                         if (d.favorites.isNotEmpty()) {
-                            item { SectionLabel("Избранное", Modifier.padding(top = 20.dp, bottom = 4.dp)) }
+                            item {
+                                Row(Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    SectionLabel("Избранное", Modifier.weight(1f))
+                                    Text("Порядок", Modifier.heightIn(min = 32.dp).pressable({ vm.openFavorites(true) }, label = "Порядок избранного").padding(horizontal = 4.dp, vertical = 6.dp),
+                                        style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
+                                }
+                            }
                             items(d.favorites, key = { "f-" + it.entry.id }) { f ->
-                                ChoiceRow(f, ::pick, title = f.entry.title, trailing = {
+                                ChoiceRow(f, ::pick, title = f.entry.title, onEdit = { vm.openEditor(EditTarget.Fav(f.entry.sourceId)) }, trailing = {
                                     IconAction(Icon.Star, "Убрать из избранного", { vm.removeFavorite(f.entry.sourceId) }, tint = c.amber, size = 16.dp)
                                 })
                             }
@@ -206,13 +232,14 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
 
 @Composable
 private fun ChoiceRow(item: PickerItem, onPick: (PickerItem) -> Unit, title: String = item.label.title, square: Boolean = false,
-                      trailing: (@Composable RowScope.() -> Unit)? = null) {
+                      trailing: (@Composable RowScope.() -> Unit)? = null, onEdit: (() -> Unit)? = null) {
     val c = NotAi.colors
     val group = !item.whole && (item.entry.availability == ChoiceAvailability.GROUP || (item.count ?: 0) > 0)
     val enabled = group || item.entry.canStart
     ListRow(title, detail = if (group || square) null else item.label.detail,
         subtitle = if (!enabled) "в архиве" else null,
         onClick = { onPick(item) },
+        onLongClick = onEdit, longClickLabel = "Изменить",
         leading = { ActivityGlyph(item.label) },
         trailing = {
             if (trailing != null) trailing()

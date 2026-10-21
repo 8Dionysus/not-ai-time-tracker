@@ -30384,6 +30384,24 @@
     },
     {
       "key": {
+        "kind": "TYPE",
+        "stableId": "activity.movement.exercise_snack",
+        "meaningVersion": 1,
+        "parentId": null,
+        "parentMeaningVersion": null
+      },
+      "text": {
+        "label": "Pausa attiva",
+        "aliases": [
+          "Exercise snack",
+          "Mini allenamento",
+          "Pausa di movimento"
+        ],
+        "description": "Qualche minuto di movimento a metà giornata: squat, scale o un paio di esercizi per interrompere il tempo da seduti."
+      }
+    },
+    {
+      "key": {
         "kind": "AXIS",
         "stableId": "facet.proposed.arisf.arisf_001",
         "meaningVersion": 1,

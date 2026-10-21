@@ -5,6 +5,9 @@ import dev.notai.tracker.Classification
 import dev.notai.tracker.CoreError
 import dev.notai.tracker.Dataset
 import dev.notai.tracker.ErrorCode
+import dev.notai.tracker.ErrorArgument
+import dev.notai.tracker.ImportIssue
+import dev.notai.tracker.ImportIssueCode
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -94,6 +97,49 @@ object Format {
         ErrorCode.INVALID_INPUT -> "Не получилось: ${e.message}"
         null -> "Не получилось: ${e.message ?: e.javaClass.simpleName}"
     }
+
+    /** A CSV problem in plain words, with the row when there is one. The English diagnostic stays for logs only. */
+    fun importIssue(i: ImportIssue): String {
+        val col = (i.arguments["column"] as? ErrorArgument.Text)?.value
+        val what = when (i.code) {
+            ImportIssueCode.TIMESTAMP_INVALID, ImportIssueCode.TIMESTAMP_PATTERN_INVALID -> "дата или время не читаются в выбранном формате" + (col?.let { " (колонка «$it»)" } ?: "")
+            ImportIssueCode.EXPLICIT_OFFSET_REQUIRED -> "у времени нет часового пояса: выбери формат без пояса"
+            ImportIssueCode.TIMESTAMP_RANGE, ImportIssueCode.INTERVAL_OVERFLOW -> "время вне допустимого диапазона"
+            ImportIssueCode.INTERVAL_INVALID -> "конец раньше начала"
+            ImportIssueCode.END_OR_DURATION_REQUIRED -> "нужна колонка конца или длительности"
+            ImportIssueCode.DURATION_ENDPOINT_MISMATCH -> "длительность не совпадает с началом и концом"
+            ImportIssueCode.DURATION_HMS_REQUIRED, ImportIssueCode.DURATION_COMPONENT_RANGE, ImportIssueCode.DURATION_NUMBER_INVALID,
+            ImportIssueCode.DURATION_PRECISION_OR_RANGE -> "длительность не читается в выбранном формате"
+            ImportIssueCode.DURATION_POSITIVE_REQUIRED -> "длительность должна быть больше нуля"
+            ImportIssueCode.LOCAL_TIME_GAP_OR_FOLD, ImportIssueCode.LOCAL_ZONE_DST_REJECTED -> "время попадает на перевод часов"
+            ImportIssueCode.FUTURE_INTERVAL -> "запись в будущем"
+            ImportIssueCode.ROW_COLUMN_COUNT -> "в строке другое число колонок"
+            ImportIssueCode.CSV_COLUMNS_MISSING -> "в файле нет колонки" + (col?.let { " «$it»" } ?: "")
+            ImportIssueCode.SOURCE_ID_CONFLICT, ImportIssueCode.SOURCE_ID_MISSING -> "повторяется или пропущен ID строки"
+            ImportIssueCode.CSV_ROW_LIMIT, ImportIssueCode.CSV_COLUMN_LIMIT, ImportIssueCode.CSV_SIZE_LIMIT -> "файл слишком большой"
+            ImportIssueCode.CSV_QUOTING_INVALID, ImportIssueCode.CSV_QUOTE_UNCLOSED -> "кавычки в строке не закрыты"
+            ImportIssueCode.BATCH_VALIDATION_FAILED -> "записи пересекаются друг с другом или с историей"
+            ImportIssueCode.APPLY_STALE -> "данные успели измениться: проверь ещё раз"
+            else -> i.diagnostic.ifBlank { i.code.name.lowercase() }
+        }
+        return (i.rowNumber?.let { "Строка $it: " } ?: "") + what
+    }
+    fun importError(e: Throwable): String = (e as? CoreError)?.importIssue?.let(::importIssue) ?: error(e)
+
+    /** One plain sentence per automatic-copy problem; the action next to it says what to do. */
+    fun backupProblem(e: dev.notai.tracker.android.AutomaticBackupError): String = when (e) {
+        dev.notai.tracker.android.AutomaticBackupError.REQUIRES_SELECTION -> "Нужно выбрать папку заново"
+        dev.notai.tracker.android.AutomaticBackupError.UNSUPPORTED -> "В эту папку нельзя сохранять копии. Выбери другую"
+        dev.notai.tracker.android.AutomaticBackupError.GRANT_REVOKED -> "Доступ к папке пропал. Выбери её снова"
+        dev.notai.tracker.android.AutomaticBackupError.PROVIDER_UNAVAILABLE -> "Папка сейчас недоступна: нет сети или приложение облака не отвечает. Повторю сам"
+        dev.notai.tracker.android.AutomaticBackupError.READBACK_UNAVAILABLE -> "Не удалось перечитать записанную копию. Повторю сам"
+        dev.notai.tracker.android.AutomaticBackupError.CORRUPT_READBACK -> "Записанная копия не совпала с данными. Повторю сам"
+        dev.notai.tracker.android.AutomaticBackupError.INTERRUPTED -> "Копия прервалась. Продолжу сам"
+        dev.notai.tracker.android.AutomaticBackupError.CREATION_UNCERTAIN -> "Неясно, появился ли файл в папке. Повтори или пропусти эту копию"
+        dev.notai.tracker.android.AutomaticBackupError.RETENTION_FAILED -> "Новая копия сохранена, а старые убрать не вышло"
+        dev.notai.tracker.android.AutomaticBackupError.SCHEDULING_FAILED -> "Телефон не дал запланировать копию. Нажми «Сохранить сейчас»"
+        dev.notai.tracker.android.AutomaticBackupError.STORAGE -> "Не хватило места или памяти на телефоне. Повторю сам"
+    }
 }
 
 /** Fixed colour slots for activity areas. Index into NotAiColors.areas; null means neutral. */
@@ -120,8 +166,8 @@ object Areas {
 
     /** Everyday areas first, in this order; professional areas follow alphabetically. */
     val everyday = listOf(
-        "area.language_practice", "area.movement", "area.learning", "area.work", "area.reading", "area.writing", "area.media",
-        "area.creative", "area.leisure", "area.social", "area.household", "area.self_care", "area.food", "area.sleep",
+        "area.language_practice", "area.movement", "area.learning", "area.work", "area.reading", "area.writing", "area.media", "area.games",
+        "area.creative", "area.leisure", "area.outdoor_leisure", "area.social", "area.household", "area.self_care", "area.food", "area.sleep",
         "area.mobility", "area.errands", "area.caregiving", "area.civic_spiritual", "area.custom",
     )
 }
@@ -135,7 +181,15 @@ fun Dataset.label(c: Classification): Label {
     val root = c.ancestorPathAtWrite.firstOrNull() ?: type?.let { rootOf(it.id) }
     val details = c.details.values.filter { it.isNotBlank() }.joinToString(", ").takeIf { it.isNotEmpty() }
     val rootName = root?.takeIf { it != c.activityTypeId }?.let { r -> types.firstOrNull { it.id == r }?.name?.lowercase() }
-    return Label(title ?: "Без занятия", details ?: rootName, Areas.slot(root), title == null && c.cardId == null, glyph(c))
+    val name = title ?: "Без занятия"
+    return Label(name, (details ?: rootName)?.takeUnless { repeats(name, it) }, Areas.slot(root), title == null && c.cardId == null, glyph(c))
+}
+
+/** "Силовая тренировка" + "тренировка и спорт" says the same twice: the quiet detail is dropped when it repeats a word of the title. */
+internal fun repeats(title: String, detail: String): Boolean {
+    fun stems(s: String) = s.lowercase().split(Regex("[^\\p{L}\\p{N}]+")).filter { it.length >= 4 }.map { it.take(5) }.toSet()
+    val t = stems(title)
+    return t.isNotEmpty() && stems(detail).any { it in t }
 }
 
 /** Icon through the core's semantic keys; a named choice without a type is "custom", never "unclassified". */

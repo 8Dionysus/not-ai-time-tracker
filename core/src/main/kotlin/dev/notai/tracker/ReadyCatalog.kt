@@ -12,8 +12,12 @@ import kotlinx.serialization.json.*
 @Serializable data class CatalogPackageManifest(val formatVersion: Int,val catalogVersion: String,
     val file: String,val bytes: Int,val sha256: String,val compatibility: CatalogCompatibilityFile? = null)
 @Serializable data class CatalogCompatibilityFile(val file: String,val bytes: Int,val sha256: String)
+/** One explicitly reviewed editorial step. [parentMove] allows the new parent to replace the installed one (the type moves
+ * in the tree; recorded history keeps its path at write). [alsoFromMeaningSha256] and [previousDefaultNameSha256s] accept
+ * older installed catalogs on the same step; a locally renamed entry keeps its personal name. */
 @Serializable data class CatalogEditorialRevision(val kind: String,val id: String,val fromMeaningSha256: String,
-    val toMeaningSha256: String,val previousDefaultNameSha256: String? = null)
+    val toMeaningSha256: String,val previousDefaultNameSha256: String? = null,val parentMove: Boolean = false,
+    val alsoFromMeaningSha256: List<String> = emptyList(),val previousDefaultNameSha256s: List<String> = emptyList())
 class ReadyCatalog private constructor(val manifest: CatalogPackageManifest,val vocabulary: VocabularyData,
     internal val revisions: List<CatalogEditorialRevision>) {
     companion object {
@@ -37,7 +41,9 @@ class ReadyCatalog private constructor(val manifest: CatalogPackageManifest,val 
             }.orEmpty()
             ensure(revisions.map { it.kind to it.id }.distinct().size == revisions.size,"Duplicate editorial revision",ErrorCode.UNSUPPORTED_IMPORT)
             for(r in revisions) {
-                ensure(listOfNotNull(r.fromMeaningSha256,r.toMeaningSha256,r.previousDefaultNameSha256).all { it.matches(Regex("[0-9a-f]{64}")) },"Invalid meaning fingerprint",ErrorCode.UNSUPPORTED_IMPORT)
+                ensure((listOfNotNull(r.fromMeaningSha256,r.toMeaningSha256,r.previousDefaultNameSha256)+r.alsoFromMeaningSha256+r.previousDefaultNameSha256s)
+                    .all { it.matches(Regex("[0-9a-f]{64}")) },"Invalid meaning fingerprint",ErrorCode.UNSUPPORTED_IMPORT)
+                ensure(!r.parentMove || r.kind == "type","Only activity types can move",ErrorCode.UNSUPPORTED_IMPORT)
                 val fingerprint = when(r.kind) {
                     "type" -> v.types.singleOrNull { it.id == r.id }?.let(::catalogMeaningFingerprint)
                     "axis" -> v.axes.singleOrNull { it.id == r.id }?.let(::catalogMeaningFingerprint)

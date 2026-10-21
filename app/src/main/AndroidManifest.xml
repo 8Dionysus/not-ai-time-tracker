@@ -10,6 +10,7 @@
         android:theme="@style/Theme.NotAi"
         android:allowBackup="false" android:fullBackupContent="false" android:dataExtractionRules="@xml/data_extraction_rules" android:supportsRtl="true">
         <service android:name=".AutomaticBackupJobService" android:exported="true" android:permission="android.permission.BIND_JOB_SERVICE" />
+        <activity android:name=".FocusRuleConfigurationActivity" android:exported="true" />
         <activity android:name=".MainActivity" android:exported="true" android:label="@string/launcher_name"
             android:windowSoftInputMode="adjustResize">
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
@@ -54,6 +55,7 @@
         <receiver android:name=".WidgetPinReceiver" android:exported="false" />
         <receiver android:name=".TimerActionReceiver" android:exported="false" />
         <receiver android:name=".QuickChoiceReceiver" android:exported="false" />
+        <receiver android:name=".PlanStartReceiver" android:exported="false" />
         <receiver android:name=".TimerWidget" android:exported="false">
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/timer_widget_info" />

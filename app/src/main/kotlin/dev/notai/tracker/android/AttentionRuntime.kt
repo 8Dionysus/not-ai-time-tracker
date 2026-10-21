@@ -14,7 +14,7 @@ import kotlinx.coroutines.*
  * periodic loop, new service, schema or alternate timer. synchronize is blocking, IO only.
  * The existing TrackerRuntime observer calls it after each committed domain view.
  */
-class AttentionRuntime(context: Context,tracker: Tracker) {
+class AttentionRuntime(context: Context,private val tracker: Tracker) {
     private val context = context.applicationContext
     @Volatile private var closed = false
     private val visibility = Any()
@@ -72,7 +72,7 @@ class AttentionRuntime(context: Context,tracker: Tracker) {
     }
     fun refresh() { if(!closed) scope.launch { synchronize() } }
     fun synchronize() {
-        for(action in listOf<()->Unit>({ ordinary.synchronize();Unit },{ focus.synchronize();Unit })) try {
+        for(action in listOf<()->Unit>({ ordinary.synchronize();Unit },{ FocusEffects.maybeBegin(context,tracker,focus.controller,focus.synchronize());Unit })) try {
             if(closed) return
             action()
         }

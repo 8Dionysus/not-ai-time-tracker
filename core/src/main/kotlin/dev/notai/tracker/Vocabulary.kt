@@ -166,10 +166,14 @@ private fun editorialReplacement(previous: Any,entry: Any,revisions: List<Catalo
     if(previous !is ActivityType || entry !is ActivityType) return null
     val revision = revisions.singleOrNull { it.kind == "type" && it.id == entry.id } ?: return null
     val current = catalogMeaningFingerprint(entry);val before = catalogMeaningFingerprint(previous)
-    if(current != revision.toMeaningSha256 || (before != revision.fromMeaningSha256 && before != current) ||
-        !catalogMeaningEquivalent(previous.copy(definition = entry.definition),entry)) return null
-    val updated = previous.copy(definition = entry.definition,name = if(revision.previousDefaultNameSha256 != null &&
-        sha256(previous.name.toByteArray(Charsets.UTF_8)) == revision.previousDefaultNameSha256) entry.name else previous.name)
+    val accepted = setOf(revision.fromMeaningSha256)+revision.alsoFromMeaningSha256
+    val base = previous.copy(definition = entry.definition,parentId = if(revision.parentMove) entry.parentId else previous.parentId)
+    if(current != revision.toMeaningSha256 || (before !in accepted && before != current) || !catalogMeaningEquivalent(base,entry)) return null
+    val defaults = listOfNotNull(revision.previousDefaultNameSha256)+revision.previousDefaultNameSha256s
+    // Names and aliases can be customized independently. Keep installed aliases even when the default name changes.
+    val renamed = sha256(previous.name.toByteArray(Charsets.UTF_8)) in defaults
+    val updated = base.copy(name = if(renamed) entry.name else previous.name,
+        aliases = if(renamed) (entry.aliases + previous.aliases).distinct() else previous.aliases)
     return updated.takeUnless { it == previous }
 }
 internal fun Dataset.mergeCatalog(incoming: VocabularyData,policy: CatalogInstallPolicy = CatalogInstallPolicy.STRICT,

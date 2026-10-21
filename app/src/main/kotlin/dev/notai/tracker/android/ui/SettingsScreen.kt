@@ -66,7 +66,7 @@ enum class SettingsPage(val title: String) {
  */
 @Composable
 fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice, openTechnical: () -> Unit, modifier: Modifier = Modifier,
-                   openPlan: (PlanSeriesUi?) -> Unit = {}, initialPage: SettingsPage = SettingsPage.ROOT) {
+                   openPlan: (PlanSeriesUi?) -> Unit = {}, initialPage: SettingsPage = SettingsPage.ROOT, closeSection: (() -> Unit)? = null) {
     val c = NotAi.colors
     val context = LocalContext.current
     val activity = remember(context) { context.activity() }
@@ -97,7 +97,8 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
         while (page == SettingsPage.BACKUP || auto?.state?.pending != null || auto?.state?.requested == true) { delay(2_000); vm.refreshAutoBackup()
             if (page != SettingsPage.BACKUP && auto?.state?.pending == null && auto?.state?.requested != true) break }
     }
-    BackHandler(enabled = page != SettingsPage.ROOT) { page = SettingsPage.ROOT }
+    fun back() { closeSection?.invoke() ?: run { page = SettingsPage.ROOT } }
+    BackHandler(enabled = page != SettingsPage.ROOT) { back() }
     val longRecord by vm.longRecord.collectAsStateWithLifecycle()
     val open = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) scope.launch {
@@ -138,7 +139,7 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
             androidx.compose.animation.fadeOut(androidx.compose.animation.core.tween(120)) }) { shown ->
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 32.dp)) {
         Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = if (shown == SettingsPage.ROOT) 4.dp else 0.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (shown != SettingsPage.ROOT) IconAction(Icon.ChevronLeft, "Назад к настройкам", { page = SettingsPage.ROOT }, tint = c.ink)
+            if (shown != SettingsPage.ROOT) IconAction(Icon.ChevronLeft, "Назад к настройкам", { back() }, tint = c.ink)
             Text(shown.title, style = if (shown == SettingsPage.ROOT) NotAi.type.title else NotAi.type.title.copy(fontSize = 23.sp, lineHeight = 30.sp), color = c.ink, maxLines = 1,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }

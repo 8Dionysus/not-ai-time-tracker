@@ -36,7 +36,7 @@ class FocusRuleConfigurationActivity: ComponentActivity() {
             val view by vm.view.collectAsStateWithLifecycle()
             NotAiTheme(theme,appearance = appearance) {
                 SettingsScreen(vm,view,theme,{ startActivity(Intent(this,TechnicalActivity::class.java)) },
-                    Modifier.fillMaxSize().background(NotAi.colors.paper).safeDrawingPadding(),initialPage = SettingsPage.FOCUS)
+                    Modifier.fillMaxSize().background(NotAi.colors.paper).safeDrawingPadding(),initialPage = SettingsPage.FOCUS,closeSection = { finish() })
             }
         }
     }

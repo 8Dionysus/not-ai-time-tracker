@@ -18,6 +18,7 @@ class ReportZonePreference(context: Context,private val tracker: Tracker,newStor
         private set
     @Volatile private var pending: PendingReportZone? = null
     private var unreadablePending = false
+    private var observedReplacement = tracker.data().let { it.datasetId to it.controlBarrier }
     init {
         if(!prefs.contains("automatic")) save(prefs.edit().putBoolean("automatic",newStore))
         try { pending = prefs.getString("pending",null)?.let { codec.decodeFromString(PendingReportZone.serializer(),it) } }
@@ -63,6 +64,15 @@ class ReportZonePreference(context: Context,private val tracker: Tracker,newStor
     @Synchronized fun setAutomatic(expected: Token,value: Boolean): Tracker.Change =
         configure(expected,value,if(value) deviceZone() else tracker.data().settings.reportZone)
     @Synchronized fun setFixed(expected: Token,zone: String): Tracker.Change = configure(expected,false,zone)
+
+    /** Restore changes the barrier even when restoring a backup of the same dataset. */
+    @Synchronized internal fun reconcileReplacement(view: TrackerView): TrackerView {
+        val replacement = view.data.let { it.datasetId to it.controlBarrier }
+        if(replacement == observedReplacement) return view
+        reconcile()
+        observedReplacement = replacement
+        return tracker.view() // Publish the reconciled zone rather than the captured restore view.
+    }
 
     /** Retry only the original token or acknowledge its observed result. Conflicts require a fresh explicit choice. */
     @Synchronized fun reconcile(): Tracker.Change? {

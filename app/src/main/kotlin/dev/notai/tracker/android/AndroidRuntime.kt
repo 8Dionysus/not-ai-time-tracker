@@ -104,7 +104,13 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
             tracker.views.catch { e ->
                 if(e is CancellationException) throw e
                 android.util.Log.w("TimerSurfaces","Store observation unavailable; open recovery controls")
-            }.collect { view ->
+            }.collect { observed ->
+                val view = try { reportZone.reconcileReplacement(observed) }
+                catch(e: Exception) {
+                    if(e is CancellationException) throw e
+                    android.util.Log.w("ReportZone","Restored reporting zone refresh pending")
+                    observed
+                }
                 try { surfaceObserver.refresh(view);FocusSignals.refresh(context,tracker) }
                 catch(e: Exception) { if(e is CancellationException) throw e; android.util.Log.w("TimerSurfaces","Surface refresh unavailable") }
                 try { automaticBackups.changed(view) } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("AutomaticBackup","Backup queue refresh unavailable") }

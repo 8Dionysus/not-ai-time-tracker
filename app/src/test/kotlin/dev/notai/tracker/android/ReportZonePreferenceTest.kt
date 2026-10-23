@@ -91,6 +91,42 @@ class ReportZonePreferenceTest {
         assertFalse(startup.automatic);assertNull(startup.recoveryProblem);assertNull(startup.reconcile())
         assertEquals("Asia/Tokyo",tracker.data().settings.reportZone);assertEquals(275,tracker.data().settings.reportDayStartMinute)
     }
+    @Test fun foregroundRestoreReconcilesAutoForSameAndDifferentDatasetButRetainsFixedZone() {
+        app.getSharedPreferences("report-zone",0).edit().clear().commit()
+        tracker.configureReportingDay(tracker.snapshot().token,ReportingDayPolicy("UTC",275))
+        tracker.manual(tracker.snapshot().token,tracker.clock.now().wall-1000,tracker.clock.now().wall,Classification())
+        tracker.saveGoal(tracker.snapshot().token,Goal("restore-zone-goal","Preserve",GoalMetric.DURATION_MS,1000))
+        val rollback = object: RollbackStore {
+            private var saved = ""
+            override fun save(json: String): String { saved = json;return "synthetic-rollback" }
+            override fun read(reference: String) = saved
+        }
+        val backups = Backups(tracker,rollback)
+        val source = tracker.data()
+        val preference = ReportZonePreference(app,tracker,true) { "Europe/Berlin" }
+        preference.reconcile()
+        for(sameDataset in listOf(true,false)) {
+            val restored = if(sameDataset) source else source.copy(datasetId = newId())
+            val preview = backups.prepare(Backups.encode(restored,tracker.clock.now()))
+            val beforeConfirmation = tracker.data()
+            preference.reconcileReplacement(tracker.view())
+            assertEquals(beforeConfirmation,tracker.data()) // Preview alone does not reconcile or replace.
+            backups.apply(preview)
+            assertEquals("UTC",tracker.data().settings.reportZone)
+            val published = preference.reconcileReplacement(tracker.view())
+            assertTrue(preference.automatic);assertEquals("Europe/Berlin",published.data.settings.reportZone)
+            assertEquals(restored.datasetId,published.data.datasetId)
+            assertEquals(source.sessions,published.data.sessions);assertEquals(source.segments,published.data.segments)
+            assertEquals(source.goals,published.data.goals);assertEquals(275,published.data.settings.reportDayStartMinute)
+            val reconciled = tracker.data()
+            preference.reconcileReplacement(tracker.view());assertEquals(reconciled,tracker.data())
+        }
+        preference.setFixed(tracker.snapshot().token,"Asia/Tokyo")
+        backups.apply(backups.prepare(Backups.encode(source,tracker.clock.now())))
+        val fixed = tracker.data();val published = preference.reconcileReplacement(tracker.view())
+        assertFalse(preference.automatic);assertEquals("UTC",published.data.settings.reportZone)
+        assertEquals(fixed,tracker.data()) // Device-local FIXED never rewrites a restored fixed zone.
+    }
     private class RollbackStoreForZoneTest: RollbackStore {
         override fun save(json: String): String = error("Export does not save rollback")
         override fun read(reference: String): String = error("Export does not read rollback")

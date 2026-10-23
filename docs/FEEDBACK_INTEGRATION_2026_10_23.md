@@ -8,7 +8,7 @@ The history selection can delete completed records in one transaction. Session I
 
 `BatchDeletionUiHost` uses that real preview. It rejects a changed selection and keeps selection on failure. Confirmed application belongs to `viewModelScope`; disposing the composable caller cannot cancel the commit or lose the Undo notice. Selection changes are briefly guarded during application without holding a UI lock across database work. Cancellation remains cancellation across both the core storage boundary and the VM bridge.
 
-Reporting-zone AUTO is device-local. New installations default to AUTO; existing fixed zones remain fixed until an explicit choice. Selecting the same IANA zone manually still exits AUTO. Startup, resume and the existing timezone event reconcile through `configureReportingDay`, retaining timestamps, IDs, day-start minutes and goal zones. JSON15 is unchanged.
+Reporting-zone AUTO is device-local. New installations default to AUTO; existing fixed zones remain fixed until an explicit choice. Selecting the same IANA zone manually still exits AUTO. Startup, resume, the existing timezone event and an observed backup replacement reconcile through `configureReportingDay`, retaining timestamps, IDs, day-start minutes and goal zones. Replacement detection includes the control barrier, so restoring the same dataset also reconciles while the app stays in the foreground. FIXED retains the zone from the restored backup. JSON15 is unchanged.
 
 The preference and core are separate stores, so their writes are not described as atomic. Before changing the core, the controller durably records a pending choice and its original expected token in local preferences. After the core commit it acknowledges the mode and removes the pending choice. If acknowledgement fails, the pending mode prevents the former opposite AUTO/FIXED mode from reverting the committed zone. Startup retries the original token or acknowledges its observed result. Conflicting state blocks automatic rewriting, displays a recovery message, and requires a fresh explicit choice. Storage/cancellation outcomes retain the intent for observation rather than assuming rollback.
 
@@ -24,7 +24,7 @@ All nine original input images were viewed as PNG pixels through authorized Page
 
 - Targeted Memory and Room deletion cases covered one commit/Undo, refusal without deletion and cancellation without losing the prior Undo.
 - The new UI bridge checks covered changed selection, cancellation, disposed caller scope, same-zone AUTO-to-FIXED and the controller resource catalogue.
-- Four reporting-preference cases passed, including failed final preference writes returning false or throwing, a fresh controller startup/reconcile, and a conflicting recovery requiring explicit choice.
+- Reporting-preference cases cover failed final preference writes returning false or throwing, a fresh controller startup/reconcile, a conflicting recovery requiring explicit choice, and confirmed foreground restores of the same/different dataset in AUTO and FIXED.
 - B's two category-context and two day-boundary regressions passed. The UI confirmation committed a batch and restored the exact original records through the snackbar Undo.
 - `UiScreensTest.neonAccentSettings` passed all four accent choices and produced five actual native-graphics Robolectric PNGs. Source data remained equal.
 - The final targeted UI scenario and `:app:assembleDebug -PtrackerUnsigned=true` passed. `apksigner verify` reported no signature, as intended.

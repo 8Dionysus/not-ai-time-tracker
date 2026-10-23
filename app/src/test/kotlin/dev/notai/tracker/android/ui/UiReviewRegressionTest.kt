@@ -87,6 +87,29 @@ class UiReviewRegressionTest {
     }
     private fun at(text: String) = Instant.parse(text).toEpochMilli()
 
+    @Test fun batchDeletePreservesSelectionOnStaleAndClearsOnlyAfterOneSuccessfulUndoableCommit() {
+        val f = fixture(FakeClock());val t = f.tracker
+        t.manual(t.snapshot().token,f.clock.wall-4000,f.clock.wall-3000,Classification(name = "One"))
+        t.manual(t.snapshot().token,f.clock.wall-2000,f.clock.wall-1000,Classification(name = "Two"))
+        val ids = t.data().sessions.map { it.id }.toSet()
+        ids.forEach(f.vm::togglePicked);f.synced()
+        val stale = runBlocking { f.vm.previewBatchDelete().getOrThrow() }
+        t.saveCard(t.snapshot().token,Card("batch-stale","Concurrent"));f.synced()
+        val before = t.data();val attempts = f.store.commits.get()
+        f.vm.applyBatchDelete(stale)
+        pump { f.notices.isNotEmpty() }
+        assertEquals(ids,f.vm.picked.value);assertEquals(before,t.data());assertEquals(attempts,f.store.commits.get())
+        val fresh = runBlocking { f.vm.previewBatchDelete().getOrThrow() }
+        f.notices.clear();f.vm.applyBatchDelete(fresh)
+        pump { f.notices.any { it.undo != null } }
+        assertTrue(f.vm.picked.value.isEmpty());assertTrue(t.data().sessions.isEmpty())
+        assertEquals(attempts+1,f.store.commits.get())
+        val notice = f.notices.single { it.undo != null }
+        f.synced();f.vm.undo(notice.undo!!)
+        pump { t.data().sessions.size == 2 }
+        assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
+    }
+
     @Test fun shortcutPreferenceControllerSupportsDisableAndReenableWithoutOtherChanges() {
         val surfaces=SurfaceSettings(widget=true,notification=true,overlay=true,focusSignal=false,shortcut=true)
         val f=fixture(FakeClock(),Settings("UTC",surfaces=surfaces));val t=f.tracker

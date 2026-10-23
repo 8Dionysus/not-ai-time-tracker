@@ -146,6 +146,8 @@ class TrackerViewModel internal constructor(private val app: Application,private
     /** Wall time from the core clock, so every screen agrees with the tracker about "now". */
     fun now(): Long = runtime?.tracker?.clock?.now()?.wall ?: System.currentTimeMillis()
     private val prefs = app.getSharedPreferences("ui", Context.MODE_PRIVATE)
+    private val _reportZoneAutomatic = MutableStateFlow(false)
+    val reportZoneAutomatic: StateFlow<Boolean> = _reportZoneAutomatic
 
     private val _notices = MutableSharedFlow<Notice>(extraBufferCapacity = 8)
     val notices: SharedFlow<Notice> = _notices
@@ -217,7 +219,9 @@ class TrackerViewModel internal constructor(private val app: Application,private
     fun load() {
         _boot.value = Boot.Loading
         viewModelScope.launch(Dispatchers.IO) {
-            _boot.value = try { Boot.Ready(UiBackends.open(app)) }
+            _boot.value = try { Boot.Ready(UiBackends.open(app).also {
+                _reportZoneAutomatic.value = it.runtime?.reportZone?.automatic ?: false
+            }) }
             catch (e: Exception) { Boot.Failed(e.message ?: e.javaClass.simpleName) }
         }
     }
@@ -480,6 +484,8 @@ class TrackerViewModel internal constructor(private val app: Application,private
         viewModelScope.launch(Dispatchers.IO) {
             val rt = waitRuntime() ?: return@launch
             try {
+                if(reconcileForeground) rt.runtime?.reportZone?.reconcile()
+                _reportZoneAutomatic.value = rt.runtime?.reportZone?.automatic ?: false
                 _capabilities.value = dev.notai.tracker.android.SurfaceSettingsBackend.read(app,rt.tracker.data().settings.surfaces,reconcileForeground)
                 _capabilityProblem.value = null
             } catch(e: Exception) { _capabilityProblem.value = dev.notai.tracker.android.SurfaceProblem.PLATFORM_FAILURE; notice(Format.error(e)) }
@@ -1002,7 +1008,15 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val d = rt.tracker.data(); rt.tracker.settings(s.token, d.settings.copy(surfaces = change(d.settings.surfaces)))
     }
     fun setReportZone(zone: String) = command({ "Часовой пояс отчётов: $zone" }) { rt, s ->
-        ZoneId.of(zone); val d = rt.tracker.data(); rt.tracker.configureReportingDay(s.token, ReportingDayPolicy(zone, d.settings.reportDayStartMinute))
+        ZoneId.of(zone)
+        val changed = rt.runtime?.reportZone?.setFixed(s.token,zone) ?: rt.tracker.configureReportingDay(s.token,
+            ReportingDayPolicy(zone,rt.tracker.data().settings.reportDayStartMinute))
+        _reportZoneAutomatic.value = false
+        changed
+    }
+    fun setReportZoneAutomatic(value: Boolean) = command({ if(value) "Часовой пояс отчётов следует за устройством. Записи могут перейти на другой день" else "Часовой пояс отчётов закреплён" }) { rt,s ->
+        val preference = rt.runtime?.reportZone ?: fail(ErrorCode.INVALID_INPUT,"Device report zone preference unavailable")
+        preference.setAutomatic(s.token,value).also { _reportZoneAutomatic.value = preference.automatic }
     }
     /** Only day labels move; recorded facts and existing goals keep their own boundaries. */
     fun setDayStart(minute: Int) = command({ "День начинается в ${minute / 60}:${(minute % 60).toString().padStart(2, '0')}" }) { rt, s ->
@@ -1248,6 +1262,16 @@ class TrackerViewModel internal constructor(private val app: Application,private
     val picked: StateFlow<Set<String>> = _picked
     fun togglePicked(sessionId: String) { _picked.value = _picked.value.let { if (sessionId in it) it - sessionId else it + sessionId } }
     fun clearPicked() { _picked.value = emptySet() }
+    suspend fun previewBatchDelete(): Result<Tracker.BatchDeletePreview> = withContext(Dispatchers.IO) {
+        runCatching {
+            val rt = runtime ?: fail(ErrorCode.STALE,"No backend")
+            rt.tracker.previewDeleteSessions(_picked.value)
+        }
+    }
+    fun applyBatchDelete(preview: Tracker.BatchDeletePreview) = command({ _ ->
+        _picked.value = emptySet()
+        "Удалено ${Format.plural(preview.sessionCount,"запись","записи","записей") }"
+    }) { rt,_ -> rt.tracker.applyDeleteSessions(preview) }
     suspend fun previewBatch(selection: Classification?, note: MetadataNoteEdit?, replace: Boolean): Result<BatchMetadataPreview> = withContext(Dispatchers.IO) {
         runCatching {
             val rt = runtime ?: fail(ErrorCode.STALE, "No backend")

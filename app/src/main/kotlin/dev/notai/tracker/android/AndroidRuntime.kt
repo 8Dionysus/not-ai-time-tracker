@@ -105,11 +105,11 @@ class TrackerRuntime private constructor(context: Context,val database: TrackerD
                 if(e is CancellationException) throw e
                 android.util.Log.w("TimerSurfaces","Store observation unavailable; open recovery controls")
             }.collect { view ->
+                try { surfaceObserver.refresh(view);FocusSignals.refresh(context,tracker) }
+                catch(e: Exception) { if(e is CancellationException) throw e; android.util.Log.w("TimerSurfaces","Surface refresh unavailable") }
                 try { automaticBackups.changed(view) } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("AutomaticBackup","Backup queue refresh unavailable") }
                 try { attention.synchronize() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("AttentionRuntime","Optional refresh pending") }
                 try { scheduleProjection.synchronize() } catch(e: Exception) { if(e is CancellationException) throw e;android.util.Log.w("ScheduleProjection","Projection refresh pending") }
-                try { surfaceObserver.refresh(view);FocusSignals.refresh(context,tracker) }
-                catch(e: Exception) { if(e is CancellationException) throw e; android.util.Log.w("TimerSurfaces","Surface refresh unavailable") }
                 val delivered = previousSchedule
                 if(delivered == null || delivered.sourceDatasetId != view.data.datasetId || delivered.sourceBarrier != view.data.controlBarrier || delivered.sourceSchedule != view.data.schedule || delivered.sourcePreferences != view.data.settings.schedule) {
                     try { previousSchedule = scheduleDelivery.synchronize() }

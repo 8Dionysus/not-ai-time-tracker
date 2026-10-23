@@ -1263,9 +1263,12 @@ class TrackerViewModel internal constructor(private val app: Application,private
     fun togglePicked(sessionId: String) { _picked.value = _picked.value.let { if (sessionId in it) it - sessionId else it + sessionId } }
     fun clearPicked() { _picked.value = emptySet() }
     suspend fun previewBatchDelete(): Result<Tracker.BatchDeletePreview> = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             val rt = runtime ?: fail(ErrorCode.STALE,"No backend")
-            rt.tracker.previewDeleteSessions(_picked.value)
+            Result.success(rt.tracker.previewDeleteSessions(_picked.value))
+        } catch(e: Exception) {
+            if(e is kotlinx.coroutines.CancellationException) throw e
+            Result.failure(e)
         }
     }
     fun applyBatchDelete(preview: Tracker.BatchDeletePreview) = command({ _ ->

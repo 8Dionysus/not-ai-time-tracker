@@ -151,7 +151,7 @@ object SurfaceSettingsBackend {
             SurfaceCapability(settings.notification,notifications,notificationProblem,setOf(SurfaceSettingsAction.REQUEST_NOTIFICATION_PERMISSION,SurfaceSettingsAction.OPEN_NOTIFICATION_SETTINGS,SurfaceSettingsAction.OPEN_TIMER_CHANNEL_SETTINGS)),
             SurfaceCapability(settings.overlay,overlay,if(overlay) null else SurfaceProblem.PERMISSION_REQUIRED,setOf(SurfaceSettingsAction.OPEN_OVERLAY_PERMISSION)),
             SurfaceCapability(settings.focusSignal,focus,if(focus) null else if(permission) SurfaceProblem.CHANNEL_BLOCKED else SurfaceProblem.PERMISSION_REQUIRED,setOf(SurfaceSettingsAction.OPEN_NOTIFICATION_SETTINGS)),
-            SurfaceCapability(settings.shortcut,true,null,emptySet()),timerNotificationCapability(context))
+            SurfaceCapability(settings.shortcut,true,null,emptySet()),timerNotificationCapability(context,settings.notificationPrivacy))
     }
     fun settingsIntent(context: Context,action: SurfaceSettingsAction): Intent? = when(action) {
         SurfaceSettingsAction.OPEN_NOTIFICATION_SETTINGS -> Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE,context.packageName)
@@ -171,9 +171,15 @@ object SurfaceSettingsBackend {
  * This never changes or suppresses the separate foreground-service indicator.
  */
 data class TimerNotificationCapability(val importance: Int?,val statusBarIconRequested: Boolean?,
-    val channelLockScreenVisibility: Int?,val settingsAction: SurfaceSettingsAction = SurfaceSettingsAction.OPEN_TIMER_CHANNEL_SETTINGS)
-internal fun timerNotificationCapability(context: Context): TimerNotificationCapability {
-    val channel = context.getSystemService(android.app.NotificationManager::class.java).getNotificationChannel(TimerSurfaces.CONTROL_CHANNEL)
+    val channelLockScreenVisibility: Int?,val settingsAction: SurfaceSettingsAction = SurfaceSettingsAction.OPEN_TIMER_CHANNEL_SETTINGS,
+    val requestedVisibility: Int = android.app.Notification.VISIBILITY_PRIVATE,val publishedVisibility: Int? = null,
+    val publishedHasPublicVersion: Boolean? = null)
+internal fun timerNotificationCapability(context: Context,privacy: NotificationPrivacy? = null): TimerNotificationCapability {
+    val manager = context.getSystemService(android.app.NotificationManager::class.java)
+    val channel = manager.getNotificationChannel(TimerSurfaces.CONTROL_CHANNEL)
     val importance = channel?.importance
-    return TimerNotificationCapability(importance,importance?.let { it >= android.app.NotificationManager.IMPORTANCE_LOW },channel?.lockscreenVisibility)
+    val published = runCatching { manager.activeNotifications.firstOrNull { it.id == TimerSurfaces.CONTROL_ID }?.notification }.getOrNull()
+    return TimerNotificationCapability(importance,importance?.let { it >= android.app.NotificationManager.IMPORTANCE_LOW },channel?.lockscreenVisibility,
+        requestedVisibility = SurfaceViews.notificationVisibility(privacy),publishedVisibility = published?.visibility,
+        publishedHasPublicVersion = published?.let { it.publicVersion != null })
 }

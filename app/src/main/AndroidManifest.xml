@@ -25,17 +25,17 @@
             <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
         </activity-alias>
         <activity-alias android:name=".LauncherAmber" android:targetActivity=".MainActivity" android:exported="true"
-            android:enabled="false" android:label="@string/launcher_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round">
+            android:enabled="false" android:label="@string/launcher_name" android:icon="@mipmap/ic_launcher_amber" android:roundIcon="@mipmap/ic_launcher_amber">
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
             <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
         </activity-alias>
         <activity-alias android:name=".LauncherMint" android:targetActivity=".MainActivity" android:exported="true"
-            android:enabled="false" android:label="@string/launcher_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round">
+            android:enabled="false" android:label="@string/launcher_name" android:icon="@mipmap/ic_launcher_mint" android:roundIcon="@mipmap/ic_launcher_mint">
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
             <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
         </activity-alias>
         <activity-alias android:name=".LauncherViolet" android:targetActivity=".MainActivity" android:exported="true"
-            android:enabled="false" android:label="@string/launcher_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round">
+            android:enabled="false" android:label="@string/launcher_name" android:icon="@mipmap/ic_launcher_violet" android:roundIcon="@mipmap/ic_launcher_violet">
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
             <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
         </activity-alias>

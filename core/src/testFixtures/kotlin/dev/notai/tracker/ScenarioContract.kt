@@ -21,6 +21,7 @@ class MemoryRollback: RollbackStore {
 abstract class ScenarioContract {
     @Test fun feedbackBatchDeleteOneCommit() = batchDeleteOneCommit(::createStore,::reopen)
     @Test fun feedbackBatchDeleteRefusals() = batchDeleteRefusals(::createStore,::reopen)
+    @Test fun feedbackBatchDeleteCancellation() = batchDeleteCancellation(::createStore)
     @Test fun pr3PlannedStartRefusals() = pr3PlannedStartRefusals(::createStore,::reopen)
     @Test fun pr3PlannedStartOneCommit() = pr3PlannedStartOneCommit(::createStore,::reopen)
     @Test fun pr3PlannedStartStorageFailure() = pr3PlannedStartStorageFailure(::createStore,::reopen)

@@ -1,0 +1,7 @@
+<resources>
+    <string name="launcher_icon_option_default">Системный вариант</string>
+    <!-- Resource names remain stable for the already integrated descriptor. -->
+    <string name="launcher_icon_option_placeholder_1">Янтарный</string>
+    <string name="launcher_icon_option_placeholder_2">Мятный</string>
+    <string name="launcher_icon_option_placeholder_3">Фиолетовый</string>
+</resources>

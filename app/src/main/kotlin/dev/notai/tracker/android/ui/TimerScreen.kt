@@ -141,7 +141,7 @@ private fun Modifier.neonGlow(): Modifier {
         t.animateFloat(0f, 1f, androidx.compose.animation.core.infiniteRepeatable(tween(9000), androidx.compose.animation.core.RepeatMode.Reverse), label = "neonShift").value
     }
     return this.drawBehind {
-        val a = c.amber.copy(alpha = 0.16f); val b = c.areas[1].copy(alpha = 0.12f)
+        val a = c.amber.copy(alpha = 0.06f); val b = c.areas[1].copy(alpha = 0.04f)
         drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(a, a.copy(alpha = 0f)),
             androidx.compose.ui.geometry.Offset(size.width * (0.25f + 0.2f * shift), size.height * 0.35f), size.width * 0.55f), radius = size.width)
         drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(b, b.copy(alpha = 0f)),

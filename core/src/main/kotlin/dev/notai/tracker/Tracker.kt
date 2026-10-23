@@ -258,6 +258,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
     fun deleteSession(expected: Token,id: String) = mutate(expected,true) { d,_ -> deletedSession(d,id) }
     class BatchDeletePreview internal constructor(val expected: Token,val sessionIds: Set<String>,val before: Dataset,val after: Dataset,val asOf: Moment) {
         val sessionCount get() = sessionIds.size
+        val recordedMs get() = before.segments.filter { it.sessionId in sessionIds }.sumExact { it.durationMs }
         val segmentCount get() = before.segments.size-after.segments.size
         val measurementCount get() = before.measurements.size-after.measurements.size
         val subjectLinkCount get() = before.subjects.links.size-after.subjects.links.size
@@ -745,7 +746,7 @@ internal fun checkToken(d: Dataset,t: Token,n: Moment) {
     if (token(d) != t) throw CoreError(ErrorCode.STALE,"Stale action; refresh snapshot",snapshot(d,n))
 }
 private fun List<Session>.replace(s: Session) = map { if (it.id == s.id) s else it }
-internal fun <T> storage(block: () -> T): T = try { block() } catch (e: CoreError) { throw e } catch (e: Exception) { throw CoreError(ErrorCode.STORAGE,"Storage operation failed: ${e.javaClass.simpleName}") }
+internal fun <T> storage(block: () -> T): T = try { block() } catch (e: java.util.concurrent.CancellationException) { throw e } catch (e: CoreError) { throw e } catch (e: Exception) { throw CoreError(ErrorCode.STORAGE,"Storage operation failed: ${e.javaClass.simpleName}") }
 
 /** Returns an observed copy; never writes clock ticks. An old boot provides no elapsed-time evidence. */
 fun materialize(s: Segment,n: Moment): Segment {

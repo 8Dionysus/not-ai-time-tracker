@@ -52,6 +52,45 @@ class ReportZonePreferenceTest {
         assertEquals(ErrorCode.STALE,assertThrows(CoreError::class.java) { preference.setFixed(old,"UTC") }.code)
         assertTrue(preference.automatic);assertEquals(before,tracker.data())
     }
+    @Test fun failedFinalPreferenceSaveRecoversOnStartupWithoutRevertingFixedZone() {
+        app.getSharedPreferences("report-zone",0).edit().clear().commit()
+        tracker.manual(tracker.snapshot().token,tracker.clock.now().wall-1000,tracker.clock.now().wall,Classification())
+        tracker.configureReportingDay(tracker.snapshot().token,ReportingDayPolicy("UTC",275))
+        tracker.saveGoal(tracker.snapshot().token,Goal("recovery-zone-goal","Preserve",GoalMetric.DURATION_MS,1000))
+        for(throwing in listOf(false,true)) {
+            ReportZonePreference(app,tracker,false) { "Europe/Berlin" }.setAutomatic(tracker.snapshot().token,true)
+            val before = tracker.data()
+            val preference = ReportZonePreference(app,tracker,false) { "Europe/Berlin" }
+            var writes = 0
+            preference.writePreference = { editor ->
+                if(++writes == 2) { if(throwing) throw java.io.IOException("Synthetic preference write failure") else false }
+                else editor.commit()
+            }
+            assertThrows(CoreError::class.java) { preference.setFixed(tracker.snapshot().token,"UTC") }
+            assertEquals(2,writes);assertEquals("UTC",tracker.data().settings.reportZone)
+            assertFalse(preference.automatic);assertNotNull(preference.recoveryProblem)
+            val committed = tracker.data()
+            val startup = ReportZonePreference(app,tracker,false) { "Europe/Berlin" }
+            startup.reconcile();startup.reconcile()
+            assertFalse(startup.automatic);assertNull(startup.recoveryProblem)
+            assertEquals(committed,tracker.data()) // Acknowledgement recovery performs no second core mutation.
+            assertEquals(before.sessions,committed.sessions);assertEquals(before.segments,committed.segments)
+            assertEquals(before.goals,committed.goals);assertEquals(275,committed.settings.reportDayStartMinute)
+        }
+    }
+    @Test fun pendingZoneConflictBlocksAutomaticRewriteUntilFreshExplicitChoice() {
+        app.getSharedPreferences("report-zone",0).edit().clear().commit()
+        val preference = ReportZonePreference(app,tracker,true) { "Europe/Berlin" };preference.reconcile()
+        var writes = 0
+        preference.writePreference = { editor -> if(++writes == 2) false else editor.commit() }
+        assertThrows(CoreError::class.java) { preference.setFixed(tracker.snapshot().token,"UTC") }
+        tracker.configureReportingDay(tracker.snapshot().token,ReportingDayPolicy("Asia/Tokyo",275))
+        val startup = ReportZonePreference(app,tracker,false) { "Europe/Berlin" };val before = tracker.data()
+        assertNull(startup.reconcile());assertNotNull(startup.recoveryProblem);assertEquals(before,tracker.data())
+        startup.setFixed(tracker.snapshot().token,"Asia/Tokyo")
+        assertFalse(startup.automatic);assertNull(startup.recoveryProblem);assertNull(startup.reconcile())
+        assertEquals("Asia/Tokyo",tracker.data().settings.reportZone);assertEquals(275,tracker.data().settings.reportDayStartMinute)
+    }
     private class RollbackStoreForZoneTest: RollbackStore {
         override fun save(json: String): String = error("Export does not save rollback")
         override fun read(reference: String): String = error("Export does not read rollback")

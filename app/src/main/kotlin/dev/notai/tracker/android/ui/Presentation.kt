@@ -173,7 +173,13 @@ object Areas {
 }
 
 /** How a saved classification reads on screen. Names are never used to classify anything. */
-data class Label(val title: String, val detail: String?, val slot: Int?, val unclassified: Boolean, val glyph: Int = ActivityGlyphs.custom)
+data class Label(val title: String, val detail: String?, val slot: Int?, val unclassified: Boolean, val glyph: Int = ActivityGlyphs.custom,
+                 /** Non-null only when detail was supplied by the category, never by the user. */
+                 val fallbackRootId: String? = null)
+
+/** The open category already supplies this context. Searches and recents keep it. */
+internal fun Label.detailInCategory(rootId: String?): String? =
+    detail.takeUnless { rootId != null && fallbackRootId == rootId }
 
 fun Dataset.label(c: Classification): Label {
     val type = c.activityTypeId?.let { id -> types.firstOrNull { it.id == id } }
@@ -182,14 +188,8 @@ fun Dataset.label(c: Classification): Label {
     val details = c.details.values.filter { it.isNotBlank() }.joinToString(", ").takeIf { it.isNotEmpty() }
     val rootName = root?.takeIf { it != c.activityTypeId }?.let { r -> types.firstOrNull { it.id == r }?.name?.lowercase() }
     val name = title ?: "Без занятия"
-    return Label(name, (details ?: rootName)?.takeUnless { repeats(name, it) }, Areas.slot(root), title == null && c.cardId == null, glyph(c))
-}
-
-/** "Силовая тренировка" + "тренировка и спорт" says the same twice: the quiet detail is dropped when it repeats a word of the title. */
-internal fun repeats(title: String, detail: String): Boolean {
-    fun stems(s: String) = s.lowercase().split(Regex("[^\\p{L}\\p{N}]+")).filter { it.length >= 4 }.map { it.take(5) }.toSet()
-    val t = stems(title)
-    return t.isNotEmpty() && stems(detail).any { it in t }
+    return Label(name, details ?: rootName, Areas.slot(root), title == null && c.cardId == null, glyph(c),
+        fallbackRootId = root.takeIf { details == null && rootName != null })
 }
 
 /** Icon through the core's semantic keys; a named choice without a type is "custom", never "unclassified". */

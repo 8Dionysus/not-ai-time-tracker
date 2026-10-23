@@ -6,12 +6,22 @@ import android.content.pm.PackageManager
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.os.Build
+import androidx.annotation.StringRes
 
 /** Stable platform choice, outside the portable dataset/backup. MainActivity is never disabled. */
 class LauncherIconController(private val context: Context) {
-    data class Option(val key: String,val alias: String)
+    data class Option(val key: String,val alias: String,@StringRes val labelRes: Int) {
+        fun label(context: Context): String = context.getString(labelRes)
+    }
     data class State(val selected: String?,val enabled: Set<String>)
     data class Selection(val state: State,val shortcutsRebound: Boolean)
+    data class AvailableOption(val option: Option,val iconResource: Int,val compatibleKeys: Set<String>)
+
+    /** Keep legacy keys switchable, but offer one row for each actual packaged icon resource. */
+    fun availableOptions(): List<AvailableOption> = options.groupBy { option ->
+        context.packageManager.getActivityInfo(component(option),PackageManager.MATCH_DISABLED_COMPONENTS).icon
+            .takeIf { it != 0 } ?: context.applicationInfo.icon
+    }.map { (icon,entries) -> AvailableOption(entries.first(),icon,entries.map { it.key }.toSet()) }
 
     fun read(): State {
         val enabled = options.filter { option ->
@@ -100,7 +110,14 @@ class LauncherIconController(private val context: Context) {
         internal fun <T> withBinding(context: Context,block: (ComponentName) -> T): T = synchronized(lock) {
             block(LauncherIconController(context).component())
         }
-        val options = listOf(Option("default","LauncherDefault"),Option("amber","LauncherAmber"),Option("mint","LauncherMint"),Option("violet","LauncherViolet"))
+        // Stable platform identities and localized labels. availableOptions reads the actual
+        // packaged resources; UI themes never supply or rename this catalogue.
+        val options = listOf(
+            Option("default","LauncherDefault",R.string.launcher_icon_option_default),
+            Option("amber","LauncherAmber",R.string.launcher_icon_option_placeholder_1),
+            Option("mint","LauncherMint",R.string.launcher_icon_option_placeholder_2),
+            Option("violet","LauncherViolet",R.string.launcher_icon_option_placeholder_3),
+        )
         private val shortcutIds = setOf("timer_action","timer_choose","timer_favorite_0","timer_favorite_1")
     }
 }

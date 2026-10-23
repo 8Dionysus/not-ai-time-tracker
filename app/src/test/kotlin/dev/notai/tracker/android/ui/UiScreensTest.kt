@@ -31,6 +31,7 @@ import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -378,6 +379,32 @@ class UiScreensTest {
         shot("06c-settings-more", vm)
     }
 
+    @Test fun reportDayBoundaryIsHiddenUntilRequestedAndCancelDoesNotWrite() {
+        val s = seed()
+        val vm = render(s)
+        compose.onNodeWithText("Настройки").performClick()
+        compose.onNodeWithText("Ещё").performClick()
+        waitText("Часовой пояс")
+        shot("feedback-settings-more",vm)
+        assertTrue(compose.onAllNodesWithText("Граница отчётного дня").fetchSemanticsNodes().isEmpty())
+        val before = s.tracker.data()
+        compose.onNodeWithText("Дополнительно").performClick()
+        compose.onNodeWithText("Граница отчётного дня").performClick()
+        waitText("Сохранить")
+        compose.onNodeWithContentDescription("Граница дня на час позже").performClick()
+        compose.onNodeWithContentDescription("Закрыть").performClick()
+        compose.waitForIdle()
+        assertTrue("Editing and cancelling must not mutate the Dataset", before == s.tracker.data())
+    }
+
+    @Test fun reportDayEditorRetainsExistingMinuteWhenOpened() {
+        var writes = 0
+        compose.setContent { NotAiTheme { DayBoundarySheet(275, { writes++ }, {}) } }
+        waitText("4:35")
+        compose.waitForIdle()
+        assertTrue("Opening a 4:35 boundary must not silently round it to 4:00", writes == 0)
+    }
+
     /** A Toggl-style export: columns are suggested from headers, the time layout from the first row, then preview and append. */
     @Config(qualifiers = "w400dp-h1300dp-xhdpi")
     @Test fun csvImport() {
@@ -510,6 +537,23 @@ class UiScreensTest {
         compose.onNodeWithText("Все занятия, прошлая неделя").performClick()
         waitText("Изменить")
         shot("36-report", vm)
+    }
+
+    @Test fun feedbackBatchDeletionConfirmationCommitsAndUndoRestoresTheOriginalRecords() {
+        val s = seed(false);val vm = render(s)
+        val before = s.tracker.data();val ids = before.sessions.take(2).map { it.id }.toSet()
+        compose.runOnIdle { ids.forEach(vm::togglePicked) }
+        waitText("Удалить · 2")
+        compose.onNodeWithText("Удалить · 2").performClick()
+        waitText("Удалить 2 записи?")
+        shot("feedback-batch-delete",vm)
+        compose.onNodeWithText("Удалить").performClick()
+        compose.waitUntil(5_000) { s.tracker.data().sessions.none { it.id in ids } }
+        waitText("Удалено 2 записи")
+        compose.onNodeWithText("Отменить").performClick()
+        compose.waitUntil(5_000) { s.tracker.data().sessions.size == before.sessions.size }
+        assertTrue(before.sessions == s.tracker.data().sessions)
+        assertTrue(before.segments == s.tracker.data().segments)
     }
 
     /** «Выбрать несколько» from the menu, a second tap adds another, and one note goes to both after a confirmation. */
@@ -851,6 +895,30 @@ class UiScreensTest {
         val vm = render(seed(running = false))
         waitText("Начать")
         shotAs("29-neon-idle", vm, ThemeChoice.NEON)
+    }
+
+    /** Each existing accent is available in Neon and changes through the actual settings control. */
+    @Test fun neonAccentSettings() {
+        val s = seed()
+        val vm = render(s, initialTheme = ThemeChoice.NEON)
+        val before = s.tracker.data()
+        compose.onNodeWithText("Настройки").performClick()
+        waitText("Акцент")
+        for (accent in Accent.entries) {
+            val choice = compose.onNode(androidx.compose.ui.test.SemanticsMatcher("Accent: ${accent.title}") { node ->
+                val click = androidx.compose.ui.semantics.SemanticsActions.OnClick
+                click in node.config && node.config[click].label == accent.title
+            }, useUnmergedTree = true)
+            choice.performClick()
+            compose.waitUntil(5000) { vm.appearance.value.accent == accent }
+            choice.assertIsSelected()
+            shotAs("33-neon-settings-${accent.name.lowercase()}", vm, ThemeChoice.NEON)
+        }
+        vm.setAppearance { it.copy(accent = Accent.AMBER) }
+        compose.onNodeWithText("Таймер").performClick()
+        waitText("1:24")
+        shotAs("34-neon-running-amber", vm, ThemeChoice.NEON)
+        assertTrue("Appearance changes must not change records or reporting settings", before == s.tracker.data())
     }
 
     @Test fun recovery() {

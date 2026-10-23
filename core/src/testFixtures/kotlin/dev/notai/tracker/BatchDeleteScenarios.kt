@@ -2,6 +2,33 @@ package dev.notai.tracker
 
 import kotlin.test.*
 
+fun batchDeleteCancellation(create: () -> StateStore) {
+    val base = create();var cancel = false
+    val cancelled = java.util.concurrent.CancellationException("Synthetic batch cancellation")
+    val store = object: StateStore {
+        override val changes get() = base.changes
+        override val checkedChanges get() = base.checkedChanges
+        override fun read() = base.read()
+        override fun readChecked() = base.readChecked()
+        override fun <T> transaction(block: (Dataset) -> Pair<Dataset,T>): T {
+            if(cancel) throw cancelled
+            return base.transaction(block)
+        }
+        override fun <T> checkedTransaction(block: (CheckedState) -> CheckedCommit<T>): T {
+            if(cancel) throw cancelled
+            return base.checkedTransaction(block)
+        }
+    }
+    val clock = FakeClock();val tracker = Tracker(store,clock)
+    tracker.manual(tracker.snapshot().token,clock.wall-1000,clock.wall,Classification())
+    val before = tracker.data();val token = tracker.snapshot().token;val ids = before.sessions.map { it.id }
+    cancel = true
+    assertSame(cancelled,assertFailsWith<java.util.concurrent.CancellationException> { tracker.previewDeleteSessions(ids) })
+    assertSame(cancelled,assertFailsWith<java.util.concurrent.CancellationException> { tracker.deleteSessions(token,ids) })
+    assertEquals(before,base.read());assertTrue(tracker.canUndo(token))
+    cancel = false;tracker.undo(token);assertTrue(tracker.data().sessions.isEmpty())
+}
+
 fun batchDeleteOneCommit(create: () -> StateStore,reopen: (StateStore) -> StateStore) {
     val clock = FakeClock();var tracker = Tracker(create(),clock)
     // First record crosses midnight: both day rows must identify the same deletion target.

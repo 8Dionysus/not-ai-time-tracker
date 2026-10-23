@@ -103,19 +103,22 @@ object SurfaceViews {
         rv.setOnClickPendingIntent(id, TimerSurfaces.pending(c, SurfaceAction(source, cmd, s.token, s.timerTarget)))
     }
 
+    /** Shared bounded projection keeps core ranking and avoids a second history query for idle icons. */
+    private fun recentChoices(view: TrackerView,s: Snapshot): List<QuickChoice> {
+        val end = minOf(MAX_TIME,System.currentTimeMillis()+1)
+        val excluded = if(s.mode == Mode.IDLE) null else s.session?.selection
+        return runCatching { view.choices().quick(HistoryWindow(maxOf(0L,end-30L*24*60*60*1000),end),chips.size,excluded) }
+            .getOrDefault(emptyList())
+    }
     /** Favourites, then the most frequent of the last 30 days (core quick source), minus what is already running. */
-    private fun quick(d: Dataset, view: TrackerView, s: Snapshot): Quick? {
+    private fun quick(d: Dataset,view: TrackerView,s: Snapshot,choices: List<QuickChoice>): Quick? {
         if (s.focus != null || s.mode == Mode.RECOVERY) return null
         val route = runCatching { SurfaceChoices.route(Surface.NOTIFICATION, s) }.getOrNull() ?: return null
-        val end = minOf(MAX_TIME, System.currentTimeMillis() + 1)
-        // Shared core projection excludes the current selection before the compact limit.
-        val excluded = if(route.application == ChoiceApplication.SWITCH) s.session?.selection else null
-        val items = runCatching { view.choices().quick(HistoryWindow(maxOf(0L, end - 30L * 24 * 60 * 60 * 1000), end), chips.size, excluded) }.getOrDefault(emptyList())
-            .map { q ->
-                val l = d.label(q.entry.selection)
-                val tint = l.slot?.let { areaColors[it] } ?: R.color.widget_ink2
-                ChipItem(if (q.entry.kind == ChoiceKind.FAVORITE) q.entry.title else l.title, l.glyph, tint) { ctx, i -> QuickChoiceReceiver.pending(ctx, route, q.reference, i) }
-            }
+        val items = choices.map { q ->
+            val l = d.label(q.entry.selection)
+            val tint = l.slot?.let { areaColors[it] } ?: R.color.widget_ink2
+            ChipItem(if (q.entry.kind == ChoiceKind.FAVORITE) q.entry.title else l.title, l.glyph, tint) { ctx, i -> QuickChoiceReceiver.pending(ctx, route, q.reference, i) }
+        }
         // Today's open plan comes first; the remaining places keep the favourites and frequent choices.
         val plan = PlanSurfaces.open(view).map { p ->
             ChipItem(p.title + (p.time?.let { " $it" } ?: ""), p.glyph, p.slot?.let { areaColors[it] } ?: R.color.widget_ink2) { ctx, i -> PlanSurfaces.pending(ctx, p, s, i) }
@@ -144,12 +147,51 @@ object SurfaceViews {
         if (q.items.size <= 2) chips.drop(2).forEach { (box, _, _) -> rv.setViewVisibility(box, View.GONE) }
     }
 
+    private val compactFavorites = intArrayOf(R.id.notification_favorite_0,R.id.notification_favorite_1,
+        R.id.notification_favorite_2,R.id.notification_favorite_3)
+
+    /** The platform does not report an OEM notification host's measured width to the publisher.
+     * Budget conservatively from the current display width, reserving 96dp for system decoration
+     * and 48dp for the start control. The layout's actual widths are checked by host fixtures;
+     * unusually narrow OEM cards can still show fewer controls than the app requests. */
+    internal fun compactFavoriteLimit(c: Context): Int {
+        // Keep the collapsed title/control row usable when enlarged system text needs its height.
+        if(c.resources.configuration.fontScale > 1.15f) return 0
+        val metrics = c.resources.displayMetrics
+        val displayDp = (metrics.widthPixels / metrics.density).toInt()
+        val configDp = c.resources.configuration.screenWidthDp.takeIf { it > 0 } ?: displayDp
+        return ((minOf(configDp,displayDp)-96-48)/40).coerceIn(0,compactFavorites.size)
+    }
+    private fun bindCompactFavorites(c: Context,rv: RemoteViews,view: TrackerView,s: Snapshot,choices: List<QuickChoice>) {
+        if(s.mode != Mode.IDLE || s.focus != null) return
+        // Only the notification loses this idle caption. The expanded labels and widget stay.
+        rv.setViewVisibility(R.id.surface_status,View.GONE)
+        val limit = compactFavoriteLimit(c)
+        if(limit == 0) return
+        val route = SurfaceChoices.route(Surface.NOTIFICATION,s)
+        val favorites = choices.filter { it.entry.kind == ChoiceKind.FAVORITE }.take(limit)
+        if(favorites.isEmpty()) return
+        rv.setViewVisibility(R.id.notification_favorites,View.VISIBLE)
+        favorites.forEachIndexed { i,q ->
+            val label = view.data.label(q.entry.selection)
+            val id = compactFavorites[i]
+            rv.setViewVisibility(id,View.VISIBLE)
+            rv.setImageViewResource(id,label.glyph)
+            rv.setInt(id,"setColorFilter",c.getColor(label.slot?.let { areaColors[it] } ?: R.color.widget_ink2))
+            rv.setContentDescription(id,c.getString(R.string.notification_start_favorite,q.entry.title.ifBlank { label.title }))
+            rv.setOnClickPendingIntent(id,QuickChoiceReceiver.pending(c,route,q.reference,i))
+        }
+    }
+
     /** Collapsed and (when there are quick choices) expanded custom views. Also used to render previews in tests. */
     internal fun notificationViews(c: Context, view: TrackerView): Pair<RemoteViews, RemoteViews?> {
         val d = view.data; val s = view.snapshot()
         val r = row(d, s, PlanSurfaces.open(view))
-        val small = RemoteViews(c.packageName, R.layout.notification_timer).also { bind(c, it, r, s, Surface.NOTIFICATION) }
-        val big = quick(d, view, s)?.let { q -> RemoteViews(c.packageName, R.layout.notification_timer_big).also { bind(c, it, r, s, Surface.NOTIFICATION); bindQuick(c, it, q) } }
+        val choices = if(s.focus == null && s.mode != Mode.RECOVERY) recentChoices(view,s) else emptyList()
+        val small = RemoteViews(c.packageName, R.layout.notification_timer).also {
+            bind(c,it,r,s,Surface.NOTIFICATION);bindCompactFavorites(c,it,view,s,choices)
+        }
+        val big = quick(d, view, s, choices)?.let { q -> RemoteViews(c.packageName, R.layout.notification_timer_big).also { bind(c, it, r, s, Surface.NOTIFICATION); bindQuick(c, it, q) } }
         return small to big
     }
 

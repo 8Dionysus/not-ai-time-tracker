@@ -1,0 +1,5 @@
+<resources>
+    <color name="launcher_icon_amber_background">#F1BC62</color>
+    <color name="launcher_icon_mint_background">#15312E</color>
+    <color name="launcher_icon_violet_background">#251B37</color>
+</resources>

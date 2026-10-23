@@ -15,6 +15,10 @@ import dev.notai.tracker.android.stageRestore
 import dev.notai.tracker.android.CopyLifetimes
 import dev.notai.tracker.android.RestoreReviewOwner
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -133,7 +137,7 @@ internal object DocumentExportCoordination {
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class TrackerViewModel internal constructor(private val app: Application,private val waitForBoundary: suspend (Long) -> Unit) : AndroidViewModel(app) {
+class TrackerViewModel internal constructor(private val app: Application,private val waitForBoundary: suspend (Long) -> Unit) : AndroidViewModel(app), BatchDeletionUiHost, ReportingZoneUiHost, LauncherIconsUiHost {
     constructor(app: Application): this(app,{ delay(it) })
     private val standaloneRestoreReviews = RestoreReviewOwner<RestorePreview>(::releaseRestorePreviewOnIo)
     internal fun releaseRestorePreviewOnIo(preview: AutoCloseable) { CopyLifetimes.get(app).releasePreview(preview) }
@@ -146,6 +150,52 @@ class TrackerViewModel internal constructor(private val app: Application,private
     /** Wall time from the core clock, so every screen agrees with the tracker about "now". */
     fun now(): Long = runtime?.tracker?.clock?.now()?.wall ?: System.currentTimeMillis()
     private val prefs = app.getSharedPreferences("ui", Context.MODE_PRIVATE)
+    private val _reportZoneAutomatic = MutableStateFlow(false)
+    override val reportZoneAutomatic: StateFlow<Boolean> = _reportZoneAutomatic
+    private val _reportZoneProblem = MutableStateFlow<String?>(null)
+    val reportZoneProblem: StateFlow<String?> = _reportZoneProblem
+    override fun useAutomaticReportZone() { setReportZoneAutomatic(true) }
+    private val _launcherIcons = MutableStateFlow(LauncherIconsUiState(null,emptyList()))
+    override val launcherIcons: StateFlow<LauncherIconsUiState> = _launcherIcons
+    private val launcherMutex = kotlinx.coroutines.sync.Mutex()
+    private val launcherChanging = java.util.concurrent.atomic.AtomicBoolean(false)
+    private fun launcherState(problem: String? = null): LauncherIconsUiState {
+        val controller = dev.notai.tracker.android.LauncherIconController(app)
+        val observed = controller.read()
+        val options = controller.availableOptions().map { entry ->
+            LauncherIconUiOption(entry.option.key,entry.option.label(app),entry.iconResource,entry.compatibleKeys)
+        }
+        return LauncherIconsUiState(observed.selected,options,launcherChanging.get(),problem ?: if(observed.selected == null)
+            "Не удалось определить выбранный значок. Выбери доступный вариант" else null)
+    }
+    private fun refreshLauncherIcons() = viewModelScope.launch(Dispatchers.IO) {
+        launcherMutex.withLock {
+            if(!launcherChanging.get()) try { _launcherIcons.value = launcherState() }
+            catch(e: Exception) {
+                if(e is kotlinx.coroutines.CancellationException) throw e
+                _launcherIcons.value = _launcherIcons.value.copy(problem = "Не удалось проверить значок приложения")
+            }
+        }
+    }
+    override fun chooseLauncherIcon(key: String) {
+        if(!launcherChanging.compareAndSet(false,true)) return
+        _launcherIcons.update { it.copy(changing = true,problem = null) }
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                launcherMutex.withLock {
+                    val result = dev.notai.tracker.android.LauncherIconController(app).select(key)
+                    _launcherIcons.value = launcherState(if(result.shortcutsRebound) null else "Значок выбран, но ярлыки пока не обновились")
+                }
+            } catch(e: Exception) {
+                if(e is kotlinx.coroutines.CancellationException) throw e
+                _launcherIcons.value = try { launcherState("Не удалось переключить значок") }
+                    catch(_: Exception) { _launcherIcons.value.copy(selectedKey = null,problem = "Не удалось проверить результат переключения") }
+            } finally {
+                launcherChanging.set(false)
+                _launcherIcons.update { it.copy(changing = false) }
+            }
+        }
+    }
 
     private val _notices = MutableSharedFlow<Notice>(extraBufferCapacity = 8)
     val notices: SharedFlow<Notice> = _notices
@@ -217,7 +267,10 @@ class TrackerViewModel internal constructor(private val app: Application,private
     fun load() {
         _boot.value = Boot.Loading
         viewModelScope.launch(Dispatchers.IO) {
-            _boot.value = try { Boot.Ready(UiBackends.open(app)) }
+            _boot.value = try { Boot.Ready(UiBackends.open(app).also {
+                _reportZoneAutomatic.value = it.reportZone?.automatic ?: false
+                _reportZoneProblem.value = it.reportZone?.recoveryProblem
+            }) }
             catch (e: Exception) { Boot.Failed(e.message ?: e.javaClass.simpleName) }
         }
     }
@@ -477,9 +530,13 @@ class TrackerViewModel internal constructor(private val app: Application,private
         }
     }
     fun refreshCapabilities(reconcileForeground: Boolean = false) {
+        refreshLauncherIcons()
         viewModelScope.launch(Dispatchers.IO) {
             val rt = waitRuntime() ?: return@launch
             try {
+                if(reconcileForeground) rt.reportZone?.reconcile()
+                _reportZoneAutomatic.value = rt.reportZone?.automatic ?: false
+                _reportZoneProblem.value = rt.reportZone?.recoveryProblem
                 _capabilities.value = dev.notai.tracker.android.SurfaceSettingsBackend.read(app,rt.tracker.data().settings.surfaces,reconcileForeground)
                 _capabilityProblem.value = null
             } catch(e: Exception) { _capabilityProblem.value = dev.notai.tracker.android.SurfaceProblem.PLATFORM_FAILURE; notice(Format.error(e)) }
@@ -1002,7 +1059,18 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val d = rt.tracker.data(); rt.tracker.settings(s.token, d.settings.copy(surfaces = change(d.settings.surfaces)))
     }
     fun setReportZone(zone: String) = command({ "Часовой пояс отчётов: $zone" }) { rt, s ->
-        ZoneId.of(zone); val d = rt.tracker.data(); rt.tracker.configureReportingDay(s.token, ReportingDayPolicy(zone, d.settings.reportDayStartMinute))
+        ZoneId.of(zone)
+        try { rt.reportZone?.setFixed(s.token,zone) ?: rt.tracker.configureReportingDay(s.token,
+            ReportingDayPolicy(zone,rt.tracker.data().settings.reportDayStartMinute)) }
+        finally {
+            _reportZoneAutomatic.value = rt.reportZone?.automatic ?: false
+            _reportZoneProblem.value = rt.reportZone?.recoveryProblem
+        }
+    }
+    fun setReportZoneAutomatic(value: Boolean) = command({ if(value) "Часовой пояс отчётов следует за устройством. Записи могут перейти на другой день" else "Часовой пояс отчётов закреплён" }) { rt,s ->
+        val preference = rt.reportZone ?: fail(ErrorCode.INVALID_INPUT,"Device report zone preference unavailable")
+        try { preference.setAutomatic(s.token,value) }
+        finally { _reportZoneAutomatic.value = preference.automatic;_reportZoneProblem.value = preference.recoveryProblem }
     }
     /** Only day labels move; recorded facts and existing goals keep their own boundaries. */
     fun setDayStart(minute: Int) = command({ "День начинается в ${minute / 60}:${(minute % 60).toString().padStart(2, '0')}" }) { rt, s ->
@@ -1246,8 +1314,68 @@ class TrackerViewModel internal constructor(private val app: Application,private
     // Several records at once: choose them in the history, then give them one activity or note. Preview first, Undo after.
     private val _picked = MutableStateFlow<Set<String>>(emptySet())
     val picked: StateFlow<Set<String>> = _picked
-    fun togglePicked(sessionId: String) { _picked.value = _picked.value.let { if (sessionId in it) it - sessionId else it + sessionId } }
-    fun clearPicked() { _picked.value = emptySet() }
+    private val pickedLock = Any()
+    private var deletingPicked = false
+    fun togglePicked(sessionId: String) = synchronized(pickedLock) {
+        if(!deletingPicked) _picked.value = _picked.value.let { if(sessionId in it) it-sessionId else it+sessionId }
+    }
+    fun clearPicked() = synchronized(pickedLock) { if(!deletingPicked) _picked.value = emptySet() }
+    suspend fun previewBatchDelete(): Result<Tracker.BatchDeletePreview> = withContext(Dispatchers.IO) {
+        try {
+            val rt = runtime ?: fail(ErrorCode.STALE,"No backend")
+            Result.success(rt.tracker.previewDeleteSessions(_picked.value))
+        } catch(e: Exception) {
+            if(e is kotlinx.coroutines.CancellationException) throw e
+            Result.failure(e)
+        }
+    }
+    override suspend fun previewPickedDeletion(): Result<PickedDeletionReview> {
+        val ids = synchronized(pickedLock) { _picked.value.toSet() }
+        return withContext(Dispatchers.IO) {
+            try {
+                val preview = (runtime ?: fail(ErrorCode.STALE,"No backend")).tracker.previewDeleteSessions(ids)
+                val consequences = buildList {
+                    add("Итоги уменьшатся на ${Format.duration(preview.recordedMs)}")
+                    if(preview.segmentCount > preview.sessionCount) add(Format.plural(preview.segmentCount,"отрезок","отрезка","отрезков")+" между паузами")
+                    if(preview.measurementCount > 0) add(Format.plural(preview.measurementCount,"измерение","измерения","измерений"))
+                    if(preview.subjectLinkCount > 0) add(Format.plural(preview.subjectLinkCount,"связь с предметом","связи с предметами","связей с предметами"))
+                    if(preview.exerciseSetCount > 0) add(Format.plural(preview.exerciseSetCount,"запись подхода","записи подходов","записей подходов"))
+                    if(preview.eventQuantityCount > 0) add(Format.plural(preview.eventQuantityCount,"запись событийной величины","записи событийной величины","записей событийной величины"))
+                    if(preview.distanceTimeCount > 0) add(Format.plural(preview.distanceTimeCount,"основание темпа","основания темпа","оснований темпа"))
+                    if(preview.subjectCorrectionCount > 0) add("В том числе ${Format.plural(preview.subjectCorrectionCount,"исправление","исправления","исправлений")}")
+                }
+                Result.success(PickedDeletionReview(preview.sessionIds,consequences) { commitPickedDeletion(preview) })
+            } catch(e: Exception) {
+                if(e is kotlinx.coroutines.CancellationException) throw e
+                Result.failure(e)
+            }
+        }
+    }
+    /** The confirmed operation and Undo notice belong to this VM even when BatchBar leaves composition. */
+    private suspend fun commitPickedDeletion(preview: Tracker.BatchDeletePreview): Result<Unit> {
+        currentCoroutineContext().ensureActive()
+        return viewModelScope.async(Dispatchers.IO) {
+            var acquired = false
+            try {
+                synchronized(pickedLock) {
+                    ensure(!deletingPicked && _picked.value == preview.sessionIds,"Selection changed; preview again",ErrorCode.STALE)
+                    deletingPicked = true;acquired = true
+                }
+                val change = (runtime ?: fail(ErrorCode.STALE,"No backend")).tracker.applyDeleteSessions(preview)
+                synchronized(pickedLock) { _picked.value = emptySet() }
+                notice("Удалено ${Format.plural(preview.sessionCount,"запись","записи","записей")}",if(change.undoAvailable) change.state.token else null)
+                Result.success(Unit)
+            } catch(e: Exception) {
+                if(e is kotlinx.coroutines.CancellationException) throw e
+                Result.failure(e)
+            } finally {
+                if(acquired) synchronized(pickedLock) { deletingPicked = false }
+            }
+        }.await()
+    }
+    fun applyBatchDelete(preview: Tracker.BatchDeletePreview) = viewModelScope.launch {
+        commitPickedDeletion(preview).onFailure { notice(Format.error(it)) }
+    }
     suspend fun previewBatch(selection: Classification?, note: MetadataNoteEdit?, replace: Boolean): Result<BatchMetadataPreview> = withContext(Dispatchers.IO) {
         runCatching {
             val rt = runtime ?: fail(ErrorCode.STALE, "No backend")

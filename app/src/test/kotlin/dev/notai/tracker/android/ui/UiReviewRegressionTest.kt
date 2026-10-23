@@ -26,6 +26,7 @@ import org.robolectric.annotation.Config
 @Config(sdk = [36])
 class UiReviewRegressionTest {
     private val originalOpen = UiBackends.open
+    private var reportZoneFactory: ((Tracker) -> ReportZonePreference)? = null
     private val fixtures = mutableListOf<Fixture>()
     private class Store(initial: Dataset): StateStore {
         @Volatile private var value = initial
@@ -45,7 +46,7 @@ class UiReviewRegressionTest {
             return result
         }
     }
-    private class Backend(override val tracker: Tracker): UiBackend {
+    private class Backend(override val tracker: Tracker,override val reportZone: ReportZonePreference? = null): UiBackend {
         override val backups = Backups(tracker,MemoryRollback())
         override val focusDue = FocusDueSignals()
         override val runtime: TrackerRuntime? = null
@@ -72,7 +73,7 @@ class UiReviewRegressionTest {
     }
     private fun fixture(clock: FakeClock,settings: Settings = Settings("UTC"),initial: Dataset? = null,waitBoundary: (suspend (Long) -> Unit)? = null): Fixture {
         val store = Store(initial ?: Dataset(settings = settings));val tracker = Tracker(store,clock)
-        UiBackends.open = { Backend(tracker) }
+        UiBackends.open = { Backend(tracker,reportZoneFactory?.invoke(tracker)) }
         val vm = if(waitBoundary == null) TrackerViewModel(RuntimeEnvironment.getApplication()) else TrackerViewModel(RuntimeEnvironment.getApplication(),waitBoundary)
         val scope = CoroutineScope(SupervisorJob()+Dispatchers.IO)
         val fixture = Fixture(clock,store,tracker,vm,scope);fixtures += fixture
@@ -86,6 +87,93 @@ class UiReviewRegressionTest {
         fixtures.forEach { it.scope.cancel();it.vm.viewModelScope.cancel() };shadowOf(Looper.getMainLooper()).idle();UiBackends.open = originalOpen
     }
     private fun at(text: String) = Instant.parse(text).toEpochMilli()
+
+    @Test fun feedbackBatchHostRejectsChangedSelectionAndPropagatesCancellation() {
+        val f = fixture(FakeClock());val t = f.tracker
+        t.manual(t.snapshot().token,f.clock.wall-4000,f.clock.wall-3000,Classification())
+        t.manual(t.snapshot().token,f.clock.wall-2000,f.clock.wall-1000,Classification());f.synced()
+        val ids = t.data().sessions.map { it.id };ids.forEach(f.vm::togglePicked)
+        val review = runBlocking { f.vm.previewPickedDeletion().getOrThrow() };val before = t.data()
+        f.vm.togglePicked(ids.first())
+        val rejected = runBlocking { review.apply() }
+        assertEquals(ErrorCode.STALE,(rejected.exceptionOrNull() as CoreError).code)
+        assertEquals(before,t.data());assertEquals(setOf(ids.last()),f.vm.picked.value)
+        f.vm.togglePicked(ids.first())
+        val cancellation = CancellationException("Synthetic storage cancellation")
+        f.store.beforeCommit = { throw cancellation }
+        try { runBlocking { f.vm.previewPickedDeletion().getOrThrow().apply() };fail("Cancellation must propagate") }
+        catch(e: CancellationException) { assertEquals(cancellation.message,e.message) }
+        assertEquals(before,t.data());assertEquals(ids.toSet(),f.vm.picked.value)
+        f.vm.togglePicked(ids.first());assertEquals(setOf(ids.last()),f.vm.picked.value)
+    }
+    @Test fun feedbackBatchCommitAndUndoSurviveDisposedCallerScope() {
+        val f = fixture(FakeClock());val t = f.tracker
+        t.manual(t.snapshot().token,f.clock.wall-2000,f.clock.wall-1000,Classification());f.synced()
+        val before = t.data();val id = before.sessions.single().id;f.vm.togglePicked(id)
+        val review = runBlocking { f.vm.previewPickedDeletion().getOrThrow() }
+        val entered = java.util.concurrent.CountDownLatch(1);val release = java.util.concurrent.CountDownLatch(1)
+        f.store.beforeCommit = { entered.countDown();assertTrue(release.await(5,java.util.concurrent.TimeUnit.SECONDS)) }
+        val caller = f.scope.launch { review.apply() }
+        try {
+            pump { entered.count == 0L };caller.cancel();release.countDown()
+            pump { f.notices.any { it.undo != null } }
+            assertTrue(caller.isCancelled);assertTrue(t.data().sessions.isEmpty());assertTrue(f.vm.picked.value.isEmpty())
+            val notice = f.notices.single { it.undo != null };f.synced();f.vm.undo(notice.undo!!)
+            pump { t.data().sessions.size == 1 }
+            assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
+        } finally { release.countDown();caller.cancel() }
+    }
+    @Test fun feedbackReportingHostSwitchesAutoToFixedEvenForTheSameIanaZone() {
+        val app: Application = RuntimeEnvironment.getApplication()
+        app.getSharedPreferences("report-zone",0).edit().clear().commit()
+        reportZoneFactory = { ReportZonePreference(app,it,false) { "Europe/Berlin" } }
+        try {
+            val f = fixture(FakeClock());val t = f.tracker
+            assertFalse(f.vm.reportZoneAutomatic.value)
+            f.vm.useAutomaticReportZone();pump { f.vm.reportZoneAutomatic.value };f.synced()
+            assertEquals("Europe/Berlin",t.data().settings.reportZone)
+            f.vm.setReportZone("Europe/Berlin");pump { !f.vm.reportZoneAutomatic.value }
+            assertEquals("Europe/Berlin",t.data().settings.reportZone)
+        } finally { app.getSharedPreferences("report-zone",0).edit().clear().commit() }
+    }
+    @Test fun feedbackLauncherCatalogDeduplicatesAssetsWithoutChangingSavedAliasesOrData() {
+        val f = fixture(FakeClock());val before = f.tracker.data()
+        pump { f.vm.launcherIcons.value.options.isNotEmpty() }
+        val controller = LauncherIconController(RuntimeEnvironment.getApplication())
+        val observed = controller.read()
+        val available = controller.availableOptions()
+        assertEquals(available.map { it.iconResource }.distinct().size,f.vm.launcherIcons.value.options.size)
+        assertEquals(LauncherIconController.options.map { it.key }.toSet(),f.vm.launcherIcons.value.options.flatMap { it.compatibleKeys }.toSet())
+        available.zip(f.vm.launcherIcons.value.options).forEach { (entry,option) ->
+            assertEquals(entry.option.label(RuntimeEnvironment.getApplication()),option.title)
+            assertEquals(entry.iconResource,option.previewDrawable)
+        }
+        assertEquals(observed.selected,f.vm.launcherIcons.value.selectedKey)
+        assertEquals(before,f.tracker.data());assertEquals(observed,controller.read())
+    }
+
+    @Test fun batchDeletePreservesSelectionOnStaleAndClearsOnlyAfterOneSuccessfulUndoableCommit() {
+        val f = fixture(FakeClock());val t = f.tracker
+        t.manual(t.snapshot().token,f.clock.wall-4000,f.clock.wall-3000,Classification(name = "One"))
+        t.manual(t.snapshot().token,f.clock.wall-2000,f.clock.wall-1000,Classification(name = "Two"))
+        val ids = t.data().sessions.map { it.id }.toSet()
+        ids.forEach(f.vm::togglePicked);f.synced()
+        val stale = runBlocking { f.vm.previewBatchDelete().getOrThrow() }
+        t.saveCard(t.snapshot().token,Card("batch-stale","Concurrent"));f.synced()
+        val before = t.data();val attempts = f.store.commits.get()
+        f.vm.applyBatchDelete(stale)
+        pump { f.notices.isNotEmpty() }
+        assertEquals(ids,f.vm.picked.value);assertEquals(before,t.data());assertEquals(attempts,f.store.commits.get())
+        val fresh = runBlocking { f.vm.previewBatchDelete().getOrThrow() }
+        f.notices.clear();f.vm.applyBatchDelete(fresh)
+        pump { f.notices.any { it.undo != null } }
+        assertTrue(f.vm.picked.value.isEmpty());assertTrue(t.data().sessions.isEmpty())
+        assertEquals(attempts+1,f.store.commits.get())
+        val notice = f.notices.single { it.undo != null }
+        f.synced();f.vm.undo(notice.undo!!)
+        pump { t.data().sessions.size == 2 }
+        assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)
+    }
 
     @Test fun shortcutPreferenceControllerSupportsDisableAndReenableWithoutOtherChanges() {
         val surfaces=SurfaceSettings(widget=true,notification=true,overlay=true,focusSignal=false,shortcut=true)

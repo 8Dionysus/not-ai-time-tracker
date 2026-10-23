@@ -50,8 +50,8 @@ fun Bracket(left: Boolean, color: Color, modifier: Modifier = Modifier, width: D
         val effect = if (dotted) PathEffect.dashPathEffect(floatArrayOf(0.1f, w * 4.2f)) else null
         // Neon: two wide, faint strokes under the line read as light, without blur or extra layers.
         if (glow && !dotted) {
-            drawPath(path, color.copy(alpha = color.alpha * 0.10f), style = Stroke(width = w * 6f, cap = StrokeCap.Round))
-            drawPath(path, color.copy(alpha = color.alpha * 0.22f), style = Stroke(width = w * 2.8f, cap = StrokeCap.Round))
+            drawPath(path, color.copy(alpha = color.alpha * 0.06f), style = Stroke(width = w * 4.5f, cap = StrokeCap.Round))
+            drawPath(path, color.copy(alpha = color.alpha * 0.14f), style = Stroke(width = w * 2.2f, cap = StrokeCap.Round))
         }
         drawPath(path, color, style = Stroke(width = if (dotted) w * 1.2f else w, cap = StrokeCap.Round, pathEffect = effect))
     }

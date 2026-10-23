@@ -1,4 +1,4 @@
-<!-- Collapsed notification: the shared timer row. -->
+<!-- Collapsed notification has its own idle favourites row; widget layout stays independent. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content">
-    <include layout="@layout/surface_timer_row" />
+    <include layout="@layout/notification_timer_row" />
 </FrameLayout>

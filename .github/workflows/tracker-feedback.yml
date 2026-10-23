@@ -1,0 +1,57 @@
+name: Tracker feedback checks
+
+on:
+  push:
+    branches: [main, feedback/core-batch-delete]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tracker-feedback-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  host:
+    name: JVM, Robolectric and unsigned APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+          overwrite-settings: false
+      - name: Ensure the repository Android toolchain
+        run: |
+          if [ ! -f "$ANDROID_HOME/platforms/android-36/android.jar" ] ||
+             [ ! -x "$ANDROID_HOME/build-tools/35.0.0/aapt2" ] ||
+             [ ! -x "$ANDROID_HOME/ndk/30.0.16248370/ndk-build" ]; then
+            "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+              'platforms;android-36' 'build-tools;35.0.0' 'ndk;30.0.16248370'
+          fi
+      - name: Check whitespace
+        run: git diff --check HEAD^ HEAD
+      - name: Check batch deletion on Memory and Room, reporting zone and UI bridge
+        run: >-
+          ./gradlew --no-daemon --console=plain -PtrackerUnsigned=true
+          :core:test --tests 'dev.notai.tracker.CoreScenariosTest.feedbackBatchDelete*'
+          :app:testDebugUnitTest
+          --tests 'dev.notai.tracker.android.RoomScenariosTest.feedbackBatchDelete*'
+          --tests 'dev.notai.tracker.android.ReportZonePreferenceTest'
+          --tests 'dev.notai.tracker.android.ui.UiReviewRegressionTest.batchDelete*'
+          --tests 'dev.notai.tracker.android.ui.UiReviewRegressionTest.feedback*'
+          --tests 'dev.notai.tracker.android.ui.PresentationContextTest'
+          --tests 'dev.notai.tracker.android.ui.UiScreensTest.reportDay*'
+          --tests 'dev.notai.tracker.android.ui.UiScreensTest.feedbackBatchDeletion*'
+          --tests 'dev.notai.tracker.android.ui.UiScreensTest.neonAccentSettings'
+      - name: Build an unsigned APK
+        run: ./gradlew --no-daemon --console=plain -PtrackerUnsigned=true :app:assembleDebug

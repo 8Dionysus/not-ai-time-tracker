@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.notai.tracker.BatchMetadataPreview
 import dev.notai.tracker.Classification
 import dev.notai.tracker.MetadataFillPolicy
@@ -18,17 +19,23 @@ import dev.notai.tracker.MetadataNoteEdit
 import kotlinx.coroutines.launch
 
 /**
- * Takes the place of the tab bar while records are being chosen: how many, and the two things that can be given to all
- * of them at once. Every change is previewed first and can be undone from the notice after.
+ * Takes the place of the tab bar while records are being chosen. Every change is previewed first
+ * and can be undone from the notice after. Selection is keyed by session, including across days.
  */
 @Composable
-fun BatchBar(vm: TrackerViewModel, count: Int, pickActivity: ((Classification, Label) -> Unit) -> Unit) {
+fun BatchBar(vm: TrackerViewModel, count: Int, pickActivity: ((Classification, Label) -> Unit) -> Unit,
+             deletionHost: BatchDeletionUiHost? = vm as? BatchDeletionUiHost) {
     val c = NotAi.colors
     val scope = rememberCoroutineScope()
     var confirm by remember { mutableStateOf<Pair<BatchMetadataPreview, String>?>(null) }
     var noteDialog by remember { mutableStateOf(false) }
     var problem by remember { mutableStateOf<String?>(null) }
-    BackHandler { vm.clearPicked() }
+    var deletion by remember { mutableStateOf<PickedDeletionReview?>(null) }
+    var deleting by remember { mutableStateOf(false) }
+    var preparingDeletion by remember { mutableStateOf(false) }
+    val picked by vm.picked.collectAsStateWithLifecycle()
+    val sessionCount = picked.size
+    BackHandler(enabled = deletion == null && !deleting) { vm.clearPicked() }
     fun preview(sel: Classification?, note: MetadataNoteEdit?, replace: Boolean, describe: String) = scope.launch {
         vm.previewBatch(sel, note, replace).onSuccess { p ->
             if (p.changes.isEmpty()) problem = "У выбранных записей это уже так" else confirm = p to describe
@@ -36,13 +43,33 @@ fun BatchBar(vm: TrackerViewModel, count: Int, pickActivity: ((Classification, L
     }
     Column(Modifier.fillMaxWidth().background(c.paper)) {
         Hairline()
-        Row(Modifier.fillMaxWidth().navigationBarsPadding().heightIn(min = 64.dp).padding(start = 8.dp, end = 12.dp),
-            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            IconAction(Icon.Close, "Отменить выбор", vm::clearPicked, tint = c.ink)
-            Text("Выбрано: $count", Modifier.weight(1f), style = NotAi.type.body.copy(fontWeight = FontWeight.Medium), color = c.ink)
-            PillButton("Занятие", { pickActivity { sel, label -> preview(sel, null, true, "Занятие станет «${label.title}».") } },
-                kind = ButtonKind.TONAL, height = 40.dp)
-            PillButton("Заметка", { noteDialog = true }, kind = ButtonKind.TONAL, height = 40.dp)
+        Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(start = 12.dp, end = 12.dp, bottom = 8.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                IconAction(Icon.Close, "Отменить выбор", vm::clearPicked, tint = c.ink)
+                Text("Выбрано: $sessionCount", style = NotAi.type.body.copy(fontWeight = FontWeight.Medium), color = c.ink)
+            }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                PillButton("Занятие", { pickActivity { sel, label -> preview(sel, null, true, "Занятие станет «${label.title}».") } },
+                    Modifier.weight(1f), kind = ButtonKind.TONAL, height = 40.dp)
+                PillButton("Заметка", { noteDialog = true }, Modifier.weight(1f), kind = ButtonKind.TONAL, height = 40.dp)
+                PillButton(if (preparingDeletion) "Проверяю…" else "Удалить · $sessionCount", {
+                    val host = deletionHost ?: return@PillButton
+                    if (preparingDeletion) return@PillButton
+                    preparingDeletion = true
+                    scope.launch {
+                        try {
+                            host.previewPickedDeletion().onSuccess { review ->
+                                when {
+                                    review.sessionIds.isEmpty() -> problem = "Нет записей для удаления"
+                                    review.sessionIds != vm.picked.value -> problem = "Выбор успел измениться. Проверь записи и повтори."
+                                    else -> deletion = review
+                                }
+                            }.onFailure { problem = Format.error(it) }
+                        } finally { preparingDeletion = false }
+                    }
+                }, Modifier.weight(1.3f), kind = ButtonKind.OUTLINE, height = 40.dp,
+                    enabled = deletionHost != null && sessionCount > 0 && !preparingDeletion)
+            }
         }
     }
     if (noteDialog) NoteDialog(onDismiss = { noteDialog = false }) { text, all ->
@@ -54,6 +81,23 @@ fun BatchBar(vm: TrackerViewModel, count: Int, pickActivity: ((Classification, L
         val n = p.changes.map { it.sessionId }.distinct().size
         ConfirmDialog("Изменить ${Format.plural(n, "запись", "записи", "записей")}?", "$describe Время записей не меняется. Отменить можно сразу после.",
             "Изменить", { vm.applyBatch(p); confirm = null }, { confirm = null })
+    }
+    deletion?.let { review ->
+        ConfirmDialog("Удалить ${Format.plural(review.sessionIds.size, "запись", "записи", "записей")}?",
+            (listOf("Выбранные записи будут удалены целиком, включая части в других днях.") + review.consequences +
+                "Отменить можно сразу после удаления.").joinToString("\n\n"),
+            if (deleting) "Удаляю…" else "Удалить", {
+                if (!deleting) {
+                    deleting = true
+                    scope.launch {
+                        try {
+                            review.apply().onFailure { problem = Format.error(it) }
+                            // A clears picked IDs only on success; cancellation or failure keeps the selection.
+                            deletion = null
+                        } finally { deleting = false }
+                    }
+                }
+            }, { if (!deleting) deletion = null }, destructive = true)
     }
     problem?.let { ConfirmDialog("Не получилось", it, null, {}, { problem = null }) }
 }

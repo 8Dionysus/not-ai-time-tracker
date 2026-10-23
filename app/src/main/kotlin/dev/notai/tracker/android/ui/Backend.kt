@@ -19,6 +19,7 @@ interface UiBackend {
     val focusDue: FocusDueSignals
     /** Android surfaces (widget, notification, overlay) exist only with the real runtime. */
     val runtime: TrackerRuntime?
+    val reportZone: dev.notai.tracker.android.ReportZonePreference? get() = runtime?.reportZone
     /** Optional ordinary-timer check-in. Exists only with the real runtime unless a test supplies one. */
     val longRecord: dev.notai.tracker.LongRecordReminder? get() = runtime?.attention?.ordinary?.controller
     /** The catalog this build ships with; null where no bundled catalog exists (screen tests). */

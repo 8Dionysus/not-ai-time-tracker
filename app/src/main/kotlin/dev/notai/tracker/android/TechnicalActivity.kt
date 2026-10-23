@@ -150,8 +150,8 @@ class TechnicalActivity: Activity() {
             val expected = shown?.token ?: return@button;val value = zone.text.toString().trim()
             try { ZoneId.of(value) } catch(_: Exception) { status.text = "Неизвестная IANA зона";return@button }
             AlertDialog.Builder(this).setTitle("Изменить зону отчётов на $value?")
-                .setMessage("Изменятся границы дней и вид отчётов по существующей истории. Физические интервалы и отдельные сохранённые зоны целей сохраняются. Смена зоны телефона не изменяет эту настройку автоматически.")
-                .setNegativeButton("Отмена",null).setPositiveButton("Сохранить") { _,_ -> runAction { runtime.tracker.settings(expected,runtime.tracker.data().settings.copy(reportZone = value)) } }.show()
+                .setMessage("Изменятся границы дней и вид отчётов по существующей истории. Физические интервалы и отдельные сохранённые зоны целей сохраняются. Выбранный пояс будет закреплён; автоматический выбор отключится.")
+                .setNegativeButton("Отмена",null).setPositiveButton("Сохранить") { _,_ -> runAction { runtime.reportZone.setFixed(expected,value) } }.show()
         }
         button("Экспорт полного JSON") { beginExport("application/json","not-ai-backup.json") { runtime.backups.write(it) } }
         button("Повторить подготовленный экспорт…") { retryExport() }

@@ -58,14 +58,14 @@ val AmoledColors = DarkColors.copy(
     paper = Color(0xFF000000), raised = Color(0xFF0D1015), sunk = Color(0xFF06080B), tonal = Color(0xFF161B22), rule = Color(0xFF1B2129),
 )
 
-/** Experimental neon-wave: deep night violet, soft neon inks. Its own accent; glow is drawn only where [NotAiColors.glow]. */
+/** Neon: quiet blue-black surfaces, readable neutral inks and a restrained halo. Uses the same chosen accent as every theme. */
 val NeonColors = NotAiColors(
-    paper = Color(0xFF0F0B1E), raised = Color(0xFF191230), sunk = Color(0xFF0A0716), tonal = Color(0xFF241A42),
-    ink = Color(0xFFF4F0FF), ink2 = Color(0xFFB3A8D9), ink3 = Color(0xFF776C9E), rule = Color(0xFF2A2150),
-    amber = Color(0xFFFF5FD2), amberInk = Color(0xFFFF8BE0), amberWash = Color(0x29FF5FD2), onAmber = Color(0xFF12091F),
+    paper = Color(0xFF0C1018), raised = Color(0xFF151A26), sunk = Color(0xFF080C13), tonal = Color(0xFF202738),
+    ink = Color(0xFFF0EEF7), ink2 = Color(0xFFB4B6C9), ink3 = Color(0xFF8B8FA6), rule = Color(0xFF2B3348),
+    amber = DarkColors.amber, amberInk = DarkColors.amberInk, amberWash = DarkColors.amberWash, onAmber = DarkColors.onAmber,
     danger = Color(0xFFFF6B8B), scrim = Color(0xA6050310),
-    areas = listOf(Color(0xFF3DF5B0), Color(0xFF4FC3FF), Color(0xFFFF7A59), Color(0xFFB98CFF), Color(0xFFF5E663), Color(0xFFFF5FA8)),
-    none = Color(0xFF6E6491), isDark = true, glow = true,
+    areas = listOf(Color(0xFF65CDA6), Color(0xFF72B7E8), Color(0xFFE99373), Color(0xFFAC96DF), Color(0xFFD5CA82), Color(0xFFD98DB3)),
+    none = Color(0xFF7E869C), isDark = true, glow = true,
 )
 
 val Onest = FontFamily(
@@ -129,8 +129,7 @@ fun NotAiTheme(choice: ThemeChoice = ThemeChoice.SYSTEM, reducedMotion: Boolean?
         ThemeChoice.SYSTEM -> if (systemDark) DarkColors else LightColors
         ThemeChoice.LIGHT -> LightColors; ThemeChoice.DARK -> DarkColors; ThemeChoice.AMOLED -> AmoledColors; ThemeChoice.NEON -> NeonColors
     }
-    // Neon brings its own accent; the others take the chosen one.
-    val colors = if (base.glow) base else accentSet(appearance.accent, base.isDark).let { a ->
+    val colors = accentSet(appearance.accent, base.isDark).let { a ->
         base.copy(amber = a.accent, amberInk = a.ink, amberWash = a.wash, onAmber = a.on)
     }
     val dark = colors.isDark

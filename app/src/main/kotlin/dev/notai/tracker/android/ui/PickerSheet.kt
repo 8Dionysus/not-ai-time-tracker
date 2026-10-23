@@ -172,10 +172,14 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
                     }
                 }
                 parent != null -> {
+                    val categoryRoot = parent.entry.selection.ancestorPathAtWrite.firstOrNull()
+                        ?: parent.label.fallbackRootId ?: parent.entry.sourceId
                     if (parent.entry.canStart) item(key = "whole") {
-                        ChoiceRow(parent.wholeArea(), ::pick)
+                        ChoiceRow(parent.wholeArea(), ::pick, categoryRoot = categoryRoot)
                     }
-                    items(children, key = { "c-" + it.entry.id }) { ch -> ChoiceRow(ch, ::pick, onEdit = editAction(ch)) }
+                    items(children, key = { "c-" + it.entry.id }) { ch ->
+                        ChoiceRow(ch, ::pick, onEdit = editAction(ch), categoryRoot = categoryRoot)
+                    }
                     if (section != null) item(key = "own") {
                         Text("Своё занятие в этом разделе: начни вводить название в поиске", Modifier.padding(vertical = 14.dp), style = NotAi.type.caption, color = c.ink2)
                     }
@@ -232,11 +236,11 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
 
 @Composable
 private fun ChoiceRow(item: PickerItem, onPick: (PickerItem) -> Unit, title: String = item.label.title, square: Boolean = false,
-                      trailing: (@Composable RowScope.() -> Unit)? = null, onEdit: (() -> Unit)? = null) {
+                      trailing: (@Composable RowScope.() -> Unit)? = null, onEdit: (() -> Unit)? = null, categoryRoot: String? = null) {
     val c = NotAi.colors
     val group = !item.whole && (item.entry.availability == ChoiceAvailability.GROUP || (item.count ?: 0) > 0)
     val enabled = group || item.entry.canStart
-    ListRow(title, detail = if (group || square) null else item.label.detail,
+    ListRow(title, detail = if (group || square || (item.whole && categoryRoot != null)) null else item.label.detailInCategory(categoryRoot),
         subtitle = if (!enabled) "в архиве" else null,
         onClick = { onPick(item) },
         onLongClick = onEdit, longClickLabel = "Изменить",

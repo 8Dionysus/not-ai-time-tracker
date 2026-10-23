@@ -1,0 +1,37 @@
+<!-- Notification-only row: idle favourites replace its caption; timer and widget rows keep their controls. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/surface_row" android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:minHeight="48dp" android:orientation="horizontal" android:gravity="center_vertical">
+    <ImageView android:id="@+id/surface_glyph" android:layout_width="22dp" android:layout_height="22dp" android:layout_marginEnd="12dp"
+        android:src="@drawable/ic_stat_notai" android:tint="@color/widget_ink2" android:importantForAccessibility="no" />
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+        <TextView android:id="@+id/surface_title" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="@color/widget_ink" android:textSize="15sp" android:includeFontPadding="false" android:singleLine="true" android:ellipsize="end" android:text="@string/app_name" />
+        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+            <Chronometer android:id="@+id/surface_chrono" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textColor="@color/widget_amber_ink" android:textSize="13sp" android:singleLine="true" android:visibility="gone" />
+            <TextView android:id="@+id/surface_status" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:textColor="@color/widget_ink2" android:textSize="13sp" android:singleLine="true" android:ellipsize="end" />
+        </FrameLayout>
+        <LinearLayout android:id="@+id/notification_favorites" android:layout_width="match_parent" android:layout_height="28dp"
+            android:orientation="horizontal" android:gravity="start|center_vertical" android:visibility="gone">
+            <ImageButton android:id="@+id/notification_favorite_0" android:layout_width="36dp" android:layout_height="28dp"
+                android:layout_marginEnd="4dp" android:background="@drawable/surface_button_tonal" android:padding="6dp"
+                android:scaleType="fitCenter" android:visibility="gone" />
+            <ImageButton android:id="@+id/notification_favorite_1" android:layout_width="36dp" android:layout_height="28dp"
+                android:layout_marginEnd="4dp" android:background="@drawable/surface_button_tonal" android:padding="6dp"
+                android:scaleType="fitCenter" android:visibility="gone" />
+            <ImageButton android:id="@+id/notification_favorite_2" android:layout_width="36dp" android:layout_height="28dp"
+                android:layout_marginEnd="4dp" android:background="@drawable/surface_button_tonal" android:padding="6dp"
+                android:scaleType="fitCenter" android:visibility="gone" />
+            <ImageButton android:id="@+id/notification_favorite_3" android:layout_width="36dp" android:layout_height="28dp"
+                android:layout_marginEnd="4dp" android:background="@drawable/surface_button_tonal" android:padding="6dp"
+                android:scaleType="fitCenter" android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+    <ImageButton android:id="@+id/surface_secondary" android:layout_width="40dp" android:layout_height="40dp" android:layout_marginStart="8dp"
+        android:background="@drawable/surface_button_tonal" android:src="@drawable/ic_pause" android:tint="@color/widget_ink" android:padding="10dp"
+        android:scaleType="fitCenter" android:contentDescription="@string/pause_timer" android:visibility="gone" />
+    <ImageButton android:id="@+id/surface_primary" android:layout_width="40dp" android:layout_height="40dp" android:layout_marginStart="8dp"
+        android:background="@drawable/surface_button_primary" android:src="@drawable/ic_play" android:tint="@color/widget_on_ink" android:padding="10dp"
+        android:scaleType="fitCenter" android:contentDescription="@string/start_timer" />
+</LinearLayout>

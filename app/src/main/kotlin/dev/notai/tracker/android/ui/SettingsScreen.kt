@@ -87,6 +87,15 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
     DisposableEffect(heldRestore) { onDispose { heldRestore?.let(restoreOwner::discard) } }
     var catalog by remember { mutableStateOf<CatalogPreview?>(null) }
     var zoneConfirm by remember { mutableStateOf<String?>(null) }
+    val reportingZoneHost = vm as? ReportingZoneUiHost
+    val fixedMode = remember(vm) { kotlinx.coroutines.flow.MutableStateFlow(false) }
+    val automaticZone by (reportingZoneHost?.reportZoneAutomatic ?: fixedMode).collectAsStateWithLifecycle()
+    val reportZoneProblem by vm.reportZoneProblem.collectAsStateWithLifecycle()
+    var chooseZone by remember { mutableStateOf(false) }
+    var confirmAutomaticZone by remember { mutableStateOf(false) }
+    var advancedDays by rememberSaveable { mutableStateOf(false) }
+    var editDayBoundary by remember { mutableStateOf(false) }
+    var showLicenses by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
     var notificationsDenied by rememberSaveable { mutableStateOf(false) }
 
@@ -270,7 +279,7 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                     status = when {
                         !fx.dndSupported -> "Нужен Android 10 или новее"
                         needAccess -> "Включено, но телефон ещё не разрешил приложению режим «Не беспокоить»"
-                        else -> "Телефон затихнет на отрезок работы и вернётся сам, даже если приложение закрыто. Исключения — по твоим правилам «Не беспокоить»"
+                        else -> "На время работы приложение включает своё правило «Не беспокоить» с приоритетными уведомлениями. Исключения задаёт телефон. После работы приложение снимает своё правило"
                     }, warn = needAccess,
                     action = if (needAccess) "Разрешить" to { runCatching { context.startActivity(android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) } } else null,
                     checked = fx.choice.dnd && fx.dndSupported) { on ->
@@ -308,14 +317,22 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
 
         SettingsPage.MORE -> {
             Group("Дни в истории") {
-                val device = ZoneId.systemDefault().id
-                val differs = settings != null && settings.reportZone != device
                 NavRow(rememberVectorPainter(Icon.Globe), "Часовой пояс",
-                    note = settings?.reportZone.orEmpty().replace('_', ' ') +
-                        if (differs) ". На телефоне сейчас ${device.replace('_', ' ')}, нажми, чтобы перейти" else ". По нему делятся дни в истории и обзоре",
-                    onClick = if (differs) ({ zoneConfirm = device }) else null)
-                Divider()
-                settings?.reportDayStartMinute?.let { DayStartRow(vm, it) }
+                    note = (if (automaticZone) "Автоматически" else "Вручную") + " · " + zoneSummary(zone, vm.now()),
+                    onClick = { chooseZone = true })
+                reportZoneProblem?.let { Text(it,Modifier.padding(16.dp),style = NotAi.type.caption,color = c.danger) }
+                val boundary = settings?.reportDayStartMinute ?: 0
+                if (boundary != 0) {
+                    Divider()
+                    NavRow(rememberVectorPainter(Icon.Moon), "Граница отчётного дня", value = boundaryClock(boundary),
+                        onClick = { editDayBoundary = true })
+                }
+                if (boundary == 0) {
+                    Divider()
+                    NavRow(rememberVectorPainter(Icon.More), "Дополнительно", onClick = { advancedDays = !advancedDays })
+                    if (advancedDays) NavRow(rememberVectorPainter(Icon.Moon), "Граница отчётного дня", value = boundaryClock(boundary),
+                        onClick = { editDayBoundary = true })
+                }
             }
             Group("Каталог и таблицы") {
                 val types = view?.data?.types?.size ?: 0
@@ -327,9 +344,9 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                         else "${Format.plural(types, "занятие", "занятия", "занятий").replace(Regex("^(\\d)(\\d{3})"), "$1 $2")}, версия ${installed ?: "базовая"}. Нажми, чтобы проверить обновление",
                     onClick = { scope.launch { busy = true; catalog = vm.prepareCatalog(); busy = false } })
                 Divider()
-                NavRow(rememberVectorPainter(Icon.Table), "Выгрузить в CSV", note = "Вся история для таблиц. Это не резервная копия", onClick = { vm.requestExport(csv = true) })
+                NavRow(rememberVectorPainter(Icon.Table), "Экспорт в CSV", note = "Вся история для таблиц. Это не резервная копия", onClick = { vm.requestExport(csv = true) })
                 Divider()
-                NavRow(rememberVectorPainter(Icon.Upload), "Добавить историю из CSV", note = "Из Toggl, Clockify или своей таблицы. Сначала покажу, что добавится",
+                NavRow(rememberVectorPainter(Icon.Upload), "Импорт из CSV", note = "Из Toggl, Clockify или своей таблицы. Сначала покажу, что добавится",
                     onClick = { csvFile.launch(arrayOf("text/*", "application/csv", "text/csv", "*/*")) })
             }
             Group("О приложении") {
@@ -338,7 +355,9 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 Divider()
                 val version = remember { runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() }
                 NavRow(rememberVectorPainter(Icon.Info), "(not)AI Time Tracker ${version.orEmpty()}".trim(),
-                    note = "Записи хранятся на этом телефоне; копии — там, куда ты их сохранишь. Шрифт Onest, SIL Open Font License")
+                    note = "Записи хранятся на этом телефоне; копии — там, куда ты их сохранишь")
+                Divider()
+                NavRow(rememberVectorPainter(Icon.Info), "Лицензии", onClick = { showLicenses = true })
             }
         }
         }
@@ -366,6 +385,15 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
             "Изменятся границы дней в истории и обзоре. Сами записи и зоны целей не меняются.", "Сменить",
             { vm.setReportZone(z); zoneConfirm = null }, { zoneConfirm = null })
     }
+    if (chooseZone) ReportZoneSheet(automaticZone, zone, vm.now(), reportingZoneHost != null,
+        onAutomatic = { chooseZone = false; confirmAutomaticZone = true },
+        onManual = { z -> chooseZone = false; if (automaticZone || z != zone.id) zoneConfirm = z },
+        onDismiss = { chooseZone = false })
+    if (confirmAutomaticZone) ConfirmDialog("Использовать пояс телефона?",
+        "${zoneSummary(ZoneId.systemDefault(), vm.now())}. При смене пояса телефона границы дней в истории и обзоре будут следовать ему. Сами записи и зоны целей не меняются.",
+        "Автоматически", { reportingZoneHost?.useAutomaticReportZone(); confirmAutomaticZone = false }, { confirmAutomaticZone = false })
+    if (editDayBoundary) DayBoundarySheet(settings?.reportDayStartMinute ?: 0, vm::setDayStart) { editDayBoundary = false }
+    if (showLicenses) LicensesSheet { showLicenses = false }
 }
 
 /** A section on the settings root: what it is and, in one line, how it stands now. */
@@ -409,7 +437,7 @@ private fun AppearanceGroup(vm: TrackerViewModel, theme: ThemeChoice, more: () -
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 ThemeChoice.entries.forEach { t -> ThemeSwatch(t, t == theme, a.accent) { vm.setTheme(t) } }
             }
-            if (theme != ThemeChoice.NEON) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("Акцент", Modifier.weight(1f), style = NotAi.type.body, color = c.ink)
                 Accent.entries.forEach { ac ->
                     val set = accentSet(ac, c.isDark); val on = ac == a.accent
@@ -417,7 +445,7 @@ private fun AppearanceGroup(vm: TrackerViewModel, theme: ThemeChoice, more: () -
                         .clip(CircleShape).background(set.accent).semantics { selected = on }
                         .pressable({ vm.setAppearance { it.copy(accent = ac) } }, role = androidx.compose.ui.semantics.Role.RadioButton, label = ac.title))
                 }
-            } else Text("Неон — экспериментальная тема со своими цветами и мягким свечением.", style = NotAi.type.caption, color = c.ink2)
+            }
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text("Размер текста", style = NotAi.type.body, color = c.ink)
                 Segmented(Appearance.textScales, a.textScale, { s -> vm.setAppearance { it.copy(textScale = s) } }, Modifier.fillMaxWidth())
@@ -435,7 +463,7 @@ private fun ThemeSwatch(t: ThemeChoice, on: Boolean, accent: Accent, onClick: ()
     val sys = androidx.compose.foundation.isSystemInDarkTheme()
     val colors = when (t) { ThemeChoice.SYSTEM -> if (sys) DarkColors else LightColors; ThemeChoice.LIGHT -> LightColors
         ThemeChoice.DARK -> DarkColors; ThemeChoice.AMOLED -> AmoledColors; ThemeChoice.NEON -> NeonColors }
-    val dot = if (t == ThemeChoice.NEON) colors.amber else accentSet(accent, colors.isDark).accent
+    val dot = accentSet(accent, colors.isDark).accent
     Column(Modifier.widthIn(min = 52.dp).semantics(mergeDescendants = true) { selected = on }
         .pressable(onClick, role = androidx.compose.ui.semantics.Role.RadioButton, label = "Тема: ${t.title}"),
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -477,6 +505,7 @@ private fun AppearancePage(vm: TrackerViewModel) {
             Toggle("Лента дня", "Полоска из отрезков над записями каждого дня", a.showRibbon) { v -> vm.setAppearance { it.copy(showRibbon = v) } }
         }
         PillButton("Вернуть как было", { vm.setAppearance { Appearance() } }, Modifier.fillMaxWidth(), ButtonKind.TONAL, height = 44.dp)
+        (vm as? LauncherIconsUiHost)?.let { LauncherIconSettings(it) }
     }
 }
 
@@ -536,27 +565,6 @@ private fun AlphaRow(title: String, percent: Int, onChange: (Int) -> Unit) {
             modifier = Modifier.semantics { contentDescription = "$title: $v процентов" },
             colors = androidx.compose.material3.SliderDefaults.colors(thumbColor = c.ink, activeTrackColor = c.ink2, inactiveTrackColor = c.sunk,
                 activeTickColor = c.ink3, inactiveTickColor = c.rule))
-    }
-}
-
-/** Night owls: records before this hour belong to the previous day. Applied after a short pause, like Focus steps. */
-@Composable
-private fun DayStartRow(vm: TrackerViewModel, minute: Int) {
-    val c = NotAi.colors
-    var hour by remember(minute) { mutableIntStateOf(minute / 60) }
-    LaunchedEffect(hour) { if (hour * 60 == minute) return@LaunchedEffect; delay(700); vm.setDayStart(hour * 60) }
-    Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 12.dp)) {
-        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
-            M3Icon(Icon.Moon, null, Modifier.size(22.dp), tint = c.ink2)
-            Spacer(Modifier.width(14.dp))
-            Text("День начинается", Modifier.weight(1f), style = NotAi.type.body, color = c.ink)
-            IconAction(Icon.Minus, "Начало дня раньше", { hour = (hour - 1).coerceAtLeast(0) }, size = 16.dp, tint = c.ink)
-            Text("$hour:00", Modifier.widthIn(min = 56.dp).semantics { contentDescription = "День начинается в $hour:00" },
-                style = NotAi.type.body.copy(fontWeight = FontWeight.Medium), color = c.ink, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-            IconAction(Icon.Plus, "Начало дня позже", { hour = (hour + 1).coerceAtMost(12) }, size = 16.dp, tint = c.ink)
-        }
-        Text(if (hour == 0) "В полночь, как в календаре" else "Записи до $hour:00 относятся к предыдущему дню. Сами записи не меняются",
-            Modifier.padding(start = 36.dp, end = 8.dp), style = NotAi.type.caption, color = c.ink2)
     }
 }
 
@@ -644,7 +652,7 @@ private fun StepRow(icon: Painter, title: String, minutes: Int, minus: () -> Uni
 
 /** A titled card: hairline border, inset dividers, nothing else. */
 @Composable
-private fun Group(title: String, content: @Composable ColumnScope.() -> Unit) {
+internal fun Group(title: String, content: @Composable ColumnScope.() -> Unit) {
     val c = NotAi.colors
     Text(title, Modifier.padding(start = 4.dp, top = 14.dp, bottom = 8.dp), style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.ink2)
     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(c.raised).border(1.dp, c.rule, RoundedCornerShape(20.dp)), content = content)

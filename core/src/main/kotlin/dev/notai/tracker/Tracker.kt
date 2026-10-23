@@ -256,17 +256,49 @@ class Tracker(val store: StateStore, val clock: Clock) {
     } }
     fun applyDeleteSession(preview: DeletePreview) = deleteSession(preview.expected,preview.sessionId)
     fun deleteSession(expected: Token,id: String) = mutate(expected,true) { d,_ -> deletedSession(d,id) }
-    private fun deletedSession(d: Dataset,id: String): Dataset {
-        ensure(d.sessions.any { it.id == id && it.status == SessionStatus.STOPPED } && d.focus?.sessionId != id,"Only completed sessions can be deleted")
-        d.schedule.links.firstOrNull { it.sessionId == id }?.let { link ->
+    class BatchDeletePreview internal constructor(val expected: Token,val sessionIds: Set<String>,val before: Dataset,val after: Dataset,val asOf: Moment) {
+        val sessionCount get() = sessionIds.size
+        val recordedMs get() = before.segments.filter { it.sessionId in sessionIds }.sumExact { it.durationMs }
+        val segmentCount get() = before.segments.size-after.segments.size
+        val measurementCount get() = before.measurements.size-after.measurements.size
+        val subjectLinkCount get() = before.subjects.links.size-after.subjects.links.size
+        val exerciseSetCount get() = before.subjects.sets.size-after.subjects.sets.size
+        val eventQuantityCount get() = before.subjects.quantities.size-after.subjects.quantities.size
+        val distanceTimeCount get() = before.subjects.distanceTimes.size-after.subjects.distanceTimes.size
+        val subjectCorrectionCount get() = before.subjects.sets.count { it.sessionId in sessionIds && it.replacesId != null }+
+            before.subjects.quantities.count { it.sessionId in sessionIds && it.replacesId != null }
+        val pendingAssignmentCount get() = before.pendingAssignments.size-after.pendingAssignments.size
+        val hasDependentFacts get() = measurementCount > 0 || subjectLinkCount > 0 || exerciseSetCount > 0 || eventQuantityCount > 0 || distanceTimeCount > 0
+        fun reports(start: Long,end: Long,filter: Filter = Filter()) = Reports.report(before,asOf,start,end,filter) to Reports.report(after,asOf,start,end,filter)
+    }
+    /** Session IDs can repeat across reporting days. Preview is read-only and owns a frozen canonical selection. */
+    fun previewDeleteSessions(ids: Collection<String>): BatchDeletePreview = storage {
+        val selected = frozenSet(ids)
+        store.transaction { d ->
+            val now = clock.now()
+            d to BatchDeletePreview(token(d),selected,d.frozen(),deletedSessions(d,selected).frozen(),now)
+        }
+    }
+    fun applyDeleteSessions(preview: BatchDeletePreview) = deleteSessions(preview.expected,preview.sessionIds)
+    /** Validate the entire set before producing one replacement and one Undo snapshot. */
+    fun deleteSessions(expected: Token,ids: Collection<String>): Change {
+        val selected = frozenSet(ids)
+        return mutate(expected,true) { d,_ -> deletedSessions(d,selected) }
+    }
+    private fun deletedSession(d: Dataset,id: String): Dataset = deletedSessions(d,setOf(id))
+    private fun deletedSessions(d: Dataset,ids: Set<String>): Dataset {
+        ensure(ids.isNotEmpty() && ids.size <= 10000,"Select between 1 and 10000 completed sessions")
+        val sessions = d.sessions.filter { it.id in ids }
+        ensure(sessions.size == ids.size && sessions.all { it.status == SessionStatus.STOPPED } && d.focus?.sessionId !in ids,"Only completed sessions can be deleted")
+        d.schedule.links.firstOrNull { it.sessionId in ids }?.let { link ->
             throw CoreError(ErrorCode.INVALID_INPUT,"Session is linked to a schedule occurrence",reason = ErrorReason.SCHEDULE_LINKED_SESSION,
-                fieldPath = "session.id",arguments = mapOf("sessionId" to ErrorArgument.Identifier(id),
+                fieldPath = "session.id",arguments = mapOf("sessionId" to ErrorArgument.Identifier(link.sessionId),
                     "seriesId" to ErrorArgument.Identifier(link.key.seriesId),"originalDate" to ErrorArgument.Text(link.key.originalDate)))
         }
-        val segmentIds = d.segments.filter { it.sessionId == id }.map { it.id }.toSet()
-        return d.copy(subjects = d.subjects.copy(links = d.subjects.links.filterNot { it.sessionId == id },sets = d.subjects.sets.filterNot { it.sessionId == id },quantities = d.subjects.quantities.filterNot { it.sessionId == id },distanceTimes = d.subjects.distanceTimes.filterNot { (it.scope == Scope.SESSION && it.targetId == id) || (it.scope == Scope.SEGMENT && it.targetId in segmentIds) }),sessions = d.sessions.filterNot { it.id == id },segments = d.segments.filterNot { it.sessionId == id },
-            measurements = d.measurements.filterNot { (it.scope == Scope.SESSION && it.targetId == id) || (it.scope == Scope.SEGMENT && it.targetId in segmentIds) },
-            pendingAssignments = d.pendingAssignments.filterNot { it.sessionId == id })
+        val segmentIds = d.segments.filter { it.sessionId in ids }.map { it.id }.toSet()
+        return d.copy(subjects = d.subjects.copy(links = d.subjects.links.filterNot { it.sessionId in ids },sets = d.subjects.sets.filterNot { it.sessionId in ids },quantities = d.subjects.quantities.filterNot { it.sessionId in ids },distanceTimes = d.subjects.distanceTimes.filterNot { (it.scope == Scope.SESSION && it.targetId in ids) || (it.scope == Scope.SEGMENT && it.targetId in segmentIds) }),sessions = d.sessions.filterNot { it.id in ids },segments = d.segments.filterNot { it.sessionId in ids },
+            measurements = d.measurements.filterNot { (it.scope == Scope.SESSION && it.targetId in ids) || (it.scope == Scope.SEGMENT && it.targetId in segmentIds) },
+            pendingAssignments = d.pendingAssignments.filterNot { it.sessionId in ids })
     }
     /** Explicit late labeling applies to the entire current session, including its earlier segments. */
     fun labelCurrent(expected: Token, selection: Classification, note: String? = null) = mutate(expected, true) { d,_ ->
@@ -714,7 +746,7 @@ internal fun checkToken(d: Dataset,t: Token,n: Moment) {
     if (token(d) != t) throw CoreError(ErrorCode.STALE,"Stale action; refresh snapshot",snapshot(d,n))
 }
 private fun List<Session>.replace(s: Session) = map { if (it.id == s.id) s else it }
-internal fun <T> storage(block: () -> T): T = try { block() } catch (e: CoreError) { throw e } catch (e: Exception) { throw CoreError(ErrorCode.STORAGE,"Storage operation failed: ${e.javaClass.simpleName}") }
+internal fun <T> storage(block: () -> T): T = try { block() } catch (e: java.util.concurrent.CancellationException) { throw e } catch (e: CoreError) { throw e } catch (e: Exception) { throw CoreError(ErrorCode.STORAGE,"Storage operation failed: ${e.javaClass.simpleName}") }
 
 /** Returns an observed copy; never writes clock ticks. An old boot provides no elapsed-time evidence. */
 fun materialize(s: Segment,n: Moment): Segment {

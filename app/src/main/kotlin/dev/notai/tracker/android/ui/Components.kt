@@ -127,8 +127,8 @@ fun ActivityGlyph(glyph: Int, slot: Int?, modifier: Modifier = Modifier, size: D
     val tint = when { unclassified -> c.amberInk; slot != null -> c.areas[slot]; else -> c.ink2 }
     // Neon: a faint halo of the icon's own colour, painted behind it in the same box.
     val halo = if (c.glow && !unclassified) Modifier.drawBehind {
-        drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(tint.copy(alpha = 0.35f), tint.copy(alpha = 0f)), center, this.size.minDimension * 0.8f),
-            radius = this.size.minDimension * 0.8f)
+        drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(tint.copy(alpha = 0.14f), tint.copy(alpha = 0f)), center, this.size.minDimension * 0.65f),
+            radius = this.size.minDimension * 0.65f)
     } else Modifier
     M3Icon(painterResource(if (unclassified) ActivityGlyphs.unclassified else glyph), null, modifier.size(size).then(halo), tint = tint)
 }

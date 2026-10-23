@@ -163,15 +163,27 @@ object TimerSurfaces {
             val withdrawn = ids - shownIds
             if(withdrawn.isNotEmpty()) manager.disableShortcuts(withdrawn,"Откройте приложение для выбора занятия")
             if(shownIds.isNotEmpty()) manager.enableShortcuts(shownIds)
-            manager.setDynamicShortcuts(entries)
+            LauncherIconController.withBinding(c) { activity ->
+                manager.setDynamicShortcuts(entries.map { entry ->
+                    LauncherIconController.boundShortcut(c,entry,activity)
+                })
+            }
             Unit
         }
     }
-    /** Prepare outside the store gate; publish only while the same shown revision/target is current.
-     * The IO hop is inside this entry point, including the default view read. No global publication
-     * lock precedes the store lock; failed platform surfaces cannot prevent the others' effects. */
-    @Suppress("UNUSED_PARAMETER") // Retained source compatibility; every installed widget converges to current policy.
-    suspend fun refresh(c: Context,tracker: Tracker,view: TrackerView? = null,previous: SurfaceSettings? = null,forceWidget: Boolean = false): Boolean = withContext(Dispatchers.IO) {
+    /** Prepare outside the store gate, then recheck the full captured view at each publication.
+     * Notification confirmation has its own first gate: shortcuts/widgets cannot delay it.
+     * No global publication lock precedes the store lock; failures remain independent. */
+    @Suppress("UNUSED_PARAMETER")
+    suspend fun refresh(c: Context,tracker: Tracker,view: TrackerView? = null,previous: SurfaceSettings? = null,forceWidget: Boolean = false): Boolean =
+        refreshCurrent(c,tracker,view,previous,null)
+
+    internal suspend fun refreshAfterAction(c: Context,tracker: Tracker,trace: TimerActionTrace?): Boolean =
+        refreshCurrent(c,tracker,null,null,trace)
+
+    internal var ancillaryPreparing: ((Context,TrackerView) -> Unit)? = null
+    internal var ancillaryPrepared: ((Context,TrackerView) -> Unit)? = null
+    private suspend fun refreshCurrent(c: Context,tracker: Tracker,view: TrackerView?,previous: SurfaceSettings?,trace: TimerActionTrace?): Boolean = withContext(Dispatchers.IO) {
         val captured = view ?: tracker.view();val shown = captured.snapshot();val settings = captured.data.settings.surfaces
         var prepared = true
         fun <T> prepare(surface: Surface,block: () -> T): T? = try { block() } catch(_: RuntimeException) {
@@ -180,37 +192,43 @@ object TimerSurfaces {
         fun effect(surface: Surface,block: () -> Unit): Boolean = try { block();true } catch(_: RuntimeException) {
             android.util.Log.w("TimerSurfaces","$surface publication unavailable");false
         }
-        val launcher = prepare(Surface.SHORTCUT) { prepareShortcut(c,captured,shown,settings) }
+        fun publishCurrent(block: () -> Boolean): Boolean = tracker.store.checkedTransaction { checked ->
+            val live = checked.data;val current = checked.snapshot(tracker.clock.now())
+            val valid = live.datasetId == captured.data.datasetId && live.revision == captured.data.revision &&
+                live.controlBarrier == captured.data.controlBarrier && current.token == shown.token && current.timerTarget == shown.timerTarget &&
+                current.mode == shown.mode && current.focus?.id == shown.focus?.id && current.focus?.phaseIndex == shown.focus?.phaseIndex && current.focus?.mode == shown.focus?.mode
+            checked.replace(live) { valid && block() }
+        }
+        val notice = if(settings.notification) prepare(Surface.NOTIFICATION) { if(notificationsAllowed(c)) notification(c,captured) else null } else null
+        refreshPrepared?.invoke(c,captured)
+        val notificationApplied = publishCurrent {
+            effect(Surface.NOTIFICATION) {
+                val manager = c.getSystemService(NotificationManager::class.java)
+                if(settings.notification && notificationsAllowed(c) && notice != null) manager.notify(CONTROL_ID,notice)
+                else manager.cancel(CONTROL_ID)
+            }
+        }
+        trace?.mark(if(!notificationApplied) "notification-skipped" else if(notice != null) "notification-published" else "notification-withdrawn")
         // Disabled is a current policy, not a transition that observation may lose.
-        // Also repair installed widgets when another publisher or conflation skipped a view.
+        ancillaryPreparing?.invoke(c,captured)
+        val launcher = prepare(Surface.SHORTCUT) { prepareShortcut(c,captured,shown,settings) }
         val preparedWidget = prepare(Surface.WIDGET) {
             val manager = AppWidgetManager.getInstance(c)
             val ids = manager.getAppWidgetIds(ComponentName(c,TimerWidget::class.java))
             Triple(manager,ids,if(ids.isEmpty()) null else widget(c,captured,settings.widget))
         }
-        val notice = if(settings.notification) prepare(Surface.NOTIFICATION) { if(notificationsAllowed(c)) notification(c,captured) else null } else null
-        refreshPrepared?.invoke(c,captured)
-        tracker.store.checkedTransaction { checked ->
-            val live = checked.data;val current = checked.snapshot(tracker.clock.now())
-            val valid = live.datasetId == captured.data.datasetId && live.revision == captured.data.revision &&
-                live.controlBarrier == captured.data.controlBarrier && current.token == shown.token && current.timerTarget == shown.timerTarget &&
-                current.mode == shown.mode && current.focus?.id == shown.focus?.id && current.focus?.phaseIndex == shown.focus?.phaseIndex && current.focus?.mode == shown.focus?.mode
-            checked.replace(live) {
-                var applied = valid && prepared
-                if(valid) {
-                    launcher?.let { applied = effect(Surface.SHORTCUT,it) && applied }
-                    preparedWidget?.let { (manager,ids,views) -> if(views != null) applied = effect(Surface.WIDGET) { manager.updateAppWidget(ids,views) } && applied }
-                    applied = effect(Surface.NOTIFICATION) {
-                        val manager = c.getSystemService(NotificationManager::class.java)
-                        if(settings.notification && notificationsAllowed(c) && notice != null) manager.notify(CONTROL_ID,notice)
-                        else manager.cancel(CONTROL_ID)
-                    } && applied
-                    if(previous?.overlay != false && !settings.overlay) applied = effect(Surface.OVERLAY) { c.stopService(Intent(c,FloatingTimerService::class.java));Unit } && applied
-                }
-                applied // A stale/failed attempt cannot advance the observer's publication history.
-            }
+        ancillaryPrepared?.invoke(c,captured)
+        val ancillaryApplied = publishCurrent {
+            var applied = prepared
+            launcher?.let { applied = effect(Surface.SHORTCUT,it) && applied }
+            preparedWidget?.let { (manager,ids,views) -> if(views != null) applied = effect(Surface.WIDGET) { manager.updateAppWidget(ids,views) } && applied }
+            if(previous?.overlay != false && !settings.overlay) applied = effect(Surface.OVERLAY) { c.stopService(Intent(c,FloatingTimerService::class.java));Unit } && applied
+            applied
         }
+        trace?.mark(if(ancillaryApplied) "ancillary-published" else "ancillary-skipped")
+        notificationApplied && ancillaryApplied // Stale/failed attempts never advance observer history.
     }
+
 }
 
 /** Submitted work belongs to the process runtime, never to an Activity awaiting its result.
@@ -228,27 +246,30 @@ class TimerActionReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context,intent: Intent) {
         val action = TimerSurfaces.parse(intent) ?: return
         val pending = goAsync()
+        val trace = TimerActionTrace.begin(context)
         CoroutineScope(SupervisorJob()+Dispatchers.IO).launch {
             try {
                 val runtime = TrackerRuntime.get(context)
-                handleCurrent(context,runtime.tracker,action)
+                trace?.mark("runtime-ready")
+                handleCurrent(context,runtime.tracker,action,trace)
             } catch(_: Exception) { android.util.Log.w("TimerSurfaces","Action unavailable; local state retained") }
             finally { pending.finish() }
         }
     }
-    internal suspend fun handleCurrent(context: Context,tracker: Tracker,action: SurfaceAction) = withContext(Dispatchers.IO) {
+    internal suspend fun handleCurrent(context: Context,tracker: Tracker,action: SurfaceAction,trace: TimerActionTrace? = null) = withContext(Dispatchers.IO) {
                 val permitted = when(action.source) {
                     Surface.NOTIFICATION -> TimerSurfaces.notificationsAllowed(context)
                     Surface.OVERLAY -> TimerSurfaces.overlayAllowed(context)
                     Surface.WIDGET, Surface.SHORTCUT -> true
                 }
-                try { TimerSurfaces.execute(tracker,action,permitted) }
+                try { TimerSurfaces.execute(tracker,action,permitted);trace?.mark("command-committed") }
                 catch(e: CoreError) {
+                    trace?.mark("command-rejected")
                     val message = "${e.code}: ${e.message}. Откройте приложение и проверьте текущее состояние."
                     context.getSharedPreferences("surface-results",Context.MODE_PRIVATE).edit().putString("last",message).putString("lastCode",e.code.name).apply()
                     android.os.Handler(android.os.Looper.getMainLooper()).post { android.widget.Toast.makeText(context,message,android.widget.Toast.LENGTH_LONG).show() }
                 }
-                TimerSurfaces.refresh(context,tracker,forceWidget = action.source == Surface.WIDGET)
+                TimerSurfaces.refreshAfterAction(context,tracker,trace)
     }
 
 }

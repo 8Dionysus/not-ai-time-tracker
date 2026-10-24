@@ -943,18 +943,26 @@ class UiScreensTest {
     }
 
     @Test fun shareSummary() {
-        val vm = render(seed())
+        val s = seed();val before = s.tracker.data();val vm = render(s)
         compose.onNodeWithText("Обзор").performClick()
         waitText("По областям")
         compose.onNodeWithContentDescription("Поделиться итогом").performClick()
         waitText("Добавить заметки")
+        // Negative control for the paused host clock: due-now draining alone cannot
+        // deliver a future Main frame. This fixture never changes the Tracker clock/data.
+        val frameDelivered = java.util.concurrent.atomic.AtomicBoolean(false)
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ frameDelivered.set(true) },16)
+        org.robolectric.shadows.ShadowLooper.idleMainLooper()
+        assertTrue("Due-now draining must leave the delayed Main frame pending",!frameDelivered.get())
         // The off-main preview may complete after any fixed sleep. Drive the host Main
         // queue until the real rendered result arrives, keeping the same assertion/deadline.
         compose.waitUntil(15_000) {
             org.robolectric.shadows.ShadowLooper.idleMainLooper(16,java.util.concurrent.TimeUnit.MILLISECONDS)
             compose.onAllNodesWithText("Всего",substring = true).fetchSemanticsNodes().isNotEmpty()
         }
+        assertTrue("The bounded wait must deliver future Main-frame work",frameDelivered.get())
         assertTrue("notes stay out until asked", compose.onAllNodesWithText("конспект", substring = true).fetchSemanticsNodes().isEmpty())
+        assertTrue("Preview and host scheduling cannot mutate the source Dataset",before == s.tracker.data())
         shot("20-share", vm)
     }
 

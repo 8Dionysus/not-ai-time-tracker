@@ -13,6 +13,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -72,7 +73,19 @@ import java.time.ZoneId
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(qualifiers = "ru-rRU-w400dp-h860dp-xhdpi")
 class UiScreensTest {
-    @get:Rule val compose = createComposeRule()
+    private lateinit var compose: androidx.compose.ui.test.junit4.ComposeContentTestRule
+
+    // Only the asynchronous share cases need queued effect resumptions. Keep every
+    // other screen's existing test environment and animation-clock behavior intact.
+    @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
+    @get:Rule val composeEnvironment = org.junit.rules.TestRule { statement, description ->
+        compose = when (description.methodName) {
+            "shareSummary", "suspendedEffectReturnsToMainAfterDelayedFrame" ->
+                createComposeRule(kotlinx.coroutines.test.StandardTestDispatcher())
+            else -> createComposeRule()
+        }
+        compose.apply(statement, description)
+    }
 
     private class MutableClock(var wall: Long, var elapsed: Long, var boot: String = "boot:screens") : Clock {
         override fun now() = Moment(wall, elapsed, boot, "process:screens")
@@ -942,19 +955,46 @@ class UiScreensTest {
         org.junit.Assert.assertEquals(45 * 60_000L, g.target)
     }
 
+    /** A real suspended IO effect must return through Compose's Main scheduler. */
+    @Test fun suspendedEffectReturnsToMainAfterDelayedFrame() {
+        val entered = CompletableDeferred<Unit>()
+        val release = CompletableDeferred<Unit>()
+        val resumedOn = java.util.concurrent.atomic.AtomicReference<Thread>()
+        compose.setContent {
+            val text by androidx.compose.runtime.produceState("") {
+                val result = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    entered.complete(Unit)
+                    release.await()
+                    "Delayed effect rendered"
+                }
+                resumedOn.set(Thread.currentThread())
+                value = result
+            }
+            androidx.compose.material3.Text(text)
+        }
+        try {
+            compose.waitUntil(15_000) { entered.isCompleted }
+            assertTrue("The pending IO result is not rendered early", compose.onAllNodesWithText("Delayed effect rendered").fetchSemanticsNodes().isEmpty())
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ release.complete(Unit) }, 16)
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+            assertTrue("Draining due-now work cannot deliver a future Main frame", !release.isCompleted)
+            org.robolectric.shadows.ShadowLooper.idleMainLooper(16, java.util.concurrent.TimeUnit.MILLISECONDS)
+            assertTrue("The delayed Main frame releases the actual IO result", release.isCompleted)
+            compose.waitUntil(15_000) { resumedOn.get() != null }
+            org.junit.Assert.assertSame("Effect publication must return to Android Main", android.os.Looper.getMainLooper().thread, resumedOn.get())
+            waitText("Delayed effect rendered")
+        } finally { release.complete(Unit) }
+    }
+
     @Test fun shareSummary() {
-        val vm = render(seed())
+        val s = seed(); val before = s.tracker.data(); val vm = render(s)
         compose.onNodeWithText("Обзор").performClick()
         waitText("По областям")
         compose.onNodeWithContentDescription("Поделиться итогом").performClick()
         waitText("Добавить заметки")
-        // The off-main preview may complete after any fixed sleep. Drive the host Main
-        // queue until the real rendered result arrives, keeping the same assertion/deadline.
-        compose.waitUntil(15_000) {
-            org.robolectric.shadows.ShadowLooper.idleMainLooper()
-            compose.onAllNodesWithText("Всего",substring = true).fetchSemanticsNodes().isNotEmpty()
-        }
+        waitText("Всего") // Original real-rendered-result assertion and 15-second deadline.
         assertTrue("notes stay out until asked", compose.onAllNodesWithText("конспект", substring = true).fetchSemanticsNodes().isEmpty())
+        assertTrue("Preview cannot mutate the source Dataset", before == s.tracker.data())
         shot("20-share", vm)
     }
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shortcut_start">@string/editorial_tracker_resource_shortcut_start_v0</string>
+    <string name="technical_name">@string/editorial_tracker_resource_technical_name_v0</string>
+    <string name="widget_description">@string/editorial_tracker_resource_widget_description_v0</string>
+    <string name="start_timer">@string/editorial_tracker_resource_start_timer_v0</string>
+    <string name="pause_timer">@string/editorial_tracker_resource_pause_timer_v0</string>
+    <string name="quick_start">@string/editorial_tracker_resource_quick_start_v0</string>
+    <string name="all_activities">@string/editorial_tracker_resource_all_activities_v0</string>
+    <string name="launcher_icon_option_default">システムのスタイル</string>
+    <string name="launcher_icon_option_placeholder_1">アンバー</string>
+    <string name="launcher_icon_option_placeholder_2">ミント</string>
+    <string name="launcher_icon_option_placeholder_3">バイオレット</string>
+    <string name="notification_start_favorite">開始：%1$s</string>
+</resources>

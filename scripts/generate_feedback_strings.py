@@ -38,6 +38,23 @@ SHOW_MORE = {
     'pt-BR':'Mostrar mais', 'de':'Mehr anzeigen', 'it':'Mostra altro', 'ar':'عرض المزيد',
     'zh-Hans':'显示更多', 'ja':'さらに表示', 'ko':'더 보기', 'hi':'और दिखाएँ',
 }
+PLATFORM_ALIASES = {name:'editorial_tracker_resource_'+name+'_v0' for name in (
+    'shortcut_start','technical_name','widget_description','start_timer','pause_timer','quick_start','all_activities')}
+PLATFORM_KEYS = ['launcher_icon_option_default','launcher_icon_option_placeholder_1',
+    'launcher_icon_option_placeholder_2','launcher_icon_option_placeholder_3','notification_start_favorite']
+PLATFORM_ROWS = {
+    'en':['System variant','Amber','Mint','Violet','Start: %1$s'],
+    'es':['Variante del sistema','Ámbar','Menta','Violeta','Iniciar: %1$s'],
+    'fr':['Variante du système','Ambre','Menthe','Violet','Démarrer : %1$s'],
+    'pt-BR':['Variante do sistema','Âmbar','Menta','Violeta','Iniciar: %1$s'],
+    'de':['Systemvariante','Bernstein','Mintgrün','Violett','Starten: %1$s'],
+    'it':['Variante di sistema','Ambra','Menta','Viola','Avvia: %1$s'],
+    'ar':['خيار النظام','كهرماني','نعناعي','بنفسجي','بدء: %1$s'],
+    'zh-Hans':['系统样式','琥珀色','薄荷绿','紫罗兰色','开始：%1$s'],
+    'ja':['システムのスタイル','アンバー','ミント','バイオレット','開始：%1$s'],
+    'ko':['시스템 스타일','앰버','민트','바이올렛','시작: %1$s'],
+    'hi':['सिस्टम का रूप','एम्बर','पुदीना','बैंगनी','शुरू करें: %1$s'],
+}
 KEYS += EXTRA_KEYS + ['deleted_show_more']
 for locale,values in ROWS.items():
     values += EXTRA[locale] + [SHOW_MORE[locale]]
@@ -46,3 +63,9 @@ for locale,values in ROWS.items():
     folder.mkdir(parents=True,exist_ok=True)
     def text(s): return escape(s.replace('\\','\\\\').replace("'","\\'").replace('"','\\"'))
     (folder/'feedback_strings.xml').write_text('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n'+''.join(f'    <string name="{key}">{text(value)}</string>\n' for key,value in zip(KEYS,values))+'</resources>\n')
+    if locale != 'ru':
+        # Keep the platform IDs used by shortcuts/widgets/controllers, reusing the reviewed
+        # editorial translations rather than creating a second set of the same copy.
+        aliases = ''.join(f'    <string name="{key}">@string/{value}</string>\n' for key,value in PLATFORM_ALIASES.items())
+        labels = ''.join(f'    <string name="{key}">{text(value)}</string>\n' for key,value in zip(PLATFORM_KEYS,PLATFORM_ROWS[locale]))
+        (folder/'platform_strings.xml').write_text('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n'+aliases+labels+'</resources>\n')

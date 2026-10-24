@@ -370,7 +370,7 @@ class UiScreensTest {
     }
 
     /** Each section is its own page; back returns to the short root. */
-    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
+    @Config(qualifiers = "ru-rRU-w400dp-h1300dp-xhdpi")
     @Test fun settingsFullPage() {
         val vm = render(seed())
         compose.onNodeWithText("Настройки").performClick()
@@ -411,7 +411,7 @@ class UiScreensTest {
     }
 
     /** A Toggl-style export: columns are suggested from headers, the time layout from the first row, then preview and append. */
-    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
+    @Config(qualifiers = "ru-rRU-w400dp-h1300dp-xhdpi")
     @Test fun csvImport() {
         val seed = seed()
         val vm = render(seed)
@@ -456,7 +456,7 @@ class UiScreensTest {
         release.complete(Result.failure(java.io.IOException("synthetic preview failure")))
     }
 
-    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
+    @Config(qualifiers = "ru-rRU-w400dp-h1300dp-xhdpi")
     @Test fun backupPage() {
         val vm = render(seed())
         compose.onNodeWithText("Настройки").performClick()
@@ -526,7 +526,7 @@ class UiScreensTest {
     }
 
     /** A saved report follows its period: create «Прошлая неделя» for everything, open it, see the total. */
-    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
+    @Config(qualifiers = "ru-rRU-w400dp-h1300dp-xhdpi")
     @Test fun savedReport() {
         val seed = seed()
         val vm = render(seed)
@@ -739,14 +739,19 @@ class UiScreensTest {
         t.stop(t.snapshot().token)
         val vm = render(seed)
         waitText("15:29–15:54")
-        val before = t.data().sessions.size
+        val before = t.data()
+        val record = before.sessions.last()
         compose.onAllNodesWithText("15:29–15:54", substring = true, useUnmergedTree = true).onFirst().performClick()
         waitText("Исправить запись")
         compose.onNodeWithContentDescription("Удалить запись").performClick()
-        waitText("Удалить запись целиком?")
+        waitText("Удалить записи (1)?")
+        assertTrue("Opening the confirmation cannot delete a record",before == t.data())
         shot("09-delete-confirm", vm)
         compose.onNodeWithText("Удалить").performClick()
-        compose.waitUntil(5_000) { t.data().sessions.size == before - 1 }
+        compose.waitUntil(5_000) { t.data().sessions.size == before.sessions.size - 1 }
+        val archived = t.data().deletedRecords.single()
+        assertTrue(archived.session.value == record)
+        assertTrue(archived.segments.map { it.value } == before.segments.filter { it.sessionId == record.id })
     }
 
     /** "Все занятия" in the notification opens the app with the route's quick choices. */
@@ -949,7 +954,7 @@ class UiScreensTest {
         shot("20-share", vm)
     }
 
-    @Config(qualifiers = "w400dp-h1960dp-xhdpi")
+    @Config(qualifiers = "ru-rRU-w400dp-h1960dp-xhdpi")
     @Test fun planEditor() {
         val seed = seed()
         plan(seed, "Английский", "18:00")

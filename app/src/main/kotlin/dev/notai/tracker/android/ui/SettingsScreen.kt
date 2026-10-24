@@ -87,6 +87,7 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
     val surfaces = settings?.surfaces
     val zone = settings?.reportZone?.let { runCatching { ZoneId.of(it) }.getOrNull() } ?: ZoneId.systemDefault()
     val caps by vm.capabilities.collectAsStateWithLifecycle()
+    val language by vm.language.collectAsStateWithLifecycle()
     val widgetRequest by vm.widgetRequest.collectAsStateWithLifecycle()
     val last by vm.lastBackup.collectAsStateWithLifecycle()
     val auto by vm.autoBackup.collectAsStateWithLifecycle()
@@ -207,7 +208,7 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
             Group(stringResource(R.string.data_language)) {
                 val deleted = view?.data?.deletedRecords?.size ?: 0
                 SectionRow(rememberVectorPainter(Icon.Trash),stringResource(R.string.deleted_title),
-                    if(deleted == 0) stringResource(R.string.deleted_empty) else java.text.NumberFormat.getIntegerInstance(java.util.Locale.forLanguageTag(vm.language.value.resolvedLocaleTag)).format(deleted),false) { page = SettingsPage.DELETED }
+                    if(deleted == 0) stringResource(R.string.deleted_empty) else java.text.NumberFormat.getIntegerInstance(java.util.Locale.forLanguageTag(language.resolvedLocaleTag)).format(deleted),false) { page = SettingsPage.DELETED }
                 Divider()
                 LanguageSettingsRow(vm)
             }

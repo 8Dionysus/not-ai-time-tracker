@@ -10,6 +10,8 @@ Deletion now archives completed records and their related facts in `Dataset.dele
 
 Snackbar Undo carries the committed deletion batch and dataset replacement barrier. It restores that specific batch against a freshly captured current token, preserving unrelated later edits. A backup replacement, including replacement of the same dataset, invalidates that old UI action. Generic core snapshot Undo and its strict expected-token checks are unchanged. `requestDelete` acknowledges `Applied` only after the VM-owned commit succeeds. Failure returns `Failed`; caller disposal does not turn an already claimed write into a false result.
 
+Changing the UI language keeps an already displayed Undo receipt alive. Its short-lived message retains the original language; subsequent notices use the new resource context. The collector is not restarted just because the locale changes.
+
 “Deleted” is directly accessible near the bottom of Settings. Each retained record can be restored. The page renders records in bounded batches and has no purge control. Old records physically deleted by earlier releases cannot be invented by this migration; recovery of those needs a pre-existing backup.
 
 Room 12→13 changes the version guard, not the physical table layout or existing history rows. The optional archive lives in the existing transactional metadata payload, with the existing chunked metadata reader. JSON16 carries this archive through full backup/restore and verified rollback. Old JSON15 remains readable. JSON15 containing a smuggled archive field is rejected rather than treated as a compatible old file. Older app versions do not understand JSON16/Room13; downgrading is not an acceptance path.

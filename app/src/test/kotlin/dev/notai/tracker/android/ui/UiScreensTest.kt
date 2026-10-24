@@ -649,6 +649,22 @@ class UiScreensTest {
         assertTrue("All four timer accents must render different pixels",images.indices.all { i -> images.indices.all { j -> i == j || !images[i].sameAs(images[j]) } })
         assertTrue(before == s.tracker.data())
     }
+    @Test fun recoveryChangingLanguageKeepsThePendingDeletionUndoAction() {
+        val s = seed(false);val vm = render(s);val before = s.tracker.data()
+        val id = before.sessions.first().id
+        compose.runOnIdle { vm.applyDeleteSession(s.tracker.previewDeleteSession(id)) }
+        compose.waitUntil(5_000) { s.tracker.data().sessions.none { it.id == id } }
+        waitText("Запись перемещена в «Удалённое»")
+        val deleted = s.tracker.data()
+        compose.runOnIdle { vm.setLanguage("en") }
+        waitText("Settings");assertTrue(deleted == s.tracker.data())
+        // The in-flight receipt keeps its original label and remains functional across locale recomposition.
+        compose.onNodeWithText("Отмена").performClick()
+        compose.waitUntil(5_000) { s.tracker.data().sessions.any { it.id == id } }
+        assertTrue(before.sessions == s.tracker.data().sessions);assertTrue(before.segments == s.tracker.data().segments)
+        compose.runOnIdle { vm.setLanguage(null) }
+        compose.waitUntil(5_000) { vm.language.value.preference.explicitTag == null }
+    }
 
     /** «Выбрать несколько» from the menu, a second tap adds another, and one note goes to both after a confirmation. */
     @Test fun batchNote() {

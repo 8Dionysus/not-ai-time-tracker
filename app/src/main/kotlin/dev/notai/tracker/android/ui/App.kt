@@ -139,13 +139,13 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     val favoritesOpen by vm.favoritesOpen.collectAsStateWithLifecycle()
     var fullSurfacePickerId by remember { mutableStateOf<String?>(null) }
     val snackbar = remember { SnackbarHostState() }
-    val localeContext = androidx.compose.ui.platform.LocalContext.current
+    val noticeContext by rememberUpdatedState(androidx.compose.ui.platform.LocalContext.current)
     val dark = c.isDark
     if (snapshot != null) SideEffect(onActionReady)
 
-    LaunchedEffect(localeContext) {
+    LaunchedEffect(Unit) {
         vm.notices.collect { n ->
-            val result = snackbar.showSnackbar(n.text, actionLabel = if (n.undo != null) localeContext.getString(R.string.undo_deletion) else null,
+            val result = snackbar.showSnackbar(n.text, actionLabel = if (n.undo != null) noticeContext.getString(R.string.undo_deletion) else null,
                 duration = if (n.undo != null) SnackbarDuration.Long else SnackbarDuration.Short)
             if (result == SnackbarResult.ActionPerformed && n.undo != null) vm.undo(n.undo,n.restoreBatchId,n.restoreBarrier)
         }

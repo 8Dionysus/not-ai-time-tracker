@@ -18,4 +18,5 @@
     <string name="delete_confirmation">기록과 연결된 데이터가 삭제된 기록으로 이동합니다. 설정 아래쪽에서 복원할 수 있습니다.</string>
     <string name="delete_counts">구간: %1$d · 측정: %2$d · 연결: %3$d · 세트: %4$d · 수량: %5$d · 페이스 데이터: %6$d · 수정: %7$d</string>
     <string name="delete_duration">합계에서 제외되는 시간: %1$s</string>
+    <string name="deleted_show_more">더 보기</string>
 </resources>

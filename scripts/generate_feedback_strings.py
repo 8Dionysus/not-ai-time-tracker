@@ -33,9 +33,14 @@ EXTRA = {
 'ko':['기록을 삭제할까요 (%1$d)?','기록과 연결된 데이터가 삭제된 기록으로 이동합니다. 설정 아래쪽에서 복원할 수 있습니다.','구간: %1$d · 측정: %2$d · 연결: %3$d · 세트: %4$d · 수량: %5$d · 페이스 데이터: %6$d · 수정: %7$d','합계에서 제외되는 시간: %1$s'],
 'hi':['रिकॉर्ड हटाएँ (%1$d)?','रिकॉर्ड और जुड़े डेटा हटाए गए रिकॉर्ड में भेजे जाएँगे। सेटिंग के नीचे से बहाल करें।','खंड: %1$d · माप: %2$d · लिंक: %3$d · सेट: %4$d · मात्राएँ: %5$d · गति डेटा: %6$d · सुधार: %7$d','कुल से हटाया गया समय: %1$s'],
 }
-KEYS += EXTRA_KEYS
+SHOW_MORE = {
+    'ru':'Показать ещё', 'en':'Show more', 'es':'Mostrar más', 'fr':'Afficher plus',
+    'pt-BR':'Mostrar mais', 'de':'Mehr anzeigen', 'it':'Mostra altro', 'ar':'عرض المزيد',
+    'zh-Hans':'显示更多', 'ja':'さらに表示', 'ko':'더 보기', 'hi':'और दिखाएँ',
+}
+KEYS += EXTRA_KEYS + ['deleted_show_more']
 for locale,values in ROWS.items():
-    values += EXTRA[locale]
+    values += EXTRA[locale] + [SHOW_MORE[locale]]
     assert len(values)==len(KEYS),locale
     folder=ROOT/{'ru':'values','pt-BR':'values-pt-rBR','zh-Hans':'values-b+zh+Hans'}.get(locale,'values-'+locale)
     folder.mkdir(parents=True,exist_ok=True)

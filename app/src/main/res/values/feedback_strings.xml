@@ -18,4 +18,5 @@
     <string name="delete_confirmation">Записи со связанными фактами будут перенесены в «Удалённое». Восстановление доступно внизу настроек.</string>
     <string name="delete_counts">Частей: %1$d · измерений: %2$d · связей: %3$d · подходов: %4$d · величин: %5$d · оснований темпа: %6$d · исправлений: %7$d</string>
     <string name="delete_duration">Время в итогах: −%1$s</string>
+    <string name="deleted_show_more">Показать ещё</string>
 </resources>

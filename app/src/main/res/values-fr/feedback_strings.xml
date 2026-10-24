@@ -18,4 +18,5 @@
     <string name="delete_confirmation">Les enregistrements et leurs données liées iront dans Supprimés. Restaurez-les en bas des paramètres.</string>
     <string name="delete_counts">Segments : %1$d · mesures : %2$d · liens : %3$d · séries : %4$d · quantités : %5$d · données d’allure : %6$d · corrections : %7$d</string>
     <string name="delete_duration">Temps retiré des totaux : %1$s</string>
+    <string name="deleted_show_more">Afficher plus</string>
 </resources>

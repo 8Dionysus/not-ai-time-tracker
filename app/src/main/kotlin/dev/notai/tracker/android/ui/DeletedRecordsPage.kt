@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import dev.notai.tracker.TrackerView
 import java.time.ZoneId
@@ -27,9 +28,9 @@ import java.time.ZoneId
                 val last = record.segments.maxOf { it.value.end ?: it.value.start }
                 Text("${Format.range(first,last,zone)} · ${Format.duration(record.recordedMs)}",style = NotAi.type.bodySmall,color = c.ink2)
                 record.session.value.note?.let { Text(it,style = NotAi.type.body,color = c.ink) }
-                PillButton(stringResource(R.string.editorial_tracker_draft_86dfb8c919ec425b6196_v0),{ vm.restoreDeleted(record.sessionId,view.snapshot().token) },Modifier.fillMaxWidth(),ButtonKind.TONAL)
+                PillButton(stringResource(R.string.editorial_tracker_draft_86dfb8c919ec425b6196_v0),{ vm.restoreDeleted(record.sessionId,view.snapshot().token) },Modifier.fillMaxWidth().testTag("restore-deleted:${record.sessionId}"),ButtonKind.TONAL)
             }
         }
     } }
-    if(records.size > count) PillButton("Показать ещё",{ count += 50 },Modifier.fillMaxWidth(),ButtonKind.TONAL)
+    if(records.size > count) PillButton(stringResource(R.string.deleted_show_more),{ count += 50 },Modifier.fillMaxWidth(),ButtonKind.TONAL)
 }

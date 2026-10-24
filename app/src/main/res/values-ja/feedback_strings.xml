@@ -18,4 +18,5 @@
     <string name="delete_confirmation">記録と関連データは「削除済み」に移動します。設定の下部から復元できます。</string>
     <string name="delete_counts">区間：%1$d · 測定：%2$d · リンク：%3$d · セット：%4$d · 数量：%5$d · ペースデータ：%6$d · 修正：%7$d</string>
     <string name="delete_duration">合計から除かれる時間：%1$s</string>
+    <string name="deleted_show_more">さらに表示</string>
 </resources>

@@ -18,4 +18,5 @@
     <string name="delete_confirmation">रिकॉर्ड और जुड़े डेटा हटाए गए रिकॉर्ड में भेजे जाएँगे। सेटिंग के नीचे से बहाल करें।</string>
     <string name="delete_counts">खंड: %1$d · माप: %2$d · लिंक: %3$d · सेट: %4$d · मात्राएँ: %5$d · गति डेटा: %6$d · सुधार: %7$d</string>
     <string name="delete_duration">कुल से हटाया गया समय: %1$s</string>
+    <string name="deleted_show_more">और दिखाएँ</string>
 </resources>

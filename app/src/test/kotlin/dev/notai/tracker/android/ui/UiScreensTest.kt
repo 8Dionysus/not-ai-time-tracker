@@ -617,6 +617,44 @@ class UiScreensTest {
         } finally { vm.viewModelScope.cancel();db.close();app.deleteDatabase(dbName) }
     }
 
+    @Test fun recoveryDeletedPaginationLocalizesAndRestoresBeyondTheFirstPage() {
+        val source = seed(false)
+        val app = ApplicationProvider.getApplicationContext<android.app.Application>()
+        val dbName = "ui-deleted-pages-${newId()}.db"
+        val db = androidx.room.Room.databaseBuilder(app,dev.notai.tracker.android.TrackerDatabase::class.java,dbName).allowMainThreadQueries().build()
+        val t = Tracker(dev.notai.tracker.android.RoomStore(db,{ source.tracker.data() }),source.clock)
+        val ids = (0..50).map { i ->
+            val day = today.minusDays(10L+i)
+            t.manual(t.snapshot().token,at(day,10,0),at(day,10,20),Classification(),note = "Deleted page fixture $i")
+            t.data().sessions.last().id
+        }
+        val before = t.data()
+        t.deleteSessions(t.snapshot().token,ids)
+        val archived = t.data().deletedRecords
+        val target = archived.sortedByDescending { it.deletedAt }[50]
+        val vm = render(Seed(t,source.clock,source.catalog))
+        try {
+            compose.runOnIdle { vm.setLanguage("en") }
+            waitText("Settings");compose.onNodeWithText("Settings").performClick()
+            compose.onNodeWithText("Deleted").performScrollTo().performClick()
+            waitText("Show more")
+            assertTrue("The 51st record must not be composed before pagination",compose.onAllNodesWithText(target.session.value.note!!).fetchSemanticsNodes().isEmpty())
+            compose.onNodeWithText("Show more").performScrollTo()
+            compose.runOnIdle { vm.setLanguage("ja") }
+            waitText("さらに表示")
+            assertTrue(compose.onAllNodesWithText("Show more").fetchSemanticsNodes().isEmpty())
+            assertTrue(compose.onAllNodesWithText("Показать ещё").fetchSemanticsNodes().isEmpty())
+            compose.onNodeWithText("さらに表示").performScrollTo().performClick()
+            compose.onNodeWithText(target.session.value.note!!).performScrollTo()
+            compose.onNodeWithTag("restore-deleted:${target.sessionId}").performScrollTo().performClick()
+            compose.waitUntil(5_000) { t.data().deletedRecords.size == 50 }
+            assertTrue(t.data().deletedRecords == archived.filterNot { it.sessionId == target.sessionId })
+            assertTrue(t.data().sessions.single { it.id == target.sessionId } == before.sessions.single { it.id == target.sessionId })
+            assertTrue(t.data().segments.filter { it.sessionId == target.sessionId } == before.segments.filter { it.sessionId == target.sessionId })
+            assertTrue(compose.onAllNodesWithText("さらに表示").fetchSemanticsNodes().isEmpty())
+        } finally { vm.viewModelScope.cancel();db.close();app.deleteDatabase(dbName) }
+    }
+
     @Test fun recoveryLanguagePickerChangesVisibleControlsWithoutChangingRecords() {
         val s = seed(false);val vm = render(s);val before = s.tracker.data()
         compose.onNodeWithText("Настройки").performClick()

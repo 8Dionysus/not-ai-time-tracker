@@ -18,4 +18,5 @@
     <string name="delete_confirmation">ستُنقل السجلات وبياناتها المرتبطة إلى المحذوفات. يمكن استعادتها أسفل الإعدادات.</string>
     <string name="delete_counts">المقاطع: %1$d · القياسات: %2$d · الروابط: %3$d · المجموعات: %4$d · الكميات: %5$d · بيانات الوتيرة: %6$d · التصحيحات: %7$d</string>
     <string name="delete_duration">الوقت المحذوف من الإجماليات: %1$s</string>
+    <string name="deleted_show_more">عرض المزيد</string>
 </resources>

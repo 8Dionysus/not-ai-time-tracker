@@ -18,4 +18,5 @@
     <string name="delete_confirmation">Einträge und zugehörige Daten werden nach Gelöscht verschoben. Die Wiederherstellung ist unten in den Einstellungen verfügbar.</string>
     <string name="delete_counts">Abschnitte: %1$d · Messungen: %2$d · Verknüpfungen: %3$d · Sätze: %4$d · Mengen: %5$d · Tempodaten: %6$d · Korrekturen: %7$d</string>
     <string name="delete_duration">Aus Summen entfernte Zeit: %1$s</string>
+    <string name="deleted_show_more">Mehr anzeigen</string>
 </resources>

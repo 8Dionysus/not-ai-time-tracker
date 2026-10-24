@@ -45,18 +45,24 @@ jobs:
           python3 scripts/generate_editorial_resources.py
           python3 scripts/generate_feedback_strings.py
           git diff --exit-code
-      - name: Check recoverable deletion, migration, gestures, locale and reduced motion
-        run: >-
-          ./gradlew --no-daemon --console=plain -PtrackerUnsigned=true
-          :core:test
-          --tests 'dev.notai.tracker.CoreScenariosTest.feedbackRecoverableDeletion'
-          --tests 'dev.notai.tracker.CoreScenariosTest.feedbackBatchDeleteOneCommit'
-          :app:testDebugUnitTest
-          --tests 'dev.notai.tracker.android.RoomScenariosTest.feedbackRecoverableDeletion'
-          --tests 'dev.notai.tracker.android.RoomScenariosTest.feedbackBatchDeleteOneCommit'
-          --tests 'dev.notai.tracker.android.RecoveryPreferencesMigrationTest'
-          --tests 'dev.notai.tracker.android.ui.UiReviewRegressionTest.recovery*'
-          --tests 'dev.notai.tracker.android.ui.UiScreensTest.recovery*'
-          --tests 'dev.notai.tracker.android.ui.UiScreensTest.feedbackBatchDeletion*'
+      - name: Build the isolated host JNI fixture
+        run: bash scripts/build-cleanup-host.sh "$JAVA_HOME" "$PWD/build/libtracker_cleanup.so"
+      - name: Run complete core and Android host regression suites and lint
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon --console=plain --continue -PtrackerUnsigned=true \
+            -PtrackerCleanupLibrary="$PWD/build/libtracker_cleanup.so" \
+            :core:test :app:testDebugUnitTest :app:lintDebug :app:lintRelease 2>&1 | tee build/full-regression.log
       - name: Build an unsigned APK
         run: ./gradlew --no-daemon --console=plain -PtrackerUnsigned=true :app:assembleDebug
+      - name: Retain raw test and lint evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: tracker-host-regression-${{ github.sha }}
+          path: |
+            build/full-regression.log
+            core/build/test-results/test/
+            app/build/test-results/testDebugUnitTest/
+            app/build/reports/lint-results-*
+          if-no-files-found: warn

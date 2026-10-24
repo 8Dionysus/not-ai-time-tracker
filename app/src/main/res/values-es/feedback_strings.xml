@@ -18,4 +18,5 @@
     <string name="delete_confirmation">Los registros y sus datos vinculados pasarán a Eliminados. Restáuralos al final de Ajustes.</string>
     <string name="delete_counts">Segmentos: %1$d · mediciones: %2$d · vínculos: %3$d · series: %4$d · cantidades: %5$d · datos de ritmo: %6$d · correcciones: %7$d</string>
     <string name="delete_duration">Tiempo retirado de los totales: %1$s</string>
+    <string name="deleted_show_more">Mostrar más</string>
 </resources>

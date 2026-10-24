@@ -18,4 +18,5 @@
     <string name="delete_confirmation">Records and their linked facts will move to Deleted. Restore them from the bottom of Settings.</string>
     <string name="delete_counts">Segments: %1$d · measurements: %2$d · links: %3$d · sets: %4$d · quantities: %5$d · pace inputs: %6$d · corrections: %7$d</string>
     <string name="delete_duration">Time removed from totals: %1$s</string>
+    <string name="deleted_show_more">Show more</string>
 </resources>

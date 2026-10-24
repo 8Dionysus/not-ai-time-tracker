@@ -18,4 +18,5 @@
     <string name="delete_confirmation">记录及其关联数据将移至“已删除”。可在设置底部恢复。</string>
     <string name="delete_counts">分段：%1$d · 测量：%2$d · 关联：%3$d · 组数：%4$d · 数量：%5$d · 配速数据：%6$d · 更正：%7$d</string>
     <string name="delete_duration">从总计移除的时间：%1$s</string>
+    <string name="deleted_show_more">显示更多</string>
 </resources>

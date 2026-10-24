@@ -80,6 +80,10 @@ fun batchDeleteOneCommit(create: () -> StateStore,reopen: (StateStore) -> StateS
     val json = Backups(tracker,MemoryRollback()).export()
     val backup = StreamingBackup.read { json.byteInputStream() }
     assertEquals(CURRENT_BACKUP_FORMAT,backup.formatVersion);assertEquals(changed.data,backup.data)
+    val streamedBytes = java.io.ByteArrayOutputStream()
+    Backups(tracker,MemoryRollback()).writeSnapshot(streamedBytes)
+    val streamedArchive = StreamingBackup.read { streamedBytes.toByteArray().inputStream() }
+    assertEquals(changed.data,streamedArchive.data) // Automatic/portable writer must retain the archived dependent facts too.
     tracker.undo(changed.state.token)
     val undone = tracker.data()
     assertEquals(before.sessions,undone.sessions);assertEquals(before.segments,undone.segments)

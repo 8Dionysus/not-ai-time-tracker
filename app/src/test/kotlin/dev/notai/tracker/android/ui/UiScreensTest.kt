@@ -73,10 +73,19 @@ import java.time.ZoneId
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(qualifiers = "ru-rRU-w400dp-h860dp-xhdpi")
 class UiScreensTest {
-    // Queue effect resumptions on the same scheduler as Compose's clock. The default
-    // UnconfinedTestDispatcher can resume a suspended effect on its IO worker.
+    private lateinit var compose: androidx.compose.ui.test.junit4.ComposeContentTestRule
+
+    // Only the asynchronous share cases need queued effect resumptions. Keep every
+    // other screen's existing test environment and animation-clock behavior intact.
     @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
-    @get:Rule val compose = createComposeRule(kotlinx.coroutines.test.StandardTestDispatcher())
+    @get:Rule val composeEnvironment = org.junit.rules.TestRule { statement, description ->
+        compose = when (description.methodName) {
+            "shareSummary", "suspendedEffectReturnsToMainAfterDelayedFrame" ->
+                createComposeRule(kotlinx.coroutines.test.StandardTestDispatcher())
+            else -> createComposeRule()
+        }
+        compose.apply(statement, description)
+    }
 
     private class MutableClock(var wall: Long, var elapsed: Long, var boot: String = "boot:screens") : Clock {
         override fun now() = Moment(wall, elapsed, boot, "process:screens")

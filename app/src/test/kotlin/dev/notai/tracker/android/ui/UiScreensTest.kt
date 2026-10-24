@@ -942,29 +942,17 @@ class UiScreensTest {
         org.junit.Assert.assertEquals(45 * 60_000L, g.target)
     }
 
+    @org.robolectric.annotation.LooperMode(org.robolectric.annotation.LooperMode.Mode.INSTRUMENTATION_TEST)
     @Test fun shareSummary() {
+        assertTrue("Async UI verification needs a test thread distinct from Android Main",Thread.currentThread() != android.os.Looper.getMainLooper().thread)
         val s = seed();val before = s.tracker.data();val vm = render(s)
         compose.onNodeWithText("Обзор").performClick()
         waitText("По областям")
         compose.onNodeWithContentDescription("Поделиться итогом").performClick()
         waitText("Добавить заметки")
-        // Negative control for the paused host clock: due-now draining alone cannot
-        // deliver a future Main frame. This fixture never changes the Tracker clock/data.
-        val frameDelivered = java.util.concurrent.atomic.AtomicBoolean(false)
-        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ frameDelivered.set(true) },16)
-        org.robolectric.shadows.ShadowLooper.idleMainLooper()
-        assertTrue("Due-now draining must leave the delayed Main frame pending",!frameDelivered.get())
-        // The off-main preview may complete after any fixed sleep. Drive the host Main
-        // queue until the real rendered result arrives, keeping the same assertion/deadline.
-        compose.waitUntil(15_000) {
-            org.robolectric.shadows.ShadowLooper.idleMainLooper(16,java.util.concurrent.TimeUnit.MILLISECONDS)
-            assertTrue("The bounded pump must release the queued Main frame before inspection",frameDelivered.get())
-            compose.mainClock.advanceTimeByFrame()
-            compose.onAllNodesWithText("Всего",substring = true).fetchSemanticsNodes().isNotEmpty()
-        }
-        assertTrue("The bounded wait must deliver future Main-frame work",frameDelivered.get())
+        waitText("Всего") // The existing 15-second rendered-result deadline.
         assertTrue("notes stay out until asked", compose.onAllNodesWithText("конспект", substring = true).fetchSemanticsNodes().isEmpty())
-        assertTrue("Preview and host scheduling cannot mutate the source Dataset",before == s.tracker.data())
+        assertTrue("Preview cannot mutate the source Dataset",before == s.tracker.data())
         shot("20-share", vm)
     }
 

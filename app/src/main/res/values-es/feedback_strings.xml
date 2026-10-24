@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">Idioma</string>
+    <string name="language_system">Idioma del sistema</string>
+    <string name="language_partial">Algunas pantallas siguen en ruso. Los nombres personales y los registros no se traducen.</string>
+    <string name="language_save_error">No se pudo guardar el idioma. Vuelve a elegir.</string>
+    <string name="deleted_title">Eliminados</string>
+    <string name="deleted_empty">No hay registros eliminados</string>
+    <string name="deleted_retained">Los registros permanecen aquí hasta restaurarlos. No hay limpieza automática.</string>
+    <string name="data_language">Datos e idioma</string>
+    <string name="undo_deletion">Deshacer</string>
+    <string name="record_deleted">Registro movido a Eliminados</string>
+    <string name="records_deleted">Movidos a Eliminados: %1$d</string>
+    <string name="record_restored">Registro restaurado</string>
+    <string name="restore_error">No se pudo confirmar la restauración. Revisa el historial y Eliminados.</string>
+    <string name="delete_error">No se pudo confirmar la eliminación. Revisa el historial y Eliminados.</string>
+    <string name="delete_title">¿Eliminar registros (%1$d)?</string>
+    <string name="delete_confirmation">Los registros y sus datos vinculados pasarán a Eliminados. Restáuralos al final de Ajustes.</string>
+    <string name="delete_counts">Segmentos: %1$d · mediciones: %2$d · vínculos: %3$d · series: %4$d · cantidades: %5$d · datos de ritmo: %6$d · correcciones: %7$d</string>
+    <string name="delete_duration">Tiempo retirado de los totales: %1$s</string>
+    <string name="deleted_show_more">Mostrar más</string>
+</resources>

@@ -1,5 +1,9 @@
 package dev.notai.tracker.android.ui
 
+import dev.notai.tracker.android.R
+
+import androidx.compose.ui.res.stringResource
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -70,7 +74,7 @@ internal fun DayBoundarySheet(minute: Int, onSave: (Int) -> Unit, onDismiss: () 
                 "Записи до ${boundaryClock(value)} относятся к предыдущему дню. Сами записи не меняются",
                 style = NotAi.type.caption, color = c.ink2)
             if (value != 0) PillButton("В полночь", { value = 0 }, Modifier.fillMaxWidth(), ButtonKind.TEXT, height = 40.dp)
-            PillButton("Сохранить", { if (value != minute) onSave(value); onDismiss() }, Modifier.fillMaxWidth())
+            PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), { if (value != minute) onSave(value); onDismiss() }, Modifier.fillMaxWidth())
         }
     }
 }

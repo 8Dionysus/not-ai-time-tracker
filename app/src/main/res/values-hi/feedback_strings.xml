@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">भाषा</string>
+    <string name="language_system">सिस्टम की भाषा</string>
+    <string name="language_partial">कुछ स्क्रीन अभी रूसी में हैं। व्यक्तिगत नामों और रिकॉर्ड का अनुवाद नहीं होता।</string>
+    <string name="language_save_error">भाषा सहेजी नहीं जा सकी। फिर से चुनें।</string>
+    <string name="deleted_title">हटाए गए रिकॉर्ड</string>
+    <string name="deleted_empty">कोई हटाया गया रिकॉर्ड नहीं</string>
+    <string name="deleted_retained">रिकॉर्ड बहाल होने तक यहाँ रहते हैं। कोई स्वचालित सफ़ाई नहीं होती।</string>
+    <string name="data_language">डेटा और भाषा</string>
+    <string name="undo_deletion">पूर्ववत करें</string>
+    <string name="record_deleted">रिकॉर्ड हटाए गए रिकॉर्ड में भेजा गया</string>
+    <string name="records_deleted">हटाए गए रिकॉर्ड में भेजे गए: %1$d</string>
+    <string name="record_restored">रिकॉर्ड बहाल हुआ</string>
+    <string name="restore_error">बहाली की पुष्टि नहीं हो सकी। इतिहास और हटाए गए रिकॉर्ड देखें।</string>
+    <string name="delete_error">हटाने की पुष्टि नहीं हो सकी। इतिहास और हटाए गए रिकॉर्ड देखें।</string>
+    <string name="delete_title">रिकॉर्ड हटाएँ (%1$d)?</string>
+    <string name="delete_confirmation">रिकॉर्ड और जुड़े डेटा हटाए गए रिकॉर्ड में भेजे जाएँगे। सेटिंग के नीचे से बहाल करें।</string>
+    <string name="delete_counts">खंड: %1$d · माप: %2$d · लिंक: %3$d · सेट: %4$d · मात्राएँ: %5$d · गति डेटा: %6$d · सुधार: %7$d</string>
+    <string name="delete_duration">कुल से हटाया गया समय: %1$s</string>
+    <string name="deleted_show_more">और दिखाएँ</string>
+</resources>

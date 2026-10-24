@@ -1,5 +1,9 @@
 package dev.notai.tracker.android.ui
 
+import dev.notai.tracker.android.R
+
+import androidx.compose.ui.res.stringResource
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -27,6 +31,8 @@ fun BatchBar(vm: TrackerViewModel, count: Int, pickActivity: ((Classification, L
              deletionHost: BatchDeletionUiHost? = vm as? BatchDeletionUiHost) {
     val c = NotAi.colors
     val scope = rememberCoroutineScope()
+    val deleteLabel = stringResource(R.string.editorial_tracker_draft_98c2a48d88776822811d_v0)
+    val failureLabel = stringResource(R.string.delete_error)
     var confirm by remember { mutableStateOf<Pair<BatchMetadataPreview, String>?>(null) }
     var noteDialog by remember { mutableStateOf(false) }
     var problem by remember { mutableStateOf<String?>(null) }
@@ -49,10 +55,10 @@ fun BatchBar(vm: TrackerViewModel, count: Int, pickActivity: ((Classification, L
                 Text("Выбрано: $sessionCount", style = NotAi.type.body.copy(fontWeight = FontWeight.Medium), color = c.ink)
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                PillButton("Занятие", { pickActivity { sel, label -> preview(sel, null, true, "Занятие станет «${label.title}».") } },
+                PillButton(stringResource(R.string.editorial_tracker_draft_1a2c7007a2d3e4977ace_v0), { pickActivity { sel, label -> preview(sel, null, true, "Занятие станет «${label.title}».") } },
                     Modifier.weight(1f), kind = ButtonKind.TONAL, height = 40.dp)
-                PillButton("Заметка", { noteDialog = true }, Modifier.weight(1f), kind = ButtonKind.TONAL, height = 40.dp)
-                PillButton(if (preparingDeletion) "Проверяю…" else "Удалить · $sessionCount", {
+                PillButton(stringResource(R.string.editorial_tracker_draft_25a310c49fcbc14afa82_v0), { noteDialog = true }, Modifier.weight(1f), kind = ButtonKind.TONAL, height = 40.dp)
+                PillButton(if (preparingDeletion) "…" else "$deleteLabel · $sessionCount", {
                     val host = deletionHost ?: return@PillButton
                     if (preparingDeletion) return@PillButton
                     preparingDeletion = true
@@ -83,15 +89,14 @@ fun BatchBar(vm: TrackerViewModel, count: Int, pickActivity: ((Classification, L
             "Изменить", { vm.applyBatch(p); confirm = null }, { confirm = null })
     }
     deletion?.let { review ->
-        ConfirmDialog("Удалить ${Format.plural(review.sessionIds.size, "запись", "записи", "записей")}?",
-            (listOf("Выбранные записи будут удалены целиком, включая части в других днях.") + review.consequences +
-                "Отменить можно сразу после удаления.").joinToString("\n\n"),
-            if (deleting) "Удаляю…" else "Удалить", {
+        ConfirmDialog(stringResource(R.string.delete_title,review.sessionIds.size),
+            (listOf(stringResource(R.string.delete_confirmation)) + review.consequences).joinToString("\n\n"),
+            if (deleting) "…" else deleteLabel, {
                 if (!deleting) {
                     deleting = true
                     scope.launch {
                         try {
-                            review.apply().onFailure { problem = Format.error(it) }
+                            review.apply().onFailure { problem = failureLabel }
                             // A clears picked IDs only on success; cancellation or failure keeps the selection.
                             deletion = null
                         } finally { deleting = false }
@@ -111,7 +116,7 @@ private fun NoteDialog(onDismiss: () -> Unit, onDone: (String, Boolean) -> Unit)
         Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             TextInput("Текст заметки", text, { text = it }, placeholder = "Например, проект «Альфа»")
             Segmented(listOf(false to "Только где пусто", true to "Заменить у всех"), all, { all = it }, Modifier.fillMaxWidth())
-            PillButton("Дальше", { onDone(text.trim(), all) }, Modifier.fillMaxWidth(), ButtonKind.PRIMARY, enabled = text.isNotBlank())
+            PillButton(stringResource(R.string.editorial_tracker_draft_b4e3665f8905663a0236_v0), { onDone(text.trim(), all) }, Modifier.fillMaxWidth(), ButtonKind.PRIMARY, enabled = text.isNotBlank())
         }
     }
 }

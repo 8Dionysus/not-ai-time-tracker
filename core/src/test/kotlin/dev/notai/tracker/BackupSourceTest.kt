@@ -23,6 +23,6 @@ class BackupSourceTest {
         assertEquals(backup.data.datasetId,receipt.datasetId)
         assertEquals(clock.wall,receipt.asOf)
         assertFalse(backup.data.types.any { it.id == "later" });assertTrue(tracker.data().types.any { it.id == "later" })
-        assertEquals(15,backup.formatVersion)
+        assertEquals(CURRENT_BACKUP_FORMAT,backup.formatVersion)
     }
 }

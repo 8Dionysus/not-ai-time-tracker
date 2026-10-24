@@ -38,7 +38,7 @@ internal fun decodeBackupVersion(json: String): Backup {
     ensure(version >= 14 || root.getValue("data").jsonObject.keys.none { it in setOf("subjects","savedReports") },
         "New domain fields in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
     val backup = when(version) {
-        8,9,10,11,12,13,14,15 -> {
+        8,9,10,11,12,13,14,15,16 -> {
             ensure(listOf("goals","focus","schedule","transfer").all { it in root.getValue("data").jsonObject },"Missing v8 backup fields")
             codec.decodeFromJsonElement<Backup>(root).also { ensure(version != 8 || !it.data.transfer.hasCompactionState(),"Compaction in v8 archive") }
         }
@@ -67,7 +67,8 @@ internal fun decodeBackupVersion(json: String): Backup {
     ensure(version in 13..CURRENT_BACKUP_FORMAT || backup.data.settings.longRecordReminder == LongRecordPreference(),"Ordinary reminder preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
     ensure(version >= 14 || !backup.data.hasChoicePersonalization(),"Personal choices in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
     ensure(version >= 14 || !backup.data.hasReportingExtensions(),"Reporting extensions in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
-    ensure(version == 15 || !backup.data.settings.surfaces.hasPresentationPreferences(),"Surface presentation preferences in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+    ensure(version >= 15 || !backup.data.settings.surfaces.hasPresentationPreferences(),"Surface presentation preferences in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
+    ensure(version >= 16 || "deletedRecords" !in root.getValue("data").jsonObject,"Deleted records in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
     ensure(version >= 14 || !backup.data.hasSubjectQuantities(),"Quantity extension in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
     return backup.copy(formatVersion = CURRENT_BACKUP_FORMAT)
 }

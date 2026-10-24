@@ -41,6 +41,7 @@ internal fun Dataset.frozen(base: Dataset? = null): Dataset {
         operations = frozenList(transfer.operations.map { it.copy(groups = frozenList(it.groups.map { g -> g.copy(group = g.group.copy(content = g.group.content.frozen(),entities = frozenList(g.group.entities)),inserted = g.inserted?.frozen(),previousOrigin = g.previousOrigin?.let { o -> o.frozenOrigin() }) })) })),
     schedule = if(schedule === base?.schedule) schedule else schedule.frozen(::capture),
     pendingAssignments = if(pendingAssignments === base?.pendingAssignments) pendingAssignments else frozenList(pendingAssignments),
+    deletedRecords = if(deletedRecords === base?.deletedRecords) deletedRecords else frozenList(deletedRecords.map { it.frozen(::capture) }),
     focus = if(focus === base?.focus) focus else focus?.copy(segmentIds = frozenList(focus.segmentIds)),
     goals = if(goals === base?.goals) goals else frozenList(goals.map { it.frozenGoal() }),
     savedReports = if(savedReports === base?.savedReports) savedReports else frozenList(savedReports.map { it.copy(filter = it.filter.frozenFilter()) }),

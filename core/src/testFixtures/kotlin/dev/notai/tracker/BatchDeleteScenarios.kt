@@ -79,7 +79,11 @@ fun batchDeleteOneCommit(create: () -> StateStore,reopen: (StateStore) -> StateS
     assertEquals(listOf("rate-$kept"),changed.data.subjects.distanceTimes.map { it.id })
     val json = Backups(tracker,MemoryRollback()).export()
     val backup = StreamingBackup.read { json.byteInputStream() }
-    assertEquals(15,backup.formatVersion);assertEquals(changed.data,backup.data)
+    assertEquals(CURRENT_BACKUP_FORMAT,backup.formatVersion);assertEquals(changed.data,backup.data)
+    val streamedBytes = java.io.ByteArrayOutputStream()
+    Backups(tracker,MemoryRollback()).writeSnapshot(streamedBytes)
+    val streamedArchive = StreamingBackup.read { streamedBytes.toByteArray().inputStream() }
+    assertEquals(changed.data,streamedArchive.data) // Automatic/portable writer must retain the archived dependent facts too.
     tracker.undo(changed.state.token)
     val undone = tracker.data()
     assertEquals(before.sessions,undone.sessions);assertEquals(before.segments,undone.segments)
@@ -89,6 +93,61 @@ fun batchDeleteOneCommit(create: () -> StateStore,reopen: (StateStore) -> StateS
     tracker = Tracker(reopen(tracker.store),clock);assertEquals(undone,tracker.data())
     val applied = tracker.applyDeleteSessions(tracker.previewDeleteSessions(listOf(first,second)))
     tracker = Tracker(reopen(tracker.store),clock);assertEquals(applied.data,tracker.data())
+    assertFalse(tracker.canUndo(tracker.snapshot().token)) // A fresh process has no snapshot Undo.
+    tracker.restoreDeleted(tracker.snapshot().token,listOf(first))
+    assertEquals(listOf(second),tracker.data().deletedRecords.map { it.sessionId })
+    tracker = Tracker(reopen(tracker.store),clock)
+    tracker.restoreDeleted(tracker.snapshot().token,listOf(second))
+    val recovered = tracker.data()
+    assertEquals(before.sessions.toSet(),recovered.sessions.toSet());assertEquals(before.segments.toSet(),recovered.segments.toSet())
+    assertEquals(before.measurements.toSet(),recovered.measurements.toSet());assertEquals(before.subjects,recovered.subjects)
+    assertTrue(recovered.deletedRecords.isEmpty());assertTrue(recovered.pendingAssignments.isEmpty())
+}
+
+fun recoverableDeletion(create: () -> StateStore,reopen: (StateStore) -> StateStore) {
+    val clock = FakeClock();var tracker = Tracker(create(),clock)
+    tracker.manual(tracker.snapshot().token,clock.wall-4000,clock.wall-3000,Classification(name = "First",details = mapOf("detail" to "literal")),"First note")
+    val first = tracker.data().sessions.single().id
+    tracker.manual(tracker.snapshot().token,clock.wall-2000,clock.wall-1000,Classification(name = "Second"),"Second note")
+    val before = tracker.data()
+    val second = before.sessions.single { it.id != first }.id
+    val firstDelete = tracker.deleteSession(tracker.snapshot().token,first)
+    tracker.deleteSession(tracker.snapshot().token,second)
+    tracker.saveCard(tracker.snapshot().token,Card("independent","Keep this later edit"))
+    tracker.restoreDeleted(tracker.snapshot().token,listOf(first))
+    assertEquals(before.sessions.single { it.id == first },tracker.data().sessions.single())
+    assertEquals(listOf(second),tracker.data().deletedRecords.map { it.sessionId })
+    assertEquals("Keep this later edit",tracker.data().cards.single().name)
+    val after = tracker.data()
+    assertFailsWith<CoreError> { tracker.restoreDeleted(tracker.snapshot().token,listOf(first)) };assertEquals(after,tracker.data())
+    assertEquals(ErrorCode.STALE,assertFailsWith<CoreError> { tracker.restoreDeleted(firstDelete.state.token,listOf(second)) }.code)
+    val again = tracker.deleteSession(tracker.snapshot().token,first)
+    assertNotEquals(firstDelete.deletionBatchId,again.deletionBatchId)
+    val json = Backups(tracker,MemoryRollback()).export()
+    assertEquals(CURRENT_BACKUP_FORMAT,Backups.decode(json).formatVersion)
+    val streamed = StreamingBackup.read { json.byteInputStream() };assertEquals(tracker.data(),streamed.data)
+    val futureDeletion = json.replace("\"deletedAt\": ${clock.wall}","\"deletedAt\": ${clock.wall+1}")
+    assertNotEquals(json,futureDeletion)
+    assertFailsWith<CoreError> { Backups.decode(futureDeletion) }
+    assertFailsWith<CoreError> { StreamingBackup.read { futureDeletion.byteInputStream() } }
+    val legacySmuggle = json.replace("\"formatVersion\": 16","\"formatVersion\": 15")
+    assertFailsWith<CoreError> { Backups.decode(legacySmuggle) }
+    assertFailsWith<CoreError> { StreamingBackup.read { legacySmuggle.byteInputStream() } }
+    val destination = Tracker(create(),clock);val restore = Backups(destination,MemoryRollback())
+    restore.apply(restore.prepare(json));assertEquals(2,destination.data().deletedRecords.size)
+    tracker = Tracker(reopen(tracker.store),clock)
+    tracker.restoreDeleted(tracker.snapshot().token,listOf(first,second))
+    assertEquals(before.sessions.toSet(),tracker.data().sessions.toSet());assertEquals(before.segments.toSet(),tracker.data().segments.toSet())
+    assertTrue(tracker.data().deletedRecords.isEmpty());assertEquals("independent",tracker.data().cards.single().id)
+    // Old JSON15 remains readable. The new field is omitted when empty.
+    val legacy = Backups(tracker,MemoryRollback()).export().replace("\"formatVersion\": 16","\"formatVersion\": 15")
+    assertEquals(tracker.data(),Backups.decode(legacy).data)
+    assertEquals(tracker.data(),StreamingBackup.read { legacy.byteInputStream() }.data)
+    tracker.deleteSession(tracker.snapshot().token,first)
+    tracker.manual(tracker.snapshot().token,clock.wall-4000,clock.wall-3000,Classification(name = "Replacement interval"))
+    val collision = tracker.data()
+    assertEquals(ErrorCode.OVERLAP,assertFailsWith<CoreError> { tracker.restoreDeleted(tracker.snapshot().token,listOf(first)) }.code)
+    assertEquals(collision,tracker.data()) // Refusal keeps the archived original and every live fact.
 }
 
 fun batchDeleteRefusals(create: () -> StateStore,reopen: (StateStore) -> StateStore) {

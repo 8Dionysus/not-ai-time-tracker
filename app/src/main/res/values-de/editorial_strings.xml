@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from the pinned reviewed editorial base; see scripts/generate_editorial_resources.py. -->
+<resources>
+    <string name="editorial_tracker_resource_technical_name_v0" formatted="false">(not)AI: technische Oberfläche</string>
+    <string name="editorial_tracker_draft_b019cfe19765e1568aca_v0" formatted="false">Der Timer hat sich bereits geändert. Tippe noch einmal.</string>
+    <string name="editorial_tracker_draft_dc78aa4bdaeaf74b5087_v1" formatted="false">Der Eintrag hat sich bereits geändert. Bearbeite ihn in der App.</string>
+    <string name="editorial_tracker_draft_f15b65f24e74b9567e1e_v0" formatted="false">Schwebende Schaltfläche ist deaktiviert</string>
+    <string name="editorial_tracker_draft_73194419a338f3e9d9db_v0" formatted="false">Schwebende Schaltfläche: Betriebssystemberechtigung nicht erteilt; der Timer ist in der App verfügbar</string>
+    <string name="editorial_tracker_draft_0078633353d122707494_v0" formatted="false">Schwebende Schaltfläche angefordert; die Systemanzeige des Dienstes ist erforderlich</string>
+    <string name="editorial_tracker_draft_c7f7efae816eb9c995d8_v0" formatted="false">Das Betriebssystem hat den Start der schwebenden Schaltfläche nicht erlaubt; der Timer ist in der App verfügbar</string>
+    <string name="editorial_tracker_draft_b65c24c54cb9e1f6f71f_v0" formatted="false">Zeiterfassung starten</string>
+    <string name="editorial_tracker_draft_b65c24c54cb9e1f6f71f_v1" formatted="false">Zeiterfassung stoppen</string>
+    <string name="editorial_tracker_draft_b65c24c54cb9e1f6f71f_v2" formatted="false">App öffnen</string>
+    <string name="editorial_tracker_draft_98218d5242bdd024b44f_v0" formatted="false">Womit warst du beschäftigt?</string>
+    <string name="editorial_tracker_draft_df8e8925267755b50091_v0" formatted="false">Zeit bereits gespeichert</string>
+    <string name="editorial_tracker_draft_878bc5c55c7cd209db23_v0" formatted="false">Noch keine häufigen Aktivitäten. Du kannst sie in der App im Verlauf auswählen.</string>
+    <string name="editorial_tracker_draft_fc6582725027af917f3f_v0" formatted="false">Ohne Aktivität fortfahren</string>
+    <string name="editorial_tracker_draft_ffeb31cee7144b493ebd_v0" formatted="false">Focus-Intervall beendet</string>
+    <string name="editorial_tracker_draft_507a9dd51a27b39695da_v0" formatted="false">Focus: Intervall beendet</string>
+    <string name="editorial_tracker_draft_30f7b195aa907ffc9f44_v0" formatted="false">Wähle den nächsten Abschnitt in der App</string>
+    <string name="editorial_tracker_draft_f49276090fc98f59c7eb_v0" formatted="false">Ohne Aktivität</string>
+    <string name="editorial_tracker_draft_8d33d037b1e8a6caa8f2_v0" formatted="false">Zeit unbekannt</string>
+    <string name="editorial_tracker_draft_1456a971df021d96fc6b_v0" formatted="false">Öffne die App, um anzugeben, wann du fertig warst</string>
+    <string name="editorial_tracker_draft_0f972ceed79827ef6674_v0" formatted="false">Arbeit</string>
+    <string name="editorial_tracker_draft_0f972ceed79827ef6674_v1" formatted="false">Pause</string>
+    <string name="editorial_tracker_draft_fc96777d5cf021949316_v0" formatted="false">Zeiterfassung läuft nicht</string>
+    <string name="editorial_tracker_draft_a377da995e582582ef74_v0" formatted="false">Fang jetzt an, die Aktivität kannst du später auswählen</string>
+    <string name="editorial_tracker_draft_0dd2a2e676bc76918404_v0" formatted="false">Sofort starten</string>
+    <string name="editorial_tracker_draft_0dd2a2e676bc76918404_v1" formatted="false">Wechseln zu</string>
+    <string name="editorial_tracker_draft_8be0e67a8ca40a71f228_v0" formatted="false">(not)AI Time</string>
+    <string name="editorial_tracker_draft_8be0e67a8ca40a71f228_v1" formatted="false">Zeiterfassung läuft</string>
+    <string name="editorial_tracker_draft_15395e458d9b9fd2c648_v0" formatted="false">Widget deaktiviert</string>
+    <string name="editorial_tracker_draft_e433b6f2ca4b6e3af4e4_v0" formatted="false">Aktiviere es in den App-Einstellungen</string>
+    <string name="editorial_tracker_draft_f53ab829f42b9b580aa1_v0" formatted="false">Der Timer hat sich bereits geändert. Öffne die Benachrichtigung erneut.</string>
+    <string name="editorial_tracker_draft_edd3b3bb7729669348cf_v0" formatted="false">Name der neuen Karte</string>
+    <string name="editorial_tracker_draft_1424fadc48cfdba7f2e8_v0" formatted="false">Zusatz: zum Beispiel listening</string>
+    <string name="editorial_tracker_draft_25a310c49fcbc14afa82_v0" formatted="false">Notiz</string>
+    <string name="editorial_tracker_draft_24c2941513796ea7c37e_v0" formatted="false">Beginn / Umschaltzeitpunkt: ISO-8601</string>
+    <string name="editorial_tracker_draft_4c1d32a0e336aae2a103_v0" formatted="false">Ende: ISO-8601</string>
+    <string name="editorial_tracker_draft_93d957f87776096f1f7c_v0" formatted="false">Berichtszeitzone: z. B. Europe/Moscow</string>
+    <string name="editorial_tracker_draft_c53f614cdcc58fd56cdd_v0" formatted="false">Neue Karte speichern</string>
+    <string name="editorial_tracker_draft_e579e1551e880275ee8e_v0" formatted="false">Karte anhand der ID auswählen…</string>
+    <string name="editorial_tracker_draft_672b06563ae08c0e15bd_v0" formatted="false">Ohne Karte</string>
+    <string name="editorial_tracker_draft_46468ba98ceea40e1ac7_v0" formatted="false">Nächster Start – ohne Karte</string>
+    <string name="editorial_tracker_draft_d05d6a802090176affd6_v0" formatted="false">Karte aus dem Katalog…</string>
+    <string name="editorial_tracker_draft_46853e0cc43aaca38c23_v0" formatted="false">Fertigen Katalog aktualisieren…</string>
+    <string name="editorial_tracker_draft_60c7c26716cac6e0288c_v0" formatted="false">Abbrechen</string>
+    <string name="editorial_tracker_draft_f668dfa98bb5a71433c8_v0" formatted="false">Anwenden</string>
+    <string name="editorial_tracker_draft_e4c2fb510f666930a31d_v0" formatted="false">Start</string>
+    <string name="editorial_tracker_draft_3f07738021d638d827ae_v0" formatted="false">Der aktuellen Aktivität zuweisen</string>
+    <string name="editorial_tracker_draft_4fb19a8ef0d0cdfca4b8_v0" formatted="false">Zusatz ab diesem Zeitpunkt ändern</string>
+    <string name="editorial_tracker_draft_ac8f99b6d409359d1824_v0" formatted="false">Switch</string>
+    <string name="editorial_tracker_draft_086a1dc3ed2a46e4cdcd_v0" formatted="false">Zuletzt aufgezeichneten Eintrag wiederholen (gespeicherte Parameter, auch archivierte)</string>
+    <string name="editorial_tracker_draft_e8a6f587efbf967f9000_v0" formatted="false">Ausgewählten Favoriten merken</string>
+    <string name="editorial_tracker_draft_c82de23849598dd9ba19_v0" formatted="false">Favoriten auswählen und starten…</string>
+    <string name="editorial_tracker_draft_934d9ad9b6afc6079e96_v0" formatted="false">Gespeicherte Variante starten?</string>
+    <string name="editorial_tracker_draft_ddf883b77157cde72f69_v0" formatted="false">Jetzt starten</string>
+    <string name="editorial_tracker_draft_cd973c587f81cd43d55e_v0" formatted="false">Manuelles Intervall speichern</string>
+    <string name="editorial_tracker_draft_a35b071b8d375ae8cdc5_v0" formatted="false">Früher gewechselt: speichern</string>
+    <string name="editorial_tracker_draft_da8a1ae6d9004274b843_v0" formatted="false">Letztes abgeschlossenes Segment korrigieren</string>
+    <string name="editorial_tracker_draft_35a89cd29708a12fa48a_v0" formatted="false">Verfügbare Korrektur rückgängig machen</string>
+    <string name="editorial_tracker_draft_189bd39e4cd87653f4f9_v0" formatted="false">Unbekannten Rest mit dem angegebenen Intervall bestätigen</string>
+    <string name="editorial_tracker_draft_3b12f74bae27aca48464_v0" formatted="false">Unbekannten Rest ausschließen</string>
+    <string name="editorial_tracker_draft_e6f9ed1a87a0b536365e_v0" formatted="false">Berichtszeitzone speichern…</string>
+    <string name="editorial_tracker_draft_2940887c6241dde6d1f8_v0" formatted="false">Unbekannte IANA-Zeitzone</string>
+    <string name="editorial_tracker_draft_bc40bf397d1028497032_v0" formatted="false">Die Tagesgrenzen und die Darstellung der Berichte zum bestehenden Verlauf ändern sich. Tatsächliche Zeitintervalle und separat gespeicherte Zielzeitzonen bleiben erhalten. Eine Änderung der Zeitzone des Telefons ändert diese Einstellung nicht automatisch.</string>
+    <string name="editorial_tracker_draft_8f4fc15539624b530640_v0" formatted="false">Speichern</string>
+    <string name="editorial_tracker_draft_a5d0e2f7718320b238e7_v0" formatted="false">Vollständiger JSON-Export</string>
+    <string name="editorial_tracker_draft_cde56f1748e7fffd5d4c_v0" formatted="false">Vorbereiteten Export wiederholen…</string>
+    <string name="editorial_tracker_draft_ae839664fa3f2d14b151_v0" formatted="false">Vorbereiteten Export abbrechen</string>
+    <string name="editorial_tracker_draft_03403303899776be344a_v0" formatted="false">Export abgebrochen; die Dateien bleiben erhalten. Du kannst eine neue Kopie vorbereiten.</string>
+    <string name="editorial_tracker_draft_db420396ba665711a595_v0" formatted="false">CSV-Bericht für heute (keine vollständige Kopie)</string>
+    <string name="editorial_tracker_draft_56e595a583181427e05e_v0" formatted="false">Im vollständigen Katalog suchen</string>
+    <string name="editorial_tracker_draft_aeadd4c264d6e13ff229_v0" formatted="false">Katalog</string>
+    <string name="editorial_tracker_draft_c27a5384934a838b45f0_v0" formatted="false">Suchen</string>
+    <string name="editorial_tracker_draft_b4e3665f8905663a0236_v0" formatted="false">Weiter</string>
+    <string name="editorial_tracker_draft_c803f60d17a11e694a72_v0" formatted="false">CSV-Verlauf hinzufügen…</string>
+    <string name="editorial_tracker_draft_0ad3ef1b305a1de3cb3d_v0" formatted="false">Menge für die gesamte Sitzung / das gesamte Segment…</string>
+    <string name="editorial_tracker_draft_5f9f6a639052ce335991_v0" formatted="false">ID der Messgröße</string>
+    <string name="editorial_tracker_draft_acea9bd30c825141c82e_v0" formatted="false">ID der Quelleinheit</string>
+    <string name="editorial_tracker_draft_5f423768ec34e36d0c6f_v0" formatted="false">Nichtnegative Dezimalzahl, Dezimaltrennzeichen Punkt</string>
+    <string name="editorial_tracker_draft_f7cc5febe7fed3ea0425_v0" formatted="false">ID der gesamten Sitzung oder des gesamten Segments</string>
+    <string name="editorial_tracker_draft_e3ad97e7e3d8a7d96926_v0" formatted="false">Gesamtwert für das Ziel; Tagesfenster werden nicht summiert</string>
+    <string name="editorial_tracker_draft_e7646b442b4edbb25707_v0" formatted="false">Trennzeichen auswählen</string>
+    <string name="editorial_tracker_draft_75f827f63b61883a3f99_v0" formatted="false">Stabiler Namespace der Quelle</string>
+    <string name="editorial_tracker_draft_a68a6e9ce2ec0c97b23e_v0" formatted="false">Aktivitätsspalte</string>
+    <string name="editorial_tracker_draft_e7df2606dfa2a656accb_v0" formatted="false">Startspalte</string>
+    <string name="editorial_tracker_draft_7990c5ea09f1291156b7_v0" formatted="false">Endspalte (oder Dauer)</string>
+    <string name="editorial_tracker_draft_403db8ac06bb94d7be16_v0" formatted="false">Dauerspalte</string>
+    <string name="editorial_tracker_draft_a9b8599614c48f979aec_v0" formatted="false">Separate Startzeitspalte</string>
+    <string name="editorial_tracker_draft_340976f26e7e40cbe214_v0" formatted="false">Separate Endzeitspalte</string>
+    <string name="editorial_tracker_draft_4f2efb87ed5cb3139462_v0" formatted="false">Kategorienspalte</string>
+    <string name="editorial_tracker_draft_776dacc84435b49d5f28_v0" formatted="false">Notizspalte</string>
+    <string name="editorial_tracker_draft_c2ce03502e37264cc84e_v0" formatted="false">Zeilen-ID-Spalte</string>
+    <string name="editorial_tracker_draft_2a2b9066a0db5a90aa35_v0" formatted="false">Muster für lokales Datum und Uhrzeit; leer = ISO mit Offset</string>
+    <string name="editorial_tracker_draft_1b859342c204b102979b_v0" formatted="false">Zeitzone der Quelle; bitte ausdrücklich bestätigen</string>
+    <string name="editorial_tracker_draft_750ebf86c3551b50b8d8_v0" formatted="false">Alle Zeilen → ausgewählte Karte; andernfalls ursprüngliche Namen ohne Typ</string>
+    <string name="editorial_tracker_draft_a09e7168f86b60429d9a_v0" formatted="false">Spalten, Uhrzeit und Dauer-Einheiten bestätigen</string>
+    <string name="editorial_tracker_draft_47dfd4f76727510ecdd0_v0" formatted="false">Vorschau</string>
+    <string name="editorial_tracker_draft_66317884d1cc9216ef57_v0" formatted="false">Vor der CSV-Zuordnung eine Karte per ID auswählen</string>
+    <string name="editorial_tracker_draft_38ba3ac69f823dcd1cfa_v0" formatted="false">Hinzufügen</string>
+    <string name="editorial_tracker_draft_7b3d9a3331f44c7d82d9_v0" formatted="false">Nächste Intervalle</string>
+    <string name="editorial_tracker_draft_d2c972d3d787fe52ecf7_v0" formatted="false">Focus starten</string>
+    <string name="editorial_tracker_draft_5dc837b71d874bbf2d5a_v0" formatted="false">Nächster Focus-Abschnitt</string>
+    <string name="editorial_tracker_draft_26fd84291735c57f4725_v0" formatted="false">Focus-Abschnitt überspringen</string>
+    <string name="editorial_tracker_draft_d3531f01d272cd8dc2fa_v0" formatted="false">Focus beenden</string>
+    <string name="editorial_tracker_draft_b4e39b4097c7bdd6129c_v0" formatted="false">Focus-Hintergrundsignal (Benachrichtigung; das Betriebssystem kann es verzögern)</string>
+    <string name="editorial_tracker_draft_8fea557c18854e866d08_v0" formatted="false">Kalendereintrag auswählen…</string>
+    <string name="editorial_tracker_draft_0991780f6f7b40c8780e_v0" formatted="false">Kalender: aktuelle und nächste Einträge</string>
+    <string name="editorial_tracker_draft_e0f8aebedbfd9561be56_v0" formatted="false">Bearbeitbaren Entwurf ausfüllen?</string>
+    <string name="editorial_tracker_draft_ea3119039087faab5097_v0" formatted="false">Start verwendet die aktuelle Uhrzeit. Für einen manuellen Eintrag müssen Anfang und Ende ausdrücklich angegeben werden; ein ganztägiger Termin legt kein Arbeitsintervall fest.</string>
+    <string name="editorial_tracker_draft_0dfab441e0c871947b1b_v0" formatted="false">Ausfüllen</string>
+    <string name="editorial_tracker_draft_641efe6e3e4336b117bf_v0" formatted="false">Widget (über den Launcher hinzufügen)</string>
+    <string name="editorial_tracker_draft_8d4775c3f247955845bb_v0" formatted="false">Steuernde Benachrichtigung</string>
+    <string name="editorial_tracker_draft_458aa9e2d9050b3e50ff_v0" formatted="false">Schwebende Schaltfläche + erforderliche Dienstanzeige</string>
+    <string name="editorial_tracker_draft_06802d8deb13940ef456_v0" formatted="false">Berechtigungseinstellungen sind auf diesem Gerät nicht verfügbar</string>
+    <string name="editorial_tracker_draft_807540c455f8b326f013_v0" formatted="false">Berechtigungen für Oberflächen prüfen</string>
+    <string name="editorial_tracker_draft_f32a2c8e84fa2a6fa6ab_v0" formatted="false">Das Overlay kann nur aus der geöffneten App gestartet werden</string>
+    <string name="editorial_tracker_draft_0dfc45256a0f00c54a7b_v0" formatted="false">OK</string>
+    <string name="editorial_tracker_draft_c52f2df15ba88a287b20_v0" formatted="false">Markierter Text</string>
+    <string name="editorial_tracker_draft_0d2caaab96c00294e4e4_v0" formatted="false">Die aktuell bearbeitbare Notiz durch den gesendeten Text ersetzen?</string>
+    <string name="editorial_tracker_draft_2fa3386e84a1309d38d7_v0" formatted="false">Aktuelle Notiz speichern</string>
+    <string name="editorial_tracker_draft_22aea0a1e4341d89d474_v0" formatted="false">Ersetzen</string>
+    <string name="editorial_tracker_draft_b8a096da057ebc09f5d0_v0" formatted="false">Focus</string>
+    <string name="editorial_tracker_draft_2e49b85703e9b3f2fb30_v0" formatted="false">Schließe den aktuellen Export ab oder brich ihn ab</string>
+    <string name="editorial_tracker_draft_28a9756ea06167190402_v0" formatted="false">Kein vorbereiteter Export</string>
+    <string name="editorial_tracker_draft_de01aa73507aebf546ce_v0" formatted="false">Vollständigen Austausch bestätigen</string>
+    <string name="editorial_tracker_draft_b2acc1df888fb198f8f4_v0" formatted="false">Nicht verfügbare Datenbank wiederherstellen</string>
+    <string name="editorial_tracker_draft_86dfb8c919ec425b6196_v0" formatted="false">Wiederherstellen</string>
+    <string name="editorial_tracker_draft_5d9ef736cdf704c8094e_v0" formatted="false">Vollständigen JSON-Export wiederherstellen…</string>
+    <string name="editorial_tracker_draft_5ac78a6bde3469dd28ac_v0" formatted="false">Lokale Rollback-Kopien…</string>
+    <string name="editorial_tracker_draft_144c142166467fca392c_v0" formatted="false">Noch keine lokalen Kopien</string>
+    <string name="editorial_tracker_draft_71fec87c1142acbd032a_v0" formatted="false">Kopie auswählen; die aktuellen Daten werden erst nach der Vorschau ersetzt</string>
+    <string name="editorial_tracker_draft_fda26863f20306fa8de4_v0" formatted="false">Unvollständige Wiederherstellung abschließen</string>
+    <string name="editorial_tracker_draft_4f044093d6d58fe32e0e_v0" formatted="false">Export abgebrochen; vorbereitete Kopie kann erneut verwendet werden</string>
+    <string name="editorial_tracker_draft_5799c96ef993116ab577_v0" formatted="false">Starten</string>
+    <string name="editorial_tracker_draft_813e7531c453460b8922_v0" formatted="false">Pause</string>
+    <string name="editorial_tracker_draft_2a535b9e411e61753f05_v0" formatted="false">Fortsetzen</string>
+    <string name="editorial_tracker_draft_f386fe7c3de9982b475f_v0" formatted="false">Stopp</string>
+    <string name="editorial_tracker_draft_2a4a743f9c6473a2ca4a_v0" formatted="false">Timer in der Benachrichtigungsleiste</string>
+    <string name="editorial_tracker_draft_50b7620ded5d3feefdc3_v0" formatted="false">Schwebende Schaltfläche: Systemanzeige</string>
+    <string name="editorial_tracker_draft_e02b6044cce8d68adcd0_v0" formatted="false">Schwebende Schaltfläche aktiviert</string>
+    <string name="editorial_tracker_draft_2c1f0b35c4ccf0757f2f_v0" formatted="false">Du kannst sie in den App-Einstellungen deaktivieren</string>
+    <string name="editorial_tracker_draft_ca28d90b10502e1038b3_v0" formatted="false">Öffne die App, um die Zeit anzupassen</string>
+    <string name="editorial_tracker_draft_1b17e3b625d672732111_v0" formatted="false">Timer</string>
+    <string name="editorial_tracker_draft_c2df626371e99f6b4ab6_v0" formatted="false">Übersicht</string>
+    <string name="editorial_tracker_draft_8a99e65a404198a79d0c_v0" formatted="false">Einstellungen</string>
+    <string name="editorial_tracker_draft_f342d1b57d57bb649441_v0" formatted="false">Lokale Datenbank ist derzeit nicht verfügbar</string>
+    <string name="editorial_tracker_draft_7fcd795d8bfbf628e8e5_v0" formatted="false">Wiederherstellung öffnen</string>
+    <string name="editorial_tracker_draft_cbdba5990922e31fc5a1_v0" formatted="false">Erneut versuchen</string>
+    <string name="editorial_tracker_draft_f9bc0dac8a7e0c324a76_v0" formatted="false">Abbrechen</string>
+    <string name="editorial_tracker_draft_256c7fda20c9b002640a_v0" formatted="false">Eintrag vollständig löschen?</string>
+    <string name="editorial_tracker_draft_98c2a48d88776822811d_v0" formatted="false">Löschen</string>
+    <string name="editorial_tracker_draft_3a32dce722dd2b874e0f_v0" formatted="false">Womit warst du beschäftigt?</string>
+    <string name="editorial_tracker_draft_0badfd7c162c745bf8cd_v0" formatted="false">Wechseln zu</string>
+    <string name="editorial_tracker_draft_bdba86f979debcd451c9_v0" formatted="false">Sofort starten</string>
+    <string name="editorial_tracker_draft_25aee3ba283a7a219f96_v0" formatted="false">Die Zeit ist bereits gespeichert. Es muss nur noch eine Aktivität ausgewählt werden.</string>
+    <string name="editorial_tracker_draft_52b03e513c696a56addf_v0" formatted="false">Der aktuelle Eintrag endet jetzt, der neue beginnt ab dieser Minute.</string>
+    <string name="editorial_tracker_draft_de2a1c04957aa5f2e43d_v0" formatted="false">Favoriten und häufige Aktivitäten der letzten 30 Tage.</string>
+    <string name="editorial_tracker_draft_957459cf20f2e483f3a0_v0" formatted="false">Noch keine häufigen Aktivitäten.</string>
+    <string name="editorial_tracker_draft_d0f2db9385d5fd9998ae_v0" formatted="false">Alle Aktivitäten</string>
+    <string name="editorial_tracker_draft_77f563d36e2ec9606da3_v0" formatted="false">Ohne Aktivität fortfahren</string>
+    <string name="editorial_tracker_draft_8ea4fb27aad7e440c15e_v0" formatted="false">Tagesverlauf</string>
+    <string name="editorial_tracker_draft_d4f52821d4cd489ea827_v0" formatted="false">Fertig</string>
+    <string name="editorial_tracker_draft_c647429c7cd47ccbc58f_v0" formatted="false">Abbrechen</string>
+    <string name="editorial_tracker_draft_457696df8953875cd0e3_v0" formatted="false">Notiz</string>
+    <string name="editorial_tracker_draft_d464164bc61a7e85c4c6_v0" formatted="false">Optional</string>
+    <string name="editorial_tracker_draft_0c53f28cf8ae8020931c_v0" formatted="false">Notiz</string>
+    <string name="editorial_tracker_draft_6b0733b73d3b42280b39_v0" formatted="false">Aktivität ändern</string>
+    <string name="editorial_tracker_draft_a723640e7ed84719343f_v0" formatted="false">Ändern</string>
+    <string name="editorial_tracker_draft_1f5bedd1a102bfd7e490_v0" formatted="false">Position des Eintrags zwischen den benachbarten Einträgen</string>
+    <string name="editorial_tracker_draft_945610afc1b733cd9cde_v0" formatted="false">Ohne Aktivität</string>
+    <string name="editorial_tracker_draft_30fe05c2c0b9cfd0625d_v0" formatted="false">Eintrag korrigieren</string>
+    <string name="editorial_tracker_draft_30fe05c2c0b9cfd0625d_v1" formatted="false">Eintrag hinzufügen</string>
+    <string name="editorial_tracker_draft_87e40c5c1ee8a15a63bd_v0" formatted="false">Eintrag löschen</string>
+    <string name="editorial_tracker_draft_9d490aef7d7e003ac51d_v0" formatted="false">Beginn</string>
+    <string name="editorial_tracker_draft_4b0708dcb2c4f4f1054e_v0" formatted="false">Ende</string>
+    <string name="editorial_tracker_draft_b679826bdf312797a5c6_v0" formatted="false">In den Favoriten</string>
+    <string name="editorial_tracker_draft_b679826bdf312797a5c6_v1" formatted="false">Zu den Favoriten hinzufügen</string>
+    <string name="editorial_tracker_draft_82b1c8d3bf61ddb56ad6_v0" formatted="false">Speichern</string>
+    <string name="editorial_tracker_draft_de07b012af25d20940d9_v0" formatted="false">Wann bist du gewechselt?</string>
+    <string name="editorial_tracker_draft_b576901daf5a143a9f94_v0" formatted="false">Zeitpunkt des Wechsels</string>
+    <string name="editorial_tracker_draft_57dc53f53a2dcf590521_v0" formatted="false">Die Zeit bis zu diesem Zeitpunkt bleibt bei der aktuellen Aktivität, danach wird sie der neuen zugeordnet.</string>
+    <string name="editorial_tracker_draft_7a94427842da266bf16f_v0" formatted="false">Aktivität auswählen</string>
+    <string name="editorial_tracker_draft_117e2b56ce25cb830325_v0" formatted="false">Wann warst du fertig?</string>
+    <string name="editorial_tracker_draft_835820b90bf6041d81d4_v0" formatted="false">spätestens jetzt</string>
+    <string name="editorial_tracker_draft_0fe49deada10db74c773_v0" formatted="false">Der Eintrag wird mit diesen Grenzen abgeschlossen. Wenn die Aktivität noch läuft, starte nach dem Speichern einen neuen Eintrag.</string>
+    <string name="editorial_tracker_draft_b99b9d609892160e58a2_v0" formatted="false">Übersicht</string>
+    <string name="editorial_tracker_draft_65da7bee269db2deae86_v0" formatted="false">Gestern gibt es keine Einträge</string>
+    <string name="editorial_tracker_draft_7d51a4c54e026090a998_v0" formatted="false">Für heute gibt es noch keine Einträge. Die Übersicht wird automatisch erstellt, sobald der erste Eintrag vorliegt.</string>
+    <string name="editorial_tracker_draft_bd0d7c95c7285fb7ccd0_v0" formatted="false">Für diese Tage gibt es keine Einträge. Die Übersicht wird automatisch erstellt, sobald Einträge vorliegen.</string>
+    <string name="editorial_tracker_draft_617ae064465f7bb30b90_v0" formatted="false">Nach Bereichen</string>
+    <string name="editorial_tracker_draft_5c54342245f5def713d5_v0" formatted="false">Für diesen Zeitraum gibt es keine Einträge.</string>
+    <string name="editorial_tracker_draft_2faa8fead166d79f497d_v0" formatted="false">Ziele</string>
+    <string name="editorial_tracker_draft_b311d0350ea2d44c2f57_v0" formatted="false">Zeit nach Tagen: </string>
+    <string name="editorial_tracker_draft_8d2ccedb9234cab582ce_v0" formatted="false">Zurück</string>
+    <string name="editorial_tracker_draft_2802ad7ac6d55ec2a936_v0" formatted="false">Schließen</string>
+    <string name="editorial_tracker_draft_c7b2a863ac8a53820978_v0" formatted="false">Leeren</string>
+    <string name="editorial_tracker_draft_752aa9166e00738cdce7_v0" formatted="false">Neuer Eintrag aus Text</string>
+    <string name="editorial_tracker_draft_752aa9166e00738cdce7_v1" formatted="false">Womit fangen wir an?</string>
+    <string name="editorial_tracker_draft_b9097891aa3064562682_v0" formatted="false">Womit bist du beschäftigt?</string>
+    <string name="editorial_tracker_draft_c4f5e8fd13167fea6d32_v0" formatted="false">Wozu bist du gewechselt?</string>
+    <string name="editorial_tracker_draft_8f08d8691dad4562b84d_v0" formatted="false">Focus: Aktivität</string>
+    <string name="editorial_tracker_draft_1a2c7007a2d3e4977ace_v0" formatted="false">Aktivität</string>
+    <string name="editorial_tracker_draft_a881a685cd25346a4de4_v0" formatted="false">Neu starten</string>
+    <string name="editorial_tracker_draft_b9be2dbbb401ad65b3f2_v0" formatted="false">Aktuelle Aktivität präzisieren</string>
+    <string name="editorial_tracker_draft_4344d0a07bc1e151f4a5_v0" formatted="false">Notiz entfernen</string>
+    <string name="editorial_tracker_draft_44599750ff4273de57b2_v0" formatted="false">Aktivität suchen oder erstellen</string>
+    <string name="editorial_tracker_draft_85d9a1eb7f0e637dc66e_v0" formatted="false">Nichts gefunden</string>
+    <string name="editorial_tracker_draft_85d9a1eb7f0e637dc66e_v1" formatted="false">Gefunden</string>
+    <string name="editorial_tracker_draft_47b9d9929cab7bf552bd_v0" formatted="false">Gesamter Bereich</string>
+    <string name="editorial_tracker_draft_5a23a043869c64456576_v0" formatted="false">Zuletzt verwendet</string>
+    <string name="editorial_tracker_draft_4ba6a449b82e5d2ac90a_v0" formatted="false">Zu Favoriten</string>
+    <string name="editorial_tracker_draft_8a016df5c8f3d36a6ece_v0" formatted="false">Favoriten</string>
+    <string name="editorial_tracker_draft_6e84c1f20ae9bf4a0c4d_v0" formatted="false">Aus Favoriten entfernen</string>
+    <string name="editorial_tracker_draft_a168a3a5ba1749583020_v0" formatted="false">Bereiche</string>
+    <string name="editorial_tracker_draft_463ffafc65787302a3ae_v0" formatted="false">Ohne Aktivität und mit Notiz starten</string>
+    <string name="editorial_tracker_draft_463ffafc65787302a3ae_v1" formatted="false">Ohne Aktivität starten</string>
+    <string name="editorial_tracker_draft_a00d9087b18112aba0d5_v0" formatted="false">archiviert</string>
+    <string name="editorial_tracker_draft_b330b55363b2b3868393_v0" formatted="false">Die Daten haben sich inzwischen geändert. Prüfe den Bildschirm und versuche es erneut.</string>
+    <string name="editorial_tracker_draft_ab7bfb28a0b78bffe8da_v0" formatted="false">Dieses Intervall ist nicht möglich: Prüfe Beginn und Ende.</string>
+    <string name="editorial_tracker_draft_6e4fa734f1e4a12a81b4_v0" formatted="false">Das Intervall überschneidet sich mit einem anderen Eintrag.</string>
+    <string name="editorial_tracker_draft_8d012a195af00e7305c1_v0" formatted="false">Präzisiere zuerst die unbekannte Zeit.</string>
+    <string name="editorial_tracker_draft_5355158ce15b15946fb2_v0" formatted="false">Speichern fehlgeschlagen. Die Daten wurden nicht geändert.</string>
+    <string name="editorial_tracker_draft_1ad4fa54719636bb33fd_v0" formatted="false">Ohne Aktivität</string>
+    <string name="editorial_tracker_draft_a680f75f261afed15d7c_v0" formatted="false">Einstellungen</string>
+    <string name="editorial_tracker_draft_0b30f7bc92826ccc1a61_v0" formatted="false">Timer außerhalb der App</string>
+    <string name="editorial_tracker_draft_a2f046ca2259b6d4c538_v0" formatted="false">Benachrichtigung</string>
+    <string name="editorial_tracker_draft_3dacf83206a9a4ab0d49_v0" formatted="false">Start und Stopp in der Benachrichtigungsleiste, Aktivität schnell auswählen</string>
+    <string name="editorial_tracker_draft_cee5930781f352557da8_v0" formatted="false">Erlauben</string>
+    <string name="editorial_tracker_draft_9eec1417928162570d58_v0" formatted="false">Einstellungen öffnen</string>
+    <string name="editorial_tracker_draft_fd873c5a82258c43ad78_v0" formatted="false">Schwebende Schaltfläche</string>
+    <string name="editorial_tracker_draft_9e808776f1a92fb584ee_v0" formatted="false">Halbtransparenter Start und Stopp über anderen Apps. Nach dem Stopp kannst du sofort eine Aktivität auswählen</string>
+    <string name="editorial_tracker_draft_3eb88f3564c836c4189b_v0" formatted="false">Widget</string>
+    <string name="editorial_tracker_draft_87d384356bf5573e5ee3_v0" formatted="false">Auf dem Startbildschirm; Schaltflächen deaktiviert</string>
+    <string name="editorial_tracker_draft_03dbd783e467d9ac4372_v0" formatted="false">Deaktiviert</string>
+    <string name="editorial_tracker_draft_797cdd16f4d13751eeeb_v1" formatted="false">Auf dem Startbildschirm</string>
+    <string name="editorial_tracker_draft_f822d9741219542f2022_v0" formatted="false">Bestätige das Hinzufügen auf dem Startbildschirm</string>
+    <string name="editorial_tracker_draft_2ce0366ad86d043d5eb8_v0" formatted="false">Nicht erschienen. Versuche es erneut oder füge es manuell hinzu: Startbildschirm lange drücken → Widgets → (not)AI Time</string>
+    <string name="editorial_tracker_draft_75f834d25f7a5b783fbb_v0" formatted="false">Der Startbildschirm kann keine Widgets aus Apps hinzufügen. Füge es manuell hinzu: Startbildschirm lange drücken → Widgets → (not)AI Time</string>
+    <string name="editorial_tracker_draft_9de4eea915a95f382154_v0" formatted="false">Das Telefon hat die Anfrage nicht angenommen. Versuche es erneut.</string>
+    <string name="editorial_tracker_draft_1fbc8522306c94f0c375_v0" formatted="false">Noch nicht auf dem Startbildschirm</string>
+    <string name="editorial_tracker_draft_22d59d1c13ba5315de1b_v0" formatted="false">Zum Startbildschirm hinzufügen</string>
+    <string name="editorial_tracker_draft_22d59d1c13ba5315de1b_v1" formatted="false">Erneut versuchen</string>
+    <string name="editorial_tracker_draft_dc6c5d941e43fe5349e1_v0" formatted="false">Focus-Signal</string>
+    <string name="editorial_tracker_draft_dd4592e575b1a3a4af5e_v0" formatted="false">Benachrichtigen, wenn ein Abschnitt beendet ist. Das Telefon kann das Signal etwas verzögern.</string>
+    <string name="editorial_tracker_draft_a2cfe1daad93e6632eae_v0" formatted="false">Darstellung</string>
+    <string name="editorial_tracker_draft_cc6e2601086686be33fe_v0" formatted="false">Design</string>
+    <string name="editorial_tracker_draft_5600606f865c2a770535_v0" formatted="false">System</string>
+    <string name="editorial_tracker_draft_0f07c1d513519e6c833b_v0" formatted="false">Hell</string>
+    <string name="editorial_tracker_draft_9b7b74c29b6a30fec254_v0" formatted="false">Dunkel</string>
+    <string name="editorial_tracker_draft_b06873d76719ffcd3c1b_v0" formatted="false">Berichtszeitzone</string>
+    <string name="editorial_tracker_draft_5d272b51d45d507c364c_v0" formatted="false">Daten</string>
+    <string name="editorial_tracker_draft_38c243c25f6bfac24d2b_v0" formatted="false">Sicherungskopie</string>
+    <string name="editorial_tracker_draft_ea10e4f237f87e4b9196_v0" formatted="false">Speichern</string>
+    <string name="editorial_tracker_draft_bea05fca09a89ea694d3_v0" formatted="false">Wiederherstellen</string>
+    <string name="editorial_tracker_draft_39087a84d9847f7d93da_v0" formatted="false">Als CSV exportieren</string>
+    <string name="editorial_tracker_draft_d946c86c7b71e238e62e_v0" formatted="false">Vollständiger Verlauf für Tabellen. Dies ist keine Sicherungskopie.</string>
+    <string name="editorial_tracker_draft_aa24de7103664d474c0e_v0" formatted="false">Verlauf aus CSV importieren</string>
+    <string name="editorial_tracker_draft_4e4769ee1a614f1bad7c_v0" formatted="false">Aus Toggl, Clockify oder einer eigenen Tabelle. Derzeit in der technischen Oberfläche.</string>
+    <string name="editorial_tracker_draft_28e259b75e8eb72ab33a_v0" formatted="false">Aktivitätenkatalog</string>
+    <string name="editorial_tracker_draft_0a5a50aed9713aca797c_v0" formatted="false">Mehr</string>
+    <string name="editorial_tracker_draft_56a157918c7e6a1c5352_v0" formatted="false">Technische Oberfläche</string>
+    <string name="editorial_tracker_draft_6968346a120957925762_v0" formatted="false">Ziele, Messungen, Kalender, CSV-Zuordnung, Datenbankwiederherstellung</string>
+    <string name="editorial_tracker_draft_5027e9837e3ca3339a41_v0" formatted="false">Alle Daten werden ausschließlich auf diesem Telefon gespeichert. Schriftart Onest, SIL Open Font License</string>
+    <string name="editorial_tracker_draft_4618b008caeff04e6acc_v0" formatted="false">Alle Daten ersetzen?</string>
+    <string name="editorial_tracker_draft_6377d0997c2e9aab7ac8_v0" formatted="false">Ersetzen</string>
+    <string name="editorial_tracker_draft_58b5c5b7e7b3c9b7afae_v0" formatted="false">Der Katalog ist bereits aktuell</string>
+    <string name="editorial_tracker_draft_58b5c5b7e7b3c9b7afae_v1" formatted="false">Katalog aktualisieren?</string>
+    <string name="editorial_tracker_draft_4313d59040699469db66_v0" formatted="false">Aktualisieren</string>
+    <string name="editorial_tracker_draft_452c5b07694c1d58f074_v0" formatted="false">Die Tagesgrenzen in Verlauf und Übersicht ändern sich. Die Einträge und Zielzeitzonen bleiben unverändert.</string>
+    <string name="editorial_tracker_draft_9e7c727ad59dd785a664_v0" formatted="false">Ändern</string>
+    <string name="editorial_tracker_draft_2256ebd19544063022fb_v0" formatted="false">Aktiviert, aber Telefonberechtigung fehlt</string>
+    <string name="editorial_tracker_draft_0173b1589e93c1b21d11_v0" formatted="false">Aktiviert, aber Benachrichtigungen sind in den Telefoneinstellungen ausgeschaltet</string>
+    <string name="editorial_tracker_draft_8719f345f695d7402991_v0" formatted="false">Das Telefon hat die Aktivierung nicht erlaubt. Versuche es erneut.</string>
+    <string name="editorial_tracker_draft_1d9d344d38d034a749fa_v0" formatted="false">Focus</string>
+    <string name="editorial_tracker_draft_b2aafd0d6a2801b26f16_v0" formatted="false">Arbeitsabschnitt</string>
+    <string name="editorial_tracker_draft_3c6fce250da321bc237c_v0" formatted="false">Pause</string>
+    <string name="editorial_tracker_draft_a0de082f26f590df7e0b_v0" formatted="false">Abbrechen</string>
+    <string name="editorial_tracker_draft_a0de082f26f590df7e0b_v1" formatted="false">Verstanden</string>
+    <string name="editorial_tracker_draft_c2989da0aa4e4edd6955_v0" formatted="false">Helles Design</string>
+    <string name="editorial_tracker_draft_c2989da0aa4e4edd6955_v1" formatted="false">Dunkles Design</string>
+    <string name="editorial_tracker_draft_d7c44c6653348c368add_v0" formatted="false">Zeiterfassung starten</string>
+    <string name="editorial_tracker_draft_43eaf749122204c049c4_v0" formatted="false">Starten</string>
+    <string name="editorial_tracker_draft_5a47607c91931b4f0cc0_v0" formatted="false">Die Zeit läuft sofort.\nDie Aktivität kannst du später auswählen.</string>
+    <string name="editorial_tracker_draft_3b86aff642ce0c738d7e_v0" formatted="false">Sofort starten</string>
+    <string name="editorial_tracker_draft_18c8e59f62a599015bc9_v0" formatted="false">Mit Aktivität starten</string>
+    <string name="editorial_tracker_draft_18c8e59f62a599015bc9_v1" formatted="false">Alle Aktivitäten</string>
+    <string name="editorial_tracker_draft_038672983f9fe7150792_v0" formatted="false">Aktivität auswählen</string>
+    <string name="editorial_tracker_draft_ddc432ee5e39ff4df7c8_v0" formatted="false">Ohne Aktivität</string>
+    <string name="editorial_tracker_draft_d134c6d82d62e46ec879_v0" formatted="false">Auswählen</string>
+    <string name="editorial_tracker_draft_82972b24c978935ca039_v0" formatted="false">Aktivität wechseln oder präzisieren</string>
+    <string name="editorial_tracker_draft_748fec6552b25c79dd24_v0" formatted="false">Pausiert. Die Pause zählt nicht zur Aktivitätszeit.</string>
+    <string name="editorial_tracker_draft_138490ca5e71f5bf41bb_v0" formatted="false">Pause</string>
+    <string name="editorial_tracker_draft_7b519bd0270e6d93458c_v0" formatted="false">Fortsetzen</string>
+    <string name="editorial_tracker_draft_8674384e26e91d4f05a9_v0" formatted="false">Stopp</string>
+    <string name="editorial_tracker_draft_9045571424e4065a1f4f_v0" formatted="false">Wechsel vergessen? </string>
+    <string name="editorial_tracker_draft_c81202634a9a341d0335_v0" formatted="false">Zeitpunkt angeben</string>
+    <string name="editorial_tracker_draft_04f3f181124110d652f4_v0" formatted="false">Ende unbekannt</string>
+    <string name="editorial_tracker_draft_04f3f181124110d652f4_v1" formatted="false">Zeit unbekannt</string>
+    <string name="editorial_tracker_draft_801a0a1eac7e6d9ef9b4_v0" formatted="false">Das Telefon wurde neu gestartet oder die Uhrzeit hat sich während der Zeiterfassung verschoben. Die App weiß nicht, wie lange die Aktivität dauerte, und wird nicht raten.</string>
+    <string name="editorial_tracker_draft_b048178228ee82e3e962_v0" formatted="false">Angeben, wann du fertig warst</string>
+    <string name="editorial_tracker_draft_30d69cc282c63d9fff4a_v1" formatted="false">Nicht berücksichtigen</string>
+    <string name="editorial_tracker_draft_9f8a3c7e7e5adb77e109_v1" formatted="false">Focus, Pause</string>
+    <string name="editorial_tracker_draft_5a480c5a17081a52ebc6_v0" formatted="false">Arbeitsabschnitt beendet</string>
+    <string name="editorial_tracker_draft_5a480c5a17081a52ebc6_v1" formatted="false">Pause beendet</string>
+    <string name="editorial_tracker_draft_b084793071c0f8ef17bb_v0" formatted="false">Pause starten</string>
+    <string name="editorial_tracker_draft_b084793071c0f8ef17bb_v1" formatted="false">Arbeit starten</string>
+    <string name="editorial_tracker_draft_d4c3ff0340d73303cb5b_v0" formatted="false">Beenden</string>
+    <string name="editorial_tracker_draft_b511447e5ae90a619852_v0" formatted="false">Arbeitsabschnitt überspringen</string>
+    <string name="editorial_tracker_draft_b511447e5ae90a619852_v1" formatted="false">Pause überspringen</string>
+    <string name="editorial_tracker_draft_cbeca4591fe9810ca6fd_v0" formatted="false">Die Pause zählt nicht zur Aktivitätszeit. Der nächste Abschnitt beginnt, wenn du tippst.</string>
+    <string name="editorial_tracker_draft_2053535d697f41d5e4e0_v0" formatted="false">Noch keine Einträge. Hier wird jeder Abschnitt angezeigt.</string>
+    <string name="editorial_tracker_draft_2053535d697f41d5e4e0_v1" formatted="false">Keine Einträge.</string>
+    <string name="editorial_tracker_draft_534fa1c71825748c438f_v0" formatted="false">Eintrag nachträglich hinzufügen</string>
+    <string name="editorial_tracker_draft_5d4de510a166f4a6deed_v0" formatted="false">Frühere anzeigen</string>
+    <string name="editorial_tracker_draft_5760d5b61d78628ba781_v0" formatted="false">Löschen</string>
+    <string name="editorial_tracker_draft_fcb37c7c429c70968e70_v0" formatted="false">Eintrag korrigieren</string>
+    <string name="editorial_tracker_draft_899133d1f06d793bc017_v0" formatted="false">Eintragsaktionen</string>
+    <string name="editorial_tracker_draft_5c0e90163450a0c5ea3f_v0" formatted="false">Korrigieren</string>
+    <string name="editorial_tracker_draft_7bd65180b11484ff842b_v0" formatted="false">Wiederholen</string>
+    <string name="editorial_tracker_draft_138c144265d2082e73d0_v0" formatted="false">Löschen</string>
+    <string name="editorial_tracker_draft_748b237516bc1d2267fc_v0" formatted="false">Welche Aktivitäten machst du am häufigsten?</string>
+    <string name="editorial_tracker_draft_0475a52ebc49a52f249b_v0" formatted="false">Markiere zwei oder drei Aktivitäten. Sie erscheinen hier, und der Start ist nur einen Fingertipp entfernt. Den Rest findest du über die Suche.</string>
+    <string name="editorial_tracker_draft_16804fc936758c4dd92a_v0" formatted="false">Nicht jetzt</string>
+    <string name="editorial_tracker_draft_5b288b8306a256518d80_v0" formatted="false">Fertig</string>
+    <string name="editorial_tracker_draft_f7cb88fa8fb77369213c_v0" formatted="false">Tag</string>
+    <string name="editorial_tracker_draft_eeb7b34f132dd6418851_v0" formatted="false">7 Tage</string>
+    <string name="editorial_tracker_draft_247ac0af8630b7161f34_v0" formatted="false">30 Tage</string>
+    <string name="editorial_tracker_draft_7851d16152b80be14e32_v0" formatted="false">Gespeichert</string>
+    <string name="editorial_tracker_draft_af9cc75a5a46d34f26a9_v0" formatted="false">Eintrag gelöscht</string>
+    <string name="editorial_tracker_draft_d1addc4a5f6d758c11c5_v0" formatted="false">Rückgängig gemacht</string>
+    <string name="editorial_tracker_draft_2a46c54305b113afc5da_v0" formatted="false">Neuer Eintrag gestartet</string>
+    <string name="editorial_tracker_draft_54896311f1efb42d77f9_v0" formatted="false">Zeit präzisiert</string>
+    <string name="editorial_tracker_draft_2ec7870903f953194944_v0" formatted="false">Unbekannter Abschnitt nicht erfasst</string>
+    <string name="editorial_tracker_draft_2991ff44bbf60dd903e2_v0" formatted="false">Intervalle geändert</string>
+    <string name="editorial_tracker_draft_45914589791d71af7d06_v0" formatted="false">Zu Favoriten hinzugefügt</string>
+    <string name="editorial_tracker_draft_59bc119df199d8385098_v0" formatted="false">Aus Favoriten entfernt</string>
+    <string name="editorial_tracker_draft_76270c25d6c1d3cee901_v0" formatted="false">Keine Daten</string>
+    <string name="editorial_tracker_draft_d40f538441f1f7f31855_v0" formatted="false">Eintrag korrigiert</string>
+    <string name="editorial_tracker_draft_06efae539159f4d2b8a0_v0" formatted="false">Eintrag hinzugefügt</string>
+    <string name="editorial_tracker_draft_a762b2b6b93d88c544a0_v0" formatted="false">Ohne Bereich</string>
+    <string name="editorial_tracker_draft_3564585e9d9f1b2fb4c0_v0" formatted="false">Speichern abgebrochen</string>
+    <string name="editorial_tracker_draft_1a42abdf35e9aa708ca6_v0" formatted="false">Datei gespeichert und überprüft</string>
+    <string name="editorial_tracker_draft_7bc4d82f7417276d190e_v0" formatted="false">Datei gespeichert. Sie kann nicht durch erneutes Einlesen überprüft werden.</string>
+    <string name="editorial_tracker_draft_598c4bd01828856d0b8c_v0" formatted="false">Daten wiederhergestellt. Die vorherigen Daten wurden separat gespeichert.</string>
+    <string name="editorial_tracker_resource_quick_start_v0" formatted="false">Sofort starten</string>
+    <string name="editorial_tracker_resource_all_activities_v0" formatted="false">Alle Aktivitäten</string>
+    <string name="editorial_tracker_resource_pause_timer_v0" formatted="false">Pause</string>
+    <string name="editorial_tracker_resource_start_timer_v0" formatted="false">Starten</string>
+    <string name="editorial_tracker_resource_shortcut_start_v0" formatted="false">Timer öffnen</string>
+    <string name="editorial_tracker_resource_widget_description_v0" formatted="false">Timer: Start und Stopp, aktuelle Aktivität und Zeit</string>
+</resources>

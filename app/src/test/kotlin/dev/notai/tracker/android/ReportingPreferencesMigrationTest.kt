@@ -14,7 +14,7 @@ import org.junit.Assert.*
 @Config(sdk = [35])
 class ReportingPreferencesMigrationTest {
     private fun open(name: String) = Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name)
-        .addMigrations(TrackerDatabase.MIGRATION_11_12).allowMainThreadQueries().build()
+        .addMigrations(TrackerDatabase.MIGRATION_11_12,TrackerDatabase.MIGRATION_12_13).allowMainThreadQueries().build()
     @Test fun legacy11KeepsAllHistoryAndCPreferencesByteForByte() {
         val context = RuntimeEnvironment.getApplication()
         for(status in SessionStatus.entries) {

@@ -23,7 +23,7 @@ import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [36])
+@Config(sdk = [36],qualifiers = "ru-rRU")
 class UiReviewRegressionTest {
     private val originalOpen = UiBackends.open
     private var reportZoneFactory: ((Tracker) -> ReportZonePreference)? = null
@@ -87,6 +87,69 @@ class UiReviewRegressionTest {
         fixtures.forEach { it.scope.cancel();it.vm.viewModelScope.cancel() };shadowOf(Looper.getMainLooper()).idle();UiBackends.open = originalOpen
     }
     private fun at(text: String) = Instant.parse(text).toEpochMilli()
+
+    @Test fun recoverySingleDeleteAcknowledgesCommitAndUndoKeepsLaterIndependentEdits() = runBlocking {
+        val f = fixture(FakeClock());val t = f.tracker
+        t.manual(t.snapshot().token,f.clock.wall-4000,f.clock.wall-3000,Classification(name = "Original"),"Keep note")
+        t.manual(t.snapshot().token,f.clock.wall-2000,f.clock.wall-1000,Classification(name = "Second"))
+        val before = t.data();val first = before.sessions[0].id;val second = before.sessions[1].id;f.synced()
+        val entered = java.util.concurrent.CountDownLatch(1);val release = java.util.concurrent.CountDownLatch(1)
+        f.store.beforeCommit = { entered.countDown();check(release.await(5,java.util.concurrent.TimeUnit.SECONDS)) }
+        val deleting = f.scope.async { f.vm.requestDelete(first) }
+        try {
+            assertTrue(entered.await(5,java.util.concurrent.TimeUnit.SECONDS))
+            assertFalse(deleting.isCompleted);assertEquals(before,t.data())
+            release.countDown();assertEquals(DeleteRequest.Applied,deleting.await())
+        } finally { release.countDown() }
+        pump { f.notices.any { it.restoreBatchId != null } };val undo = f.notices.first { it.restoreBatchId != null }
+        f.synced();assertEquals(DeleteRequest.Applied,f.vm.requestDelete(second))
+        t.saveCard(t.snapshot().token,Card("later","Independent edit"));f.synced()
+        f.vm.undo(undo.undo!!,undo.restoreBatchId,undo.restoreBarrier)
+        pump { t.data().sessions.any { it.id == first } }
+        assertEquals(before.sessions[0],t.data().sessions.single());assertEquals("later",t.data().cards.single().id)
+        assertEquals(listOf(second),t.data().deletedRecords.map { it.sessionId })
+        assertEquals(before.segments.filter { it.sessionId == first },t.data().segments)
+    }
+    @Test fun recoverySingleDeleteRefusalDoesNotReturnAppliedOrLoseTheRecord() = runBlocking {
+        val f = fixture(FakeClock());val t = f.tracker
+        t.manual(t.snapshot().token,f.clock.wall-1000,f.clock.wall,Classification(name = "Keep"));f.synced()
+        val before = t.data();f.store.rejectWrite = f.store.attempts.get()+1
+        assertEquals(DeleteRequest.Failed,f.vm.requestDelete(before.sessions.single().id))
+        assertEquals(before,t.data());assertTrue(f.notices.none { it.restoreBatchId != null })
+    }
+    @Test fun recoveryDeletionUndoCannotCrossBackupReplacementEvenOfSameDataset() = runBlocking {
+        val f = fixture(FakeClock());val t = f.tracker
+        t.manual(t.snapshot().token,f.clock.wall-1000,f.clock.wall,Classification());f.synced()
+        assertEquals(DeleteRequest.Applied,f.vm.requestDelete(t.data().sessions.single().id))
+        pump { f.notices.any { it.restoreBatchId != null } };val undo = f.notices.first { it.restoreBatchId != null }
+        val backups = Backups(t,MemoryRollback());backups.apply(backups.prepare(backups.export()));f.synced()
+        val replaced = t.data();assertNotEquals(undo.restoreBarrier,replaced.controlBarrier)
+        f.vm.undo(undo.undo!!,undo.restoreBatchId,undo.restoreBarrier)
+        pump { f.notices.any { it.text == "Не удалось подтвердить восстановление. Проверь историю и «Удалённое»." } }
+        assertEquals(replaced,t.data())
+    }
+    @Test fun recoveryLanguageThemeAndAccentReloadInNewViewModelWithoutMutatingRecords() {
+        val f = fixture(FakeClock());val t = f.tracker
+        t.manual(t.snapshot().token,f.clock.wall-1000,f.clock.wall,Classification(name = "Личное 名称"),"Literal note");f.synced()
+        val before = t.data();val oldTheme = f.vm.theme.value;val oldAppearance = f.vm.appearance.value
+        val oldLanguage = f.vm.language.value.preference.explicitTag
+        try {
+            f.vm.setTheme(ThemeChoice.NEON);f.vm.setAppearance { it.copy(accent = Accent.TEAL,pulse = false) };f.vm.setLanguage("fr")
+            pump { f.vm.language.value.preference.explicitTag == "fr" }
+            val app: Application = RuntimeEnvironment.getApplication()
+            assertTrue(app.getSharedPreferences("ui",0).edit().commit()) // Flush previous apply writes in this host fixture.
+            val next = TrackerViewModel(app);val scope = CoroutineScope(SupervisorJob()+Dispatchers.IO)
+            fixtures += Fixture(f.clock,f.store,t,next,scope)
+            scope.launch(start = CoroutineStart.UNDISPATCHED) { next.snapshot.collect { } }
+            pump { next.boot.value is TrackerViewModel.Boot.Ready && next.snapshot.value != null }
+            assertEquals(ThemeChoice.NEON,next.theme.value);assertEquals(Accent.TEAL,next.appearance.value.accent)
+            assertFalse(next.appearance.value.pulse);assertEquals("fr",next.language.value.resolvedLocaleTag)
+            assertEquals(before,t.data())
+        } finally {
+            f.vm.setTheme(oldTheme);f.vm.setAppearance { oldAppearance };f.vm.setLanguage(oldLanguage)
+            pump { f.vm.language.value.preference.explicitTag == oldLanguage }
+        }
+    }
 
     @Test fun feedbackBatchHostRejectsChangedSelectionAndPropagatesCancellation() {
         val f = fixture(FakeClock());val t = f.tracker
@@ -240,7 +303,7 @@ class UiReviewRegressionTest {
         val review = result as DeleteRequest.Confirm
         assertEquals(1,review.subjectLinks);assertEquals(1,review.exerciseSets);assertEquals(1,review.eventQuantities);assertEquals(0,review.distanceTimes)
         assertTrue(review.consequences.any { it.contains("подход") });assertTrue(review.consequences.any { it.contains("величин") });assertTrue(review.consequences.any { it.contains("связ") })
-        f.vm.applyDeleteSession(review.preview);pump { f.notices.any { it.text == "Запись удалена" } }
+        f.vm.applyDeleteSession(review.preview);pump { f.notices.any { it.text == "Запись перемещена в «Удалённое»" } }
         assertTrue(t.data().sessions.none { it.id == session });f.synced();f.vm.undo(t.snapshot().token)
         pump { f.notices.any { it.text == "Отменено" } }
         assertEquals(before.subjects,t.data().subjects);assertEquals(before.sessions,t.data().sessions);assertEquals(before.segments,t.data().segments)

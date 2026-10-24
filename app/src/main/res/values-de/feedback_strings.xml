@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">Sprache</string>
+    <string name="language_system">Systemsprache</string>
+    <string name="language_partial">Einige Ansichten sind noch auf Russisch. Persönliche Namen und Einträge werden nicht übersetzt.</string>
+    <string name="language_save_error">Sprache konnte nicht gespeichert werden. Bitte erneut wählen.</string>
+    <string name="deleted_title">Gelöscht</string>
+    <string name="deleted_empty">Keine gelöschten Einträge</string>
+    <string name="deleted_retained">Einträge bleiben hier bis zur Wiederherstellung. Es gibt keine automatische Bereinigung.</string>
+    <string name="data_language">Daten und Sprache</string>
+    <string name="undo_deletion">Rückgängig</string>
+    <string name="record_deleted">Eintrag nach Gelöscht verschoben</string>
+    <string name="records_deleted">Nach Gelöscht verschoben: %1$d</string>
+    <string name="record_restored">Eintrag wiederhergestellt</string>
+    <string name="restore_error">Wiederherstellung nicht bestätigt. Verlauf und Gelöscht prüfen.</string>
+    <string name="delete_error">Löschung nicht bestätigt. Verlauf und Gelöscht prüfen.</string>
+    <string name="delete_title">Einträge löschen (%1$d)?</string>
+    <string name="delete_confirmation">Einträge und zugehörige Daten werden nach Gelöscht verschoben. Die Wiederherstellung ist unten in den Einstellungen verfügbar.</string>
+    <string name="delete_counts">Abschnitte: %1$d · Messungen: %2$d · Verknüpfungen: %3$d · Sätze: %4$d · Mengen: %5$d · Tempodaten: %6$d · Korrekturen: %7$d</string>
+    <string name="delete_duration">Aus Summen entfernte Zeit: %1$s</string>
+    <string name="deleted_show_more">Mehr anzeigen</string>
+</resources>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">اللغة</string>
+    <string name="language_system">لغة النظام</string>
+    <string name="language_partial">بعض الشاشات ما زالت بالروسية. لا تُترجم الأسماء الشخصية والسجلات.</string>
+    <string name="language_save_error">تعذر حفظ اللغة. اختر مرة أخرى.</string>
+    <string name="deleted_title">المحذوفات</string>
+    <string name="deleted_empty">لا توجد سجلات محذوفة</string>
+    <string name="deleted_retained">تبقى السجلات هنا حتى استعادتها. لا يوجد تنظيف تلقائي.</string>
+    <string name="data_language">البيانات واللغة</string>
+    <string name="undo_deletion">تراجع</string>
+    <string name="record_deleted">نُقل السجل إلى المحذوفات</string>
+    <string name="records_deleted">نُقلت إلى المحذوفات: %1$d</string>
+    <string name="record_restored">تمت استعادة السجل</string>
+    <string name="restore_error">تعذر تأكيد الاستعادة. تحقق من السجل والمحذوفات.</string>
+    <string name="delete_error">تعذر تأكيد الحذف. تحقق من السجل والمحذوفات.</string>
+    <string name="delete_title">حذف السجلات (%1$d)؟</string>
+    <string name="delete_confirmation">ستُنقل السجلات وبياناتها المرتبطة إلى المحذوفات. يمكن استعادتها أسفل الإعدادات.</string>
+    <string name="delete_counts">المقاطع: %1$d · القياسات: %2$d · الروابط: %3$d · المجموعات: %4$d · الكميات: %5$d · بيانات الوتيرة: %6$d · التصحيحات: %7$d</string>
+    <string name="delete_duration">الوقت المحذوف من الإجماليات: %1$s</string>
+    <string name="deleted_show_more">عرض المزيد</string>
+</resources>

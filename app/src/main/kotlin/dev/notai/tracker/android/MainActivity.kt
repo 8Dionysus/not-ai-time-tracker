@@ -21,6 +21,7 @@ import dev.notai.tracker.android.ui.TrackerViewModel
  * routes system entry points (launcher shortcut, selected text) and refreshes user-enabled surfaces.
  */
 class MainActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: android.content.Context) { super.attachBaseContext(AppLanguage.context(newBase)) }
     private val vm: TrackerViewModel by viewModels()
     private var shortcutPending: SurfaceAction? = null
     private var tracedReady = false
@@ -78,6 +79,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        vm.refreshLanguage()
         vm.refreshCapabilities(reconcileForeground = true)
         // Overlay may only start from a visible Activity; widget/notification are redrawn on explicit events.
         vm.refreshSurfaces { runtime, view ->

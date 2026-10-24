@@ -21,7 +21,7 @@ import org.robolectric.annotation.GraphicsMode
 import java.io.File
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [36],qualifiers = "w400dp-h800dp-mdpi")
+@Config(sdk = [36],qualifiers = "ru-rRU-w400dp-h800dp-mdpi")
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 class NotificationCompactVisualTest {
     private val ids = intArrayOf(R.id.notification_favorite_0,R.id.notification_favorite_1,R.id.notification_favorite_2,R.id.notification_favorite_3)
@@ -50,7 +50,7 @@ class NotificationCompactVisualTest {
     }
     @Test fun compactFavoritesFitConservativeWidthsRetainLabelsAndStalePayloads() {
         for(width in listOf(220,280,320,400)) {
-            RuntimeEnvironment.setQualifiers("w${width}dp-h800dp-mdpi")
+            RuntimeEnvironment.setQualifiers("ru-rRU-w${width}dp-h800dp-mdpi")
             val c = RuntimeEnvironment.getApplication();val t = tracker();val before = t.data()
             val (small,big) = SurfaceViews.notificationViews(c,t.view())
             val rendered = measured(c,small,width-96)
@@ -125,5 +125,10 @@ class NotificationCompactVisualTest {
         listOf("Default","Amber","Mint","Violet").forEachIndexed { i,name -> canvas.drawText(name,i*128+20f,140f,paint) }
         write(bitmap,"launcher-palettes")
         assertEquals(listOf("Системный вариант","Янтарный","Мятный","Фиолетовый"),LauncherIconController.options.map { it.label(c) })
+        val english = AppLanguage.context(c,"en")
+        assertEquals(listOf("System variant","Amber","Mint","Violet"),LauncherIconController.options.map { it.label(english) })
+        assertEquals("Start",english.getString(R.string.start_timer))
+        assertEquals("Pause",english.getString(R.string.pause_timer))
+        assertEquals("Start: Personal fixture",english.getString(R.string.notification_start_favorite,"Personal fixture"))
     }
 }

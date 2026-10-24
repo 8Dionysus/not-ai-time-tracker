@@ -1,5 +1,9 @@
 package dev.notai.tracker.android.ui
 
+import dev.notai.tracker.android.R
+
+import androidx.compose.ui.res.stringResource
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -59,7 +63,7 @@ fun SavedReportSheet(r: SavedReportUi, onEdit: () -> Unit, onDelete: () -> Unit,
             Text("${windowTitle(r.query.window)}: ${r.window}" + if (r.incomplete) ", период ещё идёт" else "", style = NotAi.type.bodySmall, color = c.ink2)
             Text(Format.duration(r.totalMs), style = NotAi.type.big, color = c.ink)
             r.filterLabel?.let { Text("Занятие: ${it.title}" + (it.detail?.let { d -> " · $d" } ?: ""), style = NotAi.type.bodySmall, color = c.ink2) }
-                ?: Text("Все занятия", style = NotAi.type.bodySmall, color = c.ink2)
+                ?: Text(stringResource(R.string.editorial_tracker_draft_d0f2db9385d5fd9998ae_v0), style = NotAi.type.bodySmall, color = c.ink2)
             if (r.missing) Note("Занятие этого отчёта удалено или в архиве. Отчёт считает только его прошлые записи.")
             if (r.parts.size > 1) {
                 Spacer(Modifier.height(6.dp))
@@ -68,8 +72,8 @@ fun SavedReportSheet(r: SavedReportUi, onEdit: () -> Unit, onDelete: () -> Unit,
             }
             Spacer(Modifier.height(8.dp))
             ButtonPair(spacing = 8.dp) { m ->
-                PillButton("Изменить", onEdit, m, ButtonKind.TONAL, height = 44.dp)
-                PillButton("Удалить", { confirm = true }, m, ButtonKind.TEXT, height = 44.dp)
+                PillButton(stringResource(R.string.editorial_tracker_draft_a723640e7ed84719343f_v0), onEdit, m, ButtonKind.TONAL, height = 44.dp)
+                PillButton(stringResource(R.string.editorial_tracker_draft_98c2a48d88776822811d_v0), { confirm = true }, m, ButtonKind.TEXT, height = 44.dp)
             }
         }
     }
@@ -120,7 +124,7 @@ fun SavedReportEditor(vm: TrackerViewModel, existing: SavedReportUi?, pickActivi
                 }
             }
             TextInput("Название", shownName, { name = it; typed = true })
-            PillButton("Сохранить", { vm.saveReport(existing?.query, shownName.trim().ifBlank { "Отчёт" }, selection, window); onDismiss() },
+            PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), { vm.saveReport(existing?.query, shownName.trim().ifBlank { "Отчёт" }, selection, window); onDismiss() },
                 Modifier.fillMaxWidth(), ButtonKind.PRIMARY)
         }
     }

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.performScrollToIndex
+import androidx.compose.ui.test.performScrollToKey
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
@@ -33,6 +34,10 @@ import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.swipeLeft
+import androidx.compose.ui.test.swipe
+import androidx.compose.ui.geometry.Offset
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.cancel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -65,7 +70,7 @@ import java.time.ZoneId
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(qualifiers = "w400dp-h860dp-xhdpi")
+@Config(qualifiers = "ru-rRU-w400dp-h860dp-xhdpi")
 class UiScreensTest {
     @get:Rule val compose = createComposeRule()
 
@@ -365,7 +370,7 @@ class UiScreensTest {
     }
 
     /** Each section is its own page; back returns to the short root. */
-    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
+    @Config(qualifiers = "ru-rRU-w400dp-h1300dp-xhdpi")
     @Test fun settingsFullPage() {
         val vm = render(seed())
         compose.onNodeWithText("Настройки").performClick()
@@ -406,7 +411,7 @@ class UiScreensTest {
     }
 
     /** A Toggl-style export: columns are suggested from headers, the time layout from the first row, then preview and append. */
-    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
+    @Config(qualifiers = "ru-rRU-w400dp-h1300dp-xhdpi")
     @Test fun csvImport() {
         val seed = seed()
         val vm = render(seed)
@@ -451,7 +456,7 @@ class UiScreensTest {
         release.complete(Result.failure(java.io.IOException("synthetic preview failure")))
     }
 
-    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
+    @Config(qualifiers = "ru-rRU-w400dp-h1300dp-xhdpi")
     @Test fun backupPage() {
         val vm = render(seed())
         compose.onNodeWithText("Настройки").performClick()
@@ -495,7 +500,7 @@ class UiScreensTest {
         shot("08-entry-menu", vm)
         compose.onNodeWithText("Удалить").performClick()
         compose.waitUntil(5_000) { seed.tracker.data().sessions.size == before - 1 }
-        waitText("Запись удалена")
+        waitText("Запись перемещена в «Удалённое»")
         // The commit/notice can arrive before Home's new projection. Inject the next gesture
         // only after the removed row has left composition and the remaining rows have settled.
         compose.waitUntil(5_000) { compose.onAllNodesWithText("9:10–11:02", substring = true).fetchSemanticsNodes().isEmpty() }
@@ -521,7 +526,7 @@ class UiScreensTest {
     }
 
     /** A saved report follows its period: create «Прошлая неделя» for everything, open it, see the total. */
-    @Config(qualifiers = "w400dp-h1300dp-xhdpi")
+    @Config(qualifiers = "ru-rRU-w400dp-h1300dp-xhdpi")
     @Test fun savedReport() {
         val seed = seed()
         val vm = render(seed)
@@ -545,15 +550,159 @@ class UiScreensTest {
         compose.runOnIdle { ids.forEach(vm::togglePicked) }
         waitText("Удалить · 2")
         compose.onNodeWithText("Удалить · 2").performClick()
-        waitText("Удалить 2 записи?")
+        waitText("Удалить записи (2)?")
         shot("feedback-batch-delete",vm)
         compose.onNodeWithText("Удалить").performClick()
         compose.waitUntil(5_000) { s.tracker.data().sessions.none { it.id in ids } }
-        waitText("Удалено 2 записи")
-        compose.onNodeWithText("Отменить").performClick()
+        waitText("Перемещено в «Удалённое»: 2")
+        compose.onNodeWithText("Отмена").performClick()
         compose.waitUntil(5_000) { s.tracker.data().sessions.size == before.sessions.size }
         assertTrue(before.sessions == s.tracker.data().sessions)
         assertTrue(before.segments == s.tracker.data().segments)
+    }
+
+    /** Actual Compose → VM → Room, including re-entry with the identical day/session lazy key. */
+    @Test fun recoveryRoomSwipeUndoDoesNotRedismissAndRejectsScrollingGestures() {
+        val source = seed(false)
+        val app = ApplicationProvider.getApplicationContext<android.app.Application>()
+        val dbName = "ui-recovery-${newId()}.db"
+        val db = androidx.room.Room.databaseBuilder(app,dev.notai.tracker.android.TrackerDatabase::class.java,dbName).allowMainThreadQueries().build()
+        val t = Tracker(dev.notai.tracker.android.RoomStore(db,{ source.tracker.data() }),source.clock)
+        val s = Seed(t,source.clock,source.catalog);val vm = render(s)
+        try {
+            val original = t.data()
+            val record = original.sessions.single { session -> original.segments.any { it.sessionId == session.id && it.start == at(today,9,10) } }
+            val tag = "history-record:${record.id}"
+            fun row() = compose.onNodeWithTag(tag)
+            fun showRow() {
+                compose.waitUntil(5_000) { vm.home.value?.days?.any { day -> day.records.any { it.sessionId == record.id } } == true }
+                compose.onNode(hasScrollAction()).performScrollToKey("$today:${record.id}")
+                row().performScrollTo()
+            }
+            row().performScrollTo()
+            val scrollBefore = compose.onNode(hasScrollAction()).fetchSemanticsNode().config[androidx.compose.ui.semantics.SemanticsProperties.VerticalScrollAxisRange].value()
+            row().performTouchInput { swipe(Offset(width * 0.8f,centerY),Offset(width * 0.7f,centerY-250f),400) }
+            val scrollAfter = compose.onNode(hasScrollAction()).fetchSemanticsNode().config[androidx.compose.ui.semantics.SemanticsProperties.VerticalScrollAxisRange].value()
+            assertTrue("Vertical scrolling must still move the history",scrollAfter > scrollBefore)
+            assertTrue(original == t.data())
+            row().performScrollTo()
+            row().performTouchInput { swipe(Offset(width * 0.9f,centerY),Offset(width * 0.2f,centerY-width*0.35f),400) }
+            assertTrue(original == t.data())
+            row().performScrollTo()
+            row().performTouchInput { swipe(Offset(width * 0.8f,centerY),Offset(width * 0.5f,centerY),300) }
+            assertTrue(original == t.data())
+            repeat(2) {
+                row().performScrollTo();row().performTouchInput { swipeLeft() }
+                compose.waitUntil(5_000) { t.data().sessions.none { it.id == record.id } }
+                waitText("Запись перемещена в «Удалённое»")
+                if(it == 1) t.saveCard(t.snapshot().token,Card("later-ui-edit","Keep later independent edit"))
+                compose.onNodeWithText("Отмена").performClick()
+                compose.waitUntil(5_000) { t.data().sessions.any { it.id == record.id } }
+                showRow();compose.mainClock.advanceTimeBy(3_000);compose.waitForIdle()
+                assertTrue("Same record must remain restored after its previous dismiss lifetime",t.data().sessions.single { it.id == record.id } == record)
+                assertTrue(t.data().deletedRecords.isEmpty())
+                assertTrue(original.segments == t.data().segments)
+                if(it == 1) assertTrue(t.data().cards.any { card -> card.id == "later-ui-edit" })
+            }
+            shot("recovery-restored-history",vm)
+            row().performScrollTo();row().performTouchInput { swipeLeft() }
+            compose.waitUntil(5_000) { t.data().deletedRecords.size == 1 }
+            compose.onNodeWithText("Настройки").performClick()
+            compose.onNodeWithText("Удалённое").performScrollTo().performClick()
+            waitText("Автоматической очистки нет.")
+            shot("recovery-deleted",vm)
+            compose.onNodeWithText("Восстановить").performScrollTo().performClick()
+            compose.waitUntil(5_000) { t.data().deletedRecords.isEmpty() }
+            assertTrue(original.sessions == t.data().sessions);assertTrue(original.segments == t.data().segments)
+        } finally { vm.viewModelScope.cancel();db.close();app.deleteDatabase(dbName) }
+    }
+
+    @Test fun recoveryDeletedPaginationLocalizesAndRestoresBeyondTheFirstPage() {
+        val source = seed(false)
+        val app = ApplicationProvider.getApplicationContext<android.app.Application>()
+        val dbName = "ui-deleted-pages-${newId()}.db"
+        val db = androidx.room.Room.databaseBuilder(app,dev.notai.tracker.android.TrackerDatabase::class.java,dbName).allowMainThreadQueries().build()
+        val t = Tracker(dev.notai.tracker.android.RoomStore(db,{ source.tracker.data() }),source.clock)
+        val ids = (0..50).map { i ->
+            val day = today.minusDays(10L+i)
+            t.manual(t.snapshot().token,at(day,10,0),at(day,10,20),Classification(),note = "Deleted page fixture $i")
+            t.data().sessions.last().id
+        }
+        val before = t.data()
+        t.deleteSessions(t.snapshot().token,ids)
+        val archived = t.data().deletedRecords
+        val target = archived.sortedByDescending { it.deletedAt }[50]
+        val vm = render(Seed(t,source.clock,source.catalog))
+        try {
+            compose.runOnIdle { vm.setLanguage("en") }
+            waitText("Settings");compose.onNodeWithText("Settings").performClick()
+            compose.onNodeWithText("Deleted").performScrollTo().performClick()
+            waitText("Show more")
+            assertTrue("The 51st record must not be composed before pagination",compose.onAllNodesWithText(target.session.value.note!!).fetchSemanticsNodes().isEmpty())
+            compose.onNodeWithText("Show more").performScrollTo()
+            compose.runOnIdle { vm.setLanguage("ja") }
+            waitText("さらに表示")
+            assertTrue(compose.onAllNodesWithText("Show more").fetchSemanticsNodes().isEmpty())
+            assertTrue(compose.onAllNodesWithText("Показать ещё").fetchSemanticsNodes().isEmpty())
+            compose.onNodeWithText("さらに表示").performScrollTo().performClick()
+            compose.onNodeWithText(target.session.value.note!!).performScrollTo()
+            compose.onNodeWithTag("restore-deleted:${target.sessionId}").performScrollTo().performClick()
+            compose.waitUntil(5_000) { t.data().deletedRecords.size == 50 }
+            assertTrue(t.data().deletedRecords == archived.filterNot { it.sessionId == target.sessionId })
+            assertTrue(t.data().sessions.single { it.id == target.sessionId } == before.sessions.single { it.id == target.sessionId })
+            assertTrue(t.data().segments.filter { it.sessionId == target.sessionId } == before.segments.filter { it.sessionId == target.sessionId })
+            assertTrue(compose.onAllNodesWithText("さらに表示").fetchSemanticsNodes().isEmpty())
+        } finally { vm.viewModelScope.cancel();db.close();app.deleteDatabase(dbName) }
+    }
+
+    @Test fun recoveryLanguagePickerChangesVisibleControlsWithoutChangingRecords() {
+        val s = seed(false);val vm = render(s);val before = s.tracker.data()
+        compose.onNodeWithText("Настройки").performClick()
+        compose.onNodeWithText("Язык").performScrollTo().performClick()
+        waitText("English");compose.onNodeWithText("English").performClick()
+        waitText("Settings");compose.onNodeWithText("Deleted").performScrollTo()
+        shotAs("recovery-language-en",vm,ThemeChoice.DARK)
+        assertTrue(before == s.tracker.data())
+        compose.onNodeWithText("Language").performScrollTo().performClick()
+        compose.onNodeWithText("日本語").performScrollTo().performClick()
+        waitText("設定");compose.onNodeWithText("言語").performScrollTo()
+        shotAs("recovery-language-ja",vm,ThemeChoice.DARK)
+        compose.onNodeWithText("言語").performClick()
+        compose.onNodeWithText("システムの言語").performClick()
+        waitText("Настройки")
+        assertTrue(vm.language.value.preference.explicitTag == null)
+        assertTrue(before == s.tracker.data())
+    }
+    @Test fun recoveryNeonAccentsRemainDistinctWithReducedMotion() {
+        val s = seed();val before = s.tracker.data();val vm = render(s,reducedMotion = true,initialTheme = ThemeChoice.NEON)
+        waitText("1:24")
+        val images = mutableListOf<Bitmap>()
+        for(accent in Accent.entries) {
+            vm.setAppearance { it.copy(accent = accent) }
+            shotAs("recovery-neon-running-${accent.name.lowercase()}",vm,ThemeChoice.NEON)
+            val views = windows();val first = views.first()
+            val current = Bitmap.createBitmap(first.width,first.height,Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(current);views.forEach { drawWindow(canvas,first,it) };images += current
+        }
+        assertTrue("All four timer accents must render different pixels",images.indices.all { i -> images.indices.all { j -> i == j || !images[i].sameAs(images[j]) } })
+        assertTrue(before == s.tracker.data())
+    }
+    @Test fun recoveryChangingLanguageKeepsThePendingDeletionUndoAction() {
+        val s = seed(false);val vm = render(s);val before = s.tracker.data()
+        val id = before.sessions.first().id
+        compose.runOnIdle { vm.applyDeleteSession(s.tracker.previewDeleteSession(id)) }
+        compose.waitUntil(5_000) { s.tracker.data().sessions.none { it.id == id } }
+        waitText("Запись перемещена в «Удалённое»")
+        val deleted = s.tracker.data()
+        compose.runOnIdle { vm.setLanguage("en") }
+        waitText("Settings");assertTrue(deleted == s.tracker.data())
+        // The in-flight receipt keeps its original label and remains functional across locale recomposition.
+        compose.onNodeWithText("Отмена").performClick()
+        compose.waitUntil(5_000) { s.tracker.data().sessions.any { it.id == id } }
+        assertTrue(before.sessions == s.tracker.data().sessions);assertTrue(before.segments == s.tracker.data().segments)
+        compose.runOnIdle { vm.setLanguage(null) }
+        waitText("Настройки") // Drain UI recomposition/Main dispatch as well as the preference IO.
+        assertTrue(vm.language.value.preference.explicitTag == null)
     }
 
     /** «Выбрать несколько» from the menu, a second tap adds another, and one note goes to both after a confirmation. */
@@ -590,14 +739,20 @@ class UiScreensTest {
         t.stop(t.snapshot().token)
         val vm = render(seed)
         waitText("15:29–15:54")
-        val before = t.data().sessions.size
+        val before = t.data()
+        val record = before.sessions.last()
         compose.onAllNodesWithText("15:29–15:54", substring = true, useUnmergedTree = true).onFirst().performClick()
         waitText("Исправить запись")
         compose.onNodeWithContentDescription("Удалить запись").performClick()
-        waitText("Удалить запись целиком?")
+        waitText("Удалить записи (1)?")
+        assertTrue("Opening the confirmation cannot delete a record",before == t.data())
         shot("09-delete-confirm", vm)
         compose.onNodeWithText("Удалить").performClick()
-        compose.waitUntil(5_000) { t.data().sessions.size == before - 1 }
+        compose.waitUntil(5_000) { t.data().sessions.size == before.sessions.size - 1 }
+        assertTrue(t.data().sessions == before.sessions.filterNot { it.id == record.id })
+        val archived = t.data().deletedRecords.single()
+        assertTrue(archived.session.value == record)
+        assertTrue(archived.segments.map { it.value } == before.segments.filter { it.sessionId == record.id })
     }
 
     /** "Все занятия" in the notification opens the app with the route's quick choices. */
@@ -793,14 +948,17 @@ class UiScreensTest {
         waitText("По областям")
         compose.onNodeWithContentDescription("Поделиться итогом").performClick()
         waitText("Добавить заметки")
-        // The preview is produced off the main thread; let the looper deliver it.
-        repeat(10) { compose.waitForIdle(); org.robolectric.shadows.ShadowLooper.idleMainLooper(); Thread.sleep(150) }
-        waitText("Всего")
+        // The off-main preview may complete after any fixed sleep. Drive the host Main
+        // queue until the real rendered result arrives, keeping the same assertion/deadline.
+        compose.waitUntil(15_000) {
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+            compose.onAllNodesWithText("Всего",substring = true).fetchSemanticsNodes().isNotEmpty()
+        }
         assertTrue("notes stay out until asked", compose.onAllNodesWithText("конспект", substring = true).fetchSemanticsNodes().isEmpty())
         shot("20-share", vm)
     }
 
-    @Config(qualifiers = "w400dp-h1960dp-xhdpi")
+    @Config(qualifiers = "ru-rRU-w400dp-h1960dp-xhdpi")
     @Test fun planEditor() {
         val seed = seed()
         plan(seed, "Английский", "18:00")

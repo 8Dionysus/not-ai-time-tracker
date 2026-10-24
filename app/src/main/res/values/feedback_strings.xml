@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">Язык</string>
+    <string name="language_system">Системный</string>
+    <string name="language_partial">Часть прежних экранов пока остаётся на русском. Личные названия и записи не переводятся.</string>
+    <string name="language_save_error">Не удалось сохранить язык. Повтори выбор.</string>
+    <string name="deleted_title">Удалённое</string>
+    <string name="deleted_empty">Удалённых записей нет</string>
+    <string name="deleted_retained">Записи хранятся здесь до восстановления. Автоматической очистки нет.</string>
+    <string name="data_language">Данные и язык</string>
+    <string name="undo_deletion">Отмена</string>
+    <string name="record_deleted">Запись перемещена в «Удалённое»</string>
+    <string name="records_deleted">Перемещено в «Удалённое»: %1$d</string>
+    <string name="record_restored">Запись восстановлена</string>
+    <string name="restore_error">Не удалось подтвердить восстановление. Проверь историю и «Удалённое».</string>
+    <string name="delete_error">Не удалось подтвердить удаление. Проверь историю и «Удалённое».</string>
+    <string name="delete_title">Удалить записи (%1$d)?</string>
+    <string name="delete_confirmation">Записи со связанными фактами будут перенесены в «Удалённое». Восстановление доступно внизу настроек.</string>
+    <string name="delete_counts">Частей: %1$d · измерений: %2$d · связей: %3$d · подходов: %4$d · величин: %5$d · оснований темпа: %6$d · исправлений: %7$d</string>
+    <string name="delete_duration">Время в итогах: −%1$s</string>
+    <string name="deleted_show_more">Показать ещё</string>
+</resources>

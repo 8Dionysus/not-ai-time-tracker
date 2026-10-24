@@ -1,5 +1,9 @@
 package dev.notai.tracker.android.ui
 
+import dev.notai.tracker.android.R
+
+import androidx.compose.ui.res.stringResource
+
 import android.app.Activity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -39,7 +43,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.notai.tracker.Classification
 import dev.notai.tracker.Mode
 
-enum class Tab(val title: String) { TIMER("Таймер"), OVERVIEW("Обзор"), SETTINGS("Настройки") }
+enum class Tab(val titleRes: Int) { TIMER(R.string.editorial_tracker_draft_1b17e3b625d672732111_v0), OVERVIEW(R.string.editorial_tracker_draft_c2df626371e99f6b4ab6_v0), SETTINGS(R.string.editorial_tracker_draft_8a99e65a404198a79d0c_v0);
+    val title: String @Composable get() = stringResource(titleRes)
+}
 
 private sealed interface Sheet {
     data class Picker(val mode: PickMode, val boundary: Long? = null) : Sheet
@@ -62,6 +68,13 @@ private sealed interface Editor {
 fun TrackerApp(vm: TrackerViewModel, openTechnical: () -> Unit, reducedMotion: Boolean? = null, onActionReady: () -> Unit = {}) {
     val theme by vm.theme.collectAsStateWithLifecycle()
     val appearance by vm.appearance.collectAsStateWithLifecycle()
+    val language by vm.language.collectAsStateWithLifecycle()
+    val baseContext = androidx.compose.ui.platform.LocalContext.current
+    val localeContext = remember(baseContext,language.resolvedLocaleTag) { dev.notai.tracker.android.AppLanguage.context(baseContext,language.resolvedLocaleTag) }
+    CompositionLocalProvider(androidx.compose.ui.platform.LocalContext provides localeContext,
+        androidx.compose.ui.platform.LocalConfiguration provides localeContext.resources.configuration,
+        androidx.compose.ui.platform.LocalLayoutDirection provides if(localeContext.resources.configuration.layoutDirection == android.view.View.LAYOUT_DIRECTION_RTL)
+            androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr) {
     NotAiTheme(theme, reducedMotion, appearance) {
         val c = NotAi.colors
         val view = LocalView.current
@@ -82,6 +95,7 @@ fun TrackerApp(vm: TrackerViewModel, openTechnical: () -> Unit, reducedMotion: B
             }
         }
     }
+    }
 }
 
 @Composable
@@ -97,11 +111,11 @@ private fun Failed(message: String, retry: () -> Unit, openTechnical: () -> Unit
     Column(Modifier.fillMaxSize().systemBarsPadding().padding(24.dp), verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally) {
         IntervalFrame(IntervalState.UNKNOWN, bracketWidth = 18.dp, bracketHeight = 72.dp, opening = false) { Text("?", style = NotAi.type.big, color = c.ink2) }
-        Text("Локальная база сейчас недоступна", style = NotAi.type.sheetTitle, color = c.ink, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.editorial_tracker_draft_f342d1b57d57bb649441_v0), style = NotAi.type.sheetTitle, color = c.ink, textAlign = TextAlign.Center)
         Text("Файлы не удалены. Восстановить базу или выбрать копию можно в технической оболочке. Подробности: $message",
             style = NotAi.type.bodySmall, color = c.ink2, textAlign = TextAlign.Center)
-        PillButton("Открыть восстановление", openTechnical, Modifier.fillMaxWidth(), ButtonKind.PRIMARY)
-        PillButton("Попробовать снова", retry, Modifier.fillMaxWidth(), ButtonKind.TONAL)
+        PillButton(stringResource(R.string.editorial_tracker_draft_7fcd795d8bfbf628e8e5_v0), openTechnical, Modifier.fillMaxWidth(), ButtonKind.PRIMARY)
+        PillButton(stringResource(R.string.editorial_tracker_draft_cbdba5990922e31fc5a1_v0), retry, Modifier.fillMaxWidth(), ButtonKind.TONAL)
     }
 }
 
@@ -125,14 +139,15 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
     val favoritesOpen by vm.favoritesOpen.collectAsStateWithLifecycle()
     var fullSurfacePickerId by remember { mutableStateOf<String?>(null) }
     val snackbar = remember { SnackbarHostState() }
+    val noticeContext by rememberUpdatedState(androidx.compose.ui.platform.LocalContext.current)
     val dark = c.isDark
     if (snapshot != null) SideEffect(onActionReady)
 
     LaunchedEffect(Unit) {
         vm.notices.collect { n ->
-            val result = snackbar.showSnackbar(n.text, actionLabel = if (n.undo != null) "Отменить" else null,
+            val result = snackbar.showSnackbar(n.text, actionLabel = if (n.undo != null) noticeContext.getString(R.string.undo_deletion) else null,
                 duration = if (n.undo != null) SnackbarDuration.Long else SnackbarDuration.Short)
-            if (result == SnackbarResult.ActionPerformed && n.undo != null) vm.undo(n.undo)
+            if (result == SnackbarResult.ActionPerformed && n.undo != null) vm.undo(n.undo,n.restoreBatchId,n.restoreBarrier)
         }
     }
     LaunchedEffect(draft) { if (draft != null) { tab = Tab.TIMER; sheet = Sheet.Picker(PickMode.START) } }
@@ -228,10 +243,11 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
             onDismiss = vm::cancelSurfacePicker, onAll = { fullSurfacePickerId = state.route.id })
     }
     confirmDelete?.let { r ->
-        val parts = r.consequences.joinToString(" и ")
-        val corrections = if(r.subjectCorrections > 0) " В том числе ${Format.plural(r.subjectCorrections,"исправление","исправления","исправлений")} этих данных." else ""
-        ConfirmDialog("Удалить запись целиком?", "${r.range}: вместе с записью удалятся $parts.$corrections Сразу после удаления можно отменить.",
-            "Удалить", onConfirm = { vm.applyDeleteSession(r.preview); confirmDelete = null }, onDismiss = { confirmDelete = null }, destructive = true)
+        val p = r.preview
+        ConfirmDialog(stringResource(R.string.delete_title,1),
+            stringResource(R.string.delete_confirmation)+"\n\n"+r.range+"\n"+
+                stringResource(R.string.delete_counts,p.segmentCount,p.measurementCount,p.subjectLinkCount,p.exerciseSetCount,p.eventQuantityCount,p.distanceTimeCount,p.subjectCorrectionCount),
+            stringResource(R.string.editorial_tracker_draft_98c2a48d88776822811d_v0), onConfirm = { vm.applyDeleteSession(r.preview); confirmDelete = null }, onDismiss = { confirmDelete = null }, destructive = true)
     }
     incomingDrafts.firstOrNull()?.let { incoming ->
         ConfirmDialog("Заменить черновик?", "Текущий текст: «${draft?.note.orEmpty()}»\nНовый текст: «${incoming.draft.note.orEmpty()}»",
@@ -295,8 +311,8 @@ private fun QuickPickSheet(state: dev.notai.tracker.android.SurfacePickerState, 
                     detail = if (q.entry.kind == dev.notai.tracker.ChoiceKind.FAVORITE) null else l.detail, onClick = { onChoose(q.reference) },
                     leading = { ActivityGlyph(l) })
             }
-            if (state.choices.isEmpty()) Text("Частых занятий пока нет.", style = NotAi.type.body, color = c.ink2)
-            PillButton("Все занятия", onAll, Modifier.fillMaxWidth().padding(top = 8.dp), ButtonKind.TONAL, height = 48.dp)
+            if (state.choices.isEmpty()) Text(stringResource(R.string.editorial_tracker_draft_957459cf20f2e483f3a0_v0), style = NotAi.type.body, color = c.ink2)
+            PillButton(stringResource(R.string.editorial_tracker_draft_d0f2db9385d5fd9998ae_v0), onAll, Modifier.fillMaxWidth().padding(top = 8.dp), ButtonKind.TONAL, height = 48.dp)
             if (assignment) PillButton("Оставить без занятия", onDismiss, Modifier.fillMaxWidth().padding(top = 8.dp), ButtonKind.TONAL, height = 48.dp)
         }
     }

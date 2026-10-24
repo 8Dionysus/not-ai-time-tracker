@@ -71,7 +71,8 @@ class BackendAcceptance: Instrumentation() {
                 "history-cursors" -> historyCursors()
                 "focus-blocked" -> focusBlocked()
                 "shortcut-controller" -> shortcutController()
-                "guards" -> guards()
+                "guards" -> if(android.os.Build.VERSION.SDK_INT >= 31) guards()
+                    else error("The guards probe requires API 31 to inspect PendingIntent immutability")
                 "callback", "prequeue", "worker" -> callback(mode)
                 "deathcheck" -> deathcheck()
                 "coldarm" -> coldarm()
@@ -238,6 +239,7 @@ class BackendAcceptance: Instrumentation() {
         val date=LocalDate.of(2026,10,17);val instant=date.atTime(10,0).atZone(ZoneId.of("UTC")).toInstant()
         return ScheduleProjection(OccurrenceKey("native-guard","2026-10-17"),1,null,date,date,LocalTime.of(10,0),Classification(),"UTC",instant,DstResolution.EXACT,instant.minusSeconds(60),null,OccurrenceState.SCHEDULED)
     }
+    @androidx.annotation.RequiresApi(31)
     private fun guards(): JsonObject {
         val manager=c.getSystemService(NotificationManager::class.java)
         val p=projection();val ticket=ScheduleReminderTicket("native-guard","barrier",p.key,1,null,"UTC",p.reminderInstant!!.toEpochMilli())

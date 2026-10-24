@@ -1,7 +1,7 @@
 <resources>
     <string name="shortcut_start">Открыть таймер</string>
-    <string name="app_name">(not)AI Time Tracker</string>
-    <string name="launcher_name">(not)AI Time</string>
+    <string name="app_name" translatable="false">(not)AI Time Tracker</string>
+    <string name="launcher_name" translatable="false">(not)AI Time</string>
     <string name="technical_name">(not)AI: техническая оболочка</string>
     <string name="widget_description">Таймер: старт и стоп, текущее занятие и время</string>
     <string name="start_timer">Начать</string>

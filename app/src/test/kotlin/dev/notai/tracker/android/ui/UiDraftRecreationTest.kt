@@ -23,7 +23,7 @@ import org.robolectric.annotation.GraphicsMode
 /** MainActivity, real form/picker callbacks, actual framework recreation; never a device claim. */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk=[36],qualifiers="w400dp-h860dp-xhdpi")
+@Config(sdk=[36],qualifiers="ru-rRU-w400dp-h860dp-xhdpi")
 class UiDraftRecreationTest {
     @get:Rule val compose=createEmptyComposeRule()
     private val oldOpen=UiBackends.open

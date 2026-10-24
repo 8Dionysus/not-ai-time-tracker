@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">语言</string>
+    <string name="language_system">跟随系统</string>
+    <string name="language_partial">部分现有界面仍使用俄语。个人名称和记录不会被翻译。</string>
+    <string name="language_save_error">无法保存语言。请重新选择。</string>
+    <string name="deleted_title">已删除</string>
+    <string name="deleted_empty">没有已删除的记录</string>
+    <string name="deleted_retained">记录会保留在此处，直到恢复。不会自动清理。</string>
+    <string name="data_language">数据和语言</string>
+    <string name="undo_deletion">撤销</string>
+    <string name="record_deleted">记录已移至“已删除”</string>
+    <string name="records_deleted">已移至“已删除”：%1$d</string>
+    <string name="record_restored">记录已恢复</string>
+    <string name="restore_error">无法确认恢复结果。请检查历史记录和“已删除”。</string>
+    <string name="delete_error">无法确认删除结果。请检查历史记录和“已删除”。</string>
+    <string name="delete_title">删除记录（%1$d）？</string>
+    <string name="delete_confirmation">记录及其关联数据将移至“已删除”。可在设置底部恢复。</string>
+    <string name="delete_counts">分段：%1$d · 测量：%2$d · 关联：%3$d · 组数：%4$d · 数量：%5$d · 配速数据：%6$d · 更正：%7$d</string>
+    <string name="delete_duration">从总计移除的时间：%1$s</string>
+    <string name="deleted_show_more">显示更多</string>
+</resources>

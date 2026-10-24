@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">Langue</string>
+    <string name="language_system">Langue du système</string>
+    <string name="language_partial">Certains écrans restent en russe. Les noms personnels et les enregistrements ne sont pas traduits.</string>
+    <string name="language_save_error">Impossible de sauvegarder la langue. Réessayez.</string>
+    <string name="deleted_title">Supprimés</string>
+    <string name="deleted_empty">Aucun enregistrement supprimé</string>
+    <string name="deleted_retained">Les enregistrements restent ici jusqu’à leur restauration. Aucun nettoyage automatique.</string>
+    <string name="data_language">Données et langue</string>
+    <string name="undo_deletion">Annuler</string>
+    <string name="record_deleted">Enregistrement déplacé vers Supprimés</string>
+    <string name="records_deleted">Déplacés vers Supprimés : %1$d</string>
+    <string name="record_restored">Enregistrement restauré</string>
+    <string name="restore_error">Restauration non confirmée. Vérifiez l’historique et Supprimés.</string>
+    <string name="delete_error">Suppression non confirmée. Vérifiez l’historique et Supprimés.</string>
+    <string name="delete_title">Supprimer les enregistrements (%1$d) ?</string>
+    <string name="delete_confirmation">Les enregistrements et leurs données liées iront dans Supprimés. Restaurez-les en bas des paramètres.</string>
+    <string name="delete_counts">Segments : %1$d · mesures : %2$d · liens : %3$d · séries : %4$d · quantités : %5$d · données d’allure : %6$d · corrections : %7$d</string>
+    <string name="delete_duration">Temps retiré des totaux : %1$s</string>
+    <string name="deleted_show_more">Afficher plus</string>
+</resources>

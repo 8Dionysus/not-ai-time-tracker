@@ -1,5 +1,9 @@
 package dev.notai.tracker.android.ui
 
+import dev.notai.tracker.android.R
+
+import androidx.compose.ui.res.stringResource
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.*
@@ -64,7 +68,7 @@ fun FavoritesSheet(vm: TrackerViewModel, onEdit: (EditTarget) -> Unit, onAdd: ()
     var offset by remember { mutableFloatStateOf(0f) }
     val haptics = LocalHapticFeedback.current
     NotAiSheet(onDismiss) {
-        SheetHeader("Избранное", onDismiss)
+        SheetHeader(stringResource(R.string.editorial_tracker_draft_8a016df5c8f3d36a6ece_v0), onDismiss)
         Text(if (order.isEmpty()) "Отметь звёздочкой занятия, которые начинаешь чаще всего. Они встанут на главный экран и в шторку."
             else "Первые в списке видны в шторке, на виджете и у плавающей кнопки. Чтобы переставить, зажми и тяни.",
             Modifier.padding(horizontal = 20.dp, vertical = 4.dp), style = NotAi.type.caption, color = c.ink2)
@@ -112,7 +116,7 @@ fun FavoritesSheet(vm: TrackerViewModel, onEdit: (EditTarget) -> Unit, onAdd: ()
                 Hairline()
             }
         }
-        PillButton("Добавить в избранное", onAdd, Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp), ButtonKind.TONAL, Icon.Plus)
+        PillButton(stringResource(R.string.editorial_tracker_draft_b679826bdf312797a5c6_v1), onAdd, Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp), ButtonKind.TONAL, Icon.Plus)
     }
 }
 
@@ -134,17 +138,17 @@ fun ActivityEditorSheet(vm: TrackerViewModel, target: EditTarget, onPick: ((Clas
             var label by remember { mutableStateOf(data.label(fav.selection)) }
             val card = selection.cardId?.let { id -> data.cards.firstOrNull { it.id == id } }
             NotAiSheet(onDismiss, fullHeight = false) {
-                SheetHeader("Избранное", onDismiss, extra = { IconAction(Icon.Trash, "Убрать из избранного", { vm.removeFavorite(fav.id); onDismiss() }, size = 19.dp) })
+                SheetHeader(stringResource(R.string.editorial_tracker_draft_8a016df5c8f3d36a6ece_v0), onDismiss, extra = { IconAction(Icon.Trash, "Убрать из избранного", { vm.removeFavorite(fav.id); onDismiss() }, size = 19.dp) })
                 Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     TextInput("Название на кнопке", title, { title = it }, placeholder = label.title)
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text("Занятие", style = NotAi.type.caption, color = c.ink2)
+                        Text(stringResource(R.string.editorial_tracker_draft_1a2c7007a2d3e4977ace_v0), style = NotAi.type.caption, color = c.ink2)
                         ActivityField(label, { onPick { sel, l -> selection = sel; label = l; if (title == fav.label && fav.label == data.label(fav.selection).title) title = l.title } })
                     }
                     if (card != null) Text("Изменить само занятие «${card.name}»", Modifier.heightIn(min = 36.dp).pressable({ onDismiss(); vm.openEditor(EditTarget.Card(card.id)) })
                         .padding(vertical = 8.dp), style = NotAi.type.bodySmall.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
                 }
-                PillButton("Сохранить", {
+                PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), {
                     token?.let { vm.editFavorite(it, fav.copy(label = title.trim().ifEmpty { label.title }, selection = selection)) }; onDismiss()
                 }, Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp), ButtonKind.PRIMARY, enabled = token != null)
             }
@@ -169,10 +173,10 @@ fun ActivityEditorSheet(vm: TrackerViewModel, target: EditTarget, onPick: ((Clas
                     }
                     Text("Время занятия войдёт в итог раздела в обзоре и целях. Уже сделанные записи сохранят своё прежнее место.",
                         style = NotAi.type.caption, color = c.ink2)
-                    if (!favored) Text("Добавить в избранное", Modifier.heightIn(min = 36.dp).pressable({ vm.saveFavorite(card.name, card.classification()) }).padding(vertical = 8.dp),
+                    if (!favored) Text(stringResource(R.string.editorial_tracker_draft_b679826bdf312797a5c6_v1), Modifier.heightIn(min = 36.dp).pressable({ vm.saveFavorite(card.name, card.classification()) }).padding(vertical = 8.dp),
                         style = NotAi.type.bodySmall.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
                 }
-                PillButton("Сохранить", {
+                PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), {
                     token?.let { vm.saveCard(it, card.copy(name = name.trim().ifEmpty { card.name }.replaceFirstChar { ch -> ch.uppercase() }, activityTypeId = parent)) }; onDismiss()
                 }, Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp), ButtonKind.PRIMARY, enabled = token != null && name.isNotBlank())
             }

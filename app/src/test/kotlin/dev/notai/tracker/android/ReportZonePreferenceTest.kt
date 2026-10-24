@@ -35,7 +35,7 @@ class ReportZonePreferenceTest {
         assertEquals(before.goals,tracker.data().goals)
         val json = Backups(tracker,RollbackStoreForZoneTest()).export()
         val exported = StreamingBackup.read { json.byteInputStream() }
-        assertEquals(15,exported.formatVersion);assertEquals(zone,exported.data.settings.reportZone)
+        assertEquals(CURRENT_BACKUP_FORMAT,exported.formatVersion);assertEquals(zone,exported.data.settings.reportZone)
         preference.setFixed(tracker.snapshot().token,"Asia/Tokyo")
         assertFalse(preference.automatic);zone = "UTC";assertNull(preference.reconcile())
         assertEquals("Asia/Tokyo",tracker.data().settings.reportZone)

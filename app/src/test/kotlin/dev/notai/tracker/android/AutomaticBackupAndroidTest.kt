@@ -83,7 +83,7 @@ class AutomaticBackupAndroidTest {
             resolver.registerInputStreamSupplier(uri) { output.toByteArray().inputStream() }
             val result = exports.retryWrite(operation.id,uri,prepared.bytes,requireNotNull(prepared.sha256))
             assertTrue(result.verified);assertEquals(prepared.bytes,result.bytes)
-            val decoded = StreamingBackup.read { output.toByteArray().inputStream() };assertEquals(15,decoded.formatVersion)
+            val decoded = StreamingBackup.read { output.toByteArray().inputStream() };assertEquals(CURRENT_BACKUP_FORMAT,decoded.formatVersion)
             assertEquals(original.types,decoded.data.types);assertEquals(original.datasetId,decoded.data.datasetId)
             val target = Tracker(store(),FakeClock());val rollback = MemoryRollback();val restore = Backups(target,rollback)
             val preview = restore.prepare { output.toByteArray().inputStream() };restore.apply(preview)

@@ -12,7 +12,7 @@ import kotlinx.serialization.json.*
 
 internal const val MAX_BACKUP_RECORD_CHARS = 16*1024*1024
 
-/** Portable JSON 15 without a whole-file String/ByteArray/JSON tree. Only one record is decoded
+/** Portable JSON 16 (reads versions 1–16) without a whole-file String/ByteArray/JSON tree. Only one record is decoded
  * at a time; the resulting domain graph has the same size as a loaded store. Total file size
  * is not capped by CSV's text limit. Re-openable inputs permit a bounded metadata first pass.
  */
@@ -44,6 +44,7 @@ object StreamingBackup {
         writer.write(",\"data\":{");val d = backup.data
         field("datasetId",codec.encodeToString(d.datasetId),true);field("revision",d.revision.toString())
         if(!d.subjects.empty) field("subjects",codec.encodeToString(d.subjects))
+        if(d.deletedRecords.isNotEmpty()) rows("deletedRecords",d.deletedRecords) { codec.encodeToString(it) }
         field("transfer",codec.encodeToString(d.transfer));field("schedule",codec.encodeToString(d.schedule));field("settings",codec.encodeToString(d.settings));field("focus",codec.encodeToString(d.focus))
         field("catalogVersion",codec.encodeToString(d.catalogVersion))
         field("timerEpoch",d.timerEpoch.toString());field("controlBarrier",codec.encodeToString(d.controlBarrier))
@@ -73,6 +74,7 @@ object StreamingBackup {
         val types = mutableListOf<ActivityType>();val axes = mutableListOf<Axis>();val metrics = mutableListOf<Metric>();val units = mutableListOf<UnitDefinition>()
         val cards = mutableListOf<Card>();val favorites = mutableListOf<Favorite>();val sessions = mutableListOf<Session>();val segments = mutableListOf<Segment>()
         val savedReports = mutableListOf<SavedReportQuery>()
+        val deletedRecords = mutableListOf<DeletedRecord>()
         val measurements = mutableListOf<Measurement>();val goals = mutableListOf<Goal>()
         // Freeze/intern each decoded selection before retaining its row. A large
         // restore must not keep thousands of identical mutable JSON collections
@@ -89,6 +91,7 @@ object StreamingBackup {
             json.members { key -> if(key != "data") json.skip() else json.members { field ->
                 seen += field
                 when(field) {
+                    "deletedRecords" -> { ensure(format >= 16,"Deleted records in legacy archive",ErrorCode.UNSUPPORTED_IMPORT);json.array { deletedRecords += codec.decodeFromString<DeletedRecord>(record()) } }
                     "subjects" -> { ensure(format >= SUBJECT_FULL_FORMAT,"Subject data in legacy archive",ErrorCode.UNSUPPORTED_IMPORT);subjects = codec.decodeFromString(json.value()) }
                     "transfer" -> { ensure(format >= 8,"Transfer in legacy archive",ErrorCode.UNSUPPORTED_IMPORT);transfer = codec.decodeFromString(json.value()) }
                     "schedule" -> { ensure(format >= 8,"Schedule in legacy archive",ErrorCode.UNSUPPORTED_IMPORT);schedule = codec.decodeFromString(json.value()) }
@@ -122,7 +125,7 @@ object StreamingBackup {
         ensure(format < 7 || "focus" in seen,"Missing Focus",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format < 8 || seen.containsAll(listOf("schedule","transfer")),"Missing schedule",ErrorCode.UNSUPPORTED_IMPORT)
         val data = Dataset(datasetId = datasetId!!,revision = revision!!,types = types,cards = cards,favorites = favorites,
-            sessions = sessions,segments = segments,measurements = measurements,settings = settings!!,axes = axes,metrics = metrics,units = units,
+            sessions = sessions,segments = segments,deletedRecords = deletedRecords,measurements = measurements,settings = settings!!,axes = axes,metrics = metrics,units = units,
             savedReports = savedReports,subjects = subjects,schedule = schedule,transfer = transfer,goals = goals,focus = focus,catalogVersion = catalogVersion,timerEpoch = timerEpoch,controlBarrier = controlBarrier)
         ensure(format >= 9 || !data.transfer.hasCompactionState(),"Compaction in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format >= 10 || (data.settings.schedule == ScheduleSettings() && !data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
@@ -143,6 +146,7 @@ object StreamingBackup {
     internal fun validateBackup(b: Backup) {
         ensure(b.formatVersion == CURRENT_BACKUP_FORMAT && b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
         validate(b.data)
+        b.data.validateDeletedSnapshot(b.asOf)
         ensure(b.data.goalRevisionTimes().all { it <= b.asOf },"Goal revision after snapshot",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(b.data.quantityRecordedTimes().all { it <= b.asOf },"Quantity audit time after snapshot",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(b.data.manualTimeConfirmations().all { it.confirmedAt <= b.asOf },"Confirmation after snapshot",ErrorCode.UNSUPPORTED_IMPORT)

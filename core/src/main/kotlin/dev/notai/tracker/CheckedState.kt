@@ -5,7 +5,7 @@ class CheckedCommit<T> internal constructor(private val base: CheckedState,val s
     val result: T,val timerRows: TimerRows? = null) {
     fun requireBase(actual: CheckedState) = ensure(actual === base,"Checked change belongs to another state",ErrorCode.STALE)
 }
-data class Positioned<T>(val position: Int,val value: T)
+@kotlinx.serialization.Serializable data class Positioned<T>(val position: Int,val value: T)
 class TimerRows internal constructor(val sessions: List<Positioned<Session>>,val segments: List<Positioned<Segment>>)
 internal enum class TimerAction { START, PAUSE, RESUME, STOP, SWITCH }
 

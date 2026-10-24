@@ -6,7 +6,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.io.ByteArrayOutputStream
 
-const val CURRENT_BACKUP_FORMAT = 15
+const val CURRENT_BACKUP_FORMAT = 16
 
 /** Identity of the exact committed revision serialized by a streaming export. Not a restore token. */
 data class BackupSource(val datasetId: String,val revision: Long,val asOf: Long)
@@ -124,6 +124,7 @@ class Backups(private val tracker: Tracker,private val rollback: RollbackStore,p
             ensure(b.backupId.isNotBlank() && b.asOf in 0..MAX_TIME,"Invalid backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
             try {
                 validate(b.data)
+                b.data.validateDeletedSnapshot(b.asOf)
                 ensure(b.data.goalRevisionTimes().all { it <= b.asOf },"Goal revision after snapshot")
                 ensure(b.data.quantityRecordedTimes().all { it <= b.asOf },"Quantity audit time after snapshot")
                 ensure(b.data.manualTimeConfirmations().all { it.confirmedAt <= b.asOf },"Confirmation after snapshot")

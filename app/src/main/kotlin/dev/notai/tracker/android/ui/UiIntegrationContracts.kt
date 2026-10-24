@@ -14,7 +14,7 @@ data class PickedDeletionReview(
     val apply: suspend () -> Result<Unit>,
 )
 
-/** Device-local preference only; the report zone in Dataset/JSON 15 remains an ordinary IANA zone. */
+/** Device-local preference only; the report zone in Dataset/portable backups remains an ordinary IANA zone. */
 interface ReportingZoneUiHost {
     val reportZoneAutomatic: StateFlow<Boolean>
     fun useAutomaticReportZone()

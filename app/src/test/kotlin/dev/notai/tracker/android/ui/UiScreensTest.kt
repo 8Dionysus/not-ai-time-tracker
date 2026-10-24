@@ -951,7 +951,7 @@ class UiScreensTest {
         // The off-main preview may complete after any fixed sleep. Drive the host Main
         // queue until the real rendered result arrives, keeping the same assertion/deadline.
         compose.waitUntil(15_000) {
-            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+            org.robolectric.shadows.ShadowLooper.idleMainLooper(16,java.util.concurrent.TimeUnit.MILLISECONDS)
             compose.onAllNodesWithText("Всего",substring = true).fetchSemanticsNodes().isNotEmpty()
         }
         assertTrue("notes stay out until asked", compose.onAllNodesWithText("конспект", substring = true).fetchSemanticsNodes().isEmpty())

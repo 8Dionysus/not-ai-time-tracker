@@ -50,7 +50,7 @@ class NotificationCompactVisualTest {
     }
     @Test fun compactFavoritesFitConservativeWidthsRetainLabelsAndStalePayloads() {
         for(width in listOf(220,280,320,400)) {
-            RuntimeEnvironment.setQualifiers("w${width}dp-h800dp-mdpi")
+            RuntimeEnvironment.setQualifiers("ru-rRU-w${width}dp-h800dp-mdpi")
             val c = RuntimeEnvironment.getApplication();val t = tracker();val before = t.data()
             val (small,big) = SurfaceViews.notificationViews(c,t.view())
             val rendered = measured(c,small,width-96)

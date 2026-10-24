@@ -947,9 +947,12 @@ class UiScreensTest {
         waitText("По областям")
         compose.onNodeWithContentDescription("Поделиться итогом").performClick()
         waitText("Добавить заметки")
-        // The preview is produced off the main thread; let the looper deliver it.
-        repeat(10) { compose.waitForIdle(); org.robolectric.shadows.ShadowLooper.idleMainLooper(); Thread.sleep(150) }
-        waitText("Всего")
+        // The off-main preview may complete after any fixed sleep. Drive the host Main
+        // queue until the real rendered result arrives, keeping the same assertion/deadline.
+        compose.waitUntil(15_000) {
+            org.robolectric.shadows.ShadowLooper.idleMainLooper()
+            compose.onAllNodesWithText("Всего",substring = true).fetchSemanticsNodes().isNotEmpty()
+        }
         assertTrue("notes stay out until asked", compose.onAllNodesWithText("конспект", substring = true).fetchSemanticsNodes().isEmpty())
         shot("20-share", vm)
     }

@@ -2,7 +2,7 @@ name: Tracker feedback checks
 
 on:
   push:
-    branches: [main, feedback/core-batch-delete]
+    branches: [main, feedback/core-batch-delete, feedback/recovery-language-neon]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -40,18 +40,23 @@ jobs:
           fi
       - name: Check whitespace
         run: git diff --check HEAD^ HEAD
-      - name: Check batch deletion on Memory and Room, reporting zone and UI bridge
+      - name: Verify pinned editorial resources
+        run: |
+          python3 scripts/generate_editorial_resources.py
+          python3 scripts/generate_feedback_strings.py
+          git diff --exit-code
+      - name: Check recoverable deletion, migration, gestures, locale and reduced motion
         run: >-
           ./gradlew --no-daemon --console=plain -PtrackerUnsigned=true
-          :core:test --tests 'dev.notai.tracker.CoreScenariosTest.feedbackBatchDelete*'
+          :core:test
+          --tests 'dev.notai.tracker.CoreScenariosTest.feedbackRecoverableDeletion'
+          --tests 'dev.notai.tracker.CoreScenariosTest.feedbackBatchDeleteOneCommit'
           :app:testDebugUnitTest
-          --tests 'dev.notai.tracker.android.RoomScenariosTest.feedbackBatchDelete*'
-          --tests 'dev.notai.tracker.android.ReportZonePreferenceTest'
-          --tests 'dev.notai.tracker.android.ui.UiReviewRegressionTest.batchDelete*'
-          --tests 'dev.notai.tracker.android.ui.UiReviewRegressionTest.feedback*'
-          --tests 'dev.notai.tracker.android.ui.PresentationContextTest'
-          --tests 'dev.notai.tracker.android.ui.UiScreensTest.reportDay*'
+          --tests 'dev.notai.tracker.android.RoomScenariosTest.feedbackRecoverableDeletion'
+          --tests 'dev.notai.tracker.android.RoomScenariosTest.feedbackBatchDeleteOneCommit'
+          --tests 'dev.notai.tracker.android.RecoveryPreferencesMigrationTest'
+          --tests 'dev.notai.tracker.android.ui.UiReviewRegressionTest.recovery*'
+          --tests 'dev.notai.tracker.android.ui.UiScreensTest.recovery*'
           --tests 'dev.notai.tracker.android.ui.UiScreensTest.feedbackBatchDeletion*'
-          --tests 'dev.notai.tracker.android.ui.UiScreensTest.neonAccentSettings'
       - name: Build an unsigned APK
         run: ./gradlew --no-daemon --console=plain -PtrackerUnsigned=true :app:assembleDebug

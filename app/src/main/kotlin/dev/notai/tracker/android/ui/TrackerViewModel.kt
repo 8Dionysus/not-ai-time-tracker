@@ -45,7 +45,7 @@ data class PlanSeriesUi(val id: String,val revision: Long,val label: Label,val s
                         val time: java.time.LocalTime?,val summary: String)
 data class IncomingDraft(val id: String,val draft: EntryDraft)
 
-data class Notice(val text: String, val undo: Token? = null, val id: Long = System.nanoTime())
+data class Notice(val text: String, val undo: Token? = null, val id: Long = System.nanoTime(),val restoreBatchId: String? = null,val restoreBarrier: String? = null)
 
 data class EntryUi(val segmentId: String, val sessionId: String, val start: Long, val end: Long, val durationMs: Long,
                    val label: Label, val note: String?, val selection: Classification)
@@ -139,6 +139,20 @@ internal object DocumentExportCoordination {
 @OptIn(ExperimentalCoroutinesApi::class)
 class TrackerViewModel internal constructor(private val app: Application,private val waitForBoundary: suspend (Long) -> Unit) : AndroidViewModel(app), BatchDeletionUiHost, ReportingZoneUiHost, LauncherIconsUiHost {
     constructor(app: Application): this(app,{ delay(it) })
+    private val _language = MutableStateFlow(dev.notai.tracker.android.AppLanguage.state(app))
+    val language: StateFlow<AppLocaleState> = _language
+    fun refreshLanguage() { _language.value = dev.notai.tracker.android.AppLanguage.state(app) }
+    fun setLanguage(tag: String?) = viewModelScope.launch {
+        try {
+            val expected = _language.value.preference.revision
+            _language.value = withContext(Dispatchers.IO) { dev.notai.tracker.android.AppLanguage.select(app,tag,expected) }
+        } catch(e: Exception) {
+            if(e is kotlinx.coroutines.CancellationException) throw e
+            try { refreshLanguage() } catch(read: Exception) { if(read is kotlinx.coroutines.CancellationException) throw read }
+            notice(localText(dev.notai.tracker.android.R.string.language_save_error))
+        }
+    }
+    private fun localText(id: Int,vararg args: Any): String = dev.notai.tracker.android.AppLanguage.context(app).getString(id,*args)
     private val standaloneRestoreReviews = RestoreReviewOwner<RestorePreview>(::releaseRestorePreviewOnIo)
     internal fun releaseRestorePreviewOnIo(preview: AutoCloseable) { CopyLifetimes.get(app).releasePreview(preview) }
     override fun onCleared() { standaloneRestoreReviews.close();super.onCleared() }
@@ -199,7 +213,9 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     private val _notices = MutableSharedFlow<Notice>(extraBufferCapacity = 8)
     val notices: SharedFlow<Notice> = _notices
-    private fun notice(text: String, undo: Token? = null) { _notices.tryEmit(Notice(text, undo)) }
+    private fun notice(text: String, undo: Token? = null,restoreBatchId: String? = null,restoreBarrier: String? = null) {
+        _notices.tryEmit(Notice(text, undo,restoreBatchId = restoreBatchId,restoreBarrier = restoreBarrier))
+    }
 
     private val _theme = MutableStateFlow(runCatching { ThemeChoice.valueOf(prefs.getString("theme", "SYSTEM")!!) }.getOrDefault(ThemeChoice.SYSTEM))
     val theme: StateFlow<ThemeChoice> = _theme
@@ -559,7 +575,17 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val rt = waitRuntime() ?: return@withContext null
         rt.tracker.previewDeleteSession(id)
     }
-    fun applyDeleteSession(preview: Tracker.DeletePreview) = command({ "Запись удалена" }) { rt,_ -> rt.tracker.applyDeleteSession(preview) }
+    private fun commitSingleDeletion(preview: Tracker.DeletePreview) = viewModelScope.async(Dispatchers.IO) {
+        try {
+            val change = (runtime ?: fail(ErrorCode.STALE,"No backend")).tracker.applyDeleteSession(preview)
+            notice(localText(dev.notai.tracker.android.R.string.record_deleted),change.state.token,change.deletionBatchId,change.data.controlBarrier)
+            Result.success(change)
+        } catch(e: Exception) {
+            if(e is kotlinx.coroutines.CancellationException) throw e
+            notice(localText(dev.notai.tracker.android.R.string.delete_error));Result.failure<Tracker.Change>(e)
+        }
+    }
+    fun applyDeleteSession(preview: Tracker.DeletePreview) { commitSingleDeletion(preview) }
 
     /**
      * One entrance for the row menu, swipe and the entry sheet. A single-segment record without dependent facts is
@@ -567,7 +593,8 @@ class TrackerViewModel internal constructor(private val app: Application,private
      */
     suspend fun requestDelete(sessionId: String): DeleteRequest {
         val preview = try { previewDeleteSession(sessionId) } catch (e: Exception) {
-            notice(if ((e as? CoreError)?.code == ErrorCode.STALE) Format.error(e) else "Удалить можно только завершённую запись. Идущая запись и текущий Фокус не удаляются.")
+            if(e is kotlinx.coroutines.CancellationException) throw e
+            notice(localText(dev.notai.tracker.android.R.string.delete_error))
             return DeleteRequest.Failed
         } ?: return DeleteRequest.Failed
         if (preview.segmentCount > 1 || preview.hasDependentFacts) {
@@ -577,13 +604,13 @@ class TrackerViewModel internal constructor(private val app: Application,private
             val last = segments.mapNotNull { it.end }.maxOrNull() ?: first
             return DeleteRequest.Confirm(preview, Format.range(first, last, zone), preview.segmentCount, preview.measurementCount)
         }
-        applyDeleteSession(preview)
-        return DeleteRequest.Applied
+        return if(commitSingleDeletion(preview).await().isSuccess) DeleteRequest.Applied else DeleteRequest.Failed
     }
 
     // ---------- commands ----------
 
-    private fun command(success: ((Tracker.Change) -> String?)? = null,completed: ((Result<Tracker.Change>) -> Unit)? = null,block: (UiBackend, Snapshot) -> Tracker.Change) {
+    private fun command(success: ((Tracker.Change) -> String?)? = null,completed: ((Result<Tracker.Change>) -> Unit)? = null,
+        failure: ((Throwable)->String)? = null,block: (UiBackend, Snapshot) -> Tracker.Change) {
         val rt = runtime
         val shown = snapshot.value ?: view.value?.snapshot()
         if(rt == null || shown == null) {
@@ -593,8 +620,8 @@ class TrackerViewModel internal constructor(private val app: Application,private
             val result = try { Result.success(block(rt,shown)) }
             catch(e: Exception) { if(e is kotlinx.coroutines.CancellationException) throw e;Result.failure(e) }
             completed?.invoke(result)
-            result.fold(onSuccess = { change -> success?.invoke(change)?.let { notice(it,if(change.undoAvailable) change.state.token else null) } },
-                onFailure = { notice(Format.error(it)) })
+            result.fold(onSuccess = { change -> success?.invoke(change)?.let { notice(it,if(change.undoAvailable) change.state.token else null,change.deletionBatchId,change.data.controlBarrier) } },
+                onFailure = { notice(failure?.invoke(it) ?: Format.error(it)) })
         }
     }
 
@@ -608,7 +635,20 @@ class TrackerViewModel internal constructor(private val app: Application,private
     private fun timer(directive: TimerDirective) = command { rt, s ->
         rt.tracker.timerCommand(s.timerTarget ?: fail(ErrorCode.STALE, "Timer target unavailable"), directive)
     }
-    fun undo(token: Token) = command({ "Отменено" }) { rt, _ -> rt.tracker.undo(token) }
+    fun undo(token: Token,restoreBatchId: String? = null,restoreBarrier: String? = null) = command({
+        localText(if(restoreBatchId == null) dev.notai.tracker.android.R.string.editorial_tracker_draft_d1addc4a5f6d758c11c5_v0 else dev.notai.tracker.android.R.string.record_restored)
+    },failure = { if(restoreBatchId == null) Format.error(it) else localText(dev.notai.tracker.android.R.string.restore_error) }) { rt, _ ->
+        if(restoreBatchId == null) rt.tracker.undo(token) else {
+            val live = rt.tracker.view()
+            ensure(live.data.datasetId == token.datasetId,"Deleted dataset changed",ErrorCode.STALE)
+            ensure(restoreBarrier != null && live.data.controlBarrier == restoreBarrier,"Deleted dataset was replaced",ErrorCode.STALE)
+            val ids = live.data.deletedRecords.filter { it.batchId == restoreBatchId }.map { it.sessionId }
+            rt.tracker.restoreDeleted(live.snapshot().token,ids)
+        }
+    }
+    fun restoreDeleted(sessionId: String,expected: Token) = command({ localText(dev.notai.tracker.android.R.string.record_restored) },failure = { localText(dev.notai.tracker.android.R.string.restore_error) }) { rt,_ ->
+        rt.tracker.restoreDeleted(expected,listOf(sessionId))
+    }
 
     /** One decision point for every picked activity, so Start, Switch and labelling stay explicit. */
     fun choose(entry: ChoiceEntry, mode: PickMode, earlierBoundary: Long? = null,reference: ChoiceReference? = null,expected: Token? = null) =
@@ -1334,16 +1374,10 @@ class TrackerViewModel internal constructor(private val app: Application,private
         return withContext(Dispatchers.IO) {
             try {
                 val preview = (runtime ?: fail(ErrorCode.STALE,"No backend")).tracker.previewDeleteSessions(ids)
-                val consequences = buildList {
-                    add("Итоги уменьшатся на ${Format.duration(preview.recordedMs)}")
-                    if(preview.segmentCount > preview.sessionCount) add(Format.plural(preview.segmentCount,"отрезок","отрезка","отрезков")+" между паузами")
-                    if(preview.measurementCount > 0) add(Format.plural(preview.measurementCount,"измерение","измерения","измерений"))
-                    if(preview.subjectLinkCount > 0) add(Format.plural(preview.subjectLinkCount,"связь с предметом","связи с предметами","связей с предметами"))
-                    if(preview.exerciseSetCount > 0) add(Format.plural(preview.exerciseSetCount,"запись подхода","записи подходов","записей подходов"))
-                    if(preview.eventQuantityCount > 0) add(Format.plural(preview.eventQuantityCount,"запись событийной величины","записи событийной величины","записей событийной величины"))
-                    if(preview.distanceTimeCount > 0) add(Format.plural(preview.distanceTimeCount,"основание темпа","основания темпа","оснований темпа"))
-                    if(preview.subjectCorrectionCount > 0) add("В том числе ${Format.plural(preview.subjectCorrectionCount,"исправление","исправления","исправлений")}")
-                }
+                val consequences = listOf(
+                    localText(dev.notai.tracker.android.R.string.delete_duration,Format.duration(preview.recordedMs)),
+                    localText(dev.notai.tracker.android.R.string.delete_counts,preview.segmentCount,preview.measurementCount,preview.subjectLinkCount,
+                        preview.exerciseSetCount,preview.eventQuantityCount,preview.distanceTimeCount,preview.subjectCorrectionCount))
                 Result.success(PickedDeletionReview(preview.sessionIds,consequences) { commitPickedDeletion(preview) })
             } catch(e: Exception) {
                 if(e is kotlinx.coroutines.CancellationException) throw e
@@ -1363,7 +1397,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
                 }
                 val change = (runtime ?: fail(ErrorCode.STALE,"No backend")).tracker.applyDeleteSessions(preview)
                 synchronized(pickedLock) { _picked.value = emptySet() }
-                notice("Удалено ${Format.plural(preview.sessionCount,"запись","записи","записей")}",if(change.undoAvailable) change.state.token else null)
+                notice(localText(dev.notai.tracker.android.R.string.records_deleted,preview.sessionCount),if(change.undoAvailable) change.state.token else null,change.deletionBatchId,change.data.controlBarrier)
                 Result.success(Unit)
             } catch(e: Exception) {
                 if(e is kotlinx.coroutines.CancellationException) throw e
@@ -1374,7 +1408,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         }.await()
     }
     fun applyBatchDelete(preview: Tracker.BatchDeletePreview) = viewModelScope.launch {
-        commitPickedDeletion(preview).onFailure { notice(Format.error(it)) }
+        commitPickedDeletion(preview).onFailure { notice(localText(dev.notai.tracker.android.R.string.delete_error)) }
     }
     suspend fun previewBatch(selection: Classification?, note: MetadataNoteEdit?, replace: Boolean): Result<BatchMetadataPreview> = withContext(Dispatchers.IO) {
         runCatching {

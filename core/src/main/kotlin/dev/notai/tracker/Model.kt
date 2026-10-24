@@ -79,6 +79,7 @@ internal fun validateSurfaceSettings(value: SurfaceSettings) {
     @Required val types: List<ActivityType> = Catalog.types,
     @Required val cards: List<Card> = emptyList(), @Required val favorites: List<Favorite> = emptyList(),
     @Required val sessions: List<Session> = emptyList(), @Required val segments: List<Segment> = emptyList(),
+    @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val deletedRecords: List<DeletedRecord> = emptyList(),
     val schedule: ScheduleData = ScheduleData(),val transfer: TransferState = TransferState(),
     @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.NEVER) val savedReports: List<SavedReportQuery> = emptyList(),
     val goals: List<Goal> = emptyList(),val focus: FocusRun? = null,val catalogVersion: String? = null,
@@ -146,6 +147,7 @@ internal fun validateSegmentTime(s: Segment) {
 internal fun Segment.isEmptyInterval() = end == start && durationMs == 0L
 
 fun validate(data: Dataset) {
+    validateDeletedRecords(data)
     fun ids(values: List<String>) { ensure(values.all { it.isNotBlank() } && values.distinct().size == values.size, "Empty or duplicate ID") }
     ensure(data.datasetId.isNotBlank() && data.revision >= 0 && data.timerEpoch >= 0, "Invalid dataset metadata")
     try { ZoneId.of(data.settings.reportZone) } catch (_: Exception) { fail(ErrorCode.INVALID_INPUT, "Invalid report zone") }

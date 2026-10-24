@@ -14,7 +14,7 @@ import org.junit.Assert.*
 @Config(sdk = [36])
 class AttentionPreferencesMigrationTest {
     private fun open(name: String) = Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name)
-        .addMigrations(TrackerDatabase.MIGRATION_10_11,TrackerDatabase.MIGRATION_11_12).allowMainThreadQueries().build()
+        .addMigrations(TrackerDatabase.MIGRATION_10_11,TrackerDatabase.MIGRATION_11_12,TrackerDatabase.MIGRATION_12_13).allowMainThreadQueries().build()
 
     @Test fun v10MetadataMigratesWithDisabledDefaultAndUnchangedHistory() {
         val context = RuntimeEnvironment.getApplication()

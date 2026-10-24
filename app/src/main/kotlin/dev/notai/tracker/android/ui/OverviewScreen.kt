@@ -1,5 +1,9 @@
 package dev.notai.tracker.android.ui
 
+import dev.notai.tracker.android.R
+
+import androidx.compose.ui.res.stringResource
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -36,7 +40,7 @@ fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier 
     var newReport by remember { mutableStateOf(false) }
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp)) {
         Row(Modifier.fillMaxWidth().height(64.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("Обзор", Modifier.weight(1f), style = NotAi.type.title, color = c.ink)
+            Text(stringResource(R.string.editorial_tracker_draft_c2df626371e99f6b4ab6_v0), Modifier.weight(1f), style = NotAi.type.title, color = c.ink)
             IconAction(Icon.Share, "Поделиться итогом", { share(period) })
         }
         Segmented(Period.entries.map { it to it.title }, period, { period = it }, Modifier.fillMaxWidth(), height = 36.dp)
@@ -69,8 +73,8 @@ fun OverviewScreen(vm: TrackerViewModel, view: TrackerView?, modifier: Modifier 
         } else Columns(d.columns, d.period)
         if (d.unresolved > 0) Note("Есть отрезки с неизвестным временем: ${d.unresolved}. В итог они не входят, пока ты их не уточнишь.", Modifier.padding(top = 14.dp))
 
-        Text("По областям", Modifier.padding(top = 20.dp, bottom = 4.dp), style = NotAi.type.section, color = c.ink)
-        if (d.areas.isEmpty()) Text("За этот период записей нет.", style = NotAi.type.bodySmall, color = c.ink2)
+        Text(stringResource(R.string.editorial_tracker_draft_617ae064465f7bb30b90_v0), Modifier.padding(top = 20.dp, bottom = 4.dp), style = NotAi.type.section, color = c.ink)
+        if (d.areas.isEmpty()) Text(stringResource(R.string.editorial_tracker_draft_5c54342245f5def713d5_v0), style = NotAi.type.bodySmall, color = c.ink2)
         val max = d.areas.maxOfOrNull { it.ms }?.coerceAtLeast(1) ?: 1
         d.areas.forEach { a -> AreaBar(a, max) { a.id?.let { drill = listOf(it) } } }
         Goals(d.goals, openGoal)
@@ -125,7 +129,7 @@ private fun BreakdownSheet(vm: TrackerViewModel, period: Period, stack: List<Str
 private fun ColumnScope.Goals(goals: List<GoalUi>, open: (String?) -> Unit) {
     val c = NotAi.colors
     // Goals are optional: without any, a single quiet row instead of a section.
-    if (goals.isNotEmpty()) Text("Цели", Modifier.padding(top = 18.dp, bottom = 4.dp), style = NotAi.type.section, color = c.ink)
+    if (goals.isNotEmpty()) Text(stringResource(R.string.editorial_tracker_draft_2faa8fead166d79f497d_v0), Modifier.padding(top = 18.dp, bottom = 4.dp), style = NotAi.type.section, color = c.ink)
     else Spacer(Modifier.height(14.dp))
     goals.forEach { g ->
         ListRow(g.name, subtitle = "${g.value}, ${g.status}", onClick = { open(g.id) }, leading = {

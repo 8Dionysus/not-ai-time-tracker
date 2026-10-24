@@ -2,6 +2,10 @@
 
 package dev.notai.tracker.android.ui
 
+import dev.notai.tracker.android.R
+
+import androidx.compose.ui.res.stringResource
+
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -98,7 +102,7 @@ fun PlanSheet(vm: TrackerViewModel, existing: PlanSeriesUi?, onPickActivity: ((C
             }
             Text("План только показывается на главном экране. Время пойдёт, когда ты нажмёшь на занятие.", style = NotAi.type.caption, color = c.ink2)
         }
-        PillButton("Сохранить", {
+        PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), {
             val sel = selection ?: return@PillButton
             vm.savePlan(existing, sel, if (once) emptySet() else days.toSet(), if (once) chosen else null,
                 if (timed) LocalTime.of(minuteOfDay / 60, minuteOfDay % 60) else null)
@@ -111,10 +115,10 @@ fun PlanSheet(vm: TrackerViewModel, existing: PlanSeriesUi?, onPickActivity: ((C
                 override fun isSelectableDate(utcTimeMillis: Long) = !java.time.Instant.ofEpochMilli(utcTimeMillis).atZone(ZoneOffset.UTC).toLocalDate().isBefore(today)
             })
         DatePickerDialog(onDismissRequest = { calendar = false }, colors = DatePickerDefaults.colors(containerColor = c.raised),
-            confirmButton = { PillButton("Готово", {
+            confirmButton = { PillButton(stringResource(R.string.editorial_tracker_draft_d4f52821d4cd489ea827_v0), {
                 state.selectedDateMillis?.let { date = java.time.Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate().toString() }; calendar = false
             }, kind = ButtonKind.TEXT, height = 44.dp) },
-            dismissButton = { PillButton("Отмена", { calendar = false }, kind = ButtonKind.TEXT, height = 44.dp) }) {
+            dismissButton = { PillButton(stringResource(R.string.editorial_tracker_draft_60c7c26716cac6e0288c_v0), { calendar = false }, kind = ButtonKind.TEXT, height = 44.dp) }) {
             DatePicker(state, showModeToggle = false, colors = DatePickerDefaults.colors(containerColor = c.raised,
                 selectedDayContainerColor = c.amber, selectedDayContentColor = c.onAmber, todayDateBorderColor = c.amber, todayContentColor = c.ink))
         }
@@ -213,7 +217,7 @@ fun GoalSheet(vm: TrackerViewModel, initial: GoalDraft?, onPickActivity: ((Class
                     Modifier.padding(top = 6.dp), style = NotAi.type.caption, color = c.ink2)
             }
         }
-        PillButton("Сохранить", {
+        PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), {
             vm.saveGoal(GoalDraft(initial?.id, label?.title ?: "Всё время", selection, label, metric, direction, period, target, initial?.originalFilter, activityChanged),
                 if (initial?.period == GoalPeriod.FIXED) GoalEditMode.CORRECT_CURRENT else mode)
             onDismiss()
@@ -271,7 +275,7 @@ fun FocusEditorSheet(vm: TrackerViewModel, plan: dev.notai.tracker.FocusPlan, ru
     var work by rememberSaveable { mutableIntStateOf((plan.workMs / 60_000L).toInt()) }
     var rest by rememberSaveable { mutableIntStateOf((plan.breakMs / 60_000L).toInt()) }
     NotAiSheet(onDismiss, fullHeight = false) {
-        SheetHeader("Фокус", onDismiss)
+        SheetHeader(stringResource(R.string.editorial_tracker_draft_1d9d344d38d034a749fa_v0), onDismiss)
         Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             MinuteStepper("Работа", work, { work = (if (work > 10) work - 5 else work - 1).coerceAtLeast(5) }, { work = (if (work >= 10) work + 5 else work + 1).coerceAtMost(180) })
             MinuteStepper("Перерыв", rest, { rest = (if (rest > 5) rest - 5 else rest - 1).coerceAtLeast(1) }, { rest = (if (rest >= 5) rest + 5 else rest + 1).coerceAtMost(60) })
@@ -282,8 +286,8 @@ fun FocusEditorSheet(vm: TrackerViewModel, plan: dev.notai.tracker.FocusPlan, ru
                 style = NotAi.type.caption, color = c.ink2)
         }
         ButtonPair(Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp)) { m ->
-            PillButton("Сохранить", { vm.configureFocus(work, rest); onDismiss() }, m, ButtonKind.TONAL)
-            if (!running) PillButton("Начать", { vm.configureAndStartFocus(work, rest); onDismiss() }, m, ButtonKind.PRIMARY)
+            PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), { vm.configureFocus(work, rest); onDismiss() }, m, ButtonKind.TONAL)
+            if (!running) PillButton(stringResource(R.string.editorial_tracker_draft_5799c96ef993116ab577_v0), { vm.configureAndStartFocus(work, rest); onDismiss() }, m, ButtonKind.PRIMARY)
         }
     }
 }

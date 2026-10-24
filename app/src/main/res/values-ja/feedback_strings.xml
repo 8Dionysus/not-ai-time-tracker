@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">言語</string>
+    <string name="language_system">システムの言語</string>
+    <string name="language_partial">一部の画面はまだロシア語です。個人の名前や記録は翻訳されません。</string>
+    <string name="language_save_error">言語を保存できませんでした。もう一度選択してください。</string>
+    <string name="deleted_title">削除済み</string>
+    <string name="deleted_empty">削除済みの記録はありません</string>
+    <string name="deleted_retained">記録は復元するまでここに残ります。自動削除はありません。</string>
+    <string name="data_language">データと言語</string>
+    <string name="undo_deletion">元に戻す</string>
+    <string name="record_deleted">記録を「削除済み」に移動しました</string>
+    <string name="records_deleted">「削除済み」に移動：%1$d</string>
+    <string name="record_restored">記録を復元しました</string>
+    <string name="restore_error">復元を確認できませんでした。履歴と「削除済み」を確認してください。</string>
+    <string name="delete_error">削除を確認できませんでした。履歴と「削除済み」を確認してください。</string>
+    <string name="delete_title">記録を削除しますか（%1$d）？</string>
+    <string name="delete_confirmation">記録と関連データは「削除済み」に移動します。設定の下部から復元できます。</string>
+    <string name="delete_counts">区間：%1$d · 測定：%2$d · リンク：%3$d · セット：%4$d · 数量：%5$d · ペースデータ：%6$d · 修正：%7$d</string>
+    <string name="delete_duration">合計から除かれる時間：%1$s</string>
+</resources>

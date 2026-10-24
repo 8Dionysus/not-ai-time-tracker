@@ -16,7 +16,7 @@ import org.junit.Assert.*
 class JournalAMigrationTest {
     private val context get()=RuntimeEnvironment.getApplication()
     private fun open(name: String,migration: Migration=TrackerDatabase.MIGRATION_11_12)=Room.databaseBuilder(context,TrackerDatabase::class.java,name)
-        .addMigrations(migration).allowMainThreadQueries().build()
+        .addMigrations(migration,TrackerDatabase.MIGRATION_12_13).allowMainThreadQueries().build()
     private fun sql(name: String,block: (SQLiteDatabase)->Unit)=SQLiteDatabase.openDatabase(context.getDatabasePath(name).path,null,SQLiteDatabase.OPEN_READWRITE).use(block)
     private fun contents(db: SQLiteDatabase): Map<String,List<List<String?>>> = listOf("metadata","cards","favorites","activity_types","sessions","segments","measurements","vocabulary","store_generation","history_classifications").associateWith { table ->
         db.rawQuery("SELECT * FROM $table ORDER BY 1",null).use { c -> buildList {
@@ -34,7 +34,7 @@ class JournalAMigrationTest {
             val migrated=open(name)
             try {
                 val next=Tracker(RoomStore(migrated),clock);assertEquals(before,next.data())
-                assertEquals(12,migrated.openHelper.readableDatabase.version)
+                assertEquals(TRACKER_DATABASE_VERSION,migrated.openHelper.readableDatabase.version)
                 val backup=Backups(next,MemoryRollback()).export()
                 val destinationDb=Room.inMemoryDatabaseBuilder(context,TrackerDatabase::class.java).allowMainThreadQueries().build()
                 try {

@@ -38,7 +38,8 @@ class Tracker(val store: StateStore, val clock: Clock) {
     }
 
     data class Change(val state: Snapshot, val changedSessionIds: Set<String>, val undoAvailable: Boolean,
-        val data: Dataset, val asOf: Moment, val catalogImport: CatalogImportReport? = null, val assignment: StoppedAssignment? = null) {
+        val data: Dataset, val asOf: Moment, val catalogImport: CatalogImportReport? = null, val assignment: StoppedAssignment? = null,
+        val deletionBatchId: String? = null) {
         val changedSessions get() = data.sessions.filter { it.id in changedSessionIds }
         val changedSegments get() = data.segments.filter { it.sessionId in changedSessionIds }
         fun report(start: Long,end: Long,filter: Filter = Filter()) = Reports.report(data,asOf,start,end,filter)
@@ -57,7 +58,11 @@ class Tracker(val store: StateStore, val clock: Clock) {
             val next = edited.copy(revision = Math.addExact(old.revision,1),timerEpoch = if(identityChanged) Math.addExact(old.timerEpoch,1) else old.timerEpoch)
             checked.replace(next) { validated ->
                 val changed = changedSessions(old,next)
-                Triple(Change(validated.snapshot(now), changed, undoable, validated.data, now), old, next)
+                val deletion = if(next.deletedRecords === old.deletedRecords) null else {
+                    val prior = old.deletedRecords.map { it.sessionId }.toSet()
+                    next.deletedRecords.firstOrNull { it.sessionId !in prior }?.batchId
+                }
+                Triple(Change(validated.snapshot(now), changed, undoable, validated.data, now,deletionBatchId = deletion), old, next)
             }
         }.let { (change, previous, _) ->
             undo = if (undoable) change.state.token to previous else null
@@ -255,7 +260,7 @@ class Tracker(val store: StateStore, val clock: Clock) {
         val now = clock.now(); d to DeletePreview(token(d),id,d.frozen(),deletedSession(d,id).frozen(),now)
     } }
     fun applyDeleteSession(preview: DeletePreview) = deleteSession(preview.expected,preview.sessionId)
-    fun deleteSession(expected: Token,id: String) = mutate(expected,true) { d,_ -> deletedSession(d,id) }
+    fun deleteSession(expected: Token,id: String) = mutate(expected,true) { d,n -> archivedSessions(d,setOf(id),n) }
     class BatchDeletePreview internal constructor(val expected: Token,val sessionIds: Set<String>,val before: Dataset,val after: Dataset,val asOf: Moment) {
         val sessionCount get() = sessionIds.size
         val recordedMs get() = before.segments.filter { it.sessionId in sessionIds }.sumExact { it.durationMs }
@@ -283,7 +288,31 @@ class Tracker(val store: StateStore, val clock: Clock) {
     /** Validate the entire set before producing one replacement and one Undo snapshot. */
     fun deleteSessions(expected: Token,ids: Collection<String>): Change {
         val selected = frozenSet(ids)
-        return mutate(expected,true) { d,_ -> deletedSessions(d,selected) }
+        return mutate(expected,true) { d,n -> archivedSessions(d,selected,n) }
+    }
+    private fun archivedSessions(d: Dataset,ids: Set<String>,now: Moment): Dataset {
+        val removed = deletedSessions(d,ids) // All guards run before archiving or removing any row.
+        val batch = newId()
+        val records = ids.map { id ->
+            val segmentIds = d.segments.filter { it.sessionId == id }.map { it.id }.toSet()
+            fun target(scope: Scope,targetId: String) = if(scope == Scope.SESSION) targetId == id else targetId in segmentIds
+            DeletedRecord(batch,now.wall,Math.addExact(d.revision,1),retainedRows(d.sessions) { it.id == id }.single(),
+                retainedRows(d.segments) { it.sessionId == id },retainedRows(d.measurements) { target(it.scope,it.targetId) },
+                retainedRows(d.subjects.links) { it.sessionId == id },retainedRows(d.subjects.sets) { it.sessionId == id },
+                retainedRows(d.subjects.quantities) { it.sessionId == id },retainedRows(d.subjects.distanceTimes) { target(it.scope,it.targetId) })
+        }
+        return removed.copy(deletedRecords = d.deletedRecords+records)
+    }
+    /** Restore only these records, preserving every unrelated intervening edit. No permanent deletion exists. */
+    fun restoreDeleted(expected: Token,sessionIds: Collection<String>) = mutate(expected) { d,_ ->
+        val ids = sessionIds.toSet();val records = d.deletedRecords.filter { it.sessionId in ids }
+        ensure(ids.isNotEmpty() && records.size == ids.size,"Deleted records changed",ErrorCode.STALE)
+        d.copy(deletedRecords = d.deletedRecords.filterNot { it.sessionId in ids },
+            sessions = restoreRows(d.sessions,records.map { it.session }),segments = restoreRows(d.segments,records.flatMap { it.segments }),
+            measurements = restoreRows(d.measurements,records.flatMap { it.measurements }),subjects = d.subjects.copy(
+                links = restoreRows(d.subjects.links,records.flatMap { it.links }),sets = restoreRows(d.subjects.sets,records.flatMap { it.sets }),
+                quantities = restoreRows(d.subjects.quantities,records.flatMap { it.quantities }),
+                distanceTimes = restoreRows(d.subjects.distanceTimes,records.flatMap { it.distanceTimes })))
     }
     private fun deletedSession(d: Dataset,id: String): Dataset = deletedSessions(d,setOf(id))
     private fun deletedSessions(d: Dataset,ids: Set<String>): Dataset {

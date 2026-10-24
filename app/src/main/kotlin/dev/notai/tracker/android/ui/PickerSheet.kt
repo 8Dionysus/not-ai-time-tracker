@@ -2,6 +2,10 @@
 
 package dev.notai.tracker.android.ui
 
+import dev.notai.tracker.android.R
+
+import androidx.compose.ui.res.stringResource
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -188,7 +192,7 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
                     val d = data
                     if (d == null) item { Spacer(Modifier.height(200.dp)) } else {
                         if (d.recents.isNotEmpty()) {
-                            item { SectionLabel("Недавние", Modifier.padding(top = 14.dp, bottom = 4.dp)) }
+                            item { SectionLabel(stringResource(R.string.editorial_tracker_draft_5a23a043869c64456576_v0), Modifier.padding(top = 14.dp, bottom = 4.dp)) }
                             items(d.recents, key = { "h-" + it.entry.id }) { r ->
                                 val on = starred(r)
                                 ChoiceRow(r, ::pick, onEdit = editAction(r), trailing = {
@@ -200,7 +204,7 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
                         if (d.favorites.isNotEmpty()) {
                             item {
                                 Row(Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    SectionLabel("Избранное", Modifier.weight(1f))
+                                    SectionLabel(stringResource(R.string.editorial_tracker_draft_8a016df5c8f3d36a6ece_v0), Modifier.weight(1f))
                                     Text("Порядок", Modifier.heightIn(min = 32.dp).pressable({ vm.openFavorites(true) }, label = "Порядок избранного").padding(horizontal = 4.dp, vertical = 6.dp),
                                         style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
                                 }
@@ -211,7 +215,7 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
                                 })
                             }
                         }
-                        item { SectionLabel("Области", Modifier.padding(top = 20.dp, bottom = 4.dp)) }
+                        item { SectionLabel(stringResource(R.string.editorial_tracker_draft_a168a3a5ba1749583020_v0), Modifier.padding(top = 20.dp, bottom = 4.dp)) }
                         items(d.areas, key = { "a-" + it.entry.id }) { a -> ChoiceRow(a, ::pick, square = true) }
                         if (d.moreAreas.isNotEmpty()) {
                             if (showMore) items(d.moreAreas, key = { "m-" + it.entry.id }) { a -> ChoiceRow(a, ::pick, square = true) }

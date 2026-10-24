@@ -2,6 +2,10 @@
 
 package dev.notai.tracker.android.ui
 
+import dev.notai.tracker.android.R
+
+import androidx.compose.ui.res.stringResource
+
 import dev.notai.tracker.ReportingDayPolicy
 
 import androidx.compose.foundation.Canvas
@@ -85,10 +89,10 @@ fun TimeField(label: String, value: Long, zone: ZoneId, onChange: (Long) -> Unit
         val state = rememberTimePickerState(local.hour, local.minute, is24Hour = true)
         AlertDialog(
             onDismissRequest = { dial = false }, containerColor = c.raised,
-            confirmButton = { PillButton("Готово", {
+            confirmButton = { PillButton(stringResource(R.string.editorial_tracker_draft_d4f52821d4cd489ea827_v0), {
                 onChange(local.withHour(state.hour).withMinute(state.minute).withSecond(0).withNano(0).toInstant().toEpochMilli()); dial = false
             }, kind = ButtonKind.TEXT, height = 44.dp) },
-            dismissButton = { PillButton("Отмена", { dial = false }, kind = ButtonKind.TEXT, height = 44.dp) },
+            dismissButton = { PillButton(stringResource(R.string.editorial_tracker_draft_60c7c26716cac6e0288c_v0), { dial = false }, kind = ButtonKind.TEXT, height = 44.dp) },
             title = { Text(label, style = NotAi.type.sheetTitle, color = c.ink) },
             text = {
                 TimePicker(state, colors = TimePickerDefaults.colors(
@@ -116,10 +120,10 @@ private fun TimePair(content: @Composable (Modifier) -> Unit) {
 fun NoteField(value: String, onChange: (String) -> Unit, modifier: Modifier = Modifier) {
     val c = NotAi.colors
     Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text("Заметка", style = NotAi.type.caption, color = c.ink2)
+        Text(stringResource(R.string.editorial_tracker_draft_25a310c49fcbc14afa82_v0), style = NotAi.type.caption, color = c.ink2)
         Box(Modifier.fillMaxWidth().heightIn(min = 48.dp).clip(RoundedCornerShape(14.dp)).border(1.dp, c.rule, RoundedCornerShape(14.dp))
             .padding(horizontal = 14.dp, vertical = 13.dp)) {
-            if (value.isEmpty()) Text("Не обязательно", style = NotAi.type.body, color = c.ink2)
+            if (value.isEmpty()) Text(stringResource(R.string.editorial_tracker_draft_d464164bc61a7e85c4c6_v0), style = NotAi.type.body, color = c.ink2)
             BasicTextField(value, onChange, Modifier.fillMaxWidth().semantics { contentDescription = "Заметка" }, textStyle = NotAi.type.body.copy(color = c.ink),
                 cursorBrush = SolidColor(c.amber), keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences), maxLines = 4)
         }
@@ -222,7 +226,7 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
     }
     NotAiSheet(onDismiss) {
         SheetHeader(when { entry != null -> "Исправить запись"; gap != null -> "Записать промежуток"; else -> "Добавить запись" }, onDismiss, extra = if (entry != null && onDelete != null) {
-            { IconAction(Icon.Trash, "Удалить запись", { onDelete(entry) }, size = 19.dp) }
+            { IconAction(Icon.Trash, stringResource(R.string.editorial_tracker_draft_87e40c5c1ee8a15a63bd_v0), { onDelete(entry) }, size = 19.dp) }
         } else null)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             ActivityField(label, { onPickActivity { sel, l -> selection = sel; label = l } })
@@ -259,8 +263,8 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
         }
         val preview = state?.preview
         ButtonPair(Modifier.padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 20.dp)) { m ->
-            PillButton("Отмена", onDismiss, m, ButtonKind.TONAL)
-            PillButton("Сохранить", {
+            PillButton(stringResource(R.string.editorial_tracker_draft_60c7c26716cac6e0288c_v0), onDismiss, m, ButtonKind.TONAL)
+            PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), {
                 vm.submitEntryForm(targetId,start,end,selection ?: Classification(),note,preview)
             }, m, ButtonKind.PRIMARY, enabled = form?.saving != true && (entry == null || (preview != null && !pending)))
         }
@@ -289,13 +293,13 @@ fun StepChooser(step: Int, onStep: (Int) -> Unit, modifier: Modifier = Modifier)
 fun EarlierSheet(zone: ZoneId, segmentStart: Long, now: Long, onNext: (Long) -> Unit, onDismiss: () -> Unit, step: Int = 1, onStep: (Int) -> Unit = {}) {
     var at by remember { mutableLongStateOf(floorMinute(maxOf(segmentStart, now - 10 * MINUTE)).coerceIn(segmentStart,now)) }
     NotAiSheet(onDismiss, fullHeight = false) {
-        SheetHeader("Когда ты переключился?", onDismiss)
+        SheetHeader(stringResource(R.string.editorial_tracker_draft_de07b012af25d20940d9_v0), onDismiss)
         Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             TimeField("Момент переключения", at, zone, { at = it.coerceIn(segmentStart, now) }, focused = true, step = step,
                 hint = "между ${Format.clock(segmentStart, zone)} и сейчас")
             StepChooser(step, onStep)
-            Text("Время до этого момента останется у текущего занятия, после него перейдёт к новому.", style = NotAi.type.bodySmall, color = NotAi.colors.ink2)
-            PillButton("Выбрать занятие", { onNext(at) }, Modifier.fillMaxWidth().padding(bottom = 20.dp), ButtonKind.PRIMARY)
+            Text(stringResource(R.string.editorial_tracker_draft_57dc53f53a2dcf590521_v0), style = NotAi.type.bodySmall, color = NotAi.colors.ink2)
+            PillButton(stringResource(R.string.editorial_tracker_draft_7a94427842da266bf16f_v0), { onNext(at) }, Modifier.fillMaxWidth().padding(bottom = 20.dp), ButtonKind.PRIMARY)
         }
     }
 }
@@ -342,7 +346,7 @@ fun StartEarlierSheet(vm: TrackerViewModel, zone: ZoneId, currentStart: Long, on
                     else -> Format.error(r.exceptionOrNull()!!)
                 })
             }
-            PillButton("Сохранить", { preview?.let { vm.applyStartEarlier(it) {} }; onDismiss() },
+            PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), { preview?.let { vm.applyStartEarlier(it) {} }; onDismiss() },
                 Modifier.fillMaxWidth().padding(bottom = 20.dp), ButtonKind.PRIMARY, enabled = preview != null)
         }
     }
@@ -354,16 +358,16 @@ fun ResolveSheet(zone: ZoneId, knownStart: Long, now: Long, onConfirm: (Long, Lo
     var start by remember { mutableLongStateOf(knownStart) }
     var end by remember { mutableLongStateOf(floorMinute(now)) }
     NotAiSheet(onDismiss, fullHeight = false) {
-        SheetHeader("Когда ты закончил?", onDismiss)
+        SheetHeader(stringResource(R.string.editorial_tracker_draft_117e2b56ce25cb830325_v0), onDismiss)
         Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             TimePair {
                 TimeField("Начало", start, zone, { start = it }, it, hint = "записано ${Format.clock(knownStart, zone)}", step = step)
                 TimeField("Конец", end, zone, { end = minOf(it, now) }, it, focused = true, hint = "не позже, чем сейчас", step = step)
             }
             StepChooser(step, onStep)
-            Text("Запись закроется с этими границами. Если занятие ещё идёт, начни новую запись после сохранения.",
+            Text(stringResource(R.string.editorial_tracker_draft_0fe49deada10db74c773_v0),
                 style = NotAi.type.bodySmall, color = NotAi.colors.ink2)
-            PillButton("Сохранить", { onConfirm(start, end); onDismiss() }, Modifier.fillMaxWidth().padding(bottom = 20.dp), ButtonKind.AMBER, enabled = end > start)
+            PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), { onConfirm(start, end); onDismiss() }, Modifier.fillMaxWidth().padding(bottom = 20.dp), ButtonKind.AMBER, enabled = end > start)
         }
     }
 }

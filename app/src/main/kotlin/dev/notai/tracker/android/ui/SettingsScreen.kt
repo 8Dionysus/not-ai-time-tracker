@@ -1,5 +1,7 @@
 package dev.notai.tracker.android.ui
 
+import androidx.compose.ui.res.stringResource
+
 import dev.notai.tracker.android.RestoreReviewOwner
 
 import android.Manifest
@@ -54,9 +56,19 @@ import java.time.Instant
 import java.time.ZoneId
 
 /** Settings pages. The first one is short: appearance up front, then each section with its live state on one line. */
-enum class SettingsPage(val title: String) {
+enum class SettingsPage(private val originalTitle: String) {
     ROOT("Настройки"), APPEARANCE("Вид"), SURFACES("Таймер вне приложения"), BACKUP("Резервная копия"),
-    PLAN("Занятия и план"), FOCUS("Фокус и напоминания"), MORE("Ещё")
+    PLAN("Занятия и план"), FOCUS("Фокус и напоминания"), MORE("Ещё"), DELETED("Удалённое")
+;
+    val title: String @Composable get() = when(this) {
+        ROOT -> stringResource(R.string.editorial_tracker_draft_8a99e65a404198a79d0c_v0)
+        APPEARANCE -> stringResource(R.string.editorial_tracker_draft_a2cfe1daad93e6632eae_v0)
+        SURFACES -> stringResource(R.string.editorial_tracker_draft_0b30f7bc92826ccc1a61_v0)
+        BACKUP -> stringResource(R.string.editorial_tracker_draft_38c243c25f6bfac24d2b_v0)
+        MORE -> stringResource(R.string.editorial_tracker_draft_0a5a50aed9713aca797c_v0)
+        DELETED -> stringResource(R.string.deleted_title)
+        else -> originalTitle
+    }
 }
 
 /**
@@ -192,12 +204,20 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 SectionRow(rememberVectorPainter(Icon.More), SettingsPage.MORE.title,
                     if (update) "Есть обновление каталога занятий" else "Часовой пояс, начало дня, каталог, CSV", update) { page = SettingsPage.MORE }
             }
+            Group(stringResource(R.string.data_language)) {
+                val deleted = view?.data?.deletedRecords?.size ?: 0
+                SectionRow(rememberVectorPainter(Icon.Trash),stringResource(R.string.deleted_title),
+                    if(deleted == 0) stringResource(R.string.deleted_empty) else java.text.NumberFormat.getIntegerInstance(java.util.Locale.forLanguageTag(vm.language.value.resolvedLocaleTag)).format(deleted),false) { page = SettingsPage.DELETED }
+                Divider()
+                LanguageSettingsRow(vm)
+            }
             val version = remember { runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() }
             Text("(not)AI Time Tracker ${version.orEmpty()}. Все записи хранятся на этом телефоне".replace("  ", " "),
                 Modifier.padding(start = 4.dp, top = 18.dp), style = NotAi.type.caption, color = c.ink3)
         }
 
         SettingsPage.APPEARANCE -> AppearancePage(vm)
+        SettingsPage.DELETED -> DeletedRecordsPage(vm,view)
 
         SettingsPage.SURFACES -> Group("На экранах телефона") {
             val n = caps?.notification
@@ -398,7 +418,7 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
 
 /** A section on the settings root: what it is and, in one line, how it stands now. */
 @Composable
-private fun SectionRow(icon: Painter, title: String, state: String, warn: Boolean, onClick: () -> Unit) {
+internal fun SectionRow(icon: Painter, title: String, state: String, warn: Boolean, onClick: () -> Unit) {
     val c = NotAi.colors
     Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).pressable(onClick, label = title).padding(start = 16.dp, end = 14.dp, top = 12.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -432,7 +452,7 @@ private fun surfaceStatus(cap: SurfaceCapability?, describe: String): String = w
 private fun AppearanceGroup(vm: TrackerViewModel, theme: ThemeChoice, more: () -> Unit) {
     val c = NotAi.colors
     val a by vm.appearance.collectAsStateWithLifecycle()
-    Group("Вид") {
+    Group(stringResource(R.string.editorial_tracker_draft_a2cfe1daad93e6632eae_v0)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 ThemeChoice.entries.forEach { t -> ThemeSwatch(t, t == theme, a.accent) { vm.setTheme(t) } }
@@ -502,7 +522,7 @@ private fun AppearancePage(vm: TrackerViewModel) {
         Labeled("Главный экран") {
             Toggle("Приглашение на «Начать»", "Скобки медленно дышат, пока учёт не идёт", a.pulse) { v -> vm.setAppearance { it.copy(pulse = v) } }
             Toggle("Кнопка Фокуса", "Под быстрым стартом. Долгое нажатие — длительности", a.showFocus) { v -> vm.setAppearance { it.copy(showFocus = v) } }
-            Toggle("Лента дня", "Полоска из отрезков над записями каждого дня", a.showRibbon) { v -> vm.setAppearance { it.copy(showRibbon = v) } }
+            Toggle(stringResource(R.string.editorial_tracker_draft_8ea4fb27aad7e440c15e_v0), "Полоска из отрезков над записями каждого дня", a.showRibbon) { v -> vm.setAppearance { it.copy(showRibbon = v) } }
         }
         PillButton("Вернуть как было", { vm.setAppearance { Appearance() } }, Modifier.fillMaxWidth(), ButtonKind.TONAL, height = 44.dp)
         (vm as? LauncherIconsUiHost)?.let { LauncherIconSettings(it) }
@@ -788,8 +808,8 @@ private fun BackupPage(vm: TrackerViewModel, auto: AutoBackupUi?, last: BackupIn
                 }
             }
             ButtonPair(spacing = 8.dp) { m ->
-                PillButton("Сохранить", { vm.requestExport() }, m, ButtonKind.PRIMARY, height = 44.dp, enabled = !busy)
-                PillButton("Восстановить", restoreFile, m, ButtonKind.TONAL, height = 44.dp, enabled = !busy)
+                PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), { vm.requestExport() }, m, ButtonKind.PRIMARY, height = 44.dp, enabled = !busy)
+                PillButton(stringResource(R.string.editorial_tracker_draft_86dfb8c919ec425b6196_v0), restoreFile, m, ButtonKind.TONAL, height = 44.dp, enabled = !busy)
             }
             Text("После переустановки выбери здесь любой файл из папки автокопий. Копия — не синхронизация между телефонами.",
                 style = NotAi.type.caption, color = c.ink2)

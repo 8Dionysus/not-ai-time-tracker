@@ -14,7 +14,7 @@ class RoomJournalATest: JournalAScenarioContract() {
     private val stores=mutableMapOf<StateStore,Pair<String,TrackerDatabase>>()
     private fun open(name: String): StateStore {
         val db=Room.databaseBuilder(RuntimeEnvironment.getApplication(),TrackerDatabase::class.java,name)
-            .addMigrations(TrackerDatabase.MIGRATION_11_12).allowMainThreadQueries().build()
+            .addMigrations(TrackerDatabase.MIGRATION_11_12,TrackerDatabase.MIGRATION_12_13).allowMainThreadQueries().build()
         return RoomStore(db).also { stores[it]=name to db }
     }
     override fun createJournalStore(): StateStore = open("journal-a-${newId()}.db")

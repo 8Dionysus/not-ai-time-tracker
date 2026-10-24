@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">Language</string>
+    <string name="language_system">System default</string>
+    <string name="language_partial">Some existing screens still use Russian. Personal names and records are not translated.</string>
+    <string name="language_save_error">Could not save the language. Choose again.</string>
+    <string name="deleted_title">Deleted</string>
+    <string name="deleted_empty">No deleted records</string>
+    <string name="deleted_retained">Records stay here until restored. There is no automatic cleanup.</string>
+    <string name="data_language">Data and language</string>
+    <string name="undo_deletion">Undo</string>
+    <string name="record_deleted">Record moved to Deleted</string>
+    <string name="records_deleted">Moved to Deleted: %1$d</string>
+    <string name="record_restored">Record restored</string>
+    <string name="restore_error">Could not confirm restoration. Check history and Deleted.</string>
+    <string name="delete_error">Could not confirm deletion. Check history and Deleted.</string>
+    <string name="delete_title">Delete records (%1$d)?</string>
+    <string name="delete_confirmation">Records and their linked facts will move to Deleted. Restore them from the bottom of Settings.</string>
+    <string name="delete_counts">Segments: %1$d · measurements: %2$d · links: %3$d · sets: %4$d · quantities: %5$d · pace inputs: %6$d · corrections: %7$d</string>
+    <string name="delete_duration">Time removed from totals: %1$s</string>
+</resources>

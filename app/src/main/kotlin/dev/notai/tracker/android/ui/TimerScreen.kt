@@ -2,6 +2,12 @@
 
 package dev.notai.tracker.android.ui
 
+import androidx.compose.ui.platform.testTag
+
+import dev.notai.tracker.android.R
+
+import androidx.compose.ui.res.stringResource
+
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
@@ -28,9 +34,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -136,12 +139,12 @@ fun TimerScreen(snapshot: Snapshot?, home: HomeData?, vm: TrackerViewModel, acti
 private fun Modifier.neonGlow(): Modifier {
     val c = NotAi.colors
     if (!c.glow) return this
-    val shift = if (NotAi.reducedMotion) 0.5f else {
+    val shift = if (NotAi.reducedMotion || !NotAi.appearance.pulse) 0.5f else {
         val t = androidx.compose.animation.core.rememberInfiniteTransition(label = "neon")
         t.animateFloat(0f, 1f, androidx.compose.animation.core.infiniteRepeatable(tween(9000), androidx.compose.animation.core.RepeatMode.Reverse), label = "neonShift").value
     }
     return this.drawBehind {
-        val a = c.amber.copy(alpha = 0.06f); val b = c.areas[1].copy(alpha = 0.04f)
+        val a = c.amber.copy(alpha = 0.12f + 0.035f * shift); val b = c.amber.copy(alpha = 0.055f)
         drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(a, a.copy(alpha = 0f)),
             androidx.compose.ui.geometry.Offset(size.width * (0.25f + 0.2f * shift), size.height * 0.35f), size.width * 0.55f), radius = size.width)
         drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(b, b.copy(alpha = 0f)),
@@ -166,7 +169,7 @@ private fun IdleHero(home: HomeData?, vm: TrackerViewModel, actions: TimerAction
             .pressable(haptic(HapticFeedbackType.Confirm, vm::startBlank), label = "Начать учёт времени").semantics { contentDescription = "Начать учёт времени" },
             contentAlignment = Alignment.Center) {
             IntervalFrame(IntervalState.IDLE, bracketWidth = 26.dp, bracketHeight = 104.dp, gap = 22.dp, opening = false, invite = NotAi.appearance.pulse) {
-                Text("Начать", style = NotAi.type.start, color = c.ink)
+                Text(stringResource(R.string.editorial_tracker_draft_5799c96ef993116ab577_v0), style = NotAi.type.start, color = c.ink)
             }
         }
         Text("Время пойдёт сразу.\nЗанятие можно выбрать потом.", style = NotAi.type.bodySmall, color = c.ink2, textAlign = TextAlign.Center)
@@ -211,8 +214,8 @@ private fun CurrentLabel(home: HomeData?, onClick: () -> Unit) {
         Row(Modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp)).background(c.amberWash).pressable(onClick, label = "Выбрать занятие")
             .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             ActivityGlyph(ActivityGlyphs.unclassified, null, size = 18.dp, unclassified = true)
-            Text("Без занятия", style = NotAi.type.label, color = c.ink)
-            Text("выбрать", style = NotAi.type.label.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
+            Text(stringResource(R.string.editorial_tracker_draft_f49276090fc98f59c7eb_v0), style = NotAi.type.label, color = c.ink)
+            Text(stringResource(R.string.editorial_tracker_draft_d134c6d82d62e46ec879_v0), style = NotAi.type.label.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
         }
     } else {
         Row(Modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp)).pressable(onClick, label = "Сменить или уточнить занятие")
@@ -248,7 +251,7 @@ private fun ActiveHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, actio
         ButtonPair(Modifier.padding(top = 4.dp)) { m ->
             if (s.mode == Mode.RUNNING) PillButton("Пауза", haptic(HapticFeedbackType.ToggleOff, vm::pause), m, ButtonKind.TONAL, Icon.Pause)
             else PillButton("Продолжить", haptic(HapticFeedbackType.ToggleOn, vm::resume), m, ButtonKind.AMBER, Icon.Play)
-            PillButton("Стоп", haptic(HapticFeedbackType.Confirm, vm::stop), m, ButtonKind.PRIMARY, Icon.Stop)
+            PillButton(stringResource(R.string.editorial_tracker_draft_f386fe7c3de9982b475f_v0), haptic(HapticFeedbackType.Confirm, vm::stop), m, ButtonKind.PRIMARY, Icon.Stop)
         }
         // Two quiet fixes of the same kind: the record began before Start, or the switch happened before it was tapped.
         val earlier = s.mode == Mode.RUNNING && "switchedEarlier" in s.actions
@@ -362,10 +365,10 @@ private fun RecoveryHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, act
         }
         Text(if (start != null) "Конец неизвестен" else "Время неизвестно",
             style = NotAi.type.label.copy(fontWeight = FontWeight.Medium), color = c.ink, textAlign = TextAlign.Center)
-        Text("Телефон перезагружался или часы сдвинулись, пока шёл учёт. Сколько длилось занятие, приложение не знает и угадывать не станет.",
+        Text(stringResource(R.string.editorial_tracker_draft_801a0a1eac7e6d9ef9b4_v0),
             style = NotAi.type.bodySmall, color = c.ink2, textAlign = TextAlign.Center)
         Column(Modifier.fillMaxWidth().padding(top = 4.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            PillButton("Указать, когда закончил", actions.resolve, Modifier.fillMaxWidth(), ButtonKind.AMBER)
+            PillButton(stringResource(R.string.editorial_tracker_draft_b048178228ee82e3e962_v0), actions.resolve, Modifier.fillMaxWidth(), ButtonKind.AMBER)
             PillButton(if (start != null) "Не учитывать с ${Format.clock(start, zone)}" else "Не учитывать", vm::excludeTail, Modifier.fillMaxWidth(), ButtonKind.TONAL)
         }
     }
@@ -399,10 +402,10 @@ private fun FocusHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, action
                 FocusMode.PAUSED -> PillButton("Продолжить", haptic(HapticFeedbackType.ToggleOn, vm::resume), m, ButtonKind.AMBER, Icon.Play)
                 else -> PillButton(if (work) "Начать перерыв" else "Начать работу", vm::focusNext, m, ButtonKind.AMBER)
             }
-            PillButton("Завершить", haptic(HapticFeedbackType.Confirm, vm::stop), m, ButtonKind.PRIMARY, Icon.Stop)
+            PillButton(stringResource(R.string.editorial_tracker_draft_d4c3ff0340d73303cb5b_v0), haptic(HapticFeedbackType.Confirm, vm::stop), m, ButtonKind.PRIMARY, Icon.Stop)
         }
         if (f.mode != FocusMode.DUE) PillButton(if (work) "Пропустить отрезок" else "Пропустить перерыв", vm::focusSkip, kind = ButtonKind.TEXT, height = 44.dp)
-        Text("Перерыв не входит во время занятия. Следующий отрезок начнётся, когда ты нажмёшь.", style = NotAi.type.caption, color = c.ink2,
+        Text(stringResource(R.string.editorial_tracker_draft_cbeca4591fe9810ca6fd_v0), style = NotAi.type.caption, color = c.ink2,
             textAlign = TextAlign.Center)
     }
 }
@@ -448,43 +451,21 @@ private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: Track
             Row(Modifier.padding(horizontal = 20.dp).fillMaxWidth().heightIn(min = 48.dp).pressable({ actions.manual(day) }),
                 verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 M3Icon(Icon.Plus, null, Modifier.size(16.dp), tint = NotAi.colors.ink2)
-                Text("Добавить запись задним числом", style = NotAi.type.bodySmall, color = NotAi.colors.ink2)
+                Text(stringResource(R.string.editorial_tracker_draft_534fa1c71825748c438f_v0), style = NotAi.type.bodySmall, color = NotAi.colors.ink2)
             }
         }
     }
     if (home.canLoadMore) item(key = "more") {
         Box(Modifier.fillMaxWidth().padding(20.dp), contentAlignment = Alignment.Center) {
-            PillButton("Показать раньше", vm::showMoreDays, kind = ButtonKind.OUTLINE, height = 44.dp)
+            PillButton(stringResource(R.string.editorial_tracker_draft_5d4de510a166f4a6deed_v0), vm::showMoreDays, kind = ButtonKind.OUTLINE, height = 44.dp)
         }
     }
 }
 
-/** Swipe left to delete. The row stays away while the record goes; it comes back if nothing was deleted. */
+/** Horizontal intention is checked before consuming any part of a scrolling gesture. */
 @Composable
-private fun SwipeToDelete(e: EntryUi, delete: suspend (EntryUi) -> Boolean, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    val c = NotAi.colors
-    val state = rememberSwipeToDismissBoxState(positionalThreshold = { it * 0.35f })
-    val haptics = LocalHapticFeedback.current
-    LaunchedEffect(state.targetValue) {
-        if (state.targetValue == SwipeToDismissBoxValue.EndToStart) haptics.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
-    }
-    LaunchedEffect(state.currentValue) {
-        if (state.currentValue == SwipeToDismissBoxValue.EndToStart) {
-            if (!delete(e)) state.reset()
-            else { delay(2_500); state.reset() } // still composed: the write failed or Undo restored it
-        }
-    }
-    SwipeToDismissBox(state, modifier = modifier, enableDismissFromStartToEnd = false, backgroundContent = {
-        if (state.dismissDirection != SwipeToDismissBoxValue.EndToStart) return@SwipeToDismissBox
-        val active = state.targetValue == SwipeToDismissBoxValue.EndToStart
-        Row(Modifier.fillMaxSize().background(if (active) c.danger.copy(alpha = 0.16f) else c.sunk).padding(horizontal = 24.dp),
-            horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-            Text("Удалить", style = NotAi.type.bodySmall.copy(fontWeight = FontWeight.Medium), color = if (active) c.danger else c.ink2)
-            Spacer(Modifier.width(10.dp))
-            M3Icon(Icon.Trash, null, Modifier.size(20.dp), tint = if (active) c.danger else c.ink2)
-        }
-    }) { Box(Modifier.background(c.paper)) { content() } }
-}
+private fun SwipeToDelete(e: EntryUi, delete: suspend (EntryUi) -> Boolean, modifier: Modifier = Modifier, content: @Composable () -> Unit) =
+    IntentionalDeleteSwipe({ delete(e) },modifier.then(Modifier.testTag("history-record:${e.sessionId}")),content)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -651,7 +632,7 @@ private fun EntryMenu(open: Boolean, onDismiss: () -> Unit, onOpen: () -> Unit, 
         item("Исправить", Icon.Edit, c.ink, onOpen)
         item("Повторить", Icon.Repeat, c.ink, onRepeat)
         if (onPickMany != null) item("Выбрать несколько", Icon.Check, c.ink, onPickMany)
-        if (onDelete != null) item("Удалить", Icon.Trash, c.danger, onDelete)
+        if (onDelete != null) item(stringResource(R.string.editorial_tracker_draft_98c2a48d88776822811d_v0), Icon.Trash, c.danger, onDelete)
     }
 }
 
@@ -675,8 +656,8 @@ private fun StarterCard(vm: TrackerViewModel) {
     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(c.raised).border(1.dp, c.rule, RoundedCornerShape(20.dp))
         .padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("Чем ты занимаешься чаще всего?", style = NotAi.type.section, color = c.ink)
-            Text("Отметь два-три занятия: они встанут сюда, и старт будет в одно касание. Остальное найдётся в поиске.",
+            Text(stringResource(R.string.editorial_tracker_draft_748b237516bc1d2267fc_v0), style = NotAi.type.section, color = c.ink)
+            Text(stringResource(R.string.editorial_tracker_draft_0475a52ebc49a52f249b_v0),
                 style = NotAi.type.caption, color = c.ink2)
         }
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -695,7 +676,7 @@ private fun StarterCard(vm: TrackerViewModel) {
             }
         }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            PillButton("Не сейчас", vm::dismissStarter, kind = ButtonKind.TEXT, height = 44.dp, modifier = Modifier.offset(x = (-12).dp))
+            PillButton(stringResource(R.string.editorial_tracker_draft_16804fc936758c4dd92a_v0), vm::dismissStarter, kind = ButtonKind.TEXT, height = 44.dp, modifier = Modifier.offset(x = (-12).dp))
             Spacer(Modifier.weight(1f))
             PillButton(if (picked.isEmpty()) "Готово" else "Готово · ${picked.size}", {
                 vm.saveStarters(starters.filter { it.title in picked })

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">언어</string>
+    <string name="language_system">시스템 언어</string>
+    <string name="language_partial">일부 화면은 아직 러시아어입니다. 개인 이름과 기록은 번역하지 않습니다.</string>
+    <string name="language_save_error">언어를 저장하지 못했습니다. 다시 선택하세요.</string>
+    <string name="deleted_title">삭제된 기록</string>
+    <string name="deleted_empty">삭제된 기록이 없습니다</string>
+    <string name="deleted_retained">복원할 때까지 기록이 여기에 보관됩니다. 자동 삭제는 없습니다.</string>
+    <string name="data_language">데이터 및 언어</string>
+    <string name="undo_deletion">실행 취소</string>
+    <string name="record_deleted">기록을 삭제된 기록으로 이동했습니다</string>
+    <string name="records_deleted">삭제된 기록으로 이동: %1$d</string>
+    <string name="record_restored">기록을 복원했습니다</string>
+    <string name="restore_error">복원을 확인하지 못했습니다. 내역과 삭제된 기록을 확인하세요.</string>
+    <string name="delete_error">삭제를 확인하지 못했습니다. 내역과 삭제된 기록을 확인하세요.</string>
+    <string name="delete_title">기록을 삭제할까요 (%1$d)?</string>
+    <string name="delete_confirmation">기록과 연결된 데이터가 삭제된 기록으로 이동합니다. 설정 아래쪽에서 복원할 수 있습니다.</string>
+    <string name="delete_counts">구간: %1$d · 측정: %2$d · 연결: %3$d · 세트: %4$d · 수량: %5$d · 페이스 데이터: %6$d · 수정: %7$d</string>
+    <string name="delete_duration">합계에서 제외되는 시간: %1$s</string>
+</resources>

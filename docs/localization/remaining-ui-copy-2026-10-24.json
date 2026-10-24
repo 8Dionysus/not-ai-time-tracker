@@ -1,0 +1,4315 @@
+{
+  "scope": "Source literals, including composed captions and source/catalog fallbacks; not a claim of runtime coverage. User values are not translated.",
+  "occurrences": [
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/App.kt",
+      "line": 115,
+      "source_literal": "Файлы не удалены. Восстановить базу или выбрать копию можно в технической оболочке. Подробности: $message"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/App.kt",
+      "line": 235,
+      "source_literal": "Все занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/App.kt",
+      "line": 253,
+      "source_literal": "Заменить черновик?"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/App.kt",
+      "line": 253,
+      "source_literal": "Текущий текст: «${draft?.note.orEmpty()}»\\nНовый текст: «${incoming.draft.note.orEmpty()}»"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/App.kt",
+      "line": 254,
+      "source_literal": "Заменить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/App.kt",
+      "line": 304,
+      "source_literal": "Чем ты был занят?"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/App.kt",
+      "line": 304,
+      "source_literal": "Переключиться на"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/App.kt",
+      "line": 304,
+      "source_literal": "Начать сразу"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/App.kt",
+      "line": 306,
+      "source_literal": "Время уже сохранено, осталось выбрать занятие."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/App.kt",
+      "line": 306,
+      "source_literal": "Текущая запись закончится сейчас, новая начнётся с этой минуты."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/App.kt",
+      "line": 307,
+      "source_literal": "Избранное и частые занятия за 30 дней."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/App.kt",
+      "line": 316,
+      "source_literal": "Оставить без занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Appearance.kt",
+      "line": 7,
+      "source_literal": "Янтарь"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Appearance.kt",
+      "line": 7,
+      "source_literal": "Бирюза"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Appearance.kt",
+      "line": 7,
+      "source_literal": "Лайм"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Appearance.kt",
+      "line": 7,
+      "source_literal": "Графит"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Appearance.kt",
+      "line": 8,
+      "source_literal": "Системный"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Appearance.kt",
+      "line": 8,
+      "source_literal": "С засечками"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Appearance.kt",
+      "line": 9,
+      "source_literal": "Тонкие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Appearance.kt",
+      "line": 9,
+      "source_literal": "Обычные"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Appearance.kt",
+      "line": 28,
+      "source_literal": "Мельче"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Appearance.kt",
+      "line": 28,
+      "source_literal": "Обычный"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Appearance.kt",
+      "line": 28,
+      "source_literal": "Крупнее"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Appearance.kt",
+      "line": 28,
+      "source_literal": "Крупный"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 47,
+      "source_literal": "У выбранных записей это уже так"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 54,
+      "source_literal": "Отменить выбор"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 55,
+      "source_literal": "Выбрано: $sessionCount"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 58,
+      "source_literal": "Занятие станет «${label.title}»."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 69,
+      "source_literal": "Нет записей для удаления"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 70,
+      "source_literal": "Выбор успел измениться. Проверь записи и повтори."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 84,
+      "source_literal": "Заметка «$text» заменит прежние."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 84,
+      "source_literal": "Заметка «$text» появится там, где её не было."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 88,
+      "source_literal": "Изменить ${Format.plural(n, "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 88,
+      "source_literal": "записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 88,
+      "source_literal": "записей"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 88,
+      "source_literal": "$describe Время записей не меняется. Отменить можно сразу после."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 89,
+      "source_literal": "Изменить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 107,
+      "source_literal": "Не получилось"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 115,
+      "source_literal": "Заметка для выбранных"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 117,
+      "source_literal": "Текст заметки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 117,
+      "source_literal": "Например, проект «Альфа»"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 118,
+      "source_literal": "Только где пусто"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/BatchEdit.kt",
+      "line": 118,
+      "source_literal": "Заменить у всех"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Components.kt",
+      "line": 163,
+      "source_literal": "Лента дня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Components.kt",
+      "line": 253,
+      "source_literal": "Действия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 32,
+      "source_literal": "С поясом (ISO)"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 108,
+      "source_literal": "История из CSV"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 108,
+      "source_literal": "Занятия и проверка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 114,
+      "source_literal": "Файл"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 114,
+      "source_literal": "колонка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 114,
+      "source_literal": "колонки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 114,
+      "source_literal": "колонок"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 115,
+      "source_literal": "подсказки уже расставлены по заголовкам."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 118,
+      "source_literal": "Разделитель"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 119,
+      "source_literal": "Табуляция"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 119,
+      "source_literal": "Запятая"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 119,
+      "source_literal": "Точка с запятой"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 124,
+      "source_literal": "Источник CSV (сервис и аккаунт)"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 124,
+      "source_literal": "Например, toggl:личный"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 125,
+      "source_literal": "Одно имя для повторных выгрузок аккаунта; разные имена для разных источников."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 127,
+      "source_literal": "Занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 128,
+      "source_literal": "Категория или клиент"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 129,
+      "source_literal": "Начало"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 130,
+      "source_literal": "Время начала, если отдельной колонкой"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 131,
+      "source_literal": "Конец"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 132,
+      "source_literal": "Время конца, если отдельной колонкой"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 133,
+      "source_literal": "Длительность"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 135,
+      "source_literal": "Длительность записана как"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 136,
+      "source_literal": "1.5 ч"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 136,
+      "source_literal": "секунды"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 137,
+      "source_literal": "мс"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 140,
+      "source_literal": "Заметка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 142,
+      "source_literal": "Как записано время"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 142,
+      "source_literal": " · в файле: $it"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 144,
+      "source_literal": "Мой пояс"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 145,
+      "source_literal": "Пояс указан в самом времени"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 145,
+      "source_literal": "Время в файле считается по поясу ${fileZone.replace('_', ' ')}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 150,
+      "source_literal": "Нужны занятие, начало и конец или длительность"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 154,
+      "source_literal": "Как это назвать в трекере"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 159,
+      "source_literal": "Выбрать занятие для «${a.activity}»"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 162,
+      "source_literal": "Без названия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 164,
+      "source_literal": "строка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 164,
+      "source_literal": "строки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 164,
+      "source_literal": "строк"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 164,
+      "source_literal": "как в файле"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 167,
+      "source_literal": "Оставить как в файле"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 172,
+      "source_literal": "Проверка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 175,
+      "source_literal": "Считаю…"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 179,
+      "source_literal": "Добавится ${Format.plural(p.added, "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 179,
+      "source_literal": "записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 179,
+      "source_literal": "записей"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 180,
+      "source_literal": ", уже есть: ${p.duplicates}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 181,
+      "source_literal": ", с ошибками: ${p.errorIssues.size}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 189,
+      "source_literal": "Без занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 193,
+      "source_literal": "и ещё ${p.added - 12}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 194,
+      "source_literal": "Записи добавятся к истории, ничего существующего не заменится. Повторы из этого же источника пропускаются."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 202,
+      "source_literal": "Читаю…"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 202,
+      "source_literal": "Дальше"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 207,
+      "source_literal": "В файле не нашлось ни одной записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 212,
+      "source_literal": "Добавить ${Format.plural(it.added, "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 212,
+      "source_literal": "записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 212,
+      "source_literal": "записей"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 212,
+      "source_literal": "Добавить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 232,
+      "source_literal": "нет"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 235,
+      "source_literal": "Нет такой колонки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 241,
+      "source_literal": "Нет такой колонки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/CsvImport.kt",
+      "line": 256,
+      "source_literal": "Формат времени"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/DeletedRecordsPage.kt",
+      "line": 34,
+      "source_literal": "Показать ещё"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 45,
+      "source_literal": "Какое занятие?"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 69,
+      "source_literal": "Добавить в план"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 69,
+      "source_literal": "План"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 70,
+      "source_literal": "Убрать из плана"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 73,
+      "source_literal": "Выбрать"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 73,
+      "source_literal": "Изменить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 74,
+      "source_literal": "По дням недели"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 74,
+      "source_literal": "Один день"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 87,
+      "source_literal": "Сегодня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 87,
+      "source_literal": "Завтра"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 89,
+      "source_literal": "Другой день"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 91,
+      "source_literal": "Ко времени"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 93,
+      "source_literal": "Ко времени"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 94,
+      "source_literal": "Время только для порядка в списке"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 94,
+      "source_literal": "Без времени: просто в этот день"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 96,
+      "source_literal": "Ко времени"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 101,
+      "source_literal": "Время"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 103,
+      "source_literal": "План только показывается на главном экране. Время пойдёт, когда ты нажмёшь на занятие."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 126,
+      "source_literal": "Убрать «${existing.label.title}» из плана?"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 127,
+      "source_literal": "Записи, уже начатые по плану, останутся в истории."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 127,
+      "source_literal": "Убрать"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 168,
+      "source_literal": "Цель"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 168,
+      "source_literal": "Новая цель"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 169,
+      "source_literal": "Убрать цель"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 172,
+      "source_literal": "Любое занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 173,
+      "source_literal": "Выбрать"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 173,
+      "source_literal": "Изменить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 174,
+      "source_literal": "Считать любое занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 176,
+      "source_literal": "Что считать"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 177,
+      "source_literal": "Время"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 177,
+      "source_literal": "Записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 177,
+      "source_literal": "Дни"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 180,
+      "source_literal": "Период"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 181,
+      "source_literal": "День"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 181,
+      "source_literal": "Неделя"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 181,
+      "source_literal": "Месяц"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 181,
+      "source_literal": "Свои даты"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 182,
+      "source_literal": "Другой период — это новая цель."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 183,
+      "source_literal": "День"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 183,
+      "source_literal": "Неделя"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 183,
+      "source_literal": "Месяц"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 187,
+      "source_literal": "Граница"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 188,
+      "source_literal": "Не меньше"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 188,
+      "source_literal": "Не больше"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 203,
+      "source_literal": "Меньше"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 204,
+      "source_literal": "Цель: ${Format.goalRule(metric, direction, period, target)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 206,
+      "source_literal": "Больше"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 208,
+      "source_literal": "Дни считаются за неделю или месяц."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 209,
+      "source_literal": "Когда применить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 211,
+      "source_literal": "С завтрашнего дня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 211,
+      "source_literal": "Уже сегодня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 212,
+      "source_literal": "Со следующей недели"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 212,
+      "source_literal": "С этой недели"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 213,
+      "source_literal": "Со следующего месяца"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 213,
+      "source_literal": "С этого месяца"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 216,
+      "source_literal": "Текущий период досчитается по прежней цели."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 216,
+      "source_literal": "Текущий период пересчитается по новой цели. Прошлые останутся как были."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 221,
+      "source_literal": "Всё время"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 226,
+      "source_literal": "Убрать цель?"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 226,
+      "source_literal": "Записи не изменятся, исчезнет только сама цель."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 226,
+      "source_literal": "Убрать"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 247,
+      "source_literal": "Поделиться итогом"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 254,
+      "source_literal": "Добавить заметки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 256,
+      "source_literal": "Добавить заметки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 257,
+      "source_literal": "Заметки бывают личными, поэтому по умолчанию их нет"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 259,
+      "source_literal": "Добавить заметки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 261,
+      "source_literal": "Отправить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 264,
+      "source_literal": "Поделиться итогом"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 280,
+      "source_literal": "Работа"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 281,
+      "source_literal": "Перерыв"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 285,
+      "source_literal": "Текущий отрезок досчитается как начат, новые длительности — со следующего."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 285,
+      "source_literal": "Длительности сохранятся и для следующих раз."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 300,
+      "source_literal": "$title: меньше"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 301,
+      "source_literal": "$minutes мин"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 301,
+      "source_literal": "$title: $minutes минут"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Editors.kt",
+      "line": 303,
+      "source_literal": "$title: больше"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 72,
+      "source_literal": "Отметь звёздочкой занятия, которые начинаешь чаще всего. Они встанут на главный экран и в шторку."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 73,
+      "source_literal": "Первые в списке видны в шторке, на виджете и у плавающей кнопки. Чтобы переставить, зажми и тяни."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 99,
+      "source_literal": "Изменить: ${f.title}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 102,
+      "source_literal": "Выше"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 103,
+      "source_literal": "Ниже"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 114,
+      "source_literal": "Убрать из избранного: ${f.title}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 141,
+      "source_literal": "Убрать из избранного"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 143,
+      "source_literal": "Название на кнопке"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 148,
+      "source_literal": "Изменить само занятие «${card.name}»"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 163,
+      "source_literal": "Своё занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 165,
+      "source_literal": "Название"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 167,
+      "source_literal": "Раздел"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 168,
+      "source_literal": "Без раздела"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 170,
+      "source_literal": "Выбрать"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 170,
+      "source_literal": "Изменить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 171,
+      "source_literal": "Без раздела"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Favorites.kt",
+      "line": 174,
+      "source_literal": "Время занятия войдёт в итог раздела в обзоре и целях. Уже сделанные записи сохранят своё прежнее место."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 69,
+      "source_literal": "1 минуту"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 69,
+      "source_literal": "$step минут"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 77,
+      "source_literal": "$label раньше на $by"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 78,
+      "source_literal": "Выбрать время: $label"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 83,
+      "source_literal": "$label позже на $by"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 127,
+      "source_literal": "Заметка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 134,
+      "source_literal": "Изменить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 136,
+      "source_literal": "Изменить занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 159,
+      "source_literal": "Положение записи среди соседних"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 212,
+      "source_literal": "Без занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 228,
+      "source_literal": "Исправить запись"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 228,
+      "source_literal": "Записать промежуток"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 228,
+      "source_literal": "Добавить запись"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 239,
+      "source_literal": "Начало"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 240,
+      "source_literal": "было ${Format.clock(origStart, zone)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 241,
+      "source_literal": "свободно с ${Format.clock(state!!.freeFrom!!, zone)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 242,
+      "source_literal": "Конец"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 243,
+      "source_literal": "было ${Format.clock(origEnd, zone)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 244,
+      "source_literal": "свободно до ${Format.clock(state!!.freeUntil!!, zone)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 253,
+      "source_literal": "${Format.dayTitle(day.date, today)}, итог"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 261,
+      "source_literal": "В избранном"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 261,
+      "source_literal": "Добавить в избранное"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 279,
+      "source_literal": "Шаг ±"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 283,
+      "source_literal": "Шаг $m мин"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 285,
+      "source_literal": "$m мин"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 298,
+      "source_literal": "Момент переключения"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 299,
+      "source_literal": "между ${Format.clock(segmentStart, zone)} и сейчас"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 323,
+      "source_literal": "Когда ты начал?"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 328,
+      "source_literal": "С конца прошлой записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 331,
+      "source_literal": "С конца прошлой записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 335,
+      "source_literal": "Начало"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 336,
+      "source_literal": "раньше, чем ${Format.clock(currentStart, zone)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 341,
+      "source_literal": "Добавится ${Format.duration(preview.addedMs)} до ${Format.clock(currentStart, zone)}. "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 342,
+      "source_literal": "Это время отметится как указанное тобой, а не замеренное."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 344,
+      "source_literal": "Это время уже занято другой записью. Выбери начало позже."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 345,
+      "source_literal": "Сначала уточни неизвестное время."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 364,
+      "source_literal": "Начало"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 364,
+      "source_literal": "записано ${Format.clock(knownStart, zone)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 365,
+      "source_literal": "Конец"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 365,
+      "source_literal": "не позже, чем сейчас"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 388,
+      "source_literal": "Взять время из календаря"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 390,
+      "source_literal": "Календарь недоступен без разрешения"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 390,
+      "source_literal": "Из календаря"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 396,
+      "source_literal": "Календарь: ${Format.dayMonth(day.date)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 402,
+      "source_literal": "Календарь сейчас не отвечает."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 403,
+      "source_literal": "В этот день в календаре нет событий со временем."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Forms.kt",
+      "line": 405,
+      "source_literal": "Без названия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/LauncherIconSettings.kt",
+      "line": 20,
+      "source_literal": "Значок приложения"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/LauncherIconSettings.kt",
+      "line": 26,
+      "source_literal": "Выбран"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/LicensesSheet.kt",
+      "line": 17,
+      "source_literal": "Приложение · Apache 2.0"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/LicensesSheet.kt",
+      "line": 18,
+      "source_literal": "Шрифт Onest · SIL Open Font License"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/LicensesSheet.kt",
+      "line": 19,
+      "source_literal": "Сторонние компоненты"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/LicensesSheet.kt",
+      "line": 33,
+      "source_literal": "Не удалось открыть лицензию"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/LicensesSheet.kt",
+      "line": 37,
+      "source_literal": "Лицензии"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/LicensesSheet.kt",
+      "line": 45,
+      "source_literal": "Загружаю…"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 44,
+      "source_literal": "Поделиться итогом"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 50,
+      "source_literal": "Сегодня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 51,
+      "source_literal": ", день ещё идёт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 54,
+      "source_literal": "вчера"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 56,
+      "source_literal": "Вчера записей нет"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 56,
+      "source_literal": "За $prev записей нет"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 57,
+      "source_literal": "на ${Format.duration(diff)} больше, чем ${if (d.period == Period.DAY) prev else "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 58,
+      "source_literal": "на ${Format.duration(-diff)} меньше, чем ${if (d.period == Period.DAY) prev else "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 59,
+      "source_literal": "столько же, сколько ${if (d.period == Period.DAY) prev else "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 65,
+      "source_literal": "Сегодня записей пока нет. Обзор соберётся сам, как только появится первая."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 66,
+      "source_literal": "За эти дни записей нет. Обзор соберётся сам, как только они появятся."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 74,
+      "source_literal": "Есть отрезки с неизвестным временем: ${d.unresolved}. В итог они не входят, пока ты их не уточнишь."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 94,
+      "source_literal": "${a.name}: из чего состоит"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 119,
+      "source_literal": "Сегодня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 119,
+      "source_literal": "За ${period.title}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 121,
+      "source_literal": "За этот период здесь записей нет."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 139,
+      "source_literal": "Поставить цель"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 142,
+      "source_literal": "Поставить цель"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 142,
+      "source_literal": "Ещё цель"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 152,
+      "source_literal": "Время по дням: "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 176,
+      "source_literal": "$h ч"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 182,
+      "source_literal": "сегодня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/OverviewScreen.kt",
+      "line": 187,
+      "source_literal": "сегодня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 56,
+      "source_literal": "Назад"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 59,
+      "source_literal": "Закрыть"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 75,
+      "source_literal": "Очистить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 118,
+      "source_literal": "Вся область"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 138,
+      "source_literal": "Новая запись из текста"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 138,
+      "source_literal": "Что начинаем?"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 139,
+      "source_literal": "Чем занят?"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 140,
+      "source_literal": "На что переключился?"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 141,
+      "source_literal": "Фокус: занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 142,
+      "source_literal": "Занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 148,
+      "source_literal": "Начать новое"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 148,
+      "source_literal": "Уточнить текущее"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 149,
+      "source_literal": "Текущая запись закончится сейчас, новая начнётся с этой минуты."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 150,
+      "source_literal": "Название получит уже идущая запись. Начало остаётся ${startClock ?: "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 154,
+      "source_literal": "До $boundaryClock остаётся текущее занятие, с $boundaryClock начнётся выбранное."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 158,
+      "source_literal": "Заметка: «$note»"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 159,
+      "source_literal": "Убрать заметку"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 162,
+      "source_literal": "Найти или создать занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 167,
+      "source_literal": "Ничего не нашлось"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 167,
+      "source_literal": "Найдено"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 173,
+      "source_literal": "Создать «${query.trim()}» в разделе «${parent.label.title}»"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 173,
+      "source_literal": "Создать занятие «${query.trim()}»"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 188,
+      "source_literal": "Своё занятие в этом разделе: начни вводить название в поиске"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 199,
+      "source_literal": "Убрать из избранного"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 200,
+      "source_literal": "В избранное"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 208,
+      "source_literal": "Порядок"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 208,
+      "source_literal": "Порядок избранного"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 214,
+      "source_literal": "Убрать из избранного"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 224,
+      "source_literal": "Ещё ${d.moreAreas.size} областей: профессии и работа"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 234,
+      "source_literal": "Начать без занятия, с заметкой"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 234,
+      "source_literal": "Начать без занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 248,
+      "source_literal": "в архиве"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/PickerSheet.kt",
+      "line": 250,
+      "source_literal": "Изменить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 25,
+      "source_literal": "0 мин"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 26,
+      "source_literal": "${maxOf(1L, ms / 1000)} с"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 29,
+      "source_literal": "$h ч"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 29,
+      "source_literal": "$h ч ${m.toString().padStart(2, '0')} мин"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 29,
+      "source_literal": "$m мин"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 42,
+      "source_literal": "Сегодня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 43,
+      "source_literal": "Вчера"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 53,
+      "source_literal": "пн"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 53,
+      "source_literal": "вт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 53,
+      "source_literal": "ср"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 53,
+      "source_literal": "чт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 53,
+      "source_literal": "пт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 53,
+      "source_literal": "сб"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 53,
+      "source_literal": "вс"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 57,
+      "source_literal": "каждый день"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 58,
+      "source_literal": "по будням"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 59,
+      "source_literal": "по выходным"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 67,
+      "source_literal": "раз"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 67,
+      "source_literal": "раза"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 67,
+      "source_literal": "раз"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 68,
+      "source_literal": "день"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 68,
+      "source_literal": "дня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 68,
+      "source_literal": "дней"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 71,
+      "source_literal": " в день"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 71,
+      "source_literal": " в неделю"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 72,
+      "source_literal": " в месяц"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 73,
+      "source_literal": "от"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 73,
+      "source_literal": "не больше"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 77,
+      "source_literal": "раза"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 77,
+      "source_literal": "раз"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 78,
+      "source_literal": "дня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 78,
+      "source_literal": "дней"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 80,
+      "source_literal": "от "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 80,
+      "source_literal": "не больше "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 91,
+      "source_literal": "Данные успели измениться. Проверь экран и повтори."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 92,
+      "source_literal": "Такой интервал невозможен: проверь начало и конец."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 93,
+      "source_literal": "Интервал пересекается с другой записью."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 94,
+      "source_literal": "Сначала уточни неизвестное время."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 95,
+      "source_literal": "Ошибка хранения. Проверьте текущее состояние перед повтором."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 96,
+      "source_literal": "Этот файл не подходит: ${e.message}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 97,
+      "source_literal": "Не получилось: ${e.message}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 98,
+      "source_literal": "Не получилось: ${e.message ?: e.javaClass.simpleName}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 105,
+      "source_literal": "дата или время не читаются в выбранном формате"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 105,
+      "source_literal": " (колонка «$it»)"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 106,
+      "source_literal": "у времени нет часового пояса: выбери формат без пояса"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 107,
+      "source_literal": "время вне допустимого диапазона"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 108,
+      "source_literal": "конец раньше начала"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 109,
+      "source_literal": "нужна колонка конца или длительности"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 110,
+      "source_literal": "длительность не совпадает с началом и концом"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 112,
+      "source_literal": "длительность не читается в выбранном формате"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 113,
+      "source_literal": "длительность должна быть больше нуля"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 114,
+      "source_literal": "время попадает на перевод часов"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 115,
+      "source_literal": "запись в будущем"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 116,
+      "source_literal": "в строке другое число колонок"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 117,
+      "source_literal": "в файле нет колонки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 118,
+      "source_literal": "повторяется или пропущен ID строки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 119,
+      "source_literal": "файл слишком большой"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 120,
+      "source_literal": "кавычки в строке не закрыты"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 121,
+      "source_literal": "записи пересекаются друг с другом или с историей"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 122,
+      "source_literal": "данные успели измениться: проверь ещё раз"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 125,
+      "source_literal": "Строка $it: "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 131,
+      "source_literal": "Нужно выбрать папку заново"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 132,
+      "source_literal": "В эту папку нельзя сохранять копии. Выбери другую"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 133,
+      "source_literal": "Доступ к папке пропал. Выбери её снова"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 134,
+      "source_literal": "Папка сейчас недоступна: нет сети или приложение облака не отвечает. Повторю сам"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 135,
+      "source_literal": "Не удалось перечитать записанную копию. Повторю сам"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 136,
+      "source_literal": "Записанная копия не совпала с данными. Повторю сам"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 137,
+      "source_literal": "Копия прервалась. Продолжу сам"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 138,
+      "source_literal": "Неясно, появился ли файл в папке. Повтори или пропусти эту копию"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 139,
+      "source_literal": "Новая копия сохранена, а старые убрать не вышло"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 140,
+      "source_literal": "Телефон не дал запланировать копию. Нажми «Сохранить сейчас»"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 141,
+      "source_literal": "Не хватило места или памяти на телефоне. Повторю сам"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Presentation.kt",
+      "line": 190,
+      "source_literal": "Без занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 38,
+      "source_literal": "Часовой пояс"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 40,
+      "source_literal": "Автоматически"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 40,
+      "source_literal": "Вручную"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 43,
+      "source_literal": "Следовать часовому поясу телефона"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 44,
+      "source_literal": "Использовать пояс телефона"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 46,
+      "source_literal": "Сейчас: ${zoneSummary(current, now)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 47,
+      "source_literal": "Найти пояс IANA, например Europe/Moscow"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 51,
+      "source_literal": "Пояс не найден"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 54,
+      "source_literal": "Выбран"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 66,
+      "source_literal": "Граница отчётного дня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 69,
+      "source_literal": "Граница дня на час раньше"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 71,
+      "source_literal": "Граница дня на час позже"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 73,
+      "source_literal": "В полночь, как в календаре"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 74,
+      "source_literal": "Записи до ${boundaryClock(value)} относятся к предыдущему дню. Сами записи не меняются"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/ReportingSettings.kt",
+      "line": 76,
+      "source_literal": "В полночь"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 28,
+      "source_literal": "Эта неделя"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 29,
+      "source_literal": "Прошлая неделя"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 30,
+      "source_literal": "Этот месяц"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 31,
+      "source_literal": "Прошлый месяц"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 32,
+      "source_literal": "7 дней"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 33,
+      "source_literal": "30 дней"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 34,
+      "source_literal": "90 дней"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 36,
+      "source_literal": "${w.days} дней"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 42,
+      "source_literal": "Свои отчёты"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 48,
+      "source_literal": "Свой отчёт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 51,
+      "source_literal": "Свой отчёт: занятие и период"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 51,
+      "source_literal": "Ещё отчёт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 63,
+      "source_literal": ", период ещё идёт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 65,
+      "source_literal": "Занятие: ${it.title}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 67,
+      "source_literal": "Занятие этого отчёта удалено или в архиве. Отчёт считает только его прошлые записи."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 80,
+      "source_literal": "Удалить отчёт «${r.query.name}»?"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 80,
+      "source_literal": "Удалится только сохранённый отчёт. Записи не меняются."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 80,
+      "source_literal": "Удалить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 107,
+      "source_literal": "Все занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 109,
+      "source_literal": "Свой отчёт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 109,
+      "source_literal": "Изменить отчёт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 112,
+      "source_literal": "Что считать"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 113,
+      "source_literal": "Все занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 113,
+      "source_literal": "Нажми, чтобы выбрать одно занятие или раздел"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 113,
+      "source_literal": "Вместе со всем, что внутри"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 115,
+      "source_literal": "Все занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 118,
+      "source_literal": "Период"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 126,
+      "source_literal": "Название"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SavedReportsUi.kt",
+      "line": 127,
+      "source_literal": "Отчёт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 60,
+      "source_literal": "Настройки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 60,
+      "source_literal": "Вид"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 60,
+      "source_literal": "Таймер вне приложения"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 60,
+      "source_literal": "Резервная копия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 61,
+      "source_literal": "Занятия и план"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 61,
+      "source_literal": "Фокус и напоминания"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 61,
+      "source_literal": "Ещё"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 61,
+      "source_literal": "Удалённое"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 156,
+      "source_literal": "${Format.dayTitle(Instant.ofEpochMilli(at).atZone(zone).toLocalDate(), today).lowercase()} в ${Format.clock(at, zone)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 163,
+      "source_literal": "Назад к настройкам"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 170,
+      "source_literal": "Разделы"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 171,
+      "source_literal": "уведомление"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 171,
+      "source_literal": "плавающая кнопка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 172,
+      "source_literal": "виджет"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 172,
+      "source_literal": "ярлык на значке"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 176,
+      "source_literal": "Чему-то не хватает разрешения телефона"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 176,
+      "source_literal": "Всё выключено: учёт только в приложении"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 182,
+      "source_literal": "Автокопия сохраняется"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 183,
+      "source_literal": "Автокопия ${whenText(a.lastSuccess!!.verifiedAt)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 184,
+      "source_literal": "Автокопия включена, первая скоро появится"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 185,
+      "source_literal": "Последняя ${whenText(last!!.at)}. Автокопия выключена"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 186,
+      "source_literal": "Копий ещё не было. Включи автокопию в папку"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 192,
+      "source_literal": "избранное"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 192,
+      "source_literal": "избранных"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 192,
+      "source_literal": "избранных"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 192,
+      "source_literal": "Избранного пока нет"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 193,
+      "source_literal": "в плане ${Format.plural(plans, "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 193,
+      "source_literal": "занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 193,
+      "source_literal": "занятий"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 193,
+      "source_literal": "плана нет"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 197,
+      "source_literal": "Фокус ${it.workMs / 60_000L} + ${it.breakMs / 60_000L} мин"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 197,
+      "source_literal": "Фокус"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 198,
+      "source_literal": ", спросит о долгой записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 205,
+      "source_literal": "Есть обновление каталога занятий"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 205,
+      "source_literal": "Часовой пояс, начало дня, каталог, CSV"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 215,
+      "source_literal": "(not)AI Time Tracker ${version.orEmpty()}. Все записи хранятся на этом телефоне"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 222,
+      "source_literal": "На экранах телефона"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 224,
+      "source_literal": "Уведомление"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 225,
+      "source_literal": "Старт и стоп из шторки, быстрый выбор занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 228,
+      "source_literal": "Разрешить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 229,
+      "source_literal": "Открыть настройки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 241,
+      "source_literal": "Плавающая кнопка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 242,
+      "source_literal": "Полупрозрачный старт и стоп поверх приложений. После стопа можно сразу выбрать занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 244,
+      "source_literal": "Разрешить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 249,
+      "source_literal": "Фон окна выбора после стопа"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 256,
+      "source_literal": "Виджет"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 258,
+      "source_literal": "На главном экране, кнопки выключены"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 259,
+      "source_literal": "Выключен"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 260,
+      "source_literal": "На главном экране: ${w?.ids?.size}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 260,
+      "source_literal": "На главном экране"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 261,
+      "source_literal": "Подтверди добавление на рабочем столе"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 262,
+      "source_literal": "Не появился. Попробуй ещё раз или добавь вручную: долгое нажатие на рабочем столе → Виджеты → (not)AI Time"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 263,
+      "source_literal": "Рабочий стол не умеет добавлять виджеты из приложений. Добавь вручную: долгое нажатие на рабочем столе → Виджеты → (not)AI Time"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 264,
+      "source_literal": "Телефон не принял запрос. Попробуй ещё раз"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 265,
+      "source_literal": "Ещё не на главном экране"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 268,
+      "source_literal": "Добавить на экран"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 268,
+      "source_literal": "Попробовать ещё раз"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 273,
+      "source_literal": "Фон виджета"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 277,
+      "source_literal": "Ярлык на значке"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 277,
+      "source_literal": "Долгое нажатие на значок: старт и стоп, выбор занятия и два первых избранных"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 296,
+      "source_literal": "Во время отрезка работы"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 298,
+      "source_literal": "Не беспокоить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 300,
+      "source_literal": "Нужен Android 10 или новее"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 301,
+      "source_literal": "Включено, но телефон ещё не разрешил приложению режим «Не беспокоить»"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 302,
+      "source_literal": "На время работы приложение включает своё правило «Не беспокоить» с приоритетными уведомлениями. Исключения задаёт телефон. После работы приложение снимает своё правило"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 304,
+      "source_literal": "Разрешить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 311,
+      "source_literal": "Свой звук"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 312,
+      "source_literal": "«$it». Играет по кругу, пока приложение открыто"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 313,
+      "source_literal": "Шум, дождь или музыка из твоего файла. Играет, пока приложение открыто"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 314,
+      "source_literal": "Выбрать файл"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 314,
+      "source_literal": "Другой файл"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 319,
+      "source_literal": "Сигналы"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 321,
+      "source_literal": "Сигнал Фокуса"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 322,
+      "source_literal": "Уведомить, когда отрезок закончился. Телефон может немного задержать сигнал"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 325,
+      "source_literal": "Разрешить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 326,
+      "source_literal": "Открыть настройки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 339,
+      "source_literal": "Дни в истории"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 340,
+      "source_literal": "Часовой пояс"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 341,
+      "source_literal": "Автоматически"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 341,
+      "source_literal": "Вручную"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 347,
+      "source_literal": "Граница отчётного дня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 352,
+      "source_literal": "Дополнительно"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 353,
+      "source_literal": "Граница отчётного дня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 357,
+      "source_literal": "Каталог и таблицы"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 362,
+      "source_literal": "Каталог занятий: есть обновление"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 362,
+      "source_literal": "Каталог занятий"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 363,
+      "source_literal": "Версия $bundled: понятные названия и разделы по местам. Твои названия и история останутся. Нажми, чтобы посмотреть"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 364,
+      "source_literal": "занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 364,
+      "source_literal": "занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 364,
+      "source_literal": "занятий"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 364,
+      "source_literal": ")}, версия ${installed ?: "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 364,
+      "source_literal": "}. Нажми, чтобы проверить обновление"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 367,
+      "source_literal": "Экспорт в CSV"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 367,
+      "source_literal": "Вся история для таблиц. Это не резервная копия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 369,
+      "source_literal": "Импорт из CSV"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 369,
+      "source_literal": "Из Toggl, Clockify или своей таблицы. Сначала покажу, что добавится"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 372,
+      "source_literal": "О приложении"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 373,
+      "source_literal": "Техническая оболочка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 373,
+      "source_literal": "Измерения, календарь, восстановление базы"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 378,
+      "source_literal": "Записи хранятся на этом телефоне; копии — там, куда ты их сохранишь"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 380,
+      "source_literal": "Лицензии"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 388,
+      "source_literal": "Заменить все данные?"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 389,
+      "source_literal": "В копии ${Format.plural(p.sessions, "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 389,
+      "source_literal": "записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 389,
+      "source_literal": "записей"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 389,
+      "source_literal": "своё занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 389,
+      "source_literal": "своих занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 389,
+      "source_literal": "своих занятий"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 390,
+      "source_literal": "цель"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 390,
+      "source_literal": "цели"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 390,
+      "source_literal": "целей"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 391,
+      "source_literal": " Незакрытая запись придёт как «время неизвестно», её нужно будет уточнить."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 392,
+      "source_literal": " Текущие данные будут сохранены отдельно перед заменой. Записи, сделанные после этой копии, исчезнут."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 393,
+      "source_literal": "Заменить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 397,
+      "source_literal": "Каталог уже актуален"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 397,
+      "source_literal": "Обновить каталог?"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 398,
+      "source_literal": "Версия ${p.version}. Новых занятий: ${r.added.size}, уточнений: ${r.updated.size}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 399,
+      "source_literal": ", расхождений со своими изменениями: ${r.conflicts.size}. Они требуют разбора в технической оболочке."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 400,
+      "source_literal": " Названия, которые ты менял сам, останутся твоими; прошлые записи не меняются."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 401,
+      "source_literal": "Обновить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 404,
+      "source_literal": "Сменить часовой пояс отчётов на $z?"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 405,
+      "source_literal": "Изменятся границы дней в истории и обзоре. Сами записи и зоны целей не меняются."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 405,
+      "source_literal": "Сменить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 412,
+      "source_literal": "Использовать пояс телефона?"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 413,
+      "source_literal": "${zoneSummary(ZoneId.systemDefault(), vm.now())}. При смене пояса телефона границы дней в истории и обзоре будут следовать ему. Сами записи и зоны целей не меняются."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 414,
+      "source_literal": "Автоматически"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 444,
+      "source_literal": "Включено, но нет разрешения телефона"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 445,
+      "source_literal": "Включено, но уведомления выключены в настройках телефона"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 446,
+      "source_literal": "Телефон не дал включить. Попробуй ещё раз"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 461,
+      "source_literal": "Акцент"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 470,
+      "source_literal": "Размер текста"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 475,
+      "source_literal": "Шрифт, цифры и главный экран"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 475,
+      "source_literal": "${a.font.title}, цифры ${a.digits.title.lowercase()}, "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 476,
+      "source_literal": "компактно"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 476,
+      "source_literal": "просторно"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 488,
+      "source_literal": "Тема: ${t.title}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 516,
+      "source_literal": "Английский · с 14:05"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 519,
+      "source_literal": "Шрифт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 520,
+      "source_literal": "Цифры таймера"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 521,
+      "source_literal": "Плотность списков"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 521,
+      "source_literal": "Просторно"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 521,
+      "source_literal": "Компактно"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 522,
+      "source_literal": "Главный экран"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 523,
+      "source_literal": "Приглашение на «Начать»"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 523,
+      "source_literal": "Скобки медленно дышат, пока учёт не идёт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 524,
+      "source_literal": "Кнопка Фокуса"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 524,
+      "source_literal": "Под быстрым стартом. Долгое нажатие — длительности"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 525,
+      "source_literal": "Полоска из отрезков над записями каждого дня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 527,
+      "source_literal": "Вернуть как было"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 554,
+      "source_literal": "На экране блокировки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 556,
+      "source_literal": "Полностью"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 556,
+      "source_literal": "Кратко"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 557,
+      "source_literal": "Скрыть"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 558,
+      "source_literal": "Занятие, время и кнопки видны без разблокировки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 559,
+      "source_literal": "Без разблокировки видно только, что учёт идёт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 560,
+      "source_literal": "На заблокированном экране карточки нет"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 562,
+      "source_literal": "Значок в строке состояния"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 564,
+      "source_literal": "Значок в строке состояния скрыт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 564,
+      "source_literal": "Значок в строке состояния"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 565,
+      "source_literal": "Чтобы скрыть его и оставить карточку в шторке, включи «Свернуть» или «Без значка» в настройках этого уведомления"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 568,
+      "source_literal": "Открыть"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 582,
+      "source_literal": "непрозрачный"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 585,
+      "source_literal": "$title: $v процентов"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 602,
+      "source_literal": "Если запись идёт дольше $hours ч, тихо спросить в шторке, не забыт ли таймер"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 603,
+      "source_literal": "Включено в восстановленной копии. На этом телефоне нужно подтвердить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 603,
+      "source_literal": "Подтвердить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 604,
+      "source_literal": "Включено, но нет разрешения на уведомления"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 604,
+      "source_literal": "Разрешить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 605,
+      "source_literal": "Включено, но уведомления выключены в настройках телефона"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 605,
+      "source_literal": "Открыть настройки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 606,
+      "source_literal": "Через $hours ч записи спросит в шторке: продолжить, отложить или остановить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 608,
+      "source_literal": "Долгая запись"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 612,
+      "source_literal": "Спросить через"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 612,
+      "source_literal": "ч"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 619,
+      "source_literal": "Быстрые кнопки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 620,
+      "source_literal": "Избранное"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 621,
+      "source_literal": "Порядок, названия на кнопках, удаление повторов. Тот же порядок в шторке, виджете и на кнопке"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 623,
+      "source_literal": "План по дням"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 636,
+      "source_literal": "Добавить занятие в план"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 636,
+      "source_literal": "Добавить ещё"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 637,
+      "source_literal": "Например, английский по понедельникам и средам. В эти дни он будет ждать на главном экране"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 652,
+      "source_literal": "Длительности Фокуса"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 653,
+      "source_literal": "Отрезок работы"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 655,
+      "source_literal": "Перерыв"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 660,
+      "source_literal": "мин"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 666,
+      "source_literal": "$title: меньше"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 669,
+      "source_literal": "$title: больше"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 727,
+      "source_literal": "Отмена"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 727,
+      "source_literal": "Понятно"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 738,
+      "source_literal": "${Format.dayTitle(Instant.ofEpochMilli(at).atZone(zone).toLocalDate(), today).lowercase()} в ${Format.clock(at, zone)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 740,
+      "source_literal": "Автокопия в папку"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 742,
+      "source_literal": "Автокопия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 742,
+      "source_literal": "Недоступна в этой сборке"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 748,
+      "source_literal": "Сама сохраняет полную копию в выбранную папку: на телефоне или в облаке, если приложение облака даёт папку. Такая копия переживёт удаление приложения"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 749,
+      "source_literal": "Выключена. Новые копии не сохраняются, прежние остаются в папке"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 750,
+      "source_literal": "Приостановлена после пяти неудач подряд. ${err?.let { Format.backupProblem(it) } ?: "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 752,
+      "source_literal": "Сохраняю копию"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 753,
+      "source_literal": "Последняя ${whenText(s.lastSuccess!!.verifiedAt)}, файл проверен"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 754,
+      "source_literal": "Первая копия появится через пару минут"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 759,
+      "source_literal": "Выбрать папку"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 760,
+      "source_literal": "Повторить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 763,
+      "source_literal": "Автокопия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 768,
+      "source_literal": "Папка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 768,
+      "source_literal": "Сменить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 768,
+      "source_literal": "Выбранная папка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 774,
+      "source_literal": "Хранить копий"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 776,
+      "source_literal": "После изменений копия сохраняется через пару минут, когда телефон разрешит фоновую работу. Раз в сутки — даже без изменений. "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 777,
+      "source_literal": "Старые копии убираются, только когда новая проверена."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 779,
+      "source_literal": "Сохранить сейчас"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 781,
+      "source_literal": "Пропустить эту"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 787,
+      "source_literal": "Копии в папке"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 788,
+      "source_literal": "Нажми на копию: сначала покажу, что в ней, заменю данные только после подтверждения"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 796,
+      "source_literal": "Вручную"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 801,
+      "source_literal": "Файл копии"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 802,
+      "source_literal": "Последний ${whenText(it.at)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 802,
+      "source_literal": ", файл проверен"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 802,
+      "source_literal": "С этого телефона файлов ещё не сохраняли"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 805,
+      "source_literal": "запись"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 805,
+      "source_literal": "записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 805,
+      "source_literal": "записей"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 805,
+      "source_literal": "своё занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 805,
+      "source_literal": "своих занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 805,
+      "source_literal": "своих занятий"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 806,
+      "source_literal": "цель"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 806,
+      "source_literal": "цели"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 806,
+      "source_literal": "целей"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 814,
+      "source_literal": "После переустановки выбери здесь любой файл из папки автокопий. Копия — не синхронизация между телефонами."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 821,
+      "source_literal": "%.1f МБ"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/SettingsScreen.kt",
+      "line": 822,
+      "source_literal": "${(bytes + 1023) / 1024} КБ"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Theme.kt",
+      "line": 110,
+      "source_literal": "Авто"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Theme.kt",
+      "line": 110,
+      "source_literal": "Светлая"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Theme.kt",
+      "line": 110,
+      "source_literal": "Тёмная"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Theme.kt",
+      "line": 110,
+      "source_literal": "Чёрная"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/Theme.kt",
+      "line": 110,
+      "source_literal": "Неон"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 104,
+      "source_literal": "Светлая тема"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 104,
+      "source_literal": "Тёмная тема"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 169,
+      "source_literal": "Начать учёт времени"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 169,
+      "source_literal": "Начать учёт времени"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 175,
+      "source_literal": "Время пойдёт сразу.\\nЗанятие можно выбрать потом."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 179,
+      "source_literal": "По плану на сегодня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 188,
+      "source_literal": "Начать сразу"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 191,
+      "source_literal": "Начать с занятием"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 191,
+      "source_literal": "Все занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 203,
+      "source_literal": "Прошло ${Format.duration(ms)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 214,
+      "source_literal": "Выбрать занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 221,
+      "source_literal": "Сменить или уточнить занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 245,
+      "source_literal": "На паузе. Пауза не входит во время занятия."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 247,
+      "source_literal": "С ${Format.clock(start, zone)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 248,
+      "source_literal": "Идёт с ${Format.clock(start, zone)}. Начало сохранится при выборе."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 252,
+      "source_literal": "Пауза"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 253,
+      "source_literal": "Продолжить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 259,
+      "source_literal": "Начал раньше"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 262,
+      "source_literal": "Переключился раньше"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 267,
+      "source_literal": "Дальше по плану"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 279,
+      "source_literal": "Начать Фокус"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 279,
+      "source_literal": "Настроить Фокус"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 282,
+      "source_literal": "Фокус: $minutes мин работы"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 299,
+      "source_literal": "Изменить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 300,
+      "source_literal": "Изменить занятие"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 301,
+      "source_literal": "Убрать из избранного"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 302,
+      "source_literal": "В избранное"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 303,
+      "source_literal": "Порядок и всё избранное"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 329,
+      "source_literal": "Начать по плану"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 329,
+      "source_literal": "Действия с планом"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 331,
+      "source_literal": ", уже начато"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 340,
+      "source_literal": "Убрать на сегодня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 358,
+      "source_literal": "Начало ${Format.clock(start, zone)}, конец неизвестен"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 366,
+      "source_literal": "Конец неизвестен"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 366,
+      "source_literal": "Время неизвестно"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 372,
+      "source_literal": "Не учитывать с ${Format.clock(start, zone)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 372,
+      "source_literal": "Не учитывать"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 385,
+      "source_literal": "Фокус, отрезок работы ${f.phaseIndex / 2 + 1}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 385,
+      "source_literal": "Фокус, перерыв"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 389,
+      "source_literal": "Осталось ${Format.duration(f.remainingMs)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 392,
+      "source_literal": "Отрезок работы закончился"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 392,
+      "source_literal": "Перерыв закончился"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 393,
+      "source_literal": "осталось из ${Format.duration(f.durationMs)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 401,
+      "source_literal": "Пауза"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 402,
+      "source_literal": "Продолжить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 403,
+      "source_literal": "Начать перерыв"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 403,
+      "source_literal": "Начать работу"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 407,
+      "source_literal": "Пропустить отрезок"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 407,
+      "source_literal": "Пропустить перерыв"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 422,
+      "source_literal": "Записей пока нет. Здесь появится каждый отрезок."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 422,
+      "source_literal": "Записей нет."
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 431,
+      "source_literal": "Скрыть промежутки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 431,
+      "source_literal": "промежуток"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 431,
+      "source_literal": "промежутка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 431,
+      "source_literal": "промежутков"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 431,
+      "source_literal": " без записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 433,
+      "source_literal": "Скрыть промежутки без записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 433,
+      "source_literal": "Показать промежутки без записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 484,
+      "source_literal": "Убрать из выбранных"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 484,
+      "source_literal": "Выбрать"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 484,
+      "source_literal": "Исправить запись"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 485,
+      "source_literal": "Действия с записью"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 500,
+      "source_literal": "Повторить: ${e.label.title}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 517,
+      "source_literal": "2 паузы"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 538,
+      "source_literal": "Убрать из выбранных"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 538,
+      "source_literal": "Выбрать"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 538,
+      "source_literal": "Исправить запись"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 539,
+      "source_literal": "Действия с записью"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 554,
+      "source_literal": "Свернуть отрезки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 554,
+      "source_literal": "Показать отрезки и паузы"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 556,
+      "source_literal": "пауза"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 556,
+      "source_literal": "паузы"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 556,
+      "source_literal": "пауз"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 556,
+      "source_literal": "разные занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 563,
+      "source_literal": "Повторить: ${e.label.title}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 579,
+      "source_literal": "пауза"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 599,
+      "source_literal": "не записано"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 600,
+      "source_literal": "пауза"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 601,
+      "source_literal": "время неизвестно"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 604,
+      "source_literal": "Записать промежуток"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 616,
+      "source_literal": "Записать"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 632,
+      "source_literal": "Исправить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 633,
+      "source_literal": "Повторить"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 634,
+      "source_literal": "Выбрать несколько"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 681,
+      "source_literal": "Готово"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TimerScreen.kt",
+      "line": 681,
+      "source_literal": "Готово · ${picked.size}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 74,
+      "source_literal": "Вся область"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 77,
+      "source_literal": "День"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 77,
+      "source_literal": "7 дней"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 77,
+      "source_literal": "30 дней"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 104,
+      "source_literal": "Работа"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 104,
+      "source_literal": "Учёба"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 104,
+      "source_literal": "Язык"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 105,
+      "source_literal": "Чтение"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 105,
+      "source_literal": "Письмо"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 105,
+      "source_literal": "Силовая"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 106,
+      "source_literal": "Кардио"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 106,
+      "source_literal": "Прогулка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 106,
+      "source_literal": "Готовка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 107,
+      "source_literal": "Уборка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 107,
+      "source_literal": "Кино и сериалы"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 107,
+      "source_literal": "Отдых"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 121,
+      "source_literal": "отрезок"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 121,
+      "source_literal": "отрезка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 121,
+      "source_literal": "отрезков"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 121,
+      "source_literal": " между паузами"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 122,
+      "source_literal": "измерение"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 122,
+      "source_literal": "измерения"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 122,
+      "source_literal": "измерений"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 123,
+      "source_literal": "связь с предметом"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 123,
+      "source_literal": "связи с предметами"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 123,
+      "source_literal": "связей с предметами"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 124,
+      "source_literal": "запись подхода"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 124,
+      "source_literal": "записи подходов"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 124,
+      "source_literal": "записей подходов"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 125,
+      "source_literal": "запись событийной величины"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 125,
+      "source_literal": "записи событийных величин"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 125,
+      "source_literal": "записей событийных величин"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 126,
+      "source_literal": "основание темпа"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 126,
+      "source_literal": "основания темпа"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 126,
+      "source_literal": "оснований темпа"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 183,
+      "source_literal": "Не удалось определить выбранный значок. Выбери доступный вариант"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 190,
+      "source_literal": "Не удалось проверить значок приложения"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 201,
+      "source_literal": "Значок выбран, но ярлыки пока не обновились"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 205,
+      "source_literal": "Не удалось переключить значок"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 206,
+      "source_literal": "Не удалось проверить результат переключения"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 435,
+      "source_literal": "Убрано из плана на сегодня"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 455,
+      "source_literal": "Добавлено в план"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 455,
+      "source_literal": "План изменён"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 475,
+      "source_literal": "Убрано из плана"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 500,
+      "source_literal": "Выбор занятия устарел"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 501,
+      "source_literal": "Записано"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 514,
+      "source_literal": "Занятие «$trimmed» создано"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 631,
+      "source_literal": "Записано"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 655,
+      "source_literal": "Новая запись начата"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 689,
+      "source_literal": "Занятие «$trimmed» создано"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 736,
+      "source_literal": "Время уточнено"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 739,
+      "source_literal": "Неизвестный отрезок не учтён"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 750,
+      "source_literal": "Отрезки изменены"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 754,
+      "source_literal": "Добавлено в избранное"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 757,
+      "source_literal": "Убрано из избранного"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 771,
+      "source_literal": "Убрано из избранного вместе с повторами"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 771,
+      "source_literal": "Убрано из избранного"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 785,
+      "source_literal": "Порядок сохранён"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 787,
+      "source_literal": "Избранное изменено"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 792,
+      "source_literal": "Занятие сохранено"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 794,
+      "source_literal": "Категория сохранена"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 835,
+      "source_literal": "«${picked.single().title}» — теперь старт в одно касание"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 835,
+      "source_literal": "Готово: ${Format.plural(picked.size, "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 835,
+      "source_literal": "занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 835,
+      "source_literal": "занятий"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 890,
+      "source_literal": "Нет данных"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 907,
+      "source_literal": "Запись исправлена"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 909,
+      "source_literal": "Запись добавлена"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 914,
+      "source_literal": "Промежуток записан"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 932,
+      "source_literal": "Начало записи перенесено"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 956,
+      "source_literal": "Без области"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 980,
+      "source_literal": "осталось ${amount(p.remaining)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 981,
+      "source_literal": "есть"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 982,
+      "source_literal": "в пределах"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 983,
+      "source_literal": "больше на ${amount(p.excess)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 985,
+      "source_literal": "${amount(p.actual)} с записями"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 986,
+      "source_literal": ", есть неизвестное время"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1002,
+      "source_literal": "Цель поставлена"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1002,
+      "source_literal": "Цель изменена"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1012,
+      "source_literal": "Цель убрана"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1055,
+      "source_literal": "Без своего занятия"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1061,
+      "source_literal": "Отчёт сохранён"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1061,
+      "source_literal": "Отчёт изменён"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1067,
+      "source_literal": "Отчёт удалён"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1078,
+      "source_literal": "Сегодня, ${Format.dayMonth(today)}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1079,
+      "source_literal": "Всего "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1079,
+      "source_literal": ", день ещё идёт"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1082,
+      "source_literal": "Без области"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1083,
+      "source_literal": "Неизвестное время не входит в итог: "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1084,
+      "source_literal": "отрезок"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1084,
+      "source_literal": "отрезка"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1084,
+      "source_literal": "отрезков"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1087,
+      "source_literal": "Заметки"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1101,
+      "source_literal": "Часовой пояс отчётов: $zone"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1110,
+      "source_literal": "Часовой пояс отчётов следует за устройством. Записи могут перейти на другой день"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1110,
+      "source_literal": "Часовой пояс отчётов закреплён"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1116,
+      "source_literal": "День начинается в ${minute / 60}:${(minute % 60).toString().padStart(2, '0')}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1277,
+      "source_literal": "Сохранение отменено"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1286,
+      "source_literal": "Файл сохранён и проверен"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1286,
+      "source_literal": "Файл сохранён. Проверить его чтением нельзя"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1322,
+      "source_literal": "Данные восстановлены. Прежние сохранены отдельно"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1351,
+      "source_literal": "Не удалось взять этот файл. Попробуй другой, до 64 МБ"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1423,
+      "source_literal": "Изменено ${Format.plural(n, "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1423,
+      "source_literal": "записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1423,
+      "source_literal": "записей"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1442,
+      "source_literal": "Это файл резервной копии. Восстанови его в разделе «Резервная копия»"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1443,
+      "source_literal": "Этот файл не таблица CSV. ${inspection.problems.firstOrNull().orEmpty()}"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1464,
+      "source_literal": "Добавлено ${Format.plural(result.added, "
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1464,
+      "source_literal": "записи"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1464,
+      "source_literal": "записей"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1464,
+      "source_literal": ", повторы пропущены"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1486,
+      "source_literal": "Папка выбрана. Первая копия появится через пару минут"
+    },
+    {
+      "file": "app/src/main/kotlin/dev/notai/tracker/android/ui/TrackerViewModel.kt",
+      "line": 1517,
+      "source_literal": "Каталог обновлён"
+    }
+  ]
+}

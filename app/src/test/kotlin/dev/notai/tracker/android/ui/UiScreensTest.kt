@@ -958,6 +958,8 @@ class UiScreensTest {
         // queue until the real rendered result arrives, keeping the same assertion/deadline.
         compose.waitUntil(15_000) {
             org.robolectric.shadows.ShadowLooper.idleMainLooper(16,java.util.concurrent.TimeUnit.MILLISECONDS)
+            assertTrue("The bounded pump must release the queued Main frame before inspection",frameDelivered.get())
+            compose.mainClock.advanceTimeByFrame()
             compose.onAllNodesWithText("Всего",substring = true).fetchSemanticsNodes().isNotEmpty()
         }
         assertTrue("The bounded wait must deliver future Main-frame work",frameDelivered.get())

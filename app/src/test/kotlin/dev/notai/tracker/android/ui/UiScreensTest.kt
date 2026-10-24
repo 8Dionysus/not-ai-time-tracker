@@ -663,7 +663,8 @@ class UiScreensTest {
         compose.waitUntil(5_000) { s.tracker.data().sessions.any { it.id == id } }
         assertTrue(before.sessions == s.tracker.data().sessions);assertTrue(before.segments == s.tracker.data().segments)
         compose.runOnIdle { vm.setLanguage(null) }
-        compose.waitUntil(5_000) { vm.language.value.preference.explicitTag == null }
+        waitText("Настройки") // Drain UI recomposition/Main dispatch as well as the preference IO.
+        assertTrue(vm.language.value.preference.explicitTag == null)
     }
 
     /** «Выбрать несколько» from the menu, a second tap adds another, and one note goes to both after a confirmation. */

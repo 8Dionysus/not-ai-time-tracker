@@ -749,6 +749,7 @@ class UiScreensTest {
         shot("09-delete-confirm", vm)
         compose.onNodeWithText("Удалить").performClick()
         compose.waitUntil(5_000) { t.data().sessions.size == before.sessions.size - 1 }
+        assertTrue(t.data().sessions == before.sessions.filterNot { it.id == record.id })
         val archived = t.data().deletedRecords.single()
         assertTrue(archived.session.value == record)
         assertTrue(archived.segments.map { it.value } == before.segments.filter { it.sessionId == record.id })

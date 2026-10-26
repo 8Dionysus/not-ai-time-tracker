@@ -180,7 +180,7 @@ fun GoalSheet(vm: TrackerViewModel, initial: GoalDraft?, onPickActivity: ((Class
                     metric, ::pickMetric, Modifier.fillMaxWidth())
             }
             Field(L.s(R.string.t_b2822e2bb3)) {
-                if (editing) Text("${when (period) { GoalPeriod.DAY -> "День"; GoalPeriod.WEEK -> "Неделя"; GoalPeriod.MONTH -> "Месяц"; GoalPeriod.FIXED -> "Свои даты" }}. " +
+                if (editing) Text("${when (period) { GoalPeriod.DAY -> L.s(R.string.t_b6ef08401f); GoalPeriod.WEEK -> L.s(R.string.t_9207563dab); GoalPeriod.MONTH -> L.s(R.string.t_e558fb6e24); GoalPeriod.FIXED -> L.s(R.string.t_90d0002e66) }}. " +
                     L.s(R.string.t_d4a88f5588), style = NotAi.type.bodySmall, color = c.ink2)
                 else Segmented(listOf(GoalPeriod.DAY to L.s(R.string.t_b6ef08401f), GoalPeriod.WEEK to L.s(R.string.t_9207563dab), GoalPeriod.MONTH to L.s(R.string.t_e558fb6e24)), period, {
                     period = it; if (metric == GoalMetric.DISTINCT_RECORDED_DAYS) target = target.coerceAtMost(if (it == GoalPeriod.MONTH) 31 else 7)

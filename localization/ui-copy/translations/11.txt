@@ -1,0 +1,13 @@
+t_restore_all ‖ Restore all (%1$s) ‖ Restaurar todo (%1$s) ‖ Tout restaurer (%1$s) ‖ Restaurar tudo (%1$s) ‖ Alle wiederherstellen (%1$s) ‖ Ripristina tutto (%1$s) ‖ استعادة الكل (%1$s) ‖ 全部恢复（%1$s） ‖ すべて復元（%1$s） ‖ 모두 복원(%1$s) ‖ सभी बहाल करें (%1$s)
+t_deleted_on ‖ Deleted · %1$s ‖ Eliminados · %1$s ‖ Supprimées · %1$s ‖ Excluídos · %1$s ‖ Gelöscht · %1$s ‖ Eliminate · %1$s ‖ حُذفت · %1$s ‖ 删除于 · %1$s ‖ 削除日 · %1$s ‖ 삭제 · %1$s ‖ हटाए गए · %1$s
+t_restore_all_title ‖ Restore %1$s? ‖ ¿Restaurar %1$s? ‖ Restaurer %1$s ? ‖ Restaurar %1$s? ‖ %1$s wiederherstellen? ‖ Ripristinare %1$s? ‖ استعادة %1$s؟ ‖ 恢复 %1$s？ ‖ %1$sを復元しますか？ ‖ %1$s을 복원할까요? ‖ %1$s बहाल करें?
+t_restore_all_body ‖ The entries go back to their former places in your history. ‖ Los registros vuelven a su lugar en el historial. ‖ Les entrées reprennent leur place dans l’historique. ‖ Os registros voltam ao lugar de antes no histórico. ‖ Die Einträge kehren an ihre bisherigen Stellen im Verlauf zurück. ‖ Le voci tornano al loro posto nella cronologia. ‖ تعود السجلات إلى أماكنها السابقة في السجل. ‖ 条目会回到历史中原来的位置。 ‖ 記録は履歴の元の場所に戻ります。 ‖ 기록이 원래 자리로 돌아가요. ‖ प्रविष्टियाँ इतिहास में अपनी पुरानी जगह लौट आएँगी।
+t_restore_all_confirm ‖ Restore ‖ Restaurar ‖ Restaurer ‖ Restaurar ‖ Wiederherstellen ‖ Ripristina ‖ استعادة ‖ 恢复 ‖ 復元 ‖ 복원 ‖ बहाल करें
+t_restore_all_done ‖ Entries restored: %1$s ‖ Registros restaurados: %1$s ‖ Entrées restaurées : %1$s ‖ Registros restaurados: %1$s ‖ Wiederhergestellte Einträge: %1$s ‖ Voci ripristinate: %1$s ‖ السجلات المستعادة: %1$s ‖ 已恢复条目：%1$s ‖ 復元した記録：%1$s ‖ 복원한 기록: %1$s ‖ बहाल प्रविष्टियाँ: %1$s
+t_bc4d1d35af ‖ as in the file ‖ como en el archivo ‖ comme dans le fichier ‖ como no arquivo ‖ wie in der Datei ‖ come nel file ‖ كما في الملف ‖ 与文件一致 ‖ ファイルのまま ‖ 파일 그대로 ‖ फ़ाइल जैसा
+t_ced07fd144 ‖ none ‖ ninguna ‖ aucune ‖ nenhuma ‖ keine ‖ nessuna ‖ لا شيء ‖ 无 ‖ なし ‖ 없음 ‖ कोई नहीं
+t_096312396e ‖ For %1$s ‖ En %1$s ‖ Sur %1$s ‖ Em %1$s ‖ In %1$s ‖ In %1$s ‖ خلال %1$s ‖ %1$s内 ‖ %1$s ‖ %1$s 동안 ‖ %1$s में
+t_90d0002e66 ‖ Custom dates ‖ Fechas propias ‖ Dates personnalisées ‖ Datas próprias ‖ Eigene Daten ‖ Date personalizzate ‖ تواريخ مخصصة ‖ 自定义日期 ‖ 日付を指定 ‖ 날짜 직접 지정 ‖ अपनी तारीखें
+t_7aeae28ae9 ‖ no card ‖ sin tarjeta ‖ sans carte ‖ sem cartão ‖ ohne Karte ‖ senza scheda ‖ بلا بطاقة ‖ 无卡片 ‖ カードなし ‖ 카드 없음 ‖ बिना कार्ड
+t_6ae7f2feef ‖ all day ‖ todo el día ‖ toute la journée ‖ dia inteiro ‖ ganztägig ‖ tutto il giorno ‖ طوال اليوم ‖ 全天 ‖ 終日 ‖ 하루 종일 ‖ पूरा दिन
+t_72aecd9ad8 ‖ Error ‖ Error ‖ Erreur ‖ Erro ‖ Fehler ‖ Errore ‖ خطأ ‖ 错误 ‖ エラー ‖ 오류 ‖ त्रुटि

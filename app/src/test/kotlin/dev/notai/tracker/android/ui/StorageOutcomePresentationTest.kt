@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.*
 import org.junit.Test
 
+@org.junit.runner.RunWith(org.robolectric.RobolectricTestRunner::class)
+@org.robolectric.annotation.Config(sdk = [36], qualifiers = "ru-rRU")
 class StorageOutcomePresentationTest {
     @Test fun storageMessageDoesNotDenyAReadBackConfirmedCommit() {
         val store = object: StateStore {

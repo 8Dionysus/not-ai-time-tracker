@@ -164,7 +164,7 @@ fun CsvImportSheet(vm: TrackerViewModel, ui: CsvImportUi, zone: ZoneId, onPickAc
                             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                                 Text(a.activity.ifBlank { L.s(R.string.t_32b74a3c47) } + (a.category.takeIf { it.isNotBlank() }?.let { " · $it" } ?: ""),
                                     style = NotAi.type.body, color = c.ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                                Text("${L.p(R.plurals.p_09d3aef0c7, count)} → ${target?.second ?: "как в файле"}",
+                                Text("${L.p(R.plurals.p_09d3aef0c7, count)} → ${target?.second ?: L.s(R.string.t_bc4d1d35af)}",
                                     style = NotAi.type.caption, color = if (target != null) c.amberInk else c.ink2)
                             }
                             if (target != null) IconAction(Icon.Close, L.s(R.string.t_9e512e4de6), { targets.remove(a) }, size = 16.dp)
@@ -232,7 +232,7 @@ private fun ColumnPick(title: String, table: ColumnInspection, value: String?, r
     fun sample(col: String) = table.columns.indexOf(col).takeIf { it >= 0 }?.let { i -> table.examples.firstOrNull()?.getOrNull(i) }?.takeIf { it.isNotBlank() }
     Box {
         Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(RoundedCornerShape(14.dp)).background(c.sunk)
-            .pressable({ open = true }, label = "$title: ${value ?: "нет"}").padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            .pressable({ open = true }, label = "$title: ${value ?: L.s(R.string.t_ced07fd144)}").padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(title + if (required) "" else "", style = NotAi.type.caption, color = c.ink2)
                 Text(value?.let { v -> v + (sample(v)?.let { " · $it" } ?: "") } ?: L.s(R.string.t_210ed3cd4d), style = NotAi.type.body,

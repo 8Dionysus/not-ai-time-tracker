@@ -273,7 +273,7 @@ class TechnicalActivity: Activity() {
     }
     private fun showCsvPreview(preview: HistoryPreview,offset: Int = 0) {
         val rows = preview.intervals.drop(offset).take(30)
-        val text = rows.joinToString("\n") { "${Instant.ofEpochMilli(it.start)} → ${Instant.ofEpochMilli(it.end!!)} · ${it.selection.name.orEmpty()} · ${it.selection.cardId ?: "без карточки"}" }
+        val text = rows.joinToString("\n") { "${Instant.ofEpochMilli(it.start)} → ${Instant.ofEpochMilli(it.end!!)} · ${it.selection.name.orEmpty()} · ${it.selection.cardId ?: L.s(R.string.t_7aeae28ae9)}" }
         val dialog = AlertDialog.Builder(this).setTitle(L.s(R.string.t_117ce12b52, offset+1, offset+rows.size, preview.added))
             .setMessage(L.s(R.string.t_1bcdac8735, preview.added, preview.duplicates, text, preview.errors.size, preview.errors.take(30).joinToString("\n"), preview.warnings.joinToString("\n")))
             .setNegativeButton(L.s(R.string.t_0ec753be8d),null)
@@ -327,7 +327,7 @@ class TechnicalActivity: Activity() {
         withContext(Dispatchers.Main) {
             if(page.issue != null) { status.text = L.s(R.string.t_3c244ffaa5, page.issue);return@withContext }
             val dialog = AlertDialog.Builder(this@TechnicalActivity).setTitle(L.s(R.string.t_eca2a38089))
-                .setItems(page.occurrences.map { "${it.title ?: "Без названия"} · ${if(it.allDay) "весь день" else Instant.ofEpochMilli(it.reference.begin).toString()}" }.toTypedArray()) { _,index ->
+                .setItems(page.occurrences.map { "${it.title ?: L.s(R.string.t_32b74a3c47)} · ${if(it.allDay) L.s(R.string.t_6ae7f2feef) else Instant.ofEpochMilli(it.reference.begin).toString()}" }.toTypedArray()) { _,index ->
                     val ref = page.occurrences[index].reference
                     runAction {
                         val result = runtime.calendarOccurrences.readSelected(ref,enabled = true)
@@ -445,7 +445,7 @@ class TechnicalActivity: Activity() {
     private fun runAction(block: suspend ()->Unit) { launchAction(block) }
     private fun launchAction(block: suspend ()->Unit): Job = scope.launch {
         try { withContext(Dispatchers.IO) { block() } }
-        catch (e: Exception) { if (e is CancellationException) throw e; AlertDialog.Builder(this@TechnicalActivity).setMessage("${(e as? CoreError)?.code ?: "Ошибка"}: ${e.message}").setPositiveButton("OK",null).show() }
+        catch (e: Exception) { if (e is CancellationException) throw e; AlertDialog.Builder(this@TechnicalActivity).setMessage("${(e as? CoreError)?.code ?: L.s(R.string.t_72aecd9ad8)}: ${e.message}").setPositiveButton("OK",null).show() }
     }
     override fun onStart() { super.onStart(); visible = true; observeWhileVisible() }
     override fun onStop() { visible = false; observation?.cancel(); observation = null; super.onStop() }
@@ -457,7 +457,7 @@ class TechnicalActivity: Activity() {
                 reportText = withContext(Dispatchers.IO) {
                     val d = revision.data; val now = runtime.tracker.clock.now()
                     val report = revision.day(ReportingDayPolicy(d.settings.reportZone,d.settings.reportDayStartMinute).dateAt(now.wall))
-                    L.s(R.string.t_cc5d5d0fd4, Instant.ofEpochMilli(report.asOf), report.zone, report.recordedMs, report.unresolved.size, d.cards.joinToString { it.name }, d.sessions.size, d.segments.size, report.rows.joinToString("\n") { "${it.selection.name ?: "Без уточнения"}: ${it.durationMs} ms" })
+                    L.s(R.string.t_cc5d5d0fd4, Instant.ofEpochMilli(report.asOf), report.zone, report.recordedMs, report.unresolved.size, d.cards.joinToString { it.name }, d.sessions.size, d.segments.size, report.rows.joinToString("\n") { "${it.selection.name ?: L.s(R.string.t_5a7fa46600)}: ${it.durationMs} ms" })
                 }
                 while(isActive) {
                     val s = revision.snapshot(); shown = s

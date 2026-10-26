@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generated from Kotlin source copy; see docs/localization/UI_COPY.md. -->
+<!-- Generated from Kotlin source copy; see localization/ui-copy/README.md. -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="t_0076203bff" formatted="false">Démarrer la pause</string>
     <string name="t_0077164ed0">Export %1$s : relancez la préparation ; le fichier partiel est conservé</string>
@@ -25,6 +25,7 @@
     <string name="t_08f120e3b9" formatted="false">Lancer l’option enregistrée ?</string>
     <string name="t_090fad991e" formatted="false">Ouvrir les paramètres</string>
     <string name="t_0931eb69ad" formatted="false">Activité perso</string>
+    <string name="t_096312396e">Sur %1$s</string>
     <string name="t_09804101ad" formatted="false">Aéré</string>
     <string name="t_0a33cc879e">Retirer des favoris : %1$s</string>
     <string name="t_0a7d0c65cc" formatted="false">Enregistrement annulé</string>
@@ -334,6 +335,7 @@
     <string name="t_69d66ab891" formatted="false">Ajouter une activité au plan</string>
     <string name="t_69e5b8a8c6" formatted="false">Decimal non négatif, séparateur décimal : point</string>
     <string name="t_6a0e6066b0" formatted="false">Changé plus tôt</string>
+    <string name="t_6ae7f2feef" formatted="false">toute la journée</string>
     <string name="t_6b08862cb2" formatted="false">Impossible de vérifier l’icône de l’app</string>
     <string name="t_6b8910932e" formatted="false">Icône de la barre d’état masquée</string>
     <string name="t_6cde6c34a0" formatted="false">Prévu aujourd’hui</string>
@@ -353,6 +355,7 @@
     <string name="t_70b8d5d8d5" formatted="false">Activité</string>
     <string name="t_716e5371c7" formatted="false">Annuler la sélection</string>
     <string name="t_71790fdb53" formatted="false">Ne pas déranger</string>
+    <string name="t_72aecd9ad8" formatted="false">Erreur</string>
     <string name="t_72f931bda2" formatted="false">Sauvegarde</string>
     <string name="t_731f2bdc1e" formatted="false">Prendre l’heure dans le calendrier</string>
     <string name="t_734bcf2003" formatted="false">Icône dans la barre d’état</string>
@@ -383,6 +386,7 @@
     <string name="t_79fb04fd8b">Interface technique · Room %1$s\n%2$s\n%3$s ms · révision %4$s\n%5$s%6$s\n%7$s</string>
     <string name="t_7ae0e67853" formatted="false">Utiliser le fuseau du téléphone ?</string>
     <string name="t_7ae1597ae7" formatted="false">Ouvrez l’application pour préciser l’heure</string>
+    <string name="t_7aeae28ae9" formatted="false">sans carte</string>
     <string name="t_7b11e988e1" formatted="false">Retirer pour aujourd’hui</string>
     <string name="t_7b47d9e19e" formatted="false">Start utilise l’heure actuelle. Une entrée manuelle exige des limites explicites ; un événement sur toute la journée ne définit pas un intervalle de travail.</string>
     <string name="t_7c379e8e5c" formatted="false">Rapport enregistré</string>
@@ -464,6 +468,7 @@
     <string name="t_90078dfa30" formatted="false">lun</string>
     <string name="t_909a83238c" formatted="false">Ajouter une entrée</string>
     <string name="t_909baadb08" formatted="false">Commencé plus tôt</string>
+    <string name="t_90d0002e66" formatted="false">Dates personnalisées</string>
     <string name="t_914b6dca6d" formatted="false">Mon fuseau</string>
     <string name="t_917b58362c" formatted="false">Note</string>
     <string name="t_91b707a9d1" formatted="false">Aucune copie locale pour le moment</string>
@@ -628,6 +633,7 @@
     <string name="t_bbcf06b3c9" formatted="false">Notes</string>
     <string name="t_bbee9680a8" formatted="false">Le temps inconnu n’est pas compté :</string>
     <string name="t_bc28baf5fc" formatted="false">Aucune entrée hier</string>
+    <string name="t_bc4d1d35af" formatted="false">comme dans le fichier</string>
     <string name="t_bc5431b599" formatted="false">Dossier</string>
     <string name="t_bd16b23470" formatted="false">Sombre</string>
     <string name="t_bd4538e3c6" formatted="false">opaque</string>
@@ -688,6 +694,7 @@
     <string name="t_ce12182bac" formatted="false">ID de la mesure</string>
     <string name="t_ce3ec6ed08" formatted="false">dans la limite</string>
     <string name="t_ce5fc2ce7f" formatted="false">Ordre enregistré</string>
+    <string name="t_ced07fd144" formatted="false">aucune</string>
     <string name="t_cefdb75984" formatted="false">Colonne de fin (ou de durée)</string>
     <string name="t_cf113217ae">%1$s : %2$s minutes</string>
     <string name="t_cf3a8f3ca2" formatted="false">Démarrer le suivi</string>
@@ -759,6 +766,7 @@
     <string name="t_de7dee674e" formatted="false">C’est un fichier de sauvegarde. Restaurez-le dans « Sauvegarde »</string>
     <string name="t_de8f3c16b9" formatted="false">Exclure</string>
     <string name="t_dee20b519a" formatted="false">Pas de carte sur l’écran verrouillé</string>
+    <string name="t_deleted_on">Supprimées · %1$s</string>
     <string name="t_df12865c09" formatted="false">Police</string>
     <string name="t_dfd4e36290" formatted="false">Impossible de changer l’icône</string>
     <string name="t_e0382438fe">Focus : %1$s min de travail</string>
@@ -869,6 +877,11 @@
     <string name="t_fea5f3ca7c" formatted="false">Vous choisirez l’activité plus tard</string>
     <string name="t_fee1dd80dd">Texte actuel : « %1$s »\nNouveau texte : « %2$s »</string>
     <string name="t_feff16c4bb" formatted="false">Minuteur dans le volet de notifications</string>
+    <string name="t_restore_all">Tout restaurer (%1$s)</string>
+    <string name="t_restore_all_body" formatted="false">Les entrées reprennent leur place dans l’historique.</string>
+    <string name="t_restore_all_confirm" formatted="false">Restaurer</string>
+    <string name="t_restore_all_done">Entrées restaurées : %1$s</string>
+    <string name="t_restore_all_title">Restaurer %1$s ?</string>
     <plurals name="p_032a085f42">
         <item quantity="one">%1$d jour</item>
         <item quantity="many">%1$d jours</item>

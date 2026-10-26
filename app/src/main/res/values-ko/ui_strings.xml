@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generated from Kotlin source copy; see docs/localization/UI_COPY.md. -->
+<!-- Generated from Kotlin source copy; see localization/ui-copy/README.md. -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="t_0076203bff" formatted="false">휴식 시작</string>
     <string name="t_0077164ed0">내보내기 %1$s: 다시 준비하세요. 일부만 저장된 파일은 남아 있어요</string>
@@ -25,6 +25,7 @@
     <string name="t_08f120e3b9" formatted="false">저장한 옵션으로 시작할까요?</string>
     <string name="t_090fad991e" formatted="false">설정 열기</string>
     <string name="t_0931eb69ad" formatted="false">내 활동</string>
+    <string name="t_096312396e">%1$s 동안</string>
     <string name="t_09804101ad" formatted="false">넉넉하게</string>
     <string name="t_0a33cc879e">즐겨찾기에서 빼기: %1$s</string>
     <string name="t_0a7d0c65cc" formatted="false">저장이 취소되었습니다.</string>
@@ -334,6 +335,7 @@
     <string name="t_69d66ab891" formatted="false">계획에 활동 추가</string>
     <string name="t_69e5b8a8c6" formatted="false">0 이상의 Decimal 값, 소수점은 마침표 사용</string>
     <string name="t_6a0e6066b0" formatted="false">더 일찍 전환함</string>
+    <string name="t_6ae7f2feef" formatted="false">하루 종일</string>
     <string name="t_6b08862cb2" formatted="false">앱 아이콘을 확인하지 못했어요</string>
     <string name="t_6b8910932e" formatted="false">상태 표시줄 아이콘 숨김</string>
     <string name="t_6cde6c34a0" formatted="false">오늘의 계획</string>
@@ -353,6 +355,7 @@
     <string name="t_70b8d5d8d5" formatted="false">활동</string>
     <string name="t_716e5371c7" formatted="false">선택 취소</string>
     <string name="t_71790fdb53" formatted="false">방해 금지</string>
+    <string name="t_72aecd9ad8" formatted="false">오류</string>
     <string name="t_72f931bda2" formatted="false">백업</string>
     <string name="t_731f2bdc1e" formatted="false">캘린더에서 시간 가져오기</string>
     <string name="t_734bcf2003" formatted="false">상태 표시줄 아이콘</string>
@@ -383,6 +386,7 @@
     <string name="t_79fb04fd8b">기술 화면 · Room %1$s\n%2$s\n%3$s ms · 리비전 %4$s\n%5$s%6$s\n%7$s</string>
     <string name="t_7ae0e67853" formatted="false">휴대전화 시간대를 쓸까요?</string>
     <string name="t_7ae1597ae7" formatted="false">시간을 수정하려면 앱을 여세요.</string>
+    <string name="t_7aeae28ae9" formatted="false">카드 없음</string>
     <string name="t_7b11e988e1" formatted="false">오늘은 빼기</string>
     <string name="t_7b47d9e19e" formatted="false">시작 시각에는 현재 시간이 사용됩니다. 수동 기록에는 시작과 종료 경계를 직접 지정해야 합니다. 종일 일정으로는 작업 시간 구간을 정할 수 없습니다.</string>
     <string name="t_7c379e8e5c" formatted="false">보고서를 저장했어요</string>
@@ -464,6 +468,7 @@
     <string name="t_90078dfa30" formatted="false">월</string>
     <string name="t_909a83238c" formatted="false">기록 추가</string>
     <string name="t_909baadb08" formatted="false">더 일찍 시작함</string>
+    <string name="t_90d0002e66" formatted="false">날짜 직접 지정</string>
     <string name="t_914b6dca6d" formatted="false">내 시간대</string>
     <string name="t_917b58362c" formatted="false">메모</string>
     <string name="t_91b707a9d1" formatted="false">로컬 사본이 아직 없습니다.</string>
@@ -628,6 +633,7 @@
     <string name="t_bbcf06b3c9" formatted="false">메모</string>
     <string name="t_bbee9680a8" formatted="false">모르는 시간은 합계에 없어요:</string>
     <string name="t_bc28baf5fc" formatted="false">어제는 기록이 없어요</string>
+    <string name="t_bc4d1d35af" formatted="false">파일 그대로</string>
     <string name="t_bc5431b599" formatted="false">폴더</string>
     <string name="t_bd16b23470" formatted="false">어둡게</string>
     <string name="t_bd4538e3c6" formatted="false">불투명</string>
@@ -688,6 +694,7 @@
     <string name="t_ce12182bac" formatted="false">측정 ID</string>
     <string name="t_ce3ec6ed08" formatted="false">한도 안</string>
     <string name="t_ce5fc2ce7f" formatted="false">순서를 저장했어요</string>
+    <string name="t_ced07fd144" formatted="false">없음</string>
     <string name="t_cefdb75984" formatted="false">종료 열 (또는 duration)</string>
     <string name="t_cf113217ae">%1$s: %2$s분</string>
     <string name="t_cf3a8f3ca2" formatted="false">기록 시작</string>
@@ -759,6 +766,7 @@
     <string name="t_de7dee674e" formatted="false">백업 파일이에요. “백업”에서 복원하세요</string>
     <string name="t_de8f3c16b9" formatted="false">제외</string>
     <string name="t_dee20b519a" formatted="false">잠금 화면에 카드 없음</string>
+    <string name="t_deleted_on">삭제 · %1$s</string>
     <string name="t_df12865c09" formatted="false">글꼴</string>
     <string name="t_dfd4e36290" formatted="false">아이콘을 바꾸지 못했어요</string>
     <string name="t_e0382438fe">집중: 작업 %1$s분</string>
@@ -869,6 +877,11 @@
     <string name="t_fea5f3ca7c" formatted="false">활동은 나중에 고르면 돼요</string>
     <string name="t_fee1dd80dd">현재 텍스트: “%1$s”\n새 텍스트: “%2$s”</string>
     <string name="t_feff16c4bb" formatted="false">알림 창 타이머</string>
+    <string name="t_restore_all">모두 복원(%1$s)</string>
+    <string name="t_restore_all_body" formatted="false">기록이 원래 자리로 돌아가요.</string>
+    <string name="t_restore_all_confirm" formatted="false">복원</string>
+    <string name="t_restore_all_done">복원한 기록: %1$s</string>
+    <string name="t_restore_all_title">%1$s을 복원할까요?</string>
     <plurals name="p_032a085f42">
         <item quantity="other">%1$d일</item>
     </plurals>

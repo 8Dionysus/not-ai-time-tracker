@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generated from Kotlin source copy; see docs/localization/UI_COPY.md. -->
+<!-- Generated from Kotlin source copy; see localization/ui-copy/README.md. -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="t_0076203bff" formatted="false">Empezar descanso</string>
     <string name="t_0077164ed0">Exportación %1$s: vuelve a prepararla; el archivo parcial se conserva</string>
@@ -25,6 +25,7 @@
     <string name="t_08f120e3b9" formatted="false">¿Iniciar la opción guardada?</string>
     <string name="t_090fad991e" formatted="false">Abrir ajustes</string>
     <string name="t_0931eb69ad" formatted="false">Actividad propia</string>
+    <string name="t_096312396e">En %1$s</string>
     <string name="t_09804101ad" formatted="false">Amplio</string>
     <string name="t_0a33cc879e">Quitar de favoritos: %1$s</string>
     <string name="t_0a7d0c65cc" formatted="false">Guardado cancelado</string>
@@ -334,6 +335,7 @@
     <string name="t_69d66ab891" formatted="false">Añadir una actividad al plan</string>
     <string name="t_69e5b8a8c6" formatted="false">Decimal no negativo, con punto</string>
     <string name="t_6a0e6066b0" formatted="false">Cambié antes</string>
+    <string name="t_6ae7f2feef" formatted="false">todo el día</string>
     <string name="t_6b08862cb2" formatted="false">No se pudo comprobar el icono de la app</string>
     <string name="t_6b8910932e" formatted="false">Icono de la barra de estado oculto</string>
     <string name="t_6cde6c34a0" formatted="false">Plan para hoy</string>
@@ -353,6 +355,7 @@
     <string name="t_70b8d5d8d5" formatted="false">Actividad</string>
     <string name="t_716e5371c7" formatted="false">Cancelar selección</string>
     <string name="t_71790fdb53" formatted="false">No molestar</string>
+    <string name="t_72aecd9ad8" formatted="false">Error</string>
     <string name="t_72f931bda2" formatted="false">Copia de seguridad</string>
     <string name="t_731f2bdc1e" formatted="false">Tomar la hora del calendario</string>
     <string name="t_734bcf2003" formatted="false">Icono en la barra de estado</string>
@@ -383,6 +386,7 @@
     <string name="t_79fb04fd8b">Interfaz técnica · Room %1$s\n%2$s\n%3$s ms · revisión %4$s\n%5$s%6$s\n%7$s</string>
     <string name="t_7ae0e67853" formatted="false">¿Usar la zona horaria del teléfono?</string>
     <string name="t_7ae1597ae7" formatted="false">Abre la app para ajustar la hora</string>
+    <string name="t_7aeae28ae9" formatted="false">sin tarjeta</string>
     <string name="t_7b11e988e1" formatted="false">Quitar por hoy</string>
     <string name="t_7b47d9e19e" formatted="false">Iniciar usa la hora actual. El registro manual requiere límites explícitos; un evento de todo el día no define un intervalo de trabajo.</string>
     <string name="t_7c379e8e5c" formatted="false">Informe guardado</string>
@@ -464,6 +468,7 @@
     <string name="t_90078dfa30" formatted="false">lun</string>
     <string name="t_909a83238c" formatted="false">Añadir registro</string>
     <string name="t_909baadb08" formatted="false">Empecé antes</string>
+    <string name="t_90d0002e66" formatted="false">Fechas propias</string>
     <string name="t_914b6dca6d" formatted="false">Mi zona horaria</string>
     <string name="t_917b58362c" formatted="false">Nota</string>
     <string name="t_91b707a9d1" formatted="false">Aún no hay copias locales</string>
@@ -628,6 +633,7 @@
     <string name="t_bbcf06b3c9" formatted="false">Notas</string>
     <string name="t_bbee9680a8" formatted="false">El tiempo desconocido no cuenta en el total:</string>
     <string name="t_bc28baf5fc" formatted="false">Ayer no hubo registros</string>
+    <string name="t_bc4d1d35af" formatted="false">como en el archivo</string>
     <string name="t_bc5431b599" formatted="false">Carpeta</string>
     <string name="t_bd16b23470" formatted="false">Oscuro</string>
     <string name="t_bd4538e3c6" formatted="false">opaco</string>
@@ -688,6 +694,7 @@
     <string name="t_ce12182bac" formatted="false">ID de la métrica</string>
     <string name="t_ce3ec6ed08" formatted="false">dentro del límite</string>
     <string name="t_ce5fc2ce7f" formatted="false">Orden guardado</string>
+    <string name="t_ced07fd144" formatted="false">ninguna</string>
     <string name="t_cefdb75984" formatted="false">Columna de fin (o duración)</string>
     <string name="t_cf113217ae">%1$s: %2$s minutos</string>
     <string name="t_cf3a8f3ca2" formatted="false">Empezar a registrar</string>
@@ -759,6 +766,7 @@
     <string name="t_de7dee674e" formatted="false">Es un archivo de copia de seguridad. Restáuralo en «Copia de seguridad»</string>
     <string name="t_de8f3c16b9" formatted="false">No incluir</string>
     <string name="t_dee20b519a" formatted="false">Sin tarjeta en la pantalla bloqueada</string>
+    <string name="t_deleted_on">Eliminados · %1$s</string>
     <string name="t_df12865c09" formatted="false">Fuente</string>
     <string name="t_dfd4e36290" formatted="false">No se pudo cambiar el icono</string>
     <string name="t_e0382438fe">Enfoque: %1$s min de trabajo</string>
@@ -869,6 +877,11 @@
     <string name="t_fea5f3ca7c" formatted="false">Elegirás la actividad después</string>
     <string name="t_fee1dd80dd">Texto actual: «%1$s»\nTexto nuevo: «%2$s»</string>
     <string name="t_feff16c4bb" formatted="false">Cronómetro en el panel de notificaciones</string>
+    <string name="t_restore_all">Restaurar todo (%1$s)</string>
+    <string name="t_restore_all_body" formatted="false">Los registros vuelven a su lugar en el historial.</string>
+    <string name="t_restore_all_confirm" formatted="false">Restaurar</string>
+    <string name="t_restore_all_done">Registros restaurados: %1$s</string>
+    <string name="t_restore_all_title">¿Restaurar %1$s?</string>
     <plurals name="p_032a085f42">
         <item quantity="one">%1$d día</item>
         <item quantity="many">%1$d días</item>

@@ -286,7 +286,7 @@ private fun BottomBar(tab: Tab, onSelect: (Tab) -> Unit, live: Boolean) {
                 Column(Modifier.weight(1f).fillMaxHeight().semantics { selected = on }.pressable({ onSelect(t) }, role = Role.Tab, label = t.title),
                     horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     Box(contentAlignment = Alignment.Center) {
-                        M3Icon(icon, null, Modifier.size(22.dp), tint = if (on) c.ink else c.ink2)
+                        M3Icon(icon, null, Modifier.size(22.dp), tint = if (on && c.glow) c.amberInk else if (on) c.ink else c.ink2)
                         if (t == Tab.TIMER) Box(Modifier.size(4.dp).clip(CircleShape).background(if (live) c.amber else if (on) c.ink else c.ink2))
                     }
                     Spacer(Modifier.height(3.dp))

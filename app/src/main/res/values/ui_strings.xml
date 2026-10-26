@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generated from Kotlin source copy; see docs/localization/UI_COPY.md. -->
+<!-- Generated from Kotlin source copy; see localization/ui-copy/README.md. -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="t_0076203bff" formatted="false">Начать перерыв</string>
     <string name="t_0077164ed0">Экспорт %1$s: повторите подготовку; частичный файл сохранён</string>
@@ -16,7 +16,7 @@
     <string name="t_0467ae4bb8" formatted="false">Подтвердить</string>
     <string name="t_04bcedfa9f">между %1$s и сейчас</string>
     <string name="t_059b504fa9" formatted="false">Папка выбрана. Первая копия появится через пару минут</string>
-    <string name="t_05f4ea7fa6" formatted="false"> Текущие данные будут сохранены отдельно перед заменой. Записи, сделанные после этой копии, исчезнут.</string>
+    <string name="t_05f4ea7fa6" formatted="false">" Текущие данные будут сохранены отдельно перед заменой. Записи, сделанные после этой копии, исчезнут."</string>
     <string name="t_060c91cb5a">больше на %1$s</string>
     <string name="t_067a6eef15" formatted="false">Выберите карточку по ID перед CSV mapping</string>
     <string name="t_06d08263c2" formatted="false">В эту папку нельзя сохранять копии. Выбери другую</string>
@@ -25,6 +25,7 @@
     <string name="t_08f120e3b9" formatted="false">Запустить сохранённый вариант?</string>
     <string name="t_090fad991e" formatted="false">Открыть настройки</string>
     <string name="t_0931eb69ad" formatted="false">Своё занятие</string>
+    <string name="t_096312396e">За %1$s</string>
     <string name="t_09804101ad" formatted="false">Просторно</string>
     <string name="t_0a33cc879e">Убрать из избранного: %1$s</string>
     <string name="t_0a7d0c65cc" formatted="false">Сохранение отменено</string>
@@ -97,7 +98,7 @@
     <string name="t_1bc5f604f5" formatted="false">1 минуту</string>
     <string name="t_1bcdac8735">Добавится: %1$s; повторов: %2$s.\n%3$s\nОшибок: %4$s\n%5$s\n%6$s\nДобавление истории; полный JSON restore заменяет всё хранилище.</string>
     <string name="t_1bd48e6642">Занятие: %1$s</string>
-    <string name="t_1c38d1407f" formatted="false"> между паузами</string>
+    <string name="t_1c38d1407f" formatted="false">" между паузами"</string>
     <string name="t_1c4b04d710" formatted="false">Добавить на экран</string>
     <string name="t_1c76eec066" formatted="false">Данные восстановлены. Прежние сохранены отдельно</string>
     <string name="t_1c8ee71b8e">свободно до %1$s</string>
@@ -108,7 +109,7 @@
     <string name="t_1f1fa1b82e" formatted="false">Нажми на копию: сначала покажу, что в ней, заменю данные только после подтверждения</string>
     <string name="t_1fbd871837" formatted="false">Папка сейчас недоступна: нет сети или приложение облака не отвечает. Повторю сам</string>
     <string name="t_1fcbdeecfd">%1$s: меньше</string>
-    <string name="t_1fce9b2e5d">%1$s: %2$s. Проверь, что означает каждая — </string>
+    <string name="t_1fce9b2e5d">"%1$s: %2$s. Проверь, что означает каждая — "</string>
     <string name="t_20490f3632" formatted="false">Выбрать occurrence из календаря…</string>
     <string name="t_20c87f5908" formatted="false">Поставить цель</string>
     <string name="t_20feaa7e40" formatted="false">Начать без занятия, с заметкой</string>
@@ -138,9 +139,9 @@
     <string name="t_29f3b29df0" formatted="false">Восстановить</string>
     <string name="t_2a5e307788" formatted="false">компактно</string>
     <string name="t_2a690e69d2" formatted="false">Значок выбран, но ярлыки пока не обновились</string>
-    <string name="t_2a70012208" formatted="false">Всего </string>
+    <string name="t_2a70012208" formatted="false">"Всего "</string>
     <string name="t_2b39abab32">«%1$s». Играет по кругу, пока приложение открыто</string>
-    <string name="t_2c0db2ce7c" formatted="false">Начать: </string>
+    <string name="t_2c0db2ce7c" formatted="false">"Начать: "</string>
     <string name="t_2d2be3f11c" formatted="false">Отрезок работы</string>
     <string name="t_2d5a644e5c" formatted="false">Такой интервал невозможен: проверь начало и конец.</string>
     <string name="t_2dd965ee95" formatted="false">Акцент</string>
@@ -183,7 +184,7 @@
     <string name="t_3bfd577967">%1$s позже на %2$s</string>
     <string name="t_3c244ffaa5">Календарь: %1$s; история не изменена</string>
     <string name="t_3c6332622c" formatted="false">Открыть приложение</string>
-    <string name="t_3cd7d0dd3c" formatted="false">Время по дням: </string>
+    <string name="t_3cd7d0dd3c" formatted="false">"Время по дням: "</string>
     <string name="t_3d51050347" formatted="false">есть</string>
     <string name="t_3da1c7d83d" formatted="false">Убрать цель?</string>
     <string name="t_3de49828e8" formatted="false">Название</string>
@@ -262,7 +263,7 @@
     <string name="t_550c7a6d12" formatted="false">Записей пока нет. Здесь появится каждый отрезок.</string>
     <string name="t_552d1cca6b" formatted="false">В этот день в календаре нет событий со временем.</string>
     <string name="t_559a87f7cc" formatted="false">Добавить</string>
-    <string name="t_55c44eb122">Добавится %1$s до %2$s. </string>
+    <string name="t_55c44eb122">"Добавится %1$s до %2$s. "</string>
     <string name="t_55cd7a55ed" formatted="false">Чему-то не хватает разрешения телефона</string>
     <string name="t_55e920546e" formatted="false">Плавающая кнопка выключена</string>
     <string name="t_5695330ffb" formatted="false">Авто</string>
@@ -334,6 +335,7 @@
     <string name="t_69d66ab891" formatted="false">Добавить занятие в план</string>
     <string name="t_69e5b8a8c6" formatted="false">Неотрицательное Decimal, точка</string>
     <string name="t_6a0e6066b0" formatted="false">Переключился раньше</string>
+    <string name="t_6ae7f2feef" formatted="false">весь день</string>
     <string name="t_6b08862cb2" formatted="false">Не удалось проверить значок приложения</string>
     <string name="t_6b8910932e" formatted="false">Значок в строке состояния скрыт</string>
     <string name="t_6cde6c34a0" formatted="false">По плану на сегодня</string>
@@ -353,6 +355,7 @@
     <string name="t_70b8d5d8d5" formatted="false">Занятие</string>
     <string name="t_716e5371c7" formatted="false">Отменить выбор</string>
     <string name="t_71790fdb53" formatted="false">Не беспокоить</string>
+    <string name="t_72aecd9ad8" formatted="false">Ошибка</string>
     <string name="t_72f931bda2" formatted="false">Резервная копия</string>
     <string name="t_731f2bdc1e" formatted="false">Взять время из календаря</string>
     <string name="t_734bcf2003" formatted="false">Значок в строке состояния</string>
@@ -366,7 +369,7 @@
     <string name="t_750b471214" formatted="false">Порядок избранного</string>
     <string name="t_751e31256e">%1$s. При смене пояса телефона границы дней в истории и обзоре будут следовать ему. Сами записи и зоны целей не меняются.</string>
     <string name="t_75436e3162" formatted="false">Работа</string>
-    <string name="t_75cd08a0e5" formatted="false">Переключиться: </string>
+    <string name="t_75cd08a0e5" formatted="false">"Переключиться: "</string>
     <string name="t_762d7d64da" formatted="false">вчера</string>
     <string name="t_76393b3245" formatted="false">Локальные rollback копии…</string>
     <string name="t_766e7cabf7" formatted="false">Меньше</string>
@@ -383,6 +386,7 @@
     <string name="t_79fb04fd8b">Техническая оболочка · Room %1$s\n%2$s\n%3$s ms · ревизия %4$s\n%5$s%6$s\n%7$s</string>
     <string name="t_7ae0e67853" formatted="false">Использовать пояс телефона?</string>
     <string name="t_7ae1597ae7" formatted="false">Откройте приложение для уточнения времени</string>
+    <string name="t_7aeae28ae9" formatted="false">без карточки</string>
     <string name="t_7b11e988e1" formatted="false">Убрать на сегодня</string>
     <string name="t_7b47d9e19e" formatted="false">Start использует текущее время. Ручная запись требует явных границ; all-day не задаёт рабочий интервал.</string>
     <string name="t_7c379e8e5c" formatted="false">Отчёт сохранён</string>
@@ -398,7 +402,7 @@
     <string name="t_7f12cd4599" formatted="false">Включено, но телефон ещё не разрешил приложению режим «Не беспокоить»</string>
     <string name="t_7f17c7c62a" formatted="false">Настройки</string>
     <string name="t_7f76296ba9" formatted="false">Нет закрытого записанного сегмента</string>
-    <string name="t_7f7a71c089">В копии %1$s, %2$s, </string>
+    <string name="t_7f7a71c089">"В копии %1$s, %2$s, "</string>
     <string name="t_7fa01b6e34" formatted="false">Включено в восстановленной копии. На этом телефоне нужно подтвердить</string>
     <string name="t_80072ed701" formatted="false">Без своего занятия</string>
     <string name="t_806764743a" formatted="false">разные занятия</string>
@@ -406,7 +410,7 @@
     <string name="t_80e474035b" formatted="false">Пояс указан в самом времени</string>
     <string name="t_81129d8255" formatted="false">Цель изменена</string>
     <string name="t_8125e2fba0" formatted="false">Все строки → выбранная карточка; иначе исходные имена без типа</string>
-    <string name="t_817dfa0bfc"> (колонка «%1$s»)</string>
+    <string name="t_817dfa0bfc">" (колонка «%1$s»)"</string>
     <string name="t_819f3ba9d1" formatted="false">С конца прошлой записи</string>
     <string name="t_81b26ab0d7" formatted="false">Фон окна выбора после стопа</string>
     <string name="t_81d3d38d5c" formatted="false">Спросить через</string>
@@ -429,7 +433,7 @@
     <string name="t_85e8a3404b" formatted="false">С этого телефона файлов ещё не сохраняли</string>
     <string name="t_86042e468b" formatted="false">Измерения, календарь, восстановление базы</string>
     <string name="t_861bd8760b" formatted="false">Шрифт Onest · SIL Open Font License</string>
-    <string name="t_8633c34c71"> · в файле: %1$s</string>
+    <string name="t_8633c34c71">" · в файле: %1$s"</string>
     <string name="t_86652580fd" formatted="false">Прошлый месяц</string>
     <string name="t_8690f98524" formatted="false">, день ещё идёт</string>
     <string name="t_86d85a0147">Часовой пояс отчётов: %1$s</string>
@@ -464,6 +468,7 @@
     <string name="t_90078dfa30" formatted="false">пн</string>
     <string name="t_909a83238c" formatted="false">Добавить запись</string>
     <string name="t_909baadb08" formatted="false">Начал раньше</string>
+    <string name="t_90d0002e66" formatted="false">Свои даты</string>
     <string name="t_914b6dca6d" formatted="false">Мой пояс</string>
     <string name="t_917b58362c" formatted="false">Заметка</string>
     <string name="t_91b707a9d1" formatted="false">Локальных копий пока нет</string>
@@ -592,7 +597,7 @@
     <string name="t_b402c34a3b" formatted="false">Экспорт в CSV</string>
     <string name="t_b40a4254c7" formatted="false">Название на кнопке</string>
     <string name="t_b433c5110e" formatted="false">Первая копия появится через пару минут</string>
-    <string name="t_b4479f84f1">%1$s, цифры %2$s, </string>
+    <string name="t_b4479f84f1">"%1$s, цифры %2$s, "</string>
     <string name="t_b45bbb4570" formatted="false">Светлая тема</string>
     <string name="t_b467c6658f" formatted="false">Файл сохранён. Проверить его чтением нельзя</string>
     <string name="t_b4770c7e71">День начинается в %1$s:%2$s</string>
@@ -626,8 +631,9 @@
     <string name="t_babd8e081b" formatted="false">Изменятся границы дней в истории и обзоре. Сами записи и зоны целей не меняются.</string>
     <string name="t_bbb0e8e8cd" formatted="false">мс</string>
     <string name="t_bbcf06b3c9" formatted="false">Заметки</string>
-    <string name="t_bbee9680a8" formatted="false">Неизвестное время не входит в итог: </string>
+    <string name="t_bbee9680a8" formatted="false">"Неизвестное время не входит в итог: "</string>
     <string name="t_bc28baf5fc" formatted="false">Вчера записей нет</string>
+    <string name="t_bc4d1d35af" formatted="false">как в файле</string>
     <string name="t_bc5431b599" formatted="false">Папка</string>
     <string name="t_bd16b23470" formatted="false">Тёмная</string>
     <string name="t_bd4538e3c6" formatted="false">непрозрачный</string>
@@ -647,7 +653,7 @@
     <string name="t_c0ed5f4dda" formatted="false">кавычки в строке не закрыты</string>
     <string name="t_c12ee51dd9" formatted="false">Всё время</string>
     <string name="t_c14f88246c">Осталось %1$s</string>
-    <string name="t_c161a7bb23" formatted="false"> Незакрытая запись придёт как «время неизвестно», её нужно будет уточнить.</string>
+    <string name="t_c161a7bb23" formatted="false">" Незакрытая запись придёт как «время неизвестно», её нужно будет уточнить."</string>
     <string name="t_c23d5826a3">%1$s с записями</string>
     <string name="t_c25bd1a7c6" formatted="false">Пропустить перерыв</string>
     <string name="t_c2bf13bbb1" formatted="false">Свои отчёты</string>
@@ -675,7 +681,7 @@
     <string name="t_c85eb5f581" formatted="false">90 дней</string>
     <string name="t_c927b86cfb" formatted="false">Каталог и таблицы</string>
     <string name="t_ca7830c42f" formatted="false">Нет записей для удаления</string>
-    <string name="t_cabb0c6d9b">Строка %1$s: </string>
+    <string name="t_cabb0c6d9b">"Строка %1$s: "</string>
     <string name="t_cb26bdc6c6" formatted="false">Начало</string>
     <string name="t_cbc6fa3d6a" formatted="false">виджет</string>
     <string name="t_cbeb716470" formatted="false">Назад к настройкам</string>
@@ -688,13 +694,14 @@
     <string name="t_ce12182bac" formatted="false">ID величины</string>
     <string name="t_ce3ec6ed08" formatted="false">в пределах</string>
     <string name="t_ce5fc2ce7f" formatted="false">Порядок сохранён</string>
+    <string name="t_ced07fd144" formatted="false">нет</string>
     <string name="t_cefdb75984" formatted="false">Колонка конца (или duration)</string>
     <string name="t_cf113217ae">%1$s: %2$s минут</string>
     <string name="t_cf3a8f3ca2" formatted="false">Начать учёт</string>
     <string name="t_cf52c8daf1" formatted="false">Часовой пояс отчётов следует за устройством. Записи могут перейти на другой день</string>
     <string name="t_cf7b338323" formatted="false">Тонкие</string>
     <string name="t_cfafc18b42" formatted="false">План только показывается на главном экране. Время пойдёт, когда ты нажмёшь на занятие.</string>
-    <string name="t_d002f83ddc" formatted="false">После изменений копия сохраняется через пару минут, когда телефон разрешит фоновую работу. Раз в сутки — даже без изменений. </string>
+    <string name="t_d002f83ddc" formatted="false">"После изменений копия сохраняется через пару минут, когда телефон разрешит фоновую работу. Раз в сутки — даже без изменений. "</string>
     <string name="t_d015e9be93" formatted="false">Занятие этого отчёта удалено или в архиве. Отчёт считает только его прошлые записи.</string>
     <string name="t_d0d7180292" formatted="false">Добавлено в избранное</string>
     <string name="t_d0dd940c4c" formatted="false">Нет данных</string>
@@ -712,7 +719,7 @@
     <string name="t_d2aa318afd">записано %1$s</string>
     <string name="t_d2e9881a72">Добавится %1$s</string>
     <string name="t_d349cb398d">Прошло %1$s</string>
-    <string name="t_d37c15b206" formatted="false"> Названия, которые ты менял сам, останутся твоими; прошлые записи не меняются.</string>
+    <string name="t_d37c15b206" formatted="false">" Названия, которые ты менял сам, останутся твоими; прошлые записи не меняются."</string>
     <string name="t_d398842570" formatted="false">Подтвердить хвост указанным интервалом</string>
     <string name="t_d3c8e2e155" formatted="false">Пояс изменён. Подтверждение настройки не сохранилось; приложение повторит его при открытии</string>
     <string name="t_d40fecd7ad" formatted="false">Попробовать ещё раз</string>
@@ -752,13 +759,14 @@
     <string name="t_dd15d6eecb" formatted="false">Что начинаем?</string>
     <string name="t_dd27b7de89" formatted="false">Не удалось открыть лицензию</string>
     <string name="t_dd63bc14f9">Изменено %1$s</string>
-    <string name="t_ddca6f4db2" formatted="false"> без записи</string>
+    <string name="t_ddca6f4db2" formatted="false">" без записи"</string>
     <string name="t_ddcbc8c167" formatted="false">Отрезки изменены</string>
     <string name="t_de5d4764e8" formatted="false">Количество всего target; дневные окна не складываются</string>
     <string name="t_de5eb09e17" formatted="false">Изменить занятие</string>
     <string name="t_de7dee674e" formatted="false">Это файл резервной копии. Восстанови его в разделе «Резервная копия»</string>
     <string name="t_de8f3c16b9" formatted="false">Не учитывать</string>
     <string name="t_dee20b519a" formatted="false">На заблокированном экране карточки нет</string>
+    <string name="t_deleted_on">Удалено · %1$s</string>
     <string name="t_df12865c09" formatted="false">Шрифт</string>
     <string name="t_dfd4e36290" formatted="false">Не удалось переключить значок</string>
     <string name="t_e0382438fe">Фокус: %1$s мин работы</string>
@@ -869,6 +877,11 @@
     <string name="t_fea5f3ca7c" formatted="false">Занятие выберешь потом</string>
     <string name="t_fee1dd80dd">Текущий текст: «%1$s»\nНовый текст: «%2$s»</string>
     <string name="t_feff16c4bb" formatted="false">Таймер в шторке</string>
+    <string name="t_restore_all">Восстановить все (%1$s)</string>
+    <string name="t_restore_all_body" formatted="false">Записи вернутся в историю на свои прежние места.</string>
+    <string name="t_restore_all_confirm" formatted="false">Восстановить</string>
+    <string name="t_restore_all_done">Восстановлено записей: %1$s</string>
+    <string name="t_restore_all_title">Восстановить %1$s?</string>
     <plurals name="p_032a085f42">
         <item quantity="one">%1$d дня</item>
         <item quantity="few">%1$d дней</item>

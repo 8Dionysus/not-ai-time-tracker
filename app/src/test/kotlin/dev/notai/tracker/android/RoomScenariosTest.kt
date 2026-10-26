@@ -10,7 +10,7 @@ import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [35])
+@Config(sdk = [35], qualifiers = "ru-rRU")
 class RoomScenariosTest: ScenarioContract() {
     private val originalDirectorySync = DirectoryDurability.sync
     private val originalRename = DirectoryDurability.rename

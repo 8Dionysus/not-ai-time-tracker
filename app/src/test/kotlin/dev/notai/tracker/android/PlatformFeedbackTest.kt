@@ -20,7 +20,7 @@ import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [36])
+@Config(sdk = [36], qualifiers = "ru-rRU")
 class PlatformFeedbackTest {
     private val context: Context get() = RuntimeEnvironment.getApplication()
     @After fun reset() {

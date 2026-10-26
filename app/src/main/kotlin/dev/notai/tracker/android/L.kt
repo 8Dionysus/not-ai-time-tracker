@@ -29,7 +29,10 @@ object L {
     val currentTag: String get() = tag.value ?: "ru"
     val locale: Locale get() = Locale.forLanguageTag(currentTag)
 
-    private fun context(): Context = app ?: error("L.init was not called")
+    /** Normally bound in TrackerApplication.onCreate. A component created earlier (or a bare test) finds the process application. */
+    private fun context(): Context = app ?: (runCatching {
+        Class.forName("android.app.ActivityThread").getMethod("currentApplication").invoke(null) as? Context
+    }.getOrNull()?.also(::init) ?: error("No application context for copy"))
     fun res(): Resources { val t = currentTag; return cache.getOrPut(t) { AppLanguage.context(context(), t).resources } }
 
     fun s(id: Int): String = res().getString(id)

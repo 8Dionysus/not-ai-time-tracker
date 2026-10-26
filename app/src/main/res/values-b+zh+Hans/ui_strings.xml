@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generated from Kotlin source copy; see docs/localization/UI_COPY.md. -->
+<!-- Generated from Kotlin source copy; see localization/ui-copy/README.md. -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="t_0076203bff" formatted="false">开始休息</string>
     <string name="t_0077164ed0">导出 %1$s：请重新准备；已保留部分文件</string>
@@ -25,6 +25,7 @@
     <string name="t_08f120e3b9" formatted="false">启动已保存的选项？</string>
     <string name="t_090fad991e" formatted="false">打开设置</string>
     <string name="t_0931eb69ad" formatted="false">自定义活动</string>
+    <string name="t_096312396e">%1$s内</string>
     <string name="t_09804101ad" formatted="false">宽松</string>
     <string name="t_0a33cc879e">从收藏中移除：%1$s</string>
     <string name="t_0a7d0c65cc" formatted="false">保存已取消</string>
@@ -334,6 +335,7 @@
     <string name="t_69d66ab891" formatted="false">向计划添加活动</string>
     <string name="t_69e5b8a8c6" formatted="false">非负 Decimal 数值，使用句点作为小数点</string>
     <string name="t_6a0e6066b0" formatted="false">更早切换</string>
+    <string name="t_6ae7f2feef" formatted="false">全天</string>
     <string name="t_6b08862cb2" formatted="false">无法检查应用图标</string>
     <string name="t_6b8910932e" formatted="false">状态栏图标已隐藏</string>
     <string name="t_6cde6c34a0" formatted="false">今日计划</string>
@@ -353,6 +355,7 @@
     <string name="t_70b8d5d8d5" formatted="false">活动</string>
     <string name="t_716e5371c7" formatted="false">取消选择</string>
     <string name="t_71790fdb53" formatted="false">勿扰</string>
+    <string name="t_72aecd9ad8" formatted="false">错误</string>
     <string name="t_72f931bda2" formatted="false">备份</string>
     <string name="t_731f2bdc1e" formatted="false">从日历获取时间</string>
     <string name="t_734bcf2003" formatted="false">状态栏图标</string>
@@ -383,6 +386,7 @@
     <string name="t_79fb04fd8b">技术界面 · Room %1$s\n%2$s\n%3$s ms · 修订 %4$s\n%5$s%6$s\n%7$s</string>
     <string name="t_7ae0e67853" formatted="false">使用手机时区？</string>
     <string name="t_7ae1597ae7" formatted="false">打开应用以补充时间</string>
+    <string name="t_7aeae28ae9" formatted="false">无卡片</string>
     <string name="t_7b11e988e1" formatted="false">今天不显示</string>
     <string name="t_7b47d9e19e" formatted="false">Start 使用当前时间。手动记录必须明确指定起止时间；全天事件不能确定工作时段。</string>
     <string name="t_7c379e8e5c" formatted="false">报告已保存</string>
@@ -464,6 +468,7 @@
     <string name="t_90078dfa30" formatted="false">周一</string>
     <string name="t_909a83238c" formatted="false">添加条目</string>
     <string name="t_909baadb08" formatted="false">更早开始</string>
+    <string name="t_90d0002e66" formatted="false">自定义日期</string>
     <string name="t_914b6dca6d" formatted="false">我的时区</string>
     <string name="t_917b58362c" formatted="false">备注</string>
     <string name="t_91b707a9d1" formatted="false">暂无本地副本</string>
@@ -628,6 +633,7 @@
     <string name="t_bbcf06b3c9" formatted="false">备注</string>
     <string name="t_bbee9680a8" formatted="false">未知时间不计入合计：</string>
     <string name="t_bc28baf5fc" formatted="false">昨天没有条目</string>
+    <string name="t_bc4d1d35af" formatted="false">与文件一致</string>
     <string name="t_bc5431b599" formatted="false">文件夹</string>
     <string name="t_bd16b23470" formatted="false">深色</string>
     <string name="t_bd4538e3c6" formatted="false">不透明</string>
@@ -688,6 +694,7 @@
     <string name="t_ce12182bac" formatted="false">度量项 ID</string>
     <string name="t_ce3ec6ed08" formatted="false">在限度内</string>
     <string name="t_ce5fc2ce7f" formatted="false">顺序已保存</string>
+    <string name="t_ced07fd144" formatted="false">无</string>
     <string name="t_cefdb75984" formatted="false">结束列（或 duration）</string>
     <string name="t_cf113217ae">%1$s：%2$s 分钟</string>
     <string name="t_cf3a8f3ca2" formatted="false">开始记录</string>
@@ -759,6 +766,7 @@
     <string name="t_de7dee674e" formatted="false">这是备份文件。请在“备份”中恢复</string>
     <string name="t_de8f3c16b9" formatted="false">不计入</string>
     <string name="t_dee20b519a" formatted="false">锁屏上不显示卡片</string>
+    <string name="t_deleted_on">删除于 · %1$s</string>
     <string name="t_df12865c09" formatted="false">字体</string>
     <string name="t_dfd4e36290" formatted="false">无法切换图标</string>
     <string name="t_e0382438fe">专注：工作 %1$s 分钟</string>
@@ -869,6 +877,11 @@
     <string name="t_fea5f3ca7c" formatted="false">稍后再选活动</string>
     <string name="t_fee1dd80dd">当前文本：“%1$s”\n新文本：“%2$s”</string>
     <string name="t_feff16c4bb" formatted="false">通知栏中的计时器</string>
+    <string name="t_restore_all">全部恢复（%1$s）</string>
+    <string name="t_restore_all_body" formatted="false">条目会回到历史中原来的位置。</string>
+    <string name="t_restore_all_confirm" formatted="false">恢复</string>
+    <string name="t_restore_all_done">已恢复条目：%1$s</string>
+    <string name="t_restore_all_title">恢复 %1$s？</string>
     <plurals name="p_032a085f42">
         <item quantity="other">%1$d 天</item>
     </plurals>

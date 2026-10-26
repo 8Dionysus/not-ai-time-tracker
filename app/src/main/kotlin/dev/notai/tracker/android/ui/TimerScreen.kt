@@ -127,7 +127,7 @@ fun TimerScreen(snapshot: Snapshot?, home: HomeData?, vm: TrackerViewModel, acti
                 if (reduced) fadeIn(tween(0)) togetherWith fadeOut(tween(0))
                 else (fadeIn(tween(260, 90)) + slideInVertically(tween(320)) { it / 12 }) togetherWith fadeOut(tween(120))
             }, label = "hero") { state ->
-                Box(Modifier.fillMaxWidth().neonGlow().padding(horizontal = 20.dp).padding(top = 12.dp, bottom = 8.dp), contentAlignment = Alignment.TopCenter) {
+                Box(Modifier.fillMaxWidth().neonGlow(state.kind == HeroKind.ACTIVE || state.kind == HeroKind.FOCUS).padding(horizontal = 20.dp).padding(top = 12.dp, bottom = 8.dp), contentAlignment = Alignment.TopCenter) {
                     when (state.kind) {
                         HeroKind.LOADING -> Spacer(Modifier.height(300.dp))
                         HeroKind.IDLE -> IdleHero(home, vm, actions)
@@ -143,21 +143,22 @@ fun TimerScreen(snapshot: Snapshot?, home: HomeData?, vm: TrackerViewModel, acti
     }
 }
 
-/** Neon-wave only: a slow wash of two neon colours behind the hero. Static when animations are off. */
+/** Neon only: a wash of the accent behind the hero that breathes with the shared pulse. Recording glows clearly,
+ * rest glows faintly; with animations off it holds still at the midpoint. */
 @Composable
-private fun Modifier.neonGlow(): Modifier {
+private fun Modifier.neonGlow(live: Boolean): Modifier {
     val c = NotAi.colors
     if (!c.glow) return this
-    val shift = if (NotAi.reducedMotion || !NotAi.appearance.pulse) 0.5f else {
-        val t = androidx.compose.animation.core.rememberInfiniteTransition(label = "neon")
-        t.animateFloat(0f, 1f, androidx.compose.animation.core.infiniteRepeatable(tween(9000), androidx.compose.animation.core.RepeatMode.Reverse), label = "neonShift").value
-    }
+    val pulse = NotAi.neonPulse
     return this.drawBehind {
-        val a = c.amber.copy(alpha = 0.12f + 0.035f * shift); val b = c.amber.copy(alpha = 0.055f)
+        val p = pulse.value
+        val main = if (live) 0.15f + 0.11f * p else 0.06f + 0.05f * p
+        val side = if (live) 0.07f + 0.06f * (1f - p) else 0.03f + 0.03f * (1f - p)
+        val a = c.amber.copy(alpha = main); val b = c.amber.copy(alpha = side)
         drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(a, a.copy(alpha = 0f)),
-            androidx.compose.ui.geometry.Offset(size.width * (0.25f + 0.2f * shift), size.height * 0.35f), size.width * 0.55f), radius = size.width)
+            androidx.compose.ui.geometry.Offset(size.width * (0.42f + 0.08f * p), size.height * 0.36f), size.width * (0.52f + 0.06f * p)), radius = size.width)
         drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(b, b.copy(alpha = 0f)),
-            androidx.compose.ui.geometry.Offset(size.width * (0.8f - 0.2f * shift), size.height * 0.55f), size.width * 0.5f), radius = size.width)
+            androidx.compose.ui.geometry.Offset(size.width * (0.78f - 0.08f * p), size.height * 0.6f), size.width * 0.5f), radius = size.width)
     }
 }
 
@@ -166,7 +167,9 @@ fun Wordmark(modifier: Modifier = Modifier, size: Int = 18) {
     val c = NotAi.colors
     Row(modifier) {
         Text("(not)", style = NotAi.type.label.copy(fontSize = size.sp, fontWeight = FontWeight.Medium), color = c.ink2)
-        Text("AI", style = NotAi.type.label.copy(fontSize = size.sp, fontWeight = FontWeight.Medium), color = c.ink)
+        // Neon: the "AI" carries the accent with a soft light around it.
+        Text("AI", style = NotAi.type.label.copy(fontSize = size.sp, fontWeight = FontWeight.Medium,
+            shadow = if (c.glow) androidx.compose.ui.graphics.Shadow(c.amber.copy(alpha = 0.7f), blurRadius = 14f) else null), color = if (c.glow) c.amberInk else c.ink)
     }
 }
 

@@ -418,19 +418,19 @@ class UiReviewRegressionTest {
         try {
             val f = fixture(clock,initial = seed.data())
             pump { f.vm.snapshot.value?.focus?.mode == FocusMode.DUE }
-            pump { due.signalKey in prefs.getStringSet("delivered",emptySet()).orEmpty() || f.notices.any { it.text == due.safeLabel } }
+            pump { due.signalKey in prefs.getStringSet("delivered",emptySet()).orEmpty() || f.notices.any { it.text == Format.focusLine(due) } }
             if(outcome == "fresh") {
-                pump { manager.activeNotifications.any { it.id == 43 } || f.notices.any { it.text == due.safeLabel } }
+                pump { manager.activeNotifications.any { it.id == 43 } || f.notices.any { it.text == Format.focusLine(due) } }
                 assertTrue("The VM itself must post the first cue",manager.activeNotifications.any { it.id == 43 })
             }
             // The runtime's later asynchronous refresh used to post after the VM had
             // already emitted a local fallback. Exercise the same platform delivery.
             FocusSignals.refresh(app,f.tracker)
             if(outcome == "fresh") assertTrue(manager.activeNotifications.any { it.id == 43 })
-            if(outcome == "blocked") pump { f.notices.any { it.text == due.safeLabel } }
+            if(outcome == "blocked") pump { f.notices.any { it.text == Format.focusLine(due) } }
             else {
                 pump { due.signalKey in prefs.getStringSet("delivered",emptySet()).orEmpty() }
-                assertTrue("Automatic duplicate fallback for $outcome: ${f.notices}",f.notices.none { it.text == due.safeLabel })
+                assertTrue("Automatic duplicate fallback for $outcome: ${f.notices}",f.notices.none { it.text == Format.focusLine(due) })
             }
             assertEquals(seed.data(),f.tracker.data())
         } finally { FocusSignals.notificationFactory = originalFactory }

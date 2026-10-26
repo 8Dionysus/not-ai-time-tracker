@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generated from Kotlin source copy; see docs/localization/UI_COPY.md. -->
+<!-- Generated from Kotlin source copy; see localization/ui-copy/README.md. -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="t_0076203bff" formatted="false">بدء الاستراحة</string>
     <string name="t_0077164ed0">التصدير %1$s: أعد التحضير؛ الملف الجزئي محفوظ</string>
@@ -25,6 +25,7 @@
     <string name="t_08f120e3b9" formatted="false">تشغيل الخيار المحفوظ؟</string>
     <string name="t_090fad991e" formatted="false">فتح الإعدادات</string>
     <string name="t_0931eb69ad" formatted="false">نشاط خاص</string>
+    <string name="t_096312396e">خلال %1$s</string>
     <string name="t_09804101ad" formatted="false">واسع</string>
     <string name="t_0a33cc879e">إزالة من المفضلة: %1$s</string>
     <string name="t_0a7d0c65cc" formatted="false">أُلغي الحفظ</string>
@@ -334,6 +335,7 @@
     <string name="t_69d66ab891" formatted="false">إضافة نشاط إلى الخطة</string>
     <string name="t_69e5b8a8c6" formatted="false">عدد عشري غير سالب؛ استخدم نقطة</string>
     <string name="t_6a0e6066b0" formatted="false">انتقلت أبكر</string>
+    <string name="t_6ae7f2feef" formatted="false">طوال اليوم</string>
     <string name="t_6b08862cb2" formatted="false">تعذّر التحقق من أيقونة التطبيق</string>
     <string name="t_6b8910932e" formatted="false">أيقونة شريط الحالة مخفية</string>
     <string name="t_6cde6c34a0" formatted="false">خطة اليوم</string>
@@ -353,6 +355,7 @@
     <string name="t_70b8d5d8d5" formatted="false">النشاط</string>
     <string name="t_716e5371c7" formatted="false">إلغاء التحديد</string>
     <string name="t_71790fdb53" formatted="false">عدم الإزعاج</string>
+    <string name="t_72aecd9ad8" formatted="false">خطأ</string>
     <string name="t_72f931bda2" formatted="false">النسخ الاحتياطي</string>
     <string name="t_731f2bdc1e" formatted="false">أخذ الوقت من التقويم</string>
     <string name="t_734bcf2003" formatted="false">أيقونة في شريط الحالة</string>
@@ -383,6 +386,7 @@
     <string name="t_79fb04fd8b">الواجهة التقنية · Room %1$s\n%2$s\n%3$s ms · المراجعة %4$s\n%5$s%6$s\n%7$s</string>
     <string name="t_7ae0e67853" formatted="false">استخدام المنطقة الزمنية للهاتف؟</string>
     <string name="t_7ae1597ae7" formatted="false">افتح التطبيق لتحديد الوقت</string>
+    <string name="t_7aeae28ae9" formatted="false">بلا بطاقة</string>
     <string name="t_7b11e988e1" formatted="false">إزالة لليوم</string>
     <string name="t_7b47d9e19e" formatted="false">يستخدم البدء الوقت الحالي. ويتطلب السجل اليدوي حدودًا زمنية صريحة؛ ولا يحدد حدث اليوم الكامل فترة عمل.</string>
     <string name="t_7c379e8e5c" formatted="false">حُفظ التقرير</string>
@@ -464,6 +468,7 @@
     <string name="t_90078dfa30" formatted="false">اثنين</string>
     <string name="t_909a83238c" formatted="false">إضافة سجل</string>
     <string name="t_909baadb08" formatted="false">بدأت أبكر</string>
+    <string name="t_90d0002e66" formatted="false">تواريخ مخصصة</string>
     <string name="t_914b6dca6d" formatted="false">منطقتي الزمنية</string>
     <string name="t_917b58362c" formatted="false">ملاحظة</string>
     <string name="t_91b707a9d1" formatted="false">لا توجد نسخ محلية بعد</string>
@@ -628,6 +633,7 @@
     <string name="t_bbcf06b3c9" formatted="false">الملاحظات</string>
     <string name="t_bbee9680a8" formatted="false">الوقت غير المعروف خارج الإجمالي:</string>
     <string name="t_bc28baf5fc" formatted="false">لا توجد سجلات أمس</string>
+    <string name="t_bc4d1d35af" formatted="false">كما في الملف</string>
     <string name="t_bc5431b599" formatted="false">المجلد</string>
     <string name="t_bd16b23470" formatted="false">داكن</string>
     <string name="t_bd4538e3c6" formatted="false">معتم</string>
@@ -688,6 +694,7 @@
     <string name="t_ce12182bac" formatted="false">معرّف القياس</string>
     <string name="t_ce3ec6ed08" formatted="false">ضمن الحد</string>
     <string name="t_ce5fc2ce7f" formatted="false">حُفظ الترتيب</string>
+    <string name="t_ced07fd144" formatted="false">لا شيء</string>
     <string name="t_cefdb75984" formatted="false">عمود الانتهاء (أو المدة)</string>
     <string name="t_cf113217ae">%1$s: %2$s دقيقة</string>
     <string name="t_cf3a8f3ca2" formatted="false">بدء التتبع</string>
@@ -759,6 +766,7 @@
     <string name="t_de7dee674e" formatted="false">هذا ملف نسخة احتياطية. استعده من «النسخ الاحتياطي»</string>
     <string name="t_de8f3c16b9" formatted="false">استبعاد</string>
     <string name="t_dee20b519a" formatted="false">لا بطاقة على شاشة القفل</string>
+    <string name="t_deleted_on">حُذفت · %1$s</string>
     <string name="t_df12865c09" formatted="false">الخط</string>
     <string name="t_dfd4e36290" formatted="false">تعذّر تبديل الأيقونة</string>
     <string name="t_e0382438fe">التركيز: %1$s د من العمل</string>
@@ -869,6 +877,11 @@
     <string name="t_fea5f3ca7c" formatted="false">ستختار النشاط لاحقًا</string>
     <string name="t_fee1dd80dd">النص الحالي: «%1$s»\nالنص الجديد: «%2$s»</string>
     <string name="t_feff16c4bb" formatted="false">المؤقّت في لوحة الإشعارات</string>
+    <string name="t_restore_all">استعادة الكل (%1$s)</string>
+    <string name="t_restore_all_body" formatted="false">تعود السجلات إلى أماكنها السابقة في السجل.</string>
+    <string name="t_restore_all_confirm" formatted="false">استعادة</string>
+    <string name="t_restore_all_done">السجلات المستعادة: %1$s</string>
+    <string name="t_restore_all_title">استعادة %1$s؟</string>
     <plurals name="p_032a085f42">
         <item quantity="zero">%1$d يوم</item>
         <item quantity="one">يوم واحد</item>

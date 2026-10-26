@@ -118,7 +118,7 @@ private fun BreakdownSheet(vm: TrackerViewModel, period: Period, stack: List<Str
         SheetHeader(data?.title ?: "", onDismiss, back = if (stack.size > 1) onBack else null)
         Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             val b = data ?: run { Spacer(Modifier.height(120.dp)); return@Column }
-            Text("${if (period == Period.DAY) "Сегодня" else "За ${period.title}"}: ${Format.duration(b.totalMs)}", Modifier.padding(bottom = 8.dp),
+            Text("${if (period == Period.DAY) L.s(R.string.t_5d5d2ea20a) else L.s(R.string.t_096312396e, period.title)}: ${Format.duration(b.totalMs)}", Modifier.padding(bottom = 8.dp),
                 style = NotAi.type.bodySmall, color = c.ink2)
             if (b.parts.isEmpty()) Text(L.s(R.string.t_a7e3c8ee69), style = NotAi.type.bodySmall, color = c.ink2)
             val max = b.parts.maxOfOrNull { it.ms }?.coerceAtLeast(1) ?: 1

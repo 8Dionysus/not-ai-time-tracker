@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generated from Kotlin source copy; see docs/localization/UI_COPY.md. -->
+<!-- Generated from Kotlin source copy; see localization/ui-copy/README.md. -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="t_0076203bff" formatted="false">Pause starten</string>
     <string name="t_0077164ed0">Export %1$s: erneut vorbereiten; die Teildatei bleibt erhalten</string>
@@ -25,6 +25,7 @@
     <string name="t_08f120e3b9" formatted="false">Gespeicherte Option starten?</string>
     <string name="t_090fad991e" formatted="false">Einstellungen öffnen</string>
     <string name="t_0931eb69ad" formatted="false">Eigene Aktivität</string>
+    <string name="t_096312396e">In %1$s</string>
     <string name="t_09804101ad" formatted="false">Großzügig</string>
     <string name="t_0a33cc879e">Aus Favoriten entfernen: %1$s</string>
     <string name="t_0a7d0c65cc" formatted="false">Speichern abgebrochen</string>
@@ -334,6 +335,7 @@
     <string name="t_69d66ab891" formatted="false">Aktivität zum Plan hinzufügen</string>
     <string name="t_69e5b8a8c6" formatted="false">Nichtnegative Dezimalzahl, Dezimaltrennzeichen Punkt</string>
     <string name="t_6a0e6066b0" formatted="false">Früher gewechselt</string>
+    <string name="t_6ae7f2feef" formatted="false">ganztägig</string>
     <string name="t_6b08862cb2" formatted="false">App-Symbol ließ sich nicht prüfen</string>
     <string name="t_6b8910932e" formatted="false">Symbol in der Statusleiste ausgeblendet</string>
     <string name="t_6cde6c34a0" formatted="false">Für heute geplant</string>
@@ -353,6 +355,7 @@
     <string name="t_70b8d5d8d5" formatted="false">Aktivität</string>
     <string name="t_716e5371c7" formatted="false">Auswahl aufheben</string>
     <string name="t_71790fdb53" formatted="false">Nicht stören</string>
+    <string name="t_72aecd9ad8" formatted="false">Fehler</string>
     <string name="t_72f931bda2" formatted="false">Datensicherung</string>
     <string name="t_731f2bdc1e" formatted="false">Zeit aus dem Kalender übernehmen</string>
     <string name="t_734bcf2003" formatted="false">Symbol in der Statusleiste</string>
@@ -383,6 +386,7 @@
     <string name="t_79fb04fd8b">Technische Oberfläche · Room %1$s\n%2$s\n%3$s ms · Revision %4$s\n%5$s%6$s\n%7$s</string>
     <string name="t_7ae0e67853" formatted="false">Zeitzone des Telefons verwenden?</string>
     <string name="t_7ae1597ae7" formatted="false">Öffne die App, um die Zeit anzupassen</string>
+    <string name="t_7aeae28ae9" formatted="false">ohne Karte</string>
     <string name="t_7b11e988e1" formatted="false">Für heute entfernen</string>
     <string name="t_7b47d9e19e" formatted="false">Start verwendet die aktuelle Uhrzeit. Für einen manuellen Eintrag müssen Anfang und Ende ausdrücklich angegeben werden; ein ganztägiger Termin legt kein Arbeitsintervall fest.</string>
     <string name="t_7c379e8e5c" formatted="false">Bericht gespeichert</string>
@@ -464,6 +468,7 @@
     <string name="t_90078dfa30" formatted="false">Mo</string>
     <string name="t_909a83238c" formatted="false">Eintrag hinzufügen</string>
     <string name="t_909baadb08" formatted="false">Früher begonnen</string>
+    <string name="t_90d0002e66" formatted="false">Eigene Daten</string>
     <string name="t_914b6dca6d" formatted="false">Meine Zeitzone</string>
     <string name="t_917b58362c" formatted="false">Notiz</string>
     <string name="t_91b707a9d1" formatted="false">Noch keine lokalen Kopien</string>
@@ -628,6 +633,7 @@
     <string name="t_bbcf06b3c9" formatted="false">Notizen</string>
     <string name="t_bbee9680a8" formatted="false">Unbekannte Zeit zählt nicht mit:</string>
     <string name="t_bc28baf5fc" formatted="false">Gestern keine Einträge</string>
+    <string name="t_bc4d1d35af" formatted="false">wie in der Datei</string>
     <string name="t_bc5431b599" formatted="false">Ordner</string>
     <string name="t_bd16b23470" formatted="false">Dunkel</string>
     <string name="t_bd4538e3c6" formatted="false">deckend</string>
@@ -688,6 +694,7 @@
     <string name="t_ce12182bac" formatted="false">ID der Messgröße</string>
     <string name="t_ce3ec6ed08" formatted="false">im Rahmen</string>
     <string name="t_ce5fc2ce7f" formatted="false">Reihenfolge gespeichert</string>
+    <string name="t_ced07fd144" formatted="false">keine</string>
     <string name="t_cefdb75984" formatted="false">Endspalte (oder Dauer)</string>
     <string name="t_cf113217ae">%1$s: %2$s Minuten</string>
     <string name="t_cf3a8f3ca2" formatted="false">Zeiterfassung starten</string>
@@ -759,6 +766,7 @@
     <string name="t_de7dee674e" formatted="false">Das ist eine Sicherungsdatei. Stelle sie unter „Datensicherung“ wieder her</string>
     <string name="t_de8f3c16b9" formatted="false">Nicht berücksichtigen</string>
     <string name="t_dee20b519a" formatted="false">Keine Karte auf dem Sperrbildschirm</string>
+    <string name="t_deleted_on">Gelöscht · %1$s</string>
     <string name="t_df12865c09" formatted="false">Schrift</string>
     <string name="t_dfd4e36290" formatted="false">Symbol ließ sich nicht wechseln</string>
     <string name="t_e0382438fe">Fokus: %1$s Min. Arbeit</string>
@@ -869,6 +877,11 @@
     <string name="t_fea5f3ca7c" formatted="false">Die Aktivität wählst du später</string>
     <string name="t_fee1dd80dd">Aktueller Text: „%1$s“\nNeuer Text: „%2$s“</string>
     <string name="t_feff16c4bb" formatted="false">Timer in der Benachrichtigungsleiste</string>
+    <string name="t_restore_all">Alle wiederherstellen (%1$s)</string>
+    <string name="t_restore_all_body" formatted="false">Die Einträge kehren an ihre bisherigen Stellen im Verlauf zurück.</string>
+    <string name="t_restore_all_confirm" formatted="false">Wiederherstellen</string>
+    <string name="t_restore_all_done">Wiederhergestellte Einträge: %1$s</string>
+    <string name="t_restore_all_title">%1$s wiederherstellen?</string>
     <plurals name="p_032a085f42">
         <item quantity="one">%1$d Tag</item>
         <item quantity="other">%1$d Tage</item>

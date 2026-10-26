@@ -212,6 +212,10 @@ class UiScreensTest {
         return vm
     }
 
+    /** The uncovered Delete button of the one row that a swipe opened. */
+    private fun revealedDelete() = compose.onAllNodes(androidx.compose.ui.test.SemanticsMatcher("swipe delete") { n ->
+        n.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.TestTag)?.startsWith("swipe-delete:") == true }).onFirst()
+
     private fun waitText(text: String) {
         compose.waitUntil(15_000) { compose.onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty() }
     }
@@ -521,6 +525,11 @@ class UiScreensTest {
         compose.waitUntil(5_000) { compose.onAllNodesWithText("9:10–11:02", substring = true).fetchSemanticsNodes().isEmpty() }
         compose.waitForIdle()
         compose.onAllNodesWithText("8:30–8:55", substring = true).onFirst().performTouchInput { swipeLeft() }
+        // A swipe only uncovers the button; nothing is deleted until it is tapped.
+        compose.waitForIdle();compose.mainClock.advanceTimeBy(1_000)
+        assertTrue(seed.tracker.data().sessions.size == before - 1)
+        shot("08-swipe-revealed", vm)
+        revealedDelete().performClick()
         compose.waitUntil(5_000) { seed.tracker.data().sessions.size == before - 2 }
         compose.waitUntil(5_000) { compose.onAllNodesWithText("8:30–8:55", substring = true).fetchSemanticsNodes().isEmpty() }
     }
@@ -608,6 +617,7 @@ class UiScreensTest {
             assertTrue(original == t.data())
             repeat(2) {
                 row().performScrollTo();row().performTouchInput { swipeLeft() }
+                assertTrue(t.data().sessions.any { it.id == record.id });compose.onNodeWithTag("swipe-delete:${record.id}").performClick()
                 compose.waitUntil(5_000) { t.data().sessions.none { it.id == record.id } }
                 waitText("Запись перемещена в «Удалённое»")
                 if(it == 1) t.saveCard(t.snapshot().token,Card("later-ui-edit","Keep later independent edit"))
@@ -621,6 +631,7 @@ class UiScreensTest {
             }
             shot("recovery-restored-history",vm)
             row().performScrollTo();row().performTouchInput { swipeLeft() }
+            compose.onNodeWithTag("swipe-delete:${record.id}").performClick()
             compose.waitUntil(5_000) { t.data().deletedRecords.size == 1 }
             compose.onNodeWithText("Настройки").performClick()
             compose.onNodeWithText("Удалённое").performScrollTo().performClick()

@@ -667,6 +667,9 @@ class TrackerViewModel internal constructor(private val app: Application,private
             rt.tracker.restoreDeleted(live.snapshot().token,ids)
         }
     }
+    /** Every listed record back in one step, after the confirmation on «Удалённое». The core restores all or nothing. */
+    fun restoreAllDeleted(sessionIds: List<String>,expected: Token) = command({ change -> localText(dev.notai.tracker.android.R.string.t_restore_all_done,sessionIds.size) },
+        failure = { localText(dev.notai.tracker.android.R.string.restore_error) }) { rt,_ -> rt.tracker.restoreDeleted(expected,sessionIds) }
     fun restoreDeleted(sessionId: String,expected: Token) = command({ localText(dev.notai.tracker.android.R.string.record_restored) },failure = { localText(dev.notai.tracker.android.R.string.restore_error) }) { rt,_ ->
         rt.tracker.restoreDeleted(expected,listOf(sessionId))
     }

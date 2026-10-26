@@ -2,6 +2,8 @@
 
 package dev.notai.tracker.android.ui
 
+
+import dev.notai.tracker.android.L
 import androidx.compose.ui.platform.testTag
 
 import dev.notai.tracker.android.R
@@ -34,6 +36,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -96,12 +99,17 @@ fun TimerScreen(snapshot: Snapshot?, home: HomeData?, vm: TrackerViewModel, acti
     // Gaps stay folded per day until asked for: visible, never nagging.
     var openGaps by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(listOf<String>()) }
     val picked by vm.picked.collectAsStateWithLifecycle()
-    LazyColumn(modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 24.dp)) {
+    val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    val reveal = remember { SwipeReveal() }
+    // Any scroll folds an uncovered Delete back: it never stays armed under a moving finger.
+    LaunchedEffect(listState.isScrollInProgress) { if (listState.isScrollInProgress) reveal.open = null }
+    CompositionLocalProvider(LocalSwipeReveal provides reveal) {
+    LazyColumn(modifier.fillMaxSize(), state = listState, contentPadding = PaddingValues(bottom = 24.dp)) {
         item(key = "top") {
             Row(Modifier.fillMaxWidth().height(60.dp).padding(start = 20.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Wordmark(Modifier.weight(1f))
                 Text(home?.today?.let { Format.headerDate(it) } ?: "", style = NotAi.type.bodySmall, color = c.ink2)
-                IconAction(if (dark) Icon.Sun else Icon.Moon, if (dark) "Светлая тема" else "Тёмная тема", actions.toggleTheme)
+                IconAction(if (dark) Icon.Sun else Icon.Moon, if (dark) L.s(R.string.t_b45bbb4570) else L.s(R.string.t_ec1c55d866), actions.toggleTheme)
             }
         }
         item(key = "hero") {
@@ -131,6 +139,7 @@ fun TimerScreen(snapshot: Snapshot?, home: HomeData?, vm: TrackerViewModel, acti
             }
         }
         if (home != null) history(home, snapshot, vm, actions, openGaps, { d -> openGaps = if (d in openGaps) openGaps - d else openGaps + d }, picked)
+    }
     }
 }
 
@@ -166,17 +175,17 @@ private fun IdleHero(home: HomeData?, vm: TrackerViewModel, actions: TimerAction
     val c = NotAi.colors
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Box(Modifier.height(128.dp).widthIn(min = 280.dp).clip(RoundedCornerShape(64.dp))
-            .pressable(haptic(HapticFeedbackType.Confirm, vm::startBlank), label = "Начать учёт времени").semantics { contentDescription = "Начать учёт времени" },
+            .pressable(haptic(HapticFeedbackType.Confirm, vm::startBlank), label = L.s(R.string.t_13f1659f76)).semantics { contentDescription = L.s(R.string.t_13f1659f76) },
             contentAlignment = Alignment.Center) {
             IntervalFrame(IntervalState.IDLE, bracketWidth = 26.dp, bracketHeight = 104.dp, gap = 22.dp, opening = false, invite = NotAi.appearance.pulse) {
                 Text(stringResource(R.string.editorial_tracker_draft_5799c96ef993116ab577_v0), style = NotAi.type.start, color = c.ink)
             }
         }
-        Text("Время пойдёт сразу.\nЗанятие можно выбрать потом.", style = NotAi.type.bodySmall, color = c.ink2, textAlign = TextAlign.Center)
+        Text(L.s(R.string.t_49c5f1afe2), style = NotAi.type.bodySmall, color = c.ink2, textAlign = TextAlign.Center)
         Column(Modifier.fillMaxWidth().padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             val plan = home?.plan.orEmpty()
             if (plan.isNotEmpty()) {
-                SectionLabel("По плану на сегодня")
+                SectionLabel(L.s(R.string.t_6cde6c34a0))
                 PlanChips(plan, vm)
                 Spacer(Modifier.height(2.dp))
             }
@@ -185,10 +194,10 @@ private fun IdleHero(home: HomeData?, vm: TrackerViewModel, actions: TimerAction
             // A new install has no favourites or history yet: invite a few own activities instead of an empty section.
             if (home != null && quick.isEmpty() && !dismissed) StarterCard(vm)
             else {
-                if (quick.isNotEmpty()) SectionLabel("Начать сразу")
+                if (quick.isNotEmpty()) SectionLabel(L.s(R.string.t_fc8e4e2d1c))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     quick.forEach { q -> QuickChip(q, vm) }
-                    Chip(if (quick.isEmpty()) "Начать с занятием" else "Все занятия", { actions.pick(PickMode.START) }, dashed = true, icon = Icon.Plus)
+                    Chip(if (quick.isEmpty()) L.s(R.string.t_549bc063f3) else L.s(R.string.t_c0634e4cb3), { actions.pick(PickMode.START) }, dashed = true, icon = Icon.Plus)
                 }
             }
             if (NotAi.appearance.showFocus) FocusLink(home?.focusMinutes ?: 25, vm, Modifier.align(Alignment.Start).offset(x = (-12).dp))
@@ -200,7 +209,7 @@ private fun IdleHero(home: HomeData?, vm: TrackerViewModel, actions: TimerAction
 private fun Digits(ms: Long, state: IntervalState) {
     val c = NotAi.colors
     val color by animateColorAsState(if (state == IntervalState.RUNNING) c.ink else c.ink2, tween(400), label = "digits")
-    Row(modifier = Modifier.semantics(mergeDescendants = true) { contentDescription = "Прошло ${Format.duration(ms)}" }) {
+    Row(modifier = Modifier.semantics(mergeDescendants = true) { contentDescription = L.s(R.string.t_d349cb398d, Format.duration(ms)) }) {
         Text(Format.timerMain(ms), style = NotAi.type.timer, color = color, modifier = Modifier.alignByBaseline())
         Text(Format.timerSeconds(ms), style = NotAi.type.timerSeconds, color = c.ink2, modifier = Modifier.alignByBaseline().padding(start = 4.dp).widthIn(min = 30.dp))
     }
@@ -211,14 +220,14 @@ private fun CurrentLabel(home: HomeData?, onClick: () -> Unit) {
     val c = NotAi.colors
     val label = home?.currentLabel
     if (label == null || label.unclassified) {
-        Row(Modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp)).background(c.amberWash).pressable(onClick, label = "Выбрать занятие")
+        Row(Modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp)).background(c.amberWash).pressable(onClick, label = L.s(R.string.t_5916628df1))
             .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             ActivityGlyph(ActivityGlyphs.unclassified, null, size = 18.dp, unclassified = true)
             Text(stringResource(R.string.editorial_tracker_draft_f49276090fc98f59c7eb_v0), style = NotAi.type.label, color = c.ink)
             Text(stringResource(R.string.editorial_tracker_draft_d134c6d82d62e46ec879_v0), style = NotAi.type.label.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
         }
     } else {
-        Row(Modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp)).pressable(onClick, label = "Сменить или уточнить занятие")
+        Row(Modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp)).pressable(onClick, label = L.s(R.string.t_2840f49e22))
             .padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             ActivityGlyph(label)
             Row(Modifier.weight(1f, fill = false)) {
@@ -242,29 +251,29 @@ private fun ActiveHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, actio
         }
         CurrentLabel(home) { actions.pick(if (labelled) PickMode.SWITCH else PickMode.LABEL) }
         val line = when {
-            s.mode == Mode.PAUSED -> "На паузе. Пауза не входит во время занятия."
+            s.mode == Mode.PAUSED -> L.s(R.string.t_f94b15c5ce)
             start == null -> ""
-            labelled -> "С ${Format.clock(start, zone)}"
-            else -> "Идёт с ${Format.clock(start, zone)}. Начало сохранится при выборе."
+            labelled -> L.s(R.string.t_e2e41650a0, Format.clock(start, zone))
+            else -> L.s(R.string.t_03cb42c402, Format.clock(start, zone))
         }
         Text(line, style = NotAi.type.caption, color = c.ink2, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
         ButtonPair(Modifier.padding(top = 4.dp)) { m ->
-            if (s.mode == Mode.RUNNING) PillButton("Пауза", haptic(HapticFeedbackType.ToggleOff, vm::pause), m, ButtonKind.TONAL, Icon.Pause)
-            else PillButton("Продолжить", haptic(HapticFeedbackType.ToggleOn, vm::resume), m, ButtonKind.AMBER, Icon.Play)
+            if (s.mode == Mode.RUNNING) PillButton(L.s(R.string.t_03498e395a), haptic(HapticFeedbackType.ToggleOff, vm::pause), m, ButtonKind.TONAL, Icon.Pause)
+            else PillButton(L.s(R.string.t_3f75368ab9), haptic(HapticFeedbackType.ToggleOn, vm::resume), m, ButtonKind.AMBER, Icon.Play)
             PillButton(stringResource(R.string.editorial_tracker_draft_f386fe7c3de9982b475f_v0), haptic(HapticFeedbackType.Confirm, vm::stop), m, ButtonKind.PRIMARY, Icon.Stop)
         }
         // Two quiet fixes of the same kind: the record began before Start, or the switch happened before it was tapped.
         val earlier = s.mode == Mode.RUNNING && "switchedEarlier" in s.actions
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-            TimeFix("Начал раньше", actions.startEarlier)
+            TimeFix(L.s(R.string.t_909baadb08), actions.startEarlier)
             if (earlier) {
                 Text("·", style = NotAi.type.bodySmall, color = c.ink3)
-                TimeFix("Переключился раньше", actions.earlier)
+                TimeFix(L.s(R.string.t_6a0e6066b0), actions.earlier)
             }
         }
         val plan = home?.plan.orEmpty().filter { !it.started }
         if (plan.isNotEmpty()) Column(Modifier.fillMaxWidth().padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            SectionLabel("Дальше по плану")
+            SectionLabel(L.s(R.string.t_edd23ab082))
             PlanChips(plan, vm)
         }
     }
@@ -276,10 +285,10 @@ private fun ActiveHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, actio
 private fun FocusLink(minutes: Long, vm: TrackerViewModel, modifier: Modifier = Modifier) {
     val haptics = LocalHapticFeedback.current
     Box(modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp))
-        .combinedClickable(onClickLabel = "Начать Фокус", onLongClickLabel = "Настроить Фокус",
+        .combinedClickable(onClickLabel = L.s(R.string.t_41a9abce27), onLongClickLabel = L.s(R.string.t_9ebe3ac111),
             onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); vm.openFocusEditor() }, onClick = vm::startFocus)
         .padding(horizontal = 12.dp), contentAlignment = Alignment.Center) {
-        Text("Фокус: $minutes мин работы", style = NotAi.type.button, color = NotAi.colors.amberInk)
+        Text(L.s(R.string.t_e0382438fe, minutes), style = NotAi.type.button, color = NotAi.colors.amberInk)
     }
 }
 
@@ -296,11 +305,11 @@ private fun QuickChip(q: QuickStart, vm: TrackerViewModel) {
             @Composable fun item(text: String, icon: ImageVector, action: () -> Unit) = DropdownMenuItem(text = { Text(text, style = NotAi.type.body, color = c.ink) },
                 onClick = { menu = false; action() }, leadingIcon = { M3Icon(icon, null, Modifier.size(18.dp), tint = c.ink2) }, modifier = Modifier.widthIn(min = 210.dp))
             val card = q.entry.selection.cardId
-            if (q.favorite) item("Изменить", Icon.Edit) { vm.openEditor(EditTarget.Fav(q.entry.sourceId)) }
-            else if (card != null) item("Изменить занятие", Icon.Edit) { vm.openEditor(EditTarget.Card(card)) }
-            if (q.favorite) item("Убрать из избранного", Icon.StarLine) { vm.removeFavorites(vm.favoriteIds(q.entry.selection)) }
-            else item("В избранное", Icon.Star) { vm.saveFavorite(q.title, q.entry.selection) }
-            item("Порядок и всё избранное", Icon.Grip) { vm.openFavorites(true) }
+            if (q.favorite) item(L.s(R.string.t_9d809f884b), Icon.Edit) { vm.openEditor(EditTarget.Fav(q.entry.sourceId)) }
+            else if (card != null) item(L.s(R.string.t_de5eb09e17), Icon.Edit) { vm.openEditor(EditTarget.Card(card)) }
+            if (q.favorite) item(L.s(R.string.t_d9f48a75fd), Icon.StarLine) { vm.removeFavorites(vm.favoriteIds(q.entry.selection)) }
+            else item(L.s(R.string.t_5da9e0e83b), Icon.Star) { vm.saveFavorite(q.title, q.entry.selection) }
+            item(L.s(R.string.t_4ea0639432), Icon.Grip) { vm.openFavorites(true) }
         }
     }
 }
@@ -326,9 +335,9 @@ private fun PlanChips(plan: List<PlanItem>, vm: TrackerViewModel) {
                 Row(Modifier.heightIn(min = 40.dp).clip(RoundedCornerShape(50))
                     .background(if (p.started) Color.Transparent else c.sunk)
                     .then(if (p.started) Modifier.border(1.dp, c.rule, RoundedCornerShape(50)) else Modifier)
-                    .combinedClickable(enabled = !p.started, onClickLabel = "Начать по плану", onLongClickLabel = "Действия с планом",
+                    .combinedClickable(enabled = !p.started, onClickLabel = L.s(R.string.t_afd78e8296), onLongClickLabel = L.s(R.string.t_b8b15fe0c2),
                         onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); menu = true }, onClick = { vm.startPlanned(p) })
-                    .semantics { contentDescription = p.title + (p.time?.let { ", $it" } ?: "") + if (p.started) ", уже начато" else "" }
+                    .semantics { contentDescription = p.title + (p.time?.let { ", $it" } ?: "") + if (p.started) L.s(R.string.t_2f6a9e8aa1) else "" }
                     .padding(start = 11.dp, end = 14.dp),
                     verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                     if (p.started) M3Icon(Icon.Check, null, Modifier.size(16.dp), tint = c.ink2) else ActivityGlyph(p.glyph, p.slot, size = 17.dp)
@@ -337,7 +346,7 @@ private fun PlanChips(plan: List<PlanItem>, vm: TrackerViewModel) {
                 }
                 DropdownMenu(menu, { menu = false }, shape = RoundedCornerShape(16.dp), containerColor = c.raised,
                     border = BorderStroke(1.dp, c.rule), shadowElevation = 8.dp) {
-                    DropdownMenuItem(text = { Text("Убрать на сегодня", style = NotAi.type.body, color = c.ink) },
+                    DropdownMenuItem(text = { Text(L.s(R.string.t_7b11e988e1), style = NotAi.type.body, color = c.ink) },
                         onClick = { menu = false; vm.skipPlanned(p) }, leadingIcon = { M3Icon(Icon.Close, null, Modifier.size(18.dp), tint = c.ink2) })
                 }
             }
@@ -355,7 +364,7 @@ private fun RecoveryHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, act
                 // Known part only. After a restart nothing after the start is trusted, so the start itself is shown.
                 if (s.trustedDurationMs > 0 || start == null) Digits(s.trustedDurationMs, IntervalState.PAUSED)
                 else Text(Format.clock(start, zone), style = NotAi.type.timer, color = c.ink2,
-                    modifier = Modifier.semantics { contentDescription = "Начало ${Format.clock(start, zone)}, конец неизвестен" })
+                    modifier = Modifier.semantics { contentDescription = L.s(R.string.t_49a37138c8, Format.clock(start, zone)) })
             }
         }
         home?.currentLabel?.takeIf { !it.unclassified }?.let { l ->
@@ -363,13 +372,13 @@ private fun RecoveryHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, act
                 ActivityGlyph(l); Row { Text(l.title, style = NotAi.type.label, color = c.ink); l.detail?.let { Text(" $it", style = NotAi.type.label, color = c.ink2) } }
             }
         }
-        Text(if (start != null) "Конец неизвестен" else "Время неизвестно",
+        Text(if (start != null) L.s(R.string.t_9f8007cba2) else L.s(R.string.t_5c65c982d1),
             style = NotAi.type.label.copy(fontWeight = FontWeight.Medium), color = c.ink, textAlign = TextAlign.Center)
         Text(stringResource(R.string.editorial_tracker_draft_801a0a1eac7e6d9ef9b4_v0),
             style = NotAi.type.bodySmall, color = c.ink2, textAlign = TextAlign.Center)
         Column(Modifier.fillMaxWidth().padding(top = 4.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             PillButton(stringResource(R.string.editorial_tracker_draft_b048178228ee82e3e962_v0), actions.resolve, Modifier.fillMaxWidth(), ButtonKind.AMBER)
-            PillButton(if (start != null) "Не учитывать с ${Format.clock(start, zone)}" else "Не учитывать", vm::excludeTail, Modifier.fillMaxWidth(), ButtonKind.TONAL)
+            PillButton(if (start != null) L.s(R.string.t_fd7707e6f0, Format.clock(start, zone)) else L.s(R.string.t_de8f3c16b9), vm::excludeTail, Modifier.fillMaxWidth(), ButtonKind.TONAL)
         }
     }
 }
@@ -382,15 +391,15 @@ private fun FocusHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, action
     val work = f.phase == FocusPhase.WORK
     val state = if (f.mode == FocusMode.RUNNING) IntervalState.RUNNING else IntervalState.PAUSED
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(if (work) "Фокус, отрезок работы ${f.phaseIndex / 2 + 1}" else "Фокус, перерыв", style = NotAi.type.caption, color = c.ink2)
+        Text(if (work) L.s(R.string.t_0c15fe2798, f.phaseIndex / 2 + 1) else L.s(R.string.t_01a3d66b22), style = NotAi.type.caption, color = c.ink2)
         Box(Modifier.height(128.dp), contentAlignment = Alignment.Center) {
             IntervalFrame(if (f.mode == FocusMode.DUE) IntervalState.PAUSED else state) {
                 Text(Format.countdown(f.remainingMs), style = NotAi.type.timer, color = if (state == IntervalState.RUNNING) c.ink else c.ink2,
-                    modifier = Modifier.semantics { contentDescription = "Осталось ${Format.duration(f.remainingMs)}" })
+                    modifier = Modifier.semantics { contentDescription = L.s(R.string.t_c14f88246c, Format.duration(f.remainingMs)) })
             }
         }
-        Text(if (f.mode == FocusMode.DUE) (if (work) "Отрезок работы закончился" else "Перерыв закончился")
-             else "осталось из ${Format.duration(f.durationMs)}", style = NotAi.type.bodySmall, color = c.ink2)
+        Text(if (f.mode == FocusMode.DUE) (if (work) L.s(R.string.t_c650387bcb) else L.s(R.string.t_bdcb031d09))
+             else L.s(R.string.t_0faf5fa9ac, Format.duration(f.durationMs)), style = NotAi.type.bodySmall, color = c.ink2)
         val fraction = if (f.durationMs > 0) (f.elapsedMs.toFloat() / f.durationMs).coerceIn(0f, 1f) else 0f
         Box(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(c.sunk)) {
             Box(Modifier.fillMaxWidth(fraction).fillMaxHeight().clip(RoundedCornerShape(4.dp)).background(if (work) c.amber else c.ink3))
@@ -398,13 +407,13 @@ private fun FocusHero(s: Snapshot, home: HomeData?, vm: TrackerViewModel, action
         if (work) CurrentLabel(home) { actions.pick(PickMode.LABEL) }
         ButtonPair(Modifier.padding(top = 4.dp)) { m ->
             when (f.mode) {
-                FocusMode.RUNNING -> PillButton("Пауза", haptic(HapticFeedbackType.ToggleOff, vm::pause), m, ButtonKind.TONAL, Icon.Pause)
-                FocusMode.PAUSED -> PillButton("Продолжить", haptic(HapticFeedbackType.ToggleOn, vm::resume), m, ButtonKind.AMBER, Icon.Play)
-                else -> PillButton(if (work) "Начать перерыв" else "Начать работу", vm::focusNext, m, ButtonKind.AMBER)
+                FocusMode.RUNNING -> PillButton(L.s(R.string.t_03498e395a), haptic(HapticFeedbackType.ToggleOff, vm::pause), m, ButtonKind.TONAL, Icon.Pause)
+                FocusMode.PAUSED -> PillButton(L.s(R.string.t_3f75368ab9), haptic(HapticFeedbackType.ToggleOn, vm::resume), m, ButtonKind.AMBER, Icon.Play)
+                else -> PillButton(if (work) L.s(R.string.t_0076203bff) else L.s(R.string.t_74b69f961b), vm::focusNext, m, ButtonKind.AMBER)
             }
             PillButton(stringResource(R.string.editorial_tracker_draft_d4c3ff0340d73303cb5b_v0), haptic(HapticFeedbackType.Confirm, vm::stop), m, ButtonKind.PRIMARY, Icon.Stop)
         }
-        if (f.mode != FocusMode.DUE) PillButton(if (work) "Пропустить отрезок" else "Пропустить перерыв", vm::focusSkip, kind = ButtonKind.TEXT, height = 44.dp)
+        if (f.mode != FocusMode.DUE) PillButton(if (work) L.s(R.string.t_f4f34092fb) else L.s(R.string.t_c25bd1a7c6), vm::focusSkip, kind = ButtonKind.TEXT, height = 44.dp)
         Text(stringResource(R.string.editorial_tracker_draft_cbeca4591fe9810ca6fd_v0), style = NotAi.type.caption, color = c.ink2,
             textAlign = TextAlign.Center)
     }
@@ -419,7 +428,7 @@ private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: Track
                 val empty = day.entries.isEmpty() && day.live.isEmpty() && day.recordedMs == 0L
                 SectionTitle(Format.dayTitle(day.date, home.today), trailing = if (empty) null else Format.duration(day.recordedMs))
                 Spacer(Modifier.height(10.dp))
-                if (empty) Text(if (day.date == home.today) "Записей пока нет. Здесь появится каждый отрезок." else "Записей нет.",
+                if (empty) Text(if (day.date == home.today) L.s(R.string.t_550c7a6d12) else L.s(R.string.t_2972f8b4c4),
                     style = NotAi.type.bodySmall, color = c.ink2)
                 else {
                     val pieces = day.ribbon.map { RibbonPiece(it.start, it.end, it.slot?.let { s -> c.areas[s] } ?: c.none) } +
@@ -428,9 +437,9 @@ private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: Track
                     val fillable = day.gaps.count { it.kind == dev.notai.tracker.HistoryGapKind.UNRECORDED }
                     if (fillable > 0) {
                         val open = day.date.toString() in openGaps
-                        Text((if (open) "Скрыть промежутки" else Format.plural(fillable, "промежуток", "промежутка", "промежутков") + " без записи"),
+                        Text((if (open) L.s(R.string.t_2960da94e0) else L.p(R.plurals.p_33de38af49, fillable) + L.s(R.string.t_ddca6f4db2)),
                             Modifier.padding(top = 6.dp).heightIn(min = 32.dp).pressable({ toggleGaps(day.date.toString()) },
-                                label = if (open) "Скрыть промежутки без записи" else "Показать промежутки без записи").padding(vertical = 6.dp),
+                                label = if (open) L.s(R.string.t_57fe19481c) else L.s(R.string.t_5d09029804)).padding(vertical = 6.dp),
                             style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
                     }
                 }
@@ -465,7 +474,8 @@ private fun LazyListScope.history(home: HomeData, snapshot: Snapshot?, vm: Track
 /** Horizontal intention is checked before consuming any part of a scrolling gesture. */
 @Composable
 private fun SwipeToDelete(e: EntryUi, delete: suspend (EntryUi) -> Boolean, modifier: Modifier = Modifier, content: @Composable () -> Unit) =
-    IntentionalDeleteSwipe({ delete(e) },modifier.then(Modifier.testTag("history-record:${e.sessionId}")),content)
+    IntentionalDeleteSwipe({ delete(e) },modifier.then(Modifier.testTag("history-record:${e.sessionId}")),revealKey = e.sessionId,
+        actionTag = "swipe-delete:${e.sessionId}",content = content)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -481,8 +491,8 @@ fun EntryRow(e: EntryUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: () -> Unit,
                 onDelete = onDelete?.let { d -> { scope.launch { d() } } }, onPickMany = onPickMany)
         }
         Row(Modifier.fillMaxWidth().heightIn(min = 60.dp)
-            .combinedClickable(onClickLabel = if (choosing) (if (picked) "Убрать из выбранных" else "Выбрать") else "Исправить запись",
-                onLongClickLabel = if (choosing) null else "Действия с записью",
+            .combinedClickable(onClickLabel = if (choosing) (if (picked) L.s(R.string.t_d184a16515) else L.s(R.string.t_fe4b0c80f0)) else L.s(R.string.t_8a22f78e9c),
+                onLongClickLabel = if (choosing) null else L.s(R.string.t_9d5b844654),
                 onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); if (choosing) onOpen() else menu = true }, onClick = onOpen)
             .semantics { if (choosing) selected = picked },
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -497,7 +507,7 @@ fun EntryRow(e: EntryUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: () -> Unit,
                     maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             Text(Format.duration(e.durationMs), style = NotAi.type.body.copy(fontSize = 15.sp), color = c.ink)
-            IconAction(Icon.Repeat, "Повторить: ${e.label.title}", onRepeat, size = 16.dp)
+            IconAction(Icon.Repeat, L.s(R.string.t_6e166fe43b, e.label.title), onRepeat, size = 16.dp)
         }
         Hairline()
     }
@@ -535,8 +545,8 @@ private fun RecordRow(r: RecordUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: (
         }
         val compact = NotAi.appearance.compact
         Row(Modifier.fillMaxWidth().heightIn(min = if (compact) 48.dp else 60.dp)
-            .combinedClickable(onClickLabel = if (choosing) (if (picked) "Убрать из выбранных" else "Выбрать") else "Исправить запись",
-                onLongClickLabel = if (choosing) null else "Действия с записью",
+            .combinedClickable(onClickLabel = if (choosing) (if (picked) L.s(R.string.t_d184a16515) else L.s(R.string.t_fe4b0c80f0)) else L.s(R.string.t_8a22f78e9c),
+                onLongClickLabel = if (choosing) null else L.s(R.string.t_9d5b844654),
                 onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); if (choosing) onOpen() else menu = true }, onClick = onOpen)
             .semantics { if (choosing) selected = picked },
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -551,16 +561,16 @@ private fun RecordRow(r: RecordUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: (
                     Text(Format.range(r.start, r.end, zone) + (e.note?.let { ", $it" } ?: ""), Modifier.weight(1f, fill = false), style = NotAi.type.caption, color = c.ink2,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
                     if (split || r.mixed) Row(Modifier.padding(start = 6.dp).heightIn(min = 28.dp).clip(RoundedCornerShape(14.dp))
-                        .pressable({ open = !open }, label = if (open) "Свернуть отрезки" else "Показать отрезки и паузы").padding(horizontal = 6.dp),
+                        .pressable({ open = !open }, label = if (open) L.s(R.string.t_894c240b90) else L.s(R.string.t_5f239661cc)).padding(horizontal = 6.dp),
                         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                        Text(if (r.pauses.isNotEmpty()) Format.plural(r.pauses.size, "пауза", "паузы", "пауз") else "разные занятия",
+                        Text(if (r.pauses.isNotEmpty()) L.p(R.plurals.p_c9ec2228f3, r.pauses.size) else L.s(R.string.t_806764743a),
                             style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk, maxLines = 1)
                         M3Icon(Icon.ChevronDown, null, Modifier.size(12.dp).graphicsLayerRotate(if (open) 180f else 0f), tint = c.amberInk)
                     }
                 }
             }
             Text(Format.duration(r.recordedMs), style = NotAi.type.body.copy(fontSize = 15.sp), color = c.ink)
-            if (!choosing) IconAction(Icon.Repeat, "Повторить: ${e.label.title}", onRepeat, size = 16.dp)
+            if (!choosing) IconAction(Icon.Repeat, L.s(R.string.t_6e166fe43b, e.label.title), onRepeat, size = 16.dp)
         }
         if (open && !choosing) Column(Modifier.padding(start = 32.dp, bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             // Chronological: segment, pause, segment… Durations are the core's per-segment values.
@@ -576,7 +586,7 @@ private fun RecordRow(r: RecordUi, zone: ZoneId, onOpen: () -> Unit, onRepeat: (
                         val p = item as dev.notai.tracker.DraftInterval
                         Box(Modifier.size(width = 6.dp, height = 2.dp).background(c.ink3))
                         Text(Format.range(p.start, p.end, zone), style = NotAi.type.caption, color = c.ink3)
-                        Text("пауза", Modifier.weight(1f), style = NotAi.type.caption, color = c.ink3)
+                        Text(L.s(R.string.t_9627af1c25), Modifier.weight(1f), style = NotAi.type.caption, color = c.ink3)
                     }
                 }
             }
@@ -596,12 +606,12 @@ private fun GapRow(g: GapUi, zone: ZoneId, onFill: () -> Unit, modifier: Modifie
     val c = NotAi.colors
     val fillable = g.kind == dev.notai.tracker.HistoryGapKind.UNRECORDED
     val what = when (g.kind) {
-        dev.notai.tracker.HistoryGapKind.UNRECORDED -> "не записано"
-        dev.notai.tracker.HistoryGapKind.PAUSE -> "пауза"
-        dev.notai.tracker.HistoryGapKind.RECOVERY_UNCERTAIN -> "время неизвестно"
+        dev.notai.tracker.HistoryGapKind.UNRECORDED -> L.s(R.string.t_ef34d1807a)
+        dev.notai.tracker.HistoryGapKind.PAUSE -> L.s(R.string.t_9627af1c25)
+        dev.notai.tracker.HistoryGapKind.RECOVERY_UNCERTAIN -> L.s(R.string.t_d4993a1dc7)
     }
     Column(modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).then(if (fillable) Modifier.pressable(onFill, label = "Записать промежуток") else Modifier)
+        Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).then(if (fillable) Modifier.pressable(onFill, label = L.s(R.string.t_f2a9788239)) else Modifier)
             .semantics(mergeDescendants = true) { contentDescription = "${Format.range(g.start, g.end, zone)}, $what" },
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             // An empty dashed ring in the icon column: a place where nothing was recorded.
@@ -613,7 +623,7 @@ private fun GapRow(g: GapUi, zone: ZoneId, onFill: () -> Unit, modifier: Modifie
             Text(what, Modifier.weight(1f), style = NotAi.type.caption, color = c.ink3)
             if (fillable) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 M3Icon(Icon.Plus, null, Modifier.size(14.dp), tint = c.amberInk)
-                Text("Записать", style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
+                Text(L.s(R.string.t_4be730321c), style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
             }
         }
         Hairline()
@@ -629,9 +639,9 @@ private fun EntryMenu(open: Boolean, onDismiss: () -> Unit, onOpen: () -> Unit, 
         @Composable fun item(text: String, icon: ImageVector, color: Color, action: () -> Unit) = DropdownMenuItem(
             text = { Text(text, style = NotAi.type.body, color = color) }, onClick = { onDismiss(); action() },
             leadingIcon = { M3Icon(icon, null, Modifier.size(18.dp), tint = color) }, modifier = Modifier.widthIn(min = 196.dp))
-        item("Исправить", Icon.Edit, c.ink, onOpen)
-        item("Повторить", Icon.Repeat, c.ink, onRepeat)
-        if (onPickMany != null) item("Выбрать несколько", Icon.Check, c.ink, onPickMany)
+        item(L.s(R.string.t_9b1c9a0216), Icon.Edit, c.ink, onOpen)
+        item(L.s(R.string.t_9e506acb19), Icon.Repeat, c.ink, onRepeat)
+        if (onPickMany != null) item(L.s(R.string.t_6155f92695), Icon.Check, c.ink, onPickMany)
         if (onDelete != null) item(stringResource(R.string.editorial_tracker_draft_98c2a48d88776822811d_v0), Icon.Trash, c.danger, onDelete)
     }
 }
@@ -678,7 +688,7 @@ private fun StarterCard(vm: TrackerViewModel) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             PillButton(stringResource(R.string.editorial_tracker_draft_16804fc936758c4dd92a_v0), vm::dismissStarter, kind = ButtonKind.TEXT, height = 44.dp, modifier = Modifier.offset(x = (-12).dp))
             Spacer(Modifier.weight(1f))
-            PillButton(if (picked.isEmpty()) "Готово" else "Готово · ${picked.size}", {
+            PillButton(if (picked.isEmpty()) L.s(R.string.t_398c7d4f7b) else L.s(R.string.t_97bcfbe748, picked.size), {
                 vm.saveStarters(starters.filter { it.title in picked })
             }, kind = ButtonKind.PRIMARY, height = 44.dp, enabled = picked.isNotEmpty())
         }

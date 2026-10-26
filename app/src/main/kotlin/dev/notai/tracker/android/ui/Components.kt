@@ -1,5 +1,8 @@
 package dev.notai.tracker.android.ui
 
+
+import dev.notai.tracker.android.R
+import dev.notai.tracker.android.L
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -160,7 +163,7 @@ internal fun ribbonAxisLabels(start: Long,end: Long,zone: java.time.ZoneId): Lis
 fun DayRibbon(dayStart: Long, dayEnd: Long, pieces: List<RibbonPiece>, modifier: Modifier = Modifier, now: Long? = null, labels: Boolean = true,
               height: Dp = 8.dp,zone: java.time.ZoneId = java.time.ZoneId.systemDefault()) {
     val c = NotAi.colors
-    Column(modifier.fillMaxWidth().semantics { contentDescription = "Лента дня" }) {
+    Column(modifier.fillMaxWidth().semantics { contentDescription = L.s(R.string.t_db1042f51d) }) {
         Canvas(Modifier.fillMaxWidth().height(height)) {
             val span = (dayEnd - dayStart).coerceAtLeast(1).toFloat()
             drawRoundRect(c.sunk, cornerRadius = CornerRadius(size.height / 2))
@@ -250,7 +253,7 @@ fun Chip(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, slot:
     Row(
         modifier.heightIn(min = 40.dp).clip(RoundedCornerShape(50))
             .then(if (dashed) Modifier.dashedBorder(c.ink3) else Modifier.background(c.raised).border(BorderStroke(1.dp, c.rule), RoundedCornerShape(50)))
-            .then(if (onLongClick != null) Modifier.combinedClickable(onLongClickLabel = "Действия", onLongClick = onLongClick, onClick = onClick) else Modifier.pressable(onClick))
+            .then(if (onLongClick != null) Modifier.combinedClickable(onLongClickLabel = L.s(R.string.t_9978ac34b2), onLongClick = onLongClick, onClick = onClick) else Modifier.pressable(onClick))
             .padding(start = if (icon != null || slot != null || glyph != null) 11.dp else 14.dp, end = 14.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp),
     ) {

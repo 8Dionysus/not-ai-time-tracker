@@ -1,5 +1,8 @@
 package dev.notai.tracker.android.ui
 
+
+import dev.notai.tracker.android.R
+import dev.notai.tracker.android.L
 import android.app.Application
 import android.content.Context
 import android.net.Uri
@@ -71,10 +74,10 @@ data class HomeData(val today: LocalDate, val zone: ZoneId, val days: List<DayUi
 
 data class PickerItem(val entry: ChoiceEntry, val label: Label, val count: Int? = null, val whole: Boolean = false,
                       val reference: ChoiceReference? = null, val expected: Token? = null)
-internal fun PickerItem.wholeArea() = copy(label = label.copy(title = "Вся область",detail = label.title.lowercase()),whole = true)
+internal fun PickerItem.wholeArea() = copy(label = label.copy(title = L.s(R.string.t_e82d057d74),detail = label.title.lowercase()),whole = true)
 data class PickerData(val recents: List<PickerItem>, val favorites: List<PickerItem>, val areas: List<PickerItem>, val moreAreas: List<PickerItem>)
 
-enum class Period(val days: Int, val title: String) { DAY(1, "День"), WEEK(7, "7 дней"), MONTH(30, "30 дней") }
+enum class Period(val days: Int, val title: String) { DAY(1, L.s(R.string.t_b6ef08401f)), WEEK(7, L.s(R.string.t_e65da6ce30)), MONTH(30, L.s(R.string.t_fb925c5d79)) }
 data class AreaTotal(val name: String, val slot: Int?, val ms: Long, val glyph: Int = ActivityGlyphs.custom, val id: String? = null, val deeper: Boolean = false)
 /** One level of an area's time over the shown period: sections and activities below it, newest tree. */
 data class Breakdown(val title: String, val totalMs: Long, val parts: List<AreaTotal>)
@@ -100,11 +103,11 @@ data class CorrectionState(val preview: Tracker.CorrectionPreview?, val beforeMs
 data class BackupInfo(val at: Long, val bytes: Long, val verified: Boolean)
 /** A suggested everyday activity on first launch. */
 data class Starter(val title: String, val entry: ChoiceEntry, val glyph: Int, val slot: Int?)
-private val STARTERS = listOf(
-    "activity.work.focused_work" to "Работа", "activity.learning.focused_study" to "Учёба", "activity.language.practice" to "Язык",
-    "activity.reading.book" to "Чтение", "activity.writing.draft" to "Письмо", "activity.movement.strength" to "Силовая",
-    "activity.movement.cardio" to "Кардио", "activity.leisure.outdoor_leisure" to "Прогулка", "activity.household.cook" to "Готовка",
-    "activity.household.clean" to "Уборка", "activity.media.watch_film" to "Кино и сериалы", "activity.leisure.unstructured_rest" to "Отдых",
+private val STARTERS get() = listOf(
+    "activity.work.focused_work" to L.s(R.string.t_75436e3162), "activity.learning.focused_study" to L.s(R.string.t_2e3c5fdafe), "activity.language.practice" to L.s(R.string.t_ed3f0e507a),
+    "activity.reading.book" to L.s(R.string.t_c54788a5e8), "activity.writing.draft" to L.s(R.string.t_88f778367b), "activity.movement.strength" to L.s(R.string.t_4e1936db2d),
+    "activity.movement.cardio" to L.s(R.string.t_8532eff044), "activity.leisure.outdoor_leisure" to L.s(R.string.t_3dfcd2dc31), "activity.household.cook" to L.s(R.string.t_017c8c142b),
+    "activity.household.clean" to L.s(R.string.t_315bf156c9), "activity.media.watch_film" to L.s(R.string.t_1d4961d804), "activity.leisure.unstructured_rest" to L.s(R.string.t_989911f31c),
 )
 
 sealed interface DeleteRequest {
@@ -118,12 +121,12 @@ sealed interface DeleteRequest {
         val distanceTimes get() = preview.distanceTimeCount
         val subjectCorrections get() = preview.subjectCorrectionCount
         val consequences get() = buildList {
-            if(segments > 1) add(Format.plural(segments,"отрезок","отрезка","отрезков")+" между паузами")
-            if(measurements > 0) add(Format.plural(measurements,"измерение","измерения","измерений"))
-            if(subjectLinks > 0) add(Format.plural(subjectLinks,"связь с предметом","связи с предметами","связей с предметами"))
-            if(exerciseSets > 0) add(Format.plural(exerciseSets,"запись подхода","записи подходов","записей подходов"))
-            if(eventQuantities > 0) add(Format.plural(eventQuantities,"запись событийной величины","записи событийных величин","записей событийных величин"))
-            if(distanceTimes > 0) add(Format.plural(distanceTimes,"основание темпа","основания темпа","оснований темпа"))
+            if(segments > 1) add(L.p(R.plurals.p_51037d6f51, segments)+L.s(R.string.t_1c38d1407f))
+            if(measurements > 0) add(L.p(R.plurals.p_aaaea1e747, measurements))
+            if(subjectLinks > 0) add(L.p(R.plurals.p_07343fe85c, subjectLinks))
+            if(exerciseSets > 0) add(L.p(R.plurals.p_a03208ce01, exerciseSets))
+            if(eventQuantities > 0) add(L.p(R.plurals.p_c70b66af3f, eventQuantities))
+            if(distanceTimes > 0) add(L.p(R.plurals.p_c8e097eebc, distanceTimes))
         }
     }
 }
@@ -139,13 +142,16 @@ internal object DocumentExportCoordination {
 @OptIn(ExperimentalCoroutinesApi::class)
 class TrackerViewModel internal constructor(private val app: Application,private val waitForBoundary: suspend (Long) -> Unit) : AndroidViewModel(app), BatchDeletionUiHost, ReportingZoneUiHost, LauncherIconsUiHost {
     constructor(app: Application): this(app,{ delay(it) })
-    private val _language = MutableStateFlow(dev.notai.tracker.android.AppLanguage.state(app))
+    private val _language = MutableStateFlow(dev.notai.tracker.android.AppLanguage.state(app).also {
+        dev.notai.tracker.android.L.init(app);dev.notai.tracker.android.L.use(it.resolvedLocaleTag) })
     val language: StateFlow<AppLocaleState> = _language
-    fun refreshLanguage() { _language.value = dev.notai.tracker.android.AppLanguage.state(app) }
+    /** Copy everywhere (L) switches together with the flow, so derived screens rebuild in the new language. */
+    private fun publishLanguage(state: AppLocaleState) { dev.notai.tracker.android.L.use(state.resolvedLocaleTag);_language.value = state }
+    fun refreshLanguage() { publishLanguage(dev.notai.tracker.android.AppLanguage.state(app)) }
     fun setLanguage(tag: String?) = viewModelScope.launch {
         try {
             val expected = _language.value.preference.revision
-            _language.value = withContext(Dispatchers.IO) { dev.notai.tracker.android.AppLanguage.select(app,tag,expected) }
+            publishLanguage(withContext(Dispatchers.IO) { dev.notai.tracker.android.AppLanguage.select(app,tag,expected) })
         } catch(e: Exception) {
             if(e is kotlinx.coroutines.CancellationException) throw e
             try { refreshLanguage() } catch(read: Exception) { if(read is kotlinx.coroutines.CancellationException) throw read }
@@ -180,14 +186,14 @@ class TrackerViewModel internal constructor(private val app: Application,private
             LauncherIconUiOption(entry.option.key,entry.option.label(app),entry.iconResource,entry.compatibleKeys)
         }
         return LauncherIconsUiState(observed.selected,options,launcherChanging.get(),problem ?: if(observed.selected == null)
-            "Не удалось определить выбранный значок. Выбери доступный вариант" else null)
+            L.s(R.string.t_5b010e144f) else null)
     }
     private fun refreshLauncherIcons() = viewModelScope.launch(Dispatchers.IO) {
         launcherMutex.withLock {
             if(!launcherChanging.get()) try { _launcherIcons.value = launcherState() }
             catch(e: Exception) {
                 if(e is kotlinx.coroutines.CancellationException) throw e
-                _launcherIcons.value = _launcherIcons.value.copy(problem = "Не удалось проверить значок приложения")
+                _launcherIcons.value = _launcherIcons.value.copy(problem = L.s(R.string.t_6b08862cb2))
             }
         }
     }
@@ -198,12 +204,12 @@ class TrackerViewModel internal constructor(private val app: Application,private
             try {
                 launcherMutex.withLock {
                     val result = dev.notai.tracker.android.LauncherIconController(app).select(key)
-                    _launcherIcons.value = launcherState(if(result.shortcutsRebound) null else "Значок выбран, но ярлыки пока не обновились")
+                    _launcherIcons.value = launcherState(if(result.shortcutsRebound) null else L.s(R.string.t_2a690e69d2))
                 }
             } catch(e: Exception) {
                 if(e is kotlinx.coroutines.CancellationException) throw e
-                _launcherIcons.value = try { launcherState("Не удалось переключить значок") }
-                    catch(_: Exception) { _launcherIcons.value.copy(selectedKey = null,problem = "Не удалось проверить результат переключения") }
+                _launcherIcons.value = try { launcherState(L.s(R.string.t_dfd4e36290)) }
+                    catch(_: Exception) { _launcherIcons.value.copy(selectedKey = null,problem = L.s(R.string.t_31990f76f4)) }
             } finally {
                 launcherChanging.set(false)
                 _launcherIcons.update { it.copy(changing = false) }
@@ -284,6 +290,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         _boot.value = Boot.Loading
         viewModelScope.launch(Dispatchers.IO) {
             _boot.value = try { Boot.Ready(UiBackends.open(app).also {
+                dev.notai.tracker.android.CatalogNames.adapter = it.catalogContent
                 _reportZoneAutomatic.value = it.reportZone?.automatic ?: false
                 _reportZoneProblem.value = it.reportZone?.recoveryProblem
             }) }
@@ -340,7 +347,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     }.distinctUntilChanged().flowOn(Dispatchers.IO).stateIn(viewModelScope,SharingStarted.WhileSubscribed(5_000),null)
 
     /** History by report day. Revision/date changes invalidate idle data; open sessions also tick. */
-    val home: StateFlow<HomeData?> = combine(view, shownDays, reportingDate) { v, n, _ -> v to n }.flatMapLatest { (v, n) ->
+    val home: StateFlow<HomeData?> = combine(view, shownDays, reportingDate, _language) { v, n, _, _ -> v to n }.flatMapLatest { (v, n) ->
         if (v == null) flowOf<HomeData?>(null) else flow<HomeData?> {
             while (true) {
                 emit(homeData(v, n))
@@ -352,10 +359,22 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     private fun current(d: Dataset) = d.sessions.firstOrNull { it.status != SessionStatus.STOPPED }
 
+    /** The picker and quick starts in the chosen language. Selections stay canonical; only shown names change. */
+    @Volatile private var localizedChoices: Triple<TrackerView, String, ChoiceView>? = null
+    private fun choicesOf(v: TrackerView): ChoiceView {
+        val tag = dev.notai.tracker.android.L.currentTag
+        val adapter = runtime?.catalogContent
+        if (tag == "ru" || adapter == null) return v.choices()
+        localizedChoices?.let { (view, t, choices) -> if (view === v && t == tag) return choices }
+        val choices = runCatching { v.choices().withCatalogLabels(adapter.choiceLabels(tag, v.data)) }.getOrElse { v.choices() }
+        localizedChoices = Triple(v, tag, choices)
+        return choices
+    }
+
     /** Core quick source (favourites, then frequency in the trailing 30 days); the notification shows the same list. */
     private fun quickChoices(v: TrackerView, limit: Int = 6): List<QuickChoice> {
         val end = minOf(MAX_TIME, now() + 1)
-        return v.choices().quick(HistoryWindow(maxOf(0L, end - 30L * 24 * 60 * 60 * 1000), end), limit, current(v.data)?.selection)
+        return choicesOf(v).quick(HistoryWindow(maxOf(0L, end - 30L * 24 * 60 * 60 * 1000), end), limit, current(v.data)?.selection)
     }
     private fun QuickChoice.toQuickStart(d: Dataset,expected: Token): QuickStart {
         val l = d.label(entry.selection)
@@ -432,7 +451,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         schedule(rt, ScheduleCommand(newId(), s.token, ScheduleAction.START_OR_SWITCH, item.key.seriesId, item.seriesRevision,
             occurrence = item.key, expectedOverrideRevision = item.overrideRevision, deviceZone = deviceZone().id))
     }
-    fun skipPlanned(item: PlanItem) = planCommand("Убрано из плана на сегодня") { rt, s ->
+    fun skipPlanned(item: PlanItem) = planCommand(L.s(R.string.t_58d3c60b00)) { rt, s ->
         schedule(rt, ScheduleCommand(newId(), s.token, ScheduleAction.OVERRIDE, item.key.seriesId, item.seriesRevision,
             occurrence = item.key, override = OccurrenceOverride(item.key, OverrideOperation.SKIP), expectedOverrideRevision = item.overrideRevision,
             deviceZone = deviceZone().id))
@@ -452,7 +471,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     /** Weekdays (1 = Monday) or one date; time is optional. A changed weekly plan applies from today on, earlier days keep their meaning. */
     fun savePlan(existing: PlanSeriesUi?, selection: Classification, weekdays: Set<Int>, date: LocalDate?, time: java.time.LocalTime?) =
-        planCommand(if (existing == null) "Добавлено в план" else "План изменён") { rt, s ->
+        planCommand(if (existing == null) L.s(R.string.t_1ac5f47619) else L.s(R.string.t_c54a9c6fb4)) { rt, s ->
             val zone = deviceZone(); val today = rt.tracker.scheduleDay(zone).date
             val once = date != null
             val start = (date ?: today).toString()
@@ -472,7 +491,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
                     rule = rule, deviceZone = zone.id, replacementSeriesId = newId()))
             }
         }
-    fun removePlan(existing: PlanSeriesUi) = planCommand("Убрано из плана") { rt, s ->
+    fun removePlan(existing: PlanSeriesUi) = planCommand(L.s(R.string.t_6492631c6e)) { rt, s ->
         schedule(rt, ScheduleCommand(newId(), s.token, ScheduleAction.SET_STATE, existing.id, existing.revision, state = ScheduleState.ARCHIVED, deviceZone = deviceZone().id))
     }
 
@@ -497,8 +516,8 @@ class TrackerViewModel internal constructor(private val app: Application,private
     }
     fun chooseSurface(reference: ChoiceReference,note: String? = null,expectedRoute: dev.notai.tracker.android.SurfacePickerRoute? = null) {
         val route = pickerRoute ?: return
-        if(expectedRoute != null && route != expectedRoute) { notice("Выбор занятия устарел"); return }
-        command({ "Записано" }) { rt,_ ->
+        if(expectedRoute != null && route != expectedRoute) { notice(L.s(R.string.t_f220b98d48)); return }
+        command({ L.s(R.string.t_0fc242f26d) }) { rt,_ ->
             dev.notai.tracker.android.SurfaceChoices.choose(app,rt.tracker,route,reference,note).also { clearSurfacePicker(route) }
         }
     }
@@ -511,7 +530,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     fun createSurfaceCard(route: dev.notai.tracker.android.SurfacePickerRoute,name: String,activityTypeId: String? = null) {
         val trimmed = name.trim().replaceFirstChar { it.uppercase() }
         if(trimmed.isEmpty() || pickerRoute != route) return
-        command({ "Занятие «$trimmed» создано" }) { rt,s ->
+        command({ L.s(R.string.t_440d3db6ca, trimmed) }) { rt,s ->
             val card = Card(name = trimmed,activityTypeId = activityTypeId)
             dev.notai.tracker.android.SurfaceChoices.createAndChoose(app,rt.tracker,route,s.token,card).also { clearSurfacePicker(route) }
         }
@@ -628,7 +647,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     fun startBlank() = command { rt, s -> rt.tracker.start(s.token) }
     fun pause() = timer(TimerDirective.PAUSE)
     fun resume() = timer(TimerDirective.RESUME)
-    fun stop() = command({ c -> "Записано" }) { rt, s ->
+    fun stop() = command({ c -> L.s(R.string.t_0fc242f26d) }) { rt, s ->
         val target = s.timerTarget ?: fail(ErrorCode.STALE, "Timer target unavailable")
         rt.tracker.timerCommand(target, TimerDirective.STOP)
     }
@@ -652,11 +671,11 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     /** One decision point for every picked activity, so Start, Switch and labelling stay explicit. */
     fun choose(entry: ChoiceEntry, mode: PickMode, earlierBoundary: Long? = null,reference: ChoiceReference? = null,expected: Token? = null) =
-        command({ if (mode == PickMode.SWITCH) "Новая запись начата" else null }) { rt, _ ->
+        command({ if (mode == PickMode.SWITCH) L.s(R.string.t_eaa484fa5d) else null }) { rt, _ ->
             val shown = reference ?: fail(ErrorCode.STALE,"Choice needs its displayed reference")
             val view = rt.tracker.view();val state = view.snapshot()
             ensure(expected == state.token,"Displayed choice revision changed",ErrorCode.STALE)
-            val resolved = view.choices().resolve(shown)
+            val resolved = choicesOf(view).resolve(shown)
             ensure(resolved == entry,"Displayed choice changed",ErrorCode.STALE)
             applyChoice(rt,state,resolved.selection,resolved,mode,earlierBoundary)
         }
@@ -686,7 +705,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     fun createAndChoose(name: String, mode: PickMode, earlierBoundary: Long? = null, activityTypeId: String? = null) {
         val trimmed = name.trim().replaceFirstChar { it.uppercase() }
         if (trimmed.isEmpty()) return
-        command({ "Занятие «$trimmed» создано" }) { rt, s ->
+        command({ L.s(R.string.t_440d3db6ca, trimmed) }) { rt, s ->
             val card = Card(name = trimmed, activityTypeId = activityTypeId)
             val t = rt.tracker
             when(mode) {
@@ -733,10 +752,10 @@ class TrackerViewModel internal constructor(private val app: Application,private
         rt.tracker.repeatSegment(s.token,entry.sessionId,entry.segmentId,if(s.mode == Mode.IDLE && s.focus == null) ChoiceApplication.START else ChoiceApplication.SWITCH)
     }
 
-    fun resolveTail(start: Long, end: Long) = command({ "Время уточнено" }) { rt, s ->
+    fun resolveTail(start: Long, end: Long) = command({ L.s(R.string.t_30c994650d) }) { rt, s ->
         if (s.focus != null) rt.tracker.resolveFocus(s.token, start, end) else rt.tracker.resolveTail(s.token, start, end)
     }
-    fun excludeTail() = command({ "Неизвестный отрезок не учтён" }) { rt, s ->
+    fun excludeTail() = command({ L.s(R.string.t_b788b8485e) }) { rt, s ->
         if (s.focus != null) rt.tracker.resolveFocus(s.token, null, null) else rt.tracker.resolveTail(s.token, null, null)
     }
     fun startFocus() = command { rt, s -> rt.tracker.startFocus(s.token) }
@@ -747,14 +766,14 @@ class TrackerViewModel internal constructor(private val app: Application,private
     }
     fun focusNext() = command { rt, s -> rt.tracker.focusNext(s.token) }
     fun focusSkip() = command { rt, s -> rt.tracker.focusSkip(s.token) }
-    fun configureFocus(workMin: Int, breakMin: Int) = command({ "Отрезки изменены" }) { rt, s ->
+    fun configureFocus(workMin: Int, breakMin: Int) = command({ L.s(R.string.t_ddcbc8c167) }) { rt, s ->
         rt.tracker.configureFocus(s.token, FocusPlan(workMin * 60_000L, breakMin * 60_000L))
     }
 
-    fun saveFavorite(title: String, selection: Classification) = command({ "Добавлено в избранное" }) { rt, s ->
+    fun saveFavorite(title: String, selection: Classification) = command({ L.s(R.string.t_d0d7180292) }) { rt, s ->
         rt.tracker.addFavorite(s.token, Favorite(label = title, selection = selection))
     }
-    fun removeFavorite(id: String) = command({ "Убрано из избранного" }) { rt, s -> rt.tracker.removeFavorite(s.token, id) }
+    fun removeFavorite(id: String) = command({ L.s(R.string.t_f3503a3e3f) }) { rt, s -> rt.tracker.removeFavorite(s.token, id) }
 
     /** Favourites in their saved order (personal order first, then as added). */
     fun favorites(v: TrackerView?): List<FavoriteUi> {
@@ -768,7 +787,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val key = selectionIdentity(selection)
         return view.value?.data?.favorites.orEmpty().filter { selectionIdentity(it.selection) == key }.map { it.id }
     }
-    fun removeFavorites(ids: List<String>) = command({ if (ids.size > 1) "Убрано из избранного вместе с повторами" else "Убрано из избранного" }) { rt, s ->
+    fun removeFavorites(ids: List<String>) = command({ if (ids.size > 1) L.s(R.string.t_8b78a6e1d6) else L.s(R.string.t_f3503a3e3f) }) { rt, s ->
         var token = s.token; var last: Tracker.Change? = null
         ids.forEach { id -> last = rt.tracker.removeFavorite(token, id).also { token = it.state.token } }
         last ?: fail(ErrorCode.STALE, "Nothing to remove")
@@ -782,16 +801,16 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     /** The displayed revision is required: never silently apply a reorder/edit to a newer list. */
     fun orderFavorites(expected: Token, ids: List<String>, completed: ((Result<Tracker.Change>) -> Unit)? = null) =
-        command({ "Порядок сохранён" }, completed) { rt,_ -> rt.tracker.orderChoices(expected, ChoiceKind.FAVORITE, ids) }
+        command({ L.s(R.string.t_ce5fc2ce7f) }, completed) { rt,_ -> rt.tracker.orderChoices(expected, ChoiceKind.FAVORITE, ids) }
     fun editFavorite(expected: Token, favorite: Favorite, completed: ((Result<Tracker.Change>) -> Unit)? = null) =
-        command({ "Избранное изменено" }, completed) { rt,_ ->
+        command({ L.s(R.string.t_30e1fab800) }, completed) { rt,_ ->
             ensure(rt.tracker.data().favorites.any { it.id == favorite.id }, "Favorite no longer exists", ErrorCode.STALE)
             rt.tracker.saveFavorite(expected, favorite)
         }
     fun saveCard(expected: Token, card: Card, completed: ((Result<Tracker.Change>) -> Unit)? = null) =
-        command({ "Занятие сохранено" }, completed) { rt,_ -> rt.tracker.saveCard(expected, card) }
+        command({ L.s(R.string.t_160b172224) }, completed) { rt,_ -> rt.tracker.saveCard(expected, card) }
     fun saveType(expected: Token, type: ActivityType, completed: ((Result<Tracker.Change>) -> Unit)? = null) =
-        command({ "Категория сохранена" }, completed) { rt,_ -> rt.tracker.saveType(expected, type) }
+        command({ L.s(R.string.t_359168c1d3) }, completed) { rt,_ -> rt.tracker.saveType(expected, type) }
 
     private val _focusEditor = MutableStateFlow<FocusPlan?>(null)
     val focusEditor: StateFlow<FocusPlan?> = _focusEditor.asStateFlow()
@@ -816,7 +835,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     /** Everyday catalog types with short names; only those present and startable in this catalog are offered. */
     suspend fun starterChoices(): List<Starter> = withContext(Dispatchers.IO) {
         val v = view.value ?: waitRuntime()?.tracker?.view() ?: return@withContext emptyList()
-        val d = v.data; val choices = v.choices()
+        val d = v.data; val choices = choicesOf(v)
         STARTERS.mapNotNull { (id, title) ->
             val entry = runCatching { choices.resolve("type:$id") }.getOrNull()?.takeIf { it.canStart } ?: return@mapNotNull null
             val l = d.label(entry.selection)
@@ -832,7 +851,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
             try {
                 var token = shown.token
                 picked.forEach { st -> token = rt.tracker.addFavorite(token, Favorite(label = st.title, selection = st.entry.selection)).state.token }
-                notice(if (picked.size == 1) "«${picked.single().title}» — теперь старт в одно касание" else "Готово: ${Format.plural(picked.size, "занятие", "занятия", "занятий")} для быстрого старта")
+                notice(if (picked.size == 1) L.s(R.string.t_53e131e48c, picked.single().title) else L.s(R.string.t_7cc6025206, L.p(R.plurals.p_3a9aafb6ad, picked.size)))
             } catch (e: Exception) { notice(Format.error(e)) }
         }
     }
@@ -841,7 +860,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     suspend fun pickerData(): PickerData = withContext(Dispatchers.IO) {
         val v = view.value ?: runtime?.tracker?.view() ?: return@withContext PickerData(emptyList(), emptyList(), emptyList(), emptyList())
-        val d = v.data; val choices = v.choices()
+        val d = v.data; val choices = choicesOf(v)
         val recents = choices.suggestions(SuggestionQuery(enabled = true), pageSize = 5).items.map { PickerItem(it.entry, d.label(it.entry.selection),reference = choices.reference(it.entry),expected = v.snapshot().token) }
         val favoriteQuery = ChoiceQuery(kinds = setOf(ChoiceKind.FAVORITE), includeArchived = true)
         val favorites = generateSequence(choices.search(favoriteQuery, pageSize = 100)) { page ->
@@ -861,7 +880,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     suspend fun children(parentId: String): List<PickerItem> = withContext(Dispatchers.IO) {
         val v = view.value ?: return@withContext emptyList()
-        val choices = v.choices(); val q = ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.CHILDREN, parentId = parentId)
+        val choices = choicesOf(v); val q = ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.CHILDREN, parentId = parentId)
         generateSequence(choices.search(q, pageSize = 100)) { p -> p.next?.let { choices.search(q, it, 100) } }.flatMap { it.items }.map { hit ->
             val kids = if (hit.entry.availability == ChoiceAvailability.GROUP)
                 choices.search(ChoiceQuery(kinds = setOf(ChoiceKind.TYPE), scope = CatalogScope.CHILDREN, parentId = hit.entry.sourceId), pageSize = 1).total else null
@@ -871,14 +890,14 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     suspend fun search(text: String): List<PickerItem> = withContext(Dispatchers.IO) {
         val v = view.value ?: return@withContext emptyList()
-        val choices = v.choices()
+        val choices = choicesOf(v)
         choices.search(ChoiceQuery(text = text.take(256), kinds = setOf(ChoiceKind.FAVORITE, ChoiceKind.CARD, ChoiceKind.TYPE)), pageSize = 40)
             .items.map { PickerItem(it.entry, v.data.label(it.entry.selection),reference = choices.reference(it.entry),expected = v.snapshot().token) }
     }
 
     /** Re-project the current breadcrumb without changing the picker navigation stack. */
     suspend fun refreshPickerItem(item: PickerItem): PickerItem? = withContext(Dispatchers.IO) {
-        val v = view.value ?: return@withContext null;val choices = v.choices()
+        val v = view.value ?: return@withContext null;val choices = choicesOf(v)
         val entry = choices.resolve(item.entry.id) ?: return@withContext null
         item.copy(entry = entry,label = v.data.label(entry.selection),reference = choices.reference(entry),expected = v.snapshot().token)
     }
@@ -887,7 +906,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
 
     /** Read-only preview: before/after day totals come from the core's own reports at one moment. */
     suspend fun previewCorrection(draft: CorrectionDraft, dayStart: Long, dayEnd: Long): CorrectionState = withContext(Dispatchers.IO) {
-        val rt = runtime ?: return@withContext CorrectionState(null, 0, 0, "Нет данных", null, null)
+        val rt = runtime ?: return@withContext CorrectionState(null, 0, 0, L.s(R.string.t_d0dd940c4c), null, null)
         val d = rt.tracker.data()
         val own = d.segments.filter { it.sessionId == draft.sessionId }.sortedBy { it.start }
         val others = d.segments.filter { it.sessionId != draft.sessionId && it.end != null && !it.uncertain }
@@ -904,14 +923,14 @@ class TrackerViewModel internal constructor(private val app: Application,private
         } catch (e: Exception) { CorrectionState(null, 0, 0, Format.error(e), freeFrom, freeUntil) }
     }
 
-    fun applyCorrection(preview: Tracker.CorrectionPreview,completed: ((Result<Tracker.Change>) -> Unit)? = null) = command({ "Запись исправлена" },completed) { rt, _ -> rt.tracker.applyCorrection(preview) }
+    fun applyCorrection(preview: Tracker.CorrectionPreview,completed: ((Result<Tracker.Change>) -> Unit)? = null) = command({ L.s(R.string.t_f6f369d3a0) },completed) { rt, _ -> rt.tracker.applyCorrection(preview) }
 
-    fun manual(start: Long, end: Long, selection: Classification, note: String?,completed: ((Result<Tracker.Change>) -> Unit)? = null) = command({ "Запись добавлена" },completed) { rt, s ->
+    fun manual(start: Long, end: Long, selection: Classification, note: String?,completed: ((Result<Tracker.Change>) -> Unit)? = null) = command({ L.s(R.string.t_3b97545714) },completed) { rt, s ->
         rt.tracker.manual(s.token, start, end, selection, note?.takeIf { it.isNotBlank() })
     }
 
     /** The unchanged gap goes through the core's own draft: a fresh review of exactly that stretch must still find it free. */
-    private fun recordGap(gap: GapUi,selection: Classification,note: String?,completed: (Result<Tracker.Change>) -> Unit) = command({ "Промежуток записан" },completed) { rt,s ->
+    private fun recordGap(gap: GapUi,selection: Classification,note: String?,completed: (Result<Tracker.Change>) -> Unit) = command({ L.s(R.string.t_6ea005bd2d) },completed) { rt,s ->
         val review = rt.tracker.historyGaps(gap.start,gap.end)
         val found = review.gaps.singleOrNull { it.start == gap.start && it.end == gap.end && it.kind != HistoryGapKind.RECOVERY_UNCERTAIN }
             ?: fail(ErrorCode.STALE,"The gap is no longer free")
@@ -929,7 +948,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         }
     }
     fun applyStartEarlier(preview: StartBackfillPreview,completed: (Result<Tracker.Change>) -> Unit) =
-        command({ "Начало записи перенесено" },completed) { rt,_ -> rt.tracker.applyStartBackfill(preview) }
+        command({ L.s(R.string.t_a9a3e50e7d) },completed) { rt,_ -> rt.tracker.applyStartBackfill(preview) }
 
     fun session(sessionId: String): Pair<Session, List<Segment>>? {
         val d = view.value?.data ?: return null
@@ -951,9 +970,9 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val rootIds = d.types.filter { it.parentId == null }.map { it.id }.toSet()
         fun areaParts(report: Report): List<Pair<String?, Long>> = report.byCurrentRoot(d.types).filter { (k, ms) -> ms > 0 && (k == null || k in rootIds) }
             .toList().sortedWith(compareBy({ Areas.slot(it.first) ?: 99 }, { it.first ?: "~" }))
-        val names = d.types.associate { it.id to it.name }
+        val names = d.types.associate { it.id to (dev.notai.tracker.android.CatalogNames.type(d, it.id, it.name) ?: it.name) }
         val areas = areaParts(window).sortedByDescending { it.second }.map { (id, ms) ->
-            AreaTotal(id?.let { names[it] } ?: "Без области", Areas.slot(id), ms,
+            AreaTotal(id?.let { names[it] } ?: L.s(R.string.t_98dc4a887a), Areas.slot(id), ms,
                 id?.let { d.glyph(Classification(activityTypeId = it)) } ?: ActivityGlyphs.unclassified, id, id != null)
         }
         val columns = if (period == Period.DAY) emptyList() else calendar.days.map { day ->
@@ -977,13 +996,13 @@ class TrackerViewModel internal constructor(private val app: Application,private
         fun amount(x: Long) = Format.goalAmount(g.metric, x)
         val name = g.name + ", " + Format.goalRule(g.metric, g.direction, g.period, g.target)
         val (status, ok) = when (p.recordedStatus) {
-            GoalStatus.MINIMUM_PENDING -> "осталось ${amount(p.remaining)}" to false
-            GoalStatus.MINIMUM_REACHED -> "есть" to true
-            GoalStatus.WITHIN_LIMIT -> "в пределах" to true
-            GoalStatus.LIMIT_EXCEEDED -> "больше на ${amount(p.excess)}" to false
+            GoalStatus.MINIMUM_PENDING -> L.s(R.string.t_4d1cb9fd4a, amount(p.remaining)) to false
+            GoalStatus.MINIMUM_REACHED -> L.s(R.string.t_3d51050347) to true
+            GoalStatus.WITHIN_LIMIT -> L.s(R.string.t_ce3ec6ed08) to true
+            GoalStatus.LIMIT_EXCEEDED -> L.s(R.string.t_060c91cb5a, amount(p.excess)) to false
         }
-        val value = if (g.metric == GoalMetric.DISTINCT_RECORDED_DAYS) "${amount(p.actual)} с записями" else amount(p.actual)
-        return GoalUi(name, value, status + if (p.uncertain) ", есть неизвестное время" else "", ok,
+        val value = if (g.metric == GoalMetric.DISTINCT_RECORDED_DAYS) L.s(R.string.t_c23d5826a3, amount(p.actual)) else amount(p.actual)
+        return GoalUi(name, value, status + if (p.uncertain) L.s(R.string.t_af39297b7b) else "", ok,
             if (g.target > 0) (p.actual.toFloat() / g.target).coerceIn(0f, 1f) else 0f, g.id)
     }
 
@@ -999,7 +1018,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     }
 
     /** A new goal takes the report day of today. An edit keeps its calendar and says when it applies. */
-    fun saveGoal(draft: GoalDraft, mode: GoalEditMode) = command({ if (draft.id == null) "Цель поставлена" else "Цель изменена" }) { rt, s ->
+    fun saveGoal(draft: GoalDraft, mode: GoalEditMode) = command({ if (draft.id == null) L.s(R.string.t_cd30825052) else L.s(R.string.t_81129d8255) }) { rt, s ->
         val d = rt.tracker.data()
         val filter = if (!draft.activityChanged && draft.originalFilter != null) draft.originalFilter else when { draft.selection?.cardId != null -> Filter(cardId = draft.selection.cardId)
             draft.selection?.activityTypeId != null -> Filter(activityTypeId = draft.selection.activityTypeId); else -> Filter() }
@@ -1009,7 +1028,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
                 zone = d.settings.reportZone, filter = filter, dayStartMinute = d.settings.reportDayStartMinute)
         rt.tracker.saveGoal(s.token, goal, mode)
     }
-    fun deleteGoal(id: String) = command({ "Цель убрана" }) { rt, s -> rt.tracker.deleteGoal(s.token, id) }
+    fun deleteGoal(id: String) = command({ L.s(R.string.t_2894da98dd) }) { rt, s -> rt.tracker.deleteGoal(s.token, id) }
 
     // ---------- shareable summary ----------
 
@@ -1031,8 +1050,8 @@ class TrackerViewModel internal constructor(private val app: Application,private
             val c = chain(r.selection.activityTypeId ?: r.selection.ancestorPathAtWrite.lastOrNull())
             val at = c.indexOf(parentId); if (at < 0) null else Triple(r, c.getOrNull(at + 1), c)
         }
-        if (rows.isEmpty()) return@withContext Breakdown(d.types.find { it.id == parentId }?.name ?: "", 0, emptyList())
-        val names = d.types.associate { it.id to it.name }
+        if (rows.isEmpty()) return@withContext Breakdown(d.types.find { it.id == parentId }?.let { dev.notai.tracker.android.CatalogNames.type(d, it.id, it.name) ?: it.name } ?: "", 0, emptyList())
+        val names = d.types.associate { it.id to (dev.notai.tracker.android.CatalogNames.type(d, it.id, it.name) ?: it.name) }
         val hasChildren = d.types.mapNotNull { it.parentId }.toSet()
         val parts = rows.groupBy { (r, child, _) -> child?.let { "t:$it" } ?: "n:" + d.label(r.selection).title }.map { (key, group) ->
             val ms = group.sumOf { it.first.durationMs }
@@ -1052,19 +1071,19 @@ class TrackerViewModel internal constructor(private val app: Application,private
             val zone = ZoneId.of(r.report.zone)
             val first = r.report.dayPolicy.dateAt(r.report.start); val last = r.report.dayPolicy.dateAt(r.report.end - 1)
             val names = d.cards.associate { it.id to it.name }
-            val parts = r.groupedMs.filterValues { it > 0 }.map { (k, ms) -> (k?.let { names[it] } ?: "Без своего занятия") to ms }.sortedByDescending { it.second }
+            val parts = r.groupedMs.filterValues { it > 0 }.map { (k, ms) -> (k?.let { names[it] } ?: L.s(R.string.t_80072ed701)) to ms }.sortedByDescending { it.second }
             val filterSel = q.filter.cardId?.let { Classification(cardId = it) } ?: q.filter.activityTypeId?.let { Classification(activityTypeId = it) }
             SavedReportUi(q, Format.period(first, last), r.report.recordedMs, r.report.incomplete, parts,
                 r.references.any { it.status != ReportReferenceStatus.AVAILABLE }, filterSel?.let { d.label(it) })
         }.getOrNull() }.sortedBy { it.query.name.lowercase() }
     }
-    fun saveReport(existing: SavedReportQuery?, name: String, selection: Classification?, window: ReportWindow) = command({ _ -> if (existing == null) "Отчёт сохранён" else "Отчёт изменён" }) { rt, s ->
+    fun saveReport(existing: SavedReportQuery?, name: String, selection: Classification?, window: ReportWindow) = command({ _ -> if (existing == null) L.s(R.string.t_7c379e8e5c) else L.s(R.string.t_e1d7065cb9) }) { rt, s ->
         val d = rt.tracker.data()
         val filter = when { selection?.cardId != null -> Filter(cardId = selection.cardId); selection?.activityTypeId != null -> Filter(activityTypeId = selection.activityTypeId); else -> Filter() }
         rt.tracker.saveReportQuery(s.token, (existing ?: SavedReportQuery(name = name)).copy(name = name, window = window, filter = filter,
             grouping = ReportGrouping.CARD, groupKey = null, policy = d.settings.reportDayPolicy))
     }
-    fun deleteReport(id: String) = command({ _ -> "Отчёт удалён" }) { rt, s -> rt.tracker.deleteReportQuery(s.token, id) }
+    fun deleteReport(id: String) = command({ _ -> L.s(R.string.t_145c3ed6a6) }) { rt, s -> rt.tracker.deleteReportQuery(s.token, id) }
 
     suspend fun summary(period: Period, notes: Boolean): String? = withContext(Dispatchers.IO) {
         val v = view.value ?: return@withContext null
@@ -1073,18 +1092,18 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val first = today.minusDays(period.days - 1L)
         val report = v.calendar(first, period.days).window
         val rootIds = d.types.filter { it.parentId == null }.map { it.id }.toSet()
-        val names = d.types.associate { it.id to it.name }
+        val names = d.types.associate { it.id to (dev.notai.tracker.android.CatalogNames.type(d, it.id, it.name) ?: it.name) }
         buildString {
-            append(if (period == Period.DAY) "Сегодня, ${Format.dayMonth(today)}" else Format.period(first, today)).append('\n')
-            append("Всего ").append(Format.duration(report.recordedMs)).append(if (report.incomplete) ", день ещё идёт" else "").append('\n')
+            append(if (period == Period.DAY) L.s(R.string.t_e380f43ca4, Format.dayMonth(today)) else Format.period(first, today)).append('\n')
+            append(L.s(R.string.t_2a70012208)).append(Format.duration(report.recordedMs)).append(if (report.incomplete) L.s(R.string.t_8690f98524) else "").append('\n')
             val areas = report.byCurrentRoot(d.types).filter { (k, ms) -> ms > 0 && (k == null || k in rootIds) }.toList().sortedByDescending { it.second }
             if (areas.isNotEmpty()) append('\n')
-            areas.forEach { (id, ms) -> append(id?.let { names[it] } ?: "Без области").append(" — ").append(Format.duration(ms)).append('\n') }
-            if (report.unresolved.isNotEmpty()) append('\n').append("Неизвестное время не входит в итог: ")
-                .append(Format.plural(report.unresolved.size, "отрезок", "отрезка", "отрезков")).append('\n')
+            areas.forEach { (id, ms) -> append(id?.let { names[it] } ?: L.s(R.string.t_98dc4a887a)).append(" — ").append(Format.duration(ms)).append('\n') }
+            if (report.unresolved.isNotEmpty()) append('\n').append(L.s(R.string.t_bbee9680a8))
+                .append(L.p(R.plurals.p_51037d6f51, report.unresolved.size)).append('\n')
             if (notes) {
                 val noted = report.rows.filter { !it.note.isNullOrBlank() }.distinctBy { it.sessionId }.sortedBy { it.start }
-                if (noted.isNotEmpty()) append('\n').append("Заметки").append('\n')
+                if (noted.isNotEmpty()) append('\n').append(L.s(R.string.t_bbcf06b3c9)).append('\n')
                 noted.forEach { r ->
                     val date = report.dayPolicy.dateAt(r.start)
                     append("• ").append(Format.dayMonth(date)).append(", ").append(d.label(r.selection).title).append(": ").append(r.note).append('\n')
@@ -1098,7 +1117,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     fun setSurfaces(change: (SurfaceSettings) -> SurfaceSettings) = command { rt, s ->
         val d = rt.tracker.data(); rt.tracker.settings(s.token, d.settings.copy(surfaces = change(d.settings.surfaces)))
     }
-    fun setReportZone(zone: String) = command({ "Часовой пояс отчётов: $zone" }) { rt, s ->
+    fun setReportZone(zone: String) = command({ L.s(R.string.t_86d85a0147, zone) }) { rt, s ->
         ZoneId.of(zone)
         try { rt.reportZone?.setFixed(s.token,zone) ?: rt.tracker.configureReportingDay(s.token,
             ReportingDayPolicy(zone,rt.tracker.data().settings.reportDayStartMinute)) }
@@ -1107,13 +1126,13 @@ class TrackerViewModel internal constructor(private val app: Application,private
             _reportZoneProblem.value = rt.reportZone?.recoveryProblem
         }
     }
-    fun setReportZoneAutomatic(value: Boolean) = command({ if(value) "Часовой пояс отчётов следует за устройством. Записи могут перейти на другой день" else "Часовой пояс отчётов закреплён" }) { rt,s ->
+    fun setReportZoneAutomatic(value: Boolean) = command({ if(value) L.s(R.string.t_cf52c8daf1) else L.s(R.string.t_41f23bd106) }) { rt,s ->
         val preference = rt.reportZone ?: fail(ErrorCode.INVALID_INPUT,"Device report zone preference unavailable")
         try { preference.setAutomatic(s.token,value) }
         finally { _reportZoneAutomatic.value = preference.automatic;_reportZoneProblem.value = preference.recoveryProblem }
     }
     /** Only day labels move; recorded facts and existing goals keep their own boundaries. */
-    fun setDayStart(minute: Int) = command({ "День начинается в ${minute / 60}:${(minute % 60).toString().padStart(2, '0')}" }) { rt, s ->
+    fun setDayStart(minute: Int) = command({ L.s(R.string.t_b4770c7e71, minute / 60, (minute % 60).toString().padStart(2, '0')) }) { rt, s ->
         rt.tracker.configureReportingDay(s.token, ReportingDayPolicy(rt.tracker.data().settings.reportZone, minute))
     }
 
@@ -1274,7 +1293,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         DocumentExportCoordination.afterResultCommit?.invoke()
         if(uri == null) {
             synchronized(DocumentExportCoordination.lock) { clearDocumentExport(id);DocumentExportCoordination.writing.remove(id) }
-            notice("Сохранение отменено");return
+            notice(L.s(R.string.t_0a7d0c65cc));return
         }
         val job = viewModelScope.launch(Dispatchers.IO) {
             var completed = false
@@ -1283,7 +1302,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
                 completed = true
                 DocumentExportCoordination.afterWriteComplete?.invoke()
                 if (exports.read(id).mime == "application/json") recordBackup(result.bytes,result.verified)
-                notice(if (result.verified) "Файл сохранён и проверен" else "Файл сохранён. Проверить его чтением нельзя")
+                notice(if (result.verified) L.s(R.string.t_a8f8d66a1b) else L.s(R.string.t_b467c6658f))
             } catch (e: Exception) { notice(Format.error(e)) }
             finally {
                 synchronized(DocumentExportCoordination.lock) {
@@ -1319,7 +1338,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
         val rt = runtime
         if(rt == null) { releaseRestorePreviewOnIo(preview);notice(Format.error(CoreError(ErrorCode.STALE,"Restore backend changed")));return }
         val applying = viewModelScope.launch(Dispatchers.IO) {
-            try { rt.backups.apply(preview); notice("Данные восстановлены. Прежние сохранены отдельно") }
+            try { rt.backups.apply(preview); notice(L.s(R.string.t_1c76eec066)) }
             catch (e: Exception) { if(e is kotlinx.coroutines.CancellationException) throw e;notice(Format.error(e)) }
         }
         // Runs even when cancellation wins before the coroutine body starts. After claim,
@@ -1348,7 +1367,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
             val name = runCatching { app.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)
                 ?.use { c -> if (c.moveToFirst()) c.getString(0) else null } }.getOrNull()
             dev.notai.tracker.android.FocusEffects.importAudio(app, uri, name); refreshFocusEffects()
-        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice("Не удалось взять этот файл. Попробуй другой, до 64 МБ") }
+        } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice(L.s(R.string.t_b727ee7aba)) }
     }
 
     // Several records at once: choose them in the history, then give them one activity or note. Preview first, Undo after.
@@ -1420,7 +1439,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     fun applyBatch(preview: BatchMetadataPreview) = command({ _ ->
         val n = preview.changes.map { it.sessionId }.distinct().size
         _picked.value = emptySet()
-        "Изменено ${Format.plural(n, "запись", "записи", "записей")}"
+        L.s(R.string.t_dd63bc14f9, L.p(R.plurals.p_6c73bc4d74, n))
     }) { rt, _ -> rt.tracker.applyMetadata(preview) }
 
     // CSV history: inspect → confirm columns and time → map source activities → preview → append. Nothing is written before apply.
@@ -1439,8 +1458,8 @@ class TrackerViewModel internal constructor(private val app: Application,private
             val inspection = HistoryFiles.inspect(bytes)
             when (inspection.format) {
                 ImportFormat.DELIMITED_TEXT -> _csv.value = CsvImportUi(inspection, name)
-                ImportFormat.BACKUP_JSON -> notice("Это файл резервной копии. Восстанови его в разделе «Резервная копия»")
-                ImportFormat.UNSUPPORTED -> notice("Этот файл не таблица CSV. ${inspection.problems.firstOrNull().orEmpty()}".trim())
+                ImportFormat.BACKUP_JSON -> notice(L.s(R.string.t_de7dee674e))
+                ImportFormat.UNSUPPORTED -> notice(L.s(R.string.t_147355d342, inspection.problems.firstOrNull().orEmpty()).trim())
             }
         } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice(Format.importError(e)) }
     }
@@ -1461,7 +1480,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
             val transfer = runtime?.historyTransfer ?: return@launch
             val result = transfer.apply(preview)
             _csv.value = null
-            notice("Добавлено ${Format.plural(result.added, "запись", "записи", "записей")}" + if (result.duplicates > 0) ", повторы пропущены" else "")
+            notice(L.s(R.string.t_78fb4788c6, L.p(R.plurals.p_6c73bc4d74, result.added)) + if (result.duplicates > 0) L.s(R.string.t_99cbe96929) else "")
         } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; notice(Format.importError(e)) }
     }
 
@@ -1483,7 +1502,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     fun backupFolderIntent(): android.content.Intent? = autoBackend?.selectionIntent()
     fun chooseBackupFolder(uri: Uri, flags: Int) = viewModelScope.launch {
         autoAction { b -> b.select(uri, flags, b.status().policy) }
-        if (_autoBackup.value?.state?.enabled == true) notice("Папка выбрана. Первая копия появится через пару минут")
+        if (_autoBackup.value?.state?.enabled == true) notice(L.s(R.string.t_059b504fa9))
     }
     fun setAutoBackup(on: Boolean) = viewModelScope.launch {
         autoAction { b -> val s = b.status(); if (on) s.destination?.let { b.enable(it, s.policy) } else b.disable() }
@@ -1514,7 +1533,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
     fun applyCatalog(preview: CatalogPreview) {
         val rt = runtime ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            try { rt.applyCatalog(preview); notice("Каталог обновлён") } catch (e: Exception) { notice(Format.error(e)) }
+            try { rt.applyCatalog(preview); notice(L.s(R.string.t_27d5f2e22a)) } catch (e: Exception) { notice(Format.error(e)) }
         }
     }
 

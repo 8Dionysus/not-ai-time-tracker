@@ -1,5 +1,7 @@
 package dev.notai.tracker.android.ui
 
+
+import dev.notai.tracker.android.L
 import android.provider.Settings
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -107,7 +109,9 @@ fun typography(family: FontFamily = Onest, thinTimer: Boolean = true) = NotAiTyp
 
 val NotAiTypography = typography()
 
-enum class ThemeChoice(val title: String) { SYSTEM("Авто"), LIGHT("Светлая"), DARK("Тёмная"), AMOLED("Чёрная"), NEON("Неон") }
+enum class ThemeChoice(private val titleRes: Int) { SYSTEM(R.string.t_5695330ffb), LIGHT(R.string.t_8080010c5e), DARK(R.string.t_bd16b23470), AMOLED(R.string.t_0d6b1a17a4), NEON(R.string.t_22776aacd4);
+    val title: String get() = L.s(titleRes)
+}
 
 val LocalColors = staticCompositionLocalOf { LightColors }
 val LocalType = staticCompositionLocalOf { NotAiTypography }

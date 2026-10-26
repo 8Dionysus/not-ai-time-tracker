@@ -20,7 +20,7 @@ object FocusSignals {
     // Preparation stays outside the final domain gate; tests can mutate after preparation.
     internal var notificationFactory: (Context) -> Notification = { c ->
         Notification.Builder(c,CHANNEL).setSmallIcon(android.R.drawable.ic_media_pause)
-            .setContentTitle("Focus: интервал завершён").setContentText("Выберите следующий этап в приложении")
+            .setContentTitle(L.s(R.string.t_da4b8e5644)).setContentText(L.s(R.string.t_580b6b1b3e))
             .setContentIntent(TimerSurfaces.open(c)).setAutoCancel(true).setVisibility(Notification.VISIBILITY_PRIVATE).build()
     }
     private fun preferences(c: Context) = c.getSharedPreferences("focus-signals",Context.MODE_PRIVATE)
@@ -30,7 +30,7 @@ object FocusSignals {
             manager.areNotificationsEnabled() && manager.getNotificationChannel(CHANNEL)?.importance != NotificationManager.IMPORTANCE_NONE
     }
     private fun channel(c: Context) = c.getSystemService(NotificationManager::class.java).createNotificationChannel(
-        NotificationChannel(CHANNEL,"Завершение интервала Focus",NotificationManager.IMPORTANCE_DEFAULT))
+        NotificationChannel(CHANNEL,L.s(R.string.t_9694192342),NotificationManager.IMPORTANCE_DEFAULT))
     private fun pending(c: Context,id: String,index: Long): PendingIntent {
         val intent = Intent(c,FocusAlarmReceiver::class.java).setAction("dev.notai.tracker.FOCUS_DUE")
             .setData(android.net.Uri.parse("notai://focus/$id/$index")).putExtra("id",id).putExtra("index",index)

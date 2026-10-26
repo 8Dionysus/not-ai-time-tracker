@@ -2,6 +2,8 @@
 
 package dev.notai.tracker.android.ui
 
+
+import dev.notai.tracker.android.L
 import dev.notai.tracker.android.R
 
 import androidx.compose.ui.res.stringResource
@@ -66,7 +68,7 @@ internal fun floorMinute(ms: Long) = ms - ms % MINUTE
 @Composable
 fun TimeField(label: String, value: Long, zone: ZoneId, onChange: (Long) -> Unit, modifier: Modifier = Modifier, focused: Boolean = false, hint: String? = null,
               step: Int = 5) {
-    val by = if (step == 1) "1 минуту" else "$step минут"
+    val by = if (step == 1) L.s(R.string.t_1bc5f604f5) else L.s(R.string.t_3296879eac, step)
     val c = NotAi.colors
     var dial by rememberSaveable { mutableStateOf(false) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -74,13 +76,13 @@ fun TimeField(label: String, value: Long, zone: ZoneId, onChange: (Long) -> Unit
         Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(RoundedCornerShape(14.dp))
             .border(if (focused) 1.5.dp else 1.dp, if (focused) c.amber else c.rule, RoundedCornerShape(14.dp)).padding(horizontal = 4.dp),
             verticalAlignment = Alignment.CenterVertically) {
-            IconAction(Icon.Minus, "$label раньше на $by", { onChange(value - step * MINUTE) }, size = 18.dp)
-            Box(Modifier.weight(1f).heightIn(min = 52.dp).pressable({ dial = true }, label = "Выбрать время: $label"), contentAlignment = Alignment.Center) {
+            IconAction(Icon.Minus, L.s(R.string.t_01e118e6e9, label, by), { onChange(value - step * MINUTE) }, size = 18.dp)
+            Box(Modifier.weight(1f).heightIn(min = 52.dp).pressable({ dial = true }, label = L.s(R.string.t_d9ffbbb760, label)), contentAlignment = Alignment.Center) {
                 // Never wraps: shrinks with large system fonts instead of losing digits.
                 BasicText(Format.clock(value, zone), style = NotAi.type.sheetTitle.copy(fontSize = 22.sp, fontWeight = FontWeight.Normal, color = c.ink),
                     maxLines = 1, softWrap = false, autoSize = TextAutoSize.StepBased(minFontSize = 13.sp, maxFontSize = 22.sp))
             }
-            IconAction(Icon.Plus, "$label позже на $by", { onChange(value + step * MINUTE) }, size = 18.dp)
+            IconAction(Icon.Plus, L.s(R.string.t_3bfd577967, label, by), { onChange(value + step * MINUTE) }, size = 18.dp)
         }
         if (hint != null) Text(hint, style = NotAi.type.micro.copy(fontSize = 12.sp), color = c.ink2)
     }
@@ -124,16 +126,16 @@ fun NoteField(value: String, onChange: (String) -> Unit, modifier: Modifier = Mo
         Box(Modifier.fillMaxWidth().heightIn(min = 48.dp).clip(RoundedCornerShape(14.dp)).border(1.dp, c.rule, RoundedCornerShape(14.dp))
             .padding(horizontal = 14.dp, vertical = 13.dp)) {
             if (value.isEmpty()) Text(stringResource(R.string.editorial_tracker_draft_d464164bc61a7e85c4c6_v0), style = NotAi.type.body, color = c.ink2)
-            BasicTextField(value, onChange, Modifier.fillMaxWidth().semantics { contentDescription = "Заметка" }, textStyle = NotAi.type.body.copy(color = c.ink),
+            BasicTextField(value, onChange, Modifier.fillMaxWidth().semantics { contentDescription = L.s(R.string.t_917b58362c) }, textStyle = NotAi.type.body.copy(color = c.ink),
                 cursorBrush = SolidColor(c.amber), keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences), maxLines = 4)
         }
     }
 }
 
 @Composable
-internal fun ActivityField(label: Label, onClick: () -> Unit, action: String = "Изменить") {
+internal fun ActivityField(label: Label, onClick: () -> Unit, action: String = L.s(R.string.t_9d809f884b)) {
     val c = NotAi.colors
-    Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(RoundedCornerShape(14.dp)).background(c.sunk).pressable(onClick, label = "Изменить занятие")
+    Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(RoundedCornerShape(14.dp)).background(c.sunk).pressable(onClick, label = L.s(R.string.t_de5eb09e17))
         .padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         ActivityGlyph(label)
         Row(Modifier.weight(1f)) {
@@ -156,7 +158,7 @@ private fun MiniTimeline(day: DayUi, sessionId: String?, start: Long, end: Long,
     val count = ((hi - from + step - 1) / step).coerceAtLeast(1)
     val until = from + count * step
     val span = (until - from).toFloat()
-    Column(Modifier.fillMaxWidth().semantics { contentDescription = "Положение записи среди соседних" }) {
+    Column(Modifier.fillMaxWidth().semantics { contentDescription = L.s(R.string.t_38dfef435f) }) {
         Canvas(Modifier.fillMaxWidth().height(56.dp)) {
             fun x(t: Long) = ((t - from) / span).coerceIn(0f, 1f) * size.width
             val top = 20.dp.toPx(); val h = 12.dp.toPx()
@@ -209,7 +211,7 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
     var end by rememberSaveable { mutableLongStateOf(origEnd ?: gap?.end ?: floorMinute(minOf(now, day.end - 1))) }
     var selection by rememberSaveable(stateSaver = EntrySelectionSaver) { mutableStateOf<Classification?>(null) }
     val baseSelection = session?.first?.selection ?: Classification()
-    var label by rememberSaveable(stateSaver = EntryLabelSaver) { mutableStateOf(entry?.label ?: Label("Без занятия", null, null, true)) }
+    var label by rememberSaveable(stateSaver = EntryLabelSaver) { mutableStateOf(entry?.label ?: Label(L.s(R.string.t_aff922a637), null, null, true)) }
     var note by rememberSaveable { mutableStateOf(session?.first?.note.orEmpty()) }
     val currentView by vm.view.collectAsState()
     val currentForm by vm.entryForm.collectAsState()
@@ -225,7 +227,7 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
         pending = false
     }
     NotAiSheet(onDismiss) {
-        SheetHeader(when { entry != null -> "Исправить запись"; gap != null -> "Записать промежуток"; else -> "Добавить запись" }, onDismiss, extra = if (entry != null && onDelete != null) {
+        SheetHeader(when { entry != null -> L.s(R.string.t_8a22f78e9c); gap != null -> L.s(R.string.t_f2a9788239); else -> L.s(R.string.t_909a83238c) }, onDismiss, extra = if (entry != null && onDelete != null) {
             { IconAction(Icon.Trash, stringResource(R.string.editorial_tracker_draft_87e40c5c1ee8a15a63bd_v0), { onDelete(entry) }, size = 19.dp) }
         } else null)
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -236,12 +238,12 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
             }
             MiniTimeline(day, entry?.sessionId, start, end, origStart, origEnd, label.slot, zone)
             TimePair {
-                TimeField("Начало", start, zone, { start = it }, it, focused = origStart != null && start != origStart, step = step,
-                    hint = when { origStart != null && start != origStart -> "было ${Format.clock(origStart, zone)}"
-                        state?.freeFrom != null -> "свободно с ${Format.clock(state!!.freeFrom!!, zone)}"; else -> null })
-                TimeField("Конец", end, zone, { end = it }, it, focused = origEnd != null && end != origEnd, step = step,
-                    hint = when { origEnd != null && end != origEnd -> "было ${Format.clock(origEnd, zone)}"
-                        state?.freeUntil != null -> "свободно до ${Format.clock(state!!.freeUntil!!, zone)}"; else -> null })
+                TimeField(L.s(R.string.t_cb26bdc6c6), start, zone, { start = it }, it, focused = origStart != null && start != origStart, step = step,
+                    hint = when { origStart != null && start != origStart -> L.s(R.string.t_6090cecf2d, Format.clock(origStart, zone))
+                        state?.freeFrom != null -> L.s(R.string.t_569ffccaa8, Format.clock(state!!.freeFrom!!, zone)); else -> null })
+                TimeField(L.s(R.string.t_4e895fd70d), end, zone, { end = it }, it, focused = origEnd != null && end != origEnd, step = step,
+                    hint = when { origEnd != null && end != origEnd -> L.s(R.string.t_6090cecf2d, Format.clock(origEnd, zone))
+                        state?.freeUntil != null -> L.s(R.string.t_1c8ee71b8e, Format.clock(state!!.freeUntil!!, zone)); else -> null })
             }
             StepChooser(step, vm::setCorrectionStepMinutes)
             NoteField(note, { note = it })
@@ -250,7 +252,7 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
             if (entry != null && st != null) {
                 if (st.error != null) Note(st.error)
                 else Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(c.amberWash).padding(horizontal = 14.dp, vertical = 12.dp)) {
-                    Row { Text("${Format.dayTitle(day.date, today)}, итог", Modifier.weight(1f), style = NotAi.type.bodySmall, color = c.ink)
+                    Row { Text(L.s(R.string.t_fb27c3e29b, Format.dayTitle(day.date, today)), Modifier.weight(1f), style = NotAi.type.bodySmall, color = c.ink)
                         Text(Format.duration(st.beforeMs), style = NotAi.type.bodySmall, color = c.ink2)
                         Text(" → ${Format.duration(st.afterMs)}", style = NotAi.type.bodySmall, color = c.ink) }
                 }
@@ -258,7 +260,7 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
             Row(Modifier.heightIn(min = 44.dp).pressable({ favorite = true; vm.saveFavorite(label.title, selection ?: baseSelection) }),
                 verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 M3Icon(if (favorite) Icon.Star else Icon.StarLine, null, Modifier.size(18.dp), tint = if (favorite) c.amber else c.ink2)
-                Text(if (favorite) "В избранном" else "Добавить в избранное", style = NotAi.type.bodySmall, color = c.ink2)
+                Text(if (favorite) L.s(R.string.t_9760f4a429) else L.s(R.string.t_e6794c0df6), style = NotAi.type.bodySmall, color = c.ink2)
             }
         }
         val preview = state?.preview
@@ -276,13 +278,13 @@ fun EntrySheet(vm: TrackerViewModel, zone: ZoneId, day: DayUi, entry: EntryUi?, 
 fun StepChooser(step: Int, onStep: (Int) -> Unit, modifier: Modifier = Modifier) {
     val c = NotAi.colors
     Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-        Text("Шаг ±", style = NotAi.type.caption, color = c.ink2, modifier = Modifier.padding(end = 4.dp))
+        Text(L.s(R.string.t_e43c291b9c), style = NotAi.type.caption, color = c.ink2, modifier = Modifier.padding(end = 4.dp))
         listOf(1, 5, 15).forEach { m ->
             val on = m == step
             Box(Modifier.heightIn(min = 32.dp).widthIn(min = 44.dp).clip(RoundedCornerShape(16.dp)).background(if (on) c.sunk else androidx.compose.ui.graphics.Color.Transparent)
-                .semantics { selected = on }.pressable({ onStep(m) }, role = androidx.compose.ui.semantics.Role.RadioButton, label = "Шаг $m мин")
+                .semantics { selected = on }.pressable({ onStep(m) }, role = androidx.compose.ui.semantics.Role.RadioButton, label = L.s(R.string.t_0f9a1db081, m))
                 .padding(horizontal = 8.dp), contentAlignment = Alignment.Center) {
-                Text("$m мин", style = NotAi.type.caption.copy(fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal), color = if (on) c.ink else c.ink2)
+                Text(L.s(R.string.t_455a50db4a, m), style = NotAi.type.caption.copy(fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal), color = if (on) c.ink else c.ink2)
             }
         }
     }
@@ -295,8 +297,8 @@ fun EarlierSheet(zone: ZoneId, segmentStart: Long, now: Long, onNext: (Long) -> 
     NotAiSheet(onDismiss, fullHeight = false) {
         SheetHeader(stringResource(R.string.editorial_tracker_draft_de07b012af25d20940d9_v0), onDismiss)
         Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            TimeField("Момент переключения", at, zone, { at = it.coerceIn(segmentStart, now) }, focused = true, step = step,
-                hint = "между ${Format.clock(segmentStart, zone)} и сейчас")
+            TimeField(L.s(R.string.t_5cd8e48ad3), at, zone, { at = it.coerceIn(segmentStart, now) }, focused = true, step = step,
+                hint = L.s(R.string.t_04bcedfa9f, Format.clock(segmentStart, zone)))
             StepChooser(step, onStep)
             Text(stringResource(R.string.editorial_tracker_draft_57dc53f53a2dcf590521_v0), style = NotAi.type.bodySmall, color = NotAi.colors.ink2)
             PillButton(stringResource(R.string.editorial_tracker_draft_7a94427842da266bf16f_v0), { onNext(at) }, Modifier.fillMaxWidth().padding(bottom = 20.dp), ButtonKind.PRIMARY)
@@ -320,29 +322,29 @@ fun StartEarlierSheet(vm: TrackerViewModel, zone: ZoneId, currentStart: Long, on
         delay(120); value = vm.previewStartEarlier(at)
     }
     NotAiSheet(onDismiss, fullHeight = false) {
-        SheetHeader("Когда ты начал?", onDismiss)
+        SheetHeader(L.s(R.string.t_61394d0185), onDismiss)
         Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             previous?.let { p ->
                 val chosen = at == p.proposedSegment.start
                 Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(RoundedCornerShape(14.dp)).background(if (chosen) c.amberWash else c.sunk)
-                    .pressable({ at = p.proposedSegment.start; touched = true }, label = "С конца прошлой записи").padding(horizontal = 14.dp),
+                    .pressable({ at = p.proposedSegment.start; touched = true }, label = L.s(R.string.t_819f3ba9d1)).padding(horizontal = 14.dp),
                     verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     M3Icon(if (chosen) Icon.Check else Icon.ChevronLeft, null, Modifier.size(18.dp), tint = if (chosen) c.amberInk else c.ink2)
-                    Text("С конца прошлой записи", Modifier.weight(1f), style = NotAi.type.body, color = c.ink)
+                    Text(L.s(R.string.t_819f3ba9d1), Modifier.weight(1f), style = NotAi.type.body, color = c.ink)
                     Text(Format.clock(p.proposedSegment.start, zone), style = NotAi.type.body, color = c.ink2)
                 }
             }
-            TimeField("Начало", at, zone, { at = minOf(it, currentStart - MINUTE); touched = true }, focused = true, step = step,
-                hint = "раньше, чем ${Format.clock(currentStart, zone)}")
+            TimeField(L.s(R.string.t_cb26bdc6c6), at, zone, { at = minOf(it, currentStart - MINUTE); touched = true }, focused = true, step = step,
+                hint = L.s(R.string.t_364431ec5a, Format.clock(currentStart, zone)))
             StepChooser(step, vm::setCorrectionStepMinutes)
             val r = result
             val preview = r?.getOrNull()?.takeIf { it.proposedSegment.start == at }
             when {
-                preview != null -> Note("Добавится ${Format.duration(preview.addedMs)} до ${Format.clock(currentStart, zone)}. " +
-                    "Это время отметится как указанное тобой, а не замеренное.", wash = true)
+                preview != null -> Note(L.s(R.string.t_55c44eb122, Format.duration(preview.addedMs), Format.clock(currentStart, zone)) +
+                    L.s(R.string.t_a1725f1b08), wash = true)
                 r?.exceptionOrNull() != null -> Note(when ((r.exceptionOrNull() as? dev.notai.tracker.CoreError)?.code) {
-                    dev.notai.tracker.ErrorCode.OVERLAP -> "Это время уже занято другой записью. Выбери начало позже."
-                    dev.notai.tracker.ErrorCode.RECOVERY_REQUIRED -> "Сначала уточни неизвестное время."
+                    dev.notai.tracker.ErrorCode.OVERLAP -> L.s(R.string.t_8b4d031cf9)
+                    dev.notai.tracker.ErrorCode.RECOVERY_REQUIRED -> L.s(R.string.t_8af28e7685)
                     else -> Format.error(r.exceptionOrNull()!!)
                 })
             }
@@ -361,8 +363,8 @@ fun ResolveSheet(zone: ZoneId, knownStart: Long, now: Long, onConfirm: (Long, Lo
         SheetHeader(stringResource(R.string.editorial_tracker_draft_117e2b56ce25cb830325_v0), onDismiss)
         Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             TimePair {
-                TimeField("Начало", start, zone, { start = it }, it, hint = "записано ${Format.clock(knownStart, zone)}", step = step)
-                TimeField("Конец", end, zone, { end = minOf(it, now) }, it, focused = true, hint = "не позже, чем сейчас", step = step)
+                TimeField(L.s(R.string.t_cb26bdc6c6), start, zone, { start = it }, it, hint = L.s(R.string.t_d2aa318afd, Format.clock(knownStart, zone)), step = step)
+                TimeField(L.s(R.string.t_4e895fd70d), end, zone, { end = minOf(it, now) }, it, focused = true, hint = L.s(R.string.t_93b302d32f), step = step)
             }
             StepChooser(step, onStep)
             Text(stringResource(R.string.editorial_tracker_draft_0fe49deada10db74c773_v0),
@@ -385,24 +387,24 @@ private fun CalendarLink(vm: TrackerViewModel, day: DayUi, zone: ZoneId, onPick:
     Row(Modifier.heightIn(min = 40.dp).pressable({
         if (context.checkSelfPermission(android.Manifest.permission.READ_CALENDAR) == android.content.pm.PackageManager.PERMISSION_GRANTED) open = true
         else permission.launch(android.Manifest.permission.READ_CALENDAR)
-    }, label = "Взять время из календаря"), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+    }, label = L.s(R.string.t_731f2bdc1e)), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         M3Icon(Icon.Calendar, null, Modifier.size(16.dp), tint = c.amberInk)
-        Text(if (denied) "Календарь недоступен без разрешения" else "Из календаря", style = NotAi.type.bodySmall.copy(fontWeight = FontWeight.Medium),
+        Text(if (denied) L.s(R.string.t_6e84391a2f) else L.s(R.string.t_6d06e4bbc8), style = NotAi.type.bodySmall.copy(fontWeight = FontWeight.Medium),
             color = if (denied) c.ink2 else c.amberInk)
     }
     if (open) {
         val page by produceState<dev.notai.tracker.android.CalendarPage?>(null, day.start) { value = vm.calendarEvents(day.start, day.end) }
         NotAiSheet({ open = false }, fullHeight = false) {
-            SheetHeader("Календарь: ${Format.dayMonth(day.date)}", { open = false })
+            SheetHeader(L.s(R.string.t_c372165452, Format.dayMonth(day.date)), { open = false })
             Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 20.dp)) {
                 val p = page
                 val events = p?.occurrences.orEmpty().filter { !it.allDay }
                 when {
                     p == null -> Spacer(Modifier.height(80.dp))
-                    p.issue != null -> Text("Календарь сейчас не отвечает.", style = NotAi.type.bodySmall, color = c.ink2)
-                    events.isEmpty() -> Text("В этот день в календаре нет событий со временем.", style = NotAi.type.bodySmall, color = c.ink2)
+                    p.issue != null -> Text(L.s(R.string.t_a3ffcb3ac5), style = NotAi.type.bodySmall, color = c.ink2)
+                    events.isEmpty() -> Text(L.s(R.string.t_552d1cca6b), style = NotAi.type.bodySmall, color = c.ink2)
                     else -> events.forEach { e ->
-                        ListRow(e.title?.takeIf { it.isNotBlank() } ?: "Без названия", subtitle = Format.range(e.reference.begin, e.reference.end, zone),
+                        ListRow(e.title?.takeIf { it.isNotBlank() } ?: L.s(R.string.t_32b74a3c47), subtitle = Format.range(e.reference.begin, e.reference.end, zone),
                             onClick = { onPick(e); open = false })
                     }
                 }

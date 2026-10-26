@@ -24,6 +24,8 @@ interface UiBackend {
     val longRecord: dev.notai.tracker.LongRecordReminder? get() = runtime?.attention?.ordinary?.controller
     /** The catalog this build ships with; null where no bundled catalog exists (screen tests). */
     val bundledCatalogVersion: String? get() = runtime?.bundledCatalogVersion
+    /** Reviewed preset translations bundled with the APK; display only. */
+    val catalogContent: dev.notai.tracker.android.CatalogContentAdapter? get() = runtime?.catalogContent
     fun prepareCatalog(): CatalogPreview
     fun applyCatalog(preview: CatalogPreview): Tracker.Change
     fun submitShortcut(action: SurfaceAction): Deferred<Result<Tracker.Change>>

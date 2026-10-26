@@ -2,6 +2,8 @@
 
 package dev.notai.tracker.android.ui
 
+
+import dev.notai.tracker.android.L
 import dev.notai.tracker.android.R
 
 import androidx.compose.ui.res.stringResource
@@ -42,7 +44,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 
-private val NO_ACTIVITY = Label("Какое занятие?", null, null, true)
+private val NO_ACTIVITY get() = Label(L.s(R.string.t_e3fc5b6cc7), null, null, true)
 
 /**
  * One plan entry: an activity on chosen weekdays or on one date, with an optional time.
@@ -66,12 +68,12 @@ fun PlanSheet(vm: TrackerViewModel, existing: PlanSeriesUi?, onPickActivity: ((C
     val ready = selection != null && (once || days.isNotEmpty())
 
     NotAiSheet(onDismiss, fullHeight = false) {
-        SheetHeader(if (existing == null) "Добавить в план" else "План", onDismiss, extra = existing?.let { {
-            IconAction(Icon.Trash, "Убрать из плана", { confirmRemove = true }, size = 19.dp)
+        SheetHeader(if (existing == null) L.s(R.string.t_c4dca81d48) else L.s(R.string.t_3146141c93), onDismiss, extra = existing?.let { {
+            IconAction(Icon.Trash, L.s(R.string.t_c82a0d4427), { confirmRemove = true }, size = 19.dp)
         } })
         Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            ActivityField(label, { onPickActivity { sel, l -> selection = sel; label = l } }, if (selection == null) "Выбрать" else "Изменить")
-            Segmented(listOf(false to "По дням недели", true to "Один день"), once, { once = it }, Modifier.fillMaxWidth())
+            ActivityField(label, { onPickActivity { sel, l -> selection = sel; label = l } }, if (selection == null) L.s(R.string.t_fe4b0c80f0) else L.s(R.string.t_9d809f884b))
+            Segmented(listOf(false to L.s(R.string.t_ba7631ff32), true to L.s(R.string.t_1751103733)), once, { once = it }, Modifier.fillMaxWidth())
             if (!once) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Format.weekdays.forEachIndexed { i, name ->
                     val d = i + 1; val on = d in days
@@ -84,23 +86,23 @@ fun PlanSheet(vm: TrackerViewModel, existing: PlanSeriesUi?, onPickActivity: ((C
                     }
                 }
             } else Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                listOf(today to "Сегодня", today.plusDays(1) to "Завтра").forEach { (d, name) -> DateChip(name, chosen == d) { date = d.toString() } }
+                listOf(today to L.s(R.string.t_5d5d2ea20a), today.plusDays(1) to L.s(R.string.t_f6de15c50a)).forEach { (d, name) -> DateChip(name, chosen == d) { date = d.toString() } }
                 val other = chosen != today && chosen != today.plusDays(1)
-                DateChip(if (other) Format.dayMonth(chosen) else "Другой день", other) { calendar = true }
+                DateChip(if (other) Format.dayMonth(chosen) else L.s(R.string.t_ae6b38edaf), other) { calendar = true }
             }
-            Row(Modifier.fillMaxWidth().pressable({ timed = !timed }, label = "Ко времени"), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().pressable({ timed = !timed }, label = L.s(R.string.t_163fdcceaa)), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text("Ко времени", style = NotAi.type.body, color = c.ink)
-                    Text(if (timed) "Время только для порядка в списке" else "Без времени: просто в этот день", style = NotAi.type.caption, color = c.ink2)
+                    Text(L.s(R.string.t_163fdcceaa), style = NotAi.type.body, color = c.ink)
+                    Text(if (timed) L.s(R.string.t_f70eab72a9) else L.s(R.string.t_96a0b3fc1d), style = NotAi.type.caption, color = c.ink2)
                 }
-                NotAiSwitch(timed, { timed = it }, "Ко времени")
+                NotAiSwitch(timed, { timed = it }, L.s(R.string.t_163fdcceaa))
             }
             if (timed) {
                 // TimeField works on instants; any fixed day carries the chosen clock time.
                 val base = remember { today.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() }
-                TimeField("Время", base + minuteOfDay * MINUTE, ZoneOffset.UTC, { minuteOfDay = Math.floorMod(((it - base) / MINUTE).toInt(), 24 * 60) })
+                TimeField(L.s(R.string.t_c80d7e8172), base + minuteOfDay * MINUTE, ZoneOffset.UTC, { minuteOfDay = Math.floorMod(((it - base) / MINUTE).toInt(), 24 * 60) })
             }
-            Text("План только показывается на главном экране. Время пойдёт, когда ты нажмёшь на занятие.", style = NotAi.type.caption, color = c.ink2)
+            Text(L.s(R.string.t_cfafc18b42), style = NotAi.type.caption, color = c.ink2)
         }
         PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), {
             val sel = selection ?: return@PillButton
@@ -123,8 +125,8 @@ fun PlanSheet(vm: TrackerViewModel, existing: PlanSeriesUi?, onPickActivity: ((C
                 selectedDayContainerColor = c.amber, selectedDayContentColor = c.onAmber, todayDateBorderColor = c.amber, todayContentColor = c.ink))
         }
     }
-    if (confirmRemove && existing != null) ConfirmDialog("Убрать «${existing.label.title}» из плана?",
-        "Записи, уже начатые по плану, останутся в истории.", "Убрать", { vm.removePlan(existing); confirmRemove = false; onDismiss() },
+    if (confirmRemove && existing != null) ConfirmDialog(L.s(R.string.t_22615c35f9, existing.label.title),
+        L.s(R.string.t_181ee397c9), L.s(R.string.t_9c7449bfd1), { vm.removePlan(existing); confirmRemove = false; onDismiss() },
         { confirmRemove = false }, destructive = true)
 }
 
@@ -165,27 +167,27 @@ fun GoalSheet(vm: TrackerViewModel, initial: GoalDraft?, onPickActivity: ((Class
     val daysInvalid = metric == GoalMetric.DISTINCT_RECORDED_DAYS && period == GoalPeriod.DAY
 
     NotAiSheet(onDismiss, fullHeight = false) {
-        SheetHeader(if (editing) "Цель" else "Новая цель", onDismiss, extra = if (editing) { {
-            IconAction(Icon.Trash, "Убрать цель", { confirmRemove = true }, size = 19.dp)
+        SheetHeader(if (editing) L.s(R.string.t_d5627f6a61) else L.s(R.string.t_58e6634696), onDismiss, extra = if (editing) { {
+            IconAction(Icon.Trash, L.s(R.string.t_67a887cea0), { confirmRemove = true }, size = 19.dp)
         } } else null)
         Column(Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            ActivityField(label ?: Label("Любое занятие", null, null, false, ActivityGlyphs.custom), { onPickActivity { sel, l -> selection = sel; label = l; activityChanged = true } },
-                if (selection == null) "Выбрать" else "Изменить")
-            if (selection != null) Text("Считать любое занятие", Modifier.heightIn(min = 32.dp).pressable({ selection = null; label = null; activityChanged = true }).padding(top = 4.dp),
+            ActivityField(label ?: Label(L.s(R.string.t_191cacce9c), null, null, false, ActivityGlyphs.custom), { onPickActivity { sel, l -> selection = sel; label = l; activityChanged = true } },
+                if (selection == null) L.s(R.string.t_fe4b0c80f0) else L.s(R.string.t_9d809f884b))
+            if (selection != null) Text(L.s(R.string.t_5e94c97f99), Modifier.heightIn(min = 32.dp).pressable({ selection = null; label = null; activityChanged = true }).padding(top = 4.dp),
                 style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
-            Field("Что считать") {
-                Segmented(listOf(GoalMetric.DURATION_MS to "Время", GoalMetric.SESSION_COUNT to "Записи", GoalMetric.DISTINCT_RECORDED_DAYS to "Дни"),
+            Field(L.s(R.string.t_9b4ee5c556)) {
+                Segmented(listOf(GoalMetric.DURATION_MS to L.s(R.string.t_c80d7e8172), GoalMetric.SESSION_COUNT to L.s(R.string.t_596144b0e6), GoalMetric.DISTINCT_RECORDED_DAYS to L.s(R.string.t_46a1378615)),
                     metric, ::pickMetric, Modifier.fillMaxWidth())
             }
-            Field("Период") {
+            Field(L.s(R.string.t_b2822e2bb3)) {
                 if (editing) Text("${when (period) { GoalPeriod.DAY -> "День"; GoalPeriod.WEEK -> "Неделя"; GoalPeriod.MONTH -> "Месяц"; GoalPeriod.FIXED -> "Свои даты" }}. " +
-                    "Другой период — это новая цель.", style = NotAi.type.bodySmall, color = c.ink2)
-                else Segmented(listOf(GoalPeriod.DAY to "День", GoalPeriod.WEEK to "Неделя", GoalPeriod.MONTH to "Месяц"), period, {
+                    L.s(R.string.t_d4a88f5588), style = NotAi.type.bodySmall, color = c.ink2)
+                else Segmented(listOf(GoalPeriod.DAY to L.s(R.string.t_b6ef08401f), GoalPeriod.WEEK to L.s(R.string.t_9207563dab), GoalPeriod.MONTH to L.s(R.string.t_e558fb6e24)), period, {
                     period = it; if (metric == GoalMetric.DISTINCT_RECORDED_DAYS) target = target.coerceAtMost(if (it == GoalPeriod.MONTH) 31 else 7)
                 }, Modifier.fillMaxWidth())
             }
-            Field("Граница") {
-                Segmented(listOf(GoalDirection.MINIMUM to "Не меньше", GoalDirection.LIMIT to "Не больше"), direction, { direction = it }, Modifier.fillMaxWidth())
+            Field(L.s(R.string.t_d8e26625e7)) {
+                Segmented(listOf(GoalDirection.MINIMUM to L.s(R.string.t_0865c10035), GoalDirection.LIMIT to L.s(R.string.t_476c9846a6)), direction, { direction = it }, Modifier.fillMaxWidth())
             }
             Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(c.sunk).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 fun step(up: Boolean) {
@@ -200,30 +202,30 @@ fun GoalSheet(vm: TrackerViewModel, initial: GoalDraft?, onPickActivity: ((Class
                         GoalMetric.DISTINCT_RECORDED_DAYS -> (if (up) target + 1 else target - 1).coerceIn(1, maxDays)
                     }
                 }
-                IconAction(Icon.Minus, "Меньше", { step(false) }, tint = c.ink, size = 18.dp)
-                Text(Format.goalRule(metric, direction, period, target).replaceFirstChar { it.uppercase() }, Modifier.weight(1f).semantics { contentDescription = "Цель: ${Format.goalRule(metric, direction, period, target)}" },
+                IconAction(Icon.Minus, L.s(R.string.t_766e7cabf7), { step(false) }, tint = c.ink, size = 18.dp)
+                Text(Format.goalRule(metric, direction, period, target).replaceFirstChar { it.uppercase() }, Modifier.weight(1f).semantics { contentDescription = L.s(R.string.t_474488d799, Format.goalRule(metric, direction, period, target)) },
                     style = NotAi.type.body.copy(fontWeight = FontWeight.Medium), color = c.ink, textAlign = TextAlign.Center)
-                IconAction(Icon.Plus, "Больше", { step(true) }, tint = c.ink, size = 18.dp)
+                IconAction(Icon.Plus, L.s(R.string.t_b371499aaa), { step(true) }, tint = c.ink, size = 18.dp)
             }
-            if (daysInvalid) Note("Дни считаются за неделю или месяц.")
-            if (editing && period != GoalPeriod.FIXED) Field("Когда применить") {
+            if (daysInvalid) Note(L.s(R.string.t_488cfa5f88))
+            if (editing && period != GoalPeriod.FIXED) Field(L.s(R.string.t_137cb582b9)) {
                 val (next, now) = when (period) {
-                    GoalPeriod.DAY -> "С завтрашнего дня" to "Уже сегодня"
-                    GoalPeriod.WEEK -> "Со следующей недели" to "С этой недели"
-                    else -> "Со следующего месяца" to "С этого месяца"
+                    GoalPeriod.DAY -> L.s(R.string.t_b84fd84e60) to L.s(R.string.t_1425330b29)
+                    GoalPeriod.WEEK -> L.s(R.string.t_d458ec4c77) to L.s(R.string.t_3fa9f851cc)
+                    else -> L.s(R.string.t_c7d650974b) to L.s(R.string.t_30796d2694)
                 }
                 Segmented(listOf(GoalEditMode.NEXT_PERIOD to next, GoalEditMode.CORRECT_CURRENT to now), mode, { mode = it }, Modifier.fillMaxWidth())
-                Text(if (mode == GoalEditMode.NEXT_PERIOD) "Текущий период досчитается по прежней цели." else "Текущий период пересчитается по новой цели. Прошлые останутся как были.",
+                Text(if (mode == GoalEditMode.NEXT_PERIOD) L.s(R.string.t_853744f144) else L.s(R.string.t_c33b203048),
                     Modifier.padding(top = 6.dp), style = NotAi.type.caption, color = c.ink2)
             }
         }
         PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), {
-            vm.saveGoal(GoalDraft(initial?.id, label?.title ?: "Всё время", selection, label, metric, direction, period, target, initial?.originalFilter, activityChanged),
+            vm.saveGoal(GoalDraft(initial?.id, label?.title ?: L.s(R.string.t_c12ee51dd9), selection, label, metric, direction, period, target, initial?.originalFilter, activityChanged),
                 if (initial?.period == GoalPeriod.FIXED) GoalEditMode.CORRECT_CURRENT else mode)
             onDismiss()
         }, Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp), ButtonKind.PRIMARY, enabled = !daysInvalid)
     }
-    if (confirmRemove && initial?.id != null) ConfirmDialog("Убрать цель?", "Записи не изменятся, исчезнет только сама цель.", "Убрать",
+    if (confirmRemove && initial?.id != null) ConfirmDialog(L.s(R.string.t_3da1c7d83d), L.s(R.string.t_e0997b4d01), L.s(R.string.t_9c7449bfd1),
         { vm.deleteGoal(initial.id); confirmRemove = false; onDismiss() }, { confirmRemove = false }, destructive = true)
 }
 
@@ -244,24 +246,24 @@ fun ShareSheet(vm: TrackerViewModel, initial: Period, onDismiss: () -> Unit) {
     var notes by rememberSaveable { mutableStateOf(false) }
     val text by produceState<String?>(null, period, notes) { value = vm.summary(period, notes) }
     NotAiSheet(onDismiss, fullHeight = false) {
-        SheetHeader("Поделиться итогом", onDismiss)
+        SheetHeader(L.s(R.string.t_838a5669f7), onDismiss)
         Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Segmented(Period.entries.map { it to it.title }, period, { period = it }, Modifier.fillMaxWidth(), height = 36.dp)
             Box(Modifier.fillMaxWidth().heightIn(min = 120.dp, max = 300.dp).clip(RoundedCornerShape(14.dp)).background(c.sunk)
                 .verticalScroll(rememberScrollState()).padding(14.dp)) {
                 Text(text.orEmpty(), style = NotAi.type.bodySmall, color = c.ink)
             }
-            Row(Modifier.fillMaxWidth().pressable({ notes = !notes }, label = "Добавить заметки"), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().pressable({ notes = !notes }, label = L.s(R.string.t_62c204df09)), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text("Добавить заметки", style = NotAi.type.body, color = c.ink)
-                    Text("Заметки бывают личными, поэтому по умолчанию их нет", style = NotAi.type.caption, color = c.ink2)
+                    Text(L.s(R.string.t_62c204df09), style = NotAi.type.body, color = c.ink)
+                    Text(L.s(R.string.t_8abcbc93e4), style = NotAi.type.caption, color = c.ink2)
                 }
-                NotAiSwitch(notes, { notes = it }, "Добавить заметки")
+                NotAiSwitch(notes, { notes = it }, L.s(R.string.t_62c204df09))
             }
-            PillButton("Отправить", {
+            PillButton(L.s(R.string.t_76dcf737a6), {
                 val body = text ?: return@PillButton
                 val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, body)
-                runCatching { context.startActivity(Intent.createChooser(send, "Поделиться итогом")) }
+                runCatching { context.startActivity(Intent.createChooser(send, L.s(R.string.t_838a5669f7))) }
                 onDismiss()
             }, Modifier.fillMaxWidth().padding(bottom = 20.dp), ButtonKind.PRIMARY, Icon.Share, enabled = text != null)
         }
@@ -277,12 +279,12 @@ fun FocusEditorSheet(vm: TrackerViewModel, plan: dev.notai.tracker.FocusPlan, ru
     NotAiSheet(onDismiss, fullHeight = false) {
         SheetHeader(stringResource(R.string.editorial_tracker_draft_1d9d344d38d034a749fa_v0), onDismiss)
         Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            MinuteStepper("Работа", work, { work = (if (work > 10) work - 5 else work - 1).coerceAtLeast(5) }, { work = (if (work >= 10) work + 5 else work + 1).coerceAtMost(180) })
-            MinuteStepper("Перерыв", rest, { rest = (if (rest > 5) rest - 5 else rest - 1).coerceAtLeast(1) }, { rest = (if (rest >= 5) rest + 5 else rest + 1).coerceAtMost(60) })
+            MinuteStepper(L.s(R.string.t_75436e3162), work, { work = (if (work > 10) work - 5 else work - 1).coerceAtLeast(5) }, { work = (if (work >= 10) work + 5 else work + 1).coerceAtMost(180) })
+            MinuteStepper(L.s(R.string.t_735877a9aa), rest, { rest = (if (rest > 5) rest - 5 else rest - 1).coerceAtLeast(1) }, { rest = (if (rest >= 5) rest + 5 else rest + 1).coerceAtMost(60) })
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf(25 to 5, 50 to 10, 90 to 15).forEach { (w, b) -> DateChip("$w / $b", work == w && rest == b) { work = w; rest = b } }
             }
-            Text(if (running) "Текущий отрезок досчитается как начат, новые длительности — со следующего." else "Длительности сохранятся и для следующих раз.",
+            Text(if (running) L.s(R.string.t_fd3cb2ebef) else L.s(R.string.t_6f65bc34a3),
                 style = NotAi.type.caption, color = c.ink2)
         }
         ButtonPair(Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp)) { m ->
@@ -297,9 +299,9 @@ private fun MinuteStepper(title: String, minutes: Int, minus: () -> Unit, plus: 
     val c = NotAi.colors
     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(c.sunk).padding(start = 14.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(title, Modifier.weight(1f), style = NotAi.type.body, color = c.ink)
-        IconAction(Icon.Minus, "$title: меньше", minus, tint = c.ink, size = 16.dp)
-        Text("$minutes мин", Modifier.widthIn(min = 64.dp).semantics { contentDescription = "$title: $minutes минут" },
+        IconAction(Icon.Minus, L.s(R.string.t_1fcbdeecfd, title), minus, tint = c.ink, size = 16.dp)
+        Text(L.s(R.string.t_455a50db4a, minutes), Modifier.widthIn(min = 64.dp).semantics { contentDescription = L.s(R.string.t_cf113217ae, title, minutes) },
             style = NotAi.type.body.copy(fontWeight = FontWeight.Medium), color = c.ink, textAlign = TextAlign.Center)
-        IconAction(Icon.Plus, "$title: больше", plus, tint = c.ink, size = 16.dp)
+        IconAction(Icon.Plus, L.s(R.string.t_4ef8132cf3, title), plus, tint = c.ink, size = 16.dp)
     }
 }

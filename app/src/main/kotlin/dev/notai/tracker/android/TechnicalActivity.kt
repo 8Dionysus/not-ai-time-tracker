@@ -50,12 +50,12 @@ class TechnicalActivity: Activity() {
         body = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(24,48,24,24) }
         setContentView(ScrollView(this).apply { addView(body) })
         status = TextView(this); body.addView(status)
-        name = input("Имя новой карточки").apply { id = R.id.form_name }
-        details = input("Уточнение: например listening").apply { id = R.id.form_details }
-        note = input("Заметка").apply { id = R.id.form_note }
-        from = input("Начало / момент переключения: ISO-8601").apply { id = R.id.form_from }
-        until = input("Конец: ISO-8601").apply { id = R.id.form_until }
-        zone = input("Зона отчётов: например Europe/Moscow").apply { id = R.id.form_zone;setText(ZoneId.systemDefault().id) }
+        name = input(L.s(R.string.t_9e8bfc9912)).apply { id = R.id.form_name }
+        details = input(L.s(R.string.t_66c789d74f)).apply { id = R.id.form_details }
+        note = input(L.s(R.string.t_917b58362c)).apply { id = R.id.form_note }
+        from = input(L.s(R.string.t_4ebd720453)).apply { id = R.id.form_from }
+        until = input(L.s(R.string.t_9711f6b5b7)).apply { id = R.id.form_until }
+        zone = input(L.s(R.string.t_b67fbff66e)).apply { id = R.id.form_zone;setText(ZoneId.systemDefault().id) }
         pendingExportId = savedInstanceState?.getString("exportOperation")
         formReference = savedInstanceState?.getString("formReference")
         if(formReference != null) {
@@ -66,7 +66,7 @@ class TechnicalActivity: Activity() {
                 form.source?.let { inputDraft = EntryDraft(Classification(),form.note.takeIf { it.isNotEmpty() },
                     source = DraftSource.valueOf(it),sourceReference = form.sourceReference) }
                 pendingSelectedText = form.pendingText
-            } catch(e: Exception) { status.text = "Не удалось прочитать сохранённую форму: ${e.javaClass.simpleName}" }
+            } catch(e: Exception) { status.text = L.s(R.string.t_4ebf488399, e.javaClass.simpleName) }
         } else if(savedInstanceState?.containsKey("selectedTextDraft") == true) {
             note.setText(savedInstanceState.getString("selectedTextDraft"))
             if(savedInstanceState.getBoolean("isSelectedTextDraft")) inputDraft = EntryDraft(Classification(),note.text.toString().takeIf { it.isNotEmpty() },source = DraftSource.SELECTED_TEXT)
@@ -76,7 +76,7 @@ class TechnicalActivity: Activity() {
         intent.action = Intent.ACTION_MAIN
         scope.launch {
             try { runtime = withContext(Dispatchers.IO) { TrackerRuntime.get(this@TechnicalActivity) } }
-            catch(e: Exception) { status.text = "Локальная база недоступна: ${e.message}\nИсходные файлы сохранены. Выберите копию в восстановлении.";return@launch }
+            catch(e: Exception) { status.text = L.s(R.string.t_7da3c34069, e.message);return@launch }
             if(formReference == null) zone.setText(withContext(Dispatchers.IO) { runtime.tracker.data().settings.reportZone })
             buildActions()
             buildSurfaceControls()
@@ -99,18 +99,18 @@ class TechnicalActivity: Activity() {
         }
     }
     private fun buildActions() {
-        button("Сохранить новую карточку") {
+        button(L.s(R.string.t_129dc42035)) {
             val expected = shown?.token ?: return@button; val value = name.text.toString(); val activity = details.text.toString()
             val card = Card(name = value,details = if(activity.isBlank()) emptyMap() else mapOf("activity" to activity))
-            runAction { runtime.tracker.saveCard(expected,card);withContext(Dispatchers.Main) { selectedCardId = card.id;status.text = "Выбрана новая карточка · ${card.id}" } }
+            runAction { runtime.tracker.saveCard(expected,card);withContext(Dispatchers.Main) { selectedCardId = card.id;status.text = L.s(R.string.t_51f805f925, card.id) } }
         }
-        button("Выбрать карточку по ID…") { chooseCard() }
-        button("Без карточки") { selectedCardId = null;status.text = "Следующий Start — без карточки" }
-        button("Карточка из каталога…") { chooseType() }
-        button("Обновить готовый каталог…") { runAction { val preview = runtime.prepareBundledCatalog();withContext(Dispatchers.Main) {
-            AlertDialog.Builder(this@TechnicalActivity).setTitle("Каталог ${preview.version}")
-                .setMessage("Новых: ${preview.report.added.size}; уточнений: ${preview.report.updated.size}; конфликтов: ${preview.report.conflicts.size}. Локальные имена, архивность и история сохраняются.")
-                .setNegativeButton("Отмена",null).setPositiveButton("Применить") { _,_ -> runAction { runtime.catalogImports.apply(preview) } }.show()
+        button(L.s(R.string.t_434e93a022)) { chooseCard() }
+        button(L.s(R.string.t_93f389d809)) { selectedCardId = null;status.text = L.s(R.string.t_e6aa58192b) }
+        button(L.s(R.string.t_489dd4cb3d)) { chooseType() }
+        button(L.s(R.string.t_eeee074ac3)) { runAction { val preview = runtime.prepareBundledCatalog();withContext(Dispatchers.Main) {
+            AlertDialog.Builder(this@TechnicalActivity).setTitle(L.s(R.string.t_ba9db63b9d, preview.version))
+                .setMessage(L.s(R.string.t_5de1eb4784, preview.report.added.size, preview.report.updated.size, preview.report.conflicts.size))
+                .setNegativeButton(L.s(R.string.t_0ec753be8d),null).setPositiveButton(L.s(R.string.t_768af67762)) { _,_ -> runAction { runtime.catalogImports.apply(preview) } }.show()
         } } }
         buildCalendarControl()
         buildFocusControls()
@@ -119,44 +119,44 @@ class TechnicalActivity: Activity() {
             if(f.draft == null) t.start(e,c,f.note.takeIf { it.isNotBlank() })
             else t.startDraft(e,f.draft.copy(selection = c,note = f.note.takeIf { it.isNotEmpty() }))
         }
-        command("Назначить текущему занятию",true) { t,e,c,f -> t.labelCurrent(e,c,f.note) }
-        command("Изменить уточнение с этого момента",true) { t,e,c,f -> t.changeDetails(e,c) }
+        command(L.s(R.string.t_0195b83c6c),true) { t,e,c,f -> t.labelCurrent(e,c,f.note) }
+        command(L.s(R.string.t_14d31156f2),true) { t,e,c,f -> t.changeDetails(e,c) }
         for(directive in listOf(TimerDirective.PAUSE,TimerDirective.RESUME,TimerDirective.STOP)) button(directive.name) {
             val target = shown?.timerTarget ?: return@button
             runAction { runtime.tracker.timerCommand(target,directive) }
         }
         command("Switch",true) { t,e,c,f -> t.switch(e,c) }
-        command("Повторить последнее записанное (сохранённые, включая архивные параметры)") { t,e,_,f -> t.repeat(e,t.choices().latestRecorded()?.sourceSessionId ?: throw CoreError(ErrorCode.INVALID_INPUT,"Нет завершённой истории")) }
-        command("Запомнить выбранное избранное",true) { t,e,c,f -> t.saveFavorite(e,Favorite(label = c.name ?: "Без уточнения",selection = c)) }
-        button("Выбрать и запустить избранное…") { runAction {
+        command(L.s(R.string.t_86fde46076)) { t,e,_,f -> t.repeat(e,t.choices().latestRecorded()?.sourceSessionId ?: throw CoreError(ErrorCode.INVALID_INPUT,L.s(R.string.t_1a54271b7a))) }
+        command(L.s(R.string.t_f11be88b10),true) { t,e,c,f -> t.saveFavorite(e,Favorite(label = c.name ?: L.s(R.string.t_5a7fa46600),selection = c)) }
+        button(L.s(R.string.t_4c70fed089)) { runAction {
             val choices = runtime.tracker.choices();showChoices(choices,ChoiceQuery(kinds = setOf(ChoiceKind.FAVORITE),includeArchived = true)) { hit ->
                 val expected = choices.token
-                AlertDialog.Builder(this@TechnicalActivity).setTitle("Запустить сохранённый вариант?")
-                    .setMessage("${hit.entry.title} · ${hit.entry.sourceId}\n${hit.entry.availability}. Избранное использует сохранённые параметры, в том числе архивные.")
-                    .setNegativeButton("Отмена",null).setPositiveButton("Start сейчас") { _,_ -> runAction { runtime.tracker.startFavorite(expected,hit.entry.sourceId) } }.show()
+                AlertDialog.Builder(this@TechnicalActivity).setTitle(L.s(R.string.t_08f120e3b9))
+                    .setMessage(L.s(R.string.t_b747495fc3, hit.entry.title, hit.entry.sourceId, hit.entry.availability))
+                    .setNegativeButton(L.s(R.string.t_0ec753be8d),null).setPositiveButton(L.s(R.string.t_a1103b6e0c)) { _,_ -> runAction { runtime.tracker.startFavorite(expected,hit.entry.sourceId) } }.show()
             }
         } }
-        command("Сохранить ручной интервал",true) { t,e,c,f ->
+        command(L.s(R.string.t_0ad4a07529),true) { t,e,c,f ->
             if(f.draft == null) t.manual(e,time(f.start),time(f.end),c,f.note.takeIf { it.isNotBlank() })
             else t.recordDraft(e,f.draft.copy(selection = c,note = f.note.takeIf { it.isNotEmpty() },
                 interval = DraftInterval(time(f.start),time(f.end))))
         }
-        command("Переключился раньше: сохранить",true) { t,e,c,f -> t.switchedEarlier(e,time(f.start),c) }
-        command("Исправить последний закрытый сегмент",true) { t,e,c,f -> t.correctSegment(e,t.choices().latestRecorded()?.sourceSegmentId ?: throw CoreError(ErrorCode.INVALID_INPUT,"Нет закрытого записанного сегмента"),time(f.start),time(f.end),c) }
-        command("Отменить доступную правку") { t,e,_,f -> t.undo(e) }
-        command("Подтвердить хвост указанным интервалом") { t,e,_,f -> t.resolveTail(e,time(f.start),time(f.end)) }
-        command("Исключить неопределённый хвост") { t,e,_,f -> t.resolveTail(e,null,null) }
-        button("Сохранить зону отчётов…") {
+        command(L.s(R.string.t_2583e76aee),true) { t,e,c,f -> t.switchedEarlier(e,time(f.start),c) }
+        command(L.s(R.string.t_fdfa49e623),true) { t,e,c,f -> t.correctSegment(e,t.choices().latestRecorded()?.sourceSegmentId ?: throw CoreError(ErrorCode.INVALID_INPUT,L.s(R.string.t_7f76296ba9)),time(f.start),time(f.end),c) }
+        command(L.s(R.string.t_9cae6690eb)) { t,e,_,f -> t.undo(e) }
+        command(L.s(R.string.t_d398842570)) { t,e,_,f -> t.resolveTail(e,time(f.start),time(f.end)) }
+        command(L.s(R.string.t_e98d66a21e)) { t,e,_,f -> t.resolveTail(e,null,null) }
+        button(L.s(R.string.t_e5451eea1b)) {
             val expected = shown?.token ?: return@button;val value = zone.text.toString().trim()
-            try { ZoneId.of(value) } catch(_: Exception) { status.text = "Неизвестная IANA зона";return@button }
-            AlertDialog.Builder(this).setTitle("Изменить зону отчётов на $value?")
-                .setMessage("Изменятся границы дней и вид отчётов по существующей истории. Физические интервалы и отдельные сохранённые зоны целей сохраняются. Выбранный пояс будет закреплён; автоматический выбор отключится.")
-                .setNegativeButton("Отмена",null).setPositiveButton("Сохранить") { _,_ -> runAction { runtime.reportZone.setFixed(expected,value) } }.show()
+            try { ZoneId.of(value) } catch(_: Exception) { status.text = L.s(R.string.t_5873f87916);return@button }
+            AlertDialog.Builder(this).setTitle(L.s(R.string.t_96a64755de, value))
+                .setMessage(L.s(R.string.t_b905452397))
+                .setNegativeButton(L.s(R.string.t_0ec753be8d),null).setPositiveButton(L.s(R.string.t_4864057d62)) { _,_ -> runAction { runtime.reportZone.setFixed(expected,value) } }.show()
         }
-        button("Экспорт полного JSON") { beginExport("application/json","not-ai-backup.json") { runtime.backups.write(it) } }
-        button("Повторить подготовленный экспорт…") { retryExport() }
-        button("Отменить подготовленный экспорт") { cancelPreparedExport() }
-        button("CSV отчёт за сегодня (не полная копия)") { runAction {
+        button(L.s(R.string.t_12fa39305e)) { beginExport("application/json","not-ai-backup.json") { runtime.backups.write(it) } }
+        button(L.s(R.string.t_aa9fc365f5)) { retryExport() }
+        button(L.s(R.string.t_253cf1644f)) { cancelPreparedExport() }
+        button(L.s(R.string.t_cc6d018f5b)) { runAction {
             val t = runtime.tracker; val d = t.data(); val now = t.clock.now()
             val report = t.view().day(ReportingDayPolicy(d.settings.reportZone,d.settings.reportDayStartMinute).dateAt(now.wall))
             withContext(Dispatchers.Main) { beginExport("text/csv","not-ai-today.csv") { out ->
@@ -166,13 +166,13 @@ class TechnicalActivity: Activity() {
     }
     private fun chooseCard() = runAction {
         val choices = runtime.tracker.choices();showChoices(choices,ChoiceQuery(kinds = setOf(ChoiceKind.CARD))) { hit ->
-            selectedCardId = hit.entry.sourceId;status.text = "Выбрана: ${hit.entry.title} · ID ${hit.entry.sourceId}"
+            selectedCardId = hit.entry.sourceId;status.text = L.s(R.string.t_a12db4c166, hit.entry.title, hit.entry.sourceId)
         }
     }
     private fun chooseType() {
-        val query = EditText(this).apply { hint = "Поиск в полном каталоге" }
-        AlertDialog.Builder(this).setTitle("Каталог").setView(query).setNegativeButton("Отмена",null)
-            .setPositiveButton("Найти") { _,_ -> val value = query.text.toString();runAction {
+        val query = EditText(this).apply { hint = L.s(R.string.t_657703c887) }
+        AlertDialog.Builder(this).setTitle(L.s(R.string.t_46e27e2f0a)).setView(query).setNegativeButton(L.s(R.string.t_0ec753be8d),null)
+            .setPositiveButton(L.s(R.string.t_ed6e1d0308)) { _,_ -> val value = query.text.toString();runAction {
                 val choices = runtime.tracker.choices();showChoices(choices,ChoiceQuery(text = value,kinds = setOf(ChoiceKind.TYPE))) { hit -> chooseCatalogEntry(choices,hit) }
             } }.show()
     }
@@ -181,7 +181,7 @@ class TechnicalActivity: Activity() {
             runAction { showChoices(view,ChoiceQuery(kinds = setOf(ChoiceKind.TYPE),scope = CatalogScope.CHILDREN,parentId = hit.entry.sourceId)) { child -> chooseCatalogEntry(view,child) } }
             return
         }
-        if(!hit.entry.canStart) { status.text = "Недоступно для нового занятия: ${hit.entry.availability}";return }
+        if(!hit.entry.canStart) { status.text = L.s(R.string.t_d524af03ac, hit.entry.availability);return }
         runAction {
             val card = runtime.tracker.data().cardFromType(hit.entry.sourceId)
             runtime.tracker.saveCard(view.token,card)
@@ -192,37 +192,37 @@ class TechnicalActivity: Activity() {
         val page = view.search(query,cursor,pageSize = 30)
         withContext(Dispatchers.Main) {
             val labels = page.items.map { "${it.entry.title} · ${it.entry.sourceId}\n${it.entry.path.joinToString(" / ") { p -> p.name }}" }
-            val dialog = AlertDialog.Builder(this@TechnicalActivity).setTitle("Выбор: ${page.total}")
-                .setItems(labels.toTypedArray()) { _,index -> choose(page.items[index]) }.setNegativeButton("Отмена",null)
-            if(page.next != null) dialog.setPositiveButton("Дальше") { _,_ -> runAction { showChoices(view,query,page.next,choose) } }
+            val dialog = AlertDialog.Builder(this@TechnicalActivity).setTitle(L.s(R.string.t_7d4b8f8a7e, page.total))
+                .setItems(labels.toTypedArray()) { _,index -> choose(page.items[index]) }.setNegativeButton(L.s(R.string.t_0ec753be8d),null)
+            if(page.next != null) dialog.setPositiveButton(L.s(R.string.t_e3b9331301)) { _,_ -> runAction { showChoices(view,query,page.next,choose) } }
             dialog.show()
         }
     }
     private fun buildTransferControls() {
-        button("Добавить историю CSV…") { startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply { type = "*/*";addCategory(Intent.CATEGORY_OPENABLE) },3) }
-        button("Количество для целой сессии/сегмента…") {
+        button(L.s(R.string.t_6400526c15)) { startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply { type = "*/*";addCategory(Intent.CATEGORY_OPENABLE) },3) }
+        button(L.s(R.string.t_007f15b539)) {
             val expected = shown?.token ?: return@button
             val form = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
             fun field(label: String) = EditText(this).apply { hint = label;form.addView(this) }
-            val metric = field("ID величины");val version = field("meaningVersion").apply { setText("1") }
-            val unit = field("ID исходной единицы");val value = field("Неотрицательное Decimal, точка")
-            val target = field("ID всей сессии или сегмента")
+            val metric = field(L.s(R.string.t_ce12182bac));val version = field("meaningVersion").apply { setText("1") }
+            val unit = field(L.s(R.string.t_b4efdc2013));val value = field(L.s(R.string.t_69e5b8a8c6))
+            val target = field(L.s(R.string.t_9bc1f05bd8))
             val scopeInput = Spinner(this).apply { adapter = ArrayAdapter(this@TechnicalActivity,android.R.layout.simple_spinner_dropdown_item,Scope.entries.map { it.name });form.addView(this) }
             val error = TextView(this).also { form.addView(it) }
-            val dialog = AlertDialog.Builder(this).setTitle("Количество всего target; дневные окна не складываются")
-                .setView(form).setNegativeButton("Отмена",null).setPositiveButton("Сохранить",null).create()
+            val dialog = AlertDialog.Builder(this).setTitle(L.s(R.string.t_de5d4764e8))
+                .setView(form).setNegativeButton(L.s(R.string.t_0ec753be8d),null).setPositiveButton(L.s(R.string.t_4864057d62),null).create()
             dialog.setOnShowListener {
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                     val draft = runCatching { MeasurementDraft(metric.text.toString(),version.text.toString().toInt(),Decimal(value.text.toString()),
                         unit.text.toString(),Scope.valueOf(scopeInput.selectedItem.toString()),target.text.toString()) }
-                    draft.onFailure { error.text = "Не сохранено: ${it.message}; исправьте форму или отмените" }
+                    draft.onFailure { error.text = L.s(R.string.t_8972ce6fc3, it.message) }
                     draft.onSuccess { captured -> runAction {
                         val prepared = runtime.tracker.data().prepareMeasurement(captured)
                         val measurement = prepared.measurement
                         if(measurement == null) withContext(Dispatchers.Main) { error.text = prepared.error }
                         else {
                             runtime.tracker.measure(expected,measurement)
-                            withContext(Dispatchers.Main) { status.text = "Сохранено ${measurement.value} ${measurement.unit} для всего ${measurement.targetId}";dialog.dismiss() }
+                            withContext(Dispatchers.Main) { status.text = L.s(R.string.t_a18bb83bf1, measurement.value, measurement.unit, measurement.targetId);dialog.dismiss() }
                         }
                     } }
                 }
@@ -235,33 +235,33 @@ class TechnicalActivity: Activity() {
         val inspection = HistoryFiles.inspect(bytes)
         if(inspection.format != ImportFormat.DELIMITED_TEXT) throw CoreError(ErrorCode.UNSUPPORTED_IMPORT,inspection.problems.joinToString())
         withContext(Dispatchers.Main) {
-            AlertDialog.Builder(this@TechnicalActivity).setTitle("Выберите разделитель")
+            AlertDialog.Builder(this@TechnicalActivity).setTitle(L.s(R.string.t_affff57571))
                 .setItems(inspection.candidates.map { "${if(it.delimiter == '\t') "TAB" else it.delimiter} · ${it.columns.joinToString()}" }.toTypedArray()) { _,index ->
                     csvMapping(inspection,inspection.candidates[index])
-                }.setNegativeButton("Отмена",null).show()
+                }.setNegativeButton(L.s(R.string.t_0ec753be8d),null).show()
         }
     }
     private fun csvMapping(inspection: ImportInspection,candidate: ColumnInspection) {
         val fields = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         fun field(label: String,suggested: String = "") = EditText(this).apply { hint = label;setText(suggested);fields.addView(this) }
         fun suggestion(kind: ImportField) = candidate.suggestions[kind]?.firstOrNull().orEmpty()
-        val namespace = field("Стабильный namespace источника","csv:local")
-        val activity = field("Колонка занятия",suggestion(ImportField.ACTIVITY));val start = field("Колонка начала",suggestion(ImportField.START))
-        val end = field("Колонка конца (или duration)",suggestion(ImportField.END));val duration = field("Колонка duration",suggestion(ImportField.DURATION))
-        val startTime = field("Отдельная колонка времени начала",suggestion(ImportField.START_TIME));val endTime = field("Отдельная колонка времени конца",suggestion(ImportField.END_TIME))
-        val category = field("Колонка категории",suggestion(ImportField.CATEGORY));val noteColumn = field("Колонка заметки",suggestion(ImportField.NOTE));val record = field("Колонка ID строки",suggestion(ImportField.ID))
-        val pattern = field("Pattern локальной даты/времени; пусто = ISO с offset")
-        val sourceZone = field("Зона времени источника; подтвердите явно",zone.text.toString())
+        val namespace = field(L.s(R.string.t_a4ac32f350),"csv:local")
+        val activity = field(L.s(R.string.t_12b0be1a44),suggestion(ImportField.ACTIVITY));val start = field(L.s(R.string.t_5f0968991b),suggestion(ImportField.START))
+        val end = field(L.s(R.string.t_cefdb75984),suggestion(ImportField.END));val duration = field(L.s(R.string.t_629e3bb846),suggestion(ImportField.DURATION))
+        val startTime = field(L.s(R.string.t_c8317c85b2),suggestion(ImportField.START_TIME));val endTime = field(L.s(R.string.t_9eb9a9691b),suggestion(ImportField.END_TIME))
+        val category = field(L.s(R.string.t_d223a16aed),suggestion(ImportField.CATEGORY));val noteColumn = field(L.s(R.string.t_7ec7c94cc1),suggestion(ImportField.NOTE));val record = field(L.s(R.string.t_7eb07227f1),suggestion(ImportField.ID))
+        val pattern = field(L.s(R.string.t_e4c06f14a4))
+        val sourceZone = field(L.s(R.string.t_c67ed0b774),zone.text.toString())
         val format = Spinner(this).apply { adapter = ArrayAdapter(this@TechnicalActivity,android.R.layout.simple_spinner_dropdown_item,DurationFormat.entries.map { it.name });fields.addView(this) }
-        val useCard = CheckBox(this).apply { text = "Все строки → выбранная карточка; иначе исходные имена без типа";fields.addView(this) }
-        AlertDialog.Builder(this).setTitle("Подтвердите колонки, время и единицы duration").setView(ScrollView(this).apply { addView(fields) })
-            .setNegativeButton("Отмена",null).setPositiveButton("Preview") { _,_ ->
+        val useCard = CheckBox(this).apply { text = L.s(R.string.t_8125e2fba0);fields.addView(this) }
+        AlertDialog.Builder(this).setTitle(L.s(R.string.t_d41ba2c06d)).setView(ScrollView(this).apply { addView(fields) })
+            .setNegativeButton(L.s(R.string.t_0ec753be8d),null).setPositiveButton("Preview") { _,_ ->
                 fun optional(input: EditText) = input.text.toString().takeIf { it.isNotBlank() }
                 val mapping = CsvMapping(namespace.text.toString(),activity.text.toString(),start.text.toString(),end = optional(end),duration = optional(duration),
                     startTime = optional(startTime),endTime = optional(endTime),category = optional(category),note = optional(noteColumn),id = optional(record),
                     localPattern = optional(pattern),zone = sourceZone.text.toString(),delimiter = candidate.delimiter,durationFormat = DurationFormat.valueOf(format.selectedItem.toString()))
                 val card = if(useCard.isChecked) selectedCardId else null
-                if(useCard.isChecked && card == null) { status.text = "Выберите карточку по ID перед CSV mapping";return@setPositiveButton }
+                if(useCard.isChecked && card == null) { status.text = L.s(R.string.t_067a6eef15);return@setPositiveButton }
                 runAction {
                     val file = inspection.confirmCsv(candidate.delimiter,mapping,CsvTimeChoice(mapping.localPattern,mapping.zone),mapping.durationFormat)
                     val selection = card?.let { id -> runtime.tracker.data().cards.single { it.id == id }.classification() }
@@ -274,20 +274,20 @@ class TechnicalActivity: Activity() {
     private fun showCsvPreview(preview: HistoryPreview,offset: Int = 0) {
         val rows = preview.intervals.drop(offset).take(30)
         val text = rows.joinToString("\n") { "${Instant.ofEpochMilli(it.start)} → ${Instant.ofEpochMilli(it.end!!)} · ${it.selection.name.orEmpty()} · ${it.selection.cardId ?: "без карточки"}" }
-        val dialog = AlertDialog.Builder(this).setTitle("CSV append: ${offset+1}…${offset+rows.size} из ${preview.added}")
-            .setMessage("Добавится: ${preview.added}; повторов: ${preview.duplicates}.\n$text\nОшибок: ${preview.errors.size}\n${preview.errors.take(30).joinToString("\n")}\n${preview.warnings.joinToString("\n")}\nДобавление истории; полный JSON restore заменяет всё хранилище.")
-            .setNegativeButton("Отмена",null)
-        if(preview.canApply) dialog.setPositiveButton("Добавить") { _,_ -> runAction { runtime.historyTransfer.apply(preview) } }
-        if(offset+rows.size < preview.added) dialog.setNeutralButton("Следующие интервалы") { _,_ -> showCsvPreview(preview,offset+30) }
+        val dialog = AlertDialog.Builder(this).setTitle(L.s(R.string.t_117ce12b52, offset+1, offset+rows.size, preview.added))
+            .setMessage(L.s(R.string.t_1bcdac8735, preview.added, preview.duplicates, text, preview.errors.size, preview.errors.take(30).joinToString("\n"), preview.warnings.joinToString("\n")))
+            .setNegativeButton(L.s(R.string.t_0ec753be8d),null)
+        if(preview.canApply) dialog.setPositiveButton(L.s(R.string.t_559a87f7cc)) { _,_ -> runAction { runtime.historyTransfer.apply(preview) } }
+        if(offset+rows.size < preview.added) dialog.setNeutralButton(L.s(R.string.t_322896daf3)) { _,_ -> showCsvPreview(preview,offset+30) }
         dialog.show()
     }
     private fun buildFocusControls() {
-        command("Начать Focus",true) { t,e,c,f -> t.startFocus(e,c) }
-        command("Следующий этап Focus") { t,e,_,_ -> t.focusNext(e) }
-        command("Пропустить этап Focus") { t,e,_,_ -> t.focusSkip(e) }
-        command("Завершить Focus") { t,e,_,_ -> t.cancelFocus(e) }
+        command(L.s(R.string.t_f0caca47ee),true) { t,e,c,f -> t.startFocus(e,c) }
+        command(L.s(R.string.t_38a279b292)) { t,e,_,_ -> t.focusNext(e) }
+        command(L.s(R.string.t_d73bef6ef5)) { t,e,_,_ -> t.focusSkip(e) }
+        command(L.s(R.string.t_15b056d9f4)) { t,e,_,_ -> t.cancelFocus(e) }
         var loading = true
-        val signal = CheckBox(this).apply { text = "Фоновый сигнал Focus (уведомление, ОС может задержать)";isEnabled = false }
+        val signal = CheckBox(this).apply { text = L.s(R.string.t_6d95221406);isEnabled = false }
         body.addView(signal)
         scope.launch { signal.isChecked = withContext(Dispatchers.IO) { runtime.tracker.data().settings.surfaces.focusSignal };loading = false;signal.isEnabled = true }
         signal.setOnCheckedChangeListener { _,enabled ->
@@ -312,7 +312,7 @@ class TechnicalActivity: Activity() {
         }
     }
     private fun buildCalendarControl() {
-        button("Выбрать occurrence из календаря…") {
+        button(L.s(R.string.t_20490f3632)) {
             if(checkSelfPermission(android.Manifest.permission.READ_CALENDAR) != android.content.pm.PackageManager.PERMISSION_GRANTED)
                 requestPermissions(arrayOf(android.Manifest.permission.READ_CALENDAR),21)
             else discoverCalendar()
@@ -325,26 +325,26 @@ class TechnicalActivity: Activity() {
     private fun showCalendarPage(fromTime: Long,untilTime: Long,cursor: CalendarPageCursor? = null): Unit = runAction {
         val page = runtime.calendarOccurrences.list(fromTime,untilTime,enabled = true,limit = 30,cursor = cursor)
         withContext(Dispatchers.Main) {
-            if(page.issue != null) { status.text = "Календарь: ${page.issue}; история не изменена";return@withContext }
-            val dialog = AlertDialog.Builder(this@TechnicalActivity).setTitle("Календарь: текущие и ближайшие occurrences")
+            if(page.issue != null) { status.text = L.s(R.string.t_3c244ffaa5, page.issue);return@withContext }
+            val dialog = AlertDialog.Builder(this@TechnicalActivity).setTitle(L.s(R.string.t_eca2a38089))
                 .setItems(page.occurrences.map { "${it.title ?: "Без названия"} · ${if(it.allDay) "весь день" else Instant.ofEpochMilli(it.reference.begin).toString()}" }.toTypedArray()) { _,index ->
                     val ref = page.occurrences[index].reference
                     runAction {
                         val result = runtime.calendarOccurrences.readSelected(ref,enabled = true)
-                        val occurrence = result.occurrence ?: throw CoreError(ErrorCode.INVALID_INPUT,"Occurrence недоступен: ${result.issue}")
+                        val occurrence = result.occurrence ?: throw CoreError(ErrorCode.INVALID_INPUT,L.s(R.string.t_bf38c3fd75, result.issue))
                         val draft = occurrence.draft()
                         withContext(Dispatchers.Main) {
-                            AlertDialog.Builder(this@TechnicalActivity).setTitle("Заполнить редактируемый черновик?")
-                                .setMessage("Start использует текущее время. Ручная запись требует явных границ; all-day не задаёт рабочий интервал.")
-                                .setNegativeButton("Отмена",null).setPositiveButton("Заполнить") { _,_ ->
+                            AlertDialog.Builder(this@TechnicalActivity).setTitle(L.s(R.string.t_d129caabe1))
+                                .setMessage(L.s(R.string.t_7b47d9e19e))
+                                .setNegativeButton(L.s(R.string.t_0ec753be8d),null).setPositiveButton(L.s(R.string.t_d261564113)) { _,_ ->
                                     inputDraft = draft;note.setText(draft.note.orEmpty());selectedCardId = null
                                     from.setText(draft.interval?.start?.let { Instant.ofEpochMilli(it).toString() }.orEmpty())
                                     until.setText(draft.interval?.end?.let { Instant.ofEpochMilli(it).toString() }.orEmpty())
                                 }.show()
                         }
                     }
-                }.setNegativeButton("Отмена",null)
-            if(page.next != null) dialog.setPositiveButton("Дальше") { _,_ -> showCalendarPage(fromTime,untilTime,page.next) }
+                }.setNegativeButton(L.s(R.string.t_0ec753be8d),null)
+            if(page.next != null) dialog.setPositiveButton(L.s(R.string.t_e3b9331301)) { _,_ -> showCalendarPage(fromTime,untilTime,page.next) }
             dialog.show()
         }
     }
@@ -361,17 +361,17 @@ class TechnicalActivity: Activity() {
                 } }
             })
         }
-        toggle(Surface.WIDGET,"Виджет (добавить через launcher)",preferences.widget,{ s,b -> s.copy(widget = b) })
-        toggle(Surface.NOTIFICATION,"Управляющее уведомление",preferences.notification,{ s,b -> s.copy(notification = b) }) {
+        toggle(Surface.WIDGET,L.s(R.string.t_544a30f1ea),preferences.widget,{ s,b -> s.copy(widget = b) })
+        toggle(Surface.NOTIFICATION,L.s(R.string.t_9bcc818ccb),preferences.notification,{ s,b -> s.copy(notification = b) }) {
             if(android.os.Build.VERSION.SDK_INT >= 33 && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED)
                 requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),20)
         }
-        toggle(Surface.OVERLAY,"Плавающая кнопка + обязательный индикатор сервиса",preferences.overlay,{ s,b -> s.copy(overlay = b) }) {
+        toggle(Surface.OVERLAY,L.s(R.string.t_494ef4deb5),preferences.overlay,{ s,b -> s.copy(overlay = b) }) {
             if(!TimerSurfaces.overlayAllowed(this)) try {
                 startActivity(Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,android.net.Uri.parse("package:$packageName")))
-            } catch(_: android.content.ActivityNotFoundException) { surfaceStatus.text = "Настройки разрешения недоступны на этом устройстве" }
+            } catch(_: android.content.ActivityNotFoundException) { surfaceStatus.text = L.s(R.string.t_8213ed5bbc) }
         }
-        button("Проверить разрешения поверхностей") { refreshSurfacePermissions() }
+        button(L.s(R.string.t_e8255d5bdc)) { refreshSurfacePermissions() }
     }
     private fun renderSurfaceSettings(settings: SurfaceSettings) {
         renderingSurfaceSettings = true
@@ -384,8 +384,8 @@ class TechnicalActivity: Activity() {
             val view = withContext(Dispatchers.IO) { runtime.tracker.view().also { TimerSurfaces.refresh(this@TechnicalActivity,runtime.tracker,it,forceWidget = true) } }
             val settings = view.data.settings.surfaces
             renderSurfaceSettings(settings)
-            val overlay = if(resumed) FloatingTimerService.fromVisibleActivity(this@TechnicalActivity,settings) else "Overlay запускается только из видимого приложения"
-            surfaceStatus.text = "Уведомление: ${if(!settings.notification) "выключено" else if(TimerSurfaces.notificationsAllowed(this@TechnicalActivity)) "разрешено" else "запрошено, но запрещено ОС/каналом"}\n$overlay"
+            val overlay = if(resumed) FloatingTimerService.fromVisibleActivity(this@TechnicalActivity,settings) else L.s(R.string.t_781ebc1c5f)
+            surfaceStatus.text = L.s(R.string.t_963e150816, if(!settings.notification) L.s(R.string.t_bedfedb4d0) else if(TimerSurfaces.notificationsAllowed(this@TechnicalActivity)) L.s(R.string.t_877c853fa7) else L.s(R.string.t_964fb00c4e), overlay)
         }
     }
     override fun onResume() { super.onResume(); resumed = true; refreshSurfacePermissions() }
@@ -401,7 +401,7 @@ class TechnicalActivity: Activity() {
             formReference = formFiles.save(formReference,FormState(selectedCardId,name.text.toString(),details.text.toString(),note.text.toString(),
                 from.text.toString(),until.text.toString(),zone.text.toString(),inputDraft?.source?.name,inputDraft?.sourceReference,pendingSelectedText))
             outState.putString("formReference",formReference)
-        } catch(e: Exception) { status.text = "Форма не сохранена: ${e.javaClass.simpleName}: ${e.message}" }
+        } catch(e: Exception) { status.text = L.s(R.string.t_937cbcbd50, e.javaClass.simpleName, e.message) }
         outState.putString("exportOperation",pendingExportId)
         super.onSaveInstanceState(outState)
     }
@@ -428,10 +428,10 @@ class TechnicalActivity: Activity() {
             note.setText(text); inputDraft = draft; pendingSelectedText = null
         } else {
             pendingSelectedText = text
-            AlertDialog.Builder(this).setTitle("Выделенный текст")
-                .setMessage("Заменить текущую редактируемую заметку присланным текстом?")
-                .setNegativeButton("Сохранить текущую") { _,_ -> pendingSelectedText = null }
-                .setPositiveButton("Заменить") { _,_ -> note.setText(text); inputDraft = draft; pendingSelectedText = null }.show()
+            AlertDialog.Builder(this).setTitle(L.s(R.string.t_c619870299))
+                .setMessage(L.s(R.string.t_680a3249f0))
+                .setNegativeButton(L.s(R.string.t_9e97224af0)) { _,_ -> pendingSelectedText = null }
+                .setPositiveButton(L.s(R.string.t_d772cc53be)) { _,_ -> note.setText(text); inputDraft = draft; pendingSelectedText = null }.show()
         }
     }
     private fun consumeShortcut() {
@@ -457,7 +457,7 @@ class TechnicalActivity: Activity() {
                 reportText = withContext(Dispatchers.IO) {
                     val d = revision.data; val now = runtime.tracker.clock.now()
                     val report = revision.day(ReportingDayPolicy(d.settings.reportZone,d.settings.reportDayStartMinute).dateAt(now.wall))
-                    "Итоги на ${Instant.ofEpochMilli(report.asOf)} (${report.zone}): ${report.recordedMs} ms; неопределённых: ${report.unresolved.size}\nКарточки: ${d.cards.joinToString { it.name }}\nСессий: ${d.sessions.size}; сегментов: ${d.segments.size}\n${report.rows.joinToString("\n") { "${it.selection.name ?: "Без уточнения"}: ${it.durationMs} ms" }}"
+                    L.s(R.string.t_cc5d5d0fd4, Instant.ofEpochMilli(report.asOf), report.zone, report.recordedMs, report.unresolved.size, d.cards.joinToString { it.name }, d.sessions.size, d.segments.size, report.rows.joinToString("\n") { "${it.selection.name ?: "Без уточнения"}: ${it.durationMs} ms" })
                 }
                 while(isActive) {
                     val s = revision.snapshot(); shown = s
@@ -473,7 +473,7 @@ class TechnicalActivity: Activity() {
                         })
                     }
                     val focusText = s.focus?.let { "${it.safeLabel}: ${it.remainingMs} ms\n" }.orEmpty()
-                    status.text = "Техническая оболочка · Room ${TRACKER_DATABASE_VERSION}\n${s.safeLabel}\n${s.trustedDurationMs} ms · ревизия ${s.token.revision}\n$focusText${s.session?.selection ?: ""}\n$reportText"
+                    status.text = L.s(R.string.t_79fb04fd8b, TRACKER_DATABASE_VERSION, s.safeLabel, s.trustedDurationMs, s.token.revision, focusText, s.session?.selection ?: "", reportText)
                     runtime.focusDueSignals.consume(s.focus) { focus ->
                         deliverTechnicalFocus(runtime.tracker,focus)
                     }
@@ -485,8 +485,8 @@ class TechnicalActivity: Activity() {
     }
     private fun beginExport(mime: String,title: String,write: (java.io.OutputStream)->Unit) {
         val active = pendingExportId?.let { runCatching { exportOperations.read(it) }.getOrNull() }
-        if(active?.state in setOf("PREPARING","READY") || active?.resultReceived == false) { status.text = "Завершите или отмените текущий экспорт";return }
-        val op = try { exportOperations.begin(mime,title) } catch(e: Exception) { status.text = "Подготовка экспорта не началась: ${e.message}";return }
+        if(active?.state in setOf("PREPARING","READY") || active?.resultReceived == false) { status.text = L.s(R.string.t_43c9451f7e);return }
+        val op = try { exportOperations.begin(mime,title) } catch(e: Exception) { status.text = L.s(R.string.t_aa447181f4, e.message);return }
         pendingExportId = op.id
         runAction { val prepared = exportOperations.prepare(op.id,write);withContext(Dispatchers.Main) { if(prepared.state == "READY") showExportPicker(op.id) } }
     }
@@ -500,7 +500,7 @@ class TechnicalActivity: Activity() {
                 held
             }
             withContext(Dispatchers.Main) {
-                status.text = "Экспорт отменён; файлы сохранены. Можно подготовить новую копию."
+                status.text = L.s(R.string.t_f713a587ea)
                 if(!awaiting && pendingExportId == id) pendingExportId = null
             }
         }
@@ -522,10 +522,10 @@ class TechnicalActivity: Activity() {
     }
     private fun retryExport() {
         val id = pendingExportId ?: exportOperations.latestPending()?.id
-        if(id == null) { status.text = "Нет подготовленного экспорта";return }
+        if(id == null) { status.text = L.s(R.string.t_4ac8d095fb);return }
         pendingExportId = id
         val op = exportOperations.read(id)
-        if(op.state in setOf("READY","CANCELLED")) showExportPicker(id,true) else status.text = "Экспорт ${op.state}: повторите подготовку; частичный файл сохранён"
+        if(op.state in setOf("READY","CANCELLED")) showExportPicker(id,true) else status.text = L.s(R.string.t_0077164ed0, op.state)
     }
     private fun restoreSource(file: java.io.File) = runAction {
         val request = restoreReviews.begin() ?: return@runAction
@@ -534,18 +534,18 @@ class TechnicalActivity: Activity() {
             val preview = runtime.backups.prepare { file.inputStream() }
             if(restoreReviews.prepared(request,preview) == null) return@runAction
             withContext(Dispatchers.Main) {
-                showRestoreReview(preview,"Подтвердить полную замену",
-                    "${preview.consequence}\nСессий: ${preview.sessions}; сегментов: ${preview.segments}; целей: ${preview.goals}. Активный хвост: ${preview.unfinishedTail}; Focus: ${preview.unfinishedFocus}","Заменить") {
+                showRestoreReview(preview,L.s(R.string.t_0f605ae8ff),
+                    L.s(R.string.t_ac72e3a247, preview.consequence, preview.sessions, preview.segments, preview.goals, preview.unfinishedTail, preview.unfinishedFocus),L.s(R.string.t_d772cc53be)) {
                     val result = runtime.backups.apply(preview);withContext(Dispatchers.Main) {
-                        status.text = "Восстановлено. Откатная копия: ${result.rollbackReference}"
+                        status.text = L.s(R.string.t_886ebf7a3e, result.rollbackReference)
                     }
                 }
             }
         } else {
             val preview = DatabaseRecovery.prepare(file)
             if(restoreReviews.prepared(request,preview) == null) return@runAction
-            withContext(Dispatchers.Main) { showRestoreReview(preview,"Восстановить недоступную базу",
-                "Сессий: ${preview.sessions}; сегментов: ${preview.segments}. Текущие DB/WAL/SHM будут сохранены с проверенными хешами до замены. Старые копии сохраняются.","Восстановить") {
+            withContext(Dispatchers.Main) { showRestoreReview(preview,L.s(R.string.t_d66df6cc7f),
+                L.s(R.string.t_59ef713872, preview.sessions, preview.segments),L.s(R.string.t_29f3b29df0)) {
                     DatabaseRecovery.apply(this@TechnicalActivity,preview);withContext(Dispatchers.Main) { recreate() }
                 }
             }
@@ -555,21 +555,21 @@ class TechnicalActivity: Activity() {
     private fun showRestoreReview(preview: AutoCloseable,title: String,message: String,confirm: String,apply: suspend () -> Unit) {
         pendingRestoreDialog?.dismiss()
         val dialog = AlertDialog.Builder(this).setTitle(title).setMessage(message)
-            .setNegativeButton("Отмена",null).setPositiveButton(confirm) { _,_ ->
+            .setNegativeButton(L.s(R.string.t_0ec753be8d),null).setPositiveButton(confirm) { _,_ ->
                 if(restoreReviews.claim(preview)) launchAction(apply).invokeOnCompletion { CopyLifetimes.get(this).releasePreview(preview) }
             }.create()
         dialog.setOnDismissListener { restoreReviews.discard(preview);if(pendingRestoreDialog === dialog) pendingRestoreDialog = null }
         pendingRestoreDialog = dialog;dialog.show()
     }
     private fun buildRecoveryControls() {
-        button("Восстановить полный JSON…") { startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply { type = "application/json";addCategory(Intent.CATEGORY_OPENABLE) },2) }
-        button("Локальные rollback копии…") { runAction {
+        button(L.s(R.string.t_94405e99a7)) { startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply { type = "application/json";addCategory(Intent.CATEGORY_OPENABLE) },2) }
+        button(L.s(R.string.t_76393b3245)) { runAction {
             val files = PrivateRollbackStore(this@TechnicalActivity).files()
-            withContext(Dispatchers.Main) { if(files.isEmpty()) status.text = "Локальных копий пока нет" else AlertDialog.Builder(this@TechnicalActivity)
-                .setTitle("Выберите копию; текущие данные заменяются только после preview")
+            withContext(Dispatchers.Main) { if(files.isEmpty()) status.text = L.s(R.string.t_91b707a9d1) else AlertDialog.Builder(this@TechnicalActivity)
+                .setTitle(L.s(R.string.t_d64f83a24b))
                 .setItems(files.map { "${it.name} · ${it.length()} bytes" }.toTypedArray()) { _,index -> restoreSource(files[index]) }.show() }
         } }
-        if(DatabaseRecovery.needsAttention(this)) button("Завершить незавершённое восстановление") {
+        if(DatabaseRecovery.needsAttention(this)) button(L.s(R.string.t_cca1d52e45)) {
             runAction { DatabaseRecovery.resume(this@TechnicalActivity);withContext(Dispatchers.Main) { recreate() } }
         }
     }
@@ -582,10 +582,10 @@ class TechnicalActivity: Activity() {
             // Commit consumption before scheduling destination I/O: recreation must not
             // leave a completed/cancelled copy owned by a chooser that already returned.
             try { exportOperations.receiveResult(id,uri == null) }
-            catch(e: Exception) { status.text = "Результат экспорта не подтверждён: ${e.message}";return }
-            if(uri == null) { status.text = "Экспорт отменён; подготовленная копия доступна для повтора";return }
+            catch(e: Exception) { status.text = L.s(R.string.t_9ac9a4c129, e.message);return }
+            if(uri == null) { status.text = L.s(R.string.t_737fe33491);return }
             runAction { val result = exportOperations.write(id,uri);withContext(Dispatchers.Main) {
-                status.text = "Записано ${result.bytes} bytes. ${if(result.verified) "Копия проверена чтением." else "Provider не позволяет прочитать результат для проверки."}";pendingExportId = null
+                status.text = L.s(R.string.t_87a5f792b0, result.bytes, if(result.verified) L.s(R.string.t_c344c6222f) else L.s(R.string.t_0d0c228652));pendingExportId = null
             } }
             return
         }
@@ -596,10 +596,10 @@ class TechnicalActivity: Activity() {
                 val out = java.io.ByteArrayOutputStream();val buffer = ByteArray(8192)
                 while(out.size() <= MAX_CSV_BYTES) { val n = input.read(buffer,0,minOf(buffer.size,MAX_CSV_BYTES+1-out.size()));if(n<0) break;if(n==0) { val b=input.read();if(b<0) break;out.write(b) } else out.write(buffer,0,n) }
                 out.toByteArray()
-            } ?: throw java.io.IOException("Источник CSV недоступен")
+            } ?: throw java.io.IOException(L.s(R.string.t_92c584ce74))
             withContext(Dispatchers.Main) { inspectCsv(bytes) }
         } else if(requestCode == 2) runAction {
-            val file = contentResolver.openInputStream(uri)?.use { stageRestore(this@TechnicalActivity,it) } ?: throw java.io.IOException("Источник недоступен")
+            val file = contentResolver.openInputStream(uri)?.use { stageRestore(this@TechnicalActivity,it) } ?: throw java.io.IOException(L.s(R.string.t_5779709c59))
             withContext(Dispatchers.Main) { restoreSource(file) }
         }
     }

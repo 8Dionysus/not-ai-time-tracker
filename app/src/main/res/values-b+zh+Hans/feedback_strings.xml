@@ -2,7 +2,7 @@
 <resources>
     <string name="language_title">语言</string>
     <string name="language_system">跟随系统</string>
-    <string name="language_partial">部分现有界面仍使用俄语。个人名称和记录不会被翻译。</string>
+    <string name="language_partial">你自己的名称和备注保持原样。目录中的预设活动会被翻译。</string>
     <string name="language_save_error">无法保存语言。请重新选择。</string>
     <string name="deleted_title">已删除</string>
     <string name="deleted_empty">没有已删除的记录</string>

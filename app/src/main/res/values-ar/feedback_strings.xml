@@ -2,7 +2,7 @@
 <resources>
     <string name="language_title">اللغة</string>
     <string name="language_system">لغة النظام</string>
-    <string name="language_partial">بعض الشاشات ما زالت بالروسية. لا تُترجم الأسماء الشخصية والسجلات.</string>
+    <string name="language_partial">تبقى أسماؤك وملاحظاتك كما كتبتها. تُترجم أنشطة الكتالوج الجاهزة.</string>
     <string name="language_save_error">تعذر حفظ اللغة. اختر مرة أخرى.</string>
     <string name="deleted_title">المحذوفات</string>
     <string name="deleted_empty">لا توجد سجلات محذوفة</string>

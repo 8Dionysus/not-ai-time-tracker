@@ -73,6 +73,8 @@ fun TrackerApp(vm: TrackerViewModel, openTechnical: () -> Unit, reducedMotion: B
     val language by vm.language.collectAsStateWithLifecycle()
     val baseContext = androidx.compose.ui.platform.LocalContext.current
     val localeContext = remember(baseContext,language.resolvedLocaleTag) { dev.notai.tracker.android.AppLanguage.context(baseContext,language.resolvedLocaleTag) }
+    remember(baseContext,language.resolvedLocaleTag) {
+        if(baseContext is Activity) runCatching { dev.notai.tracker.android.AppLanguage.applyTo(baseContext.resources,language.resolvedLocaleTag) };true }
     CompositionLocalProvider(androidx.compose.ui.platform.LocalContext provides localeContext,
         androidx.compose.ui.platform.LocalConfiguration provides localeContext.resources.configuration,
         androidx.compose.ui.platform.LocalLayoutDirection provides if(localeContext.resources.configuration.layoutDirection == android.view.View.LAYOUT_DIRECTION_RTL)

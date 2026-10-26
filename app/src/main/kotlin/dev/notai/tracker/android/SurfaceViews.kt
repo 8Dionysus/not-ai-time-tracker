@@ -214,7 +214,7 @@ object SurfaceViews {
         val builder = Notification.Builder(c, TimerSurfaces.CONTROL_CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_notai).setColor(c.getColor(R.color.widget_amber))
             .setStyle(Notification.DecoratedCustomViewStyle()).setCustomContentView(small)
-            .setContentTitle(r.title).setContentText(s.safeLabel).setContentIntent(TimerSurfaces.open(c))
+            .setContentTitle(r.title).setContentText(dev.notai.tracker.android.ui.Format.stateLine(s)).setContentIntent(TimerSurfaces.open(c))
             .setOnlyAlertOnce(true).setOngoing(true).setShowWhen(false).setCategory(Notification.CATEGORY_STATUS)
             .setVisibility(lockScreenVisibility)
         if (lockScreenVisibility == Notification.VISIBILITY_PRIVATE) builder.setPublicVersion(

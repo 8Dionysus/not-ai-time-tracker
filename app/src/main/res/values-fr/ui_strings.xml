@@ -1,4 +1,967 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generated from Kotlin source copy; see docs/localization/UI_COPY.md. -->
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="t_0076203bff" formatted="false">Démarrer la pause</string>
+    <string name="t_0077164ed0">Export %1$s : relancez la préparation ; le fichier partiel est conservé</string>
+    <string name="t_007f15b539" formatted="false">Quantité pour toute la session/le segment…</string>
+    <string name="t_0087bd0bf7" formatted="false">Chercher ou créer une activité</string>
+    <string name="t_00ad5c791d">, conflits avec vos modifications : %1$s. Ils sont à régler dans l’interface technique.</string>
+    <string name="t_017c8c142b" formatted="false">Cuisine</string>
+    <string name="t_0195b83c6c" formatted="false">Attribuer à l’activité en cours</string>
+    <string name="t_01a3d66b22" formatted="false">Focus, pause</string>
+    <string name="t_01e118e6e9">%1$s plus tôt de %2$s</string>
+    <string name="t_03498e395a" formatted="false">Mettre en pause</string>
+    <string name="t_03cb42c402">En cours depuis %1$s. Le début est conservé quand vous choisissez.</string>
+    <string name="t_042dbd35f2">Ce fichier ne convient pas : %1$s</string>
+    <string name="t_0467ae4bb8" formatted="false">Confirmer</string>
+    <string name="t_04bcedfa9f">entre %1$s et maintenant</string>
+    <string name="t_059b504fa9" formatted="false">Dossier choisi. La première copie arrivera dans quelques minutes</string>
+    <string name="t_05f4ea7fa6" formatted="false">Les données actuelles seront enregistrées à part avant le remplacement. Les entrées faites après cette copie disparaîtront.</string>
+    <string name="t_060c91cb5a">dépassé de %1$s</string>
+    <string name="t_067a6eef15" formatted="false">Choisissez une carte par ID avant le mappage CSV</string>
+    <string name="t_06d08263c2" formatted="false">Impossible d’enregistrer des copies dans ce dossier. Choisissez-en un autre</string>
+    <string name="t_0865c10035" formatted="false">Au moins</string>
+    <string name="t_08ccc5ba08">%1$s : %2$s. Ouvrez l’app et vérifiez l’état actuel.</string>
+    <string name="t_08f120e3b9" formatted="false">Lancer l’option enregistrée ?</string>
+    <string name="t_090fad991e" formatted="false">Ouvrir les paramètres</string>
+    <string name="t_0931eb69ad" formatted="false">Activité perso</string>
+    <string name="t_09804101ad" formatted="false">Aéré</string>
+    <string name="t_0a33cc879e">Retirer des favoris : %1$s</string>
+    <string name="t_0a7d0c65cc" formatted="false">Enregistrement annulé</string>
+    <string name="t_0a7e3cd8d9" formatted="false">Le catalogue est à jour</string>
+    <string name="t_0ad4a07529" formatted="false">Enregistrer l’intervalle manuel</string>
+    <string name="t_0b5f48821f" formatted="false">Échec</string>
+    <string name="t_0b94cabd4c" formatted="false">Limite du jour une heure plus tôt</string>
+    <string name="t_0bfa7a54cb" formatted="false">Plan par jour</string>
+    <string name="t_0c15fe2798">Focus, phase de travail %1$s</string>
+    <string name="t_0d0c228652" formatted="false">Le fournisseur ne permet pas de relire le résultat pour vérification.</string>
+    <string name="t_0d6b1a17a4" formatted="false">Noir</string>
+    <string name="t_0d8700fb2a" formatted="false">des entrées se chevauchent entre elles ou avec l’historique</string>
+    <string name="t_0e974974fb" formatted="false">Activé, mais les notifications sont désactivées dans les paramètres du téléphone</string>
+    <string name="t_0ec753be8d" formatted="false">Annuler</string>
+    <string name="t_0f605ae8ff" formatted="false">Confirmer le remplacement complet</string>
+    <string name="t_0f73f5a22c" formatted="false">Plus grand</string>
+    <string name="t_0f9a1db081">Pas de %1$s min</string>
+    <string name="t_0faf5fa9ac">restant sur %1$s</string>
+    <string name="t_0fc242f26d" formatted="false">Enregistré</string>
+    <string name="t_1013a729a6" formatted="false">sam</string>
+    <string name="t_104053cfbe" formatted="false">Favoris et activités fréquentes des 30 derniers jours.</string>
+    <string name="t_10729118a0" formatted="false">Masquer</string>
+    <string name="t_117ce12b52">Ajout CSV : %1$s…%2$s sur %3$s</string>
+    <string name="t_11bb1b11c0" formatted="false">Sur l’écran d’accueil</string>
+    <string name="t_11d7afb599" formatted="false">La durée est écrite en</string>
+    <string name="t_1250ceafd1" formatted="false">raccourci sur l’icône</string>
+    <string name="t_125737d34a" formatted="false">Après une réinstallation, choisissez ici un fichier du dossier des copies automatiques. Une copie n’est pas une synchronisation entre téléphones.</string>
+    <string name="t_1259571a15" formatted="false">Ouvrir</string>
+    <string name="t_126d6b9747">Sur l’écran d’accueil : %1$s</string>
+    <string name="t_129d9b9794" formatted="false">Le téléphone n’a pas accepté la demande. Réessayez</string>
+    <string name="t_129dc42035" formatted="false">Enregistrer la nouvelle carte</string>
+    <string name="t_12b0be1a44" formatted="false">Colonne d’activité</string>
+    <string name="t_12f864ad2e">Suspendue après cinq échecs d’affilée. %1$s</string>
+    <string name="t_12fa39305e" formatted="false">Exporter le JSON complet</string>
+    <string name="t_137cb582b9" formatted="false">Quand appliquer</string>
+    <string name="t_13b7c69527" formatted="false">Focus (not)AI</string>
+    <string name="t_13c587506e" formatted="false">Pas encore d’entrées aujourd’hui. L’aperçu se remplira dès la première.</string>
+    <string name="t_13f1659f76" formatted="false">Démarrer le suivi du temps</string>
+    <string name="t_1425330b29" formatted="false">Dès aujourd’hui</string>
+    <string name="t_145c3ed6a6" formatted="false">Rapport supprimé</string>
+    <string name="t_147355d342">Ce fichier n’est pas un tableau CSV. %1$s</string>
+    <string name="t_14a658ce61" formatted="false">Choisir un dossier</string>
+    <string name="t_14d31156f2" formatted="false">Modifier la précision à partir de maintenant</string>
+    <string name="t_14eaa871df" formatted="false">Démarrer</string>
+    <string name="t_156e23f619" formatted="false">Depuis Toggl, Clockify ou votre tableur. Je montrerai d’abord ce qui sera ajouté</string>
+    <string name="t_15b056d9f4" formatted="false">Terminer le Focus</string>
+    <string name="t_15dfa124b4" formatted="false">Pas encore d’activités fréquentes. Choisissez-en une dans l’app, depuis l’historique.</string>
+    <string name="t_160b172224" formatted="false">Activité enregistrée</string>
+    <string name="t_161fe56e51" formatted="false">mer</string>
+    <string name="t_163fdcceaa" formatted="false">À une heure précise</string>
+    <string name="t_164b8bb2af" formatted="false">Modifier le rapport</string>
+    <string name="t_1751103733" formatted="false">Un jour</string>
+    <string name="t_176ddf9870" formatted="false">Impossible de finir le choix du fuseau. Vérifiez le fuseau actuel et choisissez-le à nouveau</string>
+    <string name="t_17e44239e9" formatted="false">Monter</string>
+    <string name="t_181ee397c9" formatted="false">Les entrées déjà lancées depuis le plan restent dans l’historique.</string>
+    <string name="t_1827ab0050" formatted="false">À minuit, comme dans un calendrier</string>
+    <string name="t_1880e6b0ec" formatted="false">Activité, temps et boutons visibles sans déverrouiller</string>
+    <string name="t_18c99fb35b" formatted="false">Suivi du temps en cours</string>
+    <string name="t_191cacce9c" formatted="false">N’importe quelle activité</string>
+    <string name="t_19295833d9" formatted="false">Cette semaine</string>
+    <string name="t_19f25d5784" formatted="false">Plus</string>
+    <string name="t_1a287db9b2" formatted="false">Graphite</string>
+    <string name="t_1a3994958c" formatted="false">À minuit</string>
+    <string name="t_1a54271b7a" formatted="false">Aucun historique terminé</string>
+    <string name="t_1a599143aa" formatted="false">Normaux</string>
+    <string name="t_1ac5f47619" formatted="false">Ajouté au plan</string>
+    <string name="t_1b27ed0870" formatted="false">Remplacer toutes les données ?</string>
+    <string name="t_1b702dcc70">Les heures du fichier sont lues dans le fuseau %1$s</string>
+    <string name="t_1bba9e465a" formatted="false">Minuteur hors de l’app</string>
+    <string name="t_1bc5f604f5" formatted="false">1 minute</string>
+    <string name="t_1bcdac8735">À ajouter : %1$s ; doublons : %2$s.\n%3$s\nErreurs : %4$s\n%5$s\n%6$s\nCela ajoute de l’historique ; une restauration JSON complète remplace tout le stockage.</string>
+    <string name="t_1bd48e6642">Activité : %1$s</string>
+    <string name="t_1c38d1407f" formatted="false">entre les pauses</string>
+    <string name="t_1c4b04d710" formatted="false">Ajouter à l’écran d’accueil</string>
+    <string name="t_1c76eec066" formatted="false">Données restaurées. Les données précédentes ont été sauvegardées séparément.</string>
+    <string name="t_1c8ee71b8e">libre jusqu’à %1$s</string>
+    <string name="t_1cd1162258" formatted="false">Mettre à jour le catalogue ?</string>
+    <string name="t_1d4961d804" formatted="false">Films et séries</string>
+    <string name="t_1deb177f5a">Prévu : %1$s</string>
+    <string name="t_1df521854e" formatted="false">Texte de la note</string>
+    <string name="t_1f1fa1b82e" formatted="false">Touchez une copie : je montre d’abord son contenu et ne remplace les données qu’après confirmation</string>
+    <string name="t_1fbd871837" formatted="false">Le dossier est indisponible : pas de réseau ou l’app cloud ne répond pas. Je réessaierai tout seul</string>
+    <string name="t_1fcbdeecfd">%1$s : moins</string>
+    <string name="t_1fce9b2e5d">%1$s : %2$s. Vérifiez ce que signifie chacune —</string>
+    <string name="t_20490f3632" formatted="false">Choisir une occurrence du calendrier…</string>
+    <string name="t_20c87f5908" formatted="false">Fixer un objectif</string>
+    <string name="t_20feaa7e40" formatted="false">Démarrer sans activité, avec une note</string>
+    <string name="t_210ed3cd4d" formatted="false">Pas de colonne</string>
+    <string name="t_212edd982b" formatted="false">Trouvé</string>
+    <string name="t_2152e4a71f" formatted="false">Les premiers de la liste apparaissent dans le volet des notifications, sur le widget et sur le bouton flottant. Pour réordonner, appuyez longuement et faites glisser.</string>
+    <string name="t_21a4608d93" formatted="false">les données ont changé : vérifiez à nouveau</string>
+    <string name="t_21afbee12c" formatted="false">Il n’est pas apparu. Réessayez ou ajoutez-le à la main : appui long sur l’écran d’accueil → Widgets → (not)AI Time</string>
+    <string name="t_224fe4a4c3">Aucune entrée pour %1$s</string>
+    <string name="t_22615c35f9">Retirer « %1$s » du plan ?</string>
+    <string name="t_22776aacd4" formatted="false">Néon</string>
+    <string name="t_2373dd4f8d" formatted="false">Semaine dernière</string>
+    <string name="t_24f866b4ee" formatted="false">Passer à</string>
+    <string name="t_253cf1644f" formatted="false">Annuler l’export préparé</string>
+    <string name="t_2583e76aee" formatted="false">J’ai changé plus tôt : enregistrer</string>
+    <string name="t_27113f7a1e" formatted="false">Erreur de stockage. Vérifiez l’état actuel avant de réessayer.</string>
+    <string name="t_27546ccb04" formatted="false">Focus et rappels</string>
+    <string name="t_279c2c3c90" formatted="false">Changer</string>
+    <string name="t_27d5f2e22a" formatted="false">Catalogue mis à jour</string>
+    <string name="t_28061309a5" formatted="false">Focus : activité</string>
+    <string name="t_2840f49e22" formatted="false">Changer ou préciser l’activité</string>
+    <string name="t_285cc40014" formatted="false">h</string>
+    <string name="t_288dc99a2b" formatted="false">Le temps est déjà enregistré ; il reste à choisir l’activité.</string>
+    <string name="t_2894da98dd" formatted="false">Objectif retiré</string>
+    <string name="t_2960da94e0" formatted="false">Masquer les trous</string>
+    <string name="t_2972f8b4c4" formatted="false">Aucune entrée.</string>
+    <string name="t_29f3b29df0" formatted="false">Restaurer</string>
+    <string name="t_2a5e307788" formatted="false">compact</string>
+    <string name="t_2a690e69d2" formatted="false">L’icône est choisie, mais les raccourcis ne sont pas encore à jour</string>
+    <string name="t_2a70012208" formatted="false">Total</string>
+    <string name="t_2b39abab32">« %1$s ». Joue en boucle tant que l’app est ouverte</string>
+    <string name="t_2c0db2ce7c" formatted="false">Démarrer :</string>
+    <string name="t_2d2be3f11c" formatted="false">Phase de travail</string>
+    <string name="t_2d5a644e5c" formatted="false">Cet intervalle est impossible : vérifiez le début et la fin.</string>
+    <string name="t_2dd965ee95" formatted="false">Accent</string>
+    <string name="t_2e31dae95f" formatted="false">Choisir un fichier</string>
+    <string name="t_2e3c5fdafe" formatted="false">Études</string>
+    <string name="t_2ea9f562ed" formatted="false">en semaine</string>
+    <string name="t_2eb808708c" formatted="false">Utiliser le fuseau du téléphone</string>
+    <string name="t_2f6a9e8aa1" formatted="false">, déjà commencée</string>
+    <string name="t_2f94692058" formatted="false">Chercher un fuseau IANA, par exemple Europe/Paris</string>
+    <string name="t_2fc6caafc1">au moins %1$s</string>
+    <string name="t_30796d2694" formatted="false">À partir de ce mois</string>
+    <string name="t_30c994650d" formatted="false">Heure précisée</string>
+    <string name="t_30e1fab800" formatted="false">Favoris modifiés</string>
+    <string name="t_30e9845126">%1$s domaines de plus : métiers et travail</string>
+    <string name="t_3146141c93" formatted="false">Plan</string>
+    <string name="t_315bf156c9" formatted="false">Ménage</string>
+    <string name="t_3179b46b9d" formatted="false">Cet intervalle chevauche une autre entrée.</string>
+    <string name="t_31990f76f4" formatted="false">Impossible de vérifier le résultat du changement</string>
+    <string name="t_32000365e9" formatted="false">Turquoise</string>
+    <string name="t_322896daf3" formatted="false">Intervalles suivants</string>
+    <string name="t_322ce697bb" formatted="false">Suivi en cours</string>
+    <string name="t_3296879eac">%1$s minutes</string>
+    <string name="t_329b31bdca" formatted="false">Raccourci sur l’icône</string>
+    <string name="t_32b74a3c47" formatted="false">Sans titre</string>
+    <string name="t_32fd384860">Les entrées avant %1$s comptent pour la veille. Les entrées elles-mêmes ne changent pas</string>
+    <string name="t_3371d6e0e9">%1$s · reste %%s</string>
+    <string name="t_33a79b3bc1" formatted="false">Un démarrage/arrêt translucide par-dessus les apps. Après l’arrêt, vous pouvez choisir l’activité tout de suite</string>
+    <string name="t_340342b07a" formatted="false">Impossible de rétablir le choix du fuseau. Choisissez-le à nouveau</string>
+    <string name="t_359168c1d3" formatted="false">Catégorie enregistrée</string>
+    <string name="t_364431ec5a">avant %1$s</string>
+    <string name="t_388cfb0795" formatted="false">Invitation sur « Démarrer »</string>
+    <string name="t_38a279b292" formatted="false">Phase de Focus suivante</string>
+    <string name="t_38dfef435f" formatted="false">Position de l’entrée parmi ses voisines</string>
+    <string name="t_398c7d4f7b" formatted="false">Terminé</string>
+    <string name="t_3a42cfebfe" formatted="false">Notification</string>
+    <string name="t_3ac95324a3" formatted="false">À quoi êtes-vous passé ?</string>
+    <string name="t_3af83d8850" formatted="false">Les données ont changé. Vérifiez l’écran et réessayez.</string>
+    <string name="t_3b97545714" formatted="false">Entrée ajoutée</string>
+    <string name="t_3bb014825e" formatted="false">Note pour la sélection</string>
+    <string name="t_3bfd577967">%1$s plus tard de %2$s</string>
+    <string name="t_3c244ffaa5">Calendrier : %1$s ; historique inchangé</string>
+    <string name="t_3c6332622c" formatted="false">Ouvrir l’app</string>
+    <string name="t_3cd7d0dd3c" formatted="false">Temps par jour :</string>
+    <string name="t_3d51050347" formatted="false">atteint</string>
+    <string name="t_3da1c7d83d" formatted="false">Retirer l’objectif ?</string>
+    <string name="t_3de49828e8" formatted="false">Nom</string>
+    <string name="t_3dfcd2dc31" formatted="false">Promenade</string>
+    <string name="t_3e32dd6cfd">Note : « %1$s »</string>
+    <string name="t_3e36db582a" formatted="false">Sans déverrouiller, on voit seulement que le suivi est en cours</string>
+    <string name="t_3e5ab0f642" formatted="false">Écran principal</string>
+    <string name="t_3f75368ab9" formatted="false">Reprendre</string>
+    <string name="t_3fa9f851cc" formatted="false">À partir de cette semaine</string>
+    <string name="t_41a9abce27" formatted="false">Démarrer le Focus</string>
+    <string name="t_41f23bd106" formatted="false">Fuseau des rapports figé</string>
+    <string name="t_4208a1afd0" formatted="false">Fuseau introuvable</string>
+    <string name="t_421fbcd348" formatted="false">Confirmez l’ajout sur l’écran d’accueil</string>
+    <string name="t_42f85ce119" formatted="false">aujourd’hui</string>
+    <string name="t_4301919e86">%1$s est terminé. Ouvrez pour continuer</string>
+    <string name="t_4304ef48ab" formatted="false">Bouton flottant : l’autorisation système n’a pas été accordée ; le minuteur reste dans l’app</string>
+    <string name="t_434e93a022" formatted="false">Choisir une carte par ID…</string>
+    <string name="t_43c9451f7e" formatted="false">Terminez ou annulez l’export en cours</string>
+    <string name="t_43f3c7181c">Déjà %1$s. Le minuteur n’est pas oublié ?</string>
+    <string name="t_440d3db6ca">Activité « %1$s » créée</string>
+    <string name="t_44b6bfd761">Modifier %1$s ?</string>
+    <string name="t_455a50db4a">%1$s min</string>
+    <string name="t_457969b009" formatted="false">Vérification</string>
+    <string name="t_45e673c416">La note « %1$s » remplacera les précédentes.</string>
+    <string name="t_45ec81da8a" formatted="false">Sélectionné</string>
+    <string name="t_46404668d3" formatted="false">Entrée longue</string>
+    <string name="t_46a1378615" formatted="false">Jours</string>
+    <string name="t_46e27e2f0a" formatted="false">Catalogue</string>
+    <string name="t_474488d799">Objectif : %1$s</string>
+    <string name="t_476c9846a6" formatted="false">Au plus</string>
+    <string name="t_4784c38b90" formatted="false">Lecture…</string>
+    <string name="t_47947a0c46" formatted="false">Fuseau horaire</string>
+    <string name="t_4864057d62" formatted="false">Enregistrer</string>
+    <string name="t_488cfa5f88" formatted="false">Les jours se comptent par semaine ou par mois.</string>
+    <string name="t_488dd14a85" formatted="false">Licences</string>
+    <string name="t_489dd4cb3d" formatted="false">Fiche du catalogue…</string>
+    <string name="t_48b72fd474" formatted="false">Copie automatique</string>
+    <string name="t_490aa0241e" formatted="false">la fin précède le début</string>
+    <string name="t_494ef4deb5" formatted="false">Bouton flottant + indicateur de service obligatoire</string>
+    <string name="t_49a37138c8">Début %1$s, fin inconnue</string>
+    <string name="t_49b9985de4" formatted="false">Pendant une phase de travail</string>
+    <string name="t_49c5f1afe2" formatted="false">Le minuteur démarre immédiatement.\nVous pourrez choisir une activité plus tard.</string>
+    <string name="t_49f64bd23b">, avec erreurs : %1$s</string>
+    <string name="t_4a81786403" formatted="false">Par exemple, toggl:perso</string>
+    <string name="t_4ac8d095fb" formatted="false">Aucune exportation préparée</string>
+    <string name="t_4ae50d3073" formatted="false">Fermer</string>
+    <string name="t_4bae800626" formatted="false">Ouvrez pour indiquer quand vous avez fini</string>
+    <string name="t_4be730321c" formatted="false">Enregistrer</string>
+    <string name="t_4c70fed089" formatted="false">Choisir et démarrer un favori…</string>
+    <string name="t_4d1cb9fd4a">reste %1$s</string>
+    <string name="t_4d397a20ed">%1$s Les horaires ne changent pas. Vous pourrez annuler juste après.</string>
+    <string name="t_4d92a280cc" formatted="false">Le choix du fuseau n’est pas terminé et les paramètres ont changé entre-temps. Vérifiez le fuseau et choisissez-le à nouveau</string>
+    <string name="t_4e1936db2d" formatted="false">Musculation</string>
+    <string name="t_4e895fd70d" formatted="false">Fin</string>
+    <string name="t_4ea0639432" formatted="false">Ordre et tous les favoris</string>
+    <string name="t_4ebd720453" formatted="false">Début / heure du changement : ISO-8601</string>
+    <string name="t_4ebf488399">Impossible de lire le formulaire enregistré : %1$s</string>
+    <string name="t_4edbcc192a" formatted="false">Bouton flottant activé</string>
+    <string name="t_4ef8132cf3">%1$s : plus</string>
+    <string name="t_4fc1809d7d" formatted="false">Dossier choisi</string>
+    <string name="t_5075c29ca7" formatted="false">Ordre, noms sur les boutons, suppression des doublons. Le même ordre dans le volet, le widget et le bouton</string>
+    <string name="t_50a62e5c0f" formatted="false">la durée ne correspond pas au début et à la fin</string>
+    <string name="t_50abb9831d" formatted="false">Impossible de savoir si le fichier est apparu dans le dossier. Réessayez ou ignorez cette copie</string>
+    <string name="t_50ac9ea6c3">%1$s, version %2$s. Touchez pour vérifier les mises à jour</string>
+    <string name="t_5123c9c552" formatted="false">mar</string>
+    <string name="t_51403c82de" formatted="false">Hier</string>
+    <string name="t_51d6a3da35" formatted="false">Que faisiez-vous ?</string>
+    <string name="t_51f805f925">Nouvelle carte choisie · %1$s</string>
+    <string name="t_5203402af7">La note « %1$s » apparaîtra là où il n’y en avait pas.</string>
+    <string name="t_52da7c24f6" formatted="false">Focus en pause</string>
+    <string name="t_53e131e48c">« %1$s » se lance désormais d’un geste</string>
+    <string name="t_542c2cd5f6" formatted="false">Copie automatique dans un dossier</string>
+    <string name="t_544a30f1ea" formatted="false">Widget (à ajouter via le lanceur)</string>
+    <string name="t_549bc063f3" formatted="false">Démarrer avec une activité</string>
+    <string name="t_54fe5cc440" formatted="false">Chiffres du minuteur</string>
+    <string name="t_550c7a6d12" formatted="false">Aucune entrée pour le moment. Chaque segment apparaîtra ici.</string>
+    <string name="t_552d1cca6b" formatted="false">Aucun événement avec horaire dans le calendrier ce jour-là.</string>
+    <string name="t_559a87f7cc" formatted="false">Ajouter</string>
+    <string name="t_55c44eb122">%1$s seront ajoutées avant %2$s.</string>
+    <string name="t_55cd7a55ed" formatted="false">Il manque une autorisation du téléphone</string>
+    <string name="t_55e920546e" formatted="false">Bouton flottant désactivé</string>
+    <string name="t_5695330ffb" formatted="false">Auto</string>
+    <string name="t_569ffccaa8">libre à partir de %1$s</string>
+    <string name="t_57792c3ae8" formatted="false">un ID de ligne est répété ou manquant</string>
+    <string name="t_5779709c59" formatted="false">Source indisponible</string>
+    <string name="t_57fe19481c" formatted="false">Masquer les trous non enregistrés</string>
+    <string name="t_580b6b1b3e" formatted="false">Choisissez la phase suivante dans l’app</string>
+    <string name="t_58533a0c30" formatted="false">Ajoutez une étoile aux activités que vous lancez le plus souvent. Elles apparaîtront sur l’écran principal et dans le volet des notifications.</string>
+    <string name="t_5873f87916" formatted="false">Fuseau horaire IANA inconnu</string>
+    <string name="t_58847603b8" formatted="false">La nouvelle copie est enregistrée, mais les anciennes n’ont pas pu être retirées</string>
+    <string name="t_58a3c5f495">%1$s : de quoi c’est fait</string>
+    <string name="t_58d3c60b00" formatted="false">Retiré du plan du jour</string>
+    <string name="t_58e6634696" formatted="false">Nouvel objectif</string>
+    <string name="t_5905870dba" formatted="false">Prévues et fréquentes</string>
+    <string name="t_5916628df1" formatted="false">Choisir une activité</string>
+    <string name="t_596144b0e6" formatted="false">Entrées</string>
+    <string name="t_59ef713872">Sessions : %1$s ; segments : %2$s. Les DB/WAL/SHM actuels seront enregistrés avec des empreintes vérifiées avant le remplacement. Les anciennes copies sont gardées.</string>
+    <string name="t_5a1413e92d">Dernière : %1$s, fichier vérifié</string>
+    <string name="t_5a1d0660ef" formatted="false">La sélection a changé. Vérifiez les entrées et réessayez.</string>
+    <string name="t_5a7fa46600" formatted="false">Sans précision</string>
+    <string name="t_5b010e144f" formatted="false">Impossible d’identifier l’icône choisie. Choisissez une option disponible</string>
+    <string name="t_5b76112f5b" formatted="false">de base</string>
+    <string name="t_5bb00e40b9" formatted="false">archivé</string>
+    <string name="t_5c65c982d1" formatted="false">Heure inconnue</string>
+    <string name="t_5c675dcb97" formatted="false">Démarrer sans activité</string>
+    <string name="t_5cd8e48ad3" formatted="false">Moment du changement</string>
+    <string name="t_5d09029804" formatted="false">Afficher les trous non enregistrés</string>
+    <string name="t_5d38673a55" formatted="false">Ajouter</string>
+    <string name="t_5d5d2ea20a" formatted="false">Aujourd’hui</string>
+    <string name="t_5d762fa56e" formatted="false">la date ou l’heure ne se lit pas dans le format choisi</string>
+    <string name="t_5da9e0e83b" formatted="false">Aux favoris</string>
+    <string name="t_5de1eb4784">Nouvelles : %1$s ; précisions : %2$s ; conflits : %3$s. Les noms locaux, l’archivage et l’historique sont conservés.</string>
+    <string name="t_5e1ad8c5d8" formatted="false">Vous pouvez le désactiver dans les paramètres de l’application</string>
+    <string name="t_5e94c97f99" formatted="false">Compter toute activité</string>
+    <string name="t_5ec7b0f52b" formatted="false">Manuel</string>
+    <string name="t_5f0968991b" formatted="false">Colonne de début</string>
+    <string name="t_5f239661cc" formatted="false">Afficher segments et pauses</string>
+    <string name="t_5f9a6b6230" formatted="false">Une bande de segments au-dessus des entrées de chaque jour</string>
+    <string name="t_5fb4185cca" formatted="false">Avec tout ce qu’elle contient</string>
+    <string name="t_5fc35f86af">autant que %1$s</string>
+    <string name="t_5fdf8988d5" formatted="false">App · Apache 2.0</string>
+    <string name="t_6090cecf2d">avant : %1$s</string>
+    <string name="t_60a8361ac8" formatted="false">Désactivée. Aucune nouvelle copie ; les anciennes restent dans le dossier</string>
+    <string name="t_60e27c596a">%1$s h %2$s min</string>
+    <string name="t_61394d0185" formatted="false">Quand avez-vous commencé ?</string>
+    <string name="t_6155f92695" formatted="false">Sélectionner plusieurs</string>
+    <string name="t_616bb19d6c" formatted="false">Autoriser</string>
+    <string name="t_617d07376f">%1$s jours</string>
+    <string name="t_61af667ee0">%1$s de plus que %2$s</string>
+    <string name="t_61ce62df94">%1$s : %2$s pour cent</string>
+    <string name="t_6213880977" formatted="false">Enregistrer maintenant</string>
+    <string name="t_624e55535f" formatted="false">Densité des listes</string>
+    <string name="t_6257137741" formatted="false">, la période n’est pas finie</string>
+    <string name="t_629e3bb846" formatted="false">Colonne de durée</string>
+    <string name="t_62c204df09" formatted="false">Ajouter les notes</string>
+    <string name="t_63833f7ebd" formatted="false">Ignorer celle-ci</string>
+    <string name="t_6400526c15" formatted="false">Importer l’historique CSV…</string>
+    <string name="t_6492631c6e" formatted="false">Retiré du plan</string>
+    <string name="t_64d9c34819" formatted="false">le fichier n’a pas de colonne</string>
+    <string name="t_64eb81c370">au plus %1$s</string>
+    <string name="t_64ed62742f" formatted="false">Fuseau, début du jour, catalogue, CSV</string>
+    <string name="t_654fad1c18" formatted="false">Heure de fin, si elle est dans une colonne à part</string>
+    <string name="t_657703c887" formatted="false">Rechercher dans le catalogue complet</string>
+    <string name="t_66c789d74f" formatted="false">Précision : par exemple listening</string>
+    <string name="t_67946fca81">Créer l’activité « %1$s »</string>
+    <string name="t_67a887cea0" formatted="false">Retirer l’objectif</string>
+    <string name="t_680a3249f0" formatted="false">Remplacer la note modifiable actuelle par le texte reçu ?</string>
+    <string name="t_69d66ab891" formatted="false">Ajouter une activité au plan</string>
+    <string name="t_69e5b8a8c6" formatted="false">Decimal non négatif, séparateur décimal : point</string>
+    <string name="t_6a0e6066b0" formatted="false">Changé plus tôt</string>
+    <string name="t_6b08862cb2" formatted="false">Impossible de vérifier l’icône de l’app</string>
+    <string name="t_6b8910932e" formatted="false">Icône de la barre d’état masquée</string>
+    <string name="t_6cde6c34a0" formatted="false">Prévu aujourd’hui</string>
+    <string name="t_6d06e4bbc8" formatted="false">Depuis le calendrier</string>
+    <string name="t_6d4aeaf49a" formatted="false">Votre rapport : une activité et une période</string>
+    <string name="t_6d714e833d" formatted="false">Arrêter</string>
+    <string name="t_6d7bb5e932">au moins %1$s par jour</string>
+    <string name="t_6d95221406" formatted="false">Signal Focus en arrière-plan (notification ; le système peut le retarder)</string>
+    <string name="t_6e166fe43b">Répéter : %1$s</string>
+    <string name="t_6e65291421">Choisir l’activité pour « %1$s »</string>
+    <string name="t_6e84391a2f" formatted="false">Le calendrier n’est pas accessible sans autorisation</string>
+    <string name="t_6ea005bd2d" formatted="false">Créneau enregistré</string>
+    <string name="t_6eb7540d7c" formatted="false">Désactivé</string>
+    <string name="t_6f65bc34a3" formatted="false">Les durées sont gardées pour les prochaines fois.</string>
+    <string name="t_6fb5a32ea5" formatted="false">tous les jours</string>
+    <string name="t_702e03be1e" formatted="false">Ambre</string>
+    <string name="t_70b8d5d8d5" formatted="false">Activité</string>
+    <string name="t_716e5371c7" formatted="false">Annuler la sélection</string>
+    <string name="t_71790fdb53" formatted="false">Ne pas déranger</string>
+    <string name="t_72f931bda2" formatted="false">Sauvegarde</string>
+    <string name="t_731f2bdc1e" formatted="false">Prendre l’heure dans le calendrier</string>
+    <string name="t_734bcf2003" formatted="false">Icône dans la barre d’état</string>
+    <string name="t_735877a9aa" formatted="false">Pause</string>
+    <string name="t_737fe33491" formatted="false">Exportation annulée ; la copie préparée peut être réutilisée</string>
+    <string name="t_738652aa6f">Modifier l’activité elle-même : « %1$s »</string>
+    <string name="t_73a0a9afdc" formatted="false">Continuer sans activité</string>
+    <string name="t_741870459d" formatted="false">Automatique</string>
+    <string name="t_747942b4fa" formatted="false">Format de l’heure</string>
+    <string name="t_74b69f961b" formatted="false">Reprendre le travail</string>
+    <string name="t_750b471214" formatted="false">Ordre des favoris</string>
+    <string name="t_751e31256e">%1$s. Quand le fuseau du téléphone change, les limites des jours dans l’historique et l’aperçu le suivent. Les entrées et les fuseaux des objectifs ne changent pas.</string>
+    <string name="t_75436e3162" formatted="false">Travail</string>
+    <string name="t_75cd08a0e5" formatted="false">Passer à :</string>
+    <string name="t_762d7d64da" formatted="false">hier</string>
+    <string name="t_76393b3245" formatted="false">Copies locales de retour arrière…</string>
+    <string name="t_766e7cabf7" formatted="false">Moins</string>
+    <string name="t_768af67762" formatted="false">Appliquer</string>
+    <string name="t_768fee24c8" formatted="false">Catalogue d’activités : mise à jour disponible</string>
+    <string name="t_76dcf737a6" formatted="false">Envoyer</string>
+    <string name="t_781ebc1c5f" formatted="false">Overlay ne peut être démarré que depuis l’application visible</string>
+    <string name="t_782c5a40e3" formatted="false">Point-virgule</string>
+    <string name="t_784e60ff6a">%1$s Ko</string>
+    <string name="t_78fb4788c6">Ajouté : %1$s</string>
+    <string name="t_793720ff06">%1$s de moins que %2$s</string>
+    <string name="t_794d0309cf" formatted="false">temps déjà enregistré</string>
+    <string name="t_79eb55406f" formatted="false">Impossible de finir le choix du fuseau. Recommencez dans les paramètres</string>
+    <string name="t_79fb04fd8b">Interface technique · Room %1$s\n%2$s\n%3$s ms · révision %4$s\n%5$s%6$s\n%7$s</string>
+    <string name="t_7ae0e67853" formatted="false">Utiliser le fuseau du téléphone ?</string>
+    <string name="t_7ae1597ae7" formatted="false">Ouvrez l’application pour préciser l’heure</string>
+    <string name="t_7b11e988e1" formatted="false">Retirer pour aujourd’hui</string>
+    <string name="t_7b47d9e19e" formatted="false">Start utilise l’heure actuelle. Une entrée manuelle exige des limites explicites ; un événement sur toute la journée ne définit pas un intervalle de travail.</string>
+    <string name="t_7c379e8e5c" formatted="false">Rapport enregistré</string>
+    <string name="t_7cc6025206">C’est fait : %1$s en démarrage rapide</string>
+    <string name="t_7d3ea0e679" formatted="false">Jours dans l’historique</string>
+    <string name="t_7d4b8f8a7e">Sélection : %1$s</string>
+    <string name="t_7d87e4d658" formatted="false">Pendant le travail, l’app active sa propre règle Ne pas déranger avec les notifications prioritaires. Le téléphone définit les exceptions. Ensuite, l’app retire sa règle</string>
+    <string name="t_7da3c34069">La base locale est indisponible : %1$s\nLes fichiers d’origine sont conservés. Choisissez une copie dans la récupération.</string>
+    <string name="t_7ddb544bcd">Certains segments ont un temps inconnu : %1$s. Ils ne comptent pas dans le total tant que vous ne les précisez pas.</string>
+    <string name="t_7dfbff730f" formatted="false">jeu</string>
+    <string name="t_7eb07227f1" formatted="false">Colonne d’ID de ligne</string>
+    <string name="t_7ec7c94cc1" formatted="false">Colonne de note</string>
+    <string name="t_7f12cd4599" formatted="false">Activé, mais le téléphone n’a pas encore autorisé l’app à utiliser Ne pas déranger</string>
+    <string name="t_7f17c7c62a" formatted="false">Paramètres</string>
+    <string name="t_7f76296ba9" formatted="false">Aucun segment enregistré clos</string>
+    <string name="t_7f7a71c089">La copie contient %1$s, %2$s,</string>
+    <string name="t_7fa01b6e34" formatted="false">Activé dans la copie restaurée. À confirmer sur ce téléphone</string>
+    <string name="t_80072ed701" formatted="false">Sans activité perso</string>
+    <string name="t_806764743a" formatted="false">plusieurs activités</string>
+    <string name="t_8080010c5e" formatted="false">Clair</string>
+    <string name="t_80e474035b" formatted="false">Le fuseau figure dans l’heure</string>
+    <string name="t_81129d8255" formatted="false">Objectif modifié</string>
+    <string name="t_8125e2fba0" formatted="false">Toutes les lignes → fiche sélectionnée ; sinon, noms source sans type</string>
+    <string name="t_817dfa0bfc">(colonne « %1$s »)</string>
+    <string name="t_819f3ba9d1" formatted="false">Depuis la fin de la dernière entrée</string>
+    <string name="t_81b26ab0d7" formatted="false">Fond de la fenêtre de choix après l’arrêt</string>
+    <string name="t_81d3d38d5c" formatted="false">Demander après</string>
+    <string name="t_820b711796" formatted="false">1.5 h</string>
+    <string name="t_8213ed5bbc" formatted="false">Les paramètres d’autorisation ne sont pas disponibles sur cet appareil</string>
+    <string name="t_8241e9552e" formatted="false">Votre activité dans cette section : commencez à taper son nom dans la recherche</string>
+    <string name="t_832c48f416" formatted="false">Composants tiers</string>
+    <string name="t_838a5669f7" formatted="false">Partager le bilan</string>
+    <string name="t_83a2768955" formatted="false">Remplacer partout</string>
+    <string name="t_83ae5f756d" formatted="false">le fichier est trop volumineux</string>
+    <string name="t_84707b7a44" formatted="false">Un nom pour les exports répétés d’un même compte ; des noms différents pour des sources différentes.</string>
+    <string name="t_84f85ce506" formatted="false">Aucun résultat</string>
+    <string name="t_851c0ae977" formatted="false">inchangé</string>
+    <string name="t_851c871818">Version %1$s. Nouvelles activités : %2$s, précisions : %3$s</string>
+    <string name="t_852778be6d" formatted="false">Calcul…</string>
+    <string name="t_8532eff044" formatted="false">Cardio</string>
+    <string name="t_853744f144" formatted="false">La période en cours finit d’être comptée avec l’objectif précédent.</string>
+    <string name="t_8543530f12">Dernier : %1$s</string>
+    <string name="t_85d33d64d6" formatted="false">la ligne n’a pas le même nombre de colonnes</string>
+    <string name="t_85e8a3404b" formatted="false">Aucun fichier n’a encore été enregistré depuis ce téléphone</string>
+    <string name="t_86042e468b" formatted="false">Mesures, calendrier, récupération de la base</string>
+    <string name="t_861bd8760b" formatted="false">Police Onest · SIL Open Font License</string>
+    <string name="t_8633c34c71">· dans le fichier : %1$s</string>
+    <string name="t_86652580fd" formatted="false">Mois dernier</string>
+    <string name="t_8690f98524" formatted="false">, la journée n’est pas finie</string>
+    <string name="t_86d85a0147">Fuseau des rapports : %1$s</string>
+    <string name="t_86ea33aef5" formatted="false">Supprimer</string>
+    <string name="t_86ee6df7f5" formatted="false">secondes</string>
+    <string name="t_86fde46076" formatted="false">Répéter la dernière entrée enregistrée (paramètres sauvegardés, y compris ceux des éléments archivés)</string>
+    <string name="t_877c853fa7" formatted="false">autorisé</string>
+    <string name="t_87a5f792b0">%1$s octets écrits. %2$s</string>
+    <string name="t_886ebf7a3e">Restauré. Copie de retour arrière : %1$s</string>
+    <string name="t_88c6fe08c7" formatted="false">bouton flottant</string>
+    <string name="t_88f1a5a112" formatted="false">Apparence</string>
+    <string name="t_88f778367b" formatted="false">Écriture</string>
+    <string name="t_892f07c05f" formatted="false">Aucune entrée pour ces jours. L’aperçu se remplira dès qu’elles arriveront.</string>
+    <string name="t_8940504c4b">Version %1$s : noms clairs et sections à leur place. Vos noms et votre historique restent. Touchez pour voir</string>
+    <string name="t_894c240b90" formatted="false">Replier les segments</string>
+    <string name="t_8972ce6fc3">Non enregistré : %1$s ; corrigez le formulaire ou annulez</string>
+    <string name="t_89aa29a273" formatted="false">notification</string>
+    <string name="t_8a22f78e9c" formatted="false">Corriger l’entrée</string>
+    <string name="t_8abcbc93e4" formatted="false">Les notes peuvent être personnelles, elles sont donc exclues par défaut</string>
+    <string name="t_8af28e7685" formatted="false">Précisez d’abord le temps inconnu.</string>
+    <string name="t_8b4d031cf9" formatted="false">Ce créneau est déjà pris par une autre entrée. Choisissez un début plus tard.</string>
+    <string name="t_8b78a6e1d6" formatted="false">Retiré des favoris avec les doublons</string>
+    <string name="t_8ba7dc1120" formatted="false">L’accès au dossier a été perdu. Choisissez-le à nouveau</string>
+    <string name="t_8be1fdf75b" formatted="false">Avec empattements</string>
+    <string name="t_8cc9628cfb" formatted="false">La copie automatique est activée ; la première arrivera bientôt</string>
+    <string name="t_8ce3643f16" formatted="false">Les parenthèses respirent lentement quand le suivi est arrêté</string>
+    <string name="t_8e273a8a05" formatted="false">Activités et vérification</string>
+    <string name="t_8e6839a84e" formatted="false">Les entrées sont stockées sur ce téléphone ; les copies, là où vous les enregistrez</string>
+    <string name="t_8f12fe23f2" formatted="false">Seulement si vide</string>
+    <string name="t_8f44a068d2" formatted="false">l’heure n’a pas de fuseau : choisissez un format sans fuseau</string>
+    <string name="t_8ff0d08fec" formatted="false">Nouvelle entrée depuis le texte</string>
+    <string name="t_90078dfa30" formatted="false">lun</string>
+    <string name="t_909a83238c" formatted="false">Ajouter une entrée</string>
+    <string name="t_909baadb08" formatted="false">Commencé plus tôt</string>
+    <string name="t_914b6dca6d" formatted="false">Mon fuseau</string>
+    <string name="t_917b58362c" formatted="false">Note</string>
+    <string name="t_91b707a9d1" formatted="false">Aucune copie locale pour le moment</string>
+    <string name="t_91d993d35c" formatted="false">Comment l’appeler dans le tracker</string>
+    <string name="t_9207563dab" formatted="false">Semaine</string>
+    <string name="t_92a5d7dc45" formatted="false">Widget</string>
+    <string name="t_92c584ce74" formatted="false">Source CSV indisponible</string>
+    <string name="t_930489be30" formatted="false">la durée ne se lit pas dans le format choisi</string>
+    <string name="t_937cbcbd50">Formulaire non enregistré : %1$s : %2$s</string>
+    <string name="t_9395be84e8" formatted="false">Focus</string>
+    <string name="t_93a176ef21" formatted="false">Le téléphone n’a pas permis de l’activer. Réessayez</string>
+    <string name="t_93b302d32f" formatted="false">pas après maintenant</string>
+    <string name="t_93be31b630" formatted="false">Suivi arrêté</string>
+    <string name="t_93eb0c0182" formatted="false">%.1f Mo</string>
+    <string name="t_93f389d809" formatted="false">Aucune fiche</string>
+    <string name="t_94405e99a7" formatted="false">Restaurer le JSON complet…</string>
+    <string name="t_946ee08764" formatted="false">Sections</string>
+    <string name="t_948200fea3" formatted="false">Bruit, pluie ou musique depuis votre fichier. Joue tant que l’app est ouverte</string>
+    <string name="t_94b8df93b6" formatted="false">Fichier</string>
+    <string name="t_9582d40584" formatted="false">Copie automatique en cours</string>
+    <string name="t_95a6a49b6e" formatted="false">Suivre le fuseau du téléphone</string>
+    <string name="t_95bd330f2a">Démarrer comme prévu : %1$s</string>
+    <string name="t_9627af1c25" formatted="false">pause</string>
+    <string name="t_963e150816">Notification : %1$s\n%2$s</string>
+    <string name="t_964e56ab98">Supprimer le rapport « %1$s » ?</string>
+    <string name="t_964fb00c4e" formatted="false">demandé, mais bloqué par le système/canal</string>
+    <string name="t_9694192342" formatted="false">Intervalle de Focus terminé</string>
+    <string name="t_96a0b3fc1d" formatted="false">Sans heure : simplement ce jour-là</string>
+    <string name="t_96a64755de">Passer le fuseau des rapports à %1$s ?</string>
+    <string name="t_96c6ac97db" formatted="false">Bouton flottant : indicateur système</string>
+    <string name="t_9711f6b5b7" formatted="false">Fin : ISO-8601</string>
+    <string name="t_9760f4a429" formatted="false">Dans les favoris</string>
+    <string name="t_97a9f0590a">Focus %1$s + %2$s min</string>
+    <string name="t_97bcfbe748">Terminé · %1$s</string>
+    <string name="t_989911f31c" formatted="false">Repos</string>
+    <string name="t_98b2073ed1" formatted="false">Effacer</string>
+    <string name="t_98dc4a887a" formatted="false">Aucun domaine</string>
+    <string name="t_98e4a9f4dd" formatted="false">Minuteur arrêté</string>
+    <string name="t_991e307efa">Thème : %1$s</string>
+    <string name="t_9924fc6aa9" formatted="false">Rapport perso</string>
+    <string name="t_9978ac34b2" formatted="false">Actions</string>
+    <string name="t_99cbe96929" formatted="false">, doublons ignorés</string>
+    <string name="t_99d406eeba" formatted="false">Section</string>
+    <string name="t_99dbea8209" formatted="false">dim</string>
+    <string name="t_9a4e6f0e95">Sélectionnés : %1$s</string>
+    <string name="t_9a65ca6053">Modifier : %1$s</string>
+    <string name="t_9ac9a4c129">Résultat de l’export non confirmé : %1$s</string>
+    <string name="t_9b1c9a0216" formatted="false">Modifier</string>
+    <string name="t_9b4ee5c556" formatted="false">Quoi compter</string>
+    <string name="t_9bc1f05bd8" formatted="false">ID de la session ou du segment entier</string>
+    <string name="t_9bcc818ccb" formatted="false">Notification de commande</string>
+    <string name="t_9c7449bfd1" formatted="false">Retirer</string>
+    <string name="t_9cae6690eb" formatted="false">Annuler la modification disponible</string>
+    <string name="t_9d5b844654" formatted="false">Actions sur l’entrée</string>
+    <string name="t_9d809f884b" formatted="false">Modifier</string>
+    <string name="t_9d9f294850" formatted="false">Démarrer et arrêter depuis le volet, choix rapide de l’activité</string>
+    <string name="t_9dd3e6ec21" formatted="false">Limite du jour une heure plus tard</string>
+    <string name="t_9de49a7593" formatted="false">Aucune entrée trouvée dans le fichier</string>
+    <string name="t_9e4e767ad0">au moins %1$s par mois</string>
+    <string name="t_9e506acb19" formatted="false">Réessayer</string>
+    <string name="t_9e512e4de6" formatted="false">Garder comme dans le fichier</string>
+    <string name="t_9e8bfc9912" formatted="false">Nom de la nouvelle fiche</string>
+    <string name="t_9e97224af0" formatted="false">Conserver la note actuelle</string>
+    <string name="t_9eb9a9691b" formatted="false">Colonne de l’heure de fin distincte</string>
+    <string name="t_9ebe3ac111" formatted="false">Régler le Focus</string>
+    <string name="t_9f431f2a5f" formatted="false">Signaux</string>
+    <string name="t_9f4988d59a">Actuel : %1$s</string>
+    <string name="t_9f4e577f1f" formatted="false">Par exemple, l’anglais le lundi et le mercredi. Ces jours-là, il vous attendra sur l’écran principal</string>
+    <string name="t_9f8007cba2" formatted="false">Fin inconnue</string>
+    <string name="t_a0113f46a3" formatted="false">Ce mois-ci</string>
+    <string name="t_a083e020a0" formatted="false">Le téléphone n’a pas permis de planifier la copie. Touchez « Enregistrer maintenant »</string>
+    <string name="t_a1103b6e0c" formatted="false">Démarrer maintenant</string>
+    <string name="t_a12db4c166">Choisie : %1$s · ID %2$s</string>
+    <string name="t_a1725f1b08" formatted="false">Ce temps sera marqué comme saisi par vous, pas mesuré.</string>
+    <string name="t_a18bb83bf1">Enregistré %1$s %2$s pour tout %3$s</string>
+    <string name="t_a23f334099" formatted="false">, demande pour une entrée longue</string>
+    <string name="t_a2503487b7">Créer « %1$s » dans « %2$s »</string>
+    <string name="t_a2c84dc5a6" formatted="false">Normal</string>
+    <string name="t_a34678cc0a" formatted="false">Par exemple, projet « Alpha »</string>
+    <string name="t_a3ffcb3ac5" formatted="false">Le calendrier ne répond pas pour le moment.</string>
+    <string name="t_a4ac32f350" formatted="false">Espace de noms source stable</string>
+    <string name="t_a5363d1b5f" formatted="false">Fichier de sauvegarde</string>
+    <string name="t_a5515a2b98" formatted="false">Comment l’heure est écrite</string>
+    <string name="t_a582d409b1" formatted="false">aéré</string>
+    <string name="t_a5b1429034">au plus %1$s par semaine</string>
+    <string name="t_a683d51495" formatted="false">L’entrée est toujours en cours</string>
+    <string name="t_a6a3fb1ef7" formatted="false">L’entrée a déjà changé. Corrigez-la dans l’app</string>
+    <string name="t_a773a5edc6">et %1$s de plus</string>
+    <string name="t_a7e3c8ee69" formatted="false">Aucune entrée ici pour cette période.</string>
+    <string name="t_a8f8d66a1b" formatted="false">Fichier enregistré et vérifié</string>
+    <string name="t_a901fbebb1">Aucun fichier n’a été supprimé. Vous pouvez restaurer la base ou choisir une copie dans l’interface technique. Détails : %1$s</string>
+    <string name="t_a94e60234f">Ajouter %1$s</string>
+    <string name="t_a9a3e50e7d" formatted="false">Début de l’entrée déplacé</string>
+    <string name="t_aa447181f4">La préparation de l’export n’a pas démarré : %1$s</string>
+    <string name="t_aa9fc365f5" formatted="false">Relancer l’export préparé…</string>
+    <string name="t_aab4eaebc4">L’activité deviendra « %1$s ».</string>
+    <string name="t_ab0662026d" formatted="false">Historique depuis un CSV</string>
+    <string name="t_ab0b3ff312">Si une entrée dure plus de %1$s h, demander discrètement dans le volet si le minuteur a été oublié</string>
+    <string name="t_abfb46281b">(not)AI Time Tracker %1$s. Toutes les entrées sont stockées sur ce téléphone</string>
+    <string name="t_ac72e3a247">%1$s\nSessions : %2$s ; segments : %3$s ; objectifs : %4$s. Fin active : %5$s ; Focus : %6$s</string>
+    <string name="t_ace6b66d31" formatted="false">l’entrée est dans le futur</string>
+    <string name="t_ad2b7927cc" formatted="false">Démarrer une autre</string>
+    <string name="t_ad7d8c2a5f">au plus %1$s par mois</string>
+    <string name="t_adcdc4ad41" formatted="false">l’heure est hors de la plage autorisée</string>
+    <string name="t_ae6b38edaf" formatted="false">Un autre jour</string>
+    <string name="t_aee593f748">%1$s dans le plan</string>
+    <string name="t_af39297b7b" formatted="false">, il y a du temps inconnu</string>
+    <string name="t_afa3b81f25">au plus %1$s par jour</string>
+    <string name="t_afb9a7edd6" formatted="false">Séparateur</string>
+    <string name="t_afbca25eab" formatted="false">, fichier vérifié</string>
+    <string name="t_afd78e8296" formatted="false">Démarrer comme prévu</string>
+    <string name="t_aff922a637" formatted="false">Sans activité</string>
+    <string name="t_aff9f84f58" formatted="false">Le changement de fuseau doit être vérifié. L’app le vérifiera à l’ouverture</string>
+    <string name="t_affff57571" formatted="false">Choisissez un séparateur</string>
+    <string name="t_b08e96f6ad" formatted="false">Signal de Focus</string>
+    <string name="t_b1a72b8b91" formatted="false">Focus : le temps doit être précisé</string>
+    <string name="t_b1dd9c744d" formatted="false">Le plan ou le minuteur a déjà changé. Regardez à nouveau</string>
+    <string name="t_b1e23e1ff0" formatted="false">Taille du texte</string>
+    <string name="t_b20271fb06" formatted="false">L’entrée en cours s’arrête maintenant ; la nouvelle commence à cette minute.</string>
+    <string name="t_b2822e2bb3" formatted="false">Période</string>
+    <string name="t_b2dde7fe6e">Dernière : %1$s. Copie automatique désactivée</string>
+    <string name="t_b32615689f" formatted="false">Retirer la note</string>
+    <string name="t_b34e097643" formatted="false">Autre fichier</string>
+    <string name="t_b363aeb862" formatted="false">Tout l’historique pour les tableurs. Ce n’est pas une sauvegarde</string>
+    <string name="t_b371499aaa" formatted="false">Plus</string>
+    <string name="t_b402c34a3b" formatted="false">Exporter en CSV</string>
+    <string name="t_b40a4254c7" formatted="false">Nom sur le bouton</string>
+    <string name="t_b433c5110e" formatted="false">La première copie arrivera dans quelques minutes</string>
+    <string name="t_b4479f84f1">%1$s, chiffres %2$s,</string>
+    <string name="t_b45bbb4570" formatted="false">Thème clair</string>
+    <string name="t_b467c6658f" formatted="false">Fichier enregistré. Impossible de le relire pour le vérifier.</string>
+    <string name="t_b4770c7e71">La journée commence à %1$s:%2$s</string>
+    <string name="t_b4efdc2013" formatted="false">ID de l’unité source</string>
+    <string name="t_b5ef1ca9d4" formatted="false">Icône de l’app</string>
+    <string name="t_b62da03c51" formatted="false">Focus : pause</string>
+    <string name="t_b6305bf26a" formatted="false">la durée doit être supérieure à zéro</string>
+    <string name="t_b67fbff66e" formatted="false">Fuseau horaire des rapports : par exemple Europe/Moscow</string>
+    <string name="t_b6cee6b950" formatted="false">Indisponible dans cette version</string>
+    <string name="t_b6ef08401f" formatted="false">Jour</string>
+    <string name="t_b715493906" formatted="false">Bouton Focus</string>
+    <string name="t_b71833f660" formatted="false">Minuteur en pause</string>
+    <string name="t_b727ee7aba" formatted="false">Impossible d’utiliser ce fichier. Essayez-en un autre, jusqu’à 64 Mo</string>
+    <string name="t_b740f2a2e2" formatted="false">Appui long sur l’icône : démarrer et arrêter, choix d’activité et les deux premiers favoris</string>
+    <string name="t_b747495fc3">%1$s · %2$s\n%3$s. Les favoris utilisent les paramètres enregistrés, y compris archivés.</string>
+    <string name="t_b74904694d" formatted="false">Activez-le dans les paramètres de l’app</string>
+    <string name="t_b788b8485e" formatted="false">Segment inconnu exclu</string>
+    <string name="t_b79a6fe480" formatted="false">La copie a été interrompue. Je la reprendrai tout seul</string>
+    <string name="t_b84572428f" formatted="false">Grand</string>
+    <string name="t_b84fd84e60" formatted="false">À partir de demain</string>
+    <string name="t_b8540eb5bb" formatted="false">Nécessite Android 10 ou version ultérieure</string>
+    <string name="t_b880e6a105" formatted="false">Favoris</string>
+    <string name="t_b8b15fe0c2" formatted="false">Actions du plan</string>
+    <string name="t_b905452397" formatted="false">Les limites des jours et l’affichage des rapports sur l’historique existant changeront. Les intervalles physiques et les fuseaux d’objectifs enregistrés à part sont conservés. Le fuseau choisi sera figé ; le choix automatique sera désactivé.</string>
+    <string name="t_b932f7eea5">Échec : %1$s</string>
+    <string name="t_b97a3fd699" formatted="false">Focus : phase de travail</string>
+    <string name="t_b9c9ff652d" formatted="false">À propos de l’app</string>
+    <string name="t_ba2ec9712b" formatted="false">Que faites-vous ?</string>
+    <string name="t_ba7631ff32" formatted="false">Par jours de la semaine</string>
+    <string name="t_ba9db63b9d">Catalogue %1$s</string>
+    <string name="t_babd8e081b" formatted="false">Les limites des jours dans l’historique et l’aperçu changeront. Les entrées et les fuseaux des objectifs ne changent pas.</string>
+    <string name="t_bbb0e8e8cd" formatted="false">ms</string>
+    <string name="t_bbcf06b3c9" formatted="false">Notes</string>
+    <string name="t_bbee9680a8" formatted="false">Le temps inconnu n’est pas compté :</string>
+    <string name="t_bc28baf5fc" formatted="false">Aucune entrée hier</string>
+    <string name="t_bc5431b599" formatted="false">Dossier</string>
+    <string name="t_bd16b23470" formatted="false">Sombre</string>
+    <string name="t_bd4538e3c6" formatted="false">opaque</string>
+    <string name="t_bd81e0c895" formatted="false">La copie écrite ne correspond pas aux données. Je réessaierai tout seul</string>
+    <string name="t_bdcb031d09" formatted="false">Pause terminée</string>
+    <string name="t_bdcd78489d">L’entrée en cours prend ce nom. Le début reste %1$s.</string>
+    <string name="t_be0773c924" formatted="false">Police, chiffres et écran principal</string>
+    <string name="t_be8f714a0e" formatted="false">Enregistre elle-même une copie complète dans le dossier choisi : sur le téléphone ou dans le cloud, si l’app cloud fournit un dossier. Cette copie survit à la désinstallation</string>
+    <string name="t_bea0873d5e" formatted="false">Boutons rapides</string>
+    <string name="t_bedfedb4d0" formatted="false">désactivé</string>
+    <string name="t_befab85c9e" formatted="false">Activé, mais sans autorisation de notifications</string>
+    <string name="t_bf38c3fd75">Occurrence indisponible : %1$s</string>
+    <string name="t_bf4c4f53cb" formatted="false">Le temps de l’activité comptera dans le total de la section, dans l’Aperçu et les objectifs. Les entrées existantes gardent leur place.</string>
+    <string name="t_c0634e4cb3" formatted="false">Toutes les activités</string>
+    <string name="t_c0683f8006" formatted="false">Sans section</string>
+    <string name="t_c0b04d97ff" formatted="false">Tabulation</string>
+    <string name="t_c0ed5f4dda" formatted="false">les guillemets de la ligne ne sont pas fermés</string>
+    <string name="t_c12ee51dd9" formatted="false">Depuis le début</string>
+    <string name="t_c14f88246c">Reste %1$s</string>
+    <string name="t_c161a7bb23" formatted="false">Une entrée non terminée arrivera en « temps inconnu » et devra être précisée.</string>
+    <string name="t_c23d5826a3">%1$s avec des entrées</string>
+    <string name="t_c25bd1a7c6" formatted="false">Ignorer la pause</string>
+    <string name="t_c2bf13bbb1" formatted="false">Rapports perso</string>
+    <string name="t_c2f668e54f" formatted="false">Mettre à jour</string>
+    <string name="t_c2fcd7ada4" formatted="false">le week-end</string>
+    <string name="t_c33b203048" formatted="false">La période en cours est recalculée avec le nouvel objectif. Les précédentes restent telles quelles.</string>
+    <string name="t_c344c6222f" formatted="false">La copie a été vérifiée par relecture.</string>
+    <string name="t_c372165452">Calendrier : %1$s</string>
+    <string name="t_c3c366f704">%1$s à %2$s</string>
+    <string name="t_c4dca81d48" formatted="false">Ajouter au plan</string>
+    <string name="t_c54788a5e8" formatted="false">Lecture</string>
+    <string name="t_c54a9c6fb4" formatted="false">Plan modifié</string>
+    <string name="t_c595cae565" formatted="false">Remplacer le brouillon ?</string>
+    <string name="t_c619870299" formatted="false">Texte sélectionné</string>
+    <string name="t_c650387bcb" formatted="false">Phase de travail terminée</string>
+    <string name="t_c67ba2d89b">Jusqu’à %1$s, l’activité actuelle continue ; à partir de %2$s, la nouvelle commence.</string>
+    <string name="t_c67ed0b774" formatted="false">Fuseau horaire de la source ; confirmez-le explicitement</string>
+    <string name="t_c6e0ce16b9" formatted="false">Prévenir à la fin d’une phase. Le téléphone peut retarder légèrement le signal</string>
+    <string name="t_c736a598e7" formatted="false">Les anciennes copies ne sont retirées qu’une fois la nouvelle vérifiée.</string>
+    <string name="t_c7d650974b" formatted="false">À partir du mois prochain</string>
+    <string name="t_c80d7e8172" formatted="false">Temps</string>
+    <string name="t_c82a0d4427" formatted="false">Retirer du plan</string>
+    <string name="t_c8317c85b2" formatted="false">Colonne de l’heure de début distincte</string>
+    <string name="t_c83889af89" formatted="false">Ouvrez l’app pour choisir une activité</string>
+    <string name="t_c85eb5f581" formatted="false">90 jours</string>
+    <string name="t_c927b86cfb" formatted="false">Catalogue et tableurs</string>
+    <string name="t_ca7830c42f" formatted="false">Aucune entrée à supprimer</string>
+    <string name="t_cabb0c6d9b">Ligne %1$s :</string>
+    <string name="t_cb26bdc6c6" formatted="false">Début</string>
+    <string name="t_cbc6fa3d6a" formatted="false">widget</string>
+    <string name="t_cbeb716470" formatted="false">Retour aux paramètres</string>
+    <string name="t_cc5d5d0fd4">Totaux du %1$s (%2$s) : %3$s ms ; non résolus : %4$s\nCartes : %5$s\nSessions : %6$s ; segments : %7$s\n%8$s</string>
+    <string name="t_cc6d018f5b" formatted="false">Rapport CSV du jour (ce n’est pas une sauvegarde complète)</string>
+    <string name="t_cca1d52e45" formatted="false">Terminer la restauration inachevée</string>
+    <string name="t_ccb2375542" formatted="false">Widget désactivé</string>
+    <string name="t_cd30825052" formatted="false">Objectif fixé</string>
+    <string name="t_cd93b2e0f1" formatted="false">Activé, mais le téléphone n’a pas donné l’autorisation</string>
+    <string name="t_ce12182bac" formatted="false">ID de la mesure</string>
+    <string name="t_ce3ec6ed08" formatted="false">dans la limite</string>
+    <string name="t_ce5fc2ce7f" formatted="false">Ordre enregistré</string>
+    <string name="t_cefdb75984" formatted="false">Colonne de fin (ou de durée)</string>
+    <string name="t_cf113217ae">%1$s : %2$s minutes</string>
+    <string name="t_cf3a8f3ca2" formatted="false">Démarrer le suivi</string>
+    <string name="t_cf52c8daf1" formatted="false">Le fuseau des rapports suit l’appareil. Des entrées peuvent changer de jour</string>
+    <string name="t_cf7b338323" formatted="false">Fins</string>
+    <string name="t_cfafc18b42" formatted="false">Le plan s’affiche seulement sur l’écran principal. Le temps démarre quand vous touchez l’activité.</string>
+    <string name="t_d002f83ddc" formatted="false">Après des modifications, une copie est enregistrée en quelques minutes, quand le téléphone autorise le travail en arrière-plan. Une fois par jour, même sans modification.</string>
+    <string name="t_d015e9be93" formatted="false">L’activité de ce rapport a été supprimée ou archivée. Le rapport ne compte que ses entrées passées.</string>
+    <string name="t_d0d7180292" formatted="false">Ajouté aux favoris</string>
+    <string name="t_d0dd940c4c" formatted="false">Aucune donnée</string>
+    <string name="t_d0fde8b6ec">Copie automatique %1$s</string>
+    <string name="t_d0ff90f238" formatted="false">Sur l’écran de verrouillage</string>
+    <string name="t_d111e0cd52" formatted="false">Limite du jour de rapport</string>
+    <string name="t_d129caabe1" formatted="false">Remplir le brouillon modifiable ?</string>
+    <string name="t_d149e0338b" formatted="false">Catégorie ou client</string>
+    <string name="t_d176283db1">%1$s s</string>
+    <string name="t_d184a16515" formatted="false">Retirer de la sélection</string>
+    <string name="t_d1f9b48826" formatted="false">Le téléphone manque d’espace ou de mémoire. Je réessaierai tout seul</string>
+    <string name="t_d223a16aed" formatted="false">Colonne de catégorie</string>
+    <string name="t_d25786deda" formatted="false">Anglais · depuis 14:05</string>
+    <string name="t_d261564113" formatted="false">Remplir</string>
+    <string name="t_d2aa318afd">enregistré %1$s</string>
+    <string name="t_d2e9881a72">Seront ajoutées : %1$s</string>
+    <string name="t_d349cb398d">Écoulé %1$s</string>
+    <string name="t_d37c15b206" formatted="false">Les noms que vous avez modifiés restent les vôtres ; les entrées passées ne changent pas.</string>
+    <string name="t_d398842570" formatted="false">Confirmer la période inconnue avec l’intervalle indiqué</string>
+    <string name="t_d3c8e2e155" formatted="false">Le fuseau a été changé. La confirmation n’a pas été enregistrée ; l’app la refera à l’ouverture</string>
+    <string name="t_d40fecd7ad" formatted="false">Réessayer</string>
+    <string name="t_d4168ace06" formatted="false">Durée</string>
+    <string name="t_d41ba2c06d" formatted="false">Confirmez les colonnes, les heures et les unités de durée</string>
+    <string name="t_d458ec4c77" formatted="false">À partir de la semaine prochaine</string>
+    <string name="t_d47aa86141" formatted="false">Compact</string>
+    <string name="t_d4993a1dc7" formatted="false">temps inconnu</string>
+    <string name="t_d4a2324628" formatted="false">Citron vert</string>
+    <string name="t_d4a88f5588" formatted="false">Une autre période, c’est un nouvel objectif.</string>
+    <string name="t_d4f447c130" formatted="false">Arrêter</string>
+    <string name="t_d524af03ac">Indisponible pour une nouvelle activité : %1$s</string>
+    <string name="t_d5627f6a61" formatted="false">Objectif</string>
+    <string name="t_d6035dc6ed" formatted="false">min</string>
+    <string name="t_d6140e7bc5" formatted="false">0 min</string>
+    <string name="t_d64f83a24b" formatted="false">Sélectionnez une copie ; les données actuelles ne seront remplacées qu’après l’aperçu</string>
+    <string name="t_d66df6cc7f" formatted="false">Restaurer la base de données indisponible</string>
+    <string name="t_d70f2e079b" formatted="false">Complet</string>
+    <string name="t_d73bef6ef5" formatted="false">Ignorer la phase Focus</string>
+    <string name="t_d772cc53be" formatted="false">Remplacer</string>
+    <string name="t_d7748bfad0" formatted="false">Rapport</string>
+    <string name="t_d7907f4d43" formatted="false">Avancé</string>
+    <string name="t_d8aac38d84" formatted="false">Activités et plan</string>
+    <string name="t_d8e26625e7" formatted="false">Seuil</string>
+    <string name="t_d9017ada66" formatted="false">Copies à garder</string>
+    <string name="t_d9a13b5014">sur %1$s</string>
+    <string name="t_d9e72beb20" formatted="false">Source du CSV (service et compte)</string>
+    <string name="t_d9f48a75fd" formatted="false">Retirer des favoris</string>
+    <string name="t_d9ffbbb760">Choisir l’heure : %1$s</string>
+    <string name="t_da4b8e5644" formatted="false">Focus : intervalle terminé</string>
+    <string name="t_dab89894aa" formatted="false">Arrêter le suivi</string>
+    <string name="t_db1042f51d" formatted="false">Frise du jour</string>
+    <string name="t_db70b53fc3" formatted="false">Les entrées sélectionnées sont déjà ainsi</string>
+    <string name="t_db922448f7">au moins %1$s par semaine</string>
+    <string name="t_dbbafdd074">Passer le fuseau des rapports à %1$s ?</string>
+    <string name="t_dc417ebce7" formatted="false">Chargement…</string>
+    <string name="t_dd15d6eecb" formatted="false">On commence quoi ?</string>
+    <string name="t_dd27b7de89" formatted="false">Impossible d’ouvrir la licence</string>
+    <string name="t_dd63bc14f9">Modifié : %1$s</string>
+    <string name="t_ddca6f4db2" formatted="false">sans entrée</string>
+    <string name="t_ddcbc8c167" formatted="false">Phases Focus mises à jour</string>
+    <string name="t_de5d4764e8" formatted="false">Quantité totale pour la cible ; les fenêtres journalières ne sont pas additionnées</string>
+    <string name="t_de5eb09e17" formatted="false">Changer d’activité</string>
+    <string name="t_de7dee674e" formatted="false">C’est un fichier de sauvegarde. Restaurez-le dans « Sauvegarde »</string>
+    <string name="t_de8f3c16b9" formatted="false">Exclure</string>
+    <string name="t_dee20b519a" formatted="false">Pas de carte sur l’écran verrouillé</string>
+    <string name="t_df12865c09" formatted="false">Police</string>
+    <string name="t_dfd4e36290" formatted="false">Impossible de changer l’icône</string>
+    <string name="t_e0382438fe">Focus : %1$s min de travail</string>
+    <string name="t_e06ca859e1" formatted="false">Bouton flottant demandé ; l’indicateur de service système est obligatoire</string>
+    <string name="t_e0997b4d01" formatted="false">Les entrées ne changent pas ; seul l’objectif disparaît.</string>
+    <string name="t_e0c6838299" formatted="false">Pas encore de copie. Activez la copie automatique dans un dossier</string>
+    <string name="t_e0f1717450" formatted="false">Descendre</string>
+    <string name="t_e1d7065cb9" formatted="false">Rapport modifié</string>
+    <string name="t_e2e41650a0">Depuis %1$s</string>
+    <string name="t_e380f43ca4">Aujourd’hui, %1$s</string>
+    <string name="t_e3af18c937" formatted="false">Interface technique</string>
+    <string name="t_e3b9331301" formatted="false">Suivant</string>
+    <string name="t_e3eed8bfd8" formatted="false">Durées du Focus</string>
+    <string name="t_e3fc5b6cc7" formatted="false">Quelle activité ?</string>
+    <string name="t_e43c291b9c" formatted="false">Pas ±</string>
+    <string name="t_e46b654bc7" formatted="false">Minuteur : choisir une activité</string>
+    <string name="t_e46c179ddb" formatted="false">Sur les écrans du téléphone</string>
+    <string name="t_e4c06f14a4" formatted="false">Format local de date et d’heure ; vide = ISO avec décalage</string>
+    <string name="t_e5451eea1b" formatted="false">Enregistrer le fuseau horaire des rapports…</string>
+    <string name="t_e558fb6e24" formatted="false">Mois</string>
+    <string name="t_e5e4253129" formatted="false">Sous le démarrage rapide. Appui long pour les durées</string>
+    <string name="t_e5ff32f6ae" formatted="false">ven</string>
+    <string name="t_e65da6ce30" formatted="false">7 jours</string>
+    <string name="t_e6794c0df6" formatted="false">Ajouter aux favoris</string>
+    <string name="t_e699415c6e" formatted="false">Les entrées s’ajoutent à l’historique, rien n’est remplacé. Les doublons de la même source sont ignorés.</string>
+    <string name="t_e6aa58192b" formatted="false">Le prochain Start sera sans fiche</string>
+    <string name="t_e6d3fcd043" formatted="false">Pas encore sur l’écran d’accueil</string>
+    <string name="t_e7672250d5" formatted="false">Autre objectif</string>
+    <string name="t_e8255d5bdc" formatted="false">Vérifier les autorisations des surfaces</string>
+    <string name="t_e82d057d74" formatted="false">Tous les domaines</string>
+    <string name="t_e887e93303" formatted="false">pas de plan</string>
+    <string name="t_e8a76312ff" formatted="false">il faut une colonne de fin ou de durée</string>
+    <string name="t_e962d6d168">, déjà présentes : %1$s</string>
+    <string name="t_e965da5858" formatted="false">Importer un CSV</string>
+    <string name="t_e97aa645db" formatted="false">Tout est désactivé : suivi uniquement dans l’app</string>
+    <string name="t_e98d66a21e" formatted="false">Exclure la période inconnue</string>
+    <string name="t_ea707316fd" formatted="false">Bouton flottant</string>
+    <string name="t_eaa484fa5d" formatted="false">Nouvelle entrée démarrée</string>
+    <string name="t_eb467ef147" formatted="false">Virgule</string>
+    <string name="t_ec1c55d866" formatted="false">Thème sombre</string>
+    <string name="t_ec3bd8ce7a">%1$s h</string>
+    <string name="t_eca17171d2" formatted="false">Système</string>
+    <string name="t_eca2a38089" formatted="false">Calendrier : occurrences en cours et à venir</string>
+    <string name="t_ed3f0e507a" formatted="false">Langue</string>
+    <string name="t_ed4b9d4acc" formatted="false">Le temps doit être précisé</string>
+    <string name="t_ed5033902e" formatted="false">Le système n’a pas autorisé le bouton flottant ; le minuteur reste dans l’app</string>
+    <string name="t_ed52dd3411" formatted="false">Touchez pour choisir une activité ou une section</string>
+    <string name="t_ed6e1d0308" formatted="false">Rechercher</string>
+    <string name="t_edd23ab082" formatted="false">Ensuite dans le plan</string>
+    <string name="t_eded3f55f1" formatted="false">Impossible d’ouvrir le choix. L’entrée est enregistrée</string>
+    <string name="t_eeee074ac3" formatted="false">Mettre à jour le catalogue intégré…</string>
+    <string name="t_ef34d1807a" formatted="false">non enregistré</string>
+    <string name="t_ef5ff32a17" formatted="false">Préciser l’activité en cours</string>
+    <string name="t_efc885e934" formatted="false">Supprimés</string>
+    <string name="t_f0caca47ee" formatted="false">Démarrer Focus</string>
+    <string name="t_f10728b46b" formatted="false">Sur l’écran d’accueil ; boutons désactivés</string>
+    <string name="t_f109cea920" formatted="false">Pas encore de favoris</string>
+    <string name="t_f1157816a0" formatted="false">Son perso</string>
+    <string name="t_f11be88b10" formatted="false">Mémoriser le favori sélectionné</string>
+    <string name="t_f127f2a1ee" formatted="false">Compris</string>
+    <string name="t_f220b98d48" formatted="false">Le choix d’activité n’est plus à jour</string>
+    <string name="t_f2351a24d5">Après %1$s h, une question s’affiche dans le volet : continuer, reporter ou arrêter</string>
+    <string name="t_f2a9788239" formatted="false">Enregistrer ce créneau</string>
+    <string name="t_f2f63c2213" formatted="false">Focus : la phase est terminée, choisissez la suivante</string>
+    <string name="t_f3503a3e3f" formatted="false">Retiré des favoris</string>
+    <string name="t_f36036b6cf" formatted="false">Pause · %s</string>
+    <string name="t_f3ff661a74" formatted="false">Autre rapport</string>
+    <string name="t_f46e3488b5" formatted="false">Copies dans le dossier</string>
+    <string name="t_f48645430a" formatted="false">Seul le rapport enregistré est supprimé. Les entrées ne changent pas.</string>
+    <string name="t_f4ca346393" formatted="false">Silence pendant une phase de Focus</string>
+    <string name="t_f4f34092fb" formatted="false">Ignorer la phase de travail</string>
+    <string name="t_f55832ba89" formatted="false">Fond du widget</string>
+    <string name="t_f5fc2f3eb8" formatted="false">Plus petit</string>
+    <string name="t_f62e9fd860" formatted="false">Avec fuseau (ISO)</string>
+    <string name="t_f6bfe94a14" formatted="false">Enregistrement de la copie</string>
+    <string name="t_f6dab074d7" formatted="false">Retour</string>
+    <string name="t_f6de15c50a" formatted="false">Demain</string>
+    <string name="t_f6f1e5272f" formatted="false">Ordre</string>
+    <string name="t_f6f369d3a0" formatted="false">Entrée corrigée</string>
+    <string name="t_f70eab72a9" formatted="false">L’heure sert seulement à ordonner la liste</string>
+    <string name="t_f713a587ea" formatted="false">Exportation annulée ; les fichiers ont été conservés. Vous pouvez préparer une nouvelle copie.</string>
+    <string name="t_f8310658c7" formatted="false">Heure de début, si elle est dans une colonne à part</string>
+    <string name="t_f8ebe73afe">Enregistré : %1$s</string>
+    <string name="t_f8fe850a57" formatted="false">Le minuteur a changé. Rouvrez la notification</string>
+    <string name="t_f9444ff8c6" formatted="false">Bref</string>
+    <string name="t_f94b15c5ce" formatted="false">En pause. La durée de la pause n’est pas incluse dans le temps de l’activité.</string>
+    <string name="t_f9c8ab7dd1" formatted="false">Catalogue d’activités</string>
+    <string name="t_fa1296f402" formatted="false">Rétablir comme avant</string>
+    <string name="t_fa620acedb" formatted="false">Une mise à jour du catalogue d’activités est disponible</string>
+    <string name="t_fa633fd3a2" formatted="false">Il faut choisir à nouveau le dossier</string>
+    <string name="t_fb27c3e29b">%1$s, total</string>
+    <string name="t_fb925c5d79" formatted="false">30 jours</string>
+    <string name="t_fc355fea11" formatted="false">les suggestions sont déjà placées d’après les en-têtes.</string>
+    <string name="t_fc60b6a6e0" formatted="false">l’heure tombe sur un changement d’heure</string>
+    <string name="t_fc656a1da4" formatted="false">Pour la masquer en gardant la carte dans le volet, activez « Réduire » ou « Sans icône » dans les paramètres de cette notification</string>
+    <string name="t_fc8e4e2d1c" formatted="false">Démarrer immédiatement</string>
+    <string name="t_fca9d98cd9" formatted="false">Le minuteur a changé. Touchez à nouveau</string>
+    <string name="t_fd042c9a3a" formatted="false">Plus tard</string>
+    <string name="t_fd3cb2ebef" formatted="false">La phase en cours se termine comme prévu ; les nouvelles durées s’appliquent dès la suivante.</string>
+    <string name="t_fd500149d4">Minuteur : %1$s</string>
+    <string name="t_fd7707e6f0">Exclure à partir de %1$s</string>
+    <string name="t_fdc5b65acf" formatted="false">Pause · reste %s</string>
+    <string name="t_fdfa49e623" formatted="false">Corriger le dernier segment clôturé</string>
+    <string name="t_fe4b0c80f0" formatted="false">Choisir</string>
+    <string name="t_fe63f1e035" formatted="false">Impossible de relire la copie écrite. Je réessaierai tout seul</string>
+    <string name="t_fe68cb28be" formatted="false">Il faut une activité, un début et une fin ou une durée</string>
+    <string name="t_fe97f5bc85" formatted="false">L’écran d’accueil ne sait pas ajouter de widgets depuis une app. Ajoutez-le à la main : appui long sur l’écran d’accueil → Widgets → (not)AI Time</string>
+    <string name="t_fea5f3ca7c" formatted="false">Vous choisirez l’activité plus tard</string>
+    <string name="t_fee1dd80dd">Texte actuel : « %1$s »\nNouveau texte : « %2$s »</string>
+    <string name="t_feff16c4bb" formatted="false">Minuteur dans le volet de notifications</string>
+    <plurals name="p_032a085f42">
+        <item quantity="one">%1$d jour</item>
+        <item quantity="many">%1$d jours</item>
+        <item quantity="other">%1$d jours</item>
+    </plurals>
+    <plurals name="p_07343fe85c">
+        <item quantity="one">%1$d lien à un objet</item>
+        <item quantity="many">%1$d liens à des objets</item>
+        <item quantity="other">%1$d liens à des objets</item>
+    </plurals>
+    <plurals name="p_09d3aef0c7">
+        <item quantity="one">%1$d ligne</item>
+        <item quantity="many">%1$d lignes</item>
+        <item quantity="other">%1$d lignes</item>
+    </plurals>
+    <plurals name="p_299205cb6b">
+        <item quantity="one">%1$d fois</item>
+        <item quantity="many">%1$d fois</item>
+        <item quantity="other">%1$d fois</item>
+    </plurals>
+    <plurals name="p_33de38af49">
+        <item quantity="one">%1$d trou</item>
+        <item quantity="many">%1$d trous</item>
+        <item quantity="other">%1$d trous</item>
+    </plurals>
+    <plurals name="p_3a9aafb6ad">
+        <item quantity="one">%1$d activité</item>
+        <item quantity="many">%1$d activités</item>
+        <item quantity="other">%1$d activités</item>
+    </plurals>
+    <plurals name="p_3b59342c88">
+        <item quantity="one">%1$d objectif</item>
+        <item quantity="many">%1$d objectifs</item>
+        <item quantity="other">%1$d objectifs</item>
+    </plurals>
+    <plurals name="p_414e6a20a2">
+        <item quantity="one">%1$d favori</item>
+        <item quantity="many">%1$d favoris</item>
+        <item quantity="other">%1$d favoris</item>
+    </plurals>
+    <plurals name="p_51037d6f51">
+        <item quantity="one">%1$d segment</item>
+        <item quantity="many">%1$d segments</item>
+        <item quantity="other">%1$d segments</item>
+    </plurals>
+    <plurals name="p_5e0f6cbad4">
+        <item quantity="one">%1$d jour</item>
+        <item quantity="many">%1$d jours</item>
+        <item quantity="other">%1$d jours</item>
+    </plurals>
+    <plurals name="p_6c73bc4d74">
+        <item quantity="one">%1$d entrée</item>
+        <item quantity="many">%1$d entrées</item>
+        <item quantity="other">%1$d entrées</item>
+    </plurals>
+    <plurals name="p_7504653931">
+        <item quantity="one">%1$d fois</item>
+        <item quantity="many">%1$d fois</item>
+        <item quantity="other">%1$d fois</item>
+    </plurals>
+    <plurals name="p_7722e30027">
+        <item quantity="one">%1$d activité perso</item>
+        <item quantity="many">%1$d activités perso</item>
+        <item quantity="other">%1$d activités perso</item>
+    </plurals>
+    <plurals name="p_a03208ce01">
+        <item quantity="one">%1$d série enregistrée</item>
+        <item quantity="many">%1$d séries enregistrées</item>
+        <item quantity="other">%1$d séries enregistrées</item>
+    </plurals>
+    <plurals name="p_aaaea1e747">
+        <item quantity="one">%1$d mesure</item>
+        <item quantity="many">%1$d mesures</item>
+        <item quantity="other">%1$d mesures</item>
+    </plurals>
+    <plurals name="p_c70b66af3f">
+        <item quantity="one">%1$d quantité d’événement</item>
+        <item quantity="many">%1$d quantités d’événement</item>
+        <item quantity="other">%1$d quantités d’événement</item>
+    </plurals>
+    <plurals name="p_c8e097eebc">
+        <item quantity="one">%1$d donnée d’allure</item>
+        <item quantity="many">%1$d données d’allure</item>
+        <item quantity="other">%1$d données d’allure</item>
+    </plurals>
+    <plurals name="p_c9ec2228f3">
+        <item quantity="one">%1$d pause</item>
+        <item quantity="many">%1$d pauses</item>
+        <item quantity="other">%1$d pauses</item>
+    </plurals>
+    <plurals name="p_de4636ae79">
+        <item quantity="one">%1$d colonne</item>
+        <item quantity="many">%1$d colonnes</item>
+        <item quantity="other">%1$d colonnes</item>
+    </plurals>
 </resources>

@@ -2,7 +2,7 @@
 <resources>
     <string name="language_title">Sprache</string>
     <string name="language_system">Systemsprache</string>
-    <string name="language_partial">Einige Ansichten sind noch auf Russisch. Persönliche Namen und Einträge werden nicht übersetzt.</string>
+    <string name="language_partial">Eigene Namen und Notizen bleiben, wie du sie geschrieben hast. Aktivitäten aus dem Katalog werden übersetzt.</string>
     <string name="language_save_error">Sprache konnte nicht gespeichert werden. Bitte erneut wählen.</string>
     <string name="deleted_title">Gelöscht</string>
     <string name="deleted_empty">Keine gelöschten Einträge</string>

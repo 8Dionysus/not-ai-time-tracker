@@ -2,7 +2,7 @@
 <resources>
     <string name="language_title">言語</string>
     <string name="language_system">システムの言語</string>
-    <string name="language_partial">一部の画面はまだロシア語です。個人の名前や記録は翻訳されません。</string>
+    <string name="language_partial">自分で付けた名前とメモはそのままです。カタログの活動は翻訳されます。</string>
     <string name="language_save_error">言語を保存できませんでした。もう一度選択してください。</string>
     <string name="deleted_title">削除済み</string>
     <string name="deleted_empty">削除済みの記録はありません</string>

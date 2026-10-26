@@ -77,7 +77,9 @@ data class PickerItem(val entry: ChoiceEntry, val label: Label, val count: Int? 
 internal fun PickerItem.wholeArea() = copy(label = label.copy(title = L.s(R.string.t_e82d057d74),detail = label.title.lowercase()),whole = true)
 data class PickerData(val recents: List<PickerItem>, val favorites: List<PickerItem>, val areas: List<PickerItem>, val moreAreas: List<PickerItem>)
 
-enum class Period(val days: Int, val title: String) { DAY(1, L.s(R.string.t_b6ef08401f)), WEEK(7, L.s(R.string.t_e65da6ce30)), MONTH(30, L.s(R.string.t_fb925c5d79)) }
+enum class Period(val days: Int, private val titleRes: Int) { DAY(1, R.string.t_b6ef08401f), WEEK(7, R.string.t_e65da6ce30), MONTH(30, R.string.t_fb925c5d79);
+    val title: String get() = L.s(titleRes)
+}
 data class AreaTotal(val name: String, val slot: Int?, val ms: Long, val glyph: Int = ActivityGlyphs.custom, val id: String? = null, val deeper: Boolean = false)
 /** One level of an area's time over the shown period: sections and activities below it, newest tree. */
 data class Breakdown(val title: String, val totalMs: Long, val parts: List<AreaTotal>)
@@ -322,7 +324,7 @@ class TrackerViewModel internal constructor(private val app: Application,private
                 val result = FocusSignals.deliverResult(app,tracker)
                 val current = result.focus
                 if(result.status == FocusDeliveryStatus.BLOCKED_BEFORE_POST && current?.mode == FocusMode.DUE && current.signalKey == due.signalKey)
-                    notice(current.safeLabel)
+                    notice(Format.focusLine(current))
             } catch(e: Exception) {
                 if(e is kotlinx.coroutines.CancellationException) throw e
                 notice(Format.error(e))

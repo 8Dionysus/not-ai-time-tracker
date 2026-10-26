@@ -2,7 +2,7 @@
 <resources>
     <string name="language_title">भाषा</string>
     <string name="language_system">सिस्टम की भाषा</string>
-    <string name="language_partial">कुछ स्क्रीन अभी रूसी में हैं। व्यक्तिगत नामों और रिकॉर्ड का अनुवाद नहीं होता।</string>
+    <string name="language_partial">आपके अपने नाम और नोट जैसे लिखे वैसे रहते हैं। कैटलॉग की तैयार गतिविधियों का अनुवाद होता है।</string>
     <string name="language_save_error">भाषा सहेजी नहीं जा सकी। फिर से चुनें।</string>
     <string name="deleted_title">हटाए गए रिकॉर्ड</string>
     <string name="deleted_empty">कोई हटाया गया रिकॉर्ड नहीं</string>

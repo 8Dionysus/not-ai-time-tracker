@@ -1,6 +1,7 @@
 package dev.notai.tracker.android.ui
 
 import android.graphics.Bitmap
+import androidx.compose.ui.semantics.getOrNull
 import android.graphics.Canvas
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.captureToImage
@@ -108,6 +109,7 @@ class UiScreensTest {
         override val backups = Backups(tracker, MemoryRollback())
         override val focusDue = FocusDueSignals()
         override val runtime: TrackerRuntime? = null
+        override val catalogContent = dev.notai.tracker.android.CatalogContentAdapter(ApplicationProvider.getApplicationContext(), catalog)
         override fun prepareCatalog() = CatalogImports(tracker) { catalog }.prepare()
         override fun applyCatalog(preview: CatalogPreview) = CatalogImports(tracker) { catalog }.apply(preview)
         override fun submitShortcut(action: SurfaceAction) = CompletableDeferred<Result<Tracker.Change>>(Result.failure(IllegalStateException("no shortcuts")))
@@ -666,6 +668,55 @@ class UiScreensTest {
             assertTrue(t.data().segments.filter { it.sessionId == target.sessionId } == before.segments.filter { it.sessionId == target.sessionId })
             assertTrue(compose.onAllNodesWithText("さらに表示").fetchSemanticsNodes().isEmpty())
         } finally { vm.viewModelScope.cancel();db.close();app.deleteDatabase(dbName) }
+    }
+
+    /** Every visible line of every main screen, after switching language: nothing Russian except the person's own values. */
+    @Test @Config(qualifiers = "ru-rRU-w400dp-h1300dp-xhdpi") fun languageSweepLeavesNoRussianCopy() {
+        val s = seed(false);val vm = render(s)
+        val d = s.tracker.data()
+        val own = (d.cards.map { it.name } + d.favorites.map { it.label } + d.goals.map { it.name } + d.sessions.mapNotNull { it.note } +
+            d.sessions.flatMap { it.selection.details.values } + listOf("Отпуск коллеги", "Созвон с командой", "Облако · not-ai")).filter { it.isNotBlank() }.sortedByDescending { it.length }
+        val cyr = Regex("[А-Яа-яЁё]")
+        fun texts(): List<String> = compose.onAllNodes(androidx.compose.ui.test.isRoot(), useUnmergedTree = true).fetchSemanticsNodes().flatMap { root ->
+            fun walk(n: androidx.compose.ui.semantics.SemanticsNode): List<String> =
+                (n.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.Text).orEmpty().map { it.text } +
+                    n.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.ContentDescription).orEmpty() +
+                    listOfNotNull(n.config.getOrNull(androidx.compose.ui.semantics.SemanticsActions.OnClick)?.label)) + n.children.flatMap(::walk)
+            walk(root)
+        }
+        fun check(where: String, lang: String) {
+            repeat(2) { compose.waitForIdle(); org.robolectric.shadows.ShadowLooper.idleMainLooper() }
+            val bad = texts().map { t -> own.fold(t) { acc, v -> acc.replace(v, "") } }.filter { cyr.containsMatchIn(it) }.distinct()
+            assertTrue("$lang/$where still shows Russian: $bad", bad.isEmpty())
+        }
+        for ((lang, tabs) in listOf("en" to listOf("Timer", "Overview", "Settings"), "ja" to emptyList())) {
+            compose.runOnIdle { vm.setLanguage(lang) }
+            val (timer, overview, settings) = if (lang == "en") tabs else listOf("タイマー", "概要", "設定")
+            waitText(settings)
+            compose.onNode(hasText(timer) and androidx.compose.ui.test.hasClickAction()).performClick();check("timer", lang)
+            if (lang != "ru") shotAs("language-$lang-timer", vm, ThemeChoice.LIGHT)
+            if (lang == "en") {
+                compose.onNode(hasText("All activities") and androidx.compose.ui.test.hasClickAction()).performClick()
+                waitText("Find or create an activity");check("picker", lang);shotAs("language-en-picker", vm, ThemeChoice.LIGHT)
+                compose.onAllNodesWithContentDescription("Close").onFirst().performClick();compose.waitForIdle()
+                compose.onAllNodes(androidx.compose.ui.test.SemanticsMatcher("history record") { n ->
+                    n.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.TestTag)?.startsWith("history-record:") == true }).onFirst().performScrollTo().performClick()
+                waitText("Edit entry");check("entry", lang)
+                compose.onAllNodesWithContentDescription("Close").onFirst().performClick();compose.waitForIdle()
+            }
+            compose.onNode(hasScrollAction()).performScrollToIndex(6);check("history", lang)
+            compose.onNode(hasText(overview) and androidx.compose.ui.test.hasClickAction()).performClick();check("overview", lang)
+            if (lang != "ru") shotAs("language-$lang-overview", vm, ThemeChoice.LIGHT)
+            if (lang == "en") for (p in listOf("7 days", "30 days")) { compose.onNodeWithText(p).performClick();check("overview-$p", lang) }
+            compose.onNode(hasText(settings) and androidx.compose.ui.test.hasClickAction()).performClick();check("settings", lang)
+            if (lang == "en") shotAs("language-en-settings", vm, ThemeChoice.LIGHT)
+            for (page in listOf("Timer outside the app", "Backup", "Activities and plan", "Focus and reminders", "More", "Deleted").takeIf { lang == "en" }.orEmpty()) {
+                compose.onNodeWithText(page).performScrollTo().performClick();check(page, lang)
+                compose.onNodeWithContentDescription("Back to settings").performClick()
+            }
+        }
+        compose.runOnIdle { vm.setLanguage(null) }
+        waitText("Настройки")
     }
 
     @Test fun recoveryLanguagePickerChangesVisibleControlsWithoutChangingRecords() {

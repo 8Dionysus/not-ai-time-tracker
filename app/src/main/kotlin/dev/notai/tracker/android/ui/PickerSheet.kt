@@ -41,6 +41,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun NotAiSheet(onDismiss: () -> Unit, fullHeight: Boolean = true, content: @Composable ColumnScope.() -> Unit) {
     val c = NotAi.colors
+    // A sheet is its own window: carry the chosen language and direction into it.
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val direction = androidx.compose.ui.platform.LocalLayoutDirection.current
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -48,7 +52,10 @@ fun NotAiSheet(onDismiss: () -> Unit, fullHeight: Boolean = true, content: @Comp
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         dragHandle = { Box(Modifier.padding(top = 10.dp, bottom = 8.dp).size(36.dp, 4.dp).clip(RoundedCornerShape(2.dp)).background(c.rule)) },
     ) {
-        Column(if (fullHeight) Modifier.fillMaxHeight(0.88f) else Modifier, content = content)
+        androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalContext provides context,
+            androidx.compose.ui.platform.LocalConfiguration provides configuration, androidx.compose.ui.platform.LocalLayoutDirection provides direction) {
+            Column(if (fullHeight) Modifier.fillMaxHeight(0.88f) else Modifier, content = content)
+        }
     }
 }
 

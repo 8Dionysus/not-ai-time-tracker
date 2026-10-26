@@ -139,6 +139,20 @@ object Format {
     }
     fun importError(e: Throwable): String = (e as? CoreError)?.importIssue?.let(::importIssue) ?: error(e)
 
+    /** The core's state line, shown in the chosen language. The core's own wording stays for diagnostics. */
+    fun stateLine(s: dev.notai.tracker.Snapshot): String = s.focus?.let(::focusLine) ?: when (s.mode) {
+        dev.notai.tracker.Mode.IDLE -> L.s(R.string.t_98e4a9f4dd)
+        dev.notai.tracker.Mode.RUNNING -> L.s(R.string.t_18c99fb35b)
+        dev.notai.tracker.Mode.PAUSED -> L.s(R.string.t_b71833f660)
+        dev.notai.tracker.Mode.RECOVERY -> L.s(R.string.t_ed4b9d4acc)
+    }
+    fun focusLine(f: dev.notai.tracker.FocusSnapshot): String = when (f.mode) {
+        dev.notai.tracker.FocusMode.RECOVERY -> L.s(R.string.t_b1a72b8b91)
+        dev.notai.tracker.FocusMode.DUE -> L.s(R.string.t_f2f63c2213)
+        dev.notai.tracker.FocusMode.PAUSED -> L.s(R.string.t_52da7c24f6)
+        dev.notai.tracker.FocusMode.RUNNING -> if (f.phase == dev.notai.tracker.FocusPhase.WORK) L.s(R.string.t_b97a3fd699) else L.s(R.string.t_b62da03c51)
+    }
+
     /** One plain sentence per automatic-copy problem; the action next to it says what to do. */
     fun backupProblem(e: dev.notai.tracker.android.AutomaticBackupError): String = when (e) {
         dev.notai.tracker.android.AutomaticBackupError.REQUIRES_SELECTION -> L.s(R.string.t_fa633fd3a2)

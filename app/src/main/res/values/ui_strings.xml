@@ -82,6 +82,7 @@
     <string name="t_181ee397c9" formatted="false">Записи, уже начатые по плану, останутся в истории.</string>
     <string name="t_1827ab0050" formatted="false">В полночь, как в календаре</string>
     <string name="t_1880e6b0ec" formatted="false">Занятие, время и кнопки видны без разблокировки</string>
+    <string name="t_18c99fb35b" formatted="false">Идёт учёт времени</string>
     <string name="t_191cacce9c" formatted="false">Любое занятие</string>
     <string name="t_19295833d9" formatted="false">Эта неделя</string>
     <string name="t_19f25d5784" formatted="false">Ещё</string>
@@ -252,6 +253,7 @@
     <string name="t_51d6a3da35" formatted="false">Чем ты был занят?</string>
     <string name="t_51f805f925">Выбрана новая карточка · %1$s</string>
     <string name="t_5203402af7">Заметка «%1$s» появится там, где её не было.</string>
+    <string name="t_52da7c24f6" formatted="false">Фокус на паузе</string>
     <string name="t_53e131e48c">«%1$s» — теперь старт в одно касание</string>
     <string name="t_542c2cd5f6" formatted="false">Автокопия в папку</string>
     <string name="t_544a30f1ea" formatted="false">Виджет (добавить через launcher)</string>
@@ -475,7 +477,7 @@
     <string name="t_93a176ef21" formatted="false">Телефон не дал включить. Попробуй ещё раз</string>
     <string name="t_93b302d32f" formatted="false">не позже, чем сейчас</string>
     <string name="t_93be31b630" formatted="false">Учёт не идёт</string>
-    <string name="t_93eb0c0182">%.1f МБ</string>
+    <string name="t_93eb0c0182" formatted="false">%.1f МБ</string>
     <string name="t_93f389d809" formatted="false">Без карточки</string>
     <string name="t_94405e99a7" formatted="false">Восстановить полный JSON…</string>
     <string name="t_946ee08764" formatted="false">Разделы</string>
@@ -499,6 +501,7 @@
     <string name="t_989911f31c" formatted="false">Отдых</string>
     <string name="t_98b2073ed1" formatted="false">Очистить</string>
     <string name="t_98dc4a887a" formatted="false">Без области</string>
+    <string name="t_98e4a9f4dd" formatted="false">Таймер остановлен</string>
     <string name="t_991e307efa">Тема: %1$s</string>
     <string name="t_9924fc6aa9" formatted="false">Свой отчёт</string>
     <string name="t_9978ac34b2" formatted="false">Действия</string>
@@ -576,6 +579,7 @@
     <string name="t_aff9f84f58" formatted="false">Результат смены пояса требует проверки. Приложение проверит его при открытии</string>
     <string name="t_affff57571" formatted="false">Выберите разделитель</string>
     <string name="t_b08e96f6ad" formatted="false">Сигнал Фокуса</string>
+    <string name="t_b1a72b8b91" formatted="false">Фокус: нужно уточнить время</string>
     <string name="t_b1dd9c744d" formatted="false">План или таймер уже изменились. Посмотри ещё раз</string>
     <string name="t_b1e23e1ff0" formatted="false">Размер текста</string>
     <string name="t_b20271fb06" formatted="false">Текущая запись закончится сейчас, новая начнётся с этой минуты.</string>
@@ -594,11 +598,13 @@
     <string name="t_b4770c7e71">День начинается в %1$s:%2$s</string>
     <string name="t_b4efdc2013" formatted="false">ID исходной единицы</string>
     <string name="t_b5ef1ca9d4" formatted="false">Значок приложения</string>
+    <string name="t_b62da03c51" formatted="false">Фокус: перерыв</string>
     <string name="t_b6305bf26a" formatted="false">длительность должна быть больше нуля</string>
     <string name="t_b67fbff66e" formatted="false">Зона отчётов: например Europe/Moscow</string>
     <string name="t_b6cee6b950" formatted="false">Недоступна в этой сборке</string>
     <string name="t_b6ef08401f" formatted="false">День</string>
     <string name="t_b715493906" formatted="false">Кнопка Фокуса</string>
+    <string name="t_b71833f660" formatted="false">Таймер на паузе</string>
     <string name="t_b727ee7aba" formatted="false">Не удалось взять этот файл. Попробуй другой, до 64 МБ</string>
     <string name="t_b740f2a2e2" formatted="false">Долгое нажатие на значок: старт и стоп, выбор занятия и два первых избранных</string>
     <string name="t_b747495fc3">%1$s · %2$s\n%3$s. Избранное использует сохранённые параметры, в том числе архивные.</string>
@@ -612,6 +618,7 @@
     <string name="t_b8b15fe0c2" formatted="false">Действия с планом</string>
     <string name="t_b905452397" formatted="false">Изменятся границы дней и вид отчётов по существующей истории. Физические интервалы и отдельные сохранённые зоны целей сохраняются. Выбранный пояс будет закреплён; автоматический выбор отключится.</string>
     <string name="t_b932f7eea5">Не получилось: %1$s</string>
+    <string name="t_b97a3fd699" formatted="false">Фокус: отрезок работы</string>
     <string name="t_b9c9ff652d" formatted="false">О приложении</string>
     <string name="t_ba2ec9712b" formatted="false">Чем занят?</string>
     <string name="t_ba7631ff32" formatted="false">По дням недели</string>
@@ -796,6 +803,7 @@
     <string name="t_eca17171d2" formatted="false">Системный</string>
     <string name="t_eca2a38089" formatted="false">Календарь: текущие и ближайшие occurrences</string>
     <string name="t_ed3f0e507a" formatted="false">Язык</string>
+    <string name="t_ed4b9d4acc" formatted="false">Требуется уточнить время</string>
     <string name="t_ed5033902e" formatted="false">ОС не разрешила запуск плавающей кнопки; таймер доступен в приложении</string>
     <string name="t_ed52dd3411" formatted="false">Нажми, чтобы выбрать одно занятие или раздел</string>
     <string name="t_ed6e1d0308" formatted="false">Найти</string>
@@ -814,8 +822,9 @@
     <string name="t_f220b98d48" formatted="false">Выбор занятия устарел</string>
     <string name="t_f2351a24d5">Через %1$s ч записи спросит в шторке: продолжить, отложить или остановить</string>
     <string name="t_f2a9788239" formatted="false">Записать промежуток</string>
+    <string name="t_f2f63c2213" formatted="false">Фокус: отрезок закончился, выбери следующий</string>
     <string name="t_f3503a3e3f" formatted="false">Убрано из избранного</string>
-    <string name="t_f36036b6cf">Пауза · %s</string>
+    <string name="t_f36036b6cf" formatted="false">Пауза · %s</string>
     <string name="t_f3ff661a74" formatted="false">Ещё отчёт</string>
     <string name="t_f46e3488b5" formatted="false">Копии в папке</string>
     <string name="t_f48645430a" formatted="false">Удалится только сохранённый отчёт. Записи не меняются.</string>
@@ -851,7 +860,7 @@
     <string name="t_fd3cb2ebef" formatted="false">Текущий отрезок досчитается как начат, новые длительности — со следующего.</string>
     <string name="t_fd500149d4">Таймер: %1$s</string>
     <string name="t_fd7707e6f0">Не учитывать с %1$s</string>
-    <string name="t_fdc5b65acf">Пауза · осталось %s</string>
+    <string name="t_fdc5b65acf" formatted="false">Пауза · осталось %s</string>
     <string name="t_fdfa49e623" formatted="false">Исправить последний закрытый сегмент</string>
     <string name="t_fe4b0c80f0" formatted="false">Выбрать</string>
     <string name="t_fe63f1e035" formatted="false">Не удалось перечитать записанную копию. Повторю сам</string>

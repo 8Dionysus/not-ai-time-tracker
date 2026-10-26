@@ -1,4 +1,1024 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generated from Kotlin source copy; see docs/localization/UI_COPY.md. -->
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="t_0076203bff" formatted="false">بدء الاستراحة</string>
+    <string name="t_0077164ed0">التصدير %1$s: أعد التحضير؛ الملف الجزئي محفوظ</string>
+    <string name="t_007f15b539" formatted="false">كمية للجلسة/المقطع كاملًا…</string>
+    <string name="t_0087bd0bf7" formatted="false">ابحث عن نشاط أو أنشئه</string>
+    <string name="t_00ad5c791d">، تعارضات مع تعديلاتك: %1$s. يجب حلها في الواجهة التقنية.</string>
+    <string name="t_017c8c142b" formatted="false">الطبخ</string>
+    <string name="t_0195b83c6c" formatted="false">تعيين للنشاط الحالي</string>
+    <string name="t_01a3d66b22" formatted="false">التركيز، استراحة</string>
+    <string name="t_01e118e6e9">%1$s أبكر بـ%2$s</string>
+    <string name="t_03498e395a" formatted="false">إيقاف مؤقت</string>
+    <string name="t_03cb42c402">جارٍ منذ %1$s. تُحفظ البداية عند الاختيار.</string>
+    <string name="t_042dbd35f2">هذا الملف غير مناسب: %1$s</string>
+    <string name="t_0467ae4bb8" formatted="false">تأكيد</string>
+    <string name="t_04bcedfa9f">بين %1$s والآن</string>
+    <string name="t_059b504fa9" formatted="false">تم اختيار المجلد. ستظهر أول نسخة خلال دقيقتين</string>
+    <string name="t_05f4ea7fa6" formatted="false">ستُحفظ البيانات الحالية بشكل منفصل قبل الاستبدال. وستختفي السجلات التي أُنشئت بعد هذه النسخة.</string>
+    <string name="t_060c91cb5a">زيادة بـ%1$s</string>
+    <string name="t_067a6eef15" formatted="false">اختر بطاقة بالمعرّف قبل ربط CSV</string>
+    <string name="t_06d08263c2" formatted="false">لا يمكن حفظ النسخ في هذا المجلد. اختر مجلدًا آخر</string>
+    <string name="t_0865c10035" formatted="false">على الأقل</string>
+    <string name="t_08ccc5ba08">%1$s: %2$s. افتح التطبيق وتحقق من الحالة الحالية.</string>
+    <string name="t_08f120e3b9" formatted="false">تشغيل الخيار المحفوظ؟</string>
+    <string name="t_090fad991e" formatted="false">فتح الإعدادات</string>
+    <string name="t_0931eb69ad" formatted="false">نشاط خاص</string>
+    <string name="t_09804101ad" formatted="false">واسع</string>
+    <string name="t_0a33cc879e">إزالة من المفضلة: %1$s</string>
+    <string name="t_0a7d0c65cc" formatted="false">أُلغي الحفظ</string>
+    <string name="t_0a7e3cd8d9" formatted="false">الكتالوج محدَّث</string>
+    <string name="t_0ad4a07529" formatted="false">حفظ الفترة اليدوية</string>
+    <string name="t_0b5f48821f" formatted="false">تعذّر ذلك</string>
+    <string name="t_0b94cabd4c" formatted="false">حد اليوم أبكر بساعة</string>
+    <string name="t_0bfa7a54cb" formatted="false">خطة حسب الأيام</string>
+    <string name="t_0c15fe2798">التركيز، مرحلة العمل %1$s</string>
+    <string name="t_0d0c228652" formatted="false">لا يسمح المزوّد بقراءة النتيجة للتحقق.</string>
+    <string name="t_0d6b1a17a4" formatted="false">أسود</string>
+    <string name="t_0d8700fb2a" formatted="false">تتداخل السجلات فيما بينها أو مع السجل</string>
+    <string name="t_0e974974fb" formatted="false">مفعّل، لكن الإشعارات متوقفة في إعدادات الهاتف</string>
+    <string name="t_0ec753be8d" formatted="false">إلغاء</string>
+    <string name="t_0f605ae8ff" formatted="false">تأكيد الاستبدال الكامل</string>
+    <string name="t_0f73f5a22c" formatted="false">أكبر</string>
+    <string name="t_0f9a1db081">خطوة %1$s د</string>
+    <string name="t_0faf5fa9ac">متبقٍ من %1$s</string>
+    <string name="t_0fc242f26d" formatted="false">تم الحفظ</string>
+    <string name="t_1013a729a6" formatted="false">سبت</string>
+    <string name="t_104053cfbe" formatted="false">المفضلة والأنشطة المتكررة خلال آخر 30 يومًا.</string>
+    <string name="t_10729118a0" formatted="false">إخفاء</string>
+    <string name="t_117ce12b52">إلحاق CSV: %1$s…%2$s من %3$s</string>
+    <string name="t_11bb1b11c0" formatted="false">على الشاشة الرئيسية</string>
+    <string name="t_11d7afb599" formatted="false">المدة مكتوبة بصيغة</string>
+    <string name="t_1250ceafd1" formatted="false">اختصار على الأيقونة</string>
+    <string name="t_125737d34a" formatted="false">بعد إعادة التثبيت، اختر هنا أي ملف من مجلد النسخ التلقائية. النسخة ليست مزامنة بين الهواتف.</string>
+    <string name="t_1259571a15" formatted="false">فتح</string>
+    <string name="t_126d6b9747">على الشاشة الرئيسية: %1$s</string>
+    <string name="t_129d9b9794" formatted="false">لم يقبل الهاتف الطلب. حاول مجددًا</string>
+    <string name="t_129dc42035" formatted="false">حفظ بطاقة جديدة</string>
+    <string name="t_12b0be1a44" formatted="false">عمود النشاط</string>
+    <string name="t_12f864ad2e">متوقفة بعد خمس إخفاقات متتالية. %1$s</string>
+    <string name="t_12fa39305e" formatted="false">تصدير JSON كامل</string>
+    <string name="t_137cb582b9" formatted="false">متى يُطبَّق</string>
+    <string name="t_13b7c69527" formatted="false">تركيز (not)AI</string>
+    <string name="t_13c587506e" formatted="false">لا توجد سجلات اليوم بعد. ستكتمل النظرة العامة تلقائيًا مع أول سجل.</string>
+    <string name="t_13f1659f76" formatted="false">بدء تتبّع الوقت</string>
+    <string name="t_1425330b29" formatted="false">من اليوم</string>
+    <string name="t_145c3ed6a6" formatted="false">حُذف التقرير</string>
+    <string name="t_147355d342">هذا الملف ليس جدول CSV. %1$s</string>
+    <string name="t_14a658ce61" formatted="false">اختيار مجلد</string>
+    <string name="t_14d31156f2" formatted="false">تغيير التفصيل من الآن</string>
+    <string name="t_14eaa871df" formatted="false">بدء</string>
+    <string name="t_156e23f619" formatted="false">من Toggl أو Clockify أو جدولك الخاص. سأعرض أولًا ما سيُضاف</string>
+    <string name="t_15b056d9f4" formatted="false">إنهاء التركيز</string>
+    <string name="t_15dfa124b4" formatted="false">لا توجد أنشطة متكررة بعد. يمكنك اختيار نشاط في التطبيق من السجل.</string>
+    <string name="t_160b172224" formatted="false">حُفظ النشاط</string>
+    <string name="t_161fe56e51" formatted="false">أربعاء</string>
+    <string name="t_163fdcceaa" formatted="false">في وقت محدد</string>
+    <string name="t_164b8bb2af" formatted="false">تعديل التقرير</string>
+    <string name="t_1751103733" formatted="false">يوم واحد</string>
+    <string name="t_176ddf9870" formatted="false">تعذّر إكمال اختيار المنطقة الزمنية. تحقق من المنطقة الحالية واخترها مجددًا</string>
+    <string name="t_17e44239e9" formatted="false">نقل لأعلى</string>
+    <string name="t_181ee397c9" formatted="false">تبقى السجلات التي بدأت من الخطة في السجل.</string>
+    <string name="t_1827ab0050" formatted="false">عند منتصف الليل كما في التقويم</string>
+    <string name="t_1880e6b0ec" formatted="false">يظهر النشاط والوقت والأزرار دون فتح القفل</string>
+    <string name="t_18c99fb35b" formatted="false">جارٍ تتبع الوقت</string>
+    <string name="t_191cacce9c" formatted="false">أي نشاط</string>
+    <string name="t_19295833d9" formatted="false">هذا الأسبوع</string>
+    <string name="t_19f25d5784" formatted="false">المزيد</string>
+    <string name="t_1a287db9b2" formatted="false">جرافيت</string>
+    <string name="t_1a3994958c" formatted="false">عند منتصف الليل</string>
+    <string name="t_1a54271b7a" formatted="false">لا يوجد سجل مكتمل</string>
+    <string name="t_1a599143aa" formatted="false">عادية</string>
+    <string name="t_1ac5f47619" formatted="false">أُضيف إلى الخطة</string>
+    <string name="t_1b27ed0870" formatted="false">استبدال كل البيانات؟</string>
+    <string name="t_1b702dcc70">تُقرأ الأوقات في الملف حسب المنطقة الزمنية %1$s</string>
+    <string name="t_1bba9e465a" formatted="false">المؤقت خارج التطبيق</string>
+    <string name="t_1bc5f604f5" formatted="false">دقيقة واحدة</string>
+    <string name="t_1bcdac8735">سيُضاف: %1$s؛ مكرر: %2$s.\n%3$s\nأخطاء: %4$s\n%5$s\n%6$s\nهذا يُلحق السجل؛ أما استعادة JSON الكاملة فتستبدل كل التخزين.</string>
+    <string name="t_1bd48e6642">النشاط: %1$s</string>
+    <string name="t_1c38d1407f" formatted="false">بين فترات الإيقاف</string>
+    <string name="t_1c4b04d710" formatted="false">إضافة إلى الشاشة الرئيسية</string>
+    <string name="t_1c76eec066" formatted="false">تمت استعادة البيانات. حُفظت البيانات السابقة في مكان منفصل.</string>
+    <string name="t_1c8ee71b8e">متاح حتى %1$s</string>
+    <string name="t_1cd1162258" formatted="false">تحديث الكتالوج؟</string>
+    <string name="t_1d4961d804" formatted="false">أفلام ومسلسلات</string>
+    <string name="t_1deb177f5a">حسب الخطة: %1$s</string>
+    <string name="t_1df521854e" formatted="false">نص الملاحظة</string>
+    <string name="t_1f1fa1b82e" formatted="false">انقر على نسخة: سأعرض محتواها أولًا ولن أستبدل البيانات إلا بعد التأكيد</string>
+    <string name="t_1fbd871837" formatted="false">المجلد غير متاح الآن: لا توجد شبكة أو تطبيق السحابة لا يستجيب. سأعيد المحاولة تلقائيًا</string>
+    <string name="t_1fcbdeecfd">%1$s: أقل</string>
+    <string name="t_1fce9b2e5d">%1$s: %2$s. تحقق من معنى كل عمود —</string>
+    <string name="t_20490f3632" formatted="false">اختيار حدث من التقويم…</string>
+    <string name="t_20c87f5908" formatted="false">ضبط هدف</string>
+    <string name="t_20feaa7e40" formatted="false">البدء بلا نشاط مع ملاحظة</string>
+    <string name="t_210ed3cd4d" formatted="false">لا يوجد عمود كهذا</string>
+    <string name="t_212edd982b" formatted="false">النتائج</string>
+    <string name="t_2152e4a71f" formatted="false">تظهر الأولى في القائمة في لوحة الإشعارات والأداة والزر العائم. لإعادة الترتيب، اضغط مطولًا واسحب.</string>
+    <string name="t_21a4608d93" formatted="false">تغيّرت البيانات: تحقق مجددًا</string>
+    <string name="t_21afbee12c" formatted="false">لم تظهر. حاول مجددًا أو أضفها يدويًا: اضغط مطولًا على الشاشة الرئيسية ← الأدوات ← (not)AI Time</string>
+    <string name="t_224fe4a4c3">لا توجد سجلات في %1$s</string>
+    <string name="t_22615c35f9">إزالة «%1$s» من الخطة؟</string>
+    <string name="t_22776aacd4" formatted="false">نيون</string>
+    <string name="t_2373dd4f8d" formatted="false">الأسبوع الماضي</string>
+    <string name="t_24f866b4ee" formatted="false">التبديل إلى</string>
+    <string name="t_253cf1644f" formatted="false">إلغاء التصدير المُعد</string>
+    <string name="t_2583e76aee" formatted="false">انتقلت أبكر: حفظ</string>
+    <string name="t_27113f7a1e" formatted="false">خطأ في التخزين. تحقق من الحالة الحالية قبل إعادة المحاولة.</string>
+    <string name="t_27546ccb04" formatted="false">التركيز والتذكيرات</string>
+    <string name="t_279c2c3c90" formatted="false">تغيير</string>
+    <string name="t_27d5f2e22a" formatted="false">تم تحديث الكتالوج</string>
+    <string name="t_28061309a5" formatted="false">التركيز: النشاط</string>
+    <string name="t_2840f49e22" formatted="false">تغيير النشاط أو تحديده</string>
+    <string name="t_285cc40014" formatted="false">س</string>
+    <string name="t_288dc99a2b" formatted="false">الوقت محفوظ بالفعل، بقي اختيار النشاط فقط.</string>
+    <string name="t_2894da98dd" formatted="false">أُزيل الهدف</string>
+    <string name="t_2960da94e0" formatted="false">إخفاء الفجوات</string>
+    <string name="t_2972f8b4c4" formatted="false">لا توجد سجلات.</string>
+    <string name="t_29f3b29df0" formatted="false">استعادة</string>
+    <string name="t_2a5e307788" formatted="false">مضغوط</string>
+    <string name="t_2a690e69d2" formatted="false">تم اختيار الأيقونة، لكن الاختصارات لم تُحدَّث بعد</string>
+    <string name="t_2a70012208" formatted="false">الإجمالي</string>
+    <string name="t_2b39abab32">«%1$s». يُعاد تشغيله ما دام التطبيق مفتوحًا</string>
+    <string name="t_2c0db2ce7c" formatted="false">بدء:</string>
+    <string name="t_2d2be3f11c" formatted="false">مرحلة العمل</string>
+    <string name="t_2d5a644e5c" formatted="false">هذه الفترة غير ممكنة: تحقق من البداية والنهاية.</string>
+    <string name="t_2dd965ee95" formatted="false">لون التمييز</string>
+    <string name="t_2e31dae95f" formatted="false">اختيار ملف</string>
+    <string name="t_2e3c5fdafe" formatted="false">الدراسة</string>
+    <string name="t_2ea9f562ed" formatted="false">في أيام العمل</string>
+    <string name="t_2eb808708c" formatted="false">استخدام المنطقة الزمنية للهاتف</string>
+    <string name="t_2f6a9e8aa1" formatted="false">، بدأ بالفعل</string>
+    <string name="t_2f94692058" formatted="false">ابحث عن منطقة IANA، مثل Asia/Riyadh</string>
+    <string name="t_2fc6caafc1">%1$s على الأقل</string>
+    <string name="t_30796d2694" formatted="false">من هذا الشهر</string>
+    <string name="t_30c994650d" formatted="false">تم تحديث الوقت</string>
+    <string name="t_30e1fab800" formatted="false">تغيّرت المفضلة</string>
+    <string name="t_30e9845126">%1$s مجالات أخرى: المهن والعمل</string>
+    <string name="t_3146141c93" formatted="false">الخطة</string>
+    <string name="t_315bf156c9" formatted="false">التنظيف</string>
+    <string name="t_3179b46b9d" formatted="false">تتداخل هذه الفترة مع سجل آخر.</string>
+    <string name="t_31990f76f4" formatted="false">تعذّر التحقق من نتيجة التبديل</string>
+    <string name="t_32000365e9" formatted="false">فيروزي</string>
+    <string name="t_322896daf3" formatted="false">الفترات التالية</string>
+    <string name="t_322ce697bb" formatted="false">التتبع جارٍ</string>
+    <string name="t_3296879eac">%1$s دقيقة</string>
+    <string name="t_329b31bdca" formatted="false">اختصار على الأيقونة</string>
+    <string name="t_32b74a3c47" formatted="false">بلا عنوان</string>
+    <string name="t_32fd384860">السجلات قبل %1$s تُحسب لليوم السابق. لا تتغير السجلات نفسها</string>
+    <string name="t_3371d6e0e9">%1$s · متبقٍ %%s</string>
+    <string name="t_33a79b3bc1" formatted="false">زر بدء وإيقاف شبه شفاف فوق التطبيقات. بعد الإيقاف يمكنك اختيار النشاط فورًا</string>
+    <string name="t_340342b07a" formatted="false">تعذّرت استعادة اختيار المنطقة الزمنية. اخترها مجددًا</string>
+    <string name="t_359168c1d3" formatted="false">حُفظت الفئة</string>
+    <string name="t_364431ec5a">قبل %1$s</string>
+    <string name="t_388cfb0795" formatted="false">دعوة على «ابدأ»</string>
+    <string name="t_38a279b292" formatted="false">مرحلة التركيز التالية</string>
+    <string name="t_38dfef435f" formatted="false">موضع السجل بين السجلات المجاورة</string>
+    <string name="t_398c7d4f7b" formatted="false">تم</string>
+    <string name="t_3a42cfebfe" formatted="false">الإشعار</string>
+    <string name="t_3ac95324a3" formatted="false">إلى ماذا انتقلت؟</string>
+    <string name="t_3af83d8850" formatted="false">تغيّرت البيانات. راجع الشاشة وحاول مجددًا.</string>
+    <string name="t_3b97545714" formatted="false">تمت إضافة السجل</string>
+    <string name="t_3bb014825e" formatted="false">ملاحظة للمحدد</string>
+    <string name="t_3bfd577967">%1$s أبطأ بـ%2$s</string>
+    <string name="t_3c244ffaa5">التقويم: %1$s؛ السجل دون تغيير</string>
+    <string name="t_3c6332622c" formatted="false">فتح التطبيق</string>
+    <string name="t_3cd7d0dd3c" formatted="false">الوقت حسب الأيام:</string>
+    <string name="t_3d51050347" formatted="false">تحقق</string>
+    <string name="t_3da1c7d83d" formatted="false">إزالة الهدف؟</string>
+    <string name="t_3de49828e8" formatted="false">الاسم</string>
+    <string name="t_3dfcd2dc31" formatted="false">المشي</string>
+    <string name="t_3e32dd6cfd">ملاحظة: «%1$s»</string>
+    <string name="t_3e36db582a" formatted="false">دون فتح القفل يظهر فقط أن التتبع جارٍ</string>
+    <string name="t_3e5ab0f642" formatted="false">الشاشة الرئيسية</string>
+    <string name="t_3f75368ab9" formatted="false">متابعة</string>
+    <string name="t_3fa9f851cc" formatted="false">من هذا الأسبوع</string>
+    <string name="t_41a9abce27" formatted="false">بدء التركيز</string>
+    <string name="t_41f23bd106" formatted="false">ثُبّتت المنطقة الزمنية للتقارير</string>
+    <string name="t_4208a1afd0" formatted="false">لم يُعثر على المنطقة الزمنية</string>
+    <string name="t_421fbcd348" formatted="false">أكّد الإضافة على الشاشة الرئيسية</string>
+    <string name="t_42f85ce119" formatted="false">اليوم</string>
+    <string name="t_4301919e86">انتهى %1$s. افتح للمتابعة</string>
+    <string name="t_4304ef48ab" formatted="false">الزر العائم: لم يُمنح إذن النظام؛ المؤقت متاح في التطبيق</string>
+    <string name="t_434e93a022" formatted="false">اختيار بطاقة بالمعرّف…</string>
+    <string name="t_43c9451f7e" formatted="false">أكمل التصدير الحالي أو ألغِه</string>
+    <string name="t_43f3c7181c">مرّت %1$s بالفعل. هل نسيت المؤقت؟</string>
+    <string name="t_440d3db6ca">أُنشئ النشاط «%1$s»</string>
+    <string name="t_44b6bfd761">تعديل %1$s؟</string>
+    <string name="t_455a50db4a">%1$s د</string>
+    <string name="t_457969b009" formatted="false">مراجعة</string>
+    <string name="t_45e673c416">ستحل الملاحظة «%1$s» محل الملاحظات السابقة.</string>
+    <string name="t_45ec81da8a" formatted="false">محددة</string>
+    <string name="t_46404668d3" formatted="false">سجل طويل</string>
+    <string name="t_46a1378615" formatted="false">الأيام</string>
+    <string name="t_46e27e2f0a" formatted="false">الكتالوج</string>
+    <string name="t_474488d799">الهدف: %1$s</string>
+    <string name="t_476c9846a6" formatted="false">على الأكثر</string>
+    <string name="t_4784c38b90" formatted="false">جارٍ القراءة…</string>
+    <string name="t_47947a0c46" formatted="false">المنطقة الزمنية</string>
+    <string name="t_4864057d62" formatted="false">حفظ</string>
+    <string name="t_488cfa5f88" formatted="false">تُحسب الأيام لكل أسبوع أو شهر.</string>
+    <string name="t_488dd14a85" formatted="false">التراخيص</string>
+    <string name="t_489dd4cb3d" formatted="false">بطاقة من الفهرس…</string>
+    <string name="t_48b72fd474" formatted="false">نسخة تلقائية</string>
+    <string name="t_490aa0241e" formatted="false">النهاية قبل البداية</string>
+    <string name="t_494ef4deb5" formatted="false">زر عائم + مؤشر الخدمة المطلوب</string>
+    <string name="t_49a37138c8">البداية %1$s، والنهاية غير معروفة</string>
+    <string name="t_49b9985de4" formatted="false">أثناء مرحلة العمل</string>
+    <string name="t_49c5f1afe2" formatted="false">سيبدأ المؤقّت فورًا.\nيمكنك اختيار نشاط لاحقًا.</string>
+    <string name="t_49f64bd23b">، مع أخطاء: %1$s</string>
+    <string name="t_4a81786403" formatted="false">مثلًا: toggl:personal</string>
+    <string name="t_4ac8d095fb" formatted="false">لا يوجد تصدير مُعدّ</string>
+    <string name="t_4ae50d3073" formatted="false">إغلاق</string>
+    <string name="t_4bae800626" formatted="false">افتح لتحديد وقت الانتهاء</string>
+    <string name="t_4be730321c" formatted="false">تسجيل</string>
+    <string name="t_4c70fed089" formatted="false">اختيار مفضّلة وبدءها…</string>
+    <string name="t_4d1cb9fd4a">متبقٍ %1$s</string>
+    <string name="t_4d397a20ed">%1$s لن تتغير أوقات السجلات. يمكنك التراجع فورًا بعد ذلك.</string>
+    <string name="t_4d92a280cc" formatted="false">لم يكتمل اختيار المنطقة الزمنية وتغيّرت الإعدادات في الأثناء. تحقق من المنطقة واخترها مجددًا</string>
+    <string name="t_4e1936db2d" formatted="false">تمارين القوة</string>
+    <string name="t_4e895fd70d" formatted="false">النهاية</string>
+    <string name="t_4ea0639432" formatted="false">الترتيب وكل المفضلة</string>
+    <string name="t_4ebd720453" formatted="false">وقت البدء / التبديل: ISO-8601</string>
+    <string name="t_4ebf488399">تعذّرت قراءة النموذج المحفوظ: %1$s</string>
+    <string name="t_4edbcc192a" formatted="false">الزر العائم مفعّل</string>
+    <string name="t_4ef8132cf3">%1$s: أكثر</string>
+    <string name="t_4fc1809d7d" formatted="false">المجلد المختار</string>
+    <string name="t_5075c29ca7" formatted="false">الترتيب وأسماء الأزرار وإزالة المكرر. الترتيب نفسه في لوحة الإشعارات والأداة والزر</string>
+    <string name="t_50a62e5c0f" formatted="false">المدة لا تطابق البداية والنهاية</string>
+    <string name="t_50abb9831d" formatted="false">ليس واضحًا هل ظهر الملف في المجلد. أعد المحاولة أو تخطَّ هذه النسخة</string>
+    <string name="t_50ac9ea6c3">%1$s، الإصدار %2$s. انقر للتحقق من وجود تحديث</string>
+    <string name="t_5123c9c552" formatted="false">ثلاثاء</string>
+    <string name="t_51403c82de" formatted="false">أمس</string>
+    <string name="t_51d6a3da35" formatted="false">ماذا كنت تفعل؟</string>
+    <string name="t_51f805f925">تم اختيار بطاقة جديدة · %1$s</string>
+    <string name="t_5203402af7">ستظهر الملاحظة «%1$s» حيث لم تكن هناك ملاحظة.</string>
+    <string name="t_52da7c24f6" formatted="false">التركيز متوقف مؤقتًا</string>
+    <string name="t_53e131e48c">«%1$s» يبدأ الآن بنقرة واحدة</string>
+    <string name="t_542c2cd5f6" formatted="false">نسخة تلقائية إلى مجلد</string>
+    <string name="t_544a30f1ea" formatted="false">أداة (أضفها عبر مُشغّل التطبيقات)</string>
+    <string name="t_549bc063f3" formatted="false">البدء مع نشاط</string>
+    <string name="t_54fe5cc440" formatted="false">أرقام المؤقت</string>
+    <string name="t_550c7a6d12" formatted="false">لا توجد سجلات بعد. سيظهر هنا كل مقطع.</string>
+    <string name="t_552d1cca6b" formatted="false">لا توجد أحداث بوقت محدد في التقويم لهذا اليوم.</string>
+    <string name="t_559a87f7cc" formatted="false">إضافة</string>
+    <string name="t_55c44eb122">ستُضاف %1$s قبل %2$s.</string>
+    <string name="t_55cd7a55ed" formatted="false">ينقص شيئًا ما إذنٌ من الهاتف</string>
+    <string name="t_55e920546e" formatted="false">تم إيقاف الزر العائم</string>
+    <string name="t_5695330ffb" formatted="false">تلقائي</string>
+    <string name="t_569ffccaa8">متاح من %1$s</string>
+    <string name="t_57792c3ae8" formatted="false">معرّف الصف مكرر أو مفقود</string>
+    <string name="t_5779709c59" formatted="false">المصدر غير متاح</string>
+    <string name="t_57fe19481c" formatted="false">إخفاء الفجوات غير المسجلة</string>
+    <string name="t_580b6b1b3e" formatted="false">اختر المرحلة التالية في التطبيق</string>
+    <string name="t_58533a0c30" formatted="false">ضع نجمة على الأنشطة التي تبدؤها كثيرًا. ستظهر على الشاشة الرئيسية وفي لوحة الإشعارات.</string>
+    <string name="t_5873f87916" formatted="false">منطقة زمنية غير معروفة وفق IANA</string>
+    <string name="t_58847603b8" formatted="false">حُفظت النسخة الجديدة، لكن تعذّر حذف القديمة</string>
+    <string name="t_58a3c5f495">%1$s: مما يتكون</string>
+    <string name="t_58d3c60b00" formatted="false">أُزيل من خطة اليوم</string>
+    <string name="t_58e6634696" formatted="false">هدف جديد</string>
+    <string name="t_5905870dba" formatted="false">حسب الخطة والمتكررة</string>
+    <string name="t_5916628df1" formatted="false">اختر نشاطًا</string>
+    <string name="t_596144b0e6" formatted="false">السجلات</string>
+    <string name="t_59ef713872">الجلسات: %1$s؛ المقاطع: %2$s. ستُحفظ ملفات DB/WAL/SHM الحالية مع بصمات متحقَّق منها قبل الاستبدال. تبقى النسخ القديمة.</string>
+    <string name="t_5a1413e92d">الأخيرة %1$s، تم التحقق من الملف</string>
+    <string name="t_5a1d0660ef" formatted="false">تغيّر التحديد. راجع السجلات وحاول مجددًا.</string>
+    <string name="t_5a7fa46600" formatted="false">بلا تفصيل</string>
+    <string name="t_5b010e144f" formatted="false">تعذّر تحديد الأيقونة المختارة. اختر خيارًا متاحًا</string>
+    <string name="t_5b76112f5b" formatted="false">الأساسي</string>
+    <string name="t_5bb00e40b9" formatted="false">في الأرشيف</string>
+    <string name="t_5c65c982d1" formatted="false">الوقت غير معروف</string>
+    <string name="t_5c675dcb97" formatted="false">البدء بلا نشاط</string>
+    <string name="t_5cd8e48ad3" formatted="false">وقت التبديل</string>
+    <string name="t_5d09029804" formatted="false">عرض الفجوات غير المسجلة</string>
+    <string name="t_5d38673a55" formatted="false">إضافة المزيد</string>
+    <string name="t_5d5d2ea20a" formatted="false">اليوم</string>
+    <string name="t_5d762fa56e" formatted="false">لا يمكن قراءة التاريخ أو الوقت بالصيغة المختارة</string>
+    <string name="t_5da9e0e83b" formatted="false">إلى المفضلة</string>
+    <string name="t_5de1eb4784">جديدة: %1$s؛ تدقيقات: %2$s؛ تعارضات: %3$s. تبقى الأسماء المحلية وحالة الأرشفة والسجل.</string>
+    <string name="t_5e1ad8c5d8" formatted="false">يمكنك إيقافه من إعدادات التطبيق</string>
+    <string name="t_5e94c97f99" formatted="false">احتساب أي نشاط</string>
+    <string name="t_5ec7b0f52b" formatted="false">يدوي</string>
+    <string name="t_5f0968991b" formatted="false">عمود البدء</string>
+    <string name="t_5f239661cc" formatted="false">عرض المقاطع والإيقافات المؤقتة</string>
+    <string name="t_5f9a6b6230" formatted="false">شريط من المقاطع فوق سجلات كل يوم</string>
+    <string name="t_5fb4185cca" formatted="false">مع كل ما بداخله</string>
+    <string name="t_5fc35f86af">مثل %1$s</string>
+    <string name="t_5fdf8988d5" formatted="false">التطبيق · Apache 2.0</string>
+    <string name="t_6090cecf2d">كان %1$s</string>
+    <string name="t_60a8361ac8" formatted="false">متوقفة. لا تُحفظ نسخ جديدة، وتبقى القديمة في المجلد</string>
+    <string name="t_60e27c596a">%1$s س %2$s د</string>
+    <string name="t_61394d0185" formatted="false">متى بدأت؟</string>
+    <string name="t_6155f92695" formatted="false">تحديد عدة سجلات</string>
+    <string name="t_616bb19d6c" formatted="false">سماح</string>
+    <string name="t_617d07376f">%1$s يومًا</string>
+    <string name="t_61af667ee0">أكثر بـ%1$s من %2$s</string>
+    <string name="t_61ce62df94">%1$s: %2$s بالمئة</string>
+    <string name="t_6213880977" formatted="false">حفظ الآن</string>
+    <string name="t_624e55535f" formatted="false">كثافة القوائم</string>
+    <string name="t_6257137741" formatted="false">، الفترة لم تنتهِ بعد</string>
+    <string name="t_629e3bb846" formatted="false">عمود المدة</string>
+    <string name="t_62c204df09" formatted="false">إضافة الملاحظات</string>
+    <string name="t_63833f7ebd" formatted="false">تخطي هذه</string>
+    <string name="t_6400526c15" formatted="false">استيراد السجل من CSV…</string>
+    <string name="t_6492631c6e" formatted="false">أُزيل من الخطة</string>
+    <string name="t_64d9c34819" formatted="false">لا يوجد في الملف عمود</string>
+    <string name="t_64eb81c370">%1$s على الأكثر</string>
+    <string name="t_64ed62742f" formatted="false">المنطقة الزمنية وبداية اليوم والكتالوج وCSV</string>
+    <string name="t_654fad1c18" formatted="false">وقت النهاية إن كان في عمود منفصل</string>
+    <string name="t_657703c887" formatted="false">البحث في الفهرس الكامل</string>
+    <string name="t_66c789d74f" formatted="false">تفاصيل، مثل الاستماع</string>
+    <string name="t_67946fca81">إنشاء النشاط «%1$s»</string>
+    <string name="t_67a887cea0" formatted="false">إزالة الهدف</string>
+    <string name="t_680a3249f0" formatted="false">هل تريد استبدال الملاحظة الحالية القابلة للتحرير بالنص المستلَم؟</string>
+    <string name="t_69d66ab891" formatted="false">إضافة نشاط إلى الخطة</string>
+    <string name="t_69e5b8a8c6" formatted="false">عدد عشري غير سالب؛ استخدم نقطة</string>
+    <string name="t_6a0e6066b0" formatted="false">انتقلت أبكر</string>
+    <string name="t_6b08862cb2" formatted="false">تعذّر التحقق من أيقونة التطبيق</string>
+    <string name="t_6b8910932e" formatted="false">أيقونة شريط الحالة مخفية</string>
+    <string name="t_6cde6c34a0" formatted="false">خطة اليوم</string>
+    <string name="t_6d06e4bbc8" formatted="false">من التقويم</string>
+    <string name="t_6d4aeaf49a" formatted="false">تقريرك الخاص: نشاط وفترة</string>
+    <string name="t_6d714e833d" formatted="false">إيقاف</string>
+    <string name="t_6d7bb5e932">%1$s على الأقل يوميًا</string>
+    <string name="t_6d95221406" formatted="false">إشارة التركيز في الخلفية (إشعار؛ قد يؤخرها نظام التشغيل)</string>
+    <string name="t_6e166fe43b">تكرار: %1$s</string>
+    <string name="t_6e65291421">اختر نشاطًا لـ«%1$s»</string>
+    <string name="t_6e84391a2f" formatted="false">التقويم غير متاح دون إذن</string>
+    <string name="t_6ea005bd2d" formatted="false">سُجّلت الفجوة</string>
+    <string name="t_6eb7540d7c" formatted="false">متوقف</string>
+    <string name="t_6f65bc34a3" formatted="false">تُحفظ المدد للمرات القادمة أيضًا.</string>
+    <string name="t_6fb5a32ea5" formatted="false">كل يوم</string>
+    <string name="t_702e03be1e" formatted="false">كهرماني</string>
+    <string name="t_70b8d5d8d5" formatted="false">النشاط</string>
+    <string name="t_716e5371c7" formatted="false">إلغاء التحديد</string>
+    <string name="t_71790fdb53" formatted="false">عدم الإزعاج</string>
+    <string name="t_72f931bda2" formatted="false">النسخ الاحتياطي</string>
+    <string name="t_731f2bdc1e" formatted="false">أخذ الوقت من التقويم</string>
+    <string name="t_734bcf2003" formatted="false">أيقونة في شريط الحالة</string>
+    <string name="t_735877a9aa" formatted="false">استراحة</string>
+    <string name="t_737fe33491" formatted="false">أُلغي التصدير؛ النسخة المُعدّة جاهزة لإعادة التصدير</string>
+    <string name="t_738652aa6f">تعديل النشاط نفسه «%1$s»</string>
+    <string name="t_73a0a9afdc" formatted="false">المتابعة بلا نشاط</string>
+    <string name="t_741870459d" formatted="false">تلقائي</string>
+    <string name="t_747942b4fa" formatted="false">صيغة الوقت</string>
+    <string name="t_74b69f961b" formatted="false">بدء العمل</string>
+    <string name="t_750b471214" formatted="false">ترتيب المفضلة</string>
+    <string name="t_751e31256e">%1$s. عند تغيّر المنطقة الزمنية للهاتف ستتبعها حدود الأيام في السجل والنظرة العامة. لا تتغير السجلات ولا مناطق الأهداف.</string>
+    <string name="t_75436e3162" formatted="false">العمل</string>
+    <string name="t_75cd08a0e5" formatted="false">التبديل:</string>
+    <string name="t_762d7d64da" formatted="false">أمس</string>
+    <string name="t_76393b3245" formatted="false">نسخ التراجع المحلية…</string>
+    <string name="t_766e7cabf7" formatted="false">أقل</string>
+    <string name="t_768af67762" formatted="false">تطبيق</string>
+    <string name="t_768fee24c8" formatted="false">كتالوج الأنشطة: يتوفر تحديث</string>
+    <string name="t_76dcf737a6" formatted="false">إرسال</string>
+    <string name="t_781ebc1c5f" formatted="false">لا يمكن تشغيل الواجهة العائمة إلا من التطبيق الظاهر</string>
+    <string name="t_782c5a40e3" formatted="false">فاصلة منقوطة</string>
+    <string name="t_784e60ff6a">%1$s ك.ب</string>
+    <string name="t_78fb4788c6">أُضيف %1$s</string>
+    <string name="t_793720ff06">أقل بـ%1$s من %2$s</string>
+    <string name="t_794d0309cf" formatted="false">الوقت محفوظ بالفعل</string>
+    <string name="t_79eb55406f" formatted="false">تعذّر إكمال اختيار المنطقة الزمنية. اختر مجددًا في الإعدادات</string>
+    <string name="t_79fb04fd8b">الواجهة التقنية · Room %1$s\n%2$s\n%3$s ms · المراجعة %4$s\n%5$s%6$s\n%7$s</string>
+    <string name="t_7ae0e67853" formatted="false">استخدام المنطقة الزمنية للهاتف؟</string>
+    <string name="t_7ae1597ae7" formatted="false">افتح التطبيق لتحديد الوقت</string>
+    <string name="t_7b11e988e1" formatted="false">إزالة لليوم</string>
+    <string name="t_7b47d9e19e" formatted="false">يستخدم البدء الوقت الحالي. ويتطلب السجل اليدوي حدودًا زمنية صريحة؛ ولا يحدد حدث اليوم الكامل فترة عمل.</string>
+    <string name="t_7c379e8e5c" formatted="false">حُفظ التقرير</string>
+    <string name="t_7cc6025206">تم: %1$s للبدء السريع</string>
+    <string name="t_7d3ea0e679" formatted="false">الأيام في السجل</string>
+    <string name="t_7d4b8f8a7e">الاختيار: %1$s</string>
+    <string name="t_7d87e4d658" formatted="false">أثناء العمل يفعّل التطبيق قاعدة «عدم الإزعاج» الخاصة به مع الإشعارات ذات الأولوية. يحدد الهاتف الاستثناءات. بعد العمل يزيل التطبيق قاعدته</string>
+    <string name="t_7da3c34069">قاعدة البيانات المحلية غير متاحة: %1$s\nالملفات الأصلية محفوظة. اختر نسخة من الاستعادة.</string>
+    <string name="t_7ddb544bcd">توجد مقاطع بوقت غير معروف: %1$s. لا تدخل في الإجمالي حتى تحددها.</string>
+    <string name="t_7dfbff730f" formatted="false">خميس</string>
+    <string name="t_7eb07227f1" formatted="false">عمود معرّف الصف</string>
+    <string name="t_7ec7c94cc1" formatted="false">عمود الملاحظة</string>
+    <string name="t_7f12cd4599" formatted="false">مفعّل، لكن الهاتف لم يسمح للتطبيق بعد باستخدام «عدم الإزعاج»</string>
+    <string name="t_7f17c7c62a" formatted="false">الإعدادات</string>
+    <string name="t_7f76296ba9" formatted="false">لا يوجد مقطع مسجَّل مغلق</string>
+    <string name="t_7f7a71c089">تحتوي النسخة على %1$s و%2$s و</string>
+    <string name="t_7fa01b6e34" formatted="false">مفعّل في النسخة المستعادة. يلزم التأكيد على هذا الهاتف</string>
+    <string name="t_80072ed701" formatted="false">بلا نشاط خاص</string>
+    <string name="t_806764743a" formatted="false">أنشطة مختلفة</string>
+    <string name="t_8080010c5e" formatted="false">فاتح</string>
+    <string name="t_80e474035b" formatted="false">المنطقة الزمنية مذكورة في الوقت نفسه</string>
+    <string name="t_81129d8255" formatted="false">تغيّر الهدف</string>
+    <string name="t_8125e2fba0" formatted="false">كل الصفوف ← البطاقة المحددة؛ وإلا فاستخدم أسماء المصدر بلا نوع</string>
+    <string name="t_817dfa0bfc">(العمود «%1$s»)</string>
+    <string name="t_819f3ba9d1" formatted="false">من نهاية السجل السابق</string>
+    <string name="t_81b26ab0d7" formatted="false">خلفية نافذة الاختيار بعد الإيقاف</string>
+    <string name="t_81d3d38d5c" formatted="false">السؤال بعد</string>
+    <string name="t_820b711796" formatted="false">1.5 س</string>
+    <string name="t_8213ed5bbc" formatted="false">إعدادات الأذونات غير متاحة على هذا الجهاز</string>
+    <string name="t_8241e9552e" formatted="false">نشاطك الخاص في هذا القسم: ابدأ بكتابة اسمه في البحث</string>
+    <string name="t_832c48f416" formatted="false">مكونات خارجية</string>
+    <string name="t_838a5669f7" formatted="false">مشاركة الملخص</string>
+    <string name="t_83a2768955" formatted="false">استبدال في الكل</string>
+    <string name="t_83ae5f756d" formatted="false">الملف كبير جدًا</string>
+    <string name="t_84707b7a44" formatted="false">اسم واحد للتصديرات المتكررة من الحساب نفسه، وأسماء مختلفة للمصادر المختلفة.</string>
+    <string name="t_84f85ce506" formatted="false">لم يُعثر على شيء</string>
+    <string name="t_851c0ae977" formatted="false">كما هي</string>
+    <string name="t_851c871818">الإصدار %1$s. أنشطة جديدة: %2$s، وتدقيقات: %3$s</string>
+    <string name="t_852778be6d" formatted="false">جارٍ الحساب…</string>
+    <string name="t_8532eff044" formatted="false">تمارين القلب</string>
+    <string name="t_853744f144" formatted="false">تُكمل الفترة الحالية حسابها وفق الهدف السابق.</string>
+    <string name="t_8543530f12">الأخير %1$s</string>
+    <string name="t_85d33d64d6" formatted="false">الصف يحتوي عددًا مختلفًا من الأعمدة</string>
+    <string name="t_85e8a3404b" formatted="false">لم يُحفظ أي ملف من هذا الهاتف بعد</string>
+    <string name="t_86042e468b" formatted="false">القياسات والتقويم واستعادة قاعدة البيانات</string>
+    <string name="t_861bd8760b" formatted="false">خط Onest · SIL Open Font License</string>
+    <string name="t_8633c34c71">· في الملف: %1$s</string>
+    <string name="t_86652580fd" formatted="false">الشهر الماضي</string>
+    <string name="t_8690f98524" formatted="false">، اليوم لم ينتهِ بعد</string>
+    <string name="t_86d85a0147">المنطقة الزمنية للتقارير: %1$s</string>
+    <string name="t_86ea33aef5" formatted="false">حذف</string>
+    <string name="t_86ee6df7f5" formatted="false">ثوانٍ</string>
+    <string name="t_86fde46076" formatted="false">تكرار آخر سجل (الإعدادات المحفوظة، بما فيها إعدادات العناصر المؤرشفة)</string>
+    <string name="t_877c853fa7" formatted="false">مسموح</string>
+    <string name="t_87a5f792b0">كُتب %1$s بايت. %2$s</string>
+    <string name="t_886ebf7a3e">تمت الاستعادة. نسخة التراجع: %1$s</string>
+    <string name="t_88c6fe08c7" formatted="false">الزر العائم</string>
+    <string name="t_88f1a5a112" formatted="false">المظهر</string>
+    <string name="t_88f778367b" formatted="false">الكتابة</string>
+    <string name="t_892f07c05f" formatted="false">لا توجد سجلات لهذه الأيام. ستكتمل النظرة العامة تلقائيًا عند ظهورها.</string>
+    <string name="t_8940504c4b">الإصدار %1$s: أسماء واضحة وأقسام في أماكنها. تبقى أسماؤك وسجلك. انقر للعرض</string>
+    <string name="t_894c240b90" formatted="false">طي المقاطع</string>
+    <string name="t_8972ce6fc3">لم يُحفظ: %1$s؛ صحّح النموذج أو ألغِ</string>
+    <string name="t_89aa29a273" formatted="false">الإشعار</string>
+    <string name="t_8a22f78e9c" formatted="false">تصحيح السجل</string>
+    <string name="t_8abcbc93e4" formatted="false">قد تكون الملاحظات شخصية، لذا لا تُضمَّن افتراضيًا</string>
+    <string name="t_8af28e7685" formatted="false">حدد الوقت غير المعروف أولًا.</string>
+    <string name="t_8b4d031cf9" formatted="false">هذا الوقت يشغله سجل آخر. اختر بداية لاحقة.</string>
+    <string name="t_8b78a6e1d6" formatted="false">أُزيل من المفضلة مع المكرر</string>
+    <string name="t_8ba7dc1120" formatted="false">فُقد الوصول إلى المجلد. اختره مجددًا</string>
+    <string name="t_8be1fdf75b" formatted="false">بحروف مذيّلة</string>
+    <string name="t_8cc9628cfb" formatted="false">النسخ التلقائي مفعّل، وستظهر أول نسخة قريبًا</string>
+    <string name="t_8ce3643f16" formatted="false">تتنفس الأقواس ببطء ما دام التتبع متوقفًا</string>
+    <string name="t_8e273a8a05" formatted="false">الأنشطة والمراجعة</string>
+    <string name="t_8e6839a84e" formatted="false">تُخزَّن السجلات على هذا الهاتف، والنسخ حيث تحفظها أنت</string>
+    <string name="t_8f12fe23f2" formatted="false">فقط حيث لا توجد</string>
+    <string name="t_8f44a068d2" formatted="false">لا توجد منطقة زمنية في الوقت: اختر صيغة بلا منطقة</string>
+    <string name="t_8ff0d08fec" formatted="false">سجل جديد من النص</string>
+    <string name="t_90078dfa30" formatted="false">اثنين</string>
+    <string name="t_909a83238c" formatted="false">إضافة سجل</string>
+    <string name="t_909baadb08" formatted="false">بدأت أبكر</string>
+    <string name="t_914b6dca6d" formatted="false">منطقتي الزمنية</string>
+    <string name="t_917b58362c" formatted="false">ملاحظة</string>
+    <string name="t_91b707a9d1" formatted="false">لا توجد نسخ محلية بعد</string>
+    <string name="t_91d993d35c" formatted="false">ما اسمه في المتتبع</string>
+    <string name="t_9207563dab" formatted="false">أسبوع</string>
+    <string name="t_92a5d7dc45" formatted="false">الأداة</string>
+    <string name="t_92c584ce74" formatted="false">مصدر CSV غير متاح</string>
+    <string name="t_930489be30" formatted="false">لا يمكن قراءة المدة بالصيغة المختارة</string>
+    <string name="t_937cbcbd50">لم يُحفظ النموذج: %1$s: %2$s</string>
+    <string name="t_9395be84e8" formatted="false">التركيز</string>
+    <string name="t_93a176ef21" formatted="false">لم يسمح الهاتف بتفعيله. حاول مجددًا</string>
+    <string name="t_93b302d32f" formatted="false">ليس بعد الآن</string>
+    <string name="t_93be31b630" formatted="false">التتبع متوقف</string>
+    <string name="t_93eb0c0182" formatted="false">%.1f م.ب</string>
+    <string name="t_93f389d809" formatted="false">من دون بطاقة</string>
+    <string name="t_94405e99a7" formatted="false">استعادة JSON كامل…</string>
+    <string name="t_946ee08764" formatted="false">الأقسام</string>
+    <string name="t_948200fea3" formatted="false">ضوضاء أو مطر أو موسيقى من ملفك. تعمل ما دام التطبيق مفتوحًا</string>
+    <string name="t_94b8df93b6" formatted="false">الملف</string>
+    <string name="t_9582d40584" formatted="false">جارٍ حفظ النسخة التلقائية</string>
+    <string name="t_95a6a49b6e" formatted="false">اتباع المنطقة الزمنية للهاتف</string>
+    <string name="t_95bd330f2a">البدء حسب الخطة: %1$s</string>
+    <string name="t_9627af1c25" formatted="false">إيقاف مؤقت</string>
+    <string name="t_963e150816">الإشعار: %1$s\n%2$s</string>
+    <string name="t_964e56ab98">حذف التقرير «%1$s»؟</string>
+    <string name="t_964fb00c4e" formatted="false">مطلوب، لكن محظور من النظام/القناة</string>
+    <string name="t_9694192342" formatted="false">اكتملت فترة التركيز</string>
+    <string name="t_96a0b3fc1d" formatted="false">بلا وقت: في هذا اليوم فقط</string>
+    <string name="t_96a64755de">تغيير منطقة التقارير إلى %1$s؟</string>
+    <string name="t_96c6ac97db" formatted="false">الزر العائم: مؤشر النظام</string>
+    <string name="t_9711f6b5b7" formatted="false">الانتهاء: ISO-8601</string>
+    <string name="t_9760f4a429" formatted="false">في المفضلة</string>
+    <string name="t_97a9f0590a">التركيز %1$s + %2$s د</string>
+    <string name="t_97bcfbe748">تم · %1$s</string>
+    <string name="t_989911f31c" formatted="false">الراحة</string>
+    <string name="t_98b2073ed1" formatted="false">مسح</string>
+    <string name="t_98dc4a887a" formatted="false">من دون مجال</string>
+    <string name="t_98e4a9f4dd" formatted="false">المؤقت متوقف</string>
+    <string name="t_991e307efa">السمة: %1$s</string>
+    <string name="t_9924fc6aa9" formatted="false">تقرير خاص</string>
+    <string name="t_9978ac34b2" formatted="false">إجراءات</string>
+    <string name="t_99cbe96929" formatted="false">، وتُخطي المكرر</string>
+    <string name="t_99d406eeba" formatted="false">القسم</string>
+    <string name="t_99dbea8209" formatted="false">أحد</string>
+    <string name="t_9a4e6f0e95">المحدد: %1$s</string>
+    <string name="t_9a65ca6053">تعديل: %1$s</string>
+    <string name="t_9ac9a4c129">لم تُؤكد نتيجة التصدير: %1$s</string>
+    <string name="t_9b1c9a0216" formatted="false">تعديل</string>
+    <string name="t_9b4ee5c556" formatted="false">ماذا يُحتسب</string>
+    <string name="t_9bc1f05bd8" formatted="false">معرّف الجلسة أو المقطع كاملًا</string>
+    <string name="t_9bcc818ccb" formatted="false">إشعار التحكّم</string>
+    <string name="t_9c7449bfd1" formatted="false">إزالة</string>
+    <string name="t_9cae6690eb" formatted="false">التراجع عن التغيير المتاح</string>
+    <string name="t_9d5b844654" formatted="false">إجراءات السجل</string>
+    <string name="t_9d809f884b" formatted="false">تعديل</string>
+    <string name="t_9d9f294850" formatted="false">البدء والإيقاف من لوحة الإشعارات واختيار سريع للنشاط</string>
+    <string name="t_9dd3e6ec21" formatted="false">حد اليوم أبطأ بساعة</string>
+    <string name="t_9de49a7593" formatted="false">لم يُعثر على أي سجل في الملف</string>
+    <string name="t_9e4e767ad0">%1$s على الأقل شهريًا</string>
+    <string name="t_9e506acb19" formatted="false">إعادة المحاولة</string>
+    <string name="t_9e512e4de6" formatted="false">الإبقاء كما في الملف</string>
+    <string name="t_9e8bfc9912" formatted="false">اسم البطاقة الجديدة</string>
+    <string name="t_9e97224af0" formatted="false">الإبقاء على الحالية</string>
+    <string name="t_9eb9a9691b" formatted="false">عمود منفصل لوقت الانتهاء</string>
+    <string name="t_9ebe3ac111" formatted="false">إعداد التركيز</string>
+    <string name="t_9f431f2a5f" formatted="false">الإشارات</string>
+    <string name="t_9f4988d59a">الآن: %1$s</string>
+    <string name="t_9f4e577f1f" formatted="false">مثلًا: الإنجليزية يومي الاثنين والأربعاء. في هذه الأيام سينتظرك على الشاشة الرئيسية</string>
+    <string name="t_9f8007cba2" formatted="false">وقت الانتهاء غير معروف</string>
+    <string name="t_a0113f46a3" formatted="false">هذا الشهر</string>
+    <string name="t_a083e020a0" formatted="false">لم يسمح الهاتف بجدولة النسخة. انقر «حفظ الآن»</string>
+    <string name="t_a1103b6e0c" formatted="false">ابدأ الآن</string>
+    <string name="t_a12db4c166">المختار: %1$s · المعرّف %2$s</string>
+    <string name="t_a1725f1b08" formatted="false">سيُعلَّم هذا الوقت على أنه أدخلته أنت لا أنه مُقاس.</string>
+    <string name="t_a18bb83bf1">حُفظ %1$s %2$s لكامل %3$s</string>
+    <string name="t_a23f334099" formatted="false">، ويسأل عن السجل الطويل</string>
+    <string name="t_a2503487b7">إنشاء «%1$s» في «%2$s»</string>
+    <string name="t_a2c84dc5a6" formatted="false">عادي</string>
+    <string name="t_a34678cc0a" formatted="false">مثلًا: مشروع «ألفا»</string>
+    <string name="t_a3ffcb3ac5" formatted="false">التقويم لا يستجيب الآن.</string>
+    <string name="t_a4ac32f350" formatted="false">مساحة أسماء ثابتة للمصدر</string>
+    <string name="t_a5363d1b5f" formatted="false">ملف النسخة</string>
+    <string name="t_a5515a2b98" formatted="false">كيف كُتب الوقت</string>
+    <string name="t_a582d409b1" formatted="false">واسع</string>
+    <string name="t_a5b1429034">%1$s على الأكثر أسبوعيًا</string>
+    <string name="t_a683d51495" formatted="false">السجل ما زال جاريًا</string>
+    <string name="t_a6a3fb1ef7" formatted="false">تغيّر السجل بالفعل. صحّحه في التطبيق</string>
+    <string name="t_a773a5edc6">و%1$s أخرى</string>
+    <string name="t_a7e3c8ee69" formatted="false">لا توجد سجلات هنا لهذه الفترة.</string>
+    <string name="t_a8f8d66a1b" formatted="false">حُفظ الملف وتم التحقق منه</string>
+    <string name="t_a901fbebb1">لم تُحذف أي ملفات. يمكنك استعادة قاعدة البيانات أو اختيار نسخة من الواجهة التقنية. التفاصيل: %1$s</string>
+    <string name="t_a94e60234f">إضافة %1$s</string>
+    <string name="t_a9a3e50e7d" formatted="false">نُقلت بداية السجل</string>
+    <string name="t_aa447181f4">لم يبدأ تحضير التصدير: %1$s</string>
+    <string name="t_aa9fc365f5" formatted="false">إعادة التصدير المُعدّ…</string>
+    <string name="t_aab4eaebc4">سيصبح النشاط «%1$s».</string>
+    <string name="t_ab0662026d" formatted="false">السجل من CSV</string>
+    <string name="t_ab0b3ff312">إذا استمر السجل أكثر من %1$s س، يسأل بهدوء في لوحة الإشعارات هل نُسي المؤقت</string>
+    <string name="t_abfb46281b">(not)AI Time Tracker %1$s. كل السجلات مخزَّنة على هذا الهاتف</string>
+    <string name="t_ac72e3a247">%1$s\nالجلسات: %2$s؛ المقاطع: %3$s؛ الأهداف: %4$s. الذيل النشط: %5$s؛ التركيز: %6$s</string>
+    <string name="t_ace6b66d31" formatted="false">السجل في المستقبل</string>
+    <string name="t_ad2b7927cc" formatted="false">بدء جديد</string>
+    <string name="t_ad7d8c2a5f">%1$s على الأكثر شهريًا</string>
+    <string name="t_adcdc4ad41" formatted="false">الوقت خارج النطاق المسموح</string>
+    <string name="t_ae6b38edaf" formatted="false">يوم آخر</string>
+    <string name="t_aee593f748">%1$s في الخطة</string>
+    <string name="t_af39297b7b" formatted="false">، يوجد وقت غير معروف</string>
+    <string name="t_afa3b81f25">%1$s على الأكثر يوميًا</string>
+    <string name="t_afb9a7edd6" formatted="false">الفاصل</string>
+    <string name="t_afbca25eab" formatted="false">، تم التحقق من الملف</string>
+    <string name="t_afd78e8296" formatted="false">البدء حسب الخطة</string>
+    <string name="t_aff922a637" formatted="false">بلا نشاط</string>
+    <string name="t_aff9f84f58" formatted="false">يحتاج تغيير المنطقة الزمنية إلى تحقق. سيتحقق التطبيق منه عند فتحه</string>
+    <string name="t_affff57571" formatted="false">اختر فاصلًا</string>
+    <string name="t_b08e96f6ad" formatted="false">إشارة التركيز</string>
+    <string name="t_b1a72b8b91" formatted="false">التركيز: يلزم تحديد الوقت</string>
+    <string name="t_b1dd9c744d" formatted="false">تغيّرت الخطة أو المؤقت. ألقِ نظرة أخرى</string>
+    <string name="t_b1e23e1ff0" formatted="false">حجم النص</string>
+    <string name="t_b20271fb06" formatted="false">ينتهي السجل الحالي الآن ويبدأ الجديد من هذه الدقيقة.</string>
+    <string name="t_b2822e2bb3" formatted="false">الفترة</string>
+    <string name="t_b2dde7fe6e">الأخيرة %1$s. النسخ التلقائي متوقف</string>
+    <string name="t_b32615689f" formatted="false">إزالة الملاحظة</string>
+    <string name="t_b34e097643" formatted="false">ملف آخر</string>
+    <string name="t_b363aeb862" formatted="false">السجل كاملًا للجداول. هذه ليست نسخة احتياطية</string>
+    <string name="t_b371499aaa" formatted="false">أكثر</string>
+    <string name="t_b402c34a3b" formatted="false">تصدير إلى CSV</string>
+    <string name="t_b40a4254c7" formatted="false">الاسم على الزر</string>
+    <string name="t_b433c5110e" formatted="false">ستظهر أول نسخة خلال دقيقتين</string>
+    <string name="t_b4479f84f1">%1$s، أرقام %2$s،</string>
+    <string name="t_b45bbb4570" formatted="false">السمة الفاتحة</string>
+    <string name="t_b467c6658f" formatted="false">حُفظ الملف، لكن يتعذّر التحقق منه بقراءته مرة أخرى</string>
+    <string name="t_b4770c7e71">يبدأ اليوم في %1$s:%2$s</string>
+    <string name="t_b4efdc2013" formatted="false">معرّف وحدة المصدر</string>
+    <string name="t_b5ef1ca9d4" formatted="false">أيقونة التطبيق</string>
+    <string name="t_b62da03c51" formatted="false">التركيز: استراحة</string>
+    <string name="t_b6305bf26a" formatted="false">يجب أن تكون المدة أكبر من صفر</string>
+    <string name="t_b67fbff66e" formatted="false">المنطقة الزمنية للتقارير، مثل Europe/Moscow</string>
+    <string name="t_b6cee6b950" formatted="false">غير متاح في هذا الإصدار</string>
+    <string name="t_b6ef08401f" formatted="false">يوم</string>
+    <string name="t_b715493906" formatted="false">زر التركيز</string>
+    <string name="t_b71833f660" formatted="false">المؤقت متوقف مؤقتًا</string>
+    <string name="t_b727ee7aba" formatted="false">تعذّر أخذ هذا الملف. جرّب ملفًا آخر حتى 64 م.ب</string>
+    <string name="t_b740f2a2e2" formatted="false">اضغط مطولًا على الأيقونة: بدء وإيقاف واختيار النشاط وأول مفضلتين</string>
+    <string name="t_b747495fc3">%1$s · %2$s\n%3$s. تستخدم المفضلة المعلمات المحفوظة، بما فيها المؤرشفة.</string>
+    <string name="t_b74904694d" formatted="false">فعّلها في إعدادات التطبيق</string>
+    <string name="t_b788b8485e" formatted="false">تم استبعاد المقطع مجهول الوقت</string>
+    <string name="t_b79a6fe480" formatted="false">انقطعت النسخة. سأتابع تلقائيًا</string>
+    <string name="t_b84572428f" formatted="false">كبير</string>
+    <string name="t_b84fd84e60" formatted="false">من الغد</string>
+    <string name="t_b8540eb5bb" formatted="false">يتطلب Android 10 أو أحدث</string>
+    <string name="t_b880e6a105" formatted="false">المفضلة</string>
+    <string name="t_b8b15fe0c2" formatted="false">إجراءات الخطة</string>
+    <string name="t_b905452397" formatted="false">ستتغير حدود الأيام وعرض التقارير للسجل الحالي. تبقى الفترات الفعلية ومناطق الأهداف المحفوظة منفصلة. سيُثبَّت النطاق المختار ويتوقف الاختيار التلقائي.</string>
+    <string name="t_b932f7eea5">تعذّر ذلك: %1$s</string>
+    <string name="t_b97a3fd699" formatted="false">التركيز: مرحلة العمل</string>
+    <string name="t_b9c9ff652d" formatted="false">حول التطبيق</string>
+    <string name="t_ba2ec9712b" formatted="false">ماذا تفعل؟</string>
+    <string name="t_ba7631ff32" formatted="false">حسب أيام الأسبوع</string>
+    <string name="t_ba9db63b9d">الكتالوج %1$s</string>
+    <string name="t_babd8e081b" formatted="false">ستتغير حدود الأيام في السجل والنظرة العامة. لا تتغير السجلات ولا مناطق الأهداف.</string>
+    <string name="t_bbb0e8e8cd" formatted="false">مللي ثانية</string>
+    <string name="t_bbcf06b3c9" formatted="false">الملاحظات</string>
+    <string name="t_bbee9680a8" formatted="false">الوقت غير المعروف خارج الإجمالي:</string>
+    <string name="t_bc28baf5fc" formatted="false">لا توجد سجلات أمس</string>
+    <string name="t_bc5431b599" formatted="false">المجلد</string>
+    <string name="t_bd16b23470" formatted="false">داكن</string>
+    <string name="t_bd4538e3c6" formatted="false">معتم</string>
+    <string name="t_bd81e0c895" formatted="false">لم تطابق النسخة المكتوبة البيانات. سأعيد المحاولة تلقائيًا</string>
+    <string name="t_bdcb031d09" formatted="false">انتهت الاستراحة</string>
+    <string name="t_bdcd78489d">سيأخذ السجل الجاري هذا الاسم. تبقى البداية %1$s.</string>
+    <string name="t_be0773c924" formatted="false">الخط والأرقام والشاشة الرئيسية</string>
+    <string name="t_be8f714a0e" formatted="false">تحفظ تلقائيًا نسخة كاملة في المجلد المختار: على الهاتف أو في السحابة إن وفّر تطبيق السحابة مجلدًا. تبقى هذه النسخة بعد حذف التطبيق</string>
+    <string name="t_bea0873d5e" formatted="false">أزرار سريعة</string>
+    <string name="t_bedfedb4d0" formatted="false">متوقف</string>
+    <string name="t_befab85c9e" formatted="false">مفعّل، لكن لا يوجد إذن للإشعارات</string>
+    <string name="t_bf38c3fd75">الحدث غير متاح: %1$s</string>
+    <string name="t_bf4c4f53cb" formatted="false">سيُحتسب وقت النشاط ضمن إجمالي القسم في النظرة العامة والأهداف. وتحتفظ السجلات الحالية بمكانها السابق.</string>
+    <string name="t_c0634e4cb3" formatted="false">كل الأنشطة</string>
+    <string name="t_c0683f8006" formatted="false">بلا قسم</string>
+    <string name="t_c0b04d97ff" formatted="false">مسافة جدولة</string>
+    <string name="t_c0ed5f4dda" formatted="false">علامات الاقتباس في الصف غير مغلقة</string>
+    <string name="t_c12ee51dd9" formatted="false">كل الوقت</string>
+    <string name="t_c14f88246c">متبقٍ %1$s</string>
+    <string name="t_c161a7bb23" formatted="false">سيصل السجل غير المغلق على أنه «وقت غير معروف» وسيلزم تحديده.</string>
+    <string name="t_c23d5826a3">%1$s فيها سجلات</string>
+    <string name="t_c25bd1a7c6" formatted="false">تخطّي الاستراحة</string>
+    <string name="t_c2bf13bbb1" formatted="false">تقارير خاصة</string>
+    <string name="t_c2f668e54f" formatted="false">تحديث</string>
+    <string name="t_c2fcd7ada4" formatted="false">في عطلة نهاية الأسبوع</string>
+    <string name="t_c33b203048" formatted="false">تُعاد حسابات الفترة الحالية وفق الهدف الجديد، وتبقى الفترات السابقة كما هي.</string>
+    <string name="t_c344c6222f" formatted="false">تم التحقق من النسخة بقراءتها.</string>
+    <string name="t_c372165452">التقويم: %1$s</string>
+    <string name="t_c3c366f704">%1$s في %2$s</string>
+    <string name="t_c4dca81d48" formatted="false">إضافة إلى الخطة</string>
+    <string name="t_c54788a5e8" formatted="false">القراءة</string>
+    <string name="t_c54a9c6fb4" formatted="false">تغيّرت الخطة</string>
+    <string name="t_c595cae565" formatted="false">استبدال المسودة؟</string>
+    <string name="t_c619870299" formatted="false">النص المحدد</string>
+    <string name="t_c650387bcb" formatted="false">انتهت مرحلة العمل</string>
+    <string name="t_c67ba2d89b">حتى %1$s يبقى النشاط الحالي، ومن %2$s يبدأ النشاط المختار.</string>
+    <string name="t_c67ed0b774" formatted="false">المنطقة الزمنية للمصدر؛ أكّدها صراحةً</string>
+    <string name="t_c6e0ce16b9" formatted="false">التنبيه عند انتهاء المرحلة. قد يؤخر الهاتف الإشارة قليلًا</string>
+    <string name="t_c736a598e7" formatted="false">لا تُحذف النسخ القديمة إلا بعد التحقق من الجديدة.</string>
+    <string name="t_c7d650974b" formatted="false">من الشهر القادم</string>
+    <string name="t_c80d7e8172" formatted="false">الوقت</string>
+    <string name="t_c82a0d4427" formatted="false">إزالة من الخطة</string>
+    <string name="t_c8317c85b2" formatted="false">عمود منفصل لوقت البدء</string>
+    <string name="t_c83889af89" formatted="false">افتح التطبيق لاختيار نشاط</string>
+    <string name="t_c85eb5f581" formatted="false">90 يومًا</string>
+    <string name="t_c927b86cfb" formatted="false">الكتالوج والجداول</string>
+    <string name="t_ca7830c42f" formatted="false">لا توجد سجلات للحذف</string>
+    <string name="t_cabb0c6d9b">الصف %1$s:</string>
+    <string name="t_cb26bdc6c6" formatted="false">البداية</string>
+    <string name="t_cbc6fa3d6a" formatted="false">الأداة</string>
+    <string name="t_cbeb716470" formatted="false">العودة إلى الإعدادات</string>
+    <string name="t_cc5d5d0fd4">الإجماليات في %1$s (%2$s): %3$s ms؛ غير محسومة: %4$s\nالبطاقات: %5$s\nالجلسات: %6$s؛ المقاطع: %7$s\n%8$s</string>
+    <string name="t_cc6d018f5b" formatted="false">تقرير CSV لليوم (ليس نسخة احتياطية كاملة)</string>
+    <string name="t_cca1d52e45" formatted="false">إكمال الاستعادة غير المكتملة</string>
+    <string name="t_ccb2375542" formatted="false">الأداة متوقفة</string>
+    <string name="t_cd30825052" formatted="false">ضُبط الهدف</string>
+    <string name="t_cd93b2e0f1" formatted="false">مفعّل، لكن الهاتف لم يمنح الإذن</string>
+    <string name="t_ce12182bac" formatted="false">معرّف القياس</string>
+    <string name="t_ce3ec6ed08" formatted="false">ضمن الحد</string>
+    <string name="t_ce5fc2ce7f" formatted="false">حُفظ الترتيب</string>
+    <string name="t_cefdb75984" formatted="false">عمود الانتهاء (أو المدة)</string>
+    <string name="t_cf113217ae">%1$s: %2$s دقيقة</string>
+    <string name="t_cf3a8f3ca2" formatted="false">بدء التتبع</string>
+    <string name="t_cf52c8daf1" formatted="false">تتبع المنطقة الزمنية للتقارير الجهاز. قد تنتقل السجلات إلى يوم آخر</string>
+    <string name="t_cf7b338323" formatted="false">رفيعة</string>
+    <string name="t_cfafc18b42" formatted="false">تظهر الخطة على الشاشة الرئيسية فقط. يبدأ الوقت عند النقر على النشاط.</string>
+    <string name="t_d002f83ddc" formatted="false">بعد التغييرات تُحفظ نسخة خلال دقيقتين عندما يسمح الهاتف بالعمل في الخلفية. ومرة يوميًا حتى دون تغييرات.</string>
+    <string name="t_d015e9be93" formatted="false">نشاط هذا التقرير محذوف أو مؤرشف. يحتسب التقرير سجلاته السابقة فقط.</string>
+    <string name="t_d0d7180292" formatted="false">أُضيف إلى المفضّلة</string>
+    <string name="t_d0dd940c4c" formatted="false">لا توجد بيانات</string>
+    <string name="t_d0fde8b6ec">النسخة التلقائية %1$s</string>
+    <string name="t_d0ff90f238" formatted="false">على شاشة القفل</string>
+    <string name="t_d111e0cd52" formatted="false">حد يوم التقرير</string>
+    <string name="t_d129caabe1" formatted="false">هل تريد تعبئة المسودة القابلة للتحرير؟</string>
+    <string name="t_d149e0338b" formatted="false">الفئة أو العميل</string>
+    <string name="t_d176283db1">%1$s ث</string>
+    <string name="t_d184a16515" formatted="false">إزالة من التحديد</string>
+    <string name="t_d1f9b48826" formatted="false">نفدت المساحة أو الذاكرة في الهاتف. سأعيد المحاولة تلقائيًا</string>
+    <string name="t_d223a16aed" formatted="false">عمود الفئة</string>
+    <string name="t_d25786deda" formatted="false">الإنجليزية · منذ 14:05</string>
+    <string name="t_d261564113" formatted="false">تعبئة</string>
+    <string name="t_d2aa318afd">مسجَّل %1$s</string>
+    <string name="t_d2e9881a72">ستُضاف %1$s</string>
+    <string name="t_d349cb398d">انقضى %1$s</string>
+    <string name="t_d37c15b206" formatted="false">تبقى الأسماء التي غيّرتها كما هي، ولا تتغير السجلات السابقة.</string>
+    <string name="t_d398842570" formatted="false">تأكيد المقطع مجهول الوقت بالفترة المحددة</string>
+    <string name="t_d3c8e2e155" formatted="false">تغيّرت المنطقة الزمنية. لم يُحفظ التأكيد، وسيكرره التطبيق عند فتحه</string>
+    <string name="t_d40fecd7ad" formatted="false">حاول مجددًا</string>
+    <string name="t_d4168ace06" formatted="false">المدة</string>
+    <string name="t_d41ba2c06d" formatted="false">أكّد الأعمدة والأوقات ووحدات المدة</string>
+    <string name="t_d458ec4c77" formatted="false">من الأسبوع القادم</string>
+    <string name="t_d47aa86141" formatted="false">مضغوط</string>
+    <string name="t_d4993a1dc7" formatted="false">وقت غير معروف</string>
+    <string name="t_d4a2324628" formatted="false">ليموني</string>
+    <string name="t_d4a88f5588" formatted="false">الفترة المختلفة تعني هدفًا جديدًا.</string>
+    <string name="t_d4f447c130" formatted="false">إيقاف</string>
+    <string name="t_d524af03ac">غير متاح لنشاط جديد: %1$s</string>
+    <string name="t_d5627f6a61" formatted="false">الهدف</string>
+    <string name="t_d6035dc6ed" formatted="false">د</string>
+    <string name="t_d6140e7bc5" formatted="false">0 د</string>
+    <string name="t_d64f83a24b" formatted="false">اختر نسخة؛ لن تُستبدل البيانات الحالية إلا بعد المعاينة</string>
+    <string name="t_d66df6cc7f" formatted="false">استعادة قاعدة البيانات غير المتاحة</string>
+    <string name="t_d70f2e079b" formatted="false">كامل</string>
+    <string name="t_d73bef6ef5" formatted="false">تخطّي مرحلة التركيز</string>
+    <string name="t_d772cc53be" formatted="false">استبدال</string>
+    <string name="t_d7748bfad0" formatted="false">تقرير</string>
+    <string name="t_d7907f4d43" formatted="false">متقدم</string>
+    <string name="t_d8aac38d84" formatted="false">الأنشطة والخطة</string>
+    <string name="t_d8e26625e7" formatted="false">الحد</string>
+    <string name="t_d9017ada66" formatted="false">عدد النسخ المحفوظة</string>
+    <string name="t_d9a13b5014">في %1$s</string>
+    <string name="t_d9e72beb20" formatted="false">مصدر CSV (الخدمة والحساب)</string>
+    <string name="t_d9f48a75fd" formatted="false">إزالة من المفضلة</string>
+    <string name="t_d9ffbbb760">اختيار الوقت: %1$s</string>
+    <string name="t_da4b8e5644" formatted="false">التركيز: اكتملت الفترة</string>
+    <string name="t_dab89894aa" formatted="false">إيقاف التتبع</string>
+    <string name="t_db1042f51d" formatted="false">شريط اليوم</string>
+    <string name="t_db70b53fc3" formatted="false">السجلات المحددة هكذا بالفعل</string>
+    <string name="t_db922448f7">%1$s على الأقل أسبوعيًا</string>
+    <string name="t_dbbafdd074">تغيير المنطقة الزمنية للتقارير إلى %1$s؟</string>
+    <string name="t_dc417ebce7" formatted="false">جارٍ التحميل…</string>
+    <string name="t_dd15d6eecb" formatted="false">بماذا نبدأ؟</string>
+    <string name="t_dd27b7de89" formatted="false">تعذّر فتح الترخيص</string>
+    <string name="t_dd63bc14f9">عُدّل %1$s</string>
+    <string name="t_ddca6f4db2" formatted="false">بلا سجل</string>
+    <string name="t_ddcbc8c167" formatted="false">تم تحديث مراحل التركيز</string>
+    <string name="t_de5d4764e8" formatted="false">الإجمالي للهدف؛ لا تُجمَع الفترات اليومية معًا</string>
+    <string name="t_de5eb09e17" formatted="false">تغيير النشاط</string>
+    <string name="t_de7dee674e" formatted="false">هذا ملف نسخة احتياطية. استعده من «النسخ الاحتياطي»</string>
+    <string name="t_de8f3c16b9" formatted="false">استبعاد</string>
+    <string name="t_dee20b519a" formatted="false">لا بطاقة على شاشة القفل</string>
+    <string name="t_df12865c09" formatted="false">الخط</string>
+    <string name="t_dfd4e36290" formatted="false">تعذّر تبديل الأيقونة</string>
+    <string name="t_e0382438fe">التركيز: %1$s د من العمل</string>
+    <string name="t_e06ca859e1" formatted="false">طُلب الزر العائم؛ مؤشر خدمة النظام إلزامي</string>
+    <string name="t_e0997b4d01" formatted="false">لن تتغير السجلات، سيختفي الهدف فقط.</string>
+    <string name="t_e0c6838299" formatted="false">لا توجد نسخ بعد. فعّل النسخ التلقائي إلى مجلد</string>
+    <string name="t_e0f1717450" formatted="false">نقل لأسفل</string>
+    <string name="t_e1d7065cb9" formatted="false">تغيّر التقرير</string>
+    <string name="t_e2e41650a0">منذ %1$s</string>
+    <string name="t_e380f43ca4">اليوم، %1$s</string>
+    <string name="t_e3af18c937" formatted="false">الواجهة التقنية</string>
+    <string name="t_e3b9331301" formatted="false">التالي</string>
+    <string name="t_e3eed8bfd8" formatted="false">مدد التركيز</string>
+    <string name="t_e3fc5b6cc7" formatted="false">أي نشاط؟</string>
+    <string name="t_e43c291b9c" formatted="false">الخطوة ±</string>
+    <string name="t_e46b654bc7" formatted="false">المؤقت: اختر نشاطًا</string>
+    <string name="t_e46c179ddb" formatted="false">على شاشات الهاتف</string>
+    <string name="t_e4c06f14a4" formatted="false">نمط التاريخ/الوقت المحلي؛ اتركه فارغًا لاستخدام ISO مع الإزاحة</string>
+    <string name="t_e5451eea1b" formatted="false">حفظ المنطقة الزمنية للتقارير…</string>
+    <string name="t_e558fb6e24" formatted="false">شهر</string>
+    <string name="t_e5e4253129" formatted="false">تحت البدء السريع. اضغط مطولًا لتعديل المدد</string>
+    <string name="t_e5ff32f6ae" formatted="false">جمعة</string>
+    <string name="t_e65da6ce30" formatted="false">7 أيام</string>
+    <string name="t_e6794c0df6" formatted="false">إضافة إلى المفضلة</string>
+    <string name="t_e699415c6e" formatted="false">تُضاف السجلات إلى السجل دون استبدال أي شيء موجود. ويُتخطى المكرر من المصدر نفسه.</string>
+    <string name="t_e6aa58192b" formatted="false">سيبدأ التشغيل التالي من دون بطاقة</string>
+    <string name="t_e6d3fcd043" formatted="false">ليست على الشاشة الرئيسية بعد</string>
+    <string name="t_e7672250d5" formatted="false">هدف آخر</string>
+    <string name="t_e8255d5bdc" formatted="false">التحقق من أذونات الواجهة</string>
+    <string name="t_e82d057d74" formatted="false">كل المجالات</string>
+    <string name="t_e887e93303" formatted="false">لا خطة</string>
+    <string name="t_e8a76312ff" formatted="false">يلزم عمود للنهاية أو المدة</string>
+    <string name="t_e962d6d168">، موجودة مسبقًا: %1$s</string>
+    <string name="t_e965da5858" formatted="false">استيراد من CSV</string>
+    <string name="t_e97aa645db" formatted="false">كل شيء متوقف: التتبع داخل التطبيق فقط</string>
+    <string name="t_e98d66a21e" formatted="false">استبعاد المقطع مجهول الوقت</string>
+    <string name="t_ea707316fd" formatted="false">الزر العائم</string>
+    <string name="t_eaa484fa5d" formatted="false">بدأ سجل جديد</string>
+    <string name="t_eb467ef147" formatted="false">فاصلة</string>
+    <string name="t_ec1c55d866" formatted="false">السمة الداكنة</string>
+    <string name="t_ec3bd8ce7a">%1$s س</string>
+    <string name="t_eca17171d2" formatted="false">النظام</string>
+    <string name="t_eca2a38089" formatted="false">التقويم: المواعيد الحالية والقادمة</string>
+    <string name="t_ed3f0e507a" formatted="false">اللغة</string>
+    <string name="t_ed4b9d4acc" formatted="false">يلزم تحديد الوقت</string>
+    <string name="t_ed5033902e" formatted="false">لم يسمح النظام بتشغيل الزر العائم؛ المؤقت متاح في التطبيق</string>
+    <string name="t_ed52dd3411" formatted="false">انقر لاختيار نشاط أو قسم</string>
+    <string name="t_ed6e1d0308" formatted="false">بحث</string>
+    <string name="t_edd23ab082" formatted="false">التالي في الخطة</string>
+    <string name="t_eded3f55f1" formatted="false">تعذّر فتح الاختيار. السجل محفوظ</string>
+    <string name="t_eeee074ac3" formatted="false">تحديث الفهرس المضمّن…</string>
+    <string name="t_ef34d1807a" formatted="false">غير مسجَّل</string>
+    <string name="t_ef5ff32a17" formatted="false">تحديد النشاط الحالي</string>
+    <string name="t_efc885e934" formatted="false">المحذوفات</string>
+    <string name="t_f0caca47ee" formatted="false">بدء التركيز</string>
+    <string name="t_f10728b46b" formatted="false">على الشاشة الرئيسية، والأزرار متوقفة</string>
+    <string name="t_f109cea920" formatted="false">لا مفضلة بعد</string>
+    <string name="t_f1157816a0" formatted="false">صوت خاص</string>
+    <string name="t_f11be88b10" formatted="false">حفظ المفضّلة المحددة</string>
+    <string name="t_f127f2a1ee" formatted="false">حسنًا</string>
+    <string name="t_f220b98d48" formatted="false">اختيار النشاط قديم</string>
+    <string name="t_f2351a24d5">بعد %1$s س من السجل يسأل في لوحة الإشعارات: متابعة أو تأجيل أو إيقاف</string>
+    <string name="t_f2a9788239" formatted="false">تسجيل هذه الفجوة</string>
+    <string name="t_f2f63c2213" formatted="false">التركيز: انتهت المرحلة، اختر التالية</string>
+    <string name="t_f3503a3e3f" formatted="false">أُزيل من المفضّلة</string>
+    <string name="t_f36036b6cf" formatted="false">إيقاف مؤقت · %s</string>
+    <string name="t_f3ff661a74" formatted="false">تقرير آخر</string>
+    <string name="t_f46e3488b5" formatted="false">النسخ في المجلد</string>
+    <string name="t_f48645430a" formatted="false">يُحذف التقرير المحفوظ فقط. لا تتغير السجلات.</string>
+    <string name="t_f4ca346393" formatted="false">هدوء أثناء مرحلة التركيز</string>
+    <string name="t_f4f34092fb" formatted="false">تخطّي مرحلة العمل</string>
+    <string name="t_f55832ba89" formatted="false">خلفية الأداة</string>
+    <string name="t_f5fc2f3eb8" formatted="false">أصغر</string>
+    <string name="t_f62e9fd860" formatted="false">مع المنطقة الزمنية (ISO)</string>
+    <string name="t_f6bfe94a14" formatted="false">جارٍ حفظ النسخة</string>
+    <string name="t_f6dab074d7" formatted="false">رجوع</string>
+    <string name="t_f6de15c50a" formatted="false">غدًا</string>
+    <string name="t_f6f1e5272f" formatted="false">الترتيب</string>
+    <string name="t_f6f369d3a0" formatted="false">تم تصحيح السجل</string>
+    <string name="t_f70eab72a9" formatted="false">الوقت لترتيب القائمة فقط</string>
+    <string name="t_f713a587ea" formatted="false">أُلغي التصدير؛ لا تزال الملفات المُعدّة محفوظة. يمكنك إعداد نسخة جديدة.</string>
+    <string name="t_f8310658c7" formatted="false">وقت البداية إن كان في عمود منفصل</string>
+    <string name="t_f8ebe73afe">حُفظ: %1$s</string>
+    <string name="t_f8fe850a57" formatted="false">تغيّر المؤقت. افتح الإشعار مرة أخرى</string>
+    <string name="t_f9444ff8c6" formatted="false">مختصر</string>
+    <string name="t_f94b15c5ce" formatted="false">متوقف مؤقتًا. لا يُحتسب وقت التوقف ضمن وقت النشاط.</string>
+    <string name="t_f9c8ab7dd1" formatted="false">كتالوج الأنشطة</string>
+    <string name="t_fa1296f402" formatted="false">إعادة كما كان</string>
+    <string name="t_fa620acedb" formatted="false">يتوفر تحديث لكتالوج الأنشطة</string>
+    <string name="t_fa633fd3a2" formatted="false">يجب اختيار المجلد من جديد</string>
+    <string name="t_fb27c3e29b">%1$s، الإجمالي</string>
+    <string name="t_fb925c5d79" formatted="false">30 يومًا</string>
+    <string name="t_fc355fea11" formatted="false">وُضعت الاقتراحات بالفعل حسب العناوين.</string>
+    <string name="t_fc60b6a6e0" formatted="false">يقع الوقت عند تغيير التوقيت</string>
+    <string name="t_fc656a1da4" formatted="false">لإخفائها مع إبقاء البطاقة في لوحة الإشعارات، فعّل «تصغير» أو «بلا أيقونة» في إعدادات هذا الإشعار</string>
+    <string name="t_fc8e4e2d1c" formatted="false">ابدأ الآن</string>
+    <string name="t_fca9d98cd9" formatted="false">تغيّر المؤقت. انقر مرة أخرى</string>
+    <string name="t_fd042c9a3a" formatted="false">لاحقًا</string>
+    <string name="t_fd3cb2ebef" formatted="false">تكتمل المرحلة الحالية كما بدأت، وتسري المدد الجديدة من المرحلة التالية.</string>
+    <string name="t_fd500149d4">المؤقت: %1$s</string>
+    <string name="t_fd7707e6f0">الاستبعاد من %1$s</string>
+    <string name="t_fdc5b65acf" formatted="false">إيقاف مؤقت · متبقٍ %s</string>
+    <string name="t_fdfa49e623" formatted="false">تصحيح آخر مقطع مغلق</string>
+    <string name="t_fe4b0c80f0" formatted="false">اختيار</string>
+    <string name="t_fe63f1e035" formatted="false">تعذّرت إعادة قراءة النسخة المكتوبة. سأعيد المحاولة تلقائيًا</string>
+    <string name="t_fe68cb28be" formatted="false">مطلوب نشاط وبداية ونهاية أو مدة</string>
+    <string name="t_fe97f5bc85" formatted="false">لا تستطيع الشاشة الرئيسية إضافة أدوات من التطبيقات. أضفها يدويًا: اضغط مطولًا على الشاشة الرئيسية ← الأدوات ← (not)AI Time</string>
+    <string name="t_fea5f3ca7c" formatted="false">ستختار النشاط لاحقًا</string>
+    <string name="t_fee1dd80dd">النص الحالي: «%1$s»\nالنص الجديد: «%2$s»</string>
+    <string name="t_feff16c4bb" formatted="false">المؤقّت في لوحة الإشعارات</string>
+    <plurals name="p_032a085f42">
+        <item quantity="zero">%1$d يوم</item>
+        <item quantity="one">يوم واحد</item>
+        <item quantity="two">يومين</item>
+        <item quantity="few">%1$d أيام</item>
+        <item quantity="many">%1$d يومًا</item>
+        <item quantity="other">%1$d يوم</item>
+    </plurals>
+    <plurals name="p_07343fe85c">
+        <item quantity="zero">%1$d ارتباط بعنصر</item>
+        <item quantity="one">ارتباط واحد بعنصر</item>
+        <item quantity="two">ارتباطان بعناصر</item>
+        <item quantity="few">%1$d ارتباطات بعناصر</item>
+        <item quantity="many">%1$d ارتباطًا بعناصر</item>
+        <item quantity="other">%1$d ارتباط بعناصر</item>
+    </plurals>
+    <plurals name="p_09d3aef0c7">
+        <item quantity="zero">%1$d صف</item>
+        <item quantity="one">صف واحد</item>
+        <item quantity="two">صفان</item>
+        <item quantity="few">%1$d صفوف</item>
+        <item quantity="many">%1$d صفًا</item>
+        <item quantity="other">%1$d صف</item>
+    </plurals>
+    <plurals name="p_299205cb6b">
+        <item quantity="zero">%1$d مرة</item>
+        <item quantity="one">مرة واحدة</item>
+        <item quantity="two">مرتان</item>
+        <item quantity="few">%1$d مرات</item>
+        <item quantity="many">%1$d مرة</item>
+        <item quantity="other">%1$d مرة</item>
+    </plurals>
+    <plurals name="p_33de38af49">
+        <item quantity="zero">%1$d فجوة</item>
+        <item quantity="one">فجوة واحدة</item>
+        <item quantity="two">فجوتان</item>
+        <item quantity="few">%1$d فجوات</item>
+        <item quantity="many">%1$d فجوة</item>
+        <item quantity="other">%1$d فجوة</item>
+    </plurals>
+    <plurals name="p_3a9aafb6ad">
+        <item quantity="zero">%1$d نشاط</item>
+        <item quantity="one">نشاط واحد</item>
+        <item quantity="two">نشاطان</item>
+        <item quantity="few">%1$d أنشطة</item>
+        <item quantity="many">%1$d نشاطًا</item>
+        <item quantity="other">%1$d نشاط</item>
+    </plurals>
+    <plurals name="p_3b59342c88">
+        <item quantity="zero">%1$d هدف</item>
+        <item quantity="one">هدف واحد</item>
+        <item quantity="two">هدفان</item>
+        <item quantity="few">%1$d أهداف</item>
+        <item quantity="many">%1$d هدفًا</item>
+        <item quantity="other">%1$d هدف</item>
+    </plurals>
+    <plurals name="p_414e6a20a2">
+        <item quantity="zero">%1$d مفضلة</item>
+        <item quantity="one">مفضلة واحدة</item>
+        <item quantity="two">مفضلتان</item>
+        <item quantity="few">%1$d مفضلات</item>
+        <item quantity="many">%1$d مفضلة</item>
+        <item quantity="other">%1$d مفضلة</item>
+    </plurals>
+    <plurals name="p_51037d6f51">
+        <item quantity="zero">%1$d مقطع</item>
+        <item quantity="one">مقطع واحد</item>
+        <item quantity="two">مقطعان</item>
+        <item quantity="few">%1$d مقاطع</item>
+        <item quantity="many">%1$d مقطعًا</item>
+        <item quantity="other">%1$d مقطع</item>
+    </plurals>
+    <plurals name="p_5e0f6cbad4">
+        <item quantity="zero">%1$d يوم</item>
+        <item quantity="one">يوم واحد</item>
+        <item quantity="two">يومان</item>
+        <item quantity="few">%1$d أيام</item>
+        <item quantity="many">%1$d يومًا</item>
+        <item quantity="other">%1$d يوم</item>
+    </plurals>
+    <plurals name="p_6c73bc4d74">
+        <item quantity="zero">%1$d سجل</item>
+        <item quantity="one">سجل واحد</item>
+        <item quantity="two">سجلان</item>
+        <item quantity="few">%1$d سجلات</item>
+        <item quantity="many">%1$d سجلًا</item>
+        <item quantity="other">%1$d سجل</item>
+    </plurals>
+    <plurals name="p_7504653931">
+        <item quantity="zero">%1$d مرة</item>
+        <item quantity="one">مرة واحدة</item>
+        <item quantity="two">مرتين</item>
+        <item quantity="few">%1$d مرات</item>
+        <item quantity="many">%1$d مرة</item>
+        <item quantity="other">%1$d مرة</item>
+    </plurals>
+    <plurals name="p_7722e30027">
+        <item quantity="zero">%1$d نشاط خاص</item>
+        <item quantity="one">نشاط خاص واحد</item>
+        <item quantity="two">نشاطان خاصان</item>
+        <item quantity="few">%1$d أنشطة خاصة</item>
+        <item quantity="many">%1$d نشاطًا خاصًا</item>
+        <item quantity="other">%1$d نشاط خاص</item>
+    </plurals>
+    <plurals name="p_a03208ce01">
+        <item quantity="zero">%1$d سجل مجموعة</item>
+        <item quantity="one">سجل مجموعة واحد</item>
+        <item quantity="two">سجلا مجموعة</item>
+        <item quantity="few">%1$d سجلات مجموعات</item>
+        <item quantity="many">%1$d سجلًا للمجموعات</item>
+        <item quantity="other">%1$d سجل مجموعات</item>
+    </plurals>
+    <plurals name="p_aaaea1e747">
+        <item quantity="zero">%1$d قياس</item>
+        <item quantity="one">قياس واحد</item>
+        <item quantity="two">قياسان</item>
+        <item quantity="few">%1$d قياسات</item>
+        <item quantity="many">%1$d قياسًا</item>
+        <item quantity="other">%1$d قياس</item>
+    </plurals>
+    <plurals name="p_c70b66af3f">
+        <item quantity="zero">%1$d سجل كمية</item>
+        <item quantity="one">سجل كمية واحد</item>
+        <item quantity="two">سجلا كمية</item>
+        <item quantity="few">%1$d سجلات كميات</item>
+        <item quantity="many">%1$d سجلًا للكميات</item>
+        <item quantity="other">%1$d سجل كميات</item>
+    </plurals>
+    <plurals name="p_c8e097eebc">
+        <item quantity="zero">%1$d أساس للوتيرة</item>
+        <item quantity="one">أساس واحد للوتيرة</item>
+        <item quantity="two">أساسان للوتيرة</item>
+        <item quantity="few">%1$d أسس للوتيرة</item>
+        <item quantity="many">%1$d أساسًا للوتيرة</item>
+        <item quantity="other">%1$d أساس للوتيرة</item>
+    </plurals>
+    <plurals name="p_c9ec2228f3">
+        <item quantity="zero">%1$d إيقاف</item>
+        <item quantity="one">إيقاف واحد</item>
+        <item quantity="two">إيقافان</item>
+        <item quantity="few">%1$d إيقافات</item>
+        <item quantity="many">%1$d إيقافًا</item>
+        <item quantity="other">%1$d إيقاف</item>
+    </plurals>
+    <plurals name="p_de4636ae79">
+        <item quantity="zero">%1$d عمود</item>
+        <item quantity="one">عمود واحد</item>
+        <item quantity="two">عمودان</item>
+        <item quantity="few">%1$d أعمدة</item>
+        <item quantity="many">%1$d عمودًا</item>
+        <item quantity="other">%1$d عمود</item>
+    </plurals>
 </resources>

@@ -364,7 +364,7 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 val update = bundled != null && installed != null && bundled != installed
                 NavRow(rememberVectorPainter(Icon.Layers), if (update) L.s(R.string.t_768fee24c8) else L.s(R.string.t_f9c8ab7dd1),
                     note = if (update) L.s(R.string.t_8940504c4b, bundled)
-                        else L.s(R.string.t_50ac9ea6c3, L.p(R.plurals.p_3a9aafb6ad, types).replace(Regex("^(\\d)(\\d{3})"), "$1 $2"), installed ?: L.s(R.string.t_5b76112f5b)),
+                        else L.s(R.string.t_50ac9ea6c3, L.p(R.plurals.p_3a9aafb6ad, types).let { if (L.locale.language == "ru") it.replace(Regex("^(\\d)(\\d{3})"), "$1 $2") else it }, installed ?: L.s(R.string.t_5b76112f5b)),
                     onClick = { scope.launch { busy = true; catalog = vm.prepareCatalog(); busy = false } })
                 Divider()
                 NavRow(rememberVectorPainter(Icon.Table), L.s(R.string.t_b402c34a3b), note = L.s(R.string.t_b363aeb862), onClick = { vm.requestExport(csv = true) })
@@ -821,6 +821,6 @@ private fun BackupPage(vm: TrackerViewModel, auto: AutoBackupUi?, last: BackupIn
 }
 
 private fun sizeText(bytes: Long): String = when {
-    bytes >= 1_048_576 -> String.format(java.util.Locale.forLanguageTag("ru"), L.s(R.string.t_93eb0c0182), bytes / 1_048_576.0)
+    bytes >= 1_048_576 -> String.format(L.locale, L.s(R.string.t_93eb0c0182), bytes / 1_048_576.0)
     else -> L.s(R.string.t_784e60ff6a, (bytes + 1023) / 1024)
 }

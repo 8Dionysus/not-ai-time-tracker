@@ -55,6 +55,7 @@ import dev.notai.tracker.android.newInstallData
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -712,12 +713,27 @@ class UiScreensTest {
             val bad = texts().map { t -> own.fold(t) { acc, v -> acc.replace(v, "") } }.filter { cyr.containsMatchIn(it) }.distinct()
             assertTrue("$lang/$where still shows Russian: $bad", bad.isEmpty())
         }
-        for ((lang, tabs) in listOf("en" to listOf("Timer", "Overview", "Settings"), "ja" to emptyList())) {
+        val languages = listOf("en", "ja", "es", "fr", "pt-BR", "de", "it", "ar", "zh-Hans", "ko", "hi")
+        fun str(lang: String, id: Int) = ApplicationProvider.getApplicationContext<android.content.Context>().createConfigurationContext(
+            android.content.res.Configuration().apply { setLocale(java.util.Locale.forLanguageTag(lang)) }).getString(id)
+        assertEquals(dev.notai.tracker.android.AppLanguage.supported - "ru", languages.toSet())
+        for (lang in languages) {
             compose.runOnIdle { vm.setLanguage(lang) }
-            val (timer, overview, settings) = if (lang == "en") tabs else listOf("タイマー", "概要", "設定")
+            repeat(2) { compose.waitForIdle(); org.robolectric.shadows.ShadowLooper.idleMainLooper() }
+            val (timer, overview, settings) = Tab.entries.map { str(lang, it.titleRes) }
+            if (lang == "en") assertEquals(listOf("Timer", "Overview", "Settings"), listOf(timer, overview, settings))
+            if (lang == "ja") assertEquals(listOf("タイマー", "概要", "設定"), listOf(timer, overview, settings))
             waitText(settings)
             compose.onNode(hasText(timer) and androidx.compose.ui.test.hasClickAction()).performClick();check("timer", lang)
-            if (lang != "ru") shotAs("language-$lang-timer", vm, ThemeChoice.LIGHT)
+            if (lang == "en" || lang == "ja") shotAs("language-$lang-timer", vm, ThemeChoice.LIGHT)
+            if (lang != "en") {
+                // Every pack: the picker shows the catalog in that language, with nothing left in Russian.
+                compose.onNode(hasText(str(lang, dev.notai.tracker.android.R.string.t_c0634e4cb3)) and androidx.compose.ui.test.hasClickAction()).performClick()
+                repeat(2) { compose.waitForIdle(); org.robolectric.shadows.ShadowLooper.idleMainLooper() }
+                check("picker", lang)
+                if (lang == "ja") shotAs("language-ja-picker", vm, ThemeChoice.LIGHT)
+                compose.onAllNodesWithContentDescription(str(lang, dev.notai.tracker.android.R.string.t_4ae50d3073)).onFirst().performClick();compose.waitForIdle()
+            }
             if (lang == "en") {
                 compose.onNode(hasText("All activities") and androidx.compose.ui.test.hasClickAction()).performClick()
                 waitText("Find or create an activity");check("picker", lang);shotAs("language-en-picker", vm, ThemeChoice.LIGHT)
@@ -729,7 +745,7 @@ class UiScreensTest {
             }
             compose.onNode(hasScrollAction()).performScrollToIndex(6);check("history", lang)
             compose.onNode(hasText(overview) and androidx.compose.ui.test.hasClickAction()).performClick();check("overview", lang)
-            if (lang != "ru") shotAs("language-$lang-overview", vm, ThemeChoice.LIGHT)
+            if (lang == "en" || lang == "ja") shotAs("language-$lang-overview", vm, ThemeChoice.LIGHT)
             if (lang == "en") for (p in listOf("7 days", "30 days")) { compose.onNodeWithText(p).performClick();check("overview-$p", lang) }
             compose.onNode(hasText(settings) and androidx.compose.ui.test.hasClickAction()).performClick();check("settings", lang)
             if (lang == "en") shotAs("language-en-settings", vm, ThemeChoice.LIGHT)

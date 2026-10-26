@@ -1,0 +1,140 @@
+1101 ‖ Spearfishing ‖ Pesca submarina ‖ Chasse sous-marine ‖ Caça submarina ‖ Speerfischen ‖ Pesca subacquea ‖ الصيد تحت الماء ‖ 水下捕鱼 ‖ スピアフィッシング ‖ 작살 낚시 ‖ भाले से पानी के नीचे मछली पकड़ना
+1102 ‖ Underwater target shooting ‖ Tiro subacuático ‖ Tir sur cible subaquatique ‖ Tiro subaquático ‖ Unterwasser-Zielschießen ‖ Tiro al bersaglio subacqueo ‖ الرماية تحت الماء ‖ 水下射靶 ‖ 水中ターゲット射撃 ‖ 수중 표적 사격 ‖ पानी के नीचे निशानेबाज़ी
+1103 ‖ Underwater orienteering ‖ Orientación subacuática ‖ Orientation subaquatique ‖ Orientação subaquática ‖ Unterwasser-Orientierung ‖ Orientamento subacqueo ‖ التوجيه تحت الماء ‖ 水下定向 ‖ 水中オリエンテーリング ‖ 수중 오리엔티어링 ‖ पानी के नीचे दिशा-ज्ञान
+1104 ‖ Underwater rugby ‖ Rugby subacuático ‖ Rugby subaquatique ‖ Rúgbi subaquático ‖ Unterwasserrugby ‖ Rugby subacqueo ‖ الرغبي تحت الماء ‖ 水下橄榄球 ‖ 水中ラグビー ‖ 수중 럭비 ‖ अंडरवॉटर रग्बी
+1105 ‖ Underwater hockey ‖ Hockey subacuático ‖ Hockey subaquatique ‖ Hóquei subaquático ‖ Unterwasserhockey ‖ Hockey subacqueo ‖ الهوكي تحت الماء ‖ 水下曲棍球 ‖ 水中ホッケー ‖ 수중 하키 ‖ अंडरवॉटर हॉकी
+1106 ‖ Coastal rowing ‖ Remo de mar ‖ Aviron de mer ‖ Remo costeiro ‖ Küstenrudern ‖ Canottaggio costiero ‖ التجديف الساحلي ‖ 海岸赛艇 ‖ コースタルローイング ‖ 연안 조정 ‖ तटीय रोइंग
+1107 ‖ Coastal endurance rowing ‖ Remo de mar de resistencia ‖ Aviron de mer d’endurance ‖ Remo costeiro de resistência ‖ Küstenrudern Langstrecke ‖ Canottaggio costiero di fondo ‖ التجديف الساحلي للتحمل ‖ 海岸耐力赛艇 ‖ コースタルローイング耐久 ‖ 연안 지구력 조정 ‖ तटीय सहनशक्ति रोइंग
+1108 ‖ Beach sprint rowing ‖ Remo beach sprint ‖ Aviron beach sprint ‖ Remo beach sprint ‖ Beach-Sprint-Rudern ‖ Beach sprint ‖ تجديف السرعة الشاطئي ‖ 海滩冲刺赛艇 ‖ ビーチスプリント ‖ 비치 스프린트 조정 ‖ बीच स्प्रिंट रोइंग
+1109 ‖ Boating ‖ Paseo en barca ‖ Balade en barque ‖ Passeio de barco ‖ Bootsfahrt ‖ Giro in barca ‖ نزهة بالقارب ‖ 划船游玩 ‖ ボート遊び ‖ 보트 타기 ‖ नाव की सैर
+1110 ‖ Diving ‖ Saltos de trampolín ‖ Plongeon ‖ Saltos ornamentais ‖ Wasserspringen ‖ Tuffi ‖ القفز في الماء ‖ 跳水 ‖ 飛び込み ‖ 다이빙 ‖ गोताखोरी कूद
+1111 ‖ RC boats ‖ Barcos teledirigidos ‖ Bateaux radiocommandés ‖ Barcos de controle remoto ‖ RC-Boote ‖ Motoscafi radiocomandati ‖ القوارب اللاسلكية ‖ 遥控船 ‖ ラジコンボート ‖ RC 보트 ‖ रिमोट कंट्रोल नावें
+1112 ‖ RC sailboats ‖ Veleros teledirigidos ‖ Voiliers radiocommandés ‖ Veleiros de controle remoto ‖ RC-Segelboote ‖ Barche a vela radiocomandate ‖ اليخوت اللاسلكية ‖ 遥控帆船 ‖ ラジコンヨット ‖ RC 요트 ‖ रिमोट कंट्रोल पाल नावें
+1113 ‖ Rafting ‖ Rafting ‖ Rafting ‖ Rafting ‖ Rafting ‖ Rafting ‖ التجديف في المياه البيضاء ‖ 漂流 ‖ ラフティング ‖ 래프팅 ‖ राफ़्टिंग
+1114 ‖ Stand-up paddleboarding ‖ Pádel surf ‖ Stand-up paddle ‖ Stand-up paddle ‖ Stand-up-Paddling ‖ SUP ‖ التجديف واقفًا ‖ 桨板 ‖ SUP ‖ 패들보드 ‖ स्टैंड-अप पैडलबोर्डिंग
+1115 ‖ Artistic swimming ‖ Natación artística ‖ Natation artistique ‖ Nado artístico ‖ Synchronschwimmen ‖ Nuoto artistico ‖ السباحة الفنية ‖ 花样游泳 ‖ アーティスティックスイミング ‖ 아티스틱 스위밍 ‖ कलात्मक तैराकी
+1116 ‖ Skimboarding ‖ Skimboard ‖ Skimboard ‖ Skimboard ‖ Skimboarding ‖ Skimboard ‖ التزلج على الشاطئ ‖ 浅滩冲浪板 ‖ スキムボード ‖ 스킴보드 ‖ स्किमबोर्डिंग
+1117 ‖ Finswimming ‖ Natación con aletas ‖ Nage avec palmes ‖ Natação com nadadeiras ‖ Flossenschwimmen ‖ Nuoto pinnato ‖ السباحة بالزعانف ‖ 蹼泳 ‖ フィンスイミング ‖ 핀수영 ‖ फ़िन तैराकी
+1118 ‖ Wildwater racing ‖ Descenso de aguas bravas ‖ Descente en eaux vives ‖ Descida em águas bravas ‖ Wildwasserrennsport ‖ Discesa in acque mosse ‖ سباق المياه البيضاء ‖ 激流速降 ‖ ワイルドウォーター ‖ 급류 활강 ‖ तेज़ धारा में दौड़
+1119 ‖ Snorkeling ‖ Esnórquel ‖ Snorkeling ‖ Snorkel ‖ Schnorcheln ‖ Snorkeling ‖ الغطس بالأنبوب ‖ 浮潜 ‖ シュノーケリング ‖ 스노클링 ‖ स्नॉर्कलिंग
+1120 ‖ Surfing ‖ Surf ‖ Surf ‖ Surfe ‖ Surfen ‖ Surf ‖ ركوب الأمواج ‖ 冲浪 ‖ サーフィン ‖ 서핑 ‖ सर्फ़िंग
+1121 ‖ Longboard surfing ‖ Surf con longboard ‖ Surf en longboard ‖ Surfe de longboard ‖ Longboard-Surfen ‖ Surf con longboard ‖ ركوب الأمواج باللوح الطويل ‖ 长板冲浪 ‖ ロングボードサーフィン ‖ 롱보드 서핑 ‖ लॉन्गबोर्ड सर्फ़िंग
+1122 ‖ Surfski ‖ Surfski ‖ Surfski ‖ Surfski ‖ Surfski ‖ Surfski ‖ قارب السيرفسكي ‖ 冲浪艇 ‖ サーフスキー ‖ 서프스키 ‖ सर्फ़स्की
+1123 ‖ Freediving ‖ Apnea libre ‖ Apnée libre ‖ Mergulho livre ‖ Freitauchen ‖ Apnea libera ‖ الغوص الحر ‖ 自由潜水 ‖ 素潜り ‖ 프리다이빙 ‖ फ़्रीडाइविंग
+1124 ‖ Freestyle kayaking ‖ Estilo libre en aguas bravas ‖ Freestyle en eaux vives ‖ Freestyle em águas bravas ‖ Wildwasser-Freestyle ‖ Freestyle in acque mosse ‖ الحركات الحرة في المياه البيضاء ‖ 激流自由式 ‖ ウォーターフリースタイル ‖ 급류 프리스타일 ‖ तेज़ धारा में फ़्रीस्टाइल
+1125 ‖ High diving ‖ Saltos de gran altura ‖ Plongeon de haut vol ‖ Saltos de grande altura ‖ Klippenspringen ‖ Tuffi dalle grandi altezze ‖ الغوص من ارتفاعات عالية ‖ 高空跳水 ‖ ハイダイビング ‖ 하이 다이빙 ‖ ऊँचाई से गोता
+1126 ‖ Water ski show ‖ Espectáculo de esquí acuático ‖ Spectacle de ski nautique ‖ Show de esqui aquático ‖ Wasserski-Show ‖ Spettacolo di sci nautico ‖ عرض التزلج على الماء ‖ 滑水表演 ‖ 水上スキーショー ‖ 수상스키 쇼 ‖ वॉटर स्की शो
+1127 ‖ Movement on the go ‖ Movimiento en ruta ‖ Mouvement en route ‖ Movimento em trajeto ‖ Bewegung unterwegs ‖ Movimento in percorso ‖ الحركة أثناء التنقل ‖ 行进运动 ‖ 移動系の運動 ‖ 이동 운동 ‖ चलते-फिरते व्यायाम
+1128 ‖ Cycling ‖ Ciclismo ‖ Cyclisme ‖ Ciclismo ‖ Radsport ‖ Ciclismo ‖ ركوب الدراجات ‖ 自行车 ‖ 自転車 ‖ 사이클 ‖ साइक्लिंग
+1129 ‖ BMX racing ‖ Carreras de BMX ‖ BMX race ‖ Corrida de BMX ‖ BMX-Rennen ‖ BMX race ‖ سباق BMX ‖ BMX 竞速 ‖ BMXレース ‖ BMX 레이스 ‖ BMX रेस
+1130 ‖ BMX freestyle ‖ BMX estilo libre ‖ BMX freestyle ‖ BMX freestyle ‖ BMX-Freestyle ‖ BMX freestyle ‖ BMX الحركات الحرة ‖ BMX 自由式 ‖ BMXフリースタイル ‖ BMX 프리스타일 ‖ BMX फ़्रीस्टाइल
+1131 ‖ Artistic cycling ‖ Ciclismo artístico ‖ Cyclisme artistique ‖ Ciclismo artístico ‖ Kunstradfahren ‖ Ciclismo artistico ‖ الدراجات الفنية ‖ 花样自行车 ‖ サイクルフィギュア ‖ 사이클 피겨 ‖ कलात्मक साइक्लिंग
+1132 ‖ Cycle ball ‖ Ciclobol ‖ Cycle-balle ‖ Ciclobol ‖ Radball ‖ Ciclopalla ‖ كرة الدراجات ‖ 自行车球 ‖ サイクルサッカー ‖ 사이클볼 ‖ साइकिल बॉल
+1133 ‖ Cyclocross ‖ Ciclocross ‖ Cyclo-cross ‖ Ciclocross ‖ Querfeldein ‖ Ciclocross ‖ سباق الضاحية بالدراجات ‖ 公路越野自行车 ‖ シクロクロス ‖ 사이클로크로스 ‖ साइक्लोक्रॉस
+1134 ‖ Velomobile ‖ Velomóvil ‖ Vélomobile ‖ Velomóvel ‖ Velomobil ‖ Velomobile ‖ دراجة مغطاة ‖ 全包式人力车 ‖ ベロモービル ‖ 벨로모빌 ‖ वेलोमोबाइल
+1135 ‖ Indoor trainer and virtual rides ‖ Rodillo y rutas virtuales ‖ Home-trainer et sorties virtuelles ‖ Rolo e pedal virtual ‖ Rollentrainer und virtuelles Fahren ‖ Rulli e uscite virtuali ‖ الدراجة الثابتة والمسارات الافتراضية ‖ 骑行台与虚拟骑行 ‖ ローラー台とバーチャルライド ‖ 실내 트레이너와 가상 라이딩 ‖ इंडोर ट्रेनर और वर्चुअल राइड
+1136 ‖ Track cycling ‖ Ciclismo en pista ‖ Cyclisme sur piste ‖ Ciclismo de pista ‖ Bahnradsport ‖ Ciclismo su pista ‖ دراجات المضمار ‖ 场地自行车 ‖ トラック競技 ‖ 트랙 사이클 ‖ ट्रैक साइक्लिंग
+1137 ‖ Bike trials ‖ Trial en bicicleta ‖ Trial à vélo ‖ Trial de bicicleta ‖ Radtrial ‖ Trial in bici ‖ تريال الدراجات ‖ 自行车攀爬 ‖ バイクトライアル ‖ 바이크 트라이얼 ‖ बाइक ट्रायल
+1138 ‖ Bike touring ‖ Cicloturismo ‖ Cyclotourisme ‖ Cicloturismo ‖ Radtour ‖ Cicloturismo ‖ جولة بالدراجة ‖ 骑行旅行 ‖ 自転車ツーリング ‖ 자전거 여행 ‖ साइकिल यात्रा
+1139 ‖ Gravel riding ‖ Gravel ‖ Gravel ‖ Gravel ‖ Gravel ‖ Gravel ‖ ركوب الطرق الحصوية ‖ 砾石路骑行 ‖ グラベル ‖ 그래블 ‖ ग्रेवल राइडिंग
+1140 ‖ Downhill MTB ‖ Descenso en BTT ‖ VTT descente ‖ Downhill de MTB ‖ MTB-Downhill ‖ MTB downhill ‖ النزول بالدراجة الجبلية ‖ 山地速降 ‖ MTBダウンヒル ‖ MTB 다운힐 ‖ MTB डाउनहिल
+1141 ‖ Cross-country MTB ‖ BTT cross-country ‖ VTT cross-country ‖ MTB cross-country ‖ MTB-Cross-Country ‖ MTB cross country ‖ الدراجة الجبلية الضاحية ‖ 山地越野 ‖ MTBクロスカントリー ‖ MTB 크로스컨트리 ‖ MTB क्रॉस-कंट्री
+1142 ‖ Mountain biking ‖ Bicicleta de montaña ‖ VTT ‖ Mountain bike ‖ Mountainbiken ‖ Mountain bike ‖ الدراجات الجبلية ‖ 山地自行车 ‖ マウンテンバイク ‖ 산악자전거 ‖ माउंटेन बाइकिंग
+1143 ‖ Hand cycle ‖ Bicicleta de mano ‖ Vélo à main ‖ Bicicleta de mão ‖ Handfahrrad ‖ Bici a mano ‖ دراجة تدار باليد ‖ 手摇单车 ‖ 手こぎ自転車 ‖ 손자전거 ‖ हाथ वाली साइकिल
+1144 ‖ Trail MTB ‖ BTT de senderos ‖ VTT trail ‖ MTB trail ‖ MTB-Trail ‖ MTB trail ‖ مسارات الدراجة الجبلية ‖ 山地林道骑行 ‖ MTBトレイル ‖ MTB 트레일 ‖ MTB ट्रेल
+1145 ‖ Road cycling ‖ Ciclismo de carretera ‖ Cyclisme sur route ‖ Ciclismo de estrada ‖ Straßenradsport ‖ Ciclismo su strada ‖ دراجات الطرق ‖ 公路自行车 ‖ ロードバイク ‖ 로드 사이클 ‖ रोड साइक्लिंग
+1146 ‖ E-MTB ‖ BTT eléctrica ‖ VTT électrique ‖ MTB elétrica ‖ E-MTB ‖ E-MTB ‖ الدراجة الجبلية الكهربائية ‖ 电动山地车 ‖ E-MTB ‖ 전기 MTB ‖ इलेक्ट्रिक MTB
+1147 ‖ E-bike ‖ Bicicleta eléctrica ‖ Vélo électrique ‖ Bicicleta elétrica ‖ E-Bike ‖ Bici elettrica ‖ الدراجة الكهربائية ‖ 电动自行车 ‖ 電動アシスト自転車 ‖ 전기자전거 ‖ ई-बाइक
+1148 ‖ Enduro MTB ‖ BTT enduro ‖ VTT enduro ‖ MTB enduro ‖ MTB-Enduro ‖ MTB enduro ‖ إندورو الدراجة الجبلية ‖ 山地耐力赛 ‖ MTBエンデューロ ‖ MTB 엔듀로 ‖ MTB एंड्यूरो
+1149 ‖ Wheels and gliding ‖ Ruedas y deslizamiento ‖ Roues et glisse ‖ Rodas e deslize ‖ Rollen und Gleiten ‖ Ruote e scivolamento ‖ العجلات والانزلاق ‖ 轮滑与滑行 ‖ 車輪と滑走 ‖ 바퀴와 활주 ‖ पहिये और फिसलन
+1150 ‖ Artistic roller skating ‖ Patinaje artístico sobre ruedas ‖ Patinage artistique à roulettes ‖ Patinação artística ‖ Rollkunstlauf ‖ Pattinaggio artistico a rotelle ‖ التزلج الفني على العجلات ‖ 花样轮滑 ‖ ローラーフィギュア ‖ 롤러 피겨 ‖ कलात्मक रोलर स्केटिंग
+1151 ‖ Downhill skating ‖ Descenso en patines ‖ Descente en rollers ‖ Downhill de patins ‖ Inline-Downhill ‖ Discesa sui pattini ‖ النزول بالمزلاج ‖ 轮滑速降 ‖ ローラーダウンヒル ‖ 롤러 다운힐 ‖ स्केट डाउनहिल
+1152 ‖ Inline freestyle ‖ Patinaje freestyle ‖ Roller freestyle ‖ Patinação freestyle ‖ Inline-Freestyle ‖ Freestyle in linea ‖ التزلج الحر على العجلات ‖ 自由式轮滑 ‖ インラインフリースタイル ‖ 인라인 프리스타일 ‖ इनलाइन फ़्रीस्टाइल
+1153 ‖ Inline hockey ‖ Hockey línea ‖ Roller hockey ‖ Hóquei inline ‖ Inlinehockey ‖ Hockey in linea ‖ الهوكي على العجلات ‖ 单排轮滑球 ‖ インラインホッケー ‖ 인라인하키 ‖ इनलाइन हॉकी
+1154 ‖ Longboarding ‖ Longboard ‖ Longboard ‖ Longboard ‖ Longboarden ‖ Longboard ‖ اللوح الطويل ‖ 长板 ‖ ロングボード ‖ 롱보드 ‖ लॉन्गबोर्डिंग
+1155 ‖ Roller skiing ‖ Esquí sobre ruedas ‖ Ski-roues ‖ Esqui sobre rodas ‖ Rollski ‖ Skiroll ‖ التزلج على العجلات ‖ 滑轮滑雪 ‖ ローラースキー ‖ 롤러스키 ‖ रोलर स्कीइंग
+1156 ‖ Rink hockey ‖ Hockey patines ‖ Rink hockey ‖ Hóquei em patins ‖ Rollhockey ‖ Hockey su pista ‖ هوكي الحلبة ‖ 轮滑球 ‖ リンクホッケー ‖ 링크하키 ‖ रिंक हॉकी
+1157 ‖ Roller skating ‖ Patines ‖ Roller ‖ Patins ‖ Rollschuh- und Inlineskaten ‖ Pattini ‖ التزلج بالعجلات ‖ 轮滑 ‖ ローラースケート ‖ 롤러스케이트 ‖ रोलर स्केटिंग
+1158 ‖ Roller downhill and slalom ‖ Descenso y eslalon en patines ‖ Descente et slalom en roller ‖ Downhill e slalom de patins ‖ Roller-Downhill und Slalom ‖ Discesa e slalom sui pattini ‖ النزول والتعرج بالمزلاج ‖ 轮滑速降与绕桩 ‖ ローラーのダウンヒルとスラローム ‖ 롤러 다운힐과 슬라럼 ‖ रोलर डाउनहिल और स्लैलम
+1159 ‖ Roller derby ‖ Roller derby ‖ Roller derby ‖ Roller derby ‖ Roller Derby ‖ Roller derby ‖ رولر ديربي ‖ 轮滑德比 ‖ ローラーダービー ‖ 롤러 더비 ‖ रोलर डर्बी
+1160 ‖ Roller freestyle ‖ Freestyle sobre ruedas ‖ Freestyle à roulettes ‖ Freestyle sobre rodas ‖ Roller-Freestyle ‖ Freestyle a rotelle ‖ الحركات الحرة بالعجلات ‖ 轮滑花式 ‖ ローラーフリースタイル ‖ 롤러 프리스타일 ‖ रोलर फ़्रीस्टाइल
+1161 ‖ Kick scooter ‖ Patinete ‖ Trottinette ‖ Patinete ‖ Tretroller ‖ Monopattino ‖ السكوتر ‖ 滑板车 ‖ キックスクーター ‖ 킥보드 ‖ किक स्कूटर
+1162 ‖ Freestyle scooter ‖ Patinete freestyle ‖ Trottinette freestyle ‖ Patinete freestyle ‖ Stuntscooter ‖ Monopattino freestyle ‖ السكوتر الحر ‖ 特技滑板车 ‖ スクーターフリースタイル ‖ 스턴트 스쿠터 ‖ फ़्रीस्टाइल स्कूटर
+1163 ‖ Skateboarding ‖ Skateboard ‖ Skateboard ‖ Skate ‖ Skateboarden ‖ Skateboard ‖ التزلج على اللوح ‖ 滑板 ‖ スケートボード ‖ 스케이트보드 ‖ स्केटबोर्डिंग
+1164 ‖ Inline speed skating ‖ Patinaje de velocidad ‖ Roller de vitesse ‖ Patinação de velocidade ‖ Speedskating ‖ Pattinaggio di velocità ‖ سباق التزلج بالعجلات ‖ 速度轮滑 ‖ インラインスピード ‖ 인라인 스피드 ‖ इनलाइन स्पीड स्केटिंग
+1165 ‖ Roller slalom ‖ Eslalon en patines ‖ Slalom en roller ‖ Slalom de patins ‖ Inline-Slalom ‖ Slalom sui pattini ‖ التعرج بالمزلاج ‖ 轮滑绕桩 ‖ スラロームスケート ‖ 롤러 슬라럼 ‖ रोलर स्लैलम
+1166 ‖ Wheelchair race session ‖ Carrera en silla deportiva ‖ Course en fauteuil de sport ‖ Prova em cadeira esportiva ‖ Rennrollstuhl-Training ‖ Gara in carrozzina sportiva ‖ سباق على الكرسي الرياضي ‖ 轮椅竞速训练 ‖ 競技用車いす走 ‖ 휠체어 경주 ‖ व्हीलचेयर रेस
+1167 ‖ Grass skiing ‖ Esquí sobre hierba ‖ Ski sur herbe ‖ Esqui na grama ‖ Grasski ‖ Sci d’erba ‖ التزلج على العشب ‖ 滑草 ‖ 草スキー ‖ 잔디 스키 ‖ घास पर स्कीइंग
+1168 ‖ Adaptive handcycle ‖ Handbike adaptada ‖ Handbike adapté ‖ Handbike adaptada ‖ Adaptives Handbike ‖ Handbike adattata ‖ دراجة اليد المكيّفة ‖ 适应性手摇车 ‖ アダプティブハンドサイクル ‖ 적응형 핸드사이클 ‖ अनुकूलित हैंडसाइकिल
+1169 ‖ Walking and running ‖ A pie y corriendo ‖ Marche et course ‖ A pé e correndo ‖ Gehen und Laufen ‖ A piedi e di corsa ‖ المشي والجري ‖ 步行与跑步 ‖ 歩く・走る ‖ 걷기와 달리기 ‖ पैदल और दौड़
+1170 ‖ Running ‖ Correr ‖ Course à pied ‖ Corrida ‖ Laufen ‖ Corsa ‖ الجري ‖ 跑步 ‖ ランニング ‖ 달리기 ‖ दौड़ना
+1171 ‖ Treadmill or track running ‖ Correr en pista o cinta ‖ Course sur piste ou tapis ‖ Corrida na pista ou esteira ‖ Laufen auf Bahn oder Band ‖ Corsa su pista o tapis ‖ الجري في المضمار أو على الجهاز ‖ 跑道或跑步机 ‖ トラックやランニングマシン ‖ 트랙·러닝머신 달리기 ‖ ट्रैक या ट्रेडमिल पर दौड़
+1172 ‖ Power walking ‖ Marcha rápida ‖ Marche rapide ‖ Caminhada rápida ‖ Schnelles Gehen ‖ Camminata veloce ‖ المشي السريع ‖ 快走 ‖ 早歩き ‖ 빠르게 걷기 ‖ तेज़ चलना
+1173 ‖ Obstacle course race ‖ Carrera de obstáculos ‖ Course à obstacles ‖ Corrida de obstáculos ‖ Hindernislauf ‖ Corsa a ostacoli ‖ سباق العوائق ‖ 障碍赛跑 ‖ 障害物レース ‖ 장애물 레이스 ‖ बाधा दौड़
+1174 ‖ Cross-country running ‖ Campo a través ‖ Cross-country ‖ Cross-country ‖ Crosslauf ‖ Corsa campestre ‖ الجري في الضاحية ‖ 越野跑 ‖ クロスカントリー走 ‖ 크로스컨트리 ‖ क्रॉस-कंट्री दौड़
+1175 ‖ Fitness walking ‖ Caminata saludable ‖ Marche santé ‖ Caminhada saudável ‖ Gesundheitswandern ‖ Camminata per la salute ‖ المشي الصحي ‖ 健身走 ‖ ウォーキング ‖ 건강 걷기 ‖ स्वास्थ्य के लिए चलना
+1176 ‖ Parkour ‖ Parkour ‖ Parkour ‖ Parkour ‖ Parkour ‖ Parkour ‖ الباركور ‖ 跑酷 ‖ パルクール ‖ 파쿠르 ‖ पार्कौर
+1177 ‖ Adventure race ‖ Carrera de aventura ‖ Raid aventure ‖ Corrida de aventura ‖ Abenteuerrennen ‖ Adventure race ‖ سباق المغامرة ‖ 探险赛 ‖ アドベンチャーレース ‖ 어드벤처 레이스 ‖ एडवेंचर रेस
+1178 ‖ Rogaining ‖ Rogaine ‖ Rogaining ‖ Rogaine ‖ Rogaining ‖ Rogaining ‖ الروغينغ ‖ 积分越野定向 ‖ ロゲイニング ‖ 로게이닝 ‖ रोगेनिंग
+1179 ‖ Outdoor climbing ‖ Escalada en roca ‖ Escalade en extérieur ‖ Escalada na natureza ‖ Klettern am Fels ‖ Arrampicata all’aperto ‖ التسلق في الطبيعة ‖ 户外攀岩 ‖ 外岩クライミング ‖ 자연 암벽 등반 ‖ प्रकृति में चढ़ाई
+1180 ‖ Orienteering ‖ Orientación ‖ Course d’orientation ‖ Orientação ‖ Orientierungslauf ‖ Orienteering ‖ التوجيه الرياضي ‖ 定向越野 ‖ オリエンテーリング ‖ 오리엔티어링 ‖ ओरिएंटियरिंग
+1181 ‖ Sports hike ‖ Senderismo deportivo ‖ Randonnée sportive ‖ Trilha esportiva ‖ Sportliche Wanderung ‖ Escursione sportiva ‖ المشي الرياضي ‖ 运动徒步 ‖ スポーツハイキング ‖ 운동 산행 ‖ खेल पैदल यात्रा
+1182 ‖ Trail running ‖ Trail ‖ Trail ‖ Trail running ‖ Trailrunning ‖ Trail running ‖ الجري في المسارات ‖ 山径跑 ‖ トレイルランニング ‖ 트레일 러닝 ‖ ट्रेल रनिंग
+1183 ‖ Trekking and summits ‖ Trekking y ascensos ‖ Trek et ascension ‖ Trekking e escalada de cumes ‖ Trekking und Gipfelbesteigung ‖ Trekking e salite in vetta ‖ الترحال وصعود القمم ‖ 徒步与登顶 ‖ トレッキングと登頂 ‖ 트레킹과 등정 ‖ ट्रेकिंग और चढ़ाई
+1184 ‖ Ultramarathon ‖ Ultramaratón ‖ Ultramarathon ‖ Ultramaratona ‖ Ultramarathon ‖ Ultramaratona ‖ الماراثون الفائق ‖ 超级马拉松 ‖ ウルトラマラソン ‖ 울트라마라톤 ‖ अल्ट्रामैराथन
+1185 ‖ Rucking ‖ Caminar con mochila lastrada ‖ Marche lestée ‖ Caminhada com mochila de peso ‖ Rucking ‖ Camminata con zaino zavorrato ‖ المشي بحقيبة أثقال ‖ 负重行军 ‖ ラッキング ‖ 러킹 ‖ वज़न वाले बैग के साथ चलना
+1186 ‖ Climbing and mountaineering ‖ Escalada y alpinismo ‖ Escalade et alpinisme ‖ Escalada e alpinismo ‖ Klettern und Bergsteigen ‖ Arrampicata e alpinismo ‖ التسلق وتسلق الجبال ‖ 攀岩与登山 ‖ クライミングと登山 ‖ 클라이밍과 등반 ‖ चढ़ाई और पर्वतारोहण
+1187 ‖ Mountaineering ‖ Alpinismo ‖ Alpinisme ‖ Alpinismo ‖ Bergsteigen ‖ Alpinismo ‖ تسلق الجبال ‖ 高山攀登 ‖ 登山 ‖ 알피니즘 ‖ पर्वतारोहण
+1188 ‖ Bouldering ‖ Búlder ‖ Bloc ‖ Boulder ‖ Bouldern ‖ Boulder ‖ تسلق الصخور الصغيرة ‖ 抱石 ‖ ボルダリング ‖ 볼더링 ‖ बोल्डरिंग
+1189 ‖ Rope climbing ‖ Escalada con cuerda ‖ Escalade en tête ‖ Escalada com corda ‖ Seilklettern ‖ Arrampicata con corda ‖ التسلق بالحبل ‖ 绳索攀岩 ‖ ロープクライミング ‖ 로프 클라이밍 ‖ रस्सी से चढ़ाई
+1190 ‖ Ice climbing ‖ Escalada en hielo ‖ Cascade de glace ‖ Escalada no gelo ‖ Eisklettern ‖ Arrampicata su ghiaccio ‖ تسلق الجليد ‖ 攀冰 ‖ アイスクライミング ‖ 빙벽 등반 ‖ बर्फ़ पर चढ़ाई
+1191 ‖ Climbing gym ‖ Rocódromo ‖ Salle d’escalade ‖ Muro de escalada ‖ Kletterhalle ‖ Palestra di arrampicata ‖ صالة التسلق ‖ 攀岩馆 ‖ クライミングジム ‖ 실내 암장 ‖ क्लाइंबिंग जिम
+1192 ‖ Speed climbing ‖ Escalada de velocidad ‖ Escalade de vitesse ‖ Escalada de velocidade ‖ Speedklettern ‖ Arrampicata di velocità ‖ تسلق السرعة ‖ 速度攀岩 ‖ スピードクライミング ‖ 스피드 클라이밍 ‖ स्पीड क्लाइंबिंग
+1193 ‖ Winter and ice ‖ Invierno y hielo ‖ Hiver et glace ‖ Inverno e gelo ‖ Winter und Eis ‖ Inverno e ghiaccio ‖ الشتاء والجليد ‖ 冬季与冰上 ‖ 冬と氷 ‖ 겨울과 얼음 ‖ सर्दी और बर्फ़
+1194 ‖ Ice stock sport ‖ Ice stock ‖ Curling bavarois ‖ Ice stock ‖ Eisstockschießen ‖ Birilli su ghiaccio ‖ رياضة آيس ستوك ‖ 冰上溜石 ‖ アイスストック ‖ 아이스스톡 ‖ आइस स्टॉक
+1195 ‖ Classic cross-country skiing ‖ Esquí de fondo clásico ‖ Ski de fond classique ‖ Esqui cross-country clássico ‖ Langlauf klassisch ‖ Sci di fondo classico ‖ التزلج الريفي الكلاسيكي ‖ 越野滑雪传统式 ‖ クロカン クラシカル ‖ 크로스컨트리 클래식 ‖ क्लासिक क्रॉस-कंट्री स्कीइंग
+1196 ‖ Skate skiing ‖ Esquí de fondo patinador ‖ Ski de fond skating ‖ Esqui cross-country skating ‖ Langlauf Skating ‖ Sci di fondo skating ‖ التزلج الريفي بأسلوب التزحلق ‖ 越野滑雪自由式 ‖ クロカン フリー ‖ 크로스컨트리 프리 ‖ स्केट स्कीइंग
+1197 ‖ Bandy ‖ Bandy ‖ Bandy ‖ Bandy ‖ Bandy ‖ Bandy ‖ الباندي ‖ 班迪球 ‖ バンディ ‖ 밴디 ‖ बैंडी
+1198 ‖ Ski big air ‖ Big air en esquí ‖ Big air à ski ‖ Big air no esqui ‖ Ski-Big-Air ‖ Big air con gli sci ‖ القفز الكبير بالتزلج ‖ 自由式滑雪大跳台 ‖ スキー ビッグエア ‖ 스키 빅에어 ‖ स्की बिग एयर
+1199 ‖ Bobsleigh ‖ Bobsleigh ‖ Bobsleigh ‖ Bobsled ‖ Bobfahren ‖ Bob ‖ الزلاجة الجماعية ‖ 雪车 ‖ ボブスレー ‖ 봅슬레이 ‖ बॉबस्ले
+1200 ‖ Alpine skiing ‖ Esquí alpino ‖ Ski alpin ‖ Esqui alpino ‖ Ski alpin ‖ Sci alpino ‖ التزلج الألبي ‖ 高山滑雪 ‖ アルペンスキー ‖ 알파인 스키 ‖ अल्पाइन स्कीइंग
+1201 ‖ Winter trekking ‖ Trekking invernal ‖ Randonnée hivernale ‖ Trekking de inverno ‖ Wintertrekking ‖ Trekking invernale ‖ الترحال الشتوي ‖ 冬季徒步 ‖ 冬のトレッキング ‖ 겨울 트레킹 ‖ शीतकालीन ट्रेकिंग
+1202 ‖ Ice rink ‖ Pista de hielo ‖ Patinoire ‖ Pista de gelo ‖ Eislaufen ‖ Pattinaggio sul ghiaccio ‖ حلبة التزلج ‖ 滑冰场 ‖ スケートリンク ‖ 아이스링크 ‖ आइस रिंक
+1203 ‖ Speed skating ‖ Patinaje de velocidad ‖ Patinage de vitesse ‖ Patinação de velocidade ‖ Eisschnelllauf ‖ Pattinaggio di velocità ‖ التزلج السريع ‖ 速度滑冰 ‖ スピードスケート ‖ 스피드스케이팅 ‖ स्पीड स्केटिंग
+1204 ‖ Curling ‖ Curling ‖ Curling ‖ Curling ‖ Curling ‖ Curling ‖ الكيرلنغ ‖ 冰壶 ‖ カーリング ‖ 컬링 ‖ कर्लिंग
+1205 ‖ Ski aerials ‖ Saltos acrobáticos ‖ Saut acrobatique ‖ Esqui aéreo ‖ Skiakrobatik ‖ Salti acrobatici ‖ القفز البهلواني بالتزلج ‖ 空中技巧 ‖ エアリアル ‖ 에어리얼 ‖ स्की एरियल्स
+1206 ‖ Moguls ‖ Baches ‖ Bosses ‖ Moguls ‖ Buckelpiste ‖ Gobbe ‖ التزلج على المطبات ‖ 雪上技巧 ‖ モーグル ‖ 모굴 ‖ मोगल्स
+1207 ‖ Parallel snowboard slalom ‖ Eslalon paralelo en snowboard ‖ Slalom parallèle en snowboard ‖ Slalom paralelo de snowboard ‖ Snowboard-Parallelslalom ‖ Slalom parallelo di snowboard ‖ التعرج المتوازي بالسنوبورد ‖ 单板平行大回转 ‖ スノーボード パラレル ‖ 스노보드 평행 회전 ‖ समानांतर स्नोबोर्ड स्लैलम
+1208 ‖ Ski jumping ‖ Saltos de esquí ‖ Saut à ski ‖ Salto de esqui ‖ Skispringen ‖ Salto con gli sci ‖ القفز بالتزلج ‖ 跳台滑雪 ‖ スキージャンプ ‖ 스키점프 ‖ स्की जंपिंग
+1209 ‖ Rink bandy ‖ Rink bandy ‖ Rink bandy ‖ Rink bandy ‖ Rinkbandy ‖ Rink bandy ‖ باندي الحلبة ‖ 小场班迪球 ‖ リンクバンディ ‖ 링크 밴디 ‖ रिंक बैंडी
+1210 ‖ Sledding and tubing ‖ Trineo y tubing ‖ Luge et bouée ‖ Trenó e boia ‖ Rodeln und Snowtubing ‖ Slittino e tubing ‖ التزلج بالمزلجة والإطار ‖ 雪橇与雪圈 ‖ そり遊び ‖ 썰매와 튜브 ‖ स्लेज और ट्यूबिंग
+1211 ‖ Luge ‖ Luge ‖ Luge ‖ Luge ‖ Rodeln ‖ Slittino ‖ الزلاجة الفردية ‖ 无舵雪橇 ‖ リュージュ ‖ 루지 ‖ ल्यूज
+1212 ‖ Natural track luge ‖ Luge en pista natural ‖ Luge sur piste naturelle ‖ Luge em pista natural ‖ Naturbahnrodeln ‖ Slittino su pista naturale ‖ الزلاجة على مسار طبيعي ‖ 天然道雪橇 ‖ 自然コースのリュージュ ‖ 자연 트랙 루지 ‖ प्राकृतिक ट्रैक ल्यूज
+1213 ‖ Synchronized skating ‖ Patinaje sincronizado ‖ Patinage synchronisé ‖ Patinação sincronizada ‖ Synchroneiskunstlauf ‖ Pattinaggio sincronizzato ‖ التزلج المتزامن ‖ 同步滑冰 ‖ シンクロナイズドスケーティング ‖ 싱크로나이즈드 스케이팅 ‖ सिंक्रोनाइज़्ड स्केटिंग
+1214 ‖ Skeleton ‖ Skeleton ‖ Skeleton ‖ Skeleton ‖ Skeleton ‖ Skeleton ‖ السكيليتون ‖ 钢架雪车 ‖ スケルトン ‖ 스켈레톤 ‖ स्केलेटन
+1215 ‖ Ski cross ‖ Skicross ‖ Skicross ‖ Ski cross ‖ Skicross ‖ Skicross ‖ سباق التزلج المتقاطع ‖ 障碍追逐 ‖ スキークロス ‖ 스키크로스 ‖ स्की क्रॉस
+1216 ‖ Ski touring ‖ Esquí de travesía ‖ Ski de randonnée ‖ Esqui de travessia ‖ Skitour ‖ Scialpinismo ‖ التزلج الجبلي ‖ 滑雪登山 ‖ スキーツアー ‖ 스키 투어 ‖ स्की टूरिंग
+1217 ‖ Speed skiing ‖ Esquí de velocidad ‖ Ski de vitesse ‖ Esqui de velocidade ‖ Speedski ‖ Sci di velocità ‖ التزلج السريع على المنحدر ‖ 速度滑雪 ‖ スピードスキー ‖ 스피드 스키 ‖ स्पीड स्कीइंग
+1218 ‖ Ski slopestyle ‖ Slopestyle en esquí ‖ Slopestyle à ski ‖ Slopestyle no esqui ‖ Ski-Slopestyle ‖ Slopestyle con gli sci ‖ السلوب ستايل بالتزلج ‖ 自由式滑雪坡面障碍技巧 ‖ スキー スロープスタイル ‖ 스키 슬로프스타일 ‖ स्की स्लोपस्टाइल
+1219 ‖ Snowshoeing ‖ Raquetas de nieve ‖ Raquettes ‖ Raquetes de neve ‖ Schneeschuhwandern ‖ Ciaspole ‖ المشي بأحذية الثلج ‖ 雪鞋行走 ‖ スノーシュー ‖ 스노슈잉 ‖ स्नोशूइंग
+1220 ‖ Snowboarding ‖ Snowboard ‖ Snowboard ‖ Snowboard ‖ Snowboarden ‖ Snowboard ‖ التزلج على اللوح الثلجي ‖ 单板滑雪 ‖ スノーボード ‖ 스노보드 ‖ स्नोबोर्डिंग
+1221 ‖ Snowboard cross ‖ Snowboard cross ‖ Snowboard cross ‖ Snowboard cross ‖ Snowboardcross ‖ Snowboard cross ‖ سباق السنوبورد المتقاطع ‖ 单板障碍追逐 ‖ スノーボードクロス ‖ 스노보드 크로스 ‖ स्नोबोर्ड क्रॉस
+1222 ‖ Snowkiting ‖ Snowkite ‖ Snowkite ‖ Snowkite ‖ Snowkiten ‖ Snowkite ‖ التزلج بالطائرة الورقية ‖ 雪地风筝 ‖ スノーカイト ‖ 스노카이트 ‖ स्नोकाइटिंग
+1223 ‖ Splitboarding ‖ Splitboard ‖ Splitboard ‖ Splitboard ‖ Splitboarden ‖ Splitboard ‖ السبليت بورد ‖ 分体滑雪板 ‖ スプリットボード ‖ 스플릿보드 ‖ स्प्लिटबोर्डिंग
+1224 ‖ Telemark ‖ Telemark ‖ Télémark ‖ Telemark ‖ Telemark ‖ Telemark ‖ التيليمارك ‖ 屈膝旋转滑雪 ‖ テレマーク ‖ 텔레마크 ‖ टेलीमार्क
+1225 ‖ Figure skating ‖ Patinaje artístico ‖ Patinage artistique ‖ Patinação artística ‖ Eiskunstlauf ‖ Pattinaggio artistico ‖ التزلج الفني ‖ 花样滑冰 ‖ フィギュアスケート ‖ 피겨스케이팅 ‖ फ़िगर स्केटिंग
+1226 ‖ Freeride skiing ‖ Esquí freeride ‖ Ski freeride ‖ Esqui freeride ‖ Freeride ‖ Sci freeride ‖ التزلج الحر خارج المسارات ‖ 野雪滑雪 ‖ フリーライドスキー ‖ 프리라이드 스키 ‖ फ़्रीराइड स्कीइंग
+1227 ‖ Freestyle skiing ‖ Esquí acrobático ‖ Ski freestyle ‖ Esqui freestyle ‖ Freestyle-Skiing ‖ Sci freestyle ‖ التزلج الحر ‖ 自由式滑雪 ‖ フリースタイルスキー ‖ 프리스타일 스키 ‖ फ़्रीस्टाइल स्कीइंग
+1228 ‖ Freestyle snowboarding ‖ Snowboard freestyle ‖ Snowboard freestyle ‖ Snowboard freestyle ‖ Freestyle-Snowboarden ‖ Snowboard freestyle ‖ السنوبورد الحر ‖ 自由式单板 ‖ スノーボード フリースタイル ‖ 스노보드 프리스타일 ‖ फ़्रीस्टाइल स्नोबोर्डिंग
+1229 ‖ Ski halfpipe ‖ Halfpipe en esquí ‖ Half-pipe à ski ‖ Halfpipe no esqui ‖ Ski-Halfpipe ‖ Halfpipe con gli sci ‖ نصف الأنبوب بالتزلج ‖ 自由式滑雪U型场地 ‖ スキー ハーフパイプ ‖ 스키 하프파이프 ‖ स्की हाफ़पाइप
+1230 ‖ Ice hockey ‖ Hockey sobre hielo ‖ Hockey sur glace ‖ Hóquei no gelo ‖ Eishockey ‖ Hockey su ghiaccio ‖ هوكي الجليد ‖ 冰球 ‖ アイスホッケー ‖ 아이스하키 ‖ आइस हॉकी
+1231 ‖ Short bandy ‖ Bandy corto ‖ Bandy court ‖ Bandy curto ‖ Kurzbandy ‖ Bandy corto ‖ الباندي القصير ‖ 短场班迪球 ‖ ショートバンディ ‖ 쇼트 밴디 ‖ शॉर्ट बैंडी
+1232 ‖ Short track ‖ Short track ‖ Short-track ‖ Patinação de velocidade em pista curta ‖ Shorttrack ‖ Short track ‖ التزلج السريع على المضمار القصير ‖ 短道速滑 ‖ ショートトラック ‖ 쇼트트랙 ‖ शॉर्ट ट्रैक
+1233 ‖ Game sports ‖ Deportes de juego ‖ Sports de jeu ‖ Esportes de jogo ‖ Spielsportarten ‖ Sport di gioco ‖ الرياضات الجماعية والتنافسية ‖ 球类与竞技运动 ‖ 球技・対戦スポーツ ‖ 구기·대전 종목 ‖ खेल प्रतियोगिताएँ
+1234 ‖ Basque pelota: hand ‖ Pelota vasca: mano ‖ Pelote basque : main nue ‖ Pelota basca: mão ‖ Baskische Pelota: Hand ‖ Pelota basca: mano ‖ البيلوتا الباسكية: اليد ‖ 巴斯克回力球：徒手 ‖ バスクペロタ：素手 ‖ 바스크 펠로타: 맨손 ‖ बास्क पेलोटा: हाथ
+1235 ‖ Basque pelota: pala corta ‖ Pelota vasca: pala corta ‖ Pelote basque : pala corta ‖ Pelota basca: pala corta ‖ Baskische Pelota: Pala corta ‖ Pelota basca: pala corta ‖ البيلوتا الباسكية: المضرب القصير ‖ 巴斯克回力球：短板 ‖ バスクペロタ：パラコルタ ‖ 바스크 펠로타: 팔라 코르타 ‖ बास्क पेलोटा: पाला कोर्टा
+1236 ‖ Basque pelota: leather paleta ‖ Pelota vasca: paleta cuero ‖ Pelote basque : paleta cuir ‖ Pelota basca: paleta couro ‖ Baskische Pelota: Paleta Leder ‖ Pelota basca: paleta cuoio ‖ البيلوتا الباسكية: كرة جلدية ‖ 巴斯克回力球：皮球拍 ‖ バスクペロタ：パレタ(革) ‖ 바스크 펠로타: 가죽 팔레타 ‖ बास्क पेलोटा: चमड़े की पलेटा
+1237 ‖ Basque pelota: rubber paleta ‖ Pelota vasca: paleta goma ‖ Pelote basque : paleta gomme ‖ Pelota basca: paleta borracha ‖ Baskische Pelota: Paleta Gummi ‖ Pelota basca: paleta gomma ‖ البيلوتا الباسكية: كرة مطاطية ‖ 巴斯克回力球：橡胶球拍 ‖ バスクペロタ：パレタ(ゴム) ‖ 바스크 펠로타: 고무 팔레타 ‖ बास्क पेलोटा: रबर की पलेटा
+1238 ‖ Basque pelota: cesta punta ‖ Pelota vasca: cesta punta ‖ Pelote basque : cesta punta ‖ Pelota basca: cesta punta ‖ Baskische Pelota: Cesta Punta ‖ Pelota basca: cesta punta ‖ البيلوتا الباسكية: السلة ‖ 巴斯克回力球：长筐 ‖ バスクペロタ：セスタプンタ ‖ 바스크 펠로타: 세스타 푼타 ‖ बास्क पेलोटा: सेस्टा पुंटा
+1239 ‖ Basque pelota: frontball ‖ Pelota vasca: frontball ‖ Pelote basque : frontball ‖ Pelota basca: frontball ‖ Baskische Pelota: Frontball ‖ Pelota basca: frontball ‖ البيلوتا الباسكية: فرونتبول ‖ 巴斯克回力球：墙球 ‖ バスクペロタ：フロントボール ‖ 바스크 펠로타: 프론트볼 ‖ बास्क पेलोटा: फ़्रंटबॉल
+1240 ‖ Basque pelota: frontenis ‖ Pelota vasca: frontenis ‖ Pelote basque : frontenis ‖ Pelota basca: frontenis ‖ Baskische Pelota: Frontenis ‖ Pelota basca: frontenis ‖ البيلوتا الباسكية: فرونتنيس ‖ 巴斯克回力球：网拍 ‖ バスクペロタ：フロンテニス ‖ 바스크 펠로타: 프론테니스 ‖ बास्क पेलोटा: फ़्रंटेनिस

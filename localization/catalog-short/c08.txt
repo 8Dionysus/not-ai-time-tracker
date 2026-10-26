@@ -1,0 +1,140 @@
+961 ‖ Own creative projects ‖ Proyectos creativos propios ‖ Projets créatifs perso ‖ Projetos criativos próprios ‖ Eigene kreative Projekte ‖ Progetti creativi personali ‖ مشاريعي الإبداعية ‖ 个人创作项目 ‖ 自分の創作プロジェクト ‖ 개인 창작 프로젝트 ‖ अपनी रचनात्मक परियोजनाएँ
+962 ‖ Personal ‖ Propio ‖ Perso ‖ Pessoal ‖ Eigenes ‖ Personale ‖ خاص ‖ 自定义 ‖ マイ分類 ‖ 나만의 분류 ‖ निजी
+963 ‖ No section yet ‖ Sin sección ‖ Sans rubrique ‖ Sem seção ‖ Noch ohne Bereich ‖ Senza sezione ‖ بلا قسم بعد ‖ 暂未分类 ‖ 未分類 ‖ 아직 분류 없음 ‖ अभी बिना श्रेणी
+964 ‖ Watching and listening ‖ Ver y escuchar ‖ Regarder et écouter ‖ Assistir e ouvir ‖ Schauen und Hören ‖ Guardare e ascoltare ‖ المشاهدة والاستماع ‖ 观看与收听 ‖ 見る・聴く ‖ 보기와 듣기 ‖ देखना और सुनना
+965 ‖ Audio and podcasts ‖ Audio y pódcasts ‖ Audio et podcasts ‖ Áudio e podcasts ‖ Audio und Podcasts ‖ Audio e podcast ‖ الصوتيات والبودكاست ‖ 音频与播客 ‖ 音声とポッドキャスト ‖ 오디오와 팟캐스트 ‖ ऑडियो और पॉडकास्ट
+966 ‖ Video ‖ Vídeo ‖ Vidéo ‖ Vídeo ‖ Video ‖ Video ‖ الفيديو ‖ 视频 ‖ 動画 ‖ 영상 ‖ वीडियो
+967 ‖ Feeds, sites and forums ‖ Feeds, webs y foros ‖ Fils, sites et forums ‖ Feeds, sites e fóruns ‖ Feeds, Websites und Foren ‖ Feed, siti e forum ‖ الخلاصات والمواقع والمنتديات ‖ 信息流、网站与论坛 ‖ フィード・サイト・掲示板 ‖ 피드·사이트·포럼 ‖ फ़ीड, साइटें और फ़ोरम
+968 ‖ Choosing what to watch ‖ Elegir qué ver ‖ Choisir quoi regarder ‖ Escolher o que assistir ‖ Aussuchen, was man schaut ‖ Scegliere cosa guardare ‖ اختيار ما سأشاهده ‖ 挑选要看的内容 ‖ 見るものを選ぶ ‖ 볼 것 고르기 ‖ क्या देखें, चुनना
+969 ‖ Streaming catalog ‖ Catálogo de streaming ‖ Catalogue de streaming ‖ Catálogo de streaming ‖ Streaming-Katalog ‖ Catalogo streaming ‖ كتالوج البث ‖ 浏览流媒体片库 ‖ 配信カタログ ‖ 스트리밍 목록 ‖ स्ट्रीमिंग कैटलॉग
+970 ‖ Short videos and social media ‖ Vídeos cortos y redes sociales ‖ Vidéos courtes et réseaux sociaux ‖ Vídeos curtos e redes sociais ‖ Kurzvideos und soziale Medien ‖ Video brevi e social ‖ المقاطع القصيرة ووسائل التواصل ‖ 短视频与社交媒体 ‖ ショート動画とSNS ‖ 숏폼과 SNS ‖ शॉर्ट वीडियो और सोशल मीडिया
+971 ‖ Web surfing ‖ Navegar por webs ‖ Surfer sur le web ‖ Navegar na internet ‖ Im Netz surfen ‖ Navigare sul web ‖ تصفح المواقع ‖ 随便上网 ‖ ネットサーフィン ‖ 웹서핑 ‖ वेब सर्फ़िंग
+972 ‖ Forums and discussions ‖ Foros y debates ‖ Forums et discussions ‖ Fóruns e discussões ‖ Foren und Diskussionen ‖ Forum e discussioni ‖ المنتديات والنقاشات ‖ 论坛与讨论 ‖ 掲示板と議論 ‖ 포럼과 토론 ‖ फ़ोरम और चर्चाएँ
+973 ‖ Scrolling a feed ‖ Pasar el feed ‖ Faire défiler le fil ‖ Rolar o feed ‖ Feed durchscrollen ‖ Scorrere il feed ‖ تصفح الخلاصة ‖ 刷信息流 ‖ フィードを眺める ‖ 피드 넘기기 ‖ फ़ीड स्क्रॉल करना
+974 ‖ Music ‖ Música ‖ Musique ‖ Música ‖ Musik ‖ Musica ‖ الموسيقى ‖ 音乐 ‖ 音楽 ‖ 음악 ‖ संगीत
+975 ‖ Listening ‖ Escuchar ‖ Écouter ‖ Ouvir ‖ Hören ‖ Ascoltare ‖ الاستماع ‖ 收听 ‖ 聴く ‖ 듣기 ‖ सुनना
+976 ‖ Album or playlist ‖ Álbum o playlist ‖ Album ou playlist ‖ Álbum ou playlist ‖ Album oder Playlist ‖ Album o playlist ‖ ألبوم أو قائمة تشغيل ‖ 专辑或歌单 ‖ アルバムやプレイリスト ‖ 앨범이나 플레이리스트 ‖ एल्बम या प्लेलिस्ट
+977 ‖ Audiobook ‖ Audiolibro ‖ Livre audio ‖ Audiolivro ‖ Hörbuch ‖ Audiolibro ‖ كتاب صوتي ‖ 有声书 ‖ オーディオブック ‖ 오디오북 ‖ ऑडियोबुक
+978 ‖ Audio drama ‖ Radioteatro ‖ Fiction audio ‖ Radionovela ‖ Hörspiel ‖ Radiodramma ‖ دراما صوتية ‖ 广播剧 ‖ オーディオドラマ ‖ 오디오 드라마 ‖ ऑडियो ड्रामा
+979 ‖ Live audio ‖ Audio en directo ‖ Audio en direct ‖ Áudio ao vivo ‖ Live-Audio ‖ Audio dal vivo ‖ بث صوتي مباشر ‖ 音频直播 ‖ 音声ライブ ‖ 오디오 라이브 ‖ लाइव ऑडियो
+980 ‖ Leisure lecture ‖ Charla por placer ‖ Conférence pour le plaisir ‖ Palestra por lazer ‖ Vortrag zum Vergnügen ‖ Conferenza per piacere ‖ محاضرة للمتعة ‖ 休闲讲座 ‖ 趣味の講演 ‖ 교양 강연 ‖ शौक़िया व्याख्यान
+981 ‖ Podcast ‖ Pódcast ‖ Podcast ‖ Podcast ‖ Podcast ‖ Podcast ‖ بودكاست ‖ 播客 ‖ ポッドキャスト ‖ 팟캐스트 ‖ पॉडकास्ट
+982 ‖ Radio ‖ Radio ‖ Radio ‖ Rádio ‖ Radio ‖ Radio ‖ الراديو ‖ 广播 ‖ ラジオ ‖ 라디오 ‖ रेडियो
+983 ‖ Ambient and sounds ‖ Ambient y sonidos ‖ Ambiances et sons ‖ Ambiente e sons ‖ Ambient und Klänge ‖ Ambient e suoni ‖ أصوات محيطة ‖ 环境音 ‖ 環境音 ‖ 앰비언트와 소리 ‖ एम्बिएंट और ध्वनियाँ
+984 ‖ Watching ‖ Ver ‖ Regarder ‖ Assistir ‖ Schauen ‖ Guardare ‖ المشاهدة ‖ 观看 ‖ 見る ‖ 보기 ‖ देखना
+985 ‖ Animation and anime ‖ Animación y anime ‖ Animation et anime ‖ Animação e anime ‖ Animation und Anime ‖ Animazione e anime ‖ الرسوم المتحركة والأنمي ‖ 动画 ‖ アニメ ‖ 애니메이션 ‖ एनीमेशन और एनीमे
+986 ‖ Video podcast ‖ Videopódcast ‖ Podcast vidéo ‖ Videocast ‖ Videopodcast ‖ Videopodcast ‖ بودكاست مرئي ‖ 视频播客 ‖ ビデオポッドキャスト ‖ 영상 팟캐스트 ‖ वीडियो पॉडकास्ट
+987 ‖ Recorded lecture or vlog ‖ Clase grabada o vlog ‖ Cours enregistré ou vlog ‖ Aula gravada ou vlog ‖ Aufgezeichneter Vortrag oder Vlog ‖ Lezione registrata o vlog ‖ محاضرة مسجلة أو فلوغ ‖ 录播讲座或视频博客 ‖ 録画講義やVlog ‖ 녹화 강의나 브이로그 ‖ रिकॉर्डेड लेक्चर या व्लॉग
+988 ‖ Esports broadcast ‖ Retransmisión de esports ‖ Diffusion d’e-sport ‖ Transmissão de e-sports ‖ E-Sport-Übertragung ‖ Diretta di esport ‖ بث الرياضات الإلكترونية ‖ 电竞直播 ‖ eスポーツ中継 ‖ e스포츠 중계 ‖ ई-स्पोर्ट्स प्रसारण
+989 ‖ Let’s plays ‖ Gameplays ‖ Let’s play ‖ Gameplays ‖ Let’s Plays ‖ Gameplay ‖ مقاطع اللعب ‖ 游戏实况 ‖ ゲーム実況 ‖ 게임 실황 ‖ लेट्स प्ले वीडियो
+990 ‖ Online videos ‖ Vídeos en internet ‖ Vidéos en ligne ‖ Vídeos na internet ‖ Onlinevideos ‖ Video online ‖ مقاطع الإنترنت ‖ 网络视频 ‖ ネット動画 ‖ 인터넷 영상 ‖ ऑनलाइन वीडियो
+991 ‖ Series ‖ Serie ‖ Série ‖ Série ‖ Serie ‖ Serie TV ‖ مسلسل ‖ 剧集 ‖ ドラマ ‖ 드라마 ‖ सीरीज़
+992 ‖ Sports broadcast ‖ Retransmisión deportiva ‖ Retransmission sportive ‖ Transmissão esportiva ‖ Sportübertragung ‖ Diretta sportiva ‖ بث رياضي ‖ 体育直播 ‖ スポーツ中継 ‖ 스포츠 중계 ‖ खेल प्रसारण
+993 ‖ Livestream ‖ Directo ‖ Live ‖ Live ‖ Livestream ‖ Live streaming ‖ بث مباشر ‖ 直播 ‖ 配信 ‖ 라이브 방송 ‖ लाइवस्ट्रीम
+994 ‖ TV show ‖ Programa de televisión ‖ Émission de télé ‖ Programa de TV ‖ Fernsehsendung ‖ Programma TV ‖ برنامج تلفزيوني ‖ 电视节目 ‖ テレビ番組 ‖ TV 프로그램 ‖ टीवी कार्यक्रम
+995 ‖ Movie ‖ Película ‖ Film ‖ Filme ‖ Film ‖ Film ‖ فيلم ‖ 电影 ‖ 映画 ‖ 영화 ‖ फ़िल्म
+996 ‖ Movie or series ‖ Película o serie ‖ Film ou série ‖ Filme ou série ‖ Film oder Serie ‖ Film o serie ‖ فيلم أو مسلسل ‖ 电影或剧集 ‖ 映画やドラマ ‖ 영화나 드라마 ‖ फ़िल्म या सीरीज़
+997 ‖ Sleep ‖ Sueño ‖ Sommeil ‖ Sono ‖ Schlaf ‖ Sonno ‖ النوم ‖ 睡眠 ‖ 睡眠 ‖ 수면 ‖ नींद
+998 ‖ Insomnia ‖ Insomnio ‖ Insomnie ‖ Insônia ‖ Schlaflosigkeit ‖ Insonnia ‖ الأرق ‖ 失眠 ‖ 眠れない時間 ‖ 불면 ‖ अनिद्रा
+999 ‖ Nap ‖ Siesta ‖ Sieste ‖ Cochilo ‖ Mittagsschlaf ‖ Pisolino ‖ قيلولة ‖ 午睡 ‖ 昼寝 ‖ 낮잠 ‖ दिन की झपकी
+1000 ‖ Other sleep-related ‖ Otros asuntos del sueño ‖ Autre lié au sommeil ‖ Outros ligados ao sono ‖ Sonstiges rund um Schlaf ‖ Altro legato al sonno ‖ أمور أخرى متعلقة بالنوم ‖ 其他与睡眠相关 ‖ その他の睡眠関連 ‖ 기타 수면 관련 ‖ नींद से जुड़ा अन्य
+1001 ‖ Short sleep ‖ Sueño corto ‖ Sommeil court ‖ Sono curto ‖ Kurzschlaf ‖ Sonno breve ‖ نوم قصير ‖ 短睡 ‖ 短い睡眠 ‖ 짧은 잠 ‖ थोड़ी नींद
+1002 ‖ Night sleep ‖ Sueño nocturno ‖ Nuit de sommeil ‖ Sono noturno ‖ Nachtschlaf ‖ Sonno notturno ‖ نوم الليل ‖ 夜间睡眠 ‖ 夜の睡眠 ‖ 밤잠 ‖ रात की नींद
+1003 ‖ Main sleep ‖ Sueño principal ‖ Sommeil principal ‖ Sono principal ‖ Hauptschlaf ‖ Sonno principale ‖ النوم الرئيسي ‖ 主睡眠 ‖ 主な睡眠 ‖ 주 수면 ‖ मुख्य नींद
+1004 ‖ Winding down for bed ‖ Prepararse para dormir ‖ Préparation au coucher ‖ Preparação para dormir ‖ Zubettgehen ‖ Prepararsi a dormire ‖ الاستعداد للنوم ‖ 睡前准备 ‖ 寝る準備 ‖ 잠자리 준비 ‖ सोने की तैयारी
+1005 ‖ Community and meaning ‖ Comunidad y sentido ‖ Communauté et sens ‖ Comunidade e sentido ‖ Gemeinschaft und Sinn ‖ Comunità e senso ‖ المجتمع والمعنى ‖ 社群与意义 ‖ コミュニティと生きがい ‖ 공동체와 의미 ‖ समुदाय और अर्थ
+1006 ‖ Helping friends for free ‖ Ayudar a amigos sin cobrar ‖ Aider des amis bénévolement ‖ Ajudar amigos de graça ‖ Freunden unentgeltlich helfen ‖ Aiutare gli amici gratis ‖ مساعدة الأصدقاء مجانًا ‖ 无偿帮朋友 ‖ 友人の手伝い ‖ 친구 무상 도움 ‖ दोस्तों की मुफ़्त मदद
+1007 ‖ Volunteering ‖ Voluntariado ‖ Bénévolat ‖ Voluntariado ‖ Ehrenamt ‖ Volontariato ‖ التطوع ‖ 志愿服务 ‖ ボランティア ‖ 자원봉사 ‖ स्वयंसेवा
+1008 ‖ Volunteering with an organization ‖ Voluntariado en una organización ‖ Bénévolat associatif ‖ Voluntariado em organização ‖ Ehrenamt in einer Organisation ‖ Volontariato in un’organizzazione ‖ التطوع في منظمة ‖ 在机构做志愿者 ‖ 団体でのボランティア ‖ 단체 자원봉사 ‖ संगठन में स्वयंसेवा
+1009 ‖ Civic duty ‖ Deber cívico ‖ Devoir civique ‖ Dever cívico ‖ Bürgerpflicht ‖ Dovere civico ‖ الواجب المدني ‖ 公民义务 ‖ 市民の義務 ‖ 시민의 의무 ‖ नागरिक कर्तव्य
+1010 ‖ Civic engagement ‖ Participación ciudadana ‖ Engagement citoyen ‖ Participação cidadã ‖ Bürgerschaftliches Engagement ‖ Partecipazione civica ‖ المشاركة المدنية ‖ 公民参与 ‖ 市民参加 ‖ 시민 참여 ‖ नागरिक भागीदारी
+1011 ‖ Community meeting ‖ Asamblea vecinal ‖ Réunion de quartier ‖ Assembleia comunitária ‖ Bürgerversammlung ‖ Assemblea di comunità ‖ اجتماع مجتمعي ‖ 社区会议 ‖ 地域の集会 ‖ 주민 회의 ‖ सामुदायिक बैठक
+1012 ‖ Community mutual aid ‖ Ayuda mutua comunitaria ‖ Entraide communautaire ‖ Mutirão comunitário ‖ Gemeinschaftliche Nachbarschaftshilfe ‖ Mutuo aiuto comunitario ‖ التعاون المجتمعي ‖ 社区互助 ‖ 地域の共同作業 ‖ 마을 품앗이 ‖ सामुदायिक परस्पर सहायता
+1013 ‖ Community service role ‖ Cargo comunitario ‖ Charge communautaire ‖ Cargo comunitário ‖ Ehrenamt in der Gemeinde ‖ Incarico comunitario ‖ دور خدمي في المجتمع ‖ 社区职务 ‖ 地域の役目 ‖ 공동체 직책 ‖ समुदाय में ज़िम्मेदारी
+1014 ‖ Yard or park cleanup ‖ Limpieza y jardinería de patio o parque ‖ Nettoyage et verdissement d’un parc ‖ Limpeza e plantio em praça ou pátio ‖ Hof oder Park aufräumen und begrünen ‖ Pulizia e verde di cortile o parco ‖ تنظيف وتشجير فناء أو حديقة ‖ 清洁绿化院子或公园 ‖ 公園や庭の清掃・緑化 ‖ 마당·공원 청소와 녹화 ‖ आँगन या पार्क की सफ़ाई और हरियाली
+1015 ‖ Organization or community tasks ‖ Asuntos de una organización o comunidad ‖ Affaires d’une association ‖ Atividades de organização ou comunidade ‖ Vereins- oder Gemeinschaftsarbeit ‖ Attività di organizzazione o comunità ‖ شؤون منظمة أو مجتمع ‖ 组织或社群事务 ‖ 団体や地域の用事 ‖ 단체·공동체 일 ‖ संगठन या समुदाय के काम
+1016 ‖ Other spiritual practice ‖ Otra práctica espiritual ‖ Autre pratique spirituelle ‖ Outra prática espiritual ‖ Andere spirituelle Praxis ‖ Altra pratica spirituale ‖ ممارسة روحية أخرى ‖ 其他灵性实践 ‖ その他の宗教的実践 ‖ 기타 영적 수행 ‖ अन्य आध्यात्मिक अभ्यास
+1017 ‖ Other community event ‖ Otro evento comunitario ‖ Autre événement communautaire ‖ Outro evento comunitário ‖ Andere Gemeinschaftsveranstaltung ‖ Altro evento di comunità ‖ فعالية مجتمعية أخرى ‖ 其他社区活动 ‖ その他の地域行事 ‖ 기타 공동체 행사 ‖ अन्य सामुदायिक कार्यक्रम
+1018 ‖ Other participation ‖ Otra participación ‖ Autre participation ‖ Outra participação ‖ Andere Beteiligung ‖ Altra partecipazione ‖ مشاركة أخرى ‖ 其他参与与交流 ‖ その他の参加と交流 ‖ 기타 참여와 교류 ‖ अन्य भागीदारी
+1019 ‖ Spiritual practice ‖ Práctica espiritual ‖ Pratique spirituelle ‖ Prática espiritual ‖ Spirituelle Praxis ‖ Pratica spirituale ‖ الممارسة الروحية ‖ 灵性实践 ‖ 宗教的実践 ‖ 영적 수행 ‖ आध्यात्मिक अभ्यास
+1020 ‖ Cultural and historical holidays ‖ Fiestas culturales e históricas ‖ Fêtes culturelles et historiques ‖ Festas culturais e históricas ‖ Kulturelle und historische Feste ‖ Feste culturali e storiche ‖ الأعياد الثقافية والتاريخية ‖ 文化与历史节日 ‖ 文化・歴史の祭り ‖ 문화·역사 명절 ‖ सांस्कृतिक और ऐतिहासिक त्योहार
+1021 ‖ Ritual food, clothes and objects ‖ Comida, ropa y objetos rituales ‖ Mets, habits et objets rituels ‖ Comida, roupas e objetos rituais ‖ Rituelle Speisen, Kleidung und Gegenstände ‖ Cibi, abiti e oggetti rituali ‖ الطعام والملابس والأدوات الطقسية ‖ 仪式食物、服饰与器物 ‖ 儀礼の料理・衣装・道具 ‖ 의례 음식·옷·물품 ‖ अनुष्ठान का भोजन, वस्त्र और सामान
+1022 ‖ Preparing a local festival ‖ Preparar una fiesta local ‖ Préparer une fête locale ‖ Preparar uma festa local ‖ Lokales Fest vorbereiten ‖ Preparare una festa locale ‖ التحضير لاحتفال محلي ‖ 筹备本地节庆 ‖ 地域の祭りの準備 ‖ 지역 축제 준비 ‖ स्थानीय उत्सव की तैयारी
+1023 ‖ Family traditions ‖ Tradiciones familiares ‖ Traditions familiales ‖ Tradições familiares ‖ Familientraditionen ‖ Tradizioni di famiglia ‖ التقاليد العائلية ‖ 家庭传统 ‖ 家族の伝統 ‖ 가족 전통 ‖ पारिवारिक परंपराएँ
+1024 ‖ Prayer and spiritual practice ‖ Oración y práctica espiritual ‖ Prière et pratique spirituelle ‖ Oração e prática espiritual ‖ Gebet und spirituelle Praxis ‖ Preghiera e pratica spirituale ‖ الصلاة والممارسة الروحية ‖ 祈祷与灵修 ‖ 祈りと宗教的実践 ‖ 기도와 영적 수행 ‖ प्रार्थना और आध्यात्मिक अभ्यास
+1025 ‖ Prayer, meditation, contemplation ‖ Oración, meditación, contemplación ‖ Prière, méditation, contemplation ‖ Oração, meditação, contemplação ‖ Gebet, Meditation, Kontemplation ‖ Preghiera, meditazione, contemplazione ‖ الصلاة والتأمل ‖ 祈祷、冥想、静观 ‖ 祈り・瞑想・黙想 ‖ 기도·명상·관상 ‖ प्रार्थना, ध्यान, चिंतन
+1026 ‖ Reading spiritual texts ‖ Lectura de textos espirituales ‖ Lecture de textes spirituels ‖ Leitura de textos espirituais ‖ Spirituelle Texte lesen ‖ Lettura di testi spirituali ‖ قراءة النصوص الروحية ‖ 阅读灵性经典 ‖ 聖典を読む ‖ 경전 읽기 ‖ आध्यात्मिक ग्रंथ पढ़ना
+1027 ‖ Community concerts and gatherings ‖ Conciertos y encuentros comunitarios ‖ Concerts et rencontres de quartier ‖ Shows e encontros comunitários ‖ Gemeinschaftskonzerte und Treffen ‖ Concerti e incontri di comunità ‖ الحفلات واللقاءات المجتمعية ‖ 社区音乐会与聚会 ‖ 地域のコンサートと集い ‖ 공동체 음악회와 모임 ‖ सामुदायिक संगीत और मिलन
+1028 ‖ Funerals and memorials ‖ Funerales y velatorios ‖ Obsèques et commémorations ‖ Funerais e homenagens ‖ Beerdigung und Trauerfeier ‖ Funerali e commemorazioni ‖ الجنازات والعزاء ‖ 葬礼与追思 ‖ 葬儀と法事 ‖ 장례와 추모 ‖ अंतिम संस्कार और श्रद्धांजलि
+1029 ‖ Leading a service or rite ‖ Oficiar un servicio o rito ‖ Célébrer un office ou un rite ‖ Conduzir culto ou rito ‖ Gottesdienst oder Ritus leiten ‖ Celebrare una funzione o un rito ‖ إمامة الصلاة أو الطقس ‖ 主持礼拜或仪式 ‖ 礼拝や儀式の執り行い ‖ 예배·의식 집전 ‖ पूजा या अनुष्ठान कराना
+1030 ‖ Religious service ‖ Servicio religioso ‖ Office religieux ‖ Culto religioso ‖ Gottesdienst ‖ Funzione religiosa ‖ الشعائر الدينية ‖ 宗教仪式 ‖ 礼拝 ‖ 예배 ‖ धार्मिक सेवा
+1031 ‖ Secular rites and commemorations ‖ Ritos laicos y conmemoraciones ‖ Rites laïques et commémorations ‖ Ritos laicos e datas comemorativas ‖ Weltliche Feiern und Gedenktage ‖ Riti laici e commemorazioni ‖ الطقوس المدنية والمناسبات التذكارية ‖ 世俗仪式与纪念活动 ‖ 世俗の儀式と記念行事 ‖ 세속 의례와 기념일 ‖ धर्मनिरपेक्ष समारोह और स्मृति अवसर
+1032 ‖ Preparing a ceremony ‖ Preparar una ceremonia ‖ Préparer une cérémonie ‖ Preparar uma cerimônia ‖ Zeremonie vorbereiten ‖ Preparare una cerimonia ‖ التحضير لمراسم ‖ 筹备仪式 ‖ 式の準備 ‖ 의식 준비 ‖ समारोह की तैयारी
+1033 ‖ Visiting a memorial site ‖ Visitar un lugar de memoria ‖ Se rendre sur un lieu de mémoire ‖ Visitar um local de memória ‖ Gedenkort besuchen ‖ Visitare un luogo della memoria ‖ زيارة مكان تذكاري ‖ 祭扫纪念地 ‖ 墓参り・慰霊 ‖ 성묘·추모지 방문 ‖ स्मृति स्थल जाना
+1034 ‖ Joint worship and rites ‖ Culto y ritos comunitarios ‖ Culte et rites collectifs ‖ Culto e ritos coletivos ‖ Gemeinsamer Gottesdienst und Riten ‖ Culto e riti comunitari ‖ العبادة والطقوس الجماعية ‖ 集体礼拜与仪式 ‖ 共同の礼拝と儀式 ‖ 공동 예배와 의식 ‖ सामूहिक पूजा और अनुष्ठान
+1035 ‖ Online service ‖ Servicio en línea ‖ Office en ligne ‖ Culto online ‖ Online-Gottesdienst ‖ Funzione online ‖ الشعائر عبر الإنترنت ‖ 线上礼拜 ‖ オンライン礼拝 ‖ 온라인 예배 ‖ ऑनलाइन धार्मिक सेवा
+1036 ‖ Sport and movement ‖ Deporte y movimiento ‖ Sport et mouvement ‖ Esporte e movimento ‖ Sport und Bewegung ‖ Sport e movimento ‖ الرياضة والحركة ‖ 运动 ‖ スポーツと運動 ‖ 운동과 스포츠 ‖ खेल और व्यायाम
+1037 ‖ Adaptive sports ‖ Deporte adaptado ‖ Sport adapté ‖ Esporte adaptado ‖ Behindertensport ‖ Sport adattato ‖ الرياضة المكيّفة ‖ 适应性运动 ‖ アダプティブスポーツ ‖ 장애인 스포츠 ‖ अनुकूलित खेल
+1038 ‖ Adaptive practices ‖ Prácticas adaptadas ‖ Pratiques adaptées ‖ Práticas adaptadas ‖ Angepasste Übungen ‖ Pratiche adattate ‖ ممارسات مكيّفة ‖ 适应性练习 ‖ アダプティブな練習 ‖ 적응형 운동 ‖ अनुकूलित अभ्यास
+1039 ‖ Adaptive rowing ‖ Remo adaptado ‖ Aviron adapté ‖ Remo adaptado ‖ Adaptives Rudern ‖ Canottaggio adattato ‖ التجديف المكيّف ‖ 适应性划船 ‖ アダプティブローイング ‖ 적응형 조정 ‖ अनुकूलित नौकायन
+1040 ‖ Adaptive yoga and mobility ‖ Yoga y movilidad adaptados ‖ Yoga et mobilité adaptés ‖ Ioga e mobilidade adaptados ‖ Angepasstes Yoga und Mobilität ‖ Yoga e mobilità adattati ‖ اليوغا والمرونة المكيّفة ‖ 适应性瑜伽与灵活性 ‖ アダプティブヨガと可動域 ‖ 적응형 요가와 가동성 ‖ अनुकूलित योग और गतिशीलता
+1041 ‖ Adaptive snowboarding ‖ Snowboard adaptado ‖ Snowboard adapté ‖ Snowboard adaptado ‖ Adaptives Snowboarden ‖ Snowboard adattato ‖ التزلج على اللوح المكيّف ‖ 适应性单板滑雪 ‖ アダプティブスノーボード ‖ 적응형 스노보드 ‖ अनुकूलित स्नोबोर्डिंग
+1042 ‖ Sit-skiing ‖ Esquí sentado ‖ Ski assis ‖ Esqui sentado ‖ Monoski ‖ Sci da seduti ‖ التزلج جلوسًا ‖ 坐式滑雪 ‖ チェアスキー ‖ 좌식 스키 ‖ बैठकर स्कीइंग
+1043 ‖ Seated strength training ‖ Fuerza sentado ‖ Renforcement assis ‖ Musculação sentado ‖ Krafttraining im Sitzen ‖ Forza da seduti ‖ تمارين القوة جلوسًا ‖ 坐姿力量训练 ‖ 座位での筋トレ ‖ 좌식 근력 운동 ‖ बैठकर शक्ति प्रशिक्षण
+1044 ‖ Wheelchair workout ‖ Entrenamiento en silla de ruedas ‖ Entraînement en fauteuil ‖ Treino em cadeira de rodas ‖ Rollstuhltraining ‖ Allenamento in carrozzina ‖ التمرين على الكرسي المتحرك ‖ 轮椅训练 ‖ 車いすトレーニング ‖ 휠체어 운동 ‖ व्हीलचेयर वर्कआउट
+1045 ‖ Handcycling ‖ Handbike ‖ Handbike ‖ Handbike ‖ Handbike ‖ Handbike ‖ دراجة اليد ‖ 手摇自行车 ‖ ハンドサイクル ‖ 핸드사이클 ‖ हैंडसाइकिलिंग
+1046 ‖ Fast wheelchair sprint ‖ Sprint en silla de ruedas ‖ Sprint en fauteuil ‖ Sprint em cadeira de rodas ‖ Rollstuhlsprint ‖ Sprint in carrozzina ‖ سباق سريع على الكرسي ‖ 轮椅快速冲刺 ‖ 車いすのスプリント ‖ 휠체어 질주 ‖ व्हीलचेयर पर तेज़ दौड़
+1047 ‖ Para and wheelchair sports ‖ Deportes paralímpicos y en silla ‖ Parasports et sports en fauteuil ‖ Esportes paralímpicos e em cadeira ‖ Para- und Rollstuhlsport ‖ Sport paralimpici e in carrozzina ‖ الرياضات البارالمبية ورياضات الكراسي ‖ 残疾人与轮椅运动 ‖ パラスポーツと車いす競技 ‖ 패럴림픽·휠체어 종목 ‖ पैरा और व्हीलचेयर खेल
+1048 ‖ Wheelchair badminton ‖ Bádminton en silla ‖ Badminton en fauteuil ‖ Badminton em cadeira de rodas ‖ Rollstuhl-Badminton ‖ Badminton in carrozzina ‖ الريشة الطائرة على الكراسي ‖ 轮椅羽毛球 ‖ 車いすバドミントン ‖ 휠체어 배드민턴 ‖ व्हीलचेयर बैडमिंटन
+1049 ‖ Wheelchair basketball ‖ Baloncesto en silla ‖ Basket fauteuil ‖ Basquete em cadeira de rodas ‖ Rollstuhlbasketball ‖ Basket in carrozzina ‖ كرة السلة على الكراسي ‖ 轮椅篮球 ‖ 車いすバスケットボール ‖ 휠체어 농구 ‖ व्हीलचेयर बास्केटबॉल
+1050 ‖ Guided running ‖ Carrera con guía ‖ Course avec guide ‖ Corrida com guia ‖ Laufen mit Guide ‖ Corsa con guida ‖ الجري مع مرشد ‖ 视障陪跑 ‖ 伴走ランニング ‖ 가이드 러닝 ‖ गाइड के साथ दौड़
+1051 ‖ Boccia ‖ Boccia ‖ Boccia ‖ Bocha ‖ Boccia ‖ Boccia ‖ البوتشيا ‖ 硬地滚球 ‖ ボッチャ ‖ 보치아 ‖ बोचा
+1052 ‖ Goalball ‖ Goalball ‖ Goalball ‖ Goalball ‖ Goalball ‖ Goalball ‖ كرة الهدف ‖ 盲人门球 ‖ ゴールボール ‖ 골볼 ‖ गोलबॉल
+1053 ‖ Wheelchair racing ‖ Carreras en silla ‖ Course en fauteuil ‖ Corrida em cadeira de rodas ‖ Rollstuhlrennen ‖ Gare in carrozzina ‖ سباقات الكراسي ‖ 轮椅竞速 ‖ 車いすレース ‖ 휠체어 레이스 ‖ व्हीलचेयर दौड़
+1054 ‖ Wheelchair curling ‖ Curling en silla ‖ Curling en fauteuil ‖ Curling em cadeira de rodas ‖ Rollstuhlcurling ‖ Curling in carrozzina ‖ الكيرلنغ على الكراسي ‖ 轮椅冰壶 ‖ 車いすカーリング ‖ 휠체어 컬링 ‖ व्हीलचेयर कर्लिंग
+1055 ‖ Para badminton ‖ Parabádminton ‖ Parabadminton ‖ Parabadminton ‖ Para-Badminton ‖ Para-badminton ‖ الريشة الطائرة البارالمبية ‖ 残疾人羽毛球 ‖ パラバドミントン ‖ 장애인 배드민턴 ‖ पैरा बैडमिंटन
+1056 ‖ Para rowing ‖ Pararremo ‖ Para-aviron ‖ Pararremo ‖ Para-Rudern ‖ Para-canottaggio ‖ التجديف البارالمبي ‖ 残疾人赛艇 ‖ パラローイング ‖ 장애인 조정 ‖ पैरा रोइंग
+1057 ‖ Para canoe ‖ Paracanoa ‖ Paracanoë ‖ Paracanoagem ‖ Para-Kanu ‖ Paracanoa ‖ الكانوي البارالمبي ‖ 残疾人皮划艇 ‖ パラカヌー ‖ 장애인 카누 ‖ पैरा कैनो
+1058 ‖ Para equestrian ‖ Paraecuestre ‖ Para-équitation ‖ Paraequestre ‖ Para-Reitsport ‖ Para-equitazione ‖ الفروسية البارالمبية ‖ 残疾人马术 ‖ パラ馬術 ‖ 장애인 승마 ‖ पैरा घुड़सवारी
+1059 ‖ Para powerlifting ‖ Powerlifting paralímpico ‖ Para-haltérophilie ‖ Halterofilismo paralímpico ‖ Para-Powerlifting ‖ Para-powerlifting ‖ رفع الأثقال البارالمبي ‖ 残疾人举重 ‖ パラパワーリフティング ‖ 장애인 역도 ‖ पैरा पावरलिफ़्टिंग
+1060 ‖ Para swimming ‖ Paranatación ‖ Paranatation ‖ Paranatação ‖ Para-Schwimmen ‖ Paranuoto ‖ السباحة البارالمبية ‖ 残疾人游泳 ‖ パラ水泳 ‖ 장애인 수영 ‖ पैरा तैराकी
+1061 ‖ Para archery ‖ Tiro con arco paralímpico ‖ Para-tir à l’arc ‖ Tiro com arco paralímpico ‖ Para-Bogenschießen ‖ Para-tiro con l’arco ‖ الرماية بالقوس البارالمبية ‖ 残疾人射箭 ‖ パラアーチェリー ‖ 장애인 양궁 ‖ पैरा तीरंदाज़ी
+1062 ‖ Para triathlon ‖ Paratriatlón ‖ Paratriathlon ‖ Paratriatlo ‖ Para-Triathlon ‖ Paratriathlon ‖ الترايثلون البارالمبي ‖ 残疾人铁人三项 ‖ パラトライアスロン ‖ 장애인 트라이애슬론 ‖ पैरा ट्रायथलॉन
+1063 ‖ Wheelchair rugby ‖ Rugby en silla ‖ Rugby fauteuil ‖ Rúgbi em cadeira de rodas ‖ Rollstuhlrugby ‖ Rugby in carrozzina ‖ الرغبي على الكراسي ‖ 轮椅橄榄球 ‖ 車いすラグビー ‖ 휠체어 럭비 ‖ व्हीलचेयर रग्बी
+1064 ‖ Sitting volleyball ‖ Voleibol sentado ‖ Volley assis ‖ Vôlei sentado ‖ Sitzvolleyball ‖ Sitting volley ‖ الكرة الطائرة جلوسًا ‖ 坐式排球 ‖ シッティングバレー ‖ 좌식 배구 ‖ बैठकर वॉलीबॉल
+1065 ‖ Sled hockey ‖ Hockey en trineo ‖ Para-hockey sur glace ‖ Hóquei em trenó ‖ Para-Eishockey ‖ Para ice hockey ‖ هوكي الزلاجات ‖ 冰橇冰球 ‖ パラアイスホッケー ‖ 아이스 슬레지하키 ‖ स्लेज हॉकी
+1066 ‖ Handcycle racing ‖ Competiciones de handbike ‖ Compétitions de handbike ‖ Competições de handbike ‖ Handbike-Rennen ‖ Gare di handbike ‖ سباقات دراجة اليد ‖ 手摇车比赛 ‖ ハンドサイクル競技 ‖ 핸드사이클 경기 ‖ हैंडसाइकिल प्रतियोगिता
+1067 ‖ Wheelchair tennis ‖ Tenis en silla ‖ Tennis fauteuil ‖ Tênis em cadeira de rodas ‖ Rollstuhltennis ‖ Tennis in carrozzina ‖ التنس على الكراسي ‖ 轮椅网球 ‖ 車いすテニス ‖ 휠체어 테니스 ‖ व्हीलचेयर टेनिस
+1068 ‖ Wheelchair fencing ‖ Esgrima en silla ‖ Escrime fauteuil ‖ Esgrima em cadeira de rodas ‖ Rollstuhlfechten ‖ Scherma in carrozzina ‖ المبارزة على الكراسي ‖ 轮椅击剑 ‖ 車いすフェンシング ‖ 휠체어 펜싱 ‖ व्हीलचेयर फ़ेंसिंग
+1069 ‖ Blind football ‖ Fútbol para ciegos ‖ Cécifoot ‖ Futebol de cegos ‖ Blindenfußball ‖ Calcio per ciechi ‖ كرة القدم للمكفوفين ‖ 盲人足球 ‖ ブラインドサッカー ‖ 시각장애인 축구 ‖ नेत्रहीन फ़ुटबॉल
+1070 ‖ Handcycling and para cycling ‖ Handbike y paraciclismo ‖ Handbike et paracyclisme ‖ Handbike e paraciclismo ‖ Handbike und Paracycling ‖ Handbike e paraciclismo ‖ دراجة اليد والدراجات البارالمبية ‖ 手摇车与残疾人自行车 ‖ ハンドサイクルとパラサイクリング ‖ 핸드사이클과 장애인 사이클 ‖ हैंडसाइकिल और पैरा साइक्लिंग
+1071 ‖ Wheelchair stroll ‖ Paseo en silla de ruedas ‖ Balade en fauteuil ‖ Passeio em cadeira de rodas ‖ Rollstuhlspaziergang ‖ Passeggiata in carrozzina ‖ نزهة على الكرسي المتحرك ‖ 轮椅散步 ‖ 車いすでの散歩 ‖ 휠체어 산책 ‖ व्हीलचेयर पर सैर
+1072 ‖ Water ‖ Agua ‖ Eau ‖ Água ‖ Wasser ‖ Acqua ‖ الرياضات المائية ‖ 水上运动 ‖ 水上・水中 ‖ 수상·수중 ‖ जल खेल
+1073 ‖ Rowing ‖ Remo ‖ Aviron ‖ Remo ‖ Rudern ‖ Canottaggio ‖ التجديف ‖ 赛艇 ‖ ボート競技 ‖ 조정 ‖ रोइंग
+1074 ‖ Apnea ‖ Apnea ‖ Apnée ‖ Apneia ‖ Apnoetauchen ‖ Apnea ‖ حبس النفس تحت الماء ‖ 闭气训练 ‖ アプネア ‖ 무호흡 잠수 ‖ एप्निया
+1075 ‖ Bodyboarding ‖ Bodyboard ‖ Bodyboard ‖ Bodyboard ‖ Bodyboarding ‖ Bodyboard ‖ ركوب الأمواج باللوح القصير ‖ 趴板冲浪 ‖ ボディボード ‖ 보디보딩 ‖ बॉडीबोर्डिंग
+1076 ‖ Bodysurfing ‖ Bodysurf ‖ Bodysurf ‖ Bodysurf ‖ Bodysurfen ‖ Bodysurf ‖ ركوب الأمواج بالجسد ‖ 徒手冲浪 ‖ ボディサーフィン ‖ 보디서핑 ‖ बॉडीसर्फ़िंग
+1077 ‖ Wakeboarding ‖ Wakeboard ‖ Wakeboard ‖ Wakeboard ‖ Wakeboarden ‖ Wakeboard ‖ الويك بورد ‖ 尾波滑水 ‖ ウェイクボード ‖ 웨이크보드 ‖ वेकबोर्डिंग
+1078 ‖ Wakesurfing ‖ Wakesurf ‖ Wakesurf ‖ Wakesurf ‖ Wakesurfen ‖ Wakesurf ‖ الويك سيرف ‖ 尾波冲浪 ‖ ウェイクサーフィン ‖ 웨이크서핑 ‖ वेकसर्फ़िंग
+1079 ‖ Wing foiling ‖ Wing foil ‖ Wing foil ‖ Wing foil ‖ Wingfoilen ‖ Wing foil ‖ الوينغ فويل ‖ 翼板水翼 ‖ ウイングフォイル ‖ 윙포일 ‖ विंग फ़ॉइलिंग
+1080 ‖ Windsurfing ‖ Windsurf ‖ Planche à voile ‖ Windsurfe ‖ Windsurfen ‖ Windsurf ‖ ركوب الأمواج الشراعي ‖ 帆板 ‖ ウィンドサーフィン ‖ 윈드서핑 ‖ विंडसर्फ़िंग
+1081 ‖ Water skiing ‖ Esquí acuático ‖ Ski nautique ‖ Esqui aquático ‖ Wasserski ‖ Sci nautico ‖ التزلج على الماء ‖ 滑水 ‖ 水上スキー ‖ 수상스키 ‖ वॉटर स्कीइंग
+1082 ‖ Jet ski racing ‖ Carreras de motos de agua ‖ Course de jet-ski ‖ Corrida de jet ski ‖ Jetski-Rennen ‖ Gare di moto d’acqua ‖ سباقات الدراجات المائية ‖ 摩托艇竞速 ‖ 水上バイクレース ‖ 제트스키 레이스 ‖ जेट स्की दौड़
+1083 ‖ Powerboat racing ‖ Motonáutica ‖ Course de bateaux à moteur ‖ Motonáutica ‖ Motorbootrennen ‖ Motonautica ‖ سباقات الزوارق ‖ 摩托艇比赛 ‖ パワーボートレース ‖ 모터보트 경주 ‖ पावरबोट दौड़
+1084 ‖ Canoe sprint ‖ Piragüismo de velocidad ‖ Course en ligne en canoë ‖ Canoagem de velocidade ‖ Kanurennsport ‖ Canoa velocità ‖ سباق الكانوي السريع ‖ 静水皮划艇 ‖ カヌースプリント ‖ 카누 스프린트 ‖ कैनो स्प्रिंट
+1085 ‖ Canoe sprint and slalom ‖ Piragüismo de velocidad y eslalon ‖ Canoë course en ligne et slalom ‖ Canoagem velocidade e slalom ‖ Kanurennsport und Slalom ‖ Canoa velocità e slalom ‖ الكانوي السريع والمتعرج ‖ 静水与激流回旋皮划艇 ‖ カヌースプリントとスラローム ‖ 카누 스프린트와 슬라럼 ‖ कैनो स्प्रिंट और स्लैलम
+1086 ‖ Canoe slalom ‖ Eslalon en piragua ‖ Canoë slalom ‖ Canoagem slalom ‖ Kanuslalom ‖ Canoa slalom ‖ الكانوي المتعرج ‖ 激流回旋 ‖ カヌースラローム ‖ 카누 슬라럼 ‖ कैनो स्लैलम
+1087 ‖ Scuba diving ‖ Buceo ‖ Plongée ‖ Mergulho ‖ Tauchen ‖ Immersioni ‖ الغوص ‖ 水肺潜水 ‖ スキューバダイビング ‖ 스쿠버다이빙 ‖ स्कूबा डाइविंग
+1088 ‖ Dragon boat ‖ Barco dragón ‖ Bateau-dragon ‖ Barco-dragão ‖ Drachenboot ‖ Dragon boat ‖ قارب التنين ‖ 龙舟 ‖ ドラゴンボート ‖ 드래곤보트 ‖ ड्रैगन बोट
+1089 ‖ Kitesurfing ‖ Kitesurf ‖ Kitesurf ‖ Kitesurfe ‖ Kitesurfen ‖ Kitesurf ‖ ركوب الأمواج بالطائرة الورقية ‖ 风筝冲浪 ‖ カイトサーフィン ‖ 카이트서핑 ‖ काइटसर्फ़िंग
+1090 ‖ Kayaking ‖ Kayak ‖ Kayak ‖ Caiaque ‖ Kajakfahren ‖ Kayak ‖ التجديف بالكاياك ‖ 皮划艇 ‖ カヤック ‖ 카약 ‖ कयाकिंग
+1091 ‖ Marathon swimming ‖ Natación de maratón ‖ Nage de grand fond ‖ Maratona aquática ‖ Marathonschwimmen ‖ Nuoto di fondo ‖ سباحة الماراثون ‖ 马拉松游泳 ‖ マラソンスイミング ‖ 마라톤 수영 ‖ मैराथन तैराकी
+1092 ‖ Mermaiding ‖ Natación de sirena ‖ Nage en sirène ‖ Natação de sereia ‖ Meerjungfrauenschwimmen ‖ Nuoto da sirena ‖ سباحة حورية البحر ‖ 美人鱼游泳 ‖ マーメイドスイム ‖ 머메이드 수영 ‖ मरमेड तैराकी
+1093 ‖ MotoSurf ‖ MotoSurf ‖ MotoSurf ‖ MotoSurf ‖ MotoSurf ‖ MotoSurf ‖ موتوسيرف ‖ 电动冲浪板 ‖ モトサーフ ‖ 모토서프 ‖ मोटोसर्फ़
+1094 ‖ Motorboat navigation ‖ Navegación en lancha ‖ Navigation en bateau à moteur ‖ Navegação em lancha ‖ Motorbootnavigation ‖ Navigazione in motoscafo ‖ الملاحة بالقارب ‖ 摩托艇航行 ‖ モーターボートの航行 ‖ 모터보트 항해 ‖ मोटरबोट नेविगेशन
+1095 ‖ Wellness swimming ‖ Natación saludable ‖ Natation bien-être ‖ Natação terapêutica ‖ Gesundheitsschwimmen ‖ Nuoto per il benessere ‖ السباحة العلاجية ‖ 康复游泳 ‖ 健康のための水泳 ‖ 건강 수영 ‖ स्वास्थ्य के लिए तैराकी
+1096 ‖ Offshore racing ‖ Regatas offshore ‖ Course offshore ‖ Corrida offshore ‖ Offshore-Rennen ‖ Gare offshore ‖ سباقات الزوارق في البحر المفتوح ‖ 近海动力艇赛 ‖ オフショアレース ‖ 오프쇼어 레이스 ‖ ऑफ़शोर दौड़
+1097 ‖ Sailing ‖ Vela ‖ Voile ‖ Vela ‖ Segeln ‖ Vela ‖ الإبحار الشراعي ‖ 帆船 ‖ セーリング ‖ 요트 ‖ पाल नौकायन
+1098 ‖ Pool swimming ‖ Natación en piscina ‖ Natation en piscine ‖ Natação na piscina ‖ Schwimmen im Becken ‖ Nuoto in piscina ‖ السباحة في المسبح ‖ 泳池游泳 ‖ プールで泳ぐ ‖ 수영장 수영 ‖ पूल में तैराकी
+1099 ‖ Open water swimming ‖ Aguas abiertas ‖ Nage en eau libre ‖ Águas abertas ‖ Freiwasserschwimmen ‖ Acque libere ‖ السباحة في المياه المفتوحة ‖ 公开水域游泳 ‖ オープンウォーター ‖ 오픈워터 수영 ‖ खुले पानी में तैराकी
+1100 ‖ Underwater wrestling ‖ Lucha subacuática ‖ Lutte subaquatique ‖ Luta subaquática ‖ Unterwasserringen ‖ Lotta subacquea ‖ المصارعة تحت الماء ‖ 水下摔跤 ‖ 水中レスリング ‖ 수중 레슬링 ‖ पानी के नीचे कुश्ती

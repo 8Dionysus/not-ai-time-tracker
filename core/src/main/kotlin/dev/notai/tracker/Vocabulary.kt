@@ -154,7 +154,7 @@ fun catalogMeaningEquivalent(previous: Any,entry: Any): Boolean = when {
     previous is UnitDefinition && entry is UnitDefinition -> previous.copy(name = entry.name) == entry
     else -> false
 }
-private fun editorialReplacement(previous: Any,entry: Any,revisions: List<CatalogEditorialRevision>): Any? {
+private fun editorialReplacement(previous: Any,entry: Any,revisions: List<CatalogEditorialRevision>,inUse: (String)->Boolean): Any? {
     if(previous is Axis && entry is Axis) {
         val revision = revisions.singleOrNull { it.kind == "axis" && it.id == entry.id } ?: return null
         val current = catalogMeaningFingerprint(entry)
@@ -173,12 +173,17 @@ private fun editorialReplacement(previous: Any,entry: Any,revisions: List<Catalo
     // Names and aliases can be customized independently. Keep installed aliases even when the default name changes.
     val renamed = sha256(previous.name.toByteArray(Charsets.UTF_8)) in defaults
     val updated = base.copy(name = if(renamed) entry.name else previous.name,
-        aliases = if(renamed) (entry.aliases + previous.aliases).distinct() else previous.aliases)
+        aliases = if(renamed) (entry.aliases + previous.aliases).distinct() else previous.aliases,
+        archived = previous.archived || (revision.archive && entry.archived && !inUse(entry.id)))
     return updated.takeUnless { it == previous }
 }
 internal fun Dataset.mergeCatalog(incoming: VocabularyData,policy: CatalogInstallPolicy = CatalogInstallPolicy.STRICT,
     revisions: List<CatalogEditorialRevision> = emptyList()): Pair<Dataset,CatalogImportReport> {
     val outcomes = mutableListOf<CatalogEntryOutcome>()
+    // A retired type stays live wherever the user's own data names it. The check reads every record outside the vocabulary,
+    // so a new kind of reference can never be missed; it runs only when the catalog actually retires something.
+    val references by lazy { codec.encodeToString(Dataset.serializer(),copy(types = emptyList(),axes = emptyList(),metrics = emptyList(),units = emptyList())) }
+    val inUse: (String)->Boolean = { id -> references.contains(kotlinx.serialization.json.JsonPrimitive(id).toString()) }
     fun <T> merge(kind: String,old: List<T>,fresh: List<T>,key: (T)->Pair<String,Int?>): List<T> {
         val keys = fresh.map(key)
         ensure(keys.distinct().size == keys.size,"Duplicate $kind key in incoming catalog")
@@ -187,7 +192,7 @@ internal fun Dataset.mergeCatalog(incoming: VocabularyData,policy: CatalogInstal
         fresh.forEach { entry ->
             val (id,version) = key(entry); val previous = existing[id to version]
             val replacement = if(previous != null && policy == CatalogInstallPolicy.PRESERVE_LOCAL_PRESENTATION)
-                editorialReplacement(previous as Any,entry as Any,revisions) else null
+                editorialReplacement(previous as Any,entry as Any,revisions,inUse) else null
             @Suppress("UNCHECKED_CAST")
             if(replacement != null) replacements[id to version] = replacement as T
             outcomes += CatalogEntryOutcome(kind,id,version,when {

@@ -1,0 +1,140 @@
+1661 ‖ Preparing a 3D print ‖ Preparar el modelo para impresión 3D ‖ Préparer un modèle pour l’impression 3D ‖ Preparar modelo para impressão 3D ‖ Modell für den 3D-Druck vorbereiten ‖ Preparare il modello per la stampa 3D ‖ تجهيز النموذج للطباعة ثلاثية الأبعاد ‖ 准备 3D 打印模型 ‖ 3Dプリント用データの準備 ‖ 3D 프린팅 모델 준비 ‖ 3D प्रिंट के लिए मॉडल तैयार करना
+1662 ‖ Finishing and painting a model ‖ Acabado y pintura del modelo ‖ Finition et peinture d’un modèle ‖ Acabamento e pintura do modelo ‖ Modell nachbearbeiten und bemalen ‖ Rifinitura e pittura del modello ‖ تشطيب النموذج وتلوينه ‖ 模型后处理与上色 ‖ モデルの仕上げと塗装 ‖ 모델 후가공과 도색 ‖ मॉडल की फ़िनिशिंग और रंगाई
+1663 ‖ Fixing things and tools ‖ Arreglar objetos y herramientas ‖ Réparer objets et outils ‖ Consertar objetos e ferramentas ‖ Dinge und Werkzeug reparieren ‖ Riparare oggetti e attrezzi ‖ تصليح الأغراض والأدوات ‖ 修理物品与工具 ‖ 物や道具の修理 ‖ 물건·공구 수리 ‖ चीज़ें और औज़ार ठीक करना
+1664 ‖ Coding for yourself ‖ Programar por gusto ‖ Coder pour soi ‖ Programar por prazer ‖ Programmieren für sich ‖ Programmare per sé ‖ البرمجة لنفسي ‖ 业余编程 ‖ 趣味のプログラミング ‖ 취미 코딩 ‖ अपने लिए कोडिंग
+1665 ‖ Amateur radio ‖ Radioafición ‖ Radioamateurisme ‖ Radioamadorismo ‖ Amateurfunk ‖ Radioamatori ‖ هواة اللاسلكي ‖ 业余无线电 ‖ アマチュア無線 ‖ 아마추어 무선 ‖ शौक़िया रेडियो
+1666 ‖ Robotics ‖ Robótica ‖ Robotique ‖ Robótica ‖ Robotik ‖ Robotica ‖ الروبوتات ‖ 机器人 ‖ ロボット製作 ‖ 로봇 공학 ‖ रोबोटिक्स
+1667 ‖ PC building and upgrades ‖ Montar y mejorar el PC ‖ Monter et améliorer un PC ‖ Montar e atualizar PC ‖ PC bauen und aufrüsten ‖ Assemblare e aggiornare il PC ‖ تجميع الحاسوب وترقيته ‖ 装机与升级 ‖ 自作PCとアップグレード ‖ PC 조립과 업그레이드 ‖ पीसी बनाना और अपग्रेड करना
+1668 ‖ Furniture assembly ‖ Montaje de muebles ‖ Montage de meubles ‖ Montagem de móveis ‖ Möbelaufbau ‖ Montaggio di mobili ‖ تركيب الأثاث ‖ 组装家具 ‖ 家具の組み立て ‖ 가구 조립 ‖ फ़र्नीचर जोड़ना
+1669 ‖ Own game or mod ‖ Juego o mod propio ‖ Son jeu ou mod ‖ Jogo ou mod próprio ‖ Eigenes Spiel oder Mod ‖ Gioco o mod personale ‖ لعبتي أو تعديلي الخاص ‖ 自制游戏或模组 ‖ 自作ゲームやMOD ‖ 나만의 게임·모드 ‖ अपना गेम या मॉड
+1670 ‖ Home carpentry ‖ Carpintería en casa ‖ Menuiserie à la maison ‖ Marcenaria em casa ‖ Tischlerarbeiten im Haus ‖ Falegnameria in casa ‖ النجارة المنزلية ‖ 家庭木工 ‖ 家の木工 ‖ 집 목공 ‖ घर की बढ़ईगिरी
+1671 ‖ Vehicle tuning ‖ Tuning de vehículos ‖ Personnalisation de véhicule ‖ Tuning de veículo ‖ Fahrzeugtuning ‖ Tuning del veicolo ‖ تعديل المركبات ‖ 改装车辆 ‖ 乗り物のカスタム ‖ 차량 튜닝 ‖ वाहन ट्यूनिंग
+1672 ‖ DIY home improvements ‖ Mejoras caseras de bricolaje ‖ Bricolage à la maison ‖ Melhorias em casa ‖ Heimwerken im Haus ‖ Migliorie fai da te in casa ‖ تحسينات المنزل بيدي ‖ 自己动手改善家居 ‖ 家のDIYリフォーム ‖ 집 셀프 개선 ‖ घर में ख़ुद सुधार
+1673 ‖ CNC, laser and plotter cutting ‖ Corte CNC, láser y plóter ‖ Découpe CNC, laser et plotter ‖ Corte CNC, laser e plotter ‖ CNC-, Laser- und Plotterschneiden ‖ Taglio CNC, laser e plotter ‖ القص باستخدام CNC والليزر والراسمة ‖ 数控、激光与刻字切割 ‖ CNC・レーザー・カッティング ‖ CNC·레이저·플로터 커팅 ‖ CNC, लेज़र और प्लॉटर कटिंग
+1674 ‖ Electronics and soldering ‖ Electrónica y soldadura ‖ Électronique et soudure ‖ Eletrônica e solda ‖ Elektronik und Löten ‖ Elettronica e saldatura ‖ الإلكترونيات واللحام ‖ 电子与焊接 ‖ 電子工作とはんだ付け ‖ 전자 공작과 납땜 ‖ इलेक्ट्रॉनिक्स और सोल्डरिंग
+1675 ‖ Music, sound and stage ‖ Música, sonido y escena ‖ Musique, son et scène ‖ Música, som e palco ‖ Musik, Ton und Bühne ‖ Musica, suono e scena ‖ الموسيقى والصوت والمسرح ‖ 音乐、声音与舞台 ‖ 音楽・音・舞台 ‖ 음악·소리·무대 ‖ संगीत, ध्वनि और मंच
+1676 ‖ Arranging and notation ‖ Arreglos y notación ‖ Arrangement et notation ‖ Arranjo e notação ‖ Arrangement und Notensatz ‖ Arrangiamento e notazione ‖ التوزيع والتدوين الموسيقي ‖ 编曲与记谱 ‖ 編曲と記譜 ‖ 편곡과 악보 작성 ‖ संयोजन और स्वरलिपि
+1677 ‖ Beatmaking ‖ Producción de beats ‖ Beatmaking ‖ Produção de beats ‖ Beatmaking ‖ Beatmaking ‖ صناعة الإيقاعات ‖ 制作节拍 ‖ ビートメイク ‖ 비트메이킹 ‖ बीट बनाना
+1678 ‖ Performance or house concert ‖ Actuación o concierto en casa ‖ Concert ou concert à la maison ‖ Apresentação ou show em casa ‖ Auftritt oder Hauskonzert ‖ Esibizione o concerto in casa ‖ عرض أو حفل منزلي ‖ 演出或家庭音乐会 ‖ 演奏会やホームコンサート ‖ 공연·하우스 콘서트 ‖ प्रस्तुति या घरेलू संगीत समारोह
+1679 ‖ Jam ‖ Jam ‖ Bœuf ‖ Jam ‖ Jam-Session ‖ Jam session ‖ جلسة عزف ارتجالية ‖ 即兴合奏 ‖ ジャム ‖ 잼 ‖ जैम
+1680 ‖ DJing ‖ Pinchar ‖ DJing ‖ Discotecagem ‖ Auflegen ‖ Fare il DJ ‖ الدي جي ‖ 打碟 ‖ DJ ‖ 디제잉 ‖ डीजे करना
+1681 ‖ Recording and audio production ‖ Grabación y producción de audio ‖ Enregistrement et production audio ‖ Gravação e produção de áudio ‖ Aufnahme und Audioproduktion ‖ Registrazione e produzione audio ‖ التسجيل والإنتاج الصوتي ‖ 录音与音频制作 ‖ 録音と音楽制作 ‖ 녹음과 오디오 제작 ‖ रिकॉर्डिंग और ऑडियो प्रोडक्शन
+1682 ‖ Playing an instrument ‖ Tocar un instrumento ‖ Jouer d’un instrument ‖ Tocar um instrumento ‖ Instrument spielen ‖ Suonare uno strumento ‖ العزف على آلة ‖ 演奏乐器 ‖ 楽器演奏 ‖ 악기 연주 ‖ वाद्य बजाना
+1683 ‖ Improvisation ‖ Improvisación ‖ Improvisation ‖ Improvisação ‖ Improvisation ‖ Improvvisazione ‖ الارتجال ‖ 即兴 ‖ 即興 ‖ 즉흥 ‖ तात्कालिक प्रस्तुति
+1684 ‖ Karaoke ‖ Karaoke ‖ Karaoké ‖ Karaokê ‖ Karaoke ‖ Karaoke ‖ الكاريوكي ‖ 卡拉OK ‖ カラオケ ‖ 노래방 ‖ कराओके
+1685 ‖ Record collection ‖ Colección de discos ‖ Collection de vinyles ‖ Coleção de discos ‖ Plattensammlung ‖ Collezione di dischi ‖ مجموعة الأسطوانات ‖ 唱片收藏 ‖ レコードコレクション ‖ 레코드 컬렉션 ‖ रिकॉर्ड संग्रह
+1686 ‖ Cosplay ‖ Cosplay ‖ Cosplay ‖ Cosplay ‖ Cosplay ‖ Cosplay ‖ الكوسبلاي ‖ 角色扮演 ‖ コスプレ ‖ 코스프레 ‖ कॉस्प्ले
+1687 ‖ Amateur musical ‖ Musical amateur ‖ Comédie musicale amateur ‖ Musical amador ‖ Laienmusical ‖ Musical amatoriale ‖ مسرحية موسيقية للهواة ‖ 业余音乐剧 ‖ アマチュアミュージカル ‖ 아마추어 뮤지컬 ‖ शौक़िया संगीत नाटक
+1688 ‖ Mastering ‖ Masterización ‖ Mastering ‖ Masterização ‖ Mastering ‖ Mastering ‖ الماسترينغ ‖ 母带处理 ‖ マスタリング ‖ 마스터링 ‖ मास्टरिंग
+1689 ‖ Instrument tuning and care ‖ Afinar y cuidar el instrumento ‖ Accordage et entretien d’instrument ‖ Afinação e cuidado do instrumento ‖ Instrument stimmen und pflegen ‖ Accordatura e cura dello strumento ‖ ضبط الآلة والعناية بها ‖ 调音与保养乐器 ‖ 楽器の調律と手入れ ‖ 악기 조율과 관리 ‖ वाद्य की ट्यूनिंग और देखभाल
+1690 ‖ Organizing a concert or show ‖ Organizar un concierto o montaje ‖ Organiser un concert ou un spectacle ‖ Organizar show ou montagem ‖ Konzert oder Aufführung organisieren ‖ Organizzare un concerto o uno spettacolo ‖ تنظيم حفل أو عرض ‖ 组织音乐会或演出 ‖ コンサートや公演の企画 ‖ 공연 기획 ‖ संगीत समारोह या मंचन आयोजित करना
+1691 ‖ Singing ‖ Cantar ‖ Chant ‖ Cantar ‖ Singen ‖ Cantare ‖ الغناء ‖ 唱歌 ‖ 歌う ‖ 노래 ‖ गाना
+1692 ‖ Poetry recital ‖ Recital de poesía ‖ Récitation poétique ‖ Declamação de poesia ‖ Lyriklesung ‖ Recitazione di poesie ‖ إلقاء الشعر ‖ 诗歌朗诵 ‖ 詩の朗読 ‖ 시 낭송 ‖ काव्य पाठ
+1693 ‖ Working in a DAW ‖ Trabajo en DAW ‖ Travail dans une STAN ‖ Trabalho em DAW ‖ Arbeit in der DAW ‖ Lavoro in DAW ‖ العمل في محطة الصوت الرقمية ‖ 使用 DAW ‖ DAWでの作業 ‖ DAW 작업 ‖ DAW में काम
+1694 ‖ Ensemble rehearsal ‖ Ensayo de conjunto ‖ Répétition d’ensemble ‖ Ensaio de conjunto ‖ Ensembleprobe ‖ Prova d’insieme ‖ بروفة الفرقة ‖ 乐团排练 ‖ アンサンブル練習 ‖ 합주 연습 ‖ समूह रिहर्सल
+1695 ‖ Dance rehearsal ‖ Ensayo de baile ‖ Répétition de danse ‖ Ensaio de dança ‖ Tanzprobe ‖ Prova di danza ‖ بروفة رقص ‖ 舞蹈排练 ‖ ダンスのリハーサル ‖ 춤 리허설 ‖ नृत्य रिहर्सल
+1696 ‖ Sound design ‖ Diseño sonoro ‖ Sound design ‖ Design de som ‖ Sounddesign ‖ Sound design ‖ تصميم الصوت ‖ 声音设计 ‖ サウンドデザイン ‖ 사운드 디자인 ‖ साउंड डिज़ाइन
+1697 ‖ Mixing ‖ Mezcla ‖ Mixage ‖ Mixagem ‖ Mischen ‖ Mixaggio ‖ المزج ‖ 混音 ‖ ミックス ‖ 믹싱 ‖ मिक्सिंग
+1698 ‖ Songwriting ‖ Composición de canciones ‖ Écriture de chansons ‖ Composição de canções ‖ Songwriting ‖ Scrivere canzoni ‖ كتابة الأغاني ‖ 写歌 ‖ 作詞作曲 ‖ 작사·작곡 ‖ गीत लिखना
+1699 ‖ Stand-up ‖ Monólogos ‖ Stand-up ‖ Stand-up ‖ Stand-up ‖ Stand-up ‖ الكوميديا الارتجالية ‖ 单口喜剧 ‖ スタンダップコメディ ‖ 스탠드업 코미디 ‖ स्टैंड-अप
+1700 ‖ Stage rehearsal ‖ Ensayo técnico ‖ Répétition technique ‖ Ensaio técnico ‖ Bühnenprobe ‖ Prova tecnica ‖ بروفة المسرح ‖ 舞台排练 ‖ 舞台稽古 ‖ 무대 리허설 ‖ मंच रिहर्सल
+1701 ‖ Theater rehearsal ‖ Ensayo de teatro ‖ Répétition de théâtre ‖ Ensaio de teatro ‖ Theaterprobe ‖ Prova teatrale ‖ بروفة مسرحية ‖ 戏剧排练 ‖ 演劇の稽古 ‖ 연극 연습 ‖ नाटक रिहर्सल
+1702 ‖ Choir ‖ Coro ‖ Chorale ‖ Coral ‖ Chor ‖ Coro ‖ الجوقة ‖ 合唱 ‖ 合唱 ‖ 합창 ‖ गायक मंडली
+1703 ‖ Playing music ‖ Tocar música ‖ Faire de la musique ‖ Tocar música ‖ Musizieren ‖ Fare musica ‖ عزف الموسيقى ‖ 演奏音乐 ‖ 音楽の演奏と練習 ‖ 음악 연주와 연습 ‖ संगीत बजाना
+1704 ‖ Directing a production ‖ Dirección escénica ‖ Mise en scène ‖ Direção de montagem ‖ Regie einer Inszenierung ‖ Regia di uno spettacolo ‖ إخراج عرض ‖ 导演作品 ‖ 演出・監督 ‖ 작품 연출 ‖ प्रस्तुति का निर्देशन
+1705 ‖ Performance rehearsal ‖ Ensayo de actuación ‖ Répétition d’un spectacle ‖ Ensaio de apresentação ‖ Auftrittsprobe ‖ Prova dell’esibizione ‖ التدرب على العرض ‖ 演出排练 ‖ 本番のリハーサル ‖ 공연 리허설 ‖ प्रस्तुति रिहर्सल
+1706 ‖ Drawing ‖ Dibujar ‖ Dessiner ‖ Desenhar ‖ Zeichnen ‖ Disegnare ‖ الرسم ‖ 画画 ‖ 絵を描く ‖ 그림 그리기 ‖ चित्र बनाना
+1707 ‖ Handicrafts ‖ Manualidades ‖ Travaux manuels ‖ Artesanato ‖ Handarbeit ‖ Lavori manuali ‖ الأشغال اليدوية ‖ 手工 ‖ 手芸 ‖ 수공예 ‖ हस्तशिल्प
+1708 ‖ Making or fixing something ‖ Hacer o arreglar algo ‖ Fabriquer ou réparer ‖ Fazer ou consertar algo ‖ Etwas bauen oder reparieren ‖ Costruire o riparare qualcosa ‖ صنع شيء أو تصليحه ‖ 制作或修理物品 ‖ 物を作る・直す ‖ 만들기·고치기 ‖ कुछ बनाना या ठीक करना
+1709 ‖ Textiles and sewing ‖ Textil y costura ‖ Textile et couture ‖ Têxteis e costura ‖ Textil und Nähen ‖ Tessuti e cucito ‖ النسيج والخياطة ‖ 纺织与缝纫 ‖ 布と裁縫 ‖ 섬유와 바느질 ‖ वस्त्र और सिलाई
+1710 ‖ Felting ‖ Fieltro ‖ Feutrage ‖ Feltragem ‖ Filzen ‖ Infeltrimento ‖ اللبّاد ‖ 羊毛毡 ‖ フェルト ‖ 펠트 공예 ‖ फ़ेल्टिंग
+1711 ‖ Embroidery ‖ Bordado ‖ Broderie ‖ Bordado ‖ Sticken ‖ Ricamo ‖ التطريز ‖ 刺绣 ‖ 刺繍 ‖ 자수 ‖ कढ़ाई
+1712 ‖ Cross-stitch ‖ Punto de cruz ‖ Point de croix ‖ Ponto cruz ‖ Kreuzstich ‖ Punto croce ‖ التطريز بالغرزة المتقاطعة ‖ 十字绣 ‖ クロスステッチ ‖ 십자수 ‖ क्रॉस-स्टिच
+1713 ‖ Crochet ‖ Ganchillo ‖ Crochet ‖ Crochê ‖ Häkeln ‖ Uncinetto ‖ الكروشيه ‖ 钩针编织 ‖ かぎ針編み ‖ 코바늘뜨기 ‖ क्रोशिया
+1714 ‖ Knitting ‖ Tejer con agujas ‖ Tricot ‖ Tricô ‖ Stricken ‖ Maglia ‖ الحياكة بالصنارتين ‖ 棒针编织 ‖ 棒針編み ‖ 대바늘뜨기 ‖ सलाई से बुनाई
+1715 ‖ Tapestry ‖ Tapiz ‖ Tapisserie ‖ Tapeçaria ‖ Gobelin ‖ Arazzo ‖ نسج السجاد الجداري ‖ 挂毯 ‖ タペストリー ‖ 태피스트리 ‖ टेपेस्ट्री
+1716 ‖ Quilt ‖ Colcha ‖ Courtepointe ‖ Colcha ‖ Quilt ‖ Trapunta ‖ اللحاف ‖ 拼布被 ‖ キルト ‖ 퀼트 ‖ रज़ाई
+1717 ‖ Quilting and patchwork ‖ Acolchado y patchwork ‖ Quilting et patchwork ‖ Quilting e patchwork ‖ Quilten und Patchwork ‖ Quilting e patchwork ‖ الكويلت والترقيع ‖ 绗缝与拼布 ‖ キルトとパッチワーク ‖ 퀼팅과 패치워크 ‖ क्विल्टिंग और पैचवर्क
+1718 ‖ Costumes and cosplay ‖ Disfraces y cosplay ‖ Costumes et cosplay ‖ Fantasias e cosplay ‖ Kostüme und Cosplay ‖ Costumi e cosplay ‖ الأزياء والكوسبلاي ‖ 服装与角色扮演 ‖ 衣装とコスプレ ‖ 의상과 코스프레 ‖ पोशाक और कॉस्प्ले
+1719 ‖ Lacemaking ‖ Encaje ‖ Dentelle ‖ Renda ‖ Klöppeln ‖ Merletto ‖ صنع الدانتيل ‖ 蕾丝编织 ‖ レース編み ‖ 레이스 뜨기 ‖ लेस बनाना
+1720 ‖ Patchwork sewing ‖ Costura de retazos ‖ Couture patchwork ‖ Costura de retalhos ‖ Patchwork nähen ‖ Cucito patchwork ‖ الخياطة بالقصاصات ‖ 拼布缝纫 ‖ パッチワーク縫い ‖ 조각보 바느질 ‖ पैचवर्क सिलाई
+1721 ‖ Macramé ‖ Macramé ‖ Macramé ‖ Macramê ‖ Makramee ‖ Macramè ‖ المكرمية ‖ 绳结编织 ‖ マクラメ ‖ 마크라메 ‖ मैक्रेमे
+1722 ‖ Soft toys and fabric dolls ‖ Peluches y muñecas de tela ‖ Peluches et poupées en tissu ‖ Bichos de pelúcia e bonecas de pano ‖ Stofftiere und Stoffpuppen ‖ Peluche e bambole di stoffa ‖ الدمى القماشية ‖ 毛绒玩具与布娃娃 ‖ ぬいぐるみと布人形 ‖ 봉제 인형 ‖ मुलायम खिलौने और कपड़े की गुड़िया
+1723 ‖ Dyeing yarn and fabric ‖ Teñir lana y tela ‖ Teinture de fil et tissu ‖ Tingir fios e tecidos ‖ Garn und Stoff färben ‖ Tingere filati e tessuti ‖ صباغة الخيوط والأقمشة ‖ 染纱与染布 ‖ 糸と布の染色 ‖ 실·천 염색 ‖ धागा और कपड़ा रंगना
+1724 ‖ Spinning ‖ Hilado ‖ Filage ‖ Fiação ‖ Spinnen ‖ Filatura ‖ الغزل ‖ 纺纱 ‖ 糸紡ぎ ‖ 실잣기 ‖ कताई
+1725 ‖ Quilt stitching ‖ Acolchar capas de tela ‖ Matelassage ‖ Acolchoamento ‖ Steppen ‖ Trapuntatura ‖ تبطين الأقمشة ‖ 多层绗缝 ‖ キルティング ‖ 누빔 ‖ परतदार सिलाई
+1726 ‖ Weaving ‖ Tejido en telar ‖ Tissage ‖ Tecelagem ‖ Weben ‖ Tessitura ‖ النسيج ‖ 织布 ‖ 機織り ‖ 직조 ‖ बुनाई
+1727 ‖ Tunisian crochet ‖ Ganchillo tunecino ‖ Crochet tunisien ‖ Crochê tunisiano ‖ Tunesisches Häkeln ‖ Uncinetto tunisino ‖ الكروشيه التونسي ‖ 阿富汗针编织 ‖ アフガン編み ‖ 아프간 뜨기 ‖ ट्यूनीशियन क्रोशिया
+1728 ‖ Sewing clothes ‖ Coser ropa ‖ Couture de vêtements ‖ Costurar roupas ‖ Kleidung nähen ‖ Cucire abiti ‖ خياطة الملابس ‖ 缝制衣服 ‖ 洋裁 ‖ 옷 만들기 ‖ कपड़े सिलना
+1729 ‖ Writing and online expression ‖ Textos y expresión en línea ‖ Écrits et expression en ligne ‖ Textos e expressão online ‖ Texte und Ausdruck online ‖ Scrittura ed espressione online ‖ الكتابة والتعبير عبر الإنترنت ‖ 写作与网络表达 ‖ 文章とネットでの発信 ‖ 글과 온라인 표현 ‖ लेखन और ऑनलाइन अभिव्यक्ति
+1730 ‖ Webcomic ‖ Webcómic ‖ Webcomic ‖ Webcomic ‖ Webcomic ‖ Webcomic ‖ القصص المصورة على الويب ‖ 网络漫画 ‖ ウェブ漫画 ‖ 웹툰 ‖ वेबकॉमिक
+1731 ‖ Journal and essays ‖ Diario y ensayos ‖ Journal et essais ‖ Diário e ensaios ‖ Tagebuch und Essays ‖ Diario e saggi ‖ اليوميات والمقالات ‖ 日记与随笔 ‖ 日記とエッセイ ‖ 일기와 에세이 ‖ डायरी और निबंध
+1732 ‖ Personal blog ‖ Blog personal ‖ Blog perso ‖ Blog pessoal ‖ Persönlicher Blog ‖ Blog personale ‖ مدونة شخصية ‖ 个人博客 ‖ 個人ブログ ‖ 개인 블로그 ‖ निजी ब्लॉग
+1733 ‖ Writing fan fiction ‖ Escribir fanfics ‖ Écrire des fanfictions ‖ Escrever fanfics ‖ Fanfiction schreiben ‖ Scrivere fanfiction ‖ كتابة قصص المعجبين ‖ 写同人小说 ‖ 二次創作小説 ‖ 팬픽 쓰기 ‖ फ़ैन फ़िक्शन लिखना
+1734 ‖ Fan translation ‖ Traducción para el fandom ‖ Traduction pour le fandom ‖ Tradução para o fandom ‖ Fanübersetzung ‖ Traduzione per il fandom ‖ الترجمة للمعجبين ‖ 粉丝翻译 ‖ ファン翻訳 ‖ 팬 번역 ‖ फ़ैन अनुवाद
+1735 ‖ Fiction: story or novel ‖ Prosa: relato o novela ‖ Prose : nouvelle ou roman ‖ Prosa: conto ou romance ‖ Prosa: Erzählung oder Roman ‖ Narrativa: racconto o romanzo ‖ النثر: قصة أو رواية ‖ 小说创作 ‖ 小説 ‖ 소설 쓰기 ‖ कहानी या उपन्यास
+1736 ‖ Own podcast, vlog or stream ‖ Pódcast, vlog o directo propio ‖ Son podcast, vlog ou stream ‖ Podcast, vlog ou live próprio ‖ Eigener Podcast, Vlog oder Stream ‖ Podcast, vlog o stream personale ‖ بودكاستي أو مدونتي المرئية أو بثي ‖ 自己的播客、视频博客或直播 ‖ 自分のポッドキャスト・Vlog・配信 ‖ 나의 팟캐스트·브이로그·방송 ‖ अपना पॉडकास्ट, व्लॉग या स्ट्रीम
+1737 ‖ Poetry ‖ Poesía ‖ Poésie ‖ Poesia ‖ Gedichte ‖ Poesia ‖ الشعر ‖ 写诗 ‖ 詩 ‖ 시 ‖ कविता
+1738 ‖ Game script ‖ Guion de juego ‖ Scénario de jeu ‖ Roteiro de jogo ‖ Spielskript ‖ Sceneggiatura di gioco ‖ نص لعبة ‖ 游戏剧本 ‖ ゲームのシナリオ ‖ 게임 시나리오 ‖ गेम स्क्रिप्ट
+1739 ‖ Fan art ‖ Fanart ‖ Fan art ‖ Fanart ‖ Fanart ‖ Fan art ‖ رسوم المعجبين ‖ 同人图 ‖ ファンアート ‖ 팬아트 ‖ फ़ैन आर्ट
+1740 ‖ Personal photo and video ‖ Fotos y vídeos personales ‖ Photo et vidéo pour soi ‖ Fotos e vídeos pessoais ‖ Fotos und Videos für sich ‖ Foto e video personali ‖ صور وفيديوهات لنفسي ‖ 个人照片与视频 ‖ 自分用の写真と動画 ‖ 개인 사진과 영상 ‖ अपने लिए फ़ोटो और वीडियो
+1741 ‖ Photo and video shooting ‖ Fotografía y vídeo ‖ Photo et vidéo ‖ Fotografia e vídeo ‖ Fotografieren und Filmen ‖ Foto e riprese ‖ التصوير الفوتوغرافي والفيديو ‖ 拍照与摄像 ‖ 写真と動画撮影 ‖ 사진·영상 촬영 ‖ फ़ोटो और वीडियो शूटिंग
+1742 ‖ Choreography ‖ Coreografía ‖ Chorégraphie ‖ Coreografia ‖ Choreografie ‖ Coreografia ‖ تصميم الرقصات ‖ 编舞 ‖ 振り付け ‖ 안무 ‖ कोरियोग्राफ़ी
+1743 ‖ Digital graphics and photo ‖ Gráficos digitales y fotografía ‖ Graphisme numérique et photo ‖ Gráficos digitais e foto ‖ Digitale Grafik und Foto ‖ Grafica digitale e foto ‖ الرسوميات الرقمية والتصوير ‖ 数字图像与摄影 ‖ デジタルグラフィックと写真 ‖ 디지털 그래픽과 사진 ‖ डिजिटल ग्राफ़िक्स और फ़ोटो
+1744 ‖ Brand identity and logo ‖ Identidad visual y logotipo ‖ Identité visuelle et logo ‖ Identidade visual e logo ‖ Corporate Design und Logo ‖ Identità visiva e logo ‖ الهوية البصرية والشعار ‖ 品牌形象与标志 ‖ アイデンティティとロゴ ‖ 아이덴티티와 로고 ‖ ब्रांड पहचान और लोगो
+1745 ‖ Photo archive ‖ Archivo de fotos ‖ Archives photo ‖ Arquivo de fotos ‖ Fotoarchiv ‖ Archivio fotografico ‖ أرشيف الصور ‖ 照片归档 ‖ 写真の整理と保存 ‖ 사진 보관 ‖ फ़ोटो संग्रह
+1746 ‖ Layout ‖ Maquetación ‖ Mise en page ‖ Diagramação ‖ Layout ‖ Impaginazione ‖ التنضيد والإخراج ‖ 排版 ‖ レイアウト ‖ 편집 디자인 ‖ लेआउट
+1747 ‖ Graphic design ‖ Diseño gráfico ‖ Graphisme ‖ Design gráfico ‖ Grafikdesign ‖ Graphic design ‖ التصميم الجرافيكي ‖ 平面设计 ‖ グラフィックデザイン ‖ 그래픽 디자인 ‖ ग्राफ़िक डिज़ाइन
+1748 ‖ RAW processing ‖ Revelado RAW ‖ Développement RAW ‖ Revelação RAW ‖ RAW-Entwicklung ‖ Sviluppo RAW ‖ معالجة صور RAW ‖ RAW 处理 ‖ RAW現像 ‖ RAW 현상 ‖ RAW प्रोसेसिंग
+1749 ‖ Culling photos ‖ Selección de fotos ‖ Tri des photos ‖ Seleção de fotos ‖ Fotos auswählen ‖ Selezione delle foto ‖ فرز الصور ‖ 挑选照片 ‖ 写真のセレクト ‖ 사진 고르기 ‖ फ़ोटो छाँटना
+1750 ‖ Photo shoot prep ‖ Preparar una sesión de fotos ‖ Préparer une séance photo ‖ Preparar ensaio fotográfico ‖ Fotoshooting vorbereiten ‖ Preparare un servizio fotografico ‖ التحضير لجلسة تصوير ‖ 准备拍摄 ‖ 撮影の準備 ‖ 촬영 준비 ‖ फ़ोटो शूट की तैयारी
+1751 ‖ Reviewing and revising visuals ‖ Revisar y corregir piezas visuales ‖ Revue et retouches visuelles ‖ Revisão e ajustes visuais ‖ Visuals prüfen und überarbeiten ‖ Revisione e correzione dei visual ‖ مراجعة المواد البصرية وتعديلها ‖ 视觉稿审阅与修改 ‖ ビジュアルの確認と修正 ‖ 시안 검토와 수정 ‖ विज़ुअल की समीक्षा और सुधार
+1752 ‖ Retouching ‖ Retoque ‖ Retouche ‖ Retoque ‖ Retusche ‖ Ritocco ‖ الرتوش ‖ 修图 ‖ レタッチ ‖ 리터칭 ‖ रीटचिंग
+1753 ‖ References and moodboard ‖ Referencias y moodboard ‖ Références et moodboard ‖ Referências e moodboard ‖ Referenzen und Moodboard ‖ Riferimenti e moodboard ‖ المراجع ولوحة الإلهام ‖ 参考图与情绪板 ‖ 資料集めとムードボード ‖ 레퍼런스와 무드보드 ‖ संदर्भ और मूडबोर्ड
+1754 ‖ Diagrams and infographics ‖ Esquemas e infografías ‖ Schémas et infographies ‖ Diagramas e infográficos ‖ Diagramme und Infografiken ‖ Schemi e infografiche ‖ المخططات والرسوم البيانية ‖ 图表与信息图 ‖ 図解とインフォグラフィック ‖ 도식과 인포그래픽 ‖ आरेख और इन्फ़ोग्राफ़िक्स
+1755 ‖ Photo shoot ‖ Sesión de fotos ‖ Prise de vue ‖ Ensaio fotográfico ‖ Fotoshooting ‖ Servizio fotografico ‖ جلسة تصوير ‖ 拍摄照片 ‖ 写真撮影 ‖ 사진 촬영 ‖ फ़ोटो शूट
+1756 ‖ Digital painting ‖ Pintura digital ‖ Peinture numérique ‖ Pintura digital ‖ Digitale Malerei ‖ Pittura digitale ‖ الرسم الرقمي بالألوان ‖ 数字绘画 ‖ デジタルペインティング ‖ 디지털 페인팅 ‖ डिजिटल पेंटिंग
+1757 ‖ Digital illustration ‖ Ilustración digital ‖ Illustration numérique ‖ Ilustração digital ‖ Digitale Illustration ‖ Illustrazione digitale ‖ الرسم التوضيحي الرقمي ‖ 数字插画 ‖ デジタルイラスト ‖ 디지털 일러스트 ‖ डिजिटल चित्रण
+1758 ‖ Digital graphic assets ‖ Recursos gráficos digitales ‖ Éléments graphiques numériques ‖ Recursos gráficos digitais ‖ Digitale Grafikelemente ‖ Risorse grafiche digitali ‖ المواد الرسومية الرقمية ‖ 数字图形素材 ‖ デジタル素材 ‖ 디지털 그래픽 소스 ‖ डिजिटल ग्राफ़िक सामग्री
+1759 ‖ Self-care and health ‖ Cuidado personal y salud ‖ Soin de soi et santé ‖ Autocuidado e saúde ‖ Selbstfürsorge und Gesundheit ‖ Cura di sé e salute ‖ العناية بالنفس والصحة ‖ 自我照顾与健康 ‖ セルフケアと健康 ‖ 자기 관리와 건강 ‖ आत्म-देखभाल और स्वास्थ्य
+1760 ‖ Intimacy ‖ Intimidad ‖ Intimité ‖ Intimidade ‖ Intimität ‖ Intimità ‖ العلاقة الحميمة ‖ 亲密 ‖ 親密な時間 ‖ 친밀한 시간 ‖ अंतरंगता
+1761 ‖ Recovery ‖ Recuperación ‖ Récupération ‖ Recuperação ‖ Erholung ‖ Recupero ‖ التعافي ‖ 恢复 ‖ 回復 ‖ 회복 ‖ स्वास्थ्य लाभ
+1762 ‖ Postpartum recovery ‖ Recuperación posparto ‖ Récupération post-partum ‖ Recuperação pós-parto ‖ Erholung nach der Geburt ‖ Recupero post-parto ‖ التعافي بعد الولادة ‖ 产后恢复 ‖ 産後の回復 ‖ 산후 회복 ‖ प्रसव के बाद रिकवरी
+1763 ‖ Pregnancy and postpartum recovery ‖ Recuperación en el embarazo y posparto ‖ Récupération pendant et après la grossesse ‖ Recuperação na gravidez e pós-parto ‖ Erholung in Schwangerschaft und nach der Geburt ‖ Recupero in gravidanza e dopo il parto ‖ التعافي أثناء الحمل وبعد الولادة ‖ 孕期与产后恢复 ‖ 妊娠中と産後の回復 ‖ 임신·산후 회복 ‖ गर्भावस्था और प्रसव के बाद रिकवरी
+1764 ‖ Time alone ‖ Tiempo a solas ‖ Temps seul ‖ Tempo sozinho ‖ Zeit für sich allein ‖ Tempo da soli ‖ وقت بمفردي ‖ 独处时间 ‖ ひとりの時間 ‖ 혼자만의 시간 ‖ अकेले का समय
+1765 ‖ Hygiene and self-care ‖ Higiene y cuidado personal ‖ Hygiène et soins personnels ‖ Higiene e cuidados pessoais ‖ Hygiene und Körperpflege ‖ Igiene e cura di sé ‖ النظافة والعناية الشخصية ‖ 个人卫生与护理 ‖ 衛生と身だしなみ ‖ 위생과 몸 관리 ‖ स्वच्छता और आत्म-देखभाल
+1766 ‖ Adapted self-care ‖ Cuidado personal adaptado ‖ Soins personnels adaptés ‖ Autocuidado adaptado ‖ Angepasste Körperpflege ‖ Cura di sé adattata ‖ العناية الشخصية المكيّفة ‖ 适应性自我护理 ‖ 個別に合わせたセルフケア ‖ 맞춤형 자기 관리 ‖ अनुकूलित आत्म-देखभाल
+1767 ‖ Other self-care ‖ Otro autocuidado ‖ Autre soin de soi ‖ Outro autocuidado ‖ Andere Selbstfürsorge ‖ Altra cura di sé ‖ عناية أخرى بالنفس ‖ 其他自我关怀 ‖ その他のセルフケア ‖ 기타 자기 돌봄 ‖ अन्य आत्म-देखभाल
+1768 ‖ Other personal services ‖ Otros servicios personales ‖ Autres services personnels ‖ Outros serviços pessoais ‖ Andere persönliche Dienstleistungen ‖ Altri servizi alla persona ‖ خدمات شخصية أخرى ‖ 其他个人服务 ‖ その他の個人向けサービス ‖ 기타 개인 서비스 ‖ अन्य निजी सेवाएँ
+1769 ‖ Other personal care ‖ Otro cuidado personal ‖ Autres soins personnels ‖ Outros cuidados pessoais ‖ Andere Körperpflege ‖ Altra cura personale ‖ رعاية شخصية أخرى ‖ 其他个人护理 ‖ その他の身の回りのケア ‖ 기타 개인 관리 ‖ अन्य निजी देखभाल
+1770 ‖ Treatments for yourself ‖ Tratamientos para uno mismo ‖ Soins pour soi ‖ Tratamentos para si ‖ Behandlungen für sich ‖ Cure per sé ‖ العلاج والإجراءات لنفسي ‖ 自我治疗与护理 ‖ 自分の治療とケア ‖ 나를 위한 치료와 관리 ‖ अपने लिए उपचार
+1771 ‖ Personal time ‖ Tiempo personal ‖ Temps personnel ‖ Tempo pessoal ‖ Private Zeit ‖ Tempo personale ‖ الوقت الشخصي ‖ 私人时间 ‖ プライベートな時間 ‖ 개인 시간 ‖ निजी समय
+1772 ‖ Medical care ‖ Atención médica ‖ Soins médicaux ‖ Atendimento médico ‖ Medizinische Versorgung ‖ Assistenza medica ‖ الرعاية الطبية ‖ 医疗护理 ‖ 医療を受ける ‖ 의료 서비스 ‖ चिकित्सा देखभाल
+1773 ‖ Wellness routine ‖ Rutina de bienestar ‖ Routine bien-être ‖ Rotina de bem-estar ‖ Gesundheitsroutine ‖ Routine di benessere ‖ روتين صحي ‖ 健康日常 ‖ 健康習慣 ‖ 건강 루틴 ‖ स्वास्थ्य दिनचर्या
+1774 ‖ Doctor visit or procedure ‖ Cita médica o procedimiento ‖ Rendez-vous médical ou soin ‖ Consulta ou procedimento ‖ Arzttermin oder Behandlung ‖ Visita medica o trattamento ‖ موعد طبي أو إجراء ‖ 看医生或做治疗 ‖ 通院や処置 ‖ 진료·시술 ‖ डॉक्टर से मिलना या प्रक्रिया
+1775 ‖ Washing, shower and getting ready ‖ Aseo, ducha y arreglarse ‖ Toilette, douche et préparation ‖ Higiene, banho e se arrumar ‖ Waschen, Duschen und Fertigmachen ‖ Lavarsi, doccia e prepararsi ‖ الاغتسال والاستحمام والاستعداد ‖ 洗漱、淋浴与收拾 ‖ 洗面・シャワー・身支度 ‖ 세수·샤워·준비 ‖ नहाना-धोना और तैयार होना
+1776 ‖ Care from someone else ‖ Cuidados de otra persona ‖ Soins reçus d’un tiers ‖ Cuidado recebido de outra pessoa ‖ Pflege durch andere ‖ Assistenza da un’altra persona ‖ رعاية من شخص آخر ‖ 他人照护 ‖ 介助を受ける ‖ 다른 사람의 돌봄 ‖ दूसरे से देखभाल पाना
+1777 ‖ Study and learning ‖ Estudio y aprendizaje ‖ Études et apprentissage ‖ Estudo e aprendizagem ‖ Lernen und Studium ‖ Studio e apprendimento ‖ الدراسة والتعلم ‖ 学习 ‖ 勉強と学び ‖ 공부와 학습 ‖ पढ़ाई और सीखना
+1778 ‖ Homework ‖ Deberes ‖ Devoirs ‖ Lição de casa ‖ Hausaufgaben ‖ Compiti ‖ الواجب المنزلي ‖ 作业 ‖ 宿題 ‖ 숙제 ‖ गृहकार्य
+1779 ‖ Class ‖ Clase ‖ Leçon ‖ Aula ‖ Unterricht ‖ Lezione ‖ حصة دراسية ‖ 上课 ‖ 授業 ‖ 수업 ‖ कक्षा
+1780 ‖ Research ‖ Investigación ‖ Recherche ‖ Pesquisa ‖ Forschung ‖ Ricerca ‖ البحث العلمي ‖ 研究 ‖ 研究 ‖ 연구 ‖ शोध
+1781 ‖ Annotations and bibliography ‖ Anotaciones y bibliografía ‖ Annotations et bibliographie ‖ Anotações e bibliografia ‖ Annotationen und Bibliografie ‖ Annotazioni e bibliografia ‖ التعليقات والمراجع ‖ 注释与参考文献 ‖ 注釈と文献管理 ‖ 주석과 참고문헌 ‖ टिप्पणियाँ और ग्रंथसूची
+1782 ‖ Archive and cataloging ‖ Archivo y catalogación ‖ Archivage et catalogage ‖ Arquivo e catalogação ‖ Archiv und Katalogisierung ‖ Archivio e catalogazione ‖ الأرشفة والفهرسة ‖ 档案与编目 ‖ アーカイブと目録作成 ‖ 아카이브와 목록화 ‖ अभिलेख और सूचीकरण
+1783 ‖ Library AV and copy equipment ‖ Equipos audiovisuales y de copia de biblioteca ‖ Matériel audiovisuel et de reprographie ‖ Equipamento audiovisual e de cópia da biblioteca ‖ Audio- und Kopiertechnik der Bibliothek ‖ Apparecchi audiovisivi e di copia della biblioteca ‖ أجهزة الصوت والنسخ في المكتبة ‖ 图书馆视听与复印设备 ‖ 図書館の視聴覚・複写機器 ‖ 도서관 시청각·복사 장비 ‖ पुस्तकालय के ऑडियो और कॉपी उपकरण
+1784 ‖ Question and hypothesis ‖ Pregunta e hipótesis ‖ Question et hypothèse ‖ Pergunta e hipótese ‖ Fragestellung und Hypothese ‖ Domanda e ipotesi ‖ السؤال والفرضية ‖ 问题与假设 ‖ 問いと仮説 ‖ 질문과 가설 ‖ प्रश्न और परिकल्पना
+1785 ‖ Reproducing a result ‖ Reproducir un resultado ‖ Reproduire un résultat ‖ Reproduzir um resultado ‖ Ergebnis reproduzieren ‖ Riprodurre un risultato ‖ إعادة إنتاج نتيجة ‖ 复现结果 ‖ 結果の再現 ‖ 결과 재현 ‖ परिणाम दोहराना
+1786 ‖ Survey sampling ‖ Muestreo para encuestas ‖ Échantillonnage d’enquête ‖ Amostragem de pesquisa ‖ Stichprobe für Umfrage ‖ Campionamento per sondaggi ‖ عينة الاستطلاع ‖ 调查抽样 ‖ 調査の標本抽出 ‖ 설문 표본 ‖ सर्वेक्षण नमूना
+1787 ‖ Grant application ‖ Solicitud de subvención ‖ Demande de subvention ‖ Proposta de financiamento ‖ Förderantrag ‖ Domanda di finanziamento ‖ طلب منحة ‖ 基金申请 ‖ 助成金の申請 ‖ 연구비 신청 ‖ अनुदान आवेदन
+1788 ‖ Measurements ‖ Mediciones ‖ Mesures ‖ Medições ‖ Messungen ‖ Misurazioni ‖ القياسات ‖ 测量 ‖ 測定 ‖ 측정 ‖ माप
+1789 ‖ Research report ‖ Informe de investigación ‖ Rapport de recherche ‖ Relatório de pesquisa ‖ Forschungsbericht ‖ Rapporto di ricerca ‖ تقرير بحثي ‖ 研究报告 ‖ 研究報告書 ‖ 연구 보고서 ‖ शोध रिपोर्ट
+1790 ‖ Research interview ‖ Entrevista de investigación ‖ Entretien de recherche ‖ Entrevista de pesquisa ‖ Forschungsinterview ‖ Intervista di ricerca ‖ مقابلة بحثية ‖ 研究访谈 ‖ 調査インタビュー ‖ 연구 인터뷰 ‖ शोध साक्षात्कार
+1791 ‖ Qualitative analysis ‖ Análisis cualitativo ‖ Analyse qualitative ‖ Análise qualitativa ‖ Qualitative Analyse ‖ Analisi qualitativa ‖ التحليل النوعي ‖ 定性分析 ‖ 質的分析 ‖ 질적 분석 ‖ गुणात्मक विश्लेषण
+1792 ‖ Archival conservation ‖ Conservación de archivos ‖ Conservation d’archives ‖ Conservação de acervo ‖ Archivgut erhalten ‖ Conservazione d’archivio ‖ صيانة المواد الأرشيفية ‖ 档案保护 ‖ 資料の保存修復 ‖ 기록물 보존 ‖ अभिलेख संरक्षण
+1793 ‖ Lab cultures ‖ Cultivos de laboratorio ‖ Cultures de laboratoire ‖ Culturas de laboratório ‖ Laborkulturen ‖ Colture di laboratorio ‖ المزارع المخبرية ‖ 实验室培养 ‖ 実験室での培養 ‖ 실험실 배양 ‖ प्रयोगशाला कल्चर
+1794 ‖ Lab notebook ‖ Cuaderno de laboratorio ‖ Cahier de laboratoire ‖ Caderno de laboratório ‖ Laborjournal ‖ Quaderno di laboratorio ‖ دفتر المختبر ‖ 实验记录本 ‖ 実験ノート ‖ 실험 노트 ‖ प्रयोगशाला लॉग
+1795 ‖ Lab protocol ‖ Protocolo de laboratorio ‖ Protocole de laboratoire ‖ Protocolo de laboratório ‖ Laborprotokoll ‖ Protocollo di laboratorio ‖ بروتوكول المختبر ‖ 实验流程 ‖ 実験手順 ‖ 실험 프로토콜 ‖ प्रयोगशाला प्रोटोकॉल
+1796 ‖ Methodology ‖ Metodología ‖ Méthodologie ‖ Metodologia ‖ Methodik ‖ Metodologia ‖ المنهجية ‖ 研究方法 ‖ 方法論 ‖ 방법론 ‖ कार्यप्रणाली
+1797 ‖ Publication monitoring ‖ Seguimiento de publicaciones ‖ Veille documentaire ‖ Monitoramento de publicações ‖ Publikationsbeobachtung ‖ Monitoraggio delle pubblicazioni ‖ متابعة المنشورات ‖ 文献追踪 ‖ 文献のモニタリング ‖ 문헌 모니터링 ‖ प्रकाशनों की निगरानी
+1798 ‖ Observation and field notes ‖ Observación y notas de campo ‖ Observation et notes de terrain ‖ Observação e notas de campo ‖ Beobachtung und Feldnotizen ‖ Osservazione e note sul campo ‖ الملاحظة والمذكرات الميدانية ‖ 观察与田野笔记 ‖ 観察とフィールドノート ‖ 관찰과 현장 기록 ‖ अवलोकन और फ़ील्ड नोट्स
+1799 ‖ Science communication ‖ Divulgación científica ‖ Médiation scientifique ‖ Divulgação científica ‖ Wissenschaftskommunikation ‖ Divulgazione scientifica ‖ التواصل العلمي ‖ 科学传播 ‖ 科学コミュニケーション ‖ 과학 커뮤니케이션 ‖ विज्ञान संचार
+1800 ‖ Research paper ‖ Artículo científico ‖ Article scientifique ‖ Artigo científico ‖ Wissenschaftlicher Artikel ‖ Articolo scientifico ‖ ورقة بحثية ‖ 学术论文 ‖ 学術論文 ‖ 연구 논문 ‖ शोध पत्र

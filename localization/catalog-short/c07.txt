@@ -1,0 +1,140 @@
+821 ‖ Accessibility testing ‖ Pruebas de accesibilidad ‖ Tests d’accessibilité ‖ Testes de acessibilidade ‖ Barrierefreiheitstests ‖ Test di accessibilità ‖ اختبار سهولة الوصول ‖ 无障碍测试 ‖ アクセシビリティテスト ‖ 접근성 테스트 ‖ सुगम्यता परीक्षण
+822 ‖ Testing and QA ‖ Pruebas y QA ‖ Tests et QA ‖ Testes e QA ‖ Tests und QA ‖ Test e QA ‖ الاختبار وضمان الجودة ‖ 测试与质量保证 ‖ テストとQA ‖ 테스트와 QA ‖ परीक्षण और QA
+823 ‖ Tech spec and API ‖ Especificación técnica y API ‖ Spécification technique et API ‖ Especificação técnica e API ‖ Technische Spezifikation und API ‖ Specifica tecnica e API ‖ المواصفات التقنية والواجهة البرمجية ‖ 技术规范与 API ‖ 技術仕様とAPI ‖ 기술 명세와 API ‖ तकनीकी विनिर्देश और API
+824 ‖ Clarifying requirements ‖ Aclarar requisitos ‖ Préciser les besoins ‖ Esclarecer requisitos ‖ Anforderungen klären ‖ Chiarire i requisiti ‖ توضيح المتطلبات ‖ 澄清需求 ‖ 要件の確認 ‖ 요구사항 정리 ‖ आवश्यकताएँ स्पष्ट करना
+825 ‖ Frontend and UI ‖ Frontend e interfaz ‖ Frontend et interface ‖ Frontend e interface ‖ Frontend und Oberfläche ‖ Frontend e interfaccia ‖ الواجهة الأمامية ‖ 前端与界面 ‖ フロントエンドとUI ‖ 프런트엔드와 UI ‖ फ़्रंटएंड और इंटरफ़ेस
+826 ‖ Own business ‖ Negocio propio ‖ Sa propre entreprise ‖ Negócio próprio ‖ Eigenes Geschäft ‖ Attività in proprio ‖ عملك الخاص ‖ 自己的生意 ‖ 自分の事業 ‖ 내 사업 ‖ अपना कारोबार
+827 ‖ Farming and nature ‖ Agricultura y naturaleza ‖ Agriculture et nature ‖ Agricultura e natureza ‖ Landwirtschaft und Natur ‖ Agricoltura e natura ‖ الزراعة والطبيعة ‖ 农业与自然 ‖ 農業と自然 ‖ 농업과 자연 ‖ खेती और प्रकृति
+828 ‖ Aquaculture ‖ Acuicultura ‖ Aquaculture ‖ Aquicultura ‖ Aquakultur ‖ Acquacoltura ‖ الاستزراع المائي ‖ 水产养殖 ‖ 水産養殖 ‖ 양식 ‖ जलीय कृषि
+829 ‖ Tree felling ‖ Tala de árboles ‖ Abattage d’arbres ‖ Derrubada de árvores ‖ Holzeinschlag ‖ Abbattimento di alberi ‖ قطع الأشجار ‖ 伐木 ‖ 伐採 ‖ 벌목 ‖ पेड़ काटना
+830 ‖ Nature restoration ‖ Restauración de la naturaleza ‖ Restauration écologique ‖ Restauração ambiental ‖ Renaturierung ‖ Ripristino ambientale ‖ استعادة الطبيعة ‖ 生态修复 ‖ 自然再生 ‖ 자연 복원 ‖ प्रकृति बहाली
+831 ‖ Surveying and mapping ‖ Geodesia y cartografía ‖ Géodésie et cartographie ‖ Geodésia e cartografia ‖ Vermessung und Kartografie ‖ Geodesia e cartografia ‖ المساحة ورسم الخرائط ‖ 测绘 ‖ 測量と地図作成 ‖ 측량과 지도 제작 ‖ सर्वेक्षण और मानचित्रण
+832 ‖ Livestock products ‖ Producción ganadera ‖ Production animale ‖ Produção pecuária ‖ Tierproduktion ‖ Produzione zootecnica ‖ المنتجات الحيوانية ‖ 畜产品生产 ‖ 畜産物の生産 ‖ 축산물 생산 ‖ पशु उत्पाद
+833 ‖ Livestock health ‖ Salud del ganado ‖ Santé du bétail ‖ Saúde do rebanho ‖ Tiergesundheit ‖ Salute del bestiame ‖ صحة الماشية ‖ 牲畜健康 ‖ 家畜の健康管理 ‖ 가축 건강 ‖ पशु स्वास्थ्य
+834 ‖ Forestry ‖ Silvicultura ‖ Sylviculture ‖ Silvicultura ‖ Forstwirtschaft ‖ Silvicoltura ‖ إدارة الغابات ‖ 林业 ‖ 林業 ‖ 임업 ‖ वानिकी
+835 ‖ Reforestation ‖ Reforestación ‖ Reboisement ‖ Reflorestamento ‖ Aufforstung ‖ Rimboschimento ‖ إعادة التشجير ‖ 造林 ‖ 森林再生 ‖ 조림 ‖ पुनर्वनीकरण
+836 ‖ Hunting ‖ Caza ‖ Chasse ‖ Caça ‖ Jagd ‖ Caccia ‖ الصيد البري ‖ 狩猎 ‖ 狩猟 ‖ 사냥 ‖ शिकार
+837 ‖ Forest fire watch ‖ Vigilancia de incendios forestales ‖ Guet des feux de forêt ‖ Vigilância de incêndios florestais ‖ Waldbrandwache ‖ Avvistamento incendi boschivi ‖ مراقبة حرائق الغابات ‖ 森林防火瞭望 ‖ 山火事の監視 ‖ 산불 감시 ‖ जंगल में आग की निगरानी
+838 ‖ Field inspection ‖ Inspección de campo ‖ Inspection de terrain ‖ Inspeção de campo ‖ Feldbegehung ‖ Ispezione sul campo ‖ الفحص الميداني ‖ 实地检查 ‖ 現地点検 ‖ 현장 점검 ‖ फ़ील्ड निरीक्षण
+839 ‖ Field observations ‖ Observaciones de campo ‖ Observations de terrain ‖ Observações de campo ‖ Feldbeobachtungen ‖ Osservazioni sul campo ‖ الملاحظات الميدانية ‖ 野外观测 ‖ 野外観察 ‖ 현장 관찰 ‖ फ़ील्ड अवलोकन
+840 ‖ Planting and sowing ‖ Siembra y plantación ‖ Semis et plantation ‖ Plantio e semeadura ‖ Säen und Pflanzen ‖ Semina e trapianto ‖ الزراعة والبذر ‖ 播种与种植 ‖ 種まきと植え付け ‖ 파종과 식재 ‖ बुवाई और रोपाई
+841 ‖ Commercial fishing ‖ Pesca comercial ‖ Pêche professionnelle ‖ Pesca comercial ‖ Berufsfischerei ‖ Pesca professionale ‖ الصيد التجاري ‖ 商业捕捞 ‖ 漁業 ‖ 어업 ‖ व्यावसायिक मछली पकड़ना
+842 ‖ Wild animal breeding ‖ Cría de animales silvestres ‖ Élevage d’animaux sauvages ‖ Criação de animais silvestres ‖ Wildtierzucht ‖ Allevamento di animali selvatici ‖ تربية الحيوانات البرية ‖ 野生动物养殖 ‖ 野生動物の飼育 ‖ 야생동물 사육 ‖ जंगली जानवरों का प्रजनन
+843 ‖ Fisheries ‖ Pesca ‖ Pêche ‖ Pesca ‖ Fischerei ‖ Pesca ‖ مصايد الأسماك ‖ 渔业 ‖ 水産業 ‖ 수산업 ‖ मत्स्य पालन
+844 ‖ Fishing gear ‖ Aparejos de pesca ‖ Matériel de pêche ‖ Equipamento de pesca ‖ Fanggeräte ‖ Attrezzatura da pesca ‖ معدات الصيد ‖ 渔具 ‖ 漁具 ‖ 어구 ‖ मछली पकड़ने के उपकरण
+845 ‖ Wild harvesting ‖ Recolección silvestre ‖ Cueillette sauvage ‖ Coleta silvestre ‖ Wildsammlung ‖ Raccolta spontanea ‖ جمع النباتات البرية ‖ 采集野生产品 ‖ 山の幸の採集 ‖ 임산물 채취 ‖ जंगली उपज इकट्ठा करना
+846 ‖ Harvesting ‖ Cosecha ‖ Récolte ‖ Colheita ‖ Ernte ‖ Raccolto ‖ الحصاد ‖ 收割 ‖ 収穫 ‖ 수확 ‖ फ़सल कटाई
+847 ‖ Hay and straw ‖ Heno y paja ‖ Foin et paille ‖ Feno e palha ‖ Heu und Stroh ‖ Fieno e paglia ‖ القش والتبن ‖ 干草与秸秆 ‖ 干し草とわら ‖ 건초와 짚 ‖ घास और भूसा
+848 ‖ Land management ‖ Gestión del territorio ‖ Gestion des terres et paysages ‖ Gestão de terras e paisagens ‖ Land- und Landschaftspflege ‖ Gestione del territorio ‖ إدارة الأراضي والمناظر الطبيعية ‖ 土地与景观管理 ‖ 土地と景観の管理 ‖ 토지·경관 관리 ‖ भूमि प्रबंधन
+849 ‖ Crop care ‖ Cuidado de cultivos ‖ Entretien des cultures ‖ Cuidado das lavouras ‖ Pflanzenpflege ‖ Cura delle colture ‖ العناية بالمحاصيل ‖ 田间管理 ‖ 作物の管理 ‖ 작물 관리 ‖ फ़सल की देखभाल
+850 ‖ Livestock care ‖ Cuidado del ganado ‖ Soins au bétail ‖ Cuidado do gado ‖ Viehpflege ‖ Cura del bestiame ‖ رعاية الماشية ‖ 照料牲畜 ‖ 家畜の世話 ‖ 가축 돌보기 ‖ पशुओं की देखभाल
+851 ‖ Clearing drainage ditches ‖ Limpieza de zanjas de drenaje ‖ Curage des fossés ‖ Limpeza de valas de drenagem ‖ Gräben räumen ‖ Pulizia dei fossi di scolo ‖ تنظيف قنوات الصرف ‖ 清理排水沟 ‖ 排水路の清掃 ‖ 배수로 청소 ‖ नाली की सफ़ाई
+852 ‖ Environmental sampling ‖ Toma de muestras ambientales ‖ Prélèvements environnementaux ‖ Coleta de amostras ambientais ‖ Umweltproben ‖ Campionamento ambientale ‖ أخذ العينات البيئية ‖ 环境采样 ‖ 環境サンプリング ‖ 환경 시료 채취 ‖ पर्यावरणीय नमूने
+853 ‖ Service and manual work ‖ Servicios y trabajo manual ‖ Services et travail manuel ‖ Serviços e trabalho manual ‖ Service und Handarbeit ‖ Servizi e lavoro manuale ‖ الخدمات والعمل اليدوي ‖ 服务与体力劳动 ‖ サービスと手作業 ‖ 서비스와 육체노동 ‖ सेवा और शारीरिक श्रम
+854 ‖ Bathhouse services ‖ Servicios de baño ‖ Soins au hammam ‖ Serviços de sauna ‖ Badservice ‖ Servizi termali ‖ خدمات الحمّام ‖ 浴室服务 ‖ 浴場サービス ‖ 목욕 서비스 ‖ स्नानघर सेवाएँ
+855 ‖ Shaving and beard trims ‖ Afeitado y arreglo de barba ‖ Rasage et taille de barbe ‖ Barba e aparo ‖ Rasur und Bartpflege ‖ Rasatura e regolazione barba ‖ الحلاقة وتهذيب اللحية ‖ 剃须与修胡 ‖ 髭剃りとひげの手入れ ‖ 면도와 수염 정리 ‖ दाढ़ी बनाना और तराशना
+856 ‖ Beauty services ‖ Servicios de belleza ‖ Soins esthétiques ‖ Serviços de beleza ‖ Beautyservices ‖ Servizi di bellezza ‖ خدمات التجميل ‖ 美容服务 ‖ 美容サービス ‖ 뷰티 서비스 ‖ ब्यूटी सेवाएँ
+857 ‖ Taking out trash ‖ Retirada de basura ‖ Évacuation des déchets ‖ Retirada de lixo ‖ Müllentsorgung ‖ Rimozione dei rifiuti ‖ إخراج النفايات ‖ 清运垃圾 ‖ ゴミ出し ‖ 쓰레기 반출 ‖ कचरा हटाना
+858 ‖ Hair removal ‖ Depilación ‖ Épilation ‖ Depilação ‖ Haarentfernung ‖ Depilazione ‖ إزالة الشعر ‖ 脱毛 ‖ 脱毛 ‖ 제모 ‖ बाल हटाना
+859 ‖ Perms ‖ Permanente ‖ Permanente ‖ Permanente ‖ Dauerwelle ‖ Permanente ‖ تجعيد الشعر ‖ 烫发 ‖ パーマ ‖ 파마 ‖ बालों में पर्म
+860 ‖ Kitchen prep ‖ Preparación en cocina ‖ Mise en place ‖ Pré-preparo na cozinha ‖ Küchenvorbereitung ‖ Preparazione in cucina ‖ تحضير المطبخ ‖ 后厨备料 ‖ 仕込み ‖ 주방 준비 ‖ रसोई की तैयारी
+861 ‖ Braids, dreads and extensions ‖ Trenzas, rastas y extensiones ‖ Tresses, dreadlocks et extensions ‖ Tranças, dreads e alongamento ‖ Zöpfe, Dreads und Extensions ‖ Trecce, dread ed extension ‖ الضفائر والدريدلوكس والوصلات ‖ 编发、脏辫与接发 ‖ 編み込み・ドレッド・エクステ ‖ 땋기·드레드·붙임머리 ‖ चोटी, ड्रेडलॉक्स और एक्सटेंशन
+862 ‖ Makeup for clients ‖ Maquillaje a clientes ‖ Maquillage client ‖ Maquiagem em clientes ‖ Make-up für Kunden ‖ Trucco ai clienti ‖ مكياج للعملاء ‖ 为顾客化妆 ‖ 顧客へのメイク ‖ 고객 메이크업 ‖ ग्राहक का मेकअप
+863 ‖ Manicure ‖ Manicura ‖ Manucure ‖ Manicure ‖ Maniküre ‖ Manicure ‖ تقليم الأظافر ‖ 美甲 ‖ ネイルケア ‖ 매니큐어 ‖ मैनीक्योर
+864 ‖ Massage ‖ Masaje ‖ Massage ‖ Massagem ‖ Massage ‖ Massaggio ‖ التدليك ‖ 按摩 ‖ マッサージ ‖ 마사지 ‖ मालिश
+865 ‖ Hair washing ‖ Lavado de cabello ‖ Shampoing ‖ Lavagem de cabelo ‖ Haarwäsche ‖ Lavaggio dei capelli ‖ غسل الشعر ‖ 洗头 ‖ シャンプー ‖ 샴푸 ‖ बाल धोना
+866 ‖ Window cleaning ‖ Limpieza de ventanas ‖ Lavage de vitres ‖ Limpeza de janelas ‖ Fensterputzen ‖ Pulizia dei vetri ‖ تنظيف النوافذ ‖ 擦窗 ‖ 窓拭き ‖ 창문 청소 ‖ खिड़कियाँ साफ़ करना
+867 ‖ Laundry processing ‖ Lavandería ‖ Traitement du linge ‖ Lavanderia ‖ Wäscheverarbeitung ‖ Lavanderia ‖ معالجة الغسيل ‖ 洗涤布草 ‖ リネンの洗濯 ‖ 세탁 처리 ‖ कपड़ों की धुलाई
+868 ‖ Returns and defects ‖ Devoluciones y defectos ‖ Retours et défauts ‖ Devoluções e defeitos ‖ Retouren und Mängel ‖ Resi e difetti ‖ المرتجعات والعيوب ‖ 退货与次品处理 ‖ 返品と不良品の処理 ‖ 반품·불량 처리 ‖ वापसी और ख़राब माल
+869 ‖ Table service ‖ Servicio de mesas ‖ Service en salle ‖ Atendimento às mesas ‖ Tischservice ‖ Servizio ai tavoli ‖ خدمة الطاولات ‖ 餐桌服务 ‖ ホール接客 ‖ 테이블 서빙 ‖ टेबल सर्विस
+870 ‖ Hair coloring ‖ Coloración del cabello ‖ Coloration ‖ Coloração de cabelo ‖ Haarefärben ‖ Colorazione dei capelli ‖ صبغ الشعر ‖ 染发 ‖ ヘアカラー ‖ 염색 ‖ बाल रंगना
+871 ‖ Hairdressing ‖ Peluquería ‖ Coiffure ‖ Cabeleireiro ‖ Friseurdienstleistungen ‖ Parrucchiere ‖ تصفيف الشعر ‖ 美发服务 ‖ 理美容 ‖ 미용 서비스 ‖ हेयरड्रेसिंग
+872 ‖ Pedicure and foot care ‖ Pedicura y cuidado de pies ‖ Pédicure et soins des pieds ‖ Pedicure e cuidado dos pés ‖ Pediküre und Fußpflege ‖ Pedicure e cura dei piedi ‖ العناية بالقدمين ‖ 足部护理 ‖ フットケア ‖ 페디큐어와 발 관리 ‖ पेडीक्योर और पैरों की देखभाल
+873 ‖ Wig fitting ‖ Ajuste de pelucas ‖ Pose de perruque ‖ Ajuste de perucas ‖ Perückenanpassung ‖ Prova di parrucche ‖ تركيب الشعر المستعار ‖ 假发定制 ‖ ウィッグの調整 ‖ 가발 맞춤 ‖ विग फ़िट करना
+874 ‖ Preparing the room ‖ Preparar el local ‖ Préparer la salle ‖ Preparar o ambiente ‖ Raum vorbereiten ‖ Preparare il locale ‖ تجهيز المكان ‖ 准备场地 ‖ 部屋の準備 ‖ 공간 준비 ‖ कमरा तैयार करना
+875 ‖ Setting up for a specialist ‖ Preparar el puesto para el maestro ‖ Préparer le poste d’un artisan ‖ Preparar a bancada do profissional ‖ Arbeitsplatz für Fachkraft vorbereiten ‖ Preparare la postazione per l’artigiano ‖ تجهيز مكان العمل للحِرَفي ‖ 为师傅备好工位 ‖ 職人の作業場所の準備 ‖ 기술자 작업대 준비 ‖ कारीगर के लिए जगह तैयार करना
+876 ‖ Helping visitors ‖ Ayudar a visitantes ‖ Aide aux visiteurs ‖ Ajudar visitantes ‖ Besuchern helfen ‖ Assistere i visitatori ‖ مساعدة الزوار ‖ 协助访客 ‖ 来訪者のサポート ‖ 방문객 도움 ‖ आगंतुकों की मदद
+877 ‖ Checking returned goods ‖ Revisar artículos devueltos ‖ Contrôle des retours ‖ Verificar produtos devolvidos ‖ Rückware prüfen ‖ Controllare la merce resa ‖ فحص البضائع المرتجعة ‖ 检查退货 ‖ 返品の確認 ‖ 반품 검수 ‖ लौटाए गए माल की जाँच
+878 ‖ Checking buyer age ‖ Verificar la edad del comprador ‖ Vérifier l’âge de l’acheteur ‖ Verificar idade do comprador ‖ Alterskontrolle ‖ Verificare l’età dell’acquirente ‖ التحقق من عمر المشتري ‖ 核验买家年龄 ‖ 年齢確認 ‖ 구매자 연령 확인 ‖ ख़रीदार की उम्र जाँचना
+879 ‖ Cashier work ‖ Trabajo en caja ‖ Tenue de caisse ‖ Trabalho no caixa ‖ Kassieren ‖ Lavoro alla cassa ‖ العمل على الصندوق ‖ 收银 ‖ レジ打ち ‖ 계산대 업무 ‖ कैश काउंटर पर काम
+880 ‖ Guest check-in ‖ Registro de huéspedes ‖ Enregistrement des clients ‖ Check-in de hóspedes ‖ Gäste-Check-in ‖ Check-in degli ospiti ‖ تسجيل وصول النزلاء ‖ 宾客入住登记 ‖ チェックイン対応 ‖ 투숙객 체크인 ‖ मेहमानों का चेक-इन
+881 ‖ Sorting goods ‖ Clasificación de mercancía ‖ Tri des marchandises ‖ Triagem de mercadorias ‖ Waren sortieren ‖ Smistamento merci ‖ فرز البضائع ‖ 货物分拣 ‖ 商品の仕分け ‖ 상품 분류 ‖ माल छाँटना
+882 ‖ Haircuts ‖ Corte de pelo ‖ Coupe de cheveux ‖ Corte de cabelo ‖ Haarschnitt ‖ Taglio di capelli ‖ قص الشعر ‖ 理发 ‖ カット ‖ 커트 ‖ बाल काटना
+883 ‖ Clearing tables ‖ Recoger mesas ‖ Débarrasser les tables ‖ Retirar as mesas ‖ Tische abräumen ‖ Sparecchiare i tavoli ‖ تنظيف الطاولات ‖ 收拾餐桌 ‖ テーブルの片付け ‖ 테이블 정리 ‖ मेज़ साफ़ करना
+884 ‖ Skin care ‖ Cuidado de la piel ‖ Soins de la peau ‖ Cuidados com a pele ‖ Hautpflege ‖ Cura della pelle ‖ العناية بالبشرة ‖ 皮肤护理 ‖ スキンケア ‖ 피부 관리 ‖ त्वचा की देखभाल
+885 ‖ Scalp care ‖ Cuidado del cuero cabelludo ‖ Soins du cuir chevelu ‖ Tratamento do couro cabeludo ‖ Kopfhautpflege ‖ Cura del cuoio capelluto ‖ العناية بفروة الرأس ‖ 头皮护理 ‖ 頭皮ケア ‖ 두피 관리 ‖ सिर की त्वचा की देखभाल
+886 ‖ Grounds maintenance ‖ Mantenimiento de exteriores ‖ Entretien des espaces extérieurs ‖ Manutenção de áreas externas ‖ Geländepflege ‖ Manutenzione delle aree esterne ‖ صيانة المساحات الخارجية ‖ 场地养护 ‖ 敷地の手入れ ‖ 부지 관리 ‖ परिसर का रखरखाव
+887 ‖ Dry cleaning ‖ Tintorería ‖ Nettoyage à sec ‖ Lavagem a seco ‖ Chemische Reinigung ‖ Lavaggio a secco ‖ التنظيف الجاف ‖ 干洗 ‖ ドライクリーニング ‖ 드라이클리닝 ‖ ड्राई क्लीनिंग
+888 ‖ Focused work ‖ Trabajo concentrado ‖ Travail concentré ‖ Trabalho focado ‖ Konzentriertes Arbeiten ‖ Lavoro concentrato ‖ العمل المركّز ‖ 专注工作 ‖ 集中作業 ‖ 집중 작업 ‖ एकाग्र काम
+889 ‖ Construction and repair ‖ Obra y reparaciones ‖ Chantier et réparations ‖ Obra e reparos ‖ Bau und Reparatur ‖ Edilizia e riparazioni ‖ البناء والإصلاح ‖ 施工与维修 ‖ 建設と修理 ‖ 건설과 수리 ‖ निर्माण और मरम्मत
+890 ‖ HVAC ‖ Climatización ‖ CVC ‖ Climatização ‖ Heizung, Lüftung, Klima ‖ Climatizzazione ‖ التدفئة والتهوية والتكييف ‖ 暖通空调 ‖ 空調設備 ‖ 냉난방·환기 ‖ हीटिंग, वेंटिलेशन, एसी
+891 ‖ Demolition ‖ Demolición ‖ Démolition ‖ Demolição ‖ Abbruch ‖ Demolizione ‖ الهدم ‖ 拆除 ‖ 解体 ‖ 철거 ‖ तोड़-फोड़
+892 ‖ Timber framing ‖ Estructura de madera ‖ Charpente ‖ Estrutura de madeira ‖ Holzbau ‖ Carpenteria in legno ‖ الهياكل الخشبية ‖ 木结构 ‖ 木造躯体 ‖ 목조 골조 ‖ लकड़ी का ढाँचा
+893 ‖ Fault diagnosis ‖ Diagnóstico de averías ‖ Diagnostic de panne ‖ Diagnóstico de defeito ‖ Fehlerdiagnose ‖ Diagnosi del guasto ‖ تشخيص العطل ‖ 故障诊断 ‖ 故障診断 ‖ 고장 진단 ‖ ख़राबी का पता लगाना
+894 ‖ Earthworks ‖ Movimiento de tierras ‖ Terrassement ‖ Terraplenagem ‖ Erdarbeiten ‖ Movimento terra ‖ أعمال الحفر والردم ‖ 土方工程 ‖ 土工事 ‖ 토공사 ‖ मिट्टी का काम
+895 ‖ Making parts ‖ Fabricación de piezas ‖ Fabrication de pièces ‖ Fabricação de peças ‖ Teilefertigung ‖ Realizzazione di pezzi ‖ تصنيع القطع ‖ 制作零件 ‖ 部品の製作 ‖ 부품 제작 ‖ पुर्ज़े बनाना
+896 ‖ Masonry and concrete ‖ Albañilería y hormigón ‖ Maçonnerie et béton ‖ Alvenaria e concreto ‖ Mauerwerk und Beton ‖ Muratura e calcestruzzo ‖ البناء بالطوب والخرسانة ‖ 砌筑与混凝土 ‖ 組積とコンクリート ‖ 조적과 콘크리트 ‖ चिनाई और कंक्रीट
+897 ‖ Roofing ‖ Tejados ‖ Toiture ‖ Telhado ‖ Dacharbeiten ‖ Coperture ‖ الأسقف ‖ 屋面 ‖ 屋根工事 ‖ 지붕 공사 ‖ छत का काम
+898 ‖ Scaffolding ‖ Andamios ‖ Échafaudages ‖ Andaimes ‖ Gerüstbau ‖ Ponteggi ‖ السقالات ‖ 脚手架 ‖ 足場 ‖ 비계 ‖ मचान
+899 ‖ Sheet materials and insulation ‖ Paneles y aislamiento ‖ Plaques et isolation ‖ Chapas e isolamento ‖ Plattenmaterial und Dämmung ‖ Pannelli e isolamento ‖ الألواح والعزل ‖ 板材与保温 ‖ ボードと断熱 ‖ 판재와 단열 ‖ शीट सामग्री और इन्सुलेशन
+900 ‖ Installation ‖ Montaje ‖ Montage ‖ Montagem ‖ Montage ‖ Montaggio ‖ التركيب ‖ 安装 ‖ 据え付け ‖ 설치 ‖ स्थापना
+901 ‖ Wallpapering ‖ Empapelado ‖ Papier peint ‖ Papel de parede ‖ Tapezieren ‖ Carta da parati ‖ ورق الجدران ‖ 贴壁纸 ‖ 壁紙貼り ‖ 도배 ‖ वॉलपेपर लगाना
+902 ‖ Survey and measurements ‖ Inspección y mediciones ‖ Relevés et métrés ‖ Vistoria e medições ‖ Aufmaß und Bestandsaufnahme ‖ Sopralluogo e misure ‖ المعاينة والقياسات ‖ 勘察与测量 ‖ 現地調査と採寸 ‖ 현장 조사와 실측 ‖ निरीक्षण और माप
+903 ‖ Finish carpentry ‖ Carpintería de acabado ‖ Menuiserie de finition ‖ Marcenaria de acabamento ‖ Innenausbau und Tischlerei ‖ Falegnameria di finitura ‖ النجارة والتشطيب ‖ 装修木工 ‖ 造作と建具 ‖ 마감 목공 ‖ फ़िनिशिंग बढ़ईगिरी
+904 ‖ Facade cleaning ‖ Limpieza de fachadas ‖ Nettoyage de façade ‖ Limpeza de fachada ‖ Fassadenreinigung ‖ Pulizia delle facciate ‖ تنظيف الواجهات ‖ 外墙清洗 ‖ 外壁の清掃 ‖ 외벽 청소 ‖ भवन के अग्रभाग की सफ़ाई
+905 ‖ Moving materials ‖ Traslado de materiales ‖ Manutention des matériaux ‖ Movimentação de materiais ‖ Material transportieren ‖ Movimentazione dei materiali ‖ نقل المواد ‖ 搬运材料 ‖ 資材の運搬 ‖ 자재 운반 ‖ सामग्री ढोना
+906 ‖ Upholstery ‖ Tapicería ‖ Tapisserie d’ameublement ‖ Estofamento ‖ Polstern ‖ Tappezzeria ‖ تنجيد الأثاث ‖ 家具翻新软包 ‖ 家具の張り替え ‖ 가구 천갈이 ‖ फ़र्नीचर की गद्दी
+907 ‖ Installation planning ‖ Planificar el montaje ‖ Planification du montage ‖ Planejamento da montagem ‖ Montageplanung ‖ Pianificazione del montaggio ‖ تخطيط التركيب ‖ 安装规划 ‖ 施工計画 ‖ 설치 계획 ‖ स्थापना की योजना
+908 ‖ Tiles and flooring ‖ Azulejos y suelos ‖ Carrelage et sols ‖ Pisos e revestimentos ‖ Fliesen und Böden ‖ Piastrelle e pavimenti ‖ البلاط والأرضيات ‖ 瓷砖与地面 ‖ タイルと床 ‖ 타일과 바닥 ‖ टाइल और फ़र्श
+909 ‖ Securing the work area ‖ Preparar una zona de trabajo segura ‖ Sécuriser la zone de travail ‖ Preparar área de trabalho segura ‖ Arbeitsbereich absichern ‖ Mettere in sicurezza l’area di lavoro ‖ تأمين منطقة العمل ‖ 布置安全作业区 ‖ 安全な作業場所の確保 ‖ 안전한 작업 구역 준비 ‖ सुरक्षित कार्यस्थल तैयार करना
+910 ‖ Surface preparation ‖ Preparación de superficies ‖ Préparation des surfaces ‖ Preparação de superfície ‖ Untergrundvorbereitung ‖ Preparazione delle superfici ‖ تجهيز الأسطح ‖ 表面处理 ‖ 下地処理 ‖ 표면 준비 ‖ सतह तैयार करना
+911 ‖ Painting ‖ Pintura ‖ Peinture ‖ Pintura ‖ Streichen ‖ Pittura ‖ الطلاء ‖ 刷漆 ‖ 塗装 ‖ 도장 ‖ पेंटिंग
+912 ‖ Installation inspection ‖ Revisión del montaje ‖ Contrôle du montage ‖ Inspeção da instalação ‖ Montageprüfung ‖ Verifica dell’installazione ‖ فحص التركيب ‖ 安装验收 ‖ 施工検査 ‖ 설치 검사 ‖ स्थापना की जाँच
+913 ‖ Preventive maintenance ‖ Mantenimiento preventivo ‖ Maintenance préventive ‖ Manutenção preventiva ‖ Vorbeugende Wartung ‖ Manutenzione preventiva ‖ الصيانة الوقائية ‖ 预防性维护 ‖ 予防保全 ‖ 예방 정비 ‖ निवारक रखरखाव
+914 ‖ Commissioning ‖ Puesta en marcha ‖ Mise en service ‖ Comissionamento ‖ Inbetriebnahme ‖ Messa in servizio ‖ التشغيل التجريبي والتسليم ‖ 调试交付 ‖ 試運転と引き渡し ‖ 시운전 ‖ कमीशनिंग
+915 ‖ Marking out ‖ Replanteo ‖ Traçage ‖ Marcação ‖ Anreißen ‖ Tracciatura ‖ التخطيط والتعليم ‖ 放线划线 ‖ 墨出し ‖ 마킹 ‖ निशान लगाना
+916 ‖ Cutting and shaping ‖ Corte y conformado ‖ Découpe et façonnage ‖ Corte e conformação ‖ Zuschneiden und Formen ‖ Taglio e sagomatura ‖ القص والتشكيل ‖ 切割与成型 ‖ 切断と成形 ‖ 절단과 성형 ‖ काटना और आकार देना
+917 ‖ Repairs ‖ Reparación ‖ Réparation ‖ Reparo ‖ Reparatur ‖ Riparazione ‖ الإصلاح ‖ 维修 ‖ 修理 ‖ 수리 ‖ मरम्मत
+918 ‖ Plumbing ‖ Fontanería ‖ Plomberie ‖ Encanamento ‖ Sanitärinstallation ‖ Idraulica ‖ السباكة ‖ 水暖管道 ‖ 配管 ‖ 배관 ‖ प्लंबिंग
+919 ‖ Assembling structures ‖ Montaje de estructuras ‖ Assemblage de structures ‖ Montagem de estruturas ‖ Konstruktionen zusammenbauen ‖ Assemblaggio di strutture ‖ تجميع الهياكل ‖ 组装结构 ‖ 構造物の組み立て ‖ 구조물 조립 ‖ ढाँचे जोड़ना
+920 ‖ Welding and soldering ‖ Soldadura ‖ Soudure et brasage ‖ Solda ‖ Schweißen und Löten ‖ Saldatura e brasatura ‖ اللحام ‖ 焊接 ‖ 溶接とはんだ付け ‖ 용접과 납땜 ‖ वेल्डिंग और सोल्डरिंग
+921 ‖ Estimate ‖ Presupuesto de obra ‖ Devis ‖ Orçamento de obra ‖ Kostenvoranschlag ‖ Preventivo ‖ تقدير التكلفة ‖ 预算报价 ‖ 見積もり ‖ 견적 ‖ अनुमानित लागत
+922 ‖ Cable splicing ‖ Empalme de cables ‖ Épissure de câbles ‖ Emenda de cabos ‖ Kabelspleißen ‖ Giunzione di cavi ‖ وصل الكابلات ‖ 电缆接续 ‖ ケーブルの接続 ‖ 케이블 접속 ‖ केबल जोड़ना
+923 ‖ Rigging ‖ Aparejamiento ‖ Levage et gréage ‖ Rigging ‖ Anschlagen und Riggen ‖ Imbracatura ‖ أعمال الرفع والتعليق ‖ 吊装索具 ‖ 玉掛け ‖ 리깅 ‖ रिगिंग
+924 ‖ Site cleanup ‖ Limpieza de la obra ‖ Nettoyage du chantier ‖ Limpeza da obra ‖ Baustellenreinigung ‖ Pulizia del cantiere ‖ تنظيف الموقع ‖ 现场清理 ‖ 現場の清掃 ‖ 현장 정리 ‖ साइट की सफ़ाई
+925 ‖ Material disposal ‖ Eliminación de materiales ‖ Évacuation des matériaux ‖ Descarte de materiais ‖ Materialentsorgung ‖ Smaltimento dei materiali ‖ التخلص من المواد ‖ 材料处置 ‖ 資材の廃棄 ‖ 자재 폐기 ‖ सामग्री का निपटान
+926 ‖ Reading drawings ‖ Lectura de planos ‖ Lecture de plans ‖ Leitura de plantas ‖ Zeichnungen lesen ‖ Lettura di disegni ‖ قراءة المخططات ‖ 看图纸 ‖ 図面の読解 ‖ 도면 해독 ‖ नक़्शे पढ़ना
+927 ‖ Plastering ‖ Enlucido ‖ Plâtrerie ‖ Reboco ‖ Verputzen ‖ Intonacatura ‖ اللياسة ‖ 抹灰 ‖ 左官 ‖ 미장 ‖ प्लास्टर करना
+928 ‖ Electrical installation ‖ Instalación eléctrica ‖ Électricité ‖ Instalação elétrica ‖ Elektroinstallation ‖ Impianto elettrico ‖ التمديدات الكهربائية ‖ 电气安装 ‖ 電気工事 ‖ 전기 공사 ‖ बिजली की वायरिंग
+929 ‖ Finance and admin ‖ Finanzas y administración ‖ Finances et administration ‖ Finanças e administração ‖ Finanzen und Verwaltung ‖ Finanza e amministrazione ‖ المالية والإدارة ‖ 财务与行政 ‖ 財務と事務 ‖ 재무와 행정 ‖ वित्त और प्रशासन
+930 ‖ Audit ‖ Auditoría ‖ Audit ‖ Auditoria ‖ Revision ‖ Audit ‖ التدقيق ‖ 审计 ‖ 監査 ‖ 감사 ‖ ऑडिट
+931 ‖ Betting odds ‖ Cuotas de apuestas ‖ Cotes de paris ‖ Odds de apostas ‖ Wettquoten ‖ Quote delle scommesse ‖ احتمالات المراهنات ‖ 博彩赔率 ‖ 賭けのオッズ ‖ 베팅 배당률 ‖ सट्टेबाज़ी के भाव
+932 ‖ Accounting ‖ Contabilidad ‖ Comptabilité ‖ Contabilidade ‖ Buchhaltung ‖ Contabilità ‖ المحاسبة ‖ 会计 ‖ 経理 ‖ 회계 ‖ लेखा
+933 ‖ Budget ‖ Presupuesto ‖ Budget ‖ Orçamento ‖ Budget ‖ Budget ‖ الميزانية ‖ 预算 ‖ 予算 ‖ 예산 ‖ बजट
+934 ‖ Internal policies ‖ Normas internas ‖ Règles internes ‖ Normas internas ‖ Interne Richtlinien ‖ Regole interne ‖ اللوائح الداخلية ‖ 内部制度 ‖ 社内規程 ‖ 내부 규정 ‖ आंतरिक नियम
+935 ‖ Contracts ‖ Contratos ‖ Contrats ‖ Contratos ‖ Verträge ‖ Contratti ‖ العقود ‖ 合同 ‖ 契約 ‖ 계약 ‖ अनुबंध
+936 ‖ Career development ‖ Desarrollo profesional ‖ Évolution de carrière ‖ Desenvolvimento de carreira ‖ Karriereentwicklung ‖ Sviluppo di carriera ‖ التطوير المهني ‖ 职业发展 ‖ キャリア開発 ‖ 경력 개발 ‖ करियर विकास
+937 ‖ Compliance ‖ Cumplimiento normativo ‖ Conformité ‖ Compliance ‖ Compliance ‖ Compliance ‖ الامتثال ‖ 合规 ‖ コンプライアンス ‖ 컴플라이언스 ‖ अनुपालन
+938 ‖ Licenses and certificates ‖ Licencias y certificados ‖ Licences et certifications ‖ Licenças e certificados ‖ Lizenzen und Zertifikate ‖ Licenze e certificati ‖ التراخيص والشهادات ‖ 执照与证书 ‖ 免許と資格 ‖ 면허와 자격증 ‖ लाइसेंस और प्रमाणपत्र
+939 ‖ Taxes ‖ Impuestos ‖ Impôts ‖ Impostos ‖ Steuern ‖ Tasse ‖ الضرائب ‖ 税务 ‖ 税金 ‖ 세금 ‖ कर
+940 ‖ Currency exchange ‖ Cambio de divisas ‖ Change de devises ‖ Câmbio ‖ Geldwechsel ‖ Cambio valuta ‖ صرف العملات ‖ 货币兑换 ‖ 両替 ‖ 환전 ‖ मुद्रा विनिमय
+941 ‖ Job application and cover letter ‖ Candidatura y carta de presentación ‖ Candidature et lettre de motivation ‖ Candidatura e carta de apresentação ‖ Bewerbung und Anschreiben ‖ Candidatura e lettera di presentazione ‖ طلب التوظيف وخطاب التقديم ‖ 求职申请与求职信 ‖ 応募書類と添え状 ‖ 지원서와 자기소개서 ‖ आवेदन और कवर लेटर
+942 ‖ Office paperwork ‖ Documentos de oficina ‖ Documents administratifs ‖ Documentos de escritório ‖ Büroakten ‖ Documenti d’ufficio ‖ الأوراق المكتبية ‖ 办公文件 ‖ 事務書類 ‖ 사무 서류 ‖ दफ़्तरी काग़ज़ात
+943 ‖ Arranging an insurance contract ‖ Formalizar un contrato de seguro ‖ Souscription d’un contrat d’assurance ‖ Contratação de seguro ‖ Versicherungsvertrag abschließen ‖ Stipulare un contratto assicurativo ‖ إبرام عقد التأمين ‖ 签订保险合同 ‖ 保険契約の手配 ‖ 보험 계약 체결 ‖ बीमा अनुबंध करना
+944 ‖ Workplace safety ‖ Seguridad laboral ‖ Santé et sécurité au travail ‖ Segurança do trabalho ‖ Arbeitsschutz ‖ Sicurezza sul lavoro ‖ السلامة المهنية ‖ 劳动安全 ‖ 労働安全 ‖ 산업 안전 ‖ कार्यस्थल सुरक्षा
+945 ‖ Insurance loss assessment ‖ Peritaje de siniestros ‖ Expertise de sinistre ‖ Avaliação de sinistros ‖ Schadenbewertung ‖ Perizia dei sinistri ‖ تقييم الأضرار المؤمَّنة ‖ 保险定损 ‖ 損害査定 ‖ 손해 사정 ‖ बीमा क्षति का आकलन
+946 ‖ Insurance risk assessment ‖ Evaluación de riesgos asegurables ‖ Évaluation des risques assurables ‖ Avaliação de riscos seguráveis ‖ Versicherungsrisiko bewerten ‖ Valutazione del rischio assicurativo ‖ تقييم مخاطر التأمين ‖ 保险风险评估 ‖ 保険リスクの評価 ‖ 보험 위험 평가 ‖ बीमा जोखिम आकलन
+947 ‖ Legal questions ‖ Cuestiones legales ‖ Questions juridiques ‖ Questões jurídicas ‖ Rechtsfragen ‖ Questioni legali ‖ المسائل القانونية ‖ 法律问题 ‖ 法律の問題 ‖ 법률 문제 ‖ क़ानूनी प्रश्न
+948 ‖ Price fairness review ‖ Revisión de precios regulados ‖ Contrôle des prix réglementés ‖ Análise de preços regulados ‖ Preisprüfung ‖ Verifica dei prezzi regolati ‖ مراجعة عدالة الأسعار ‖ 价格合理性审查 ‖ 価格の妥当性確認 ‖ 가격 적정성 검토 ‖ मूल्य उचितता की जाँच
+949 ‖ Guest payment authorization ‖ Verificar el pago del huésped ‖ Vérifier le paiement du client ‖ Verificar pagamento do hóspede ‖ Zahlung des Gastes prüfen ‖ Verificare il pagamento dell’ospite ‖ التحقق من دفع النزيل ‖ 核验住客付款 ‖ 宿泊客の支払い確認 ‖ 투숙객 결제 확인 ‖ मेहमान के भुगतान की जाँच
+950 ‖ Expenses and reimbursements ‖ Gastos y reembolsos ‖ Frais et remboursements ‖ Despesas e reembolsos ‖ Ausgaben und Erstattungen ‖ Spese e rimborsi ‖ النفقات والتعويضات ‖ 费用与报销 ‖ 経費と精算 ‖ 비용과 환급 ‖ ख़र्च और प्रतिपूर्ति
+951 ‖ Interest and fee calculation ‖ Cálculo de intereses y comisiones ‖ Calcul des intérêts et commissions ‖ Cálculo de juros e taxas ‖ Zinsen und Gebühren berechnen ‖ Calcolo di interessi e commissioni ‖ حساب الفوائد والعمولات ‖ 计算利息与佣金 ‖ 利息と手数料の計算 ‖ 이자·수수료 계산 ‖ ब्याज और शुल्क की गणना
+952 ‖ Resume and portfolio ‖ Currículum y portafolio ‖ CV et portfolio ‖ Currículo e portfólio ‖ Lebenslauf und Portfolio ‖ Curriculum e portfolio ‖ السيرة الذاتية ومعرض الأعمال ‖ 简历与作品集 ‖ 履歴書とポートフォリオ ‖ 이력서와 포트폴리오 ‖ रिज़्यूमे और पोर्टफ़ोलियो
+953 ‖ Releasing collateral ‖ Liberar una garantía ‖ Mainlevée de gage ‖ Liberação de garantia ‖ Pfandfreigabe ‖ Svincolo della garanzia ‖ فك الرهن ‖ 解除抵押 ‖ 担保の解除 ‖ 담보 해제 ‖ गिरवी छुड़ाना
+954 ‖ Job interview ‖ Entrevista de trabajo ‖ Entretien d’embauche ‖ Entrevista de emprego ‖ Vorstellungsgespräch ‖ Colloquio di lavoro ‖ مقابلة العمل ‖ 求职面试 ‖ 就職面接 ‖ 취업 면접 ‖ नौकरी का इंटरव्यू
+955 ‖ Policy servicing ‖ Gestión de pólizas ‖ Gestion des contrats d’assurance ‖ Gestão de apólices ‖ Policenverwaltung ‖ Gestione delle polizze ‖ متابعة وثائق التأمين ‖ 保单管理 ‖ 保険契約の管理 ‖ 보험 계약 관리 ‖ पॉलिसी सेवा
+956 ‖ Insurance case ‖ Caso de seguro ‖ Dossier d’assurance ‖ Caso de seguro ‖ Versicherungsfall ‖ Pratica assicurativa ‖ قضية التأمين ‖ 保险案件 ‖ 保険案件 ‖ 보험 건 ‖ बीमा मामला
+957 ‖ Invoices and statements ‖ Facturas y actas ‖ Factures et procès-verbaux ‖ Faturas e recibos ‖ Rechnungen und Nachweise ‖ Fatture e verbali ‖ الفواتير والمحاضر ‖ 发票与结算单 ‖ 請求書と納品書 ‖ 청구서와 확인서 ‖ बिल और प्रमाणपत्र
+958 ‖ Securities records ‖ Registro de operaciones con valores ‖ Suivi des opérations sur titres ‖ Registro de operações com valores ‖ Wertpapierbuchhaltung ‖ Registro delle operazioni in titoli ‖ سجل صفقات الأوراق المالية ‖ 证券交易记录 ‖ 証券取引の記録 ‖ 증권 거래 기록 ‖ प्रतिभूति लेनदेन का रिकॉर्ड
+959 ‖ Financial analysis ‖ Análisis financiero ‖ Analyse financière ‖ Análise financeira ‖ Finanzanalyse ‖ Analisi finanziaria ‖ التحليل المالي ‖ 财务分析 ‖ 財務分析 ‖ 재무 분석 ‖ वित्तीय विश्लेषण
+960 ‖ Financial plan ‖ Plan financiero ‖ Plan financier ‖ Plano financeiro ‖ Finanzplan ‖ Piano finanziario ‖ الخطة المالية ‖ 财务计划 ‖ 資金計画 ‖ 재무 계획 ‖ वित्तीय योजना

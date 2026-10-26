@@ -1,0 +1,119 @@
+1801 ‖ Literature review ‖ Revisión bibliográfica ‖ Revue de littérature ‖ Revisão de literatura ‖ Literaturrecherche ‖ Revisione della letteratura ‖ مراجعة الأدبيات ‖ 文献综述 ‖ 文献レビュー ‖ 문헌 검토 ‖ साहित्य समीक्षा
+1802 ‖ Surveys and questionnaires ‖ Encuestas y cuestionarios ‖ Enquêtes et questionnaires ‖ Pesquisas e questionários ‖ Umfragen und Fragebögen ‖ Sondaggi e questionari ‖ الاستطلاعات والاستبيانات ‖ 问卷调查 ‖ アンケート調査 ‖ 설문 조사 ‖ सर्वेक्षण और प्रश्नावली
+1803 ‖ Screening materials ‖ Cribado de materiales ‖ Tri des documents selon critères ‖ Triagem de materiais ‖ Material nach Kriterien sichten ‖ Selezione dei materiali ‖ فرز المواد حسب المعايير ‖ 按标准筛选材料 ‖ 基準による資料の選別 ‖ 기준별 자료 선별 ‖ मानदंड से सामग्री छाँटना
+1804 ‖ Sample collection ‖ Toma de muestras ‖ Prélèvement d’échantillons ‖ Coleta de amostras ‖ Probenahme ‖ Raccolta di campioni ‖ جمع العينات ‖ 采集样本 ‖ 試料採取 ‖ 시료 채취 ‖ नमूना संग्रह
+1805 ‖ Lab session prep ‖ Preparar una sesión de laboratorio ‖ Préparer une séance de labo ‖ Preparar sessão de laboratório ‖ Laborsitzung vorbereiten ‖ Preparare una sessione di laboratorio ‖ التحضير لجلسة مختبر ‖ 准备实验 ‖ 実験の準備 ‖ 실험 준비 ‖ प्रयोगशाला सत्र की तैयारी
+1806 ‖ Journal subscriptions ‖ Suscripciones a revistas ‖ Abonnements aux revues ‖ Assinaturas de periódicos ‖ Zeitschriftenabos ‖ Abbonamenti alle riviste ‖ اشتراكات المجلات ‖ 期刊订阅 ‖ 雑誌の購読管理 ‖ 학술지 구독 ‖ पत्रिका सदस्यता
+1807 ‖ Finding sources ‖ Búsqueda de fuentes ‖ Recherche de sources ‖ Busca de fontes ‖ Quellensuche ‖ Ricerca delle fonti ‖ البحث عن المصادر ‖ 查找资料 ‖ 資料探し ‖ 자료 찾기 ‖ स्रोत खोजना
+1808 ‖ Helping library users ‖ Atender a usuarios de biblioteca ‖ Aider les lecteurs ‖ Atender leitores da biblioteca ‖ Bibliotheksnutzern helfen ‖ Assistere gli utenti della biblioteca ‖ مساعدة رواد المكتبة ‖ 帮助图书馆读者 ‖ 図書館利用者の案内 ‖ 도서관 이용자 안내 ‖ पुस्तकालय पाठकों की मदद
+1809 ‖ Classified ad orders ‖ Recepción de anuncios clasificados ‖ Réception de petites annonces ‖ Recebimento de classificados ‖ Kleinanzeigen annehmen ‖ Ricezione di annunci ‖ استلام الإعلانات المبوبة ‖ 受理分类广告 ‖ 三行広告の受付 ‖ 광고 접수 ‖ वर्गीकृत विज्ञापन लेना
+1810 ‖ Source authentication ‖ Autenticación de fuentes ‖ Authentification d’une source ‖ Autenticação de fonte ‖ Quellenechtheit prüfen ‖ Autenticazione della fonte ‖ التحقق من أصالة المصدر ‖ 鉴定史料真伪 ‖ 史料の真正性確認 ‖ 사료 진위 확인 ‖ स्रोत की प्रामाणिकता जाँचना
+1811 ‖ Publishing results ‖ Publicar resultados ‖ Publier les résultats ‖ Publicar resultados ‖ Ergebnisse veröffentlichen ‖ Pubblicare i risultati ‖ نشر النتائج ‖ 发布成果 ‖ 成果の発表 ‖ 결과 발표 ‖ परिणाम प्रकाशित करना
+1812 ‖ Developing lab methods ‖ Desarrollar métodos de laboratorio ‖ Mise au point de méthodes ‖ Desenvolver métodos de laboratório ‖ Labormethoden entwickeln ‖ Sviluppare metodi di laboratorio ‖ تطوير طرق المختبر ‖ 开发实验方法 ‖ 実験手法の開発 ‖ 실험 방법 개발 ‖ प्रयोगशाला विधियाँ विकसित करना
+1813 ‖ Shelving books ‖ Colocar libros ‖ Rangement des livres ‖ Arrumar livros ‖ Bücher einstellen ‖ Ricollocare i libri ‖ ترتيب الكتب ‖ 图书上架 ‖ 配架 ‖ 서가 정리 ‖ किताबें लगाना
+1814 ‖ Peer review ‖ Revisión por pares ‖ Évaluation par les pairs ‖ Revisão por pares ‖ Peer-Review ‖ Revisione paritaria ‖ مراجعة الأقران ‖ 同行评审 ‖ 査読 ‖ 동료 심사 ‖ सहकर्मी समीक्षा
+1815 ‖ Data and material collection ‖ Recopilación de datos y materiales ‖ Collecte de données et matériaux ‖ Coleta de dados e materiais ‖ Daten und Material sammeln ‖ Raccolta di dati e materiali ‖ جمع البيانات والمواد ‖ 收集数据与资料 ‖ データと資料の収集 ‖ 데이터·자료 수집 ‖ डेटा और सामग्री जुटाना
+1816 ‖ Synthesis and conclusions ‖ Síntesis y conclusiones ‖ Synthèse et conclusions ‖ Síntese e conclusões ‖ Synthese und Schlussfolgerungen ‖ Sintesi e conclusioni ‖ التوليف والاستنتاجات ‖ 综合与结论 ‖ まとめと結論 ‖ 종합과 결론 ‖ संश्लेषण और निष्कर्ष
+1817 ‖ Lab supply tracking ‖ Control de consumibles de laboratorio ‖ Suivi des consommables de labo ‖ Controle de insumos de laboratório ‖ Laborverbrauchsmaterial erfassen ‖ Gestione dei materiali di laboratorio ‖ متابعة مستهلكات المختبر ‖ 实验耗材管理 ‖ 実験用消耗品の管理 ‖ 실험 소모품 관리 ‖ प्रयोगशाला सामग्री का हिसाब
+1818 ‖ Experiment ‖ Experimento ‖ Expérience ‖ Experimento ‖ Experiment ‖ Esperimento ‖ التجربة ‖ 实验 ‖ 実験 ‖ 실험 ‖ प्रयोग
+1819 ‖ Research ethics ‖ Ética de la investigación ‖ Éthique de la recherche ‖ Ética em pesquisa ‖ Forschungsethik ‖ Etica della ricerca ‖ أخلاقيات البحث ‖ 研究伦理 ‖ 研究倫理 ‖ 연구 윤리 ‖ शोध नैतिकता
+1820 ‖ Notes ‖ Apuntes ‖ Prise de notes ‖ Anotações ‖ Mitschrift ‖ Appunti ‖ تدوين الملاحظات ‖ 笔记 ‖ ノート取り ‖ 필기 ‖ नोट्स
+1821 ‖ Course ‖ Curso ‖ Cours ‖ Curso ‖ Kurs ‖ Corso ‖ الدورة ‖ 课程 ‖ 講座 ‖ 강좌 ‖ पाठ्यक्रम
+1822 ‖ Teaching ‖ Docencia ‖ Enseignement ‖ Ensino ‖ Unterrichten ‖ Insegnamento ‖ التدريس ‖ 教学 ‖ 教えること ‖ 가르치기 ‖ पढ़ाना
+1823 ‖ Leading a discussion ‖ Moderar un debate ‖ Animer une discussion ‖ Conduzir uma discussão ‖ Diskussion leiten ‖ Guidare una discussione ‖ إدارة النقاش ‖ 主持讨论 ‖ 議論の進行 ‖ 토론 진행 ‖ चर्चा चलाना
+1824 ‖ Demonstrating a technique ‖ Demostrar una técnica ‖ Démontrer une technique ‖ Demonstrar uma técnica ‖ Technik vorführen ‖ Dimostrare una tecnica ‖ عرض تقنية ‖ 示范技巧 ‖ 手本を見せる ‖ 시범 보이기 ‖ तकनीक दिखाना
+1825 ‖ One-on-one lesson ‖ Clase individual ‖ Cours particulier ‖ Aula individual ‖ Einzelunterricht ‖ Lezione individuale ‖ درس فردي ‖ 一对一辅导 ‖ 個別指導 ‖ 개인 수업 ‖ व्यक्तिगत पाठ
+1826 ‖ Coaching and mentoring ‖ Coaching y mentoría ‖ Coaching et mentorat ‖ Coaching e mentoria ‖ Coaching und Mentoring ‖ Coaching e mentoring ‖ التدريب والإرشاد ‖ 教练与辅导 ‖ コーチングとメンタリング ‖ 코칭과 멘토링 ‖ कोचिंग और मेंटरिंग
+1827 ‖ Professional mentoring ‖ Mentoría profesional ‖ Mentorat professionnel ‖ Mentoria profissional ‖ Berufliches Mentoring ‖ Mentoring professionale ‖ الإرشاد المهني ‖ 职业指导 ‖ 仕事のメンタリング ‖ 직업 멘토링 ‖ पेशेवर मार्गदर्शन
+1828 ‖ Online course ‖ Curso en línea ‖ Cours en ligne ‖ Curso online ‖ Onlinekurs ‖ Corso online ‖ دورة عبر الإنترنت ‖ 在线课程 ‖ オンライン講座 ‖ 온라인 강좌 ‖ ऑनलाइन कोर्स
+1829 ‖ Lesson plan ‖ Plan de clase ‖ Plan de cours ‖ Plano de aula ‖ Unterrichtsplan ‖ Piano della lezione ‖ خطة الدرس ‖ 教案 ‖ 授業計画 ‖ 수업 계획 ‖ पाठ योजना
+1830 ‖ Helping a struggling student ‖ Ayudar a un alumno con dificultades ‖ Aider un élève en difficulté ‖ Ajudar aluno com dificuldades ‖ Lernenden mit Schwierigkeiten helfen ‖ Aiutare uno studente in difficoltà ‖ مساعدة طالب متعثر ‖ 帮助学习困难的学生 ‖ つまずいた生徒の支援 ‖ 어려움 겪는 학생 돕기 ‖ कठिनाई में छात्र की मदद
+1831 ‖ Grading student work ‖ Corregir trabajos de alumnos ‖ Corriger les copies ‖ Corrigir trabalhos de alunos ‖ Schülerarbeiten korrigieren ‖ Correggere i compiti ‖ تصحيح أعمال الطلاب ‖ 批改作业 ‖ 生徒の課題の採点 ‖ 학생 과제 채점 ‖ छात्रों का काम जाँचना
+1832 ‖ Course syllabus ‖ Programa del curso ‖ Programme du cours ‖ Programa do curso ‖ Kurslehrplan ‖ Programma del corso ‖ منهج الدورة ‖ 课程大纲 ‖ カリキュラム ‖ 강의 계획 ‖ पाठ्यक्रम रूपरेखा
+1833 ‖ Writing and grading tests ‖ Preparar y corregir exámenes ‖ Préparer et corriger des tests ‖ Elaborar e corrigir provas ‖ Tests erstellen und korrigieren ‖ Preparare e correggere test ‖ إعداد الاختبارات وتصحيحها ‖ 出题与阅卷 ‖ テストの作成と採点 ‖ 시험 출제와 채점 ‖ परीक्षा बनाना और जाँचना
+1834 ‖ Team training ‖ Formación para el equipo ‖ Formation d’équipe ‖ Treinamento da equipe ‖ Teamschulung ‖ Formazione del team ‖ تدريب الفريق ‖ 团队培训 ‖ チーム研修 ‖ 팀 교육 ‖ टीम प्रशिक्षण
+1835 ‖ Classroom management ‖ Gestión del grupo ‖ Gestion de classe ‖ Gestão de turma ‖ Gruppenführung ‖ Gestione della classe ‖ إدارة الفصل ‖ 班级管理 ‖ クラス運営 ‖ 학급 관리 ‖ कक्षा प्रबंधन
+1836 ‖ Lesson, lecture or workshop ‖ Clase, conferencia o taller ‖ Cours, conférence ou atelier ‖ Aula, palestra ou oficina ‖ Unterricht, Vortrag oder Workshop ‖ Lezione, conferenza o workshop ‖ درس أو محاضرة أو ورشة ‖ 授课、讲座或工作坊 ‖ 授業・講義・ワークショップ ‖ 수업·강연·워크숍 ‖ पाठ, व्याख्यान या कार्यशाला
+1837 ‖ Learning materials ‖ Materiales didácticos ‖ Supports pédagogiques ‖ Materiais didáticos ‖ Lernmaterialien ‖ Materiali didattici ‖ المواد التعليمية ‖ 教学材料 ‖ 教材 ‖ 학습 자료 ‖ शिक्षण सामग्री
+1838 ‖ Tracking student progress ‖ Seguimiento del progreso ‖ Suivi des progrès ‖ Acompanhamento do progresso ‖ Lernfortschritt dokumentieren ‖ Monitorare i progressi ‖ متابعة تقدم الطلاب ‖ 跟踪学生进度 ‖ 学習進度の記録 ‖ 학생 진도 관리 ‖ छात्रों की प्रगति दर्ज करना
+1839 ‖ Self-study ‖ Autoaprendizaje ‖ Autoformation ‖ Autodidatismo ‖ Selbststudium ‖ Autoapprendimento ‖ التعلم الذاتي ‖ 自学 ‖ 独学 ‖ 독학 ‖ स्वाध्याय
+1840 ‖ Video course or lecture ‖ Videocurso o conferencia ‖ Cours vidéo ou conférence ‖ Videoaula ou palestra ‖ Videokurs oder Vortrag ‖ Videocorso o lezione ‖ دورة مرئية أو محاضرة ‖ 视频课程或讲座 ‖ 動画講座や講義 ‖ 영상 강의 ‖ वीडियो कोर्स या व्याख्यान
+1841 ‖ Extracurriculars ‖ Actividades extraescolares ‖ Activités périscolaires ‖ Atividades extracurriculares ‖ Außerschulische Aktivitäten ‖ Attività extracurricolari ‖ الأنشطة اللاصفية ‖ 课外活动 ‖ 課外活動 ‖ 과외 활동 ‖ पाठ्येतर गतिविधियाँ
+1842 ‖ Problems and contest tasks ‖ Problemas y olimpiadas ‖ Exercices et problèmes d’olympiade ‖ Problemas e olimpíadas ‖ Aufgaben und Olympiade ‖ Problemi e olimpiadi ‖ المسائل ومسابقات الأولمبياد ‖ 习题与竞赛题 ‖ 問題演習とコンテスト ‖ 문제 풀이와 경시 문제 ‖ प्रश्न और प्रतियोगिता अभ्यास
+1843 ‖ Studying a topic from sources ‖ Estudiar un tema con fuentes ‖ Étudier un sujet par les sources ‖ Estudar um tema por fontes ‖ Thema anhand von Quellen lernen ‖ Studiare un tema dalle fonti ‖ دراسة موضوع من المصادر ‖ 查阅资料学习专题 ‖ 資料でテーマを学ぶ ‖ 자료로 주제 공부 ‖ स्रोतों से विषय पढ़ना
+1844 ‖ Spaced repetition ‖ Repaso espaciado ‖ Répétition espacée ‖ Repetição espaçada ‖ Verteiltes Wiederholen ‖ Ripetizione dilazionata ‖ التكرار المتباعد ‖ 间隔重复 ‖ 間隔反復 ‖ 간격 반복 ‖ अंतराल पुनरावृत्ति
+1845 ‖ Flashcards and active recall ‖ Tarjetas y recuerdo activo ‖ Cartes et rappel actif ‖ Flashcards e recordação ativa ‖ Karteikarten und aktives Abrufen ‖ Flashcard e richiamo attivo ‖ البطاقات والاستذكار النشط ‖ 卡片与主动回忆 ‖ 単語カードと想起練習 ‖ 플래시카드와 능동 회상 ‖ फ़्लैशकार्ड और सक्रिय स्मरण
+1846 ‖ Group discussion of a topic ‖ Debatir un tema en grupo ‖ Discussion de groupe ‖ Discussão em grupo ‖ Thema in der Gruppe besprechen ‖ Discussione di gruppo ‖ مناقشة موضوع في مجموعة ‖ 小组讨论 ‖ グループで話し合う ‖ 그룹 토론 ‖ समूह में चर्चा
+1847 ‖ Educational podcast ‖ Pódcast educativo ‖ Podcast éducatif ‖ Podcast educativo ‖ Lernpodcast ‖ Podcast educativo ‖ بودكاست تعليمي ‖ 教育播客 ‖ 学習ポッドキャスト ‖ 교육 팟캐스트 ‖ शैक्षिक पॉडकास्ट
+1848 ‖ Learning on the job ‖ Aprender en la práctica ‖ Apprentissage sur le terrain ‖ Aprender na prática ‖ Lernen in der Praxis ‖ Imparare sul campo ‖ التعلم بالممارسة ‖ 实践中学习 ‖ 実地で学ぶ ‖ 현장 학습 ‖ अभ्यास से सीखना
+1849 ‖ Explaining to understand ‖ Explicar para entender ‖ Expliquer pour comprendre ‖ Explicar para entender ‖ Erklären, um zu verstehen ‖ Spiegare per capire ‖ الشرح للفهم ‖ 讲出来以理解 ‖ 説明して理解する ‖ 설명하며 이해하기 ‖ समझने के लिए समझाना
+1850 ‖ Skill drills ‖ Practicar una habilidad ‖ Entraîner une compétence ‖ Treinar uma habilidade ‖ Fertigkeit üben ‖ Esercitare un’abilità ‖ التدرب على مهارة ‖ 技能练习 ‖ スキルの反復練習 ‖ 기술 반복 연습 ‖ कौशल अभ्यास
+1851 ‖ Break between classes ‖ Pausa entre clases ‖ Pause entre les cours ‖ Intervalo entre aulas ‖ Pause zwischen Stunden ‖ Pausa tra le lezioni ‖ استراحة بين الحصص ‖ 课间休息 ‖ 授業の合間の休憩 ‖ 쉬는 시간 ‖ कक्षाओं के बीच ब्रेक
+1852 ‖ Following a tutorial ‖ Seguir un tutorial ‖ Suivre un tutoriel ‖ Seguir um tutorial ‖ Tutorial nacharbeiten ‖ Seguire un tutorial ‖ اتباع درس تعليمي خطوة بخطوة ‖ 跟着教程做 ‖ チュートリアルをなぞる ‖ 튜토리얼 따라 하기 ‖ ट्यूटोरियल का पालन
+1853 ‖ Professional development ‖ Formación continua ‖ Formation continue ‖ Capacitação profissional ‖ Weiterbildung ‖ Aggiornamento professionale ‖ التطوير المهني المستمر ‖ 职业进修 ‖ スキルアップ研修 ‖ 직무 역량 강화 ‖ व्यावसायिक विकास
+1854 ‖ Portfolio ‖ Portafolio ‖ Portfolio ‖ Portfólio ‖ Portfolio ‖ Portfolio ‖ ملف الأعمال ‖ 作品集 ‖ ポートフォリオ ‖ 포트폴리오 ‖ पोर्टफ़ोलियो
+1855 ‖ Job training ‖ Formación laboral ‖ Formation professionnelle ‖ Treinamento profissional ‖ Berufliche Schulung ‖ Formazione professionale ‖ التدريب المهني ‖ 职业培训 ‖ 職業研修 ‖ 직업 교육 ‖ व्यावसायिक प्रशिक्षण
+1856 ‖ Self-test and practice exam ‖ Autoevaluación y examen de prueba ‖ Autotest et examen blanc ‖ Autoavaliação e simulado ‖ Selbsttest und Probeprüfung ‖ Autovalutazione e simulazione d’esame ‖ الاختبار الذاتي والتجريبي ‖ 自测与模拟考 ‖ 自己テストと模試 ‖ 자가 테스트와 모의고사 ‖ स्व-परीक्षण और अभ्यास परीक्षा
+1857 ‖ Coding exercises ‖ Ejercicios de programación ‖ Exercices de programmation ‖ Exercícios de programação ‖ Programmierübungen ‖ Esercizi di programmazione ‖ تمارين البرمجة ‖ 编程练习 ‖ プログラミング演習 ‖ 코딩 연습 ‖ प्रोग्रामिंग अभ्यास
+1858 ‖ Study group ‖ Grupo de estudio ‖ Groupe d’étude ‖ Grupo de estudo ‖ Lerngruppe ‖ Gruppo di studio ‖ مجموعة الدراسة ‖ 学习小组 ‖ 勉強会 ‖ 스터디 그룹 ‖ अध्ययन समूह
+1859 ‖ Study plan and goals ‖ Plan y objetivos de estudio ‖ Plan et objectifs d’étude ‖ Plano e metas de estudo ‖ Lernplan und Ziele ‖ Piano e obiettivi di studio ‖ خطة الدراسة والأهداف ‖ 学习计划与目标 ‖ 学習計画と目標 ‖ 학습 계획과 목표 ‖ अध्ययन योजना और लक्ष्य
+1860 ‖ Learning through a project ‖ Aprender con un proyecto propio ‖ Apprendre par un projet ‖ Aprender com um projeto ‖ Am eigenen Projekt lernen ‖ Imparare con un progetto ‖ التعلم من خلال مشروع ‖ 通过项目学习 ‖ プロジェクトで学ぶ ‖ 프로젝트로 배우기 ‖ परियोजना से सीखना
+1861 ‖ Focused study ‖ Estudio concentrado ‖ Étude concentrée ‖ Estudo focado ‖ Konzentriertes Lernen ‖ Studio concentrato ‖ الدراسة المركزة ‖ 专注学习 ‖ 集中して勉強 ‖ 집중 공부 ‖ एकाग्र अध्ययन
+1862 ‖ Study research ‖ Investigación para estudios ‖ Recherche pour les études ‖ Pesquisa acadêmica ‖ Recherche fürs Studium ‖ Ricerca per lo studio ‖ بحث دراسي ‖ 学习研究 ‖ 学習のための調べ物 ‖ 학습용 조사 ‖ अध्ययन के लिए शोध
+1863 ‖ School or university ‖ Colegio o universidad ‖ École ou université ‖ Escola ou faculdade ‖ Schule oder Uni ‖ Scuola o università ‖ المدرسة أو الجامعة ‖ 学校或大学 ‖ 学校・大学 ‖ 학교·대학 ‖ स्कूल या विश्वविद्यालय
+1864 ‖ Presentation or thesis defense ‖ Exposición o defensa ‖ Exposé ou soutenance ‖ Apresentação ou defesa ‖ Referat oder Verteidigung ‖ Relazione o discussione della tesi ‖ عرض أو مناقشة عمل ‖ 报告或答辩 ‖ 発表や口頭試問 ‖ 발표·논문 심사 ‖ प्रस्तुति या शोध बचाव
+1865 ‖ Homework assignment ‖ Tarea ‖ Devoir à la maison ‖ Tarefa de casa ‖ Hausaufgabe ‖ Compito a casa ‖ الواجب المدرسي ‖ 家庭作业 ‖ 課題 ‖ 과제 ‖ होमवर्क
+1866 ‖ Office hours ‖ Tutoría con el profesor ‖ Rendez-vous avec l’enseignant ‖ Atendimento do professor ‖ Sprechstunde ‖ Ricevimento del docente ‖ استشارة الأستاذ ‖ 答疑 ‖ オフィスアワー ‖ 교수 면담 ‖ शिक्षक से परामर्श
+1867 ‖ Lab work ‖ Práctica de laboratorio ‖ Travaux pratiques ‖ Aula de laboratório ‖ Laborpraktikum ‖ Esercitazione di laboratorio ‖ العمل المخبري ‖ 实验课 ‖ 実験・実習 ‖ 실험 수업 ‖ प्रयोगशाला कार्य
+1868 ‖ Lecture ‖ Clase magistral ‖ Cours magistral ‖ Aula expositiva ‖ Vorlesung ‖ Lezione frontale ‖ محاضرة ‖ 讲座 ‖ 講義 ‖ 강의 ‖ व्याख्यान
+1869 ‖ Practical skill practice ‖ Práctica de una habilidad ‖ Pratique d’un savoir-faire ‖ Prática de habilidade ‖ Praktische Übung ‖ Pratica di un’abilità ‖ التدرب على مهارة عملية ‖ 实操练习 ‖ 実技の練習 ‖ 실기 연습 ‖ व्यावहारिक कौशल अभ्यास
+1870 ‖ Exam prep ‖ Preparación de exámenes ‖ Révisions d’examen ‖ Preparação para prova ‖ Prüfungsvorbereitung ‖ Preparazione all’esame ‖ التحضير للامتحان ‖ 备考 ‖ 試験勉強 ‖ 시험 준비 ‖ परीक्षा की तैयारी
+1871 ‖ Career guidance ‖ Orientación profesional ‖ Orientation professionnelle ‖ Orientação profissional ‖ Berufsberatung ‖ Orientamento professionale ‖ التوجيه المهني ‖ 职业指导 ‖ 進路指導 ‖ 진로 상담 ‖ करियर मार्गदर्शन
+1872 ‖ Study group review ‖ Repaso en grupo ‖ TD et séance de révision ‖ Revisão em grupo ‖ Tutorium ‖ Revisione in gruppo ‖ مراجعة في مجموعة دراسية ‖ 小组复习 ‖ 演習・復習会 ‖ 그룹 복습 ‖ समूह में दोहराव
+1873 ‖ Reviewing grades and mistakes ‖ Revisar notas y errores ‖ Revoir notes et erreurs ‖ Revisar notas e erros ‖ Noten und Fehler besprechen ‖ Rivedere voti ed errori ‖ مراجعة الدرجات والأخطاء ‖ 分析成绩与错题 ‖ 成績とミスの見直し ‖ 성적·오답 점검 ‖ अंकों और ग़लतियों की समीक्षा
+1874 ‖ Solving problem sets ‖ Resolver ejercicios ‖ Résoudre des exercices ‖ Resolver exercícios ‖ Übungsaufgaben lösen ‖ Risolvere esercizi ‖ حل التمارين ‖ 做练习题 ‖ 問題を解く ‖ 문제 풀기 ‖ अभ्यास प्रश्न हल करना
+1875 ‖ Class or seminar ‖ Clase o seminario ‖ Cours ou séminaire ‖ Aula ou seminário ‖ Unterricht oder Seminar ‖ Lezione o seminario ‖ درس أو حلقة نقاش ‖ 课堂或研讨课 ‖ 授業やゼミ ‖ 수업·세미나 ‖ कक्षा या संगोष्ठी
+1876 ‖ Field practicum ‖ Prácticas de campo ‖ Stage de terrain ‖ Estágio de campo ‖ Praktikum im Feld ‖ Tirocinio sul campo ‖ التدريب الميداني ‖ 实习实践 ‖ 実地実習 ‖ 현장 실습 ‖ फ़ील्ड प्रैक्टिकम
+1877 ‖ School admin ‖ Trámites académicos ‖ Démarches scolaires ‖ Burocracia acadêmica ‖ Studienformalitäten ‖ Pratiche scolastiche ‖ الإجراءات الدراسية ‖ 学业手续 ‖ 学務手続き ‖ 학사 행정 ‖ शैक्षणिक औपचारिकताएँ
+1878 ‖ School project ‖ Proyecto escolar ‖ Projet scolaire ‖ Projeto escolar ‖ Schulprojekt ‖ Progetto scolastico ‖ مشروع دراسي ‖ 课程项目 ‖ 学校のプロジェクト ‖ 학교 프로젝트 ‖ स्कूल परियोजना
+1879 ‖ Studying with classmates ‖ Estudiar con compañeros ‖ Étudier entre camarades ‖ Estudar com colegas ‖ Lernen mit Kommilitonen ‖ Studiare con i compagni ‖ الدراسة مع الزملاء ‖ 与同学一起学习 ‖ 同級生と勉強 ‖ 동기들과 공부 ‖ सहपाठियों के साथ पढ़ाई
+1880 ‖ Exam or test ‖ Examen o prueba ‖ Examen ou test ‖ Prova ou teste ‖ Prüfung oder Test ‖ Esame o test ‖ امتحان أو اختبار ‖ 考试或测验 ‖ 試験・テスト ‖ 시험 ‖ परीक्षा या टेस्ट
+1881 ‖ Reading ‖ Lectura ‖ Lecture ‖ Leitura ‖ Lesen ‖ Lettura ‖ القراءة ‖ 阅读 ‖ 読書 ‖ 읽기 ‖ पढ़ना
+1882 ‖ Book ‖ Libro ‖ Livre ‖ Livro ‖ Buch ‖ Libro ‖ كتاب ‖ 书 ‖ 本 ‖ 책 ‖ किताब
+1883 ‖ References and manuals ‖ Obras de consulta y manuales ‖ Ouvrages de référence et modes d’emploi ‖ Referências e manuais ‖ Nachschlagewerke und Anleitungen ‖ Opere di consultazione e manuali ‖ المراجع والأدلة ‖ 参考书与说明书 ‖ 参考書や説明書 ‖ 참고서와 설명서 ‖ संदर्भ और निर्देश पुस्तिकाएँ
+1884 ‖ Article or text ‖ Artículo o texto ‖ Article ou texte ‖ Artigo ou texto ‖ Artikel oder Text ‖ Articolo o testo ‖ مقال أو نص ‖ 文章 ‖ 記事や文章 ‖ 글·기사 ‖ लेख या पाठ
+1885 ‖ Leisure reading ‖ Lectura por placer ‖ Lecture pour soi ‖ Leitura por prazer ‖ Lesen zum Vergnügen ‖ Lettura per piacere ‖ القراءة للمتعة ‖ 休闲阅读 ‖ 楽しみの読書 ‖ 취미 독서 ‖ अपने लिए पढ़ना
+1886 ‖ Blogs and websites ‖ Blogs y webs ‖ Blogs et sites ‖ Blogs e sites ‖ Blogs und Websites ‖ Blog e siti ‖ المدونات والمواقع ‖ 博客与网站 ‖ ブログとサイト ‖ 블로그와 사이트 ‖ ब्लॉग और वेबसाइटें
+1887 ‖ Long report ‖ Informe extenso ‖ Long rapport ‖ Relatório longo ‖ Langer Bericht ‖ Rapporto lungo ‖ تقرير طويل ‖ 长篇报告 ‖ 長いレポート ‖ 긴 보고서 ‖ लंबी रिपोर्ट
+1888 ‖ Magazines and newspapers ‖ Revistas y periódicos ‖ Magazines et journaux ‖ Revistas e jornais ‖ Zeitschriften und Zeitungen ‖ Riviste e giornali ‖ المجلات والصحف ‖ 杂志与报纸 ‖ 雑誌と新聞 ‖ 잡지와 신문 ‖ पत्रिकाएँ और अख़बार
+1889 ‖ Reading at the library ‖ Leer en la biblioteca ‖ Lire à la bibliothèque ‖ Ler na biblioteca ‖ In der Bibliothek lesen ‖ Leggere in biblioteca ‖ القراءة في المكتبة ‖ 在图书馆读书 ‖ 図書館で読む ‖ 도서관 독서 ‖ पुस्तकालय में पढ़ना
+1890 ‖ Comics and manga ‖ Cómics y manga ‖ BD et mangas ‖ Quadrinhos e mangá ‖ Comics und Manga ‖ Fumetti e manga ‖ القصص المصورة والمانغا ‖ 漫画 ‖ 漫画 ‖ 만화 ‖ कॉमिक्स और मांगा
+1891 ‖ News ‖ Noticias ‖ Actualités ‖ Notícias ‖ Nachrichten ‖ Notizie ‖ الأخبار ‖ 新闻 ‖ ニュース ‖ 뉴스 ‖ समाचार
+1892 ‖ Newsletters ‖ Boletines ‖ Newsletters ‖ Newsletters ‖ Newsletter ‖ Newsletter ‖ النشرات البريدية ‖ 邮件简报 ‖ メールマガジン ‖ 뉴스레터 ‖ न्यूज़लेटर
+1893 ‖ Novels and poetry ‖ Novela y poesía ‖ Romans et poésie ‖ Romance e poesia ‖ Romane und Lyrik ‖ Romanzi e poesia ‖ الروايات والشعر ‖ 小说与诗歌 ‖ 小説と詩 ‖ 소설과 시 ‖ उपन्यास और कविता
+1894 ‖ Article ‖ Artículo ‖ Article ‖ Artigo ‖ Artikel ‖ Articolo ‖ مقال ‖ 文章 ‖ 記事 ‖ 기사 ‖ लेख
+1895 ‖ Fan fiction ‖ Fanfics ‖ Fanfictions ‖ Fanfics ‖ Fanfiction ‖ Fanfiction ‖ قصص المعجبين ‖ 同人小说 ‖ 二次創作 ‖ 팬픽 ‖ फ़ैन फ़िक्शन
+1896 ‖ Forums and posts ‖ Foros y publicaciones ‖ Forums et posts ‖ Fóruns e posts ‖ Foren und Beiträge ‖ Forum e post ‖ المنتديات والمنشورات ‖ 论坛与帖子 ‖ 掲示板と投稿 ‖ 포럼과 게시물 ‖ फ़ोरम और पोस्ट
+1897 ‖ E-book ‖ Libro electrónico ‖ Livre numérique ‖ E-book ‖ E-Book ‖ E-book ‖ كتاب إلكتروني ‖ 电子书 ‖ 電子書籍 ‖ 전자책 ‖ ई-बुक
+1898 ‖ Languages ‖ Idiomas ‖ Langues ‖ Idiomas ‖ Sprachen ‖ Lingue ‖ اللغات ‖ 语言 ‖ 語学 ‖ 언어 ‖ भाषाएँ
+1899 ‖ Language learning ‖ Aprender idiomas ‖ Apprentissage des langues ‖ Aprender idiomas ‖ Sprachenlernen ‖ Studio delle lingue ‖ تعلم اللغات ‖ 学习语言 ‖ 語学学習 ‖ 언어 학습 ‖ भाषा सीखना
+1900 ‖ Listening for gist ‖ Comprensión auditiva global ‖ Compréhension orale globale ‖ Compreensão auditiva geral ‖ Globales Hörverstehen ‖ Ascolto globale ‖ الاستماع للفهم العام ‖ 泛听 ‖ 聞き取り（概要） ‖ 듣기 이해 ‖ सुनकर समझना
+1901 ‖ Speaking out loud ‖ Hablar en voz alta ‖ Parler à voix haute ‖ Falar em voz alta ‖ Laut sprechen ‖ Parlare ad alta voce ‖ التحدث بصوت عالٍ ‖ 开口练习 ‖ 声に出して話す ‖ 소리 내어 말하기 ‖ ज़ोर से बोलना
+1902 ‖ Grammar ‖ Gramática ‖ Grammaire ‖ Gramática ‖ Grammatik ‖ Grammatica ‖ القواعد ‖ 语法 ‖ 文法 ‖ 문법 ‖ व्याकरण
+1903 ‖ Dictation and transcription ‖ Dictado y transcripción ‖ Dictée et transcription ‖ Ditado e transcrição ‖ Diktat und Transkription ‖ Dettato e trascrizione ‖ الإملاء والتفريغ ‖ 听写与转写 ‖ ディクテーションと書き起こし ‖ 받아쓰기와 전사 ‖ श्रुतलेख और प्रतिलेखन
+1904 ‖ Intensive listening ‖ Escucha intensiva ‖ Écoute intensive ‖ Escuta intensiva ‖ Intensives Hören ‖ Ascolto intensivo ‖ الاستماع المكثف ‖ 精听 ‖ 精聴 ‖ 집중 듣기 ‖ गहन श्रवण
+1905 ‖ Translation exercises ‖ Ejercicios de traducción ‖ Exercices de traduction ‖ Exercícios de tradução ‖ Übersetzungsübungen ‖ Esercizi di traduzione ‖ تمارين الترجمة ‖ 翻译练习 ‖ 翻訳練習 ‖ 번역 연습 ‖ अनुवाद अभ्यास
+1906 ‖ Writing in the language ‖ Escribir en el idioma ‖ Écrire dans la langue ‖ Escrever no idioma ‖ In der Sprache schreiben ‖ Scrivere nella lingua ‖ الكتابة باللغة ‖ 用外语写作 ‖ その言語で書く ‖ 외국어로 쓰기 ‖ भाषा में लिखना
+1907 ‖ Pronunciation ‖ Pronunciación ‖ Prononciation ‖ Pronúncia ‖ Aussprache ‖ Pronuncia ‖ النطق ‖ 发音 ‖ 発音 ‖ 발음 ‖ उच्चारण
+1908 ‖ Reviewing your mistakes ‖ Revisar tus errores ‖ Revoir ses erreurs ‖ Revisar seus erros ‖ Eigene Fehler durchgehen ‖ Rivedere i propri errori ‖ مراجعة أخطائي ‖ 分析自己的错误 ‖ 自分のミスの見直し ‖ 내 실수 분석 ‖ अपनी ग़लतियाँ देखना
+1909 ‖ Text analysis ‖ Análisis de texto ‖ Analyse de texte ‖ Análise de texto ‖ Textanalyse ‖ Analisi del testo ‖ تحليل النص ‖ 文本精读 ‖ 文章の精読 ‖ 텍스트 분석 ‖ पाठ विश्लेषण
+1910 ‖ Conversation practice ‖ Práctica de conversación ‖ Pratique de la conversation ‖ Prática de conversação ‖ Gesprächsübung ‖ Pratica di conversazione ‖ ممارسة المحادثة ‖ 口语练习 ‖ 会話練習 ‖ 회화 연습 ‖ बातचीत अभ्यास
+1911 ‖ Vocabulary and flashcards ‖ Vocabulario y tarjetas ‖ Vocabulaire et cartes ‖ Vocabulário e flashcards ‖ Vokabeln und Karteikarten ‖ Vocabolario e flashcard ‖ المفردات والبطاقات ‖ 词汇与卡片 ‖ 単語とカード ‖ 단어와 카드 ‖ शब्दावली और कार्ड
+1912 ‖ Reading in the language ‖ Leer en el idioma ‖ Lire dans la langue ‖ Ler no idioma ‖ In der Sprache lesen ‖ Leggere nella lingua ‖ القراءة باللغة ‖ 外语阅读 ‖ その言語で読む ‖ 외국어로 읽기 ‖ भाषा में पढ़ना
+1913 ‖ Shadowing ‖ Shadowing ‖ Shadowing ‖ Shadowing ‖ Shadowing ‖ Shadowing ‖ المحاكاة الصوتية ‖ 跟读 ‖ シャドーイング ‖ 섀도잉 ‖ शैडोइंग
+1914 ‖ Background listening ‖ Idioma de fondo ‖ Langue en fond sonore ‖ Idioma de fundo ‖ Sprache im Hintergrund ‖ Lingua in sottofondo ‖ اللغة في الخلفية ‖ 背景语言输入 ‖ 聞き流し ‖ 배경 듣기 ‖ पृष्ठभूमि में भाषा
+1915 ‖ Language through media ‖ Idioma con películas y medios ‖ Langue via films et médias ‖ Idioma com filmes e mídia ‖ Sprache über Filme und Medien ‖ Lingua con film e media ‖ اللغة عبر الأفلام والوسائط ‖ 通过影视学语言 ‖ 映画やメディアで語学 ‖ 영화·미디어로 언어 공부 ‖ फ़िल्मों और मीडिया से भाषा
+1916 ‖ Flashcard review ‖ Repaso de tarjetas ‖ Révision des cartes ‖ Revisão de flashcards ‖ Karteikarten wiederholen ‖ Ripasso delle flashcard ‖ مراجعة البطاقات ‖ 复习卡片 ‖ カードの復習 ‖ 카드 복습 ‖ कार्ड दोहराना
+1917 ‖ Language practice ‖ Práctica de idiomas ‖ Pratique de la langue ‖ Prática de idioma ‖ Sprachpraxis ‖ Pratica linguistica ‖ ممارسة اللغة ‖ 语言练习 ‖ 語学の練習 ‖ 언어 연습 ‖ भाषा अभ्यास
+1918 ‖ Talking with a native speaker ‖ Conversar con un nativo ‖ Parler avec un natif ‖ Conversar com nativo ‖ Gespräch mit Muttersprachlern ‖ Parlare con un madrelingua ‖ التحدث مع متحدث أصلي ‖ 与母语者交流 ‖ ネイティブとの会話 ‖ 원어민과 대화 ‖ मूल वक्ता से बातचीत
+1919 ‖ Language lesson ‖ Clase de idioma ‖ Cours de langue ‖ Aula de idioma ‖ Sprachunterricht ‖ Lezione di lingua ‖ درس لغة ‖ 语言课 ‖ 語学レッスン ‖ 언어 수업 ‖ भाषा पाठ

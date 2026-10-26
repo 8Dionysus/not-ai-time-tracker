@@ -16,7 +16,7 @@
     <string name="t_0467ae4bb8" formatted="false">تأكيد</string>
     <string name="t_04bcedfa9f">بين %1$s والآن</string>
     <string name="t_059b504fa9" formatted="false">تم اختيار المجلد. ستظهر أول نسخة خلال دقيقتين</string>
-    <string name="t_05f4ea7fa6" formatted="false">ستُحفظ البيانات الحالية بشكل منفصل قبل الاستبدال. وستختفي السجلات التي أُنشئت بعد هذه النسخة.</string>
+    <string name="t_05f4ea7fa6" formatted="false">" ستُحفظ البيانات الحالية بشكل منفصل قبل الاستبدال. وستختفي السجلات التي أُنشئت بعد هذه النسخة."</string>
     <string name="t_060c91cb5a">زيادة بـ%1$s</string>
     <string name="t_067a6eef15" formatted="false">اختر بطاقة بالمعرّف قبل ربط CSV</string>
     <string name="t_06d08263c2" formatted="false">لا يمكن حفظ النسخ في هذا المجلد. اختر مجلدًا آخر</string>
@@ -98,7 +98,7 @@
     <string name="t_1bc5f604f5" formatted="false">دقيقة واحدة</string>
     <string name="t_1bcdac8735">سيُضاف: %1$s؛ مكرر: %2$s.\n%3$s\nأخطاء: %4$s\n%5$s\n%6$s\nهذا يُلحق السجل؛ أما استعادة JSON الكاملة فتستبدل كل التخزين.</string>
     <string name="t_1bd48e6642">النشاط: %1$s</string>
-    <string name="t_1c38d1407f" formatted="false">بين فترات الإيقاف</string>
+    <string name="t_1c38d1407f" formatted="false">" بين فترات الإيقاف"</string>
     <string name="t_1c4b04d710" formatted="false">إضافة إلى الشاشة الرئيسية</string>
     <string name="t_1c76eec066" formatted="false">تمت استعادة البيانات. حُفظت البيانات السابقة في مكان منفصل.</string>
     <string name="t_1c8ee71b8e">متاح حتى %1$s</string>
@@ -139,9 +139,9 @@
     <string name="t_29f3b29df0" formatted="false">استعادة</string>
     <string name="t_2a5e307788" formatted="false">مضغوط</string>
     <string name="t_2a690e69d2" formatted="false">تم اختيار الأيقونة، لكن الاختصارات لم تُحدَّث بعد</string>
-    <string name="t_2a70012208" formatted="false">الإجمالي</string>
+    <string name="t_2a70012208" formatted="false">"الإجمالي "</string>
     <string name="t_2b39abab32">«%1$s». يُعاد تشغيله ما دام التطبيق مفتوحًا</string>
-    <string name="t_2c0db2ce7c" formatted="false">بدء:</string>
+    <string name="t_2c0db2ce7c" formatted="false">"بدء: "</string>
     <string name="t_2d2be3f11c" formatted="false">مرحلة العمل</string>
     <string name="t_2d5a644e5c" formatted="false">هذه الفترة غير ممكنة: تحقق من البداية والنهاية.</string>
     <string name="t_2dd965ee95" formatted="false">لون التمييز</string>
@@ -184,7 +184,7 @@
     <string name="t_3bfd577967">%1$s أبطأ بـ%2$s</string>
     <string name="t_3c244ffaa5">التقويم: %1$s؛ السجل دون تغيير</string>
     <string name="t_3c6332622c" formatted="false">فتح التطبيق</string>
-    <string name="t_3cd7d0dd3c" formatted="false">الوقت حسب الأيام:</string>
+    <string name="t_3cd7d0dd3c" formatted="false">"الوقت حسب الأيام: "</string>
     <string name="t_3d51050347" formatted="false">تحقق</string>
     <string name="t_3da1c7d83d" formatted="false">إزالة الهدف؟</string>
     <string name="t_3de49828e8" formatted="false">الاسم</string>
@@ -263,7 +263,7 @@
     <string name="t_550c7a6d12" formatted="false">لا توجد سجلات بعد. سيظهر هنا كل مقطع.</string>
     <string name="t_552d1cca6b" formatted="false">لا توجد أحداث بوقت محدد في التقويم لهذا اليوم.</string>
     <string name="t_559a87f7cc" formatted="false">إضافة</string>
-    <string name="t_55c44eb122">ستُضاف %1$s قبل %2$s.</string>
+    <string name="t_55c44eb122">"ستُضاف %1$s قبل %2$s. "</string>
     <string name="t_55cd7a55ed" formatted="false">ينقص شيئًا ما إذنٌ من الهاتف</string>
     <string name="t_55e920546e" formatted="false">تم إيقاف الزر العائم</string>
     <string name="t_5695330ffb" formatted="false">تلقائي</string>
@@ -369,7 +369,7 @@
     <string name="t_750b471214" formatted="false">ترتيب المفضلة</string>
     <string name="t_751e31256e">%1$s. عند تغيّر المنطقة الزمنية للهاتف ستتبعها حدود الأيام في السجل والنظرة العامة. لا تتغير السجلات ولا مناطق الأهداف.</string>
     <string name="t_75436e3162" formatted="false">العمل</string>
-    <string name="t_75cd08a0e5" formatted="false">التبديل:</string>
+    <string name="t_75cd08a0e5" formatted="false">"التبديل: "</string>
     <string name="t_762d7d64da" formatted="false">أمس</string>
     <string name="t_76393b3245" formatted="false">نسخ التراجع المحلية…</string>
     <string name="t_766e7cabf7" formatted="false">أقل</string>
@@ -410,7 +410,7 @@
     <string name="t_80e474035b" formatted="false">المنطقة الزمنية مذكورة في الوقت نفسه</string>
     <string name="t_81129d8255" formatted="false">تغيّر الهدف</string>
     <string name="t_8125e2fba0" formatted="false">كل الصفوف ← البطاقة المحددة؛ وإلا فاستخدم أسماء المصدر بلا نوع</string>
-    <string name="t_817dfa0bfc">(العمود «%1$s»)</string>
+    <string name="t_817dfa0bfc">" (العمود «%1$s»)"</string>
     <string name="t_819f3ba9d1" formatted="false">من نهاية السجل السابق</string>
     <string name="t_81b26ab0d7" formatted="false">خلفية نافذة الاختيار بعد الإيقاف</string>
     <string name="t_81d3d38d5c" formatted="false">السؤال بعد</string>
@@ -433,7 +433,7 @@
     <string name="t_85e8a3404b" formatted="false">لم يُحفظ أي ملف من هذا الهاتف بعد</string>
     <string name="t_86042e468b" formatted="false">القياسات والتقويم واستعادة قاعدة البيانات</string>
     <string name="t_861bd8760b" formatted="false">خط Onest · SIL Open Font License</string>
-    <string name="t_8633c34c71">· في الملف: %1$s</string>
+    <string name="t_8633c34c71">" · في الملف: %1$s"</string>
     <string name="t_86652580fd" formatted="false">الشهر الماضي</string>
     <string name="t_8690f98524" formatted="false">، اليوم لم ينتهِ بعد</string>
     <string name="t_86d85a0147">المنطقة الزمنية للتقارير: %1$s</string>
@@ -631,7 +631,7 @@
     <string name="t_babd8e081b" formatted="false">ستتغير حدود الأيام في السجل والنظرة العامة. لا تتغير السجلات ولا مناطق الأهداف.</string>
     <string name="t_bbb0e8e8cd" formatted="false">مللي ثانية</string>
     <string name="t_bbcf06b3c9" formatted="false">الملاحظات</string>
-    <string name="t_bbee9680a8" formatted="false">الوقت غير المعروف خارج الإجمالي:</string>
+    <string name="t_bbee9680a8" formatted="false">"الوقت غير المعروف خارج الإجمالي: "</string>
     <string name="t_bc28baf5fc" formatted="false">لا توجد سجلات أمس</string>
     <string name="t_bc4d1d35af" formatted="false">كما في الملف</string>
     <string name="t_bc5431b599" formatted="false">المجلد</string>
@@ -653,7 +653,7 @@
     <string name="t_c0ed5f4dda" formatted="false">علامات الاقتباس في الصف غير مغلقة</string>
     <string name="t_c12ee51dd9" formatted="false">كل الوقت</string>
     <string name="t_c14f88246c">متبقٍ %1$s</string>
-    <string name="t_c161a7bb23" formatted="false">سيصل السجل غير المغلق على أنه «وقت غير معروف» وسيلزم تحديده.</string>
+    <string name="t_c161a7bb23" formatted="false">" سيصل السجل غير المغلق على أنه «وقت غير معروف» وسيلزم تحديده."</string>
     <string name="t_c23d5826a3">%1$s فيها سجلات</string>
     <string name="t_c25bd1a7c6" formatted="false">تخطّي الاستراحة</string>
     <string name="t_c2bf13bbb1" formatted="false">تقارير خاصة</string>
@@ -681,7 +681,7 @@
     <string name="t_c85eb5f581" formatted="false">90 يومًا</string>
     <string name="t_c927b86cfb" formatted="false">الكتالوج والجداول</string>
     <string name="t_ca7830c42f" formatted="false">لا توجد سجلات للحذف</string>
-    <string name="t_cabb0c6d9b">الصف %1$s:</string>
+    <string name="t_cabb0c6d9b">"الصف %1$s: "</string>
     <string name="t_cb26bdc6c6" formatted="false">البداية</string>
     <string name="t_cbc6fa3d6a" formatted="false">الأداة</string>
     <string name="t_cbeb716470" formatted="false">العودة إلى الإعدادات</string>
@@ -701,7 +701,7 @@
     <string name="t_cf52c8daf1" formatted="false">تتبع المنطقة الزمنية للتقارير الجهاز. قد تنتقل السجلات إلى يوم آخر</string>
     <string name="t_cf7b338323" formatted="false">رفيعة</string>
     <string name="t_cfafc18b42" formatted="false">تظهر الخطة على الشاشة الرئيسية فقط. يبدأ الوقت عند النقر على النشاط.</string>
-    <string name="t_d002f83ddc" formatted="false">بعد التغييرات تُحفظ نسخة خلال دقيقتين عندما يسمح الهاتف بالعمل في الخلفية. ومرة يوميًا حتى دون تغييرات.</string>
+    <string name="t_d002f83ddc" formatted="false">"بعد التغييرات تُحفظ نسخة خلال دقيقتين عندما يسمح الهاتف بالعمل في الخلفية. ومرة يوميًا حتى دون تغييرات. "</string>
     <string name="t_d015e9be93" formatted="false">نشاط هذا التقرير محذوف أو مؤرشف. يحتسب التقرير سجلاته السابقة فقط.</string>
     <string name="t_d0d7180292" formatted="false">أُضيف إلى المفضّلة</string>
     <string name="t_d0dd940c4c" formatted="false">لا توجد بيانات</string>
@@ -719,7 +719,7 @@
     <string name="t_d2aa318afd">مسجَّل %1$s</string>
     <string name="t_d2e9881a72">ستُضاف %1$s</string>
     <string name="t_d349cb398d">انقضى %1$s</string>
-    <string name="t_d37c15b206" formatted="false">تبقى الأسماء التي غيّرتها كما هي، ولا تتغير السجلات السابقة.</string>
+    <string name="t_d37c15b206" formatted="false">" تبقى الأسماء التي غيّرتها كما هي، ولا تتغير السجلات السابقة."</string>
     <string name="t_d398842570" formatted="false">تأكيد المقطع مجهول الوقت بالفترة المحددة</string>
     <string name="t_d3c8e2e155" formatted="false">تغيّرت المنطقة الزمنية. لم يُحفظ التأكيد، وسيكرره التطبيق عند فتحه</string>
     <string name="t_d40fecd7ad" formatted="false">حاول مجددًا</string>
@@ -759,7 +759,7 @@
     <string name="t_dd15d6eecb" formatted="false">بماذا نبدأ؟</string>
     <string name="t_dd27b7de89" formatted="false">تعذّر فتح الترخيص</string>
     <string name="t_dd63bc14f9">عُدّل %1$s</string>
-    <string name="t_ddca6f4db2" formatted="false">بلا سجل</string>
+    <string name="t_ddca6f4db2" formatted="false">" بلا سجل"</string>
     <string name="t_ddcbc8c167" formatted="false">تم تحديث مراحل التركيز</string>
     <string name="t_de5d4764e8" formatted="false">الإجمالي للهدف؛ لا تُجمَع الفترات اليومية معًا</string>
     <string name="t_de5eb09e17" formatted="false">تغيير النشاط</string>

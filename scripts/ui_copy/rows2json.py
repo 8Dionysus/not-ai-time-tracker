@@ -10,7 +10,10 @@ for path in sys.argv[1:]:
     for n, line in enumerate(open(path, encoding='utf-8'), 1):
         line = line.rstrip('\n')
         if not line.strip() or line.startswith('#'): continue
-        cells = [c.strip() for c in line.split('‖')]
+        # Cells are separated by ' ‖ '; only that single space belongs to the separator, so copy may start or end with a space.
+        raw = line.split('‖')
+        cells = [raw[0].strip()] + [c[1:] if c.startswith(' ') else c for c in raw[1:]]
+        cells = [cells[0]] + [c[:-1] if c.endswith(' ') and i < len(cells) - 2 else c for i, c in enumerate(cells[1:])]
         key, vals = cells[0], cells[1:]
         assert len(vals) == 11, (path, n, key, len(vals))
         vals = [v.replace('\\n', '\n') for v in vals]

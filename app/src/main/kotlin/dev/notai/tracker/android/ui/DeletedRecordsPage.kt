@@ -73,7 +73,7 @@ import java.time.ZoneId
         Column(Modifier.weight(1f),verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(label.title,style = NotAi.type.body,color = c.ink,maxLines = 1,overflow = TextOverflow.Ellipsis)
             Text("${Format.dayTitle(date,today)} · ${Format.range(first,last,zone)} · ${Format.duration(record.recordedMs)}",
-                style = NotAi.type.caption,color = c.ink2,maxLines = 1,overflow = TextOverflow.Ellipsis)
+                style = NotAi.type.caption,color = c.ink2,maxLines = 2,overflow = TextOverflow.Ellipsis)
             record.session.value.note?.takeIf { it.isNotBlank() }?.let { Text(it,style = NotAi.type.caption,color = c.ink3,maxLines = 2,overflow = TextOverflow.Ellipsis) }
         }
         Box(Modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp)).testTag("restore-deleted:${record.sessionId}")

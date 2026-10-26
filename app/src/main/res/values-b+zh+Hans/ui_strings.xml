@@ -139,7 +139,7 @@
     <string name="t_29f3b29df0" formatted="false">恢复</string>
     <string name="t_2a5e307788" formatted="false">紧凑</string>
     <string name="t_2a690e69d2" formatted="false">已选择图标，但快捷方式尚未更新</string>
-    <string name="t_2a70012208" formatted="false">合计</string>
+    <string name="t_2a70012208" formatted="false">"合计 "</string>
     <string name="t_2b39abab32">“%1$s”。应用打开时循环播放</string>
     <string name="t_2c0db2ce7c" formatted="false">开始：</string>
     <string name="t_2d2be3f11c" formatted="false">工作阶段</string>
@@ -433,7 +433,7 @@
     <string name="t_85e8a3404b" formatted="false">此手机尚未保存过文件</string>
     <string name="t_86042e468b" formatted="false">测量、日历、数据库恢复</string>
     <string name="t_861bd8760b" formatted="false">Onest 字体 · SIL Open Font License</string>
-    <string name="t_8633c34c71">· 文件中：%1$s</string>
+    <string name="t_8633c34c71">" · 文件中：%1$s"</string>
     <string name="t_86652580fd" formatted="false">上月</string>
     <string name="t_8690f98524" formatted="false">，今天尚未结束</string>
     <string name="t_86d85a0147">报告时区：%1$s</string>

@@ -768,17 +768,17 @@
 "hi": "गिन रहे हैं…"
 },
 "t_8633c34c71": {
-"en": "· in file: %1$s",
-"es": "· en el archivo: %1$s",
-"fr": "· dans le fichier : %1$s",
-"pt-BR": "· no arquivo: %1$s",
-"de": "· in der Datei: %1$s",
-"it": "· nel file: %1$s",
-"ar": "· في الملف: %1$s",
-"zh-Hans": "· 文件中：%1$s",
-"ja": "· ファイル内：%1$s",
-"ko": "· 파일: %1$s",
-"hi": "· फ़ाइल में: %1$s"
+"en": " · in file: %1$s",
+"es": " · en el archivo: %1$s",
+"fr": " · dans le fichier : %1$s",
+"pt-BR": " · no arquivo: %1$s",
+"de": " · in der Datei: %1$s",
+"it": " · nel file: %1$s",
+"ar": " · في الملف: %1$s",
+"zh-Hans": " · 文件中：%1$s",
+"ja": " · ファイル内：%1$s",
+"ko": " · 파일: %1$s",
+"hi": " · फ़ाइल में: %1$s"
 },
 "t_86ee6df7f5": {
 "en": "seconds",

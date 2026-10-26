@@ -768,17 +768,17 @@
 "hi": "गुरु"
 },
 "t_817dfa0bfc": {
-"en": "(column “%1$s”)",
-"es": "(columna «%1$s»)",
-"fr": "(colonne « %1$s »)",
-"pt-BR": "(coluna “%1$s”)",
-"de": "(Spalte „%1$s“)",
-"it": "(colonna «%1$s»)",
-"ar": "(العمود «%1$s»)",
+"en": " (column “%1$s”)",
+"es": " (columna «%1$s»)",
+"fr": " (colonne « %1$s »)",
+"pt-BR": " (coluna “%1$s”)",
+"de": " (Spalte „%1$s“)",
+"it": " (colonna «%1$s»)",
+"ar": " (العمود «%1$s»)",
 "zh-Hans": "（列“%1$s”）",
 "ja": "（列「%1$s」）",
-"ko": "(열 “%1$s”)",
-"hi": "(कॉलम “%1$s”)"
+"ko": " (열 “%1$s”)",
+"hi": " (कॉलम “%1$s”)"
 },
 "t_83ae5f756d": {
 "en": "the file is too large",
@@ -1054,16 +1054,16 @@
 "hi": "सप्ताहांत में"
 },
 "t_cabb0c6d9b": {
-"en": "Row %1$s:",
-"es": "Fila %1$s:",
-"fr": "Ligne %1$s :",
-"pt-BR": "Linha %1$s:",
-"de": "Zeile %1$s:",
-"it": "Riga %1$s:",
-"ar": "الصف %1$s:",
+"en": "Row %1$s: ",
+"es": "Fila %1$s: ",
+"fr": "Ligne %1$s : ",
+"pt-BR": "Linha %1$s: ",
+"de": "Zeile %1$s: ",
+"it": "Riga %1$s: ",
+"ar": "الصف %1$s: ",
 "zh-Hans": "第 %1$s 行：",
 "ja": "%1$s行目：",
-"ko": "%1$s행:",
+"ko": "%1$s행: ",
 "hi": "पंक्ति %1$s:"
 },
 "t_d176283db1": {

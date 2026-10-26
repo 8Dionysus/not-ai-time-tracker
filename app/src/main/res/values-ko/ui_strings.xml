@@ -16,7 +16,7 @@
     <string name="t_0467ae4bb8" formatted="false">확인</string>
     <string name="t_04bcedfa9f">%1$s부터 지금 사이</string>
     <string name="t_059b504fa9" formatted="false">폴더를 골랐어요. 첫 사본은 몇 분 뒤에 생겨요</string>
-    <string name="t_05f4ea7fa6" formatted="false">바꾸기 전에 현재 데이터를 따로 저장해요. 이 사본 이후의 기록은 사라져요.</string>
+    <string name="t_05f4ea7fa6" formatted="false">" 바꾸기 전에 현재 데이터를 따로 저장해요. 이 사본 이후의 기록은 사라져요."</string>
     <string name="t_060c91cb5a">%1$s 초과</string>
     <string name="t_067a6eef15" formatted="false">CSV 매핑 전에 ID로 카드를 고르세요</string>
     <string name="t_06d08263c2" formatted="false">이 폴더에는 사본을 저장할 수 없어요. 다른 폴더를 고르세요</string>
@@ -98,7 +98,7 @@
     <string name="t_1bc5f604f5" formatted="false">1분</string>
     <string name="t_1bcdac8735">추가: %1$s, 중복: %2$s.\n%3$s\n오류: %4$s\n%5$s\n%6$s\n기록을 추가해요. 전체 JSON 복원은 저장소 전체를 바꿔요.</string>
     <string name="t_1bd48e6642">활동: %1$s</string>
-    <string name="t_1c38d1407f" formatted="false">(일시정지 사이)</string>
+    <string name="t_1c38d1407f" formatted="false">" (일시정지 사이)"</string>
     <string name="t_1c4b04d710" formatted="false">홈 화면에 추가</string>
     <string name="t_1c76eec066" formatted="false">데이터가 복원되었습니다. 이전 데이터는 별도로 저장되었습니다.</string>
     <string name="t_1c8ee71b8e">%1$s까지 비어 있음</string>
@@ -139,9 +139,9 @@
     <string name="t_29f3b29df0" formatted="false">복원</string>
     <string name="t_2a5e307788" formatted="false">촘촘하게</string>
     <string name="t_2a690e69d2" formatted="false">아이콘은 골랐지만 바로가기가 아직 업데이트되지 않았어요</string>
-    <string name="t_2a70012208" formatted="false">합계</string>
+    <string name="t_2a70012208" formatted="false">"합계 "</string>
     <string name="t_2b39abab32">“%1$s”. 앱이 열려 있는 동안 반복 재생돼요</string>
-    <string name="t_2c0db2ce7c" formatted="false">시작:</string>
+    <string name="t_2c0db2ce7c" formatted="false">"시작: "</string>
     <string name="t_2d2be3f11c" formatted="false">작업 구간</string>
     <string name="t_2d5a644e5c" formatted="false">불가능한 구간이에요: 시작과 끝을 확인하세요.</string>
     <string name="t_2dd965ee95" formatted="false">강조 색</string>
@@ -184,7 +184,7 @@
     <string name="t_3bfd577967">%1$s %2$s 늦추기</string>
     <string name="t_3c244ffaa5">캘린더: %1$s, 기록은 그대로</string>
     <string name="t_3c6332622c" formatted="false">앱 열기</string>
-    <string name="t_3cd7d0dd3c" formatted="false">날짜별 시간:</string>
+    <string name="t_3cd7d0dd3c" formatted="false">"날짜별 시간: "</string>
     <string name="t_3d51050347" formatted="false">달성</string>
     <string name="t_3da1c7d83d" formatted="false">목표를 뺄까요?</string>
     <string name="t_3de49828e8" formatted="false">이름</string>
@@ -263,7 +263,7 @@
     <string name="t_550c7a6d12" formatted="false">아직 기록이 없습니다. 각 구간이 여기에 표시됩니다.</string>
     <string name="t_552d1cca6b" formatted="false">이날 캘린더에 시간이 있는 일정이 없어요.</string>
     <string name="t_559a87f7cc" formatted="false">추가</string>
-    <string name="t_55c44eb122">%2$s 전에 %1$s이 추가돼요.</string>
+    <string name="t_55c44eb122">"%2$s 전에 %1$s이 추가돼요. "</string>
     <string name="t_55cd7a55ed" formatted="false">휴대전화 권한이 부족한 항목이 있어요</string>
     <string name="t_55e920546e" formatted="false">플로팅 버튼을 껐어요</string>
     <string name="t_5695330ffb" formatted="false">자동</string>
@@ -369,7 +369,7 @@
     <string name="t_750b471214" formatted="false">즐겨찾기 순서</string>
     <string name="t_751e31256e">%1$s. 휴대전화 시간대가 바뀌면 기록과 개요의 하루 경계가 따라가요. 기록과 목표의 시간대는 바뀌지 않아요.</string>
     <string name="t_75436e3162" formatted="false">작업</string>
-    <string name="t_75cd08a0e5" formatted="false">전환:</string>
+    <string name="t_75cd08a0e5" formatted="false">"전환: "</string>
     <string name="t_762d7d64da" formatted="false">어제</string>
     <string name="t_76393b3245" formatted="false">로컬 롤백 사본…</string>
     <string name="t_766e7cabf7" formatted="false">줄이기</string>
@@ -402,7 +402,7 @@
     <string name="t_7f12cd4599" formatted="false">켜져 있지만 휴대전화가 아직 앱의 방해 금지 사용을 허용하지 않았어요</string>
     <string name="t_7f17c7c62a" formatted="false">설정</string>
     <string name="t_7f76296ba9" formatted="false">끝난 기록 구간이 없어요</string>
-    <string name="t_7f7a71c089">사본 내용: %1$s, %2$s,</string>
+    <string name="t_7f7a71c089">"사본 내용: %1$s, %2$s, "</string>
     <string name="t_7fa01b6e34" formatted="false">복원한 사본에서 켜져 있어요. 이 휴대전화에서 확인해야 해요</string>
     <string name="t_80072ed701" formatted="false">내 활동 없음</string>
     <string name="t_806764743a" formatted="false">여러 활동</string>
@@ -410,7 +410,7 @@
     <string name="t_80e474035b" formatted="false">시간에 시간대가 포함됨</string>
     <string name="t_81129d8255" formatted="false">목표를 바꿨어요</string>
     <string name="t_8125e2fba0" formatted="false">모든 행 → 선택한 카드; 그렇지 않으면 유형 없이 원본 이름 사용</string>
-    <string name="t_817dfa0bfc">(열 “%1$s”)</string>
+    <string name="t_817dfa0bfc">" (열 “%1$s”)"</string>
     <string name="t_819f3ba9d1" formatted="false">이전 기록이 끝난 때부터</string>
     <string name="t_81b26ab0d7" formatted="false">정지 후 선택 창의 배경</string>
     <string name="t_81d3d38d5c" formatted="false">물어볼 시간</string>
@@ -433,7 +433,7 @@
     <string name="t_85e8a3404b" formatted="false">이 휴대전화에서 아직 파일을 저장하지 않았어요</string>
     <string name="t_86042e468b" formatted="false">측정, 캘린더, 데이터베이스 복구</string>
     <string name="t_861bd8760b" formatted="false">Onest 글꼴 · SIL Open Font License</string>
-    <string name="t_8633c34c71">· 파일: %1$s</string>
+    <string name="t_8633c34c71">" · 파일: %1$s"</string>
     <string name="t_86652580fd" formatted="false">지난달</string>
     <string name="t_8690f98524" formatted="false">, 아직 하루가 끝나지 않음</string>
     <string name="t_86d85a0147">보고서 시간대: %1$s</string>
@@ -597,7 +597,7 @@
     <string name="t_b402c34a3b" formatted="false">CSV로 내보내기</string>
     <string name="t_b40a4254c7" formatted="false">버튼에 표시할 이름</string>
     <string name="t_b433c5110e" formatted="false">첫 사본은 몇 분 뒤에 생겨요</string>
-    <string name="t_b4479f84f1">%1$s, 숫자 %2$s,</string>
+    <string name="t_b4479f84f1">"%1$s, 숫자 %2$s, "</string>
     <string name="t_b45bbb4570" formatted="false">밝은 테마</string>
     <string name="t_b467c6658f" formatted="false">파일이 저장되었지만 다시 읽어 확인할 수 없습니다.</string>
     <string name="t_b4770c7e71">하루는 %1$s:%2$s에 시작해요</string>
@@ -631,7 +631,7 @@
     <string name="t_babd8e081b" formatted="false">기록과 개요의 하루 경계가 바뀌어요. 기록과 목표 시간대는 바뀌지 않아요.</string>
     <string name="t_bbb0e8e8cd" formatted="false">밀리초</string>
     <string name="t_bbcf06b3c9" formatted="false">메모</string>
-    <string name="t_bbee9680a8" formatted="false">모르는 시간은 합계에 없어요:</string>
+    <string name="t_bbee9680a8" formatted="false">"모르는 시간은 합계에 없어요: "</string>
     <string name="t_bc28baf5fc" formatted="false">어제는 기록이 없어요</string>
     <string name="t_bc4d1d35af" formatted="false">파일 그대로</string>
     <string name="t_bc5431b599" formatted="false">폴더</string>
@@ -653,7 +653,7 @@
     <string name="t_c0ed5f4dda" formatted="false">행의 따옴표가 닫히지 않았어요</string>
     <string name="t_c12ee51dd9" formatted="false">전체 기간</string>
     <string name="t_c14f88246c">%1$s 남음</string>
-    <string name="t_c161a7bb23" formatted="false">끝나지 않은 기록은 “시간 모름”으로 들어오고 정해야 해요.</string>
+    <string name="t_c161a7bb23" formatted="false">" 끝나지 않은 기록은 “시간 모름”으로 들어오고 정해야 해요."</string>
     <string name="t_c23d5826a3">기록 있는 %1$s</string>
     <string name="t_c25bd1a7c6" formatted="false">휴식 건너뛰기</string>
     <string name="t_c2bf13bbb1" formatted="false">나만의 보고서</string>
@@ -681,7 +681,7 @@
     <string name="t_c85eb5f581" formatted="false">90일</string>
     <string name="t_c927b86cfb" formatted="false">카탈로그와 표</string>
     <string name="t_ca7830c42f" formatted="false">삭제할 기록이 없어요</string>
-    <string name="t_cabb0c6d9b">%1$s행:</string>
+    <string name="t_cabb0c6d9b">"%1$s행: "</string>
     <string name="t_cb26bdc6c6" formatted="false">시작</string>
     <string name="t_cbc6fa3d6a" formatted="false">위젯</string>
     <string name="t_cbeb716470" formatted="false">설정으로 돌아가기</string>
@@ -701,7 +701,7 @@
     <string name="t_cf52c8daf1" formatted="false">보고서 시간대가 기기를 따라가요. 기록이 다른 날로 옮겨질 수 있어요</string>
     <string name="t_cf7b338323" formatted="false">얇게</string>
     <string name="t_cfafc18b42" formatted="false">계획은 홈 화면에 보이기만 해요. 활동을 누르면 시간이 시작돼요.</string>
-    <string name="t_d002f83ddc" formatted="false">변경 후에는 휴대전화가 백그라운드 작업을 허용하면 몇 분 안에 사본을 저장해요. 변경이 없어도 하루에 한 번 저장해요.</string>
+    <string name="t_d002f83ddc" formatted="false">"변경 후에는 휴대전화가 백그라운드 작업을 허용하면 몇 분 안에 사본을 저장해요. 변경이 없어도 하루에 한 번 저장해요. "</string>
     <string name="t_d015e9be93" formatted="false">이 보고서의 활동이 삭제되었거나 보관됐어요. 지난 기록만 셉니다.</string>
     <string name="t_d0d7180292" formatted="false">즐겨찾기에 추가했습니다.</string>
     <string name="t_d0dd940c4c" formatted="false">데이터가 없습니다.</string>
@@ -719,7 +719,7 @@
     <string name="t_d2aa318afd">기록됨 %1$s</string>
     <string name="t_d2e9881a72">추가될 항목: %1$s</string>
     <string name="t_d349cb398d">%1$s 지남</string>
-    <string name="t_d37c15b206" formatted="false">직접 바꾼 이름은 그대로이고 지난 기록도 바뀌지 않아요.</string>
+    <string name="t_d37c15b206" formatted="false">" 직접 바꾼 이름은 그대로이고 지난 기록도 바뀌지 않아요."</string>
     <string name="t_d398842570" formatted="false">지정한 구간으로 미확인 시간을 확정</string>
     <string name="t_d3c8e2e155" formatted="false">시간대를 바꿨어요. 확인 내용이 저장되지 않아 앱을 열 때 다시 할게요</string>
     <string name="t_d40fecd7ad" formatted="false">다시 시도</string>
@@ -759,7 +759,7 @@
     <string name="t_dd15d6eecb" formatted="false">무엇을 시작할까요?</string>
     <string name="t_dd27b7de89" formatted="false">라이선스를 열지 못했어요</string>
     <string name="t_dd63bc14f9">%1$s 변경됨</string>
-    <string name="t_ddca6f4db2" formatted="false">기록 없음</string>
+    <string name="t_ddca6f4db2" formatted="false">" 기록 없음"</string>
     <string name="t_ddcbc8c167" formatted="false">구간이 변경되었습니다.</string>
     <string name="t_de5d4764e8" formatted="false">목표 전체 수량; 일별 기간의 값을 합산하지 않음</string>
     <string name="t_de5eb09e17" formatted="false">활동 바꾸기</string>

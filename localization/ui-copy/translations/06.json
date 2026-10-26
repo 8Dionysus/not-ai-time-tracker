@@ -430,16 +430,16 @@
 "hi": "सेटिंग"
 },
 "t_7f7a71c089": {
-"en": "The copy has %1$s, %2$s,",
-"es": "La copia tiene %1$s, %2$s,",
-"fr": "La copie contient %1$s, %2$s,",
-"pt-BR": "A cópia tem %1$s, %2$s,",
-"de": "Die Kopie enthält %1$s, %2$s,",
-"it": "La copia contiene %1$s, %2$s,",
+"en": "The copy has %1$s, %2$s, ",
+"es": "La copia tiene %1$s, %2$s, ",
+"fr": "La copie contient %1$s, %2$s, ",
+"pt-BR": "A cópia tem %1$s, %2$s, ",
+"de": "Die Kopie enthält %1$s, %2$s, ",
+"it": "La copia contiene %1$s, %2$s, ",
 "ar": "تحتوي النسخة على %1$s و%2$s و",
 "zh-Hans": "副本中有 %1$s、%2$s、",
 "ja": "コピーの内容：%1$s、%2$s、",
-"ko": "사본 내용: %1$s, %2$s,",
+"ko": "사본 내용: %1$s, %2$s, ",
 "hi": "कॉपी में %1$s, %2$s,"
 },
 "t_7fa01b6e34": {
@@ -976,16 +976,16 @@
 "hi": "पहली कॉपी कुछ मिनट में बनेगी"
 },
 "t_b4479f84f1": {
-"en": "%1$s, %2$s digits,",
-"es": "%1$s, cifras %2$s,",
-"fr": "%1$s, chiffres %2$s,",
-"pt-BR": "%1$s, dígitos %2$s,",
-"de": "%1$s, Ziffern %2$s,",
-"it": "%1$s, cifre %2$s,",
+"en": "%1$s, %2$s digits, ",
+"es": "%1$s, cifras %2$s, ",
+"fr": "%1$s, chiffres %2$s, ",
+"pt-BR": "%1$s, dígitos %2$s, ",
+"de": "%1$s, Ziffern %2$s, ",
+"it": "%1$s, cifre %2$s, ",
 "ar": "%1$s، أرقام %2$s،",
 "zh-Hans": "%1$s，数字%2$s，",
 "ja": "%1$s、数字は%2$s、",
-"ko": "%1$s, 숫자 %2$s,",
+"ko": "%1$s, 숫자 %2$s, ",
 "hi": "%1$s, अंक %2$s,"
 },
 "t_b6cee6b950": {
@@ -1158,17 +1158,17 @@
 "hi": "चालू है, पर सूचना की अनुमति नहीं"
 },
 "t_c161a7bb23": {
-"en": "An unfinished entry will arrive as “time unknown” and will need to be specified.",
-"es": "Un registro sin cerrar llegará como «tiempo desconocido» y habrá que precisarlo.",
-"fr": "Une entrée non terminée arrivera en « temps inconnu » et devra être précisée.",
-"pt-BR": "Um registro não encerrado virá como “tempo desconhecido” e precisará ser especificado.",
-"de": "Ein offener Eintrag kommt als „Zeit unbekannt“ und muss angegeben werden.",
-"it": "Una voce non chiusa arriverà come «tempo sconosciuto» e andrà precisata.",
-"ar": "سيصل السجل غير المغلق على أنه «وقت غير معروف» وسيلزم تحديده.",
+"en": " An unfinished entry will arrive as “time unknown” and will need to be specified.",
+"es": " Un registro sin cerrar llegará como «tiempo desconocido» y habrá que precisarlo.",
+"fr": " Une entrée non terminée arrivera en « temps inconnu » et devra être précisée.",
+"pt-BR": " Um registro não encerrado virá como “tempo desconhecido” e precisará ser especificado.",
+"de": " Ein offener Eintrag kommt als „Zeit unbekannt“ und muss angegeben werden.",
+"it": " Una voce non chiusa arriverà come «tempo sconosciuto» e andrà precisata.",
+"ar": " سيصل السجل غير المغلق على أنه «وقت غير معروف» وسيلزم تحديده.",
 "zh-Hans": "未结束的条目会显示为“时间未知”，需要补充确认。",
 "ja": "終了していない記録は「時間不明」として入り、確定が必要になります。",
-"ko": "끝나지 않은 기록은 “시간 모름”으로 들어오고 정해야 해요.",
-"hi": "अधूरी प्रविष्टि “समय अज्ञात” के रूप में आएगी और उसे बताना होगा।"
+"ko": " 끝나지 않은 기록은 “시간 모름”으로 들어오고 정해야 해요.",
+"hi": " अधूरी प्रविष्टि “समय अज्ञात” के रूप में आएगी और उसे बताना होगा।"
 }
 },
 "plurals": {}

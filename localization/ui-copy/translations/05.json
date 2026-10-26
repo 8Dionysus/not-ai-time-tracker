@@ -638,17 +638,17 @@
 "hi": "पुष्टि करें"
 },
 "t_05f4ea7fa6": {
-"en": "The current data will be saved separately before replacing. Entries made after this copy will disappear.",
-"es": "Los datos actuales se guardarán aparte antes de reemplazarlos. Los registros hechos después de esta copia desaparecerán.",
-"fr": "Les données actuelles seront enregistrées à part avant le remplacement. Les entrées faites après cette copie disparaîtront.",
-"pt-BR": "Os dados atuais serão salvos à parte antes da substituição. Os registros feitos depois desta cópia vão sumir.",
-"de": "Die aktuellen Daten werden vor dem Ersetzen separat gesichert. Einträge nach dieser Kopie verschwinden.",
-"it": "I dati attuali verranno salvati a parte prima della sostituzione. Le voci fatte dopo questa copia spariranno.",
-"ar": "ستُحفظ البيانات الحالية بشكل منفصل قبل الاستبدال. وستختفي السجلات التي أُنشئت بعد هذه النسخة.",
+"en": " The current data will be saved separately before replacing. Entries made after this copy will disappear.",
+"es": " Los datos actuales se guardarán aparte antes de reemplazarlos. Los registros hechos después de esta copia desaparecerán.",
+"fr": " Les données actuelles seront enregistrées à part avant le remplacement. Les entrées faites après cette copie disparaîtront.",
+"pt-BR": " Os dados atuais serão salvos à parte antes da substituição. Os registros feitos depois desta cópia vão sumir.",
+"de": " Die aktuellen Daten werden vor dem Ersetzen separat gesichert. Einträge nach dieser Kopie verschwinden.",
+"it": " I dati attuali verranno salvati a parte prima della sostituzione. Le voci fatte dopo questa copia spariranno.",
+"ar": " ستُحفظ البيانات الحالية بشكل منفصل قبل الاستبدال. وستختفي السجلات التي أُنشئت بعد هذه النسخة.",
 "zh-Hans": "替换前会另外保存当前数据。此副本之后的条目将消失。",
 "ja": "置き換える前に現在のデータを別に保存します。このコピー以降の記録は消えます。",
-"ko": "바꾸기 전에 현재 데이터를 따로 저장해요. 이 사본 이후의 기록은 사라져요.",
-"hi": "बदलने से पहले मौजूदा डेटा अलग से सहेजा जाएगा। इस कॉपी के बाद की प्रविष्टियाँ हट जाएँगी।"
+"ko": " 바꾸기 전에 현재 데이터를 따로 저장해요. 이 사본 이후의 기록은 사라져요.",
+"hi": " बदलने से पहले मौजूदा डेटा अलग से सहेजा जाएगा। इस कॉपी के बाद की प्रविष्टियाँ हट जाएँगी।"
 },
 "t_090fad991e": {
 "en": "Open settings",

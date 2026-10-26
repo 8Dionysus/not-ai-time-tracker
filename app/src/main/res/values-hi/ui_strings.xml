@@ -16,7 +16,7 @@
     <string name="t_0467ae4bb8" formatted="false">पुष्टि करें</string>
     <string name="t_04bcedfa9f">%1$s और अभी के बीच</string>
     <string name="t_059b504fa9" formatted="false">फ़ोल्डर चुना गया। पहली कॉपी कुछ मिनट में बनेगी</string>
-    <string name="t_05f4ea7fa6" formatted="false">बदलने से पहले मौजूदा डेटा अलग से सहेजा जाएगा। इस कॉपी के बाद की प्रविष्टियाँ हट जाएँगी।</string>
+    <string name="t_05f4ea7fa6" formatted="false">" बदलने से पहले मौजूदा डेटा अलग से सहेजा जाएगा। इस कॉपी के बाद की प्रविष्टियाँ हट जाएँगी।"</string>
     <string name="t_060c91cb5a">%1$s ज़्यादा</string>
     <string name="t_067a6eef15" formatted="false">CSV मैपिंग से पहले ID से कार्ड चुनें</string>
     <string name="t_06d08263c2" formatted="false">इस फ़ोल्डर में कॉपी सहेजी नहीं जा सकतीं। दूसरा चुनें</string>
@@ -98,7 +98,7 @@
     <string name="t_1bc5f604f5" formatted="false">1 मिनट</string>
     <string name="t_1bcdac8735">जुड़ेंगे: %1$s; दोहराव: %2$s।\n%3$s\nत्रुटियाँ: %4$s\n%5$s\n%6$s\nयह इतिहास जोड़ता है; पूरा JSON रिस्टोर सारा संग्रह बदल देता है।</string>
     <string name="t_1bd48e6642">गतिविधि: %1$s</string>
-    <string name="t_1c38d1407f" formatted="false">विरामों के बीच</string>
+    <string name="t_1c38d1407f" formatted="false">" विरामों के बीच"</string>
     <string name="t_1c4b04d710" formatted="false">होम स्क्रीन पर जोड़ें</string>
     <string name="t_1c76eec066" formatted="false">डेटा पुनर्स्थापित किया गया। पिछला डेटा अलग से सहेजा गया है।</string>
     <string name="t_1c8ee71b8e">%1$s तक खाली</string>
@@ -410,7 +410,7 @@
     <string name="t_80e474035b" formatted="false">समय में ही समय क्षेत्र दिया है</string>
     <string name="t_81129d8255" formatted="false">लक्ष्य बदला गया</string>
     <string name="t_8125e2fba0" formatted="false">सभी पंक्तियाँ → चुना हुआ कार्ड; अन्यथा बिना प्रकार के स्रोत नाम</string>
-    <string name="t_817dfa0bfc">(कॉलम “%1$s”)</string>
+    <string name="t_817dfa0bfc">" (कॉलम “%1$s”)"</string>
     <string name="t_819f3ba9d1" formatted="false">पिछली प्रविष्टि के अंत से</string>
     <string name="t_81b26ab0d7" formatted="false">रोकने के बाद चुनाव विंडो की पृष्ठभूमि</string>
     <string name="t_81d3d38d5c" formatted="false">इसके बाद पूछें</string>
@@ -433,7 +433,7 @@
     <string name="t_85e8a3404b" formatted="false">इस फ़ोन से अभी कोई फ़ाइल नहीं सहेजी गई</string>
     <string name="t_86042e468b" formatted="false">माप, कैलेंडर, डेटाबेस बहाली</string>
     <string name="t_861bd8760b" formatted="false">Onest फ़ॉन्ट · SIL Open Font License</string>
-    <string name="t_8633c34c71">· फ़ाइल में: %1$s</string>
+    <string name="t_8633c34c71">" · फ़ाइल में: %1$s"</string>
     <string name="t_86652580fd" formatted="false">पिछला महीना</string>
     <string name="t_8690f98524" formatted="false">, दिन अभी जारी है</string>
     <string name="t_86d85a0147">रिपोर्ट का समय क्षेत्र: %1$s</string>
@@ -653,7 +653,7 @@
     <string name="t_c0ed5f4dda" formatted="false">पंक्ति में उद्धरण चिह्न बंद नहीं हैं</string>
     <string name="t_c12ee51dd9" formatted="false">पूरा समय</string>
     <string name="t_c14f88246c">%1$s बाकी</string>
-    <string name="t_c161a7bb23" formatted="false">अधूरी प्रविष्टि “समय अज्ञात” के रूप में आएगी और उसे बताना होगा।</string>
+    <string name="t_c161a7bb23" formatted="false">" अधूरी प्रविष्टि “समय अज्ञात” के रूप में आएगी और उसे बताना होगा।"</string>
     <string name="t_c23d5826a3">प्रविष्टियों वाले %1$s</string>
     <string name="t_c25bd1a7c6" formatted="false">विराम छोड़ें</string>
     <string name="t_c2bf13bbb1" formatted="false">अपनी रिपोर्टें</string>
@@ -719,7 +719,7 @@
     <string name="t_d2aa318afd">दर्ज %1$s</string>
     <string name="t_d2e9881a72">जोड़े जाएँगे: %1$s</string>
     <string name="t_d349cb398d">%1$s बीते</string>
-    <string name="t_d37c15b206" formatted="false">आपके बदले नाम आपके ही रहेंगे; पिछली प्रविष्टियाँ नहीं बदलेंगी।</string>
+    <string name="t_d37c15b206" formatted="false">" आपके बदले नाम आपके ही रहेंगे; पिछली प्रविष्टियाँ नहीं बदलेंगी।"</string>
     <string name="t_d398842570" formatted="false">निर्दिष्ट समय के साथ अज्ञात खंड की पुष्टि करें</string>
     <string name="t_d3c8e2e155" formatted="false">समय क्षेत्र बदल गया। पुष्टि सहेजी नहीं गई; ऐप खुलने पर फिर करेगा</string>
     <string name="t_d40fecd7ad" formatted="false">फिर कोशिश करें</string>
@@ -759,7 +759,7 @@
     <string name="t_dd15d6eecb" formatted="false">क्या शुरू करें?</string>
     <string name="t_dd27b7de89" formatted="false">लाइसेंस नहीं खुल सका</string>
     <string name="t_dd63bc14f9">%1$s बदली गईं</string>
-    <string name="t_ddca6f4db2" formatted="false">बिना प्रविष्टि</string>
+    <string name="t_ddca6f4db2" formatted="false">" बिना प्रविष्टि"</string>
     <string name="t_ddcbc8c167" formatted="false">खंड बदले गए</string>
     <string name="t_de5d4764e8" formatted="false">लक्ष्य की कुल मात्रा; दैनिक अवधियों को जोड़कर कुल न निकालें</string>
     <string name="t_de5eb09e17" formatted="false">गतिविधि बदलें</string>

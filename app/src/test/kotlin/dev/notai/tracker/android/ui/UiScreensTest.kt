@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performScrollToKey
@@ -210,6 +211,17 @@ class UiScreensTest {
         waitText("Сегодня")
         assertTrue("startup trace hook fires once controls are live", actionReady > 0)
         return vm
+    }
+
+    /** Swipe a history row open once the list has settled; a scroll still in progress folds it back by design. */
+    private fun reveal(sessionId: String) {
+        val row = compose.onNodeWithTag("history-record:$sessionId")
+        repeat(3) {
+            row.performScrollTo();compose.waitForIdle();compose.mainClock.advanceTimeBy(500);compose.waitForIdle()
+            row.performTouchInput { swipeLeft() };compose.waitForIdle()
+            if (compose.onAllNodesWithTag("swipe-delete:$sessionId").fetchSemanticsNodes().isNotEmpty()) return
+        }
+        throw AssertionError("Swipe did not uncover Delete for $sessionId")
     }
 
     /** The uncovered Delete button of the one row that a swipe opened. */
@@ -616,7 +628,7 @@ class UiScreensTest {
             row().performTouchInput { swipe(Offset(width * 0.8f,centerY),Offset(width * 0.5f,centerY),300) }
             assertTrue(original == t.data())
             repeat(2) {
-                row().performScrollTo();row().performTouchInput { swipeLeft() }
+                reveal(record.id)
                 assertTrue(t.data().sessions.any { it.id == record.id });compose.onNodeWithTag("swipe-delete:${record.id}").performClick()
                 compose.waitUntil(5_000) { t.data().sessions.none { it.id == record.id } }
                 waitText("Запись перемещена в «Удалённое»")
@@ -630,7 +642,7 @@ class UiScreensTest {
                 if(it == 1) assertTrue(t.data().cards.any { card -> card.id == "later-ui-edit" })
             }
             shot("recovery-restored-history",vm)
-            row().performScrollTo();row().performTouchInput { swipeLeft() }
+            reveal(record.id)
             compose.onNodeWithTag("swipe-delete:${record.id}").performClick()
             compose.waitUntil(5_000) { t.data().deletedRecords.size == 1 }
             compose.onNodeWithText("Настройки").performClick()

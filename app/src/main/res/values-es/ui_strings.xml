@@ -16,7 +16,7 @@
     <string name="t_0467ae4bb8" formatted="false">Confirmar</string>
     <string name="t_04bcedfa9f">entre %1$s y ahora</string>
     <string name="t_059b504fa9" formatted="false">Carpeta elegida. La primera copia aparecerá en un par de minutos</string>
-    <string name="t_05f4ea7fa6" formatted="false">Los datos actuales se guardarán aparte antes de reemplazarlos. Los registros hechos después de esta copia desaparecerán.</string>
+    <string name="t_05f4ea7fa6" formatted="false">" Los datos actuales se guardarán aparte antes de reemplazarlos. Los registros hechos después de esta copia desaparecerán."</string>
     <string name="t_060c91cb5a">%1$s de más</string>
     <string name="t_067a6eef15" formatted="false">Elige una tarjeta por ID antes del mapeo CSV</string>
     <string name="t_06d08263c2" formatted="false">No se pueden guardar copias en esta carpeta. Elige otra</string>
@@ -98,7 +98,7 @@
     <string name="t_1bc5f604f5" formatted="false">1 minuto</string>
     <string name="t_1bcdac8735">Se añadirán: %1$s; repeticiones: %2$s.\n%3$s\nErrores: %4$s\n%5$s\n%6$s\nEsto añade historial; una restauración JSON completa reemplaza todo el almacenamiento.</string>
     <string name="t_1bd48e6642">Actividad: %1$s</string>
-    <string name="t_1c38d1407f" formatted="false">entre pausas</string>
+    <string name="t_1c38d1407f" formatted="false">" entre pausas"</string>
     <string name="t_1c4b04d710" formatted="false">Añadir a la pantalla de inicio</string>
     <string name="t_1c76eec066" formatted="false">Datos restaurados. Los anteriores se conservaron por separado</string>
     <string name="t_1c8ee71b8e">libre hasta %1$s</string>
@@ -139,9 +139,9 @@
     <string name="t_29f3b29df0" formatted="false">Restaurar</string>
     <string name="t_2a5e307788" formatted="false">compacto</string>
     <string name="t_2a690e69d2" formatted="false">El icono está elegido, pero los accesos directos aún no se actualizaron</string>
-    <string name="t_2a70012208" formatted="false">Total</string>
+    <string name="t_2a70012208" formatted="false">"Total "</string>
     <string name="t_2b39abab32">«%1$s». Suena en bucle mientras la app está abierta</string>
-    <string name="t_2c0db2ce7c" formatted="false">Empezar:</string>
+    <string name="t_2c0db2ce7c" formatted="false">"Empezar: "</string>
     <string name="t_2d2be3f11c" formatted="false">Tramo de trabajo</string>
     <string name="t_2d5a644e5c" formatted="false">Ese intervalo no es posible: revisa el inicio y el fin.</string>
     <string name="t_2dd965ee95" formatted="false">Acento</string>
@@ -184,7 +184,7 @@
     <string name="t_3bfd577967">%1$s después en %2$s</string>
     <string name="t_3c244ffaa5">Calendario: %1$s; historial sin cambios</string>
     <string name="t_3c6332622c" formatted="false">Abrir la app</string>
-    <string name="t_3cd7d0dd3c" formatted="false">Tiempo por días:</string>
+    <string name="t_3cd7d0dd3c" formatted="false">"Tiempo por días: "</string>
     <string name="t_3d51050347" formatted="false">cumplido</string>
     <string name="t_3da1c7d83d" formatted="false">¿Quitar el objetivo?</string>
     <string name="t_3de49828e8" formatted="false">Nombre</string>
@@ -263,7 +263,7 @@
     <string name="t_550c7a6d12" formatted="false">Aún no hay registros. Aquí aparecerá cada segmento.</string>
     <string name="t_552d1cca6b" formatted="false">Ese día no hay eventos con hora en el calendario.</string>
     <string name="t_559a87f7cc" formatted="false">Añadir</string>
-    <string name="t_55c44eb122">Se añadirán %1$s antes de las %2$s.</string>
+    <string name="t_55c44eb122">"Se añadirán %1$s antes de las %2$s. "</string>
     <string name="t_55cd7a55ed" formatted="false">A algo le falta un permiso del teléfono</string>
     <string name="t_55e920546e" formatted="false">Botón flotante desactivado</string>
     <string name="t_5695330ffb" formatted="false">Auto</string>
@@ -369,7 +369,7 @@
     <string name="t_750b471214" formatted="false">Orden de favoritos</string>
     <string name="t_751e31256e">%1$s. Si cambia la zona horaria del teléfono, los límites de los días en el historial y el resumen la seguirán. Los registros y las zonas de los objetivos no cambian.</string>
     <string name="t_75436e3162" formatted="false">Trabajo</string>
-    <string name="t_75cd08a0e5" formatted="false">Cambiar:</string>
+    <string name="t_75cd08a0e5" formatted="false">"Cambiar: "</string>
     <string name="t_762d7d64da" formatted="false">ayer</string>
     <string name="t_76393b3245" formatted="false">Copias de recuperación locales…</string>
     <string name="t_766e7cabf7" formatted="false">Menos</string>
@@ -402,7 +402,7 @@
     <string name="t_7f12cd4599" formatted="false">Activado, pero el teléfono aún no ha permitido a la app usar No molestar</string>
     <string name="t_7f17c7c62a" formatted="false">Ajustes</string>
     <string name="t_7f76296ba9" formatted="false">No hay tramo registrado cerrado</string>
-    <string name="t_7f7a71c089">La copia tiene %1$s, %2$s,</string>
+    <string name="t_7f7a71c089">"La copia tiene %1$s, %2$s, "</string>
     <string name="t_7fa01b6e34" formatted="false">Activado en la copia restaurada. Hay que confirmarlo en este teléfono</string>
     <string name="t_80072ed701" formatted="false">Sin actividad propia</string>
     <string name="t_806764743a" formatted="false">varias actividades</string>
@@ -410,7 +410,7 @@
     <string name="t_80e474035b" formatted="false">La zona horaria está en la propia hora</string>
     <string name="t_81129d8255" formatted="false">Objetivo cambiado</string>
     <string name="t_8125e2fba0" formatted="false">Todas las filas → actividad seleccionada; de lo contrario, nombres originales sin tipo</string>
-    <string name="t_817dfa0bfc">(columna «%1$s»)</string>
+    <string name="t_817dfa0bfc">" (columna «%1$s»)"</string>
     <string name="t_819f3ba9d1" formatted="false">Desde el final del último registro</string>
     <string name="t_81b26ab0d7" formatted="false">Fondo de la ventana de elección tras parar</string>
     <string name="t_81d3d38d5c" formatted="false">Preguntar tras</string>
@@ -433,7 +433,7 @@
     <string name="t_85e8a3404b" formatted="false">Aún no se ha guardado ningún archivo desde este teléfono</string>
     <string name="t_86042e468b" formatted="false">Mediciones, calendario, recuperación de la base</string>
     <string name="t_861bd8760b" formatted="false">Fuente Onest · SIL Open Font License</string>
-    <string name="t_8633c34c71">· en el archivo: %1$s</string>
+    <string name="t_8633c34c71">" · en el archivo: %1$s"</string>
     <string name="t_86652580fd" formatted="false">Mes pasado</string>
     <string name="t_8690f98524" formatted="false">, el día aún sigue</string>
     <string name="t_86d85a0147">Zona horaria de informes: %1$s</string>
@@ -597,7 +597,7 @@
     <string name="t_b402c34a3b" formatted="false">Exportar a CSV</string>
     <string name="t_b40a4254c7" formatted="false">Nombre en el botón</string>
     <string name="t_b433c5110e" formatted="false">La primera copia aparecerá en un par de minutos</string>
-    <string name="t_b4479f84f1">%1$s, cifras %2$s,</string>
+    <string name="t_b4479f84f1">"%1$s, cifras %2$s, "</string>
     <string name="t_b45bbb4570" formatted="false">Tema claro</string>
     <string name="t_b467c6658f" formatted="false">Archivo guardado. No se puede comprobar leyéndolo</string>
     <string name="t_b4770c7e71">El día empieza a las %1$s:%2$s</string>
@@ -631,7 +631,7 @@
     <string name="t_babd8e081b" formatted="false">Cambiarán los límites de los días en el historial y el resumen. Los registros y las zonas de los objetivos no cambian.</string>
     <string name="t_bbb0e8e8cd" formatted="false">ms</string>
     <string name="t_bbcf06b3c9" formatted="false">Notas</string>
-    <string name="t_bbee9680a8" formatted="false">El tiempo desconocido no cuenta en el total:</string>
+    <string name="t_bbee9680a8" formatted="false">"El tiempo desconocido no cuenta en el total: "</string>
     <string name="t_bc28baf5fc" formatted="false">Ayer no hubo registros</string>
     <string name="t_bc4d1d35af" formatted="false">como en el archivo</string>
     <string name="t_bc5431b599" formatted="false">Carpeta</string>
@@ -653,7 +653,7 @@
     <string name="t_c0ed5f4dda" formatted="false">las comillas de la fila no están cerradas</string>
     <string name="t_c12ee51dd9" formatted="false">Todo el tiempo</string>
     <string name="t_c14f88246c">Quedan %1$s</string>
-    <string name="t_c161a7bb23" formatted="false">Un registro sin cerrar llegará como «tiempo desconocido» y habrá que precisarlo.</string>
+    <string name="t_c161a7bb23" formatted="false">" Un registro sin cerrar llegará como «tiempo desconocido» y habrá que precisarlo."</string>
     <string name="t_c23d5826a3">%1$s con registros</string>
     <string name="t_c25bd1a7c6" formatted="false">Omitir descanso</string>
     <string name="t_c2bf13bbb1" formatted="false">Informes propios</string>
@@ -681,7 +681,7 @@
     <string name="t_c85eb5f581" formatted="false">90 días</string>
     <string name="t_c927b86cfb" formatted="false">Catálogo y tablas</string>
     <string name="t_ca7830c42f" formatted="false">No hay registros para eliminar</string>
-    <string name="t_cabb0c6d9b">Fila %1$s:</string>
+    <string name="t_cabb0c6d9b">"Fila %1$s: "</string>
     <string name="t_cb26bdc6c6" formatted="false">Inicio</string>
     <string name="t_cbc6fa3d6a" formatted="false">widget</string>
     <string name="t_cbeb716470" formatted="false">Volver a ajustes</string>
@@ -701,7 +701,7 @@
     <string name="t_cf52c8daf1" formatted="false">La zona horaria de informes sigue al dispositivo. Los registros pueden pasar a otro día</string>
     <string name="t_cf7b338323" formatted="false">Finos</string>
     <string name="t_cfafc18b42" formatted="false">El plan solo se muestra en la pantalla principal. El tiempo empieza cuando tocas la actividad.</string>
-    <string name="t_d002f83ddc" formatted="false">Tras los cambios, la copia se guarda en un par de minutos, cuando el teléfono permite el trabajo en segundo plano. Una vez al día, aunque no haya cambios.</string>
+    <string name="t_d002f83ddc" formatted="false">"Tras los cambios, la copia se guarda en un par de minutos, cuando el teléfono permite el trabajo en segundo plano. Una vez al día, aunque no haya cambios. "</string>
     <string name="t_d015e9be93" formatted="false">La actividad de este informe se eliminó o archivó. El informe solo cuenta sus registros pasados.</string>
     <string name="t_d0d7180292" formatted="false">Añadido a favoritos</string>
     <string name="t_d0dd940c4c" formatted="false">Sin datos</string>
@@ -719,7 +719,7 @@
     <string name="t_d2aa318afd">registrado %1$s</string>
     <string name="t_d2e9881a72">Se añadirán %1$s</string>
     <string name="t_d349cb398d">Transcurrido %1$s</string>
-    <string name="t_d37c15b206" formatted="false">Los nombres que cambiaste tú siguen siendo tuyos; los registros pasados no cambian.</string>
+    <string name="t_d37c15b206" formatted="false">" Los nombres que cambiaste tú siguen siendo tuyos; los registros pasados no cambian."</string>
     <string name="t_d398842570" formatted="false">Confirmar el tramo final con el intervalo indicado</string>
     <string name="t_d3c8e2e155" formatted="false">La zona horaria cambió. La confirmación no se guardó; la app la repetirá al abrirse</string>
     <string name="t_d40fecd7ad" formatted="false">Intentar de nuevo</string>
@@ -759,7 +759,7 @@
     <string name="t_dd15d6eecb" formatted="false">¿Qué empezamos?</string>
     <string name="t_dd27b7de89" formatted="false">No se pudo abrir la licencia</string>
     <string name="t_dd63bc14f9">Cambiados %1$s</string>
-    <string name="t_ddca6f4db2" formatted="false">sin registro</string>
+    <string name="t_ddca6f4db2" formatted="false">" sin registro"</string>
     <string name="t_ddcbc8c167" formatted="false">Segmentos actualizados</string>
     <string name="t_de5d4764e8" formatted="false">Cantidad total del objetivo; las ventanas diarias no se suman</string>
     <string name="t_de5eb09e17" formatted="false">Cambiar actividad</string>

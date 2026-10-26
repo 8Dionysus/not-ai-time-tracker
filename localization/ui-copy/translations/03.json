@@ -508,16 +508,16 @@
 "hi": "इस दिन कैलेंडर में समय वाला कोई इवेंट नहीं है।"
 },
 "t_55c44eb122": {
-"en": "Adds %1$s before %2$s.",
-"es": "Se añadirán %1$s antes de las %2$s.",
-"fr": "%1$s seront ajoutées avant %2$s.",
-"pt-BR": "Serão adicionados %1$s antes de %2$s.",
-"de": "%1$s werden vor %2$s hinzugefügt.",
-"it": "Si aggiungono %1$s prima delle %2$s.",
-"ar": "ستُضاف %1$s قبل %2$s.",
+"en": "Adds %1$s before %2$s. ",
+"es": "Se añadirán %1$s antes de las %2$s. ",
+"fr": "%1$s seront ajoutées avant %2$s. ",
+"pt-BR": "Serão adicionados %1$s antes de %2$s. ",
+"de": "%1$s werden vor %2$s hinzugefügt. ",
+"it": "Si aggiungono %1$s prima delle %2$s. ",
+"ar": "ستُضاف %1$s قبل %2$s. ",
 "zh-Hans": "将在 %2$s 之前添加 %1$s。",
 "ja": "%2$sの前に%1$sが追加されます。",
-"ko": "%2$s 전에 %1$s이 추가돼요.",
+"ko": "%2$s 전에 %1$s이 추가돼요. ",
 "hi": "%2$s से पहले %1$s जुड़ेगा।"
 },
 "t_569ffccaa8": {
@@ -950,16 +950,16 @@
 "hi": "%1$s में कोई प्रविष्टि नहीं"
 },
 "t_3cd7d0dd3c": {
-"en": "Time by day:",
-"es": "Tiempo por días:",
-"fr": "Temps par jour :",
-"pt-BR": "Tempo por dia:",
-"de": "Zeit nach Tagen:",
-"it": "Tempo per giorno:",
-"ar": "الوقت حسب الأيام:",
+"en": "Time by day: ",
+"es": "Tiempo por días: ",
+"fr": "Temps par jour : ",
+"pt-BR": "Tempo por dia: ",
+"de": "Zeit nach Tagen: ",
+"it": "Tempo per giorno: ",
+"ar": "الوقت حسب الأيام: ",
 "zh-Hans": "每日时间：",
 "ja": "日別の時間：",
-"ko": "날짜별 시간:",
+"ko": "날짜별 시간: ",
 "hi": "दिन के अनुसार समय:"
 },
 "t_42f85ce119": {

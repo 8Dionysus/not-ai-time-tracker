@@ -16,7 +16,7 @@
     <string name="t_0467ae4bb8" formatted="false">Confirmar</string>
     <string name="t_04bcedfa9f">entre %1$s e agora</string>
     <string name="t_059b504fa9" formatted="false">Pasta escolhida. A primeira cópia aparece em alguns minutos</string>
-    <string name="t_05f4ea7fa6" formatted="false">Os dados atuais serão salvos à parte antes da substituição. Os registros feitos depois desta cópia vão sumir.</string>
+    <string name="t_05f4ea7fa6" formatted="false">" Os dados atuais serão salvos à parte antes da substituição. Os registros feitos depois desta cópia vão sumir."</string>
     <string name="t_060c91cb5a">%1$s a mais</string>
     <string name="t_067a6eef15" formatted="false">Escolha um cartão por ID antes do mapeamento CSV</string>
     <string name="t_06d08263c2" formatted="false">Não é possível salvar cópias nesta pasta. Escolha outra</string>
@@ -98,7 +98,7 @@
     <string name="t_1bc5f604f5" formatted="false">1 minuto</string>
     <string name="t_1bcdac8735">Serão adicionados: %1$s; repetições: %2$s.\n%3$s\nErros: %4$s\n%5$s\n%6$s\nIsso acrescenta histórico; uma restauração JSON completa substitui todo o armazenamento.</string>
     <string name="t_1bd48e6642">Atividade: %1$s</string>
-    <string name="t_1c38d1407f" formatted="false">entre pausas</string>
+    <string name="t_1c38d1407f" formatted="false">" entre pausas"</string>
     <string name="t_1c4b04d710" formatted="false">Adicionar à tela inicial</string>
     <string name="t_1c76eec066" formatted="false">Dados restaurados. Os anteriores foram salvos separadamente</string>
     <string name="t_1c8ee71b8e">livre até %1$s</string>
@@ -139,9 +139,9 @@
     <string name="t_29f3b29df0" formatted="false">Restaurar</string>
     <string name="t_2a5e307788" formatted="false">compacto</string>
     <string name="t_2a690e69d2" formatted="false">O ícone foi escolhido, mas os atalhos ainda não foram atualizados</string>
-    <string name="t_2a70012208" formatted="false">Total</string>
+    <string name="t_2a70012208" formatted="false">"Total "</string>
     <string name="t_2b39abab32">“%1$s”. Toca em loop enquanto o app está aberto</string>
-    <string name="t_2c0db2ce7c" formatted="false">Iniciar:</string>
+    <string name="t_2c0db2ce7c" formatted="false">"Iniciar: "</string>
     <string name="t_2d2be3f11c" formatted="false">Fase de trabalho</string>
     <string name="t_2d5a644e5c" formatted="false">Esse intervalo não é possível: confira início e fim.</string>
     <string name="t_2dd965ee95" formatted="false">Destaque</string>
@@ -184,7 +184,7 @@
     <string name="t_3bfd577967">%1$s mais tarde em %2$s</string>
     <string name="t_3c244ffaa5">Calendário: %1$s; histórico inalterado</string>
     <string name="t_3c6332622c" formatted="false">Abrir o app</string>
-    <string name="t_3cd7d0dd3c" formatted="false">Tempo por dia:</string>
+    <string name="t_3cd7d0dd3c" formatted="false">"Tempo por dia: "</string>
     <string name="t_3d51050347" formatted="false">cumprida</string>
     <string name="t_3da1c7d83d" formatted="false">Remover a meta?</string>
     <string name="t_3de49828e8" formatted="false">Nome</string>
@@ -263,7 +263,7 @@
     <string name="t_550c7a6d12" formatted="false">Ainda não há registros. Cada segmento aparecerá aqui.</string>
     <string name="t_552d1cca6b" formatted="false">Não há eventos com horário no calendário neste dia.</string>
     <string name="t_559a87f7cc" formatted="false">Adicionar</string>
-    <string name="t_55c44eb122">Serão adicionados %1$s antes de %2$s.</string>
+    <string name="t_55c44eb122">"Serão adicionados %1$s antes de %2$s. "</string>
     <string name="t_55cd7a55ed" formatted="false">Falta alguma permissão do telefone</string>
     <string name="t_55e920546e" formatted="false">Botão flutuante desativado</string>
     <string name="t_5695330ffb" formatted="false">Auto</string>
@@ -369,7 +369,7 @@
     <string name="t_750b471214" formatted="false">Ordem dos favoritos</string>
     <string name="t_751e31256e">%1$s. Quando o fuso do telefone mudar, os limites dos dias no histórico e no resumo vão segui-lo. Os registros e os fusos das metas não mudam.</string>
     <string name="t_75436e3162" formatted="false">Trabalho</string>
-    <string name="t_75cd08a0e5" formatted="false">Mudar:</string>
+    <string name="t_75cd08a0e5" formatted="false">"Mudar: "</string>
     <string name="t_762d7d64da" formatted="false">ontem</string>
     <string name="t_76393b3245" formatted="false">Cópias locais de reversão…</string>
     <string name="t_766e7cabf7" formatted="false">Menos</string>
@@ -402,7 +402,7 @@
     <string name="t_7f12cd4599" formatted="false">Ativado, mas o telefone ainda não permitiu que o app use o Não perturbe</string>
     <string name="t_7f17c7c62a" formatted="false">Configurações</string>
     <string name="t_7f76296ba9" formatted="false">Nenhum trecho registrado encerrado</string>
-    <string name="t_7f7a71c089">A cópia tem %1$s, %2$s,</string>
+    <string name="t_7f7a71c089">"A cópia tem %1$s, %2$s, "</string>
     <string name="t_7fa01b6e34" formatted="false">Ativado na cópia restaurada. É preciso confirmar neste telefone</string>
     <string name="t_80072ed701" formatted="false">Sem atividade própria</string>
     <string name="t_806764743a" formatted="false">várias atividades</string>
@@ -410,7 +410,7 @@
     <string name="t_80e474035b" formatted="false">O fuso está no próprio horário</string>
     <string name="t_81129d8255" formatted="false">Meta alterada</string>
     <string name="t_8125e2fba0" formatted="false">Todas as linhas → atividade selecionada; caso contrário, nomes originais sem tipo</string>
-    <string name="t_817dfa0bfc">(coluna “%1$s”)</string>
+    <string name="t_817dfa0bfc">" (coluna “%1$s”)"</string>
     <string name="t_819f3ba9d1" formatted="false">Do fim do último registro</string>
     <string name="t_81b26ab0d7" formatted="false">Fundo da janela de escolha após parar</string>
     <string name="t_81d3d38d5c" formatted="false">Perguntar após</string>
@@ -433,7 +433,7 @@
     <string name="t_85e8a3404b" formatted="false">Nenhum arquivo foi salvo deste telefone ainda</string>
     <string name="t_86042e468b" formatted="false">Medições, calendário, recuperação do banco</string>
     <string name="t_861bd8760b" formatted="false">Fonte Onest · SIL Open Font License</string>
-    <string name="t_8633c34c71">· no arquivo: %1$s</string>
+    <string name="t_8633c34c71">" · no arquivo: %1$s"</string>
     <string name="t_86652580fd" formatted="false">Mês passado</string>
     <string name="t_8690f98524" formatted="false">, o dia ainda não acabou</string>
     <string name="t_86d85a0147">Fuso dos relatórios: %1$s</string>
@@ -597,7 +597,7 @@
     <string name="t_b402c34a3b" formatted="false">Exportar para CSV</string>
     <string name="t_b40a4254c7" formatted="false">Nome no botão</string>
     <string name="t_b433c5110e" formatted="false">A primeira cópia aparece em alguns minutos</string>
-    <string name="t_b4479f84f1">%1$s, dígitos %2$s,</string>
+    <string name="t_b4479f84f1">"%1$s, dígitos %2$s, "</string>
     <string name="t_b45bbb4570" formatted="false">Tema claro</string>
     <string name="t_b467c6658f" formatted="false">Arquivo salvo. Não é possível verificá-lo pela leitura</string>
     <string name="t_b4770c7e71">O dia começa às %1$s:%2$s</string>
@@ -631,7 +631,7 @@
     <string name="t_babd8e081b" formatted="false">Os limites dos dias no histórico e no resumo vão mudar. Os registros e os fusos das metas não mudam.</string>
     <string name="t_bbb0e8e8cd" formatted="false">ms</string>
     <string name="t_bbcf06b3c9" formatted="false">Notas</string>
-    <string name="t_bbee9680a8" formatted="false">O tempo desconhecido não entra no total:</string>
+    <string name="t_bbee9680a8" formatted="false">"O tempo desconhecido não entra no total: "</string>
     <string name="t_bc28baf5fc" formatted="false">Nenhum registro ontem</string>
     <string name="t_bc4d1d35af" formatted="false">como no arquivo</string>
     <string name="t_bc5431b599" formatted="false">Pasta</string>
@@ -653,7 +653,7 @@
     <string name="t_c0ed5f4dda" formatted="false">as aspas da linha não foram fechadas</string>
     <string name="t_c12ee51dd9" formatted="false">Todo o período</string>
     <string name="t_c14f88246c">Faltam %1$s</string>
-    <string name="t_c161a7bb23" formatted="false">Um registro não encerrado virá como “tempo desconhecido” e precisará ser especificado.</string>
+    <string name="t_c161a7bb23" formatted="false">" Um registro não encerrado virá como “tempo desconhecido” e precisará ser especificado."</string>
     <string name="t_c23d5826a3">%1$s com registros</string>
     <string name="t_c25bd1a7c6" formatted="false">Pular pausa</string>
     <string name="t_c2bf13bbb1" formatted="false">Relatórios próprios</string>
@@ -681,7 +681,7 @@
     <string name="t_c85eb5f581" formatted="false">90 dias</string>
     <string name="t_c927b86cfb" formatted="false">Catálogo e planilhas</string>
     <string name="t_ca7830c42f" formatted="false">Nenhum registro para excluir</string>
-    <string name="t_cabb0c6d9b">Linha %1$s:</string>
+    <string name="t_cabb0c6d9b">"Linha %1$s: "</string>
     <string name="t_cb26bdc6c6" formatted="false">Início</string>
     <string name="t_cbc6fa3d6a" formatted="false">widget</string>
     <string name="t_cbeb716470" formatted="false">Voltar às configurações</string>
@@ -701,7 +701,7 @@
     <string name="t_cf52c8daf1" formatted="false">O fuso dos relatórios segue o aparelho. Registros podem passar para outro dia</string>
     <string name="t_cf7b338323" formatted="false">Finos</string>
     <string name="t_cfafc18b42" formatted="false">O plano só aparece na tela principal. O tempo começa quando você toca na atividade.</string>
-    <string name="t_d002f83ddc" formatted="false">Depois de mudanças, a cópia é salva em alguns minutos, quando o telefone permitir trabalho em segundo plano. Uma vez por dia, mesmo sem mudanças.</string>
+    <string name="t_d002f83ddc" formatted="false">"Depois de mudanças, a cópia é salva em alguns minutos, quando o telefone permitir trabalho em segundo plano. Uma vez por dia, mesmo sem mudanças. "</string>
     <string name="t_d015e9be93" formatted="false">A atividade deste relatório foi excluída ou arquivada. O relatório conta só os registros passados.</string>
     <string name="t_d0d7180292" formatted="false">Adicionado aos favoritos</string>
     <string name="t_d0dd940c4c" formatted="false">Sem dados</string>
@@ -719,7 +719,7 @@
     <string name="t_d2aa318afd">registrado %1$s</string>
     <string name="t_d2e9881a72">Serão adicionados %1$s</string>
     <string name="t_d349cb398d">Decorrido %1$s</string>
-    <string name="t_d37c15b206" formatted="false">Os nomes que você mudou continuam seus; os registros passados não mudam.</string>
+    <string name="t_d37c15b206" formatted="false">" Os nomes que você mudou continuam seus; os registros passados não mudam."</string>
     <string name="t_d398842570" formatted="false">Confirmar o trecho final com o intervalo indicado</string>
     <string name="t_d3c8e2e155" formatted="false">O fuso foi alterado. A confirmação não foi salva; o app vai repeti-la ao abrir</string>
     <string name="t_d40fecd7ad" formatted="false">Tentar de novo</string>
@@ -759,7 +759,7 @@
     <string name="t_dd15d6eecb" formatted="false">O que vamos começar?</string>
     <string name="t_dd27b7de89" formatted="false">Não foi possível abrir a licença</string>
     <string name="t_dd63bc14f9">Alterados %1$s</string>
-    <string name="t_ddca6f4db2" formatted="false">sem registro</string>
+    <string name="t_ddca6f4db2" formatted="false">" sem registro"</string>
     <string name="t_ddcbc8c167" formatted="false">Segmentos atualizados</string>
     <string name="t_de5d4764e8" formatted="false">Quantidade total da meta; as janelas diárias não são somadas</string>
     <string name="t_de5eb09e17" formatted="false">Mudar atividade</string>

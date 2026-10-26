@@ -105,16 +105,16 @@
 "hi": "चालू है, पर फ़ोन ने अनुमति नहीं दी"
 },
 "t_d002f83ddc": {
-"en": "After changes, a copy is saved within a couple of minutes, when the phone allows background work. Once a day — even without changes.",
-"es": "Tras los cambios, la copia se guarda en un par de minutos, cuando el teléfono permite el trabajo en segundo plano. Una vez al día, aunque no haya cambios.",
-"fr": "Après des modifications, une copie est enregistrée en quelques minutes, quand le téléphone autorise le travail en arrière-plan. Une fois par jour, même sans modification.",
-"pt-BR": "Depois de mudanças, a cópia é salva em alguns minutos, quando o telefone permitir trabalho em segundo plano. Uma vez por dia, mesmo sem mudanças.",
-"de": "Nach Änderungen wird eine Kopie nach ein paar Minuten gesichert, sobald das Telefon Hintergrundarbeit erlaubt. Einmal am Tag – auch ohne Änderungen.",
-"it": "Dopo le modifiche la copia si salva entro un paio di minuti, quando il telefono consente il lavoro in background. Una volta al giorno anche senza modifiche.",
-"ar": "بعد التغييرات تُحفظ نسخة خلال دقيقتين عندما يسمح الهاتف بالعمل في الخلفية. ومرة يوميًا حتى دون تغييرات.",
+"en": "After changes, a copy is saved within a couple of minutes, when the phone allows background work. Once a day — even without changes. ",
+"es": "Tras los cambios, la copia se guarda en un par de minutos, cuando el teléfono permite el trabajo en segundo plano. Una vez al día, aunque no haya cambios. ",
+"fr": "Après des modifications, une copie est enregistrée en quelques minutes, quand le téléphone autorise le travail en arrière-plan. Une fois par jour, même sans modification. ",
+"pt-BR": "Depois de mudanças, a cópia é salva em alguns minutos, quando o telefone permitir trabalho em segundo plano. Uma vez por dia, mesmo sem mudanças. ",
+"de": "Nach Änderungen wird eine Kopie nach ein paar Minuten gesichert, sobald das Telefon Hintergrundarbeit erlaubt. Einmal am Tag – auch ohne Änderungen. ",
+"it": "Dopo le modifiche la copia si salva entro un paio di minuti, quando il telefono consente il lavoro in background. Una volta al giorno anche senza modifiche. ",
+"ar": "بعد التغييرات تُحفظ نسخة خلال دقيقتين عندما يسمح الهاتف بالعمل في الخلفية. ومرة يوميًا حتى دون تغييرات. ",
 "zh-Hans": "有更改时，会在手机允许后台运行后几分钟内保存副本。即使没有更改，每天也会保存一次。",
 "ja": "変更があると、端末がバックグラウンド処理を許可したときに数分以内にコピーを保存します。変更がなくても1日1回保存します。",
-"ko": "변경 후에는 휴대전화가 백그라운드 작업을 허용하면 몇 분 안에 사본을 저장해요. 변경이 없어도 하루에 한 번 저장해요.",
+"ko": "변경 후에는 휴대전화가 백그라운드 작업을 허용하면 몇 분 안에 사본을 저장해요. 변경이 없어도 하루에 한 번 저장해요. ",
 "hi": "बदलाव के बाद, फ़ोन बैकग्राउंड काम की अनुमति दे तो कुछ मिनट में कॉपी सहेजी जाती है। दिन में एक बार — बिना बदलाव के भी।"
 },
 "t_d0fde8b6ec": {
@@ -157,17 +157,17 @@
 "hi": "अंग्रेज़ी · 14:05 से"
 },
 "t_d37c15b206": {
-"en": "Names you changed yourself stay yours; past entries don’t change.",
-"es": "Los nombres que cambiaste tú siguen siendo tuyos; los registros pasados no cambian.",
-"fr": "Les noms que vous avez modifiés restent les vôtres ; les entrées passées ne changent pas.",
-"pt-BR": "Os nomes que você mudou continuam seus; os registros passados não mudam.",
-"de": "Namen, die du selbst geändert hast, bleiben deine; frühere Einträge ändern sich nicht.",
-"it": "I nomi che hai cambiato restano tuoi; le voci passate non cambiano.",
-"ar": "تبقى الأسماء التي غيّرتها كما هي، ولا تتغير السجلات السابقة.",
+"en": " Names you changed yourself stay yours; past entries don’t change.",
+"es": " Los nombres que cambiaste tú siguen siendo tuyos; los registros pasados no cambian.",
+"fr": " Les noms que vous avez modifiés restent les vôtres ; les entrées passées ne changent pas.",
+"pt-BR": " Os nomes que você mudou continuam seus; os registros passados não mudam.",
+"de": " Namen, die du selbst geändert hast, bleiben deine; frühere Einträge ändern sich nicht.",
+"it": " I nomi che hai cambiato restano tuoi; le voci passate non cambiano.",
+"ar": " تبقى الأسماء التي غيّرتها كما هي، ولا تتغير السجلات السابقة.",
 "zh-Hans": "你自己改过的名称保持不变；过去的条目不受影响。",
 "ja": "自分で変えた名前はそのまま残り、過去の記録も変わりません。",
-"ko": "직접 바꾼 이름은 그대로이고 지난 기록도 바뀌지 않아요.",
-"hi": "आपके बदले नाम आपके ही रहेंगे; पिछली प्रविष्टियाँ नहीं बदलेंगी।"
+"ko": " 직접 바꾼 이름은 그대로이고 지난 기록도 바뀌지 않아요.",
+"hi": " आपके बदले नाम आपके ही रहेंगे; पिछली प्रविष्टियाँ नहीं बदलेंगी।"
 },
 "t_d40fecd7ad": {
 "en": "Try again",

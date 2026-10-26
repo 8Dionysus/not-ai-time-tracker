@@ -16,7 +16,7 @@
     <string name="t_0467ae4bb8" formatted="false">Confirm</string>
     <string name="t_04bcedfa9f">between %1$s and now</string>
     <string name="t_059b504fa9" formatted="false">Folder chosen. The first copy will appear in a couple of minutes</string>
-    <string name="t_05f4ea7fa6" formatted="false">The current data will be saved separately before replacing. Entries made after this copy will disappear.</string>
+    <string name="t_05f4ea7fa6" formatted="false">" The current data will be saved separately before replacing. Entries made after this copy will disappear."</string>
     <string name="t_060c91cb5a">over by %1$s</string>
     <string name="t_067a6eef15" formatted="false">Choose a card by ID before CSV mapping</string>
     <string name="t_06d08263c2" formatted="false">Copies can’t be saved to this folder. Choose another one</string>
@@ -98,7 +98,7 @@
     <string name="t_1bc5f604f5" formatted="false">1 minute</string>
     <string name="t_1bcdac8735">Will add: %1$s; repeats: %2$s.\n%3$s\nErrors: %4$s\n%5$s\n%6$s\nThis appends history; a full JSON restore replaces all storage.</string>
     <string name="t_1bd48e6642">Activity: %1$s</string>
-    <string name="t_1c38d1407f" formatted="false">between pauses</string>
+    <string name="t_1c38d1407f" formatted="false">" between pauses"</string>
     <string name="t_1c4b04d710" formatted="false">Add to home screen</string>
     <string name="t_1c76eec066" formatted="false">Data restored. Previous data was saved separately.</string>
     <string name="t_1c8ee71b8e">free until %1$s</string>
@@ -139,9 +139,9 @@
     <string name="t_29f3b29df0" formatted="false">Restore</string>
     <string name="t_2a5e307788" formatted="false">compact</string>
     <string name="t_2a690e69d2" formatted="false">The icon is chosen, but the shortcuts haven’t updated yet</string>
-    <string name="t_2a70012208" formatted="false">Total</string>
+    <string name="t_2a70012208" formatted="false">"Total "</string>
     <string name="t_2b39abab32">“%1$s”. Loops while the app is open</string>
-    <string name="t_2c0db2ce7c" formatted="false">Start:</string>
+    <string name="t_2c0db2ce7c" formatted="false">"Start: "</string>
     <string name="t_2d2be3f11c" formatted="false">Work phase</string>
     <string name="t_2d5a644e5c" formatted="false">That interval isn’t possible: check the start and end.</string>
     <string name="t_2dd965ee95" formatted="false">Accent</string>
@@ -184,7 +184,7 @@
     <string name="t_3bfd577967">%1$s later by %2$s</string>
     <string name="t_3c244ffaa5">Calendar: %1$s; history unchanged</string>
     <string name="t_3c6332622c" formatted="false">Open app</string>
-    <string name="t_3cd7d0dd3c" formatted="false">Time by day:</string>
+    <string name="t_3cd7d0dd3c" formatted="false">"Time by day: "</string>
     <string name="t_3d51050347" formatted="false">done</string>
     <string name="t_3da1c7d83d" formatted="false">Remove the goal?</string>
     <string name="t_3de49828e8" formatted="false">Name</string>
@@ -263,7 +263,7 @@
     <string name="t_550c7a6d12" formatted="false">No entries yet. Each segment will appear here.</string>
     <string name="t_552d1cca6b" formatted="false">There are no timed calendar events on this day.</string>
     <string name="t_559a87f7cc" formatted="false">Add</string>
-    <string name="t_55c44eb122">Adds %1$s before %2$s.</string>
+    <string name="t_55c44eb122">"Adds %1$s before %2$s. "</string>
     <string name="t_55cd7a55ed" formatted="false">Something is missing a phone permission</string>
     <string name="t_55e920546e" formatted="false">Floating button turned off</string>
     <string name="t_5695330ffb" formatted="false">Auto</string>
@@ -369,7 +369,7 @@
     <string name="t_750b471214" formatted="false">Favorites order</string>
     <string name="t_751e31256e">%1$s. When the phone’s time zone changes, day boundaries in history and Overview will follow it. Entries and goal zones don’t change.</string>
     <string name="t_75436e3162" formatted="false">Work</string>
-    <string name="t_75cd08a0e5" formatted="false">Switch:</string>
+    <string name="t_75cd08a0e5" formatted="false">"Switch: "</string>
     <string name="t_762d7d64da" formatted="false">yesterday</string>
     <string name="t_76393b3245" formatted="false">Local rollback copies…</string>
     <string name="t_766e7cabf7" formatted="false">Less</string>
@@ -402,7 +402,7 @@
     <string name="t_7f12cd4599" formatted="false">On, but the phone hasn’t allowed the app to use Do Not Disturb yet</string>
     <string name="t_7f17c7c62a" formatted="false">Settings</string>
     <string name="t_7f76296ba9" formatted="false">No closed recorded segment</string>
-    <string name="t_7f7a71c089">The copy has %1$s, %2$s,</string>
+    <string name="t_7f7a71c089">"The copy has %1$s, %2$s, "</string>
     <string name="t_7fa01b6e34" formatted="false">On in the restored copy. It needs confirming on this phone</string>
     <string name="t_80072ed701" formatted="false">No own activity</string>
     <string name="t_806764743a" formatted="false">different activities</string>
@@ -410,7 +410,7 @@
     <string name="t_80e474035b" formatted="false">The time zone is in the time itself</string>
     <string name="t_81129d8255" formatted="false">Goal changed</string>
     <string name="t_8125e2fba0" formatted="false">All rows → selected card; otherwise use source names without a type</string>
-    <string name="t_817dfa0bfc">(column “%1$s”)</string>
+    <string name="t_817dfa0bfc">" (column “%1$s”)"</string>
     <string name="t_819f3ba9d1" formatted="false">From the end of the last entry</string>
     <string name="t_81b26ab0d7" formatted="false">Background of the choice window after stopping</string>
     <string name="t_81d3d38d5c" formatted="false">Ask after</string>
@@ -433,7 +433,7 @@
     <string name="t_85e8a3404b" formatted="false">No files have been saved from this phone yet</string>
     <string name="t_86042e468b" formatted="false">Measurements, calendar, database recovery</string>
     <string name="t_861bd8760b" formatted="false">Onest font · SIL Open Font License</string>
-    <string name="t_8633c34c71">· in file: %1$s</string>
+    <string name="t_8633c34c71">" · in file: %1$s"</string>
     <string name="t_86652580fd" formatted="false">Last month</string>
     <string name="t_8690f98524" formatted="false">, the day isn’t over yet</string>
     <string name="t_86d85a0147">Report time zone: %1$s</string>
@@ -597,7 +597,7 @@
     <string name="t_b402c34a3b" formatted="false">Export to CSV</string>
     <string name="t_b40a4254c7" formatted="false">Name on the button</string>
     <string name="t_b433c5110e" formatted="false">The first copy will appear in a couple of minutes</string>
-    <string name="t_b4479f84f1">%1$s, %2$s digits,</string>
+    <string name="t_b4479f84f1">"%1$s, %2$s digits, "</string>
     <string name="t_b45bbb4570" formatted="false">Light theme</string>
     <string name="t_b467c6658f" formatted="false">File saved, but reading it back for verification is not possible.</string>
     <string name="t_b4770c7e71">The day starts at %1$s:%2$s</string>
@@ -631,7 +631,7 @@
     <string name="t_babd8e081b" formatted="false">Day boundaries in history and Overview will change. Entries and goal zones don’t change.</string>
     <string name="t_bbb0e8e8cd" formatted="false">ms</string>
     <string name="t_bbcf06b3c9" formatted="false">Notes</string>
-    <string name="t_bbee9680a8" formatted="false">Unknown time isn’t in the total:</string>
+    <string name="t_bbee9680a8" formatted="false">"Unknown time isn’t in the total: "</string>
     <string name="t_bc28baf5fc" formatted="false">No entries yesterday</string>
     <string name="t_bc4d1d35af" formatted="false">as in the file</string>
     <string name="t_bc5431b599" formatted="false">Folder</string>
@@ -653,7 +653,7 @@
     <string name="t_c0ed5f4dda" formatted="false">quotation marks in the row aren’t closed</string>
     <string name="t_c12ee51dd9" formatted="false">All time</string>
     <string name="t_c14f88246c">%1$s left</string>
-    <string name="t_c161a7bb23" formatted="false">An unfinished entry will arrive as “time unknown” and will need to be specified.</string>
+    <string name="t_c161a7bb23" formatted="false">" An unfinished entry will arrive as “time unknown” and will need to be specified."</string>
     <string name="t_c23d5826a3">%1$s with entries</string>
     <string name="t_c25bd1a7c6" formatted="false">Skip break</string>
     <string name="t_c2bf13bbb1" formatted="false">Own reports</string>
@@ -681,7 +681,7 @@
     <string name="t_c85eb5f581" formatted="false">90 days</string>
     <string name="t_c927b86cfb" formatted="false">Catalog and spreadsheets</string>
     <string name="t_ca7830c42f" formatted="false">No entries to delete</string>
-    <string name="t_cabb0c6d9b">Row %1$s:</string>
+    <string name="t_cabb0c6d9b">"Row %1$s: "</string>
     <string name="t_cb26bdc6c6" formatted="false">Start</string>
     <string name="t_cbc6fa3d6a" formatted="false">widget</string>
     <string name="t_cbeb716470" formatted="false">Back to settings</string>
@@ -701,7 +701,7 @@
     <string name="t_cf52c8daf1" formatted="false">The report time zone follows the device. Entries may move to another day</string>
     <string name="t_cf7b338323" formatted="false">Thin</string>
     <string name="t_cfafc18b42" formatted="false">The plan is only shown on the home screen. Time starts when you tap the activity.</string>
-    <string name="t_d002f83ddc" formatted="false">After changes, a copy is saved within a couple of minutes, when the phone allows background work. Once a day — even without changes.</string>
+    <string name="t_d002f83ddc" formatted="false">"After changes, a copy is saved within a couple of minutes, when the phone allows background work. Once a day — even without changes. "</string>
     <string name="t_d015e9be93" formatted="false">This report’s activity was deleted or archived. The report counts only its past entries.</string>
     <string name="t_d0d7180292" formatted="false">Added to favorites</string>
     <string name="t_d0dd940c4c" formatted="false">No data</string>
@@ -719,7 +719,7 @@
     <string name="t_d2aa318afd">recorded %1$s</string>
     <string name="t_d2e9881a72">Will add %1$s</string>
     <string name="t_d349cb398d">Elapsed %1$s</string>
-    <string name="t_d37c15b206" formatted="false">Names you changed yourself stay yours; past entries don’t change.</string>
+    <string name="t_d37c15b206" formatted="false">" Names you changed yourself stay yours; past entries don’t change."</string>
     <string name="t_d398842570" formatted="false">Confirm the unknown segment with the specified interval</string>
     <string name="t_d3c8e2e155" formatted="false">The time zone was changed. The confirmation wasn’t saved; the app will repeat it when opened</string>
     <string name="t_d40fecd7ad" formatted="false">Try again</string>
@@ -759,7 +759,7 @@
     <string name="t_dd15d6eecb" formatted="false">What are we starting?</string>
     <string name="t_dd27b7de89" formatted="false">Couldn’t open the license</string>
     <string name="t_dd63bc14f9">Changed %1$s</string>
-    <string name="t_ddca6f4db2" formatted="false">without an entry</string>
+    <string name="t_ddca6f4db2" formatted="false">" without an entry"</string>
     <string name="t_ddcbc8c167" formatted="false">Focus phases updated</string>
     <string name="t_de5d4764e8" formatted="false">Total amount for the target; daily windows are not added together</string>
     <string name="t_de5eb09e17" formatted="false">Change activity</string>

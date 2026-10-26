@@ -139,7 +139,7 @@
     <string name="t_29f3b29df0" formatted="false">復元</string>
     <string name="t_2a5e307788" formatted="false">コンパクト</string>
     <string name="t_2a690e69d2" formatted="false">アイコンは選びましたが、ショートカットはまだ更新されていません</string>
-    <string name="t_2a70012208" formatted="false">合計</string>
+    <string name="t_2a70012208" formatted="false">"合計 "</string>
     <string name="t_2b39abab32">「%1$s」。アプリを開いている間ループ再生します</string>
     <string name="t_2c0db2ce7c" formatted="false">開始：</string>
     <string name="t_2d2be3f11c" formatted="false">作業区間</string>
@@ -433,7 +433,7 @@
     <string name="t_85e8a3404b" formatted="false">この端末からはまだファイルを保存していません</string>
     <string name="t_86042e468b" formatted="false">測定、カレンダー、データベースの復旧</string>
     <string name="t_861bd8760b" formatted="false">Onestフォント · SIL Open Font License</string>
-    <string name="t_8633c34c71">· ファイル内：%1$s</string>
+    <string name="t_8633c34c71">" · ファイル内：%1$s"</string>
     <string name="t_86652580fd" formatted="false">先月</string>
     <string name="t_8690f98524" formatted="false">、まだ1日の途中</string>
     <string name="t_86d85a0147">レポートのタイムゾーン：%1$s</string>

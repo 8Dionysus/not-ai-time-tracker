@@ -16,7 +16,7 @@
     <string name="t_0467ae4bb8" formatted="false">Conferma</string>
     <string name="t_04bcedfa9f">tra %1$s e adesso</string>
     <string name="t_059b504fa9" formatted="false">Cartella scelta. La prima copia arriverà tra un paio di minuti</string>
-    <string name="t_05f4ea7fa6" formatted="false">I dati attuali verranno salvati a parte prima della sostituzione. Le voci fatte dopo questa copia spariranno.</string>
+    <string name="t_05f4ea7fa6" formatted="false">" I dati attuali verranno salvati a parte prima della sostituzione. Le voci fatte dopo questa copia spariranno."</string>
     <string name="t_060c91cb5a">%1$s in più</string>
     <string name="t_067a6eef15" formatted="false">Scegli una scheda per ID prima della mappatura CSV</string>
     <string name="t_06d08263c2" formatted="false">In questa cartella non si possono salvare copie. Scegline un’altra</string>
@@ -98,7 +98,7 @@
     <string name="t_1bc5f604f5" formatted="false">1 minuto</string>
     <string name="t_1bcdac8735">Da aggiungere: %1$s; ripetizioni: %2$s.\n%3$s\nErrori: %4$s\n%5$s\n%6$s\nQuesto aggiunge cronologia; un ripristino JSON completo sostituisce tutta l’archiviazione.</string>
     <string name="t_1bd48e6642">Attività: %1$s</string>
-    <string name="t_1c38d1407f" formatted="false">tra le pause</string>
+    <string name="t_1c38d1407f" formatted="false">" tra le pause"</string>
     <string name="t_1c4b04d710" formatted="false">Aggiungi alla schermata Home</string>
     <string name="t_1c76eec066" formatted="false">Dati ripristinati. I dati precedenti sono stati salvati separatamente</string>
     <string name="t_1c8ee71b8e">libero fino alle %1$s</string>
@@ -139,9 +139,9 @@
     <string name="t_29f3b29df0" formatted="false">Ripristina</string>
     <string name="t_2a5e307788" formatted="false">compatto</string>
     <string name="t_2a690e69d2" formatted="false">L’icona è scelta, ma le scorciatoie non sono ancora aggiornate</string>
-    <string name="t_2a70012208" formatted="false">Totale</string>
+    <string name="t_2a70012208" formatted="false">"Totale "</string>
     <string name="t_2b39abab32">«%1$s». Suona in loop finché l’app è aperta</string>
-    <string name="t_2c0db2ce7c" formatted="false">Avvia:</string>
+    <string name="t_2c0db2ce7c" formatted="false">"Avvia: "</string>
     <string name="t_2d2be3f11c" formatted="false">Fase di lavoro</string>
     <string name="t_2d5a644e5c" formatted="false">Questo intervallo non è possibile: controlla inizio e fine.</string>
     <string name="t_2dd965ee95" formatted="false">Accento</string>
@@ -184,7 +184,7 @@
     <string name="t_3bfd577967">%1$s dopo di %2$s</string>
     <string name="t_3c244ffaa5">Calendario: %1$s; cronologia invariata</string>
     <string name="t_3c6332622c" formatted="false">Apri l’app</string>
-    <string name="t_3cd7d0dd3c" formatted="false">Tempo per giorno:</string>
+    <string name="t_3cd7d0dd3c" formatted="false">"Tempo per giorno: "</string>
     <string name="t_3d51050347" formatted="false">raggiunto</string>
     <string name="t_3da1c7d83d" formatted="false">Togliere l’obiettivo?</string>
     <string name="t_3de49828e8" formatted="false">Nome</string>
@@ -263,7 +263,7 @@
     <string name="t_550c7a6d12" formatted="false">Non ci sono ancora registrazioni. Qui comparirà ogni intervallo.</string>
     <string name="t_552d1cca6b" formatted="false">In questo giorno non ci sono eventi con orario nel calendario.</string>
     <string name="t_559a87f7cc" formatted="false">Aggiungi</string>
-    <string name="t_55c44eb122">Si aggiungono %1$s prima delle %2$s.</string>
+    <string name="t_55c44eb122">"Si aggiungono %1$s prima delle %2$s. "</string>
     <string name="t_55cd7a55ed" formatted="false">Manca un permesso del telefono</string>
     <string name="t_55e920546e" formatted="false">Pulsante mobile disattivato</string>
     <string name="t_5695330ffb" formatted="false">Auto</string>
@@ -369,7 +369,7 @@
     <string name="t_750b471214" formatted="false">Ordine dei preferiti</string>
     <string name="t_751e31256e">%1$s. Se cambia il fuso del telefono, i limiti dei giorni in cronologia e panoramica lo seguiranno. Le voci e i fusi degli obiettivi non cambiano.</string>
     <string name="t_75436e3162" formatted="false">Lavoro</string>
-    <string name="t_75cd08a0e5" formatted="false">Passa a:</string>
+    <string name="t_75cd08a0e5" formatted="false">"Passa a: "</string>
     <string name="t_762d7d64da" formatted="false">ieri</string>
     <string name="t_76393b3245" formatted="false">Copie locali per annullare il ripristino…</string>
     <string name="t_766e7cabf7" formatted="false">Meno</string>
@@ -402,7 +402,7 @@
     <string name="t_7f12cd4599" formatted="false">Attivo, ma il telefono non ha ancora consentito all’app di usare Non disturbare</string>
     <string name="t_7f17c7c62a" formatted="false">Impostazioni</string>
     <string name="t_7f76296ba9" formatted="false">Nessun segmento registrato chiuso</string>
-    <string name="t_7f7a71c089">La copia contiene %1$s, %2$s,</string>
+    <string name="t_7f7a71c089">"La copia contiene %1$s, %2$s, "</string>
     <string name="t_7fa01b6e34" formatted="false">Attivo nella copia ripristinata. Va confermato su questo telefono</string>
     <string name="t_80072ed701" formatted="false">Senza attività personale</string>
     <string name="t_806764743a" formatted="false">attività diverse</string>
@@ -410,7 +410,7 @@
     <string name="t_80e474035b" formatted="false">Il fuso è indicato nell’ora stessa</string>
     <string name="t_81129d8255" formatted="false">Obiettivo modificato</string>
     <string name="t_8125e2fba0" formatted="false">Tutte le righe → scheda selezionata; altrimenti, mantieni i nomi originali senza tipo</string>
-    <string name="t_817dfa0bfc">(colonna «%1$s»)</string>
+    <string name="t_817dfa0bfc">" (colonna «%1$s»)"</string>
     <string name="t_819f3ba9d1" formatted="false">Dalla fine dell’ultima voce</string>
     <string name="t_81b26ab0d7" formatted="false">Sfondo della finestra di scelta dopo lo stop</string>
     <string name="t_81d3d38d5c" formatted="false">Chiedi dopo</string>
@@ -433,7 +433,7 @@
     <string name="t_85e8a3404b" formatted="false">Da questo telefono non è stato ancora salvato nessun file</string>
     <string name="t_86042e468b" formatted="false">Misurazioni, calendario, recupero del database</string>
     <string name="t_861bd8760b" formatted="false">Font Onest · SIL Open Font License</string>
-    <string name="t_8633c34c71">· nel file: %1$s</string>
+    <string name="t_8633c34c71">" · nel file: %1$s"</string>
     <string name="t_86652580fd" formatted="false">Mese scorso</string>
     <string name="t_8690f98524" formatted="false">, la giornata è ancora in corso</string>
     <string name="t_86d85a0147">Fuso dei report: %1$s</string>
@@ -597,7 +597,7 @@
     <string name="t_b402c34a3b" formatted="false">Esporta in CSV</string>
     <string name="t_b40a4254c7" formatted="false">Nome sul pulsante</string>
     <string name="t_b433c5110e" formatted="false">La prima copia arriverà tra un paio di minuti</string>
-    <string name="t_b4479f84f1">%1$s, cifre %2$s,</string>
+    <string name="t_b4479f84f1">"%1$s, cifre %2$s, "</string>
     <string name="t_b45bbb4570" formatted="false">Tema chiaro</string>
     <string name="t_b467c6658f" formatted="false">File salvato. Non è possibile verificarlo leggendolo</string>
     <string name="t_b4770c7e71">La giornata inizia alle %1$s:%2$s</string>
@@ -631,7 +631,7 @@
     <string name="t_babd8e081b" formatted="false">Cambieranno i limiti dei giorni in cronologia e panoramica. Le voci e i fusi degli obiettivi non cambiano.</string>
     <string name="t_bbb0e8e8cd" formatted="false">ms</string>
     <string name="t_bbcf06b3c9" formatted="false">Note</string>
-    <string name="t_bbee9680a8" formatted="false">Il tempo sconosciuto non è nel totale:</string>
+    <string name="t_bbee9680a8" formatted="false">"Il tempo sconosciuto non è nel totale: "</string>
     <string name="t_bc28baf5fc" formatted="false">Nessuna voce ieri</string>
     <string name="t_bc4d1d35af" formatted="false">come nel file</string>
     <string name="t_bc5431b599" formatted="false">Cartella</string>
@@ -653,7 +653,7 @@
     <string name="t_c0ed5f4dda" formatted="false">le virgolette della riga non sono chiuse</string>
     <string name="t_c12ee51dd9" formatted="false">Sempre</string>
     <string name="t_c14f88246c">Mancano %1$s</string>
-    <string name="t_c161a7bb23" formatted="false">Una voce non chiusa arriverà come «tempo sconosciuto» e andrà precisata.</string>
+    <string name="t_c161a7bb23" formatted="false">" Una voce non chiusa arriverà come «tempo sconosciuto» e andrà precisata."</string>
     <string name="t_c23d5826a3">%1$s con voci</string>
     <string name="t_c25bd1a7c6" formatted="false">Salta la pausa</string>
     <string name="t_c2bf13bbb1" formatted="false">Report personali</string>
@@ -681,7 +681,7 @@
     <string name="t_c85eb5f581" formatted="false">90 giorni</string>
     <string name="t_c927b86cfb" formatted="false">Catalogo e fogli di calcolo</string>
     <string name="t_ca7830c42f" formatted="false">Nessuna voce da eliminare</string>
-    <string name="t_cabb0c6d9b">Riga %1$s:</string>
+    <string name="t_cabb0c6d9b">"Riga %1$s: "</string>
     <string name="t_cb26bdc6c6" formatted="false">Inizio</string>
     <string name="t_cbc6fa3d6a" formatted="false">widget</string>
     <string name="t_cbeb716470" formatted="false">Torna alle impostazioni</string>
@@ -701,7 +701,7 @@
     <string name="t_cf52c8daf1" formatted="false">Il fuso dei report segue il dispositivo. Le voci possono passare a un altro giorno</string>
     <string name="t_cf7b338323" formatted="false">Sottili</string>
     <string name="t_cfafc18b42" formatted="false">Il piano compare solo nella schermata principale. Il tempo parte quando tocchi l’attività.</string>
-    <string name="t_d002f83ddc" formatted="false">Dopo le modifiche la copia si salva entro un paio di minuti, quando il telefono consente il lavoro in background. Una volta al giorno anche senza modifiche.</string>
+    <string name="t_d002f83ddc" formatted="false">"Dopo le modifiche la copia si salva entro un paio di minuti, quando il telefono consente il lavoro in background. Una volta al giorno anche senza modifiche. "</string>
     <string name="t_d015e9be93" formatted="false">L’attività di questo report è stata eliminata o archiviata. Il report conta solo le voci passate.</string>
     <string name="t_d0d7180292" formatted="false">Aggiunto ai preferiti</string>
     <string name="t_d0dd940c4c" formatted="false">Nessun dato</string>
@@ -719,7 +719,7 @@
     <string name="t_d2aa318afd">registrato %1$s</string>
     <string name="t_d2e9881a72">Verranno aggiunte %1$s</string>
     <string name="t_d349cb398d">Trascorso %1$s</string>
-    <string name="t_d37c15b206" formatted="false">I nomi che hai cambiato restano tuoi; le voci passate non cambiano.</string>
+    <string name="t_d37c15b206" formatted="false">" I nomi che hai cambiato restano tuoi; le voci passate non cambiano."</string>
     <string name="t_d398842570" formatted="false">Conferma la parte finale con l’intervallo indicato</string>
     <string name="t_d3c8e2e155" formatted="false">Il fuso è stato cambiato. La conferma non è stata salvata; l’app la ripeterà all’apertura</string>
     <string name="t_d40fecd7ad" formatted="false">Riprova</string>
@@ -759,7 +759,7 @@
     <string name="t_dd15d6eecb" formatted="false">Cosa iniziamo?</string>
     <string name="t_dd27b7de89" formatted="false">Impossibile aprire la licenza</string>
     <string name="t_dd63bc14f9">Modificate %1$s</string>
-    <string name="t_ddca6f4db2" formatted="false">senza voce</string>
+    <string name="t_ddca6f4db2" formatted="false">" senza voce"</string>
     <string name="t_ddcbc8c167" formatted="false">Segmenti modificati</string>
     <string name="t_de5d4764e8" formatted="false">Quantità totale per l’elemento selezionato; i periodi giornalieri non si sommano</string>
     <string name="t_de5eb09e17" formatted="false">Cambia attività</string>

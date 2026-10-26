@@ -287,16 +287,16 @@
 "hi": "नोट"
 },
 "t_bbee9680a8": {
-"en": "Unknown time isn’t in the total:",
-"es": "El tiempo desconocido no cuenta en el total:",
-"fr": "Le temps inconnu n’est pas compté :",
-"pt-BR": "O tempo desconhecido não entra no total:",
-"de": "Unbekannte Zeit zählt nicht mit:",
-"it": "Il tempo sconosciuto non è nel totale:",
-"ar": "الوقت غير المعروف خارج الإجمالي:",
+"en": "Unknown time isn’t in the total: ",
+"es": "El tiempo desconocido no cuenta en el total: ",
+"fr": "Le temps inconnu n’est pas compté : ",
+"pt-BR": "O tempo desconhecido não entra no total: ",
+"de": "Unbekannte Zeit zählt nicht mit: ",
+"it": "Il tempo sconosciuto non è nel totale: ",
+"ar": "الوقت غير المعروف خارج الإجمالي: ",
 "zh-Hans": "未知时间不计入合计：",
 "ja": "不明な時間は合計に含まれません：",
-"ko": "모르는 시간은 합계에 없어요:",
+"ko": "모르는 시간은 합계에 없어요: ",
 "hi": "अज्ञात समय कुल में नहीं:"
 },
 "t_c23d5826a3": {

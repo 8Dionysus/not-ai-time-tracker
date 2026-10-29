@@ -18,7 +18,7 @@ jobs:
   compare:
     name: Original exporters and historical readers
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -30,6 +30,14 @@ jobs:
           java-version: '21'
           cache: gradle
           overwrite-settings: false
+      - name: Ensure the repository Android toolchain
+        run: |
+          if [ ! -f "$ANDROID_HOME/platforms/android-36/android.jar" ] ||
+             [ ! -x "$ANDROID_HOME/build-tools/35.0.0/aapt2" ] ||
+             [ ! -x "$ANDROID_HOME/ndk/30.0.16248370/ndk-build" ]; then
+            "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+              'platforms;android-36' 'build-tools;35.0.0' 'ndk;30.0.16248370'
+          fi
       - name: Compare exact synthetic exports through historical restore paths
         env:
           TRACKER_MATRIX_HEAD: ${{ github.event.pull_request.head.sha }}

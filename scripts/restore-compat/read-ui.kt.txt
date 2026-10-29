@@ -1,0 +1,143 @@
+package dev.notai.tracker.android.ui
+
+import android.content.ContentProvider
+import android.content.ContentValues
+import android.content.pm.ProviderInfo
+import android.net.Uri
+import android.os.Looper
+import androidx.lifecycle.viewModelScope
+import dev.notai.tracker.*
+import dev.notai.tracker.android.*
+import java.io.File
+import java.io.IOException
+import java.io.InputStream
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.util.concurrent.CopyOnWriteArrayList
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import org.junit.Assert.*
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
+import org.robolectric.Shadows.shadowOf
+import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowContentResolver
+
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [35],qualifiers = "ru-rRU")
+class LegacyUiMatrixTest {
+    private class Provider: ContentProvider() {
+        override fun onCreate() = true
+        override fun getType(uri: Uri) = "application/octet-stream"
+        override fun query(uri: Uri,projection: Array<out String>?,selection: String?,args: Array<out String>?,sort: String?): android.database.Cursor? = null
+        override fun insert(uri: Uri,values: ContentValues?): Uri? = null
+        override fun delete(uri: Uri,selection: String?,args: Array<out String>?) = 0
+        override fun update(uri: Uri,values: ContentValues?,selection: String?,args: Array<out String>?) = 0
+    }
+    @Test fun compareActualRestoreRouteAndNotice() = runBlocking {
+        val app = RuntimeEnvironment.getApplication();val originalOpen = UiBackends.open
+        val oldSync = DirectoryDurability.sync;val oldRename = DirectoryDurability.rename
+        DirectoryDurability.sync = { d -> java.nio.channels.FileChannel.open(d.toPath(),java.nio.file.StandardOpenOption.READ).use { it.force(true) } }
+        DirectoryDurability.rename = { a,b -> Files.move(a.toPath(),b.toPath(),StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);Unit }
+        val store = object: StateStore {
+            private var value = Dataset()
+            override val changes = MutableStateFlow(value)
+            override fun read() = value
+            @Synchronized override fun <T> transaction(block: (Dataset)->Pair<Dataset,T>): T {
+                val (next,result) = block(value);validate(next);value = next;changes.value = next;return result
+            }
+        }
+        val tracker = Tracker(store,Clock { Moment(3000,1000,"matrix-boot") })
+        val rollback = object: RollbackStore {
+            override fun save(json: String) = error("preview never saves")
+            override fun read(reference: String) = error("preview never reads rollback")
+        }
+        UiBackends.open = { object: UiBackend {
+            override val tracker = tracker
+            override val backups = Backups(tracker,rollback)
+            override val focusDue = FocusDueSignals()
+            override val runtime: TrackerRuntime? = null
+            override fun prepareCatalog(): CatalogPreview = error("unused")
+            override fun applyCatalog(preview: CatalogPreview): Tracker.Change = error("unused")
+            override fun submitShortcut(action: SurfaceAction) = CompletableDeferred<Result<Tracker.Change>>()
+        } }
+        val provider = Provider()
+        provider.attachInfo(app,ProviderInfo().apply { authority = "synthetic.restore.matrix";exported = true })
+        ShadowContentResolver.registerProviderInternal("synthetic.restore.matrix",provider)
+        val resolver = shadowOf(app.contentResolver);val vm = TrackerViewModel(app)
+        val notices = CopyOnWriteArrayList<String>();val scope = CoroutineScope(SupervisorJob()+Dispatchers.IO)
+        scope.launch(start = CoroutineStart.UNDISPATCHED) { vm.notices.collect { notices += it.text } }
+        fun pump(predicate: () -> Boolean) {
+            val limit = System.nanoTime()+20_000_000_000L
+            while(!predicate()) {
+                shadowOf(Looper.getMainLooper()).idle()
+                check(System.nanoTime() < limit) { "Synthetic restore fixture timed out" }
+                Thread.sleep(5)
+            }
+        }
+        val directory = File(System.getenv("TRACKER_MATRIX_DIR"))
+        val fixed = System.getenv("TRACKER_MATRIX_FIXED") == "true"
+        val label = System.getenv("TRACKER_MATRIX_LABEL")
+        val lines = mutableListOf<String>()
+        try {
+            pump { vm.boot.value is TrackerViewModel.Boot.Ready }
+            val before = tracker.data()
+            val original = File(directory,"original-v1.json").readBytes()
+            val version15 = File(directory,"app-v15.json").readBytes()
+            val text = version15.toString(Charsets.UTF_8)
+            val badEnum = text.replace("\"status\": \"STOPPED\"","\"status\": \"NOT_A_STATUS\"")
+            check(badEnum != text)
+            val missingStatus = text.replace(Regex("\\\"status\\\"\\s*:\\s*\\\"STOPPED\\\"\\s*,"),"")
+            check(missingStatus != text)
+            suspend fun attempt(name: String,supply: () -> InputStream,expectPreview: Boolean,expectedSuffix: String? = null) {
+                val filename = if(name == "v15-no-extension") name else "$name.bin"
+                val uri = Uri.parse("content://synthetic.restore.matrix/$filename")
+                resolver.registerInputStreamSupplier(uri) { supply() }
+                assertEquals("application/octet-stream",app.contentResolver.getType(uri))
+                val firstNotice = notices.size;val owner = RestoreReviewOwner<RestorePreview>()
+                try {
+                    val preview = vm.prepareRestore(uri,owner)
+                    if(expectPreview) {
+                        assertNotNull("$label $name",preview)
+                        assertEquals("matrix-data",preview!!.datasetId)
+                        assertEquals(1,preview.sessions)
+                        lines += "$label $name: preview"
+                    } else {
+                        assertNull("$label $name",preview)
+                        pump { notices.size > firstNotice }
+                        val notice = notices.last()
+                        assertTrue("$label $name unexpected notice: $notice",notice.endsWith(requireNotNull(expectedSuffix)))
+                        lines += "$label $name: $notice"
+                    }
+                    assertEquals("$label $name changed local data",before,tracker.data())
+                } finally { owner.close() }
+            }
+            attempt("original-v1",{ original.inputStream() },fixed,if(fixed) null else "Missing dataset fields")
+            attempt("v15-no-extension",{ version15.inputStream() },true)
+            attempt("v15-bom",{ (byteArrayOf(0xEF.toByte(),0xBB.toByte(),0xBF.toByte())+version15).inputStream() },true)
+            attempt("empty",{ byteArrayOf().inputStream() },false,"Invalid JSON framing")
+            attempt("truncated",{ version15.copyOf(version15.size-7).inputStream() },false,"Truncated JSON value")
+            attempt("invalid-utf8",{ (byteArrayOf(0xC3.toByte(),0x28)+version15).inputStream() },false,
+                if(fixed) "Backup is not valid UTF-8" else "Malformed or unreadable backup")
+            attempt("unknown-status",{ badEnum.byteInputStream() },false,
+                if(fixed) "Backup JSON has invalid or unsupported fields" else "Malformed or unreadable backup")
+            attempt("missing-status",{ missingStatus.byteInputStream() },false,
+                if(fixed) "Backup JSON has invalid or unsupported fields" else "Malformed or unreadable backup")
+            attempt("interrupted-provider",{ object: InputStream() {
+                private var remaining = 16
+                override fun read(): Int { if(remaining-- > 0) return ' '.code;throw IOException("synthetic provider interruption") }
+                override fun read(b: ByteArray,off: Int,len: Int): Int {
+                    if(remaining <= 0) throw IOException("synthetic provider interruption")
+                    val count = minOf(remaining,len);java.util.Arrays.fill(b,off,off+count,' '.code.toByte());remaining -= count;return count
+                }
+            } },false,if(fixed) "Ошибка хранения. Проверьте текущее состояние перед повтором." else "synthetic provider interruption")
+            File(directory,"ui-$label.txt").writeText(lines.joinToString("\n",postfix = "\n"))
+        } finally {
+            scope.cancel();vm.viewModelScope.cancel();UiBackends.open = originalOpen
+            DirectoryDurability.sync = oldSync;DirectoryDurability.rename = oldRename
+        }
+    }
+}

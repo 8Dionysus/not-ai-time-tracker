@@ -724,6 +724,14 @@ class UiScreensTest {
             if (lang == "en") assertEquals(listOf("Timer", "Overview", "Settings"), listOf(timer, overview, settings))
             if (lang == "ja") assertEquals(listOf("タイマー", "概要", "設定"), listOf(timer, overview, settings))
             waitText(settings)
+            // The language flow invalidates history on IO. Wait for the seeded unclassified record's
+            // new label as well as the tab copy, so this check observes the rebuilt projection.
+            val unclassified = str(lang, dev.notai.tracker.android.R.string.t_aff922a637)
+            compose.waitUntil(15_000) {
+                vm.language.value.resolvedLocaleTag == lang && vm.home.value?.days?.any { day ->
+                    day.entries.any { it.label.unclassified && it.label.title == unclassified }
+                } == true
+            }
             compose.onNode(hasText(timer) and androidx.compose.ui.test.hasClickAction()).performClick();check("timer", lang)
             if (lang == "en" || lang == "ja") shotAs("language-$lang-timer", vm, ThemeChoice.LIGHT)
             if (lang != "en") {

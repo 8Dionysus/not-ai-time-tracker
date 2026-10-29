@@ -2,10 +2,12 @@ package dev.notai.tracker.android.ui
 
 import android.content.ContentProvider
 import android.content.ContentValues
+import android.content.Intent
 import android.content.pm.ProviderInfo
 import android.net.Uri
 import android.os.Looper
 import androidx.lifecycle.viewModelScope
+import androidx.activity.result.contract.ActivityResultContracts
 import dev.notai.tracker.*
 import dev.notai.tracker.android.*
 import java.io.File
@@ -84,12 +86,19 @@ class LegacyUiMatrixTest {
         val lines = mutableListOf<String>()
         try {
             pump { vm.boot.value is TrackerViewModel.Boot.Ready }
+            val chooser = ActivityResultContracts.OpenDocument().createIntent(app,arrayOf("application/json","*/*"))
+            assertEquals(Intent.ACTION_OPEN_DOCUMENT,chooser.action)
+            assertEquals("*/*",chooser.type)
+            assertArrayEquals(arrayOf("application/json","*/*"),chooser.getStringArrayExtra(Intent.EXTRA_MIME_TYPES))
+            lines += "$label chooser: JSON and wildcard MIME types"
             val before = tracker.data()
             val original = File(directory,"original-v1.json").readBytes()
             val version15 = File(directory,"app-v15.json").readBytes()
             val text = version15.toString(Charsets.UTF_8)
             val badEnum = text.replace("\"status\": \"STOPPED\"","\"status\": \"NOT_A_STATUS\"")
             check(badEnum != text)
+            val unknownField = text.replace("\"status\": \"STOPPED\"","\"status\": \"STOPPED\", \"unknownSyntheticField\": true")
+            check(unknownField != text)
             val missingStatus = text.replace(Regex("\\\"status\\\"\\s*:\\s*\\\"STOPPED\\\"\\s*,"),"")
             check(missingStatus != text)
             suspend fun attempt(name: String,supply: () -> InputStream,expectPreview: Boolean,expectedSuffix: String? = null) {
@@ -123,6 +132,8 @@ class LegacyUiMatrixTest {
             attempt("invalid-utf8",{ (byteArrayOf(0xC3.toByte(),0x28)+version15).inputStream() },false,
                 if(fixed) "Backup is not valid UTF-8" else "Malformed or unreadable backup")
             attempt("unknown-status",{ badEnum.byteInputStream() },false,
+                if(fixed) "Backup JSON has invalid or unsupported fields" else "Malformed or unreadable backup")
+            attempt("unknown-field",{ unknownField.byteInputStream() },false,
                 if(fixed) "Backup JSON has invalid or unsupported fields" else "Malformed or unreadable backup")
             attempt("missing-status",{ missingStatus.byteInputStream() },false,
                 if(fixed) "Backup JSON has invalid or unsupported fields" else "Malformed or unreadable backup")

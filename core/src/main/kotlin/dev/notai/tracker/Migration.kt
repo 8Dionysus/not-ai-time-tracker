@@ -2,8 +2,8 @@ package dev.notai.tracker
 
 import kotlinx.serialization.json.*
 
-/** The very first v1 exporter (2664dd9) had no type table. Its built-in
- * template IDs and labels are the only type definitions present in that release.
+/** The very first v1 exporter (2664dd9) had no type table. Its five built-in
+ * template IDs and labels were available independently of saved records.
  * Do not invent a definition for a custom partOf value: an archive that needs
  * one cannot be restored without more information. */
 internal fun originalV1Types(data: Dataset): List<ActivityType> {
@@ -15,7 +15,7 @@ internal fun originalV1Types(data: Dataset): List<ActivityType> {
         ActivityType("reading","Чтение"),ActivityType("work","Работа"),ActivityType("rest","Отдых"))
     ensure(referenced.all { id -> builtins.any { it.id == id } },
         "Legacy backup references an activity type without a definition",ErrorCode.UNSUPPORTED_IMPORT)
-    return builtins.filter { it.id in referenced }
+    return builtins
 }
 
 /** Only the old flat link is known. Preserve it as a one-node historical path, never infer a new parent. */

@@ -8,6 +8,8 @@ import kotlinx.serialization.json.*
 abstract class JournalAScenarioContract {
     protected abstract fun createJournalStore(): StateStore
     protected open fun reopenJournalStore(store: StateStore): StateStore = store
+    private val originalV1Builtins = listOf(ActivityType("language","Языковая практика"),ActivityType("fitness","Тренировка"),
+        ActivityType("reading","Чтение"),ActivityType("work","Работа"),ActivityType("rest","Отдых"))
     @Test fun ordinaryCardCreationRollsBackRefusedModesAndPreservesDraftLabelEarlierAndFocus() {
         val clock = FakeClock(10000);val t = Tracker(createJournalStore(),clock)
         val card = Card("ordinary-created","Ordinary created")
@@ -92,7 +94,8 @@ abstract class JournalAScenarioContract {
         // The later v1 fixture includes types, which that exporter did not write.
         val directory = java.io.File(System.getProperty("tracker.samples"))
         val old = directory.resolve("history-v1-initial.json").readText()
-        val expected = Backups.decode(directory.resolve("history-v1.json").readText())
+        val laterV1 = Backups.decode(directory.resolve("history-v1.json").readText())
+        val expected = laterV1.copy(data = laterV1.data.copy(types = originalV1Builtins))
         val streamed = StreamingBackup.read { old.byteInputStream() }
         assertEquals(expected,streamed)
         assertEquals(expected,Backups.decode(old))
@@ -114,7 +117,7 @@ abstract class JournalAScenarioContract {
         val old = directory.resolve("history-v1-initial.json").readText()
         val noTypes = old.replace("\"partOf\": \"language\"","\"partOf\": null")
         val unclassified = StreamingBackup.read { noTypes.byteInputStream() }
-        assertEquals(emptyList(),unclassified.data.types)
+        assertEquals(originalV1Builtins,unclassified.data.types)
         assertEquals(unclassified,Backups.decode(noTypes))
         assertEquals("example-dataset-v1",unclassified.data.datasetId)
         assertEquals("Europe/Moscow",unclassified.data.settings.reportZone)
@@ -122,9 +125,27 @@ abstract class JournalAScenarioContract {
             "reading" to "Чтение","work" to "Работа","rest" to "Отдых")) {
             val original = old.replace("\"partOf\": \"language\"","\"partOf\": \"$id\"")
             val decoded = StreamingBackup.read { original.byteInputStream() }
-            assertEquals(listOf(ActivityType(id,name)),decoded.data.types)
+            assertEquals(originalV1Builtins,decoded.data.types)
+            assertEquals(name,decoded.data.types.single { it.id == id }.name)
             assertEquals(decoded,Backups.decode(original))
         }
+        val root = codec.parseToJsonElement(old).jsonObject
+        val emptyData = root.getValue("data").jsonObject.toMutableMap()
+        for(field in listOf("cards","favorites","sessions","segments","measurements")) emptyData[field] = JsonArray(emptyList())
+        val empty = JsonObject(root+("data" to JsonObject(emptyData))).toString()
+        val emptyBackup = StreamingBackup.read { empty.byteInputStream() }
+        assertEquals(originalV1Builtins,emptyBackup.data.types)
+        assertEquals(emptyBackup,Backups.decode(empty))
+        val emptyTarget = Tracker(createJournalStore(),FakeClock());val emptyRollback = MemoryRollback()
+        val emptyBefore = emptyTarget.data();val emptyBackups = Backups(emptyTarget,emptyRollback)
+        val emptyPreview = emptyBackups.prepare { empty.byteInputStream() }
+        assertEquals(emptyBefore,emptyTarget.data())
+        val emptyResult = emptyBackups.apply(emptyPreview)
+        val emptyRestored = Tracker(reopenJournalStore(emptyTarget.store),FakeClock()).data()
+        assertEquals(originalV1Builtins,emptyRestored.types)
+        assertEquals(emptyBackup.data.settings,emptyRestored.settings)
+        assertEquals(emptyBackup.data.datasetId,emptyRestored.datasetId)
+        assertEquals(emptyBefore,emptyRollback.readSnapshot(emptyResult.rollbackReference).data)
 
         val custom = old.replace("\"partOf\": \"language\"","\"partOf\": \"private-custom-type\"")
         val target = Tracker(createJournalStore(),FakeClock());val backup = Backups(target,MemoryRollback())

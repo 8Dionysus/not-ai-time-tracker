@@ -100,7 +100,10 @@ class AutomaticBackupAndroidTest {
         try {
             val root = java.io.File(System.getProperty("tracker.samples"))
             val bytes = root.resolve("history-v1-initial.json").readBytes()
-            val expected = Backups.decode(root.resolve("history-v1.json").readText())
+            val laterV1 = Backups.decode(root.resolve("history-v1.json").readText())
+            val builtins = listOf(ActivityType("language","Языковая практика"),ActivityType("fitness","Тренировка"),
+                ActivityType("reading","Чтение"),ActivityType("work","Работа"),ActivityType("rest","Отдых"))
+            val expected = laterV1.copy(data = laterV1.data.copy(types = builtins))
             val resolver = shadowOf(context.contentResolver)
             val provider = Provider().apply { mime = "application/octet-stream" }
             provider.attachInfo(context,ProviderInfo().apply { authority = "synthetic.restore";exported = true })

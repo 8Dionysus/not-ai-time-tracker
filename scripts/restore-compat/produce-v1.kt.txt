@@ -19,5 +19,8 @@ class LegacyMatrixTest {
         val preview = Backups(Tracker(MemoryStore(),FakeClock(wall = 3000)),MemoryRollback()).prepare(archive)
         assertEquals("matrix-data",preview.datasetId)
         File(System.getenv("TRACKER_MATRIX_DIR"),"original-v1.json").writeText(archive,Charsets.UTF_8)
+        val empty = data.copy(cards = emptyList(),favorites = emptyList(),sessions = emptyList(),segments = emptyList(),measurements = emptyList())
+        val emptyArchive = Backups(Tracker(MemoryStore(empty),FakeClock(wall = 3000)),MemoryRollback()).export()
+        File(System.getenv("TRACKER_MATRIX_DIR"),"original-v1-empty.json").writeText(emptyArchive,Charsets.UTF_8)
     }
 }

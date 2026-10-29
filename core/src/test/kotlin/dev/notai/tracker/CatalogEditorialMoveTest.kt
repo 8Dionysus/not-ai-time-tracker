@@ -140,6 +140,25 @@ class CatalogEditorialMoveTest {
         assertEquals(listOf(child),tracker.data().children("leaf"))
         assertTrue(tracker.data().children("root.code").any { it.id == "leaf" })
     }
+    @Test fun aPersonallyRenamedRetiredTypeStaysBrowsable() {
+        val tracker = Tracker(MemoryStore(),FakeClock())
+        install(tracker,files(v1(),"1",emptyList()))
+        val personal = tracker.data().types.single { it.id == "leaf" }.copy(name = "My activity")
+        tracker.saveType(tracker.snapshot().token,personal)
+        assertTrue(install(tracker,files(retired(),"2",retire())).canApply)
+        assertEquals(personal,tracker.data().types.single { it.id == "leaf" })
+        assertTrue(tracker.data().children("root.code").any { it.id == "leaf" })
+    }
+    @Test fun aRetiredTypeWithPersonalAliasesStaysBrowsable() {
+        val tracker = Tracker(MemoryStore(),FakeClock())
+        install(tracker,files(v1(),"1",emptyList()))
+        val original = tracker.data().types.single { it.id == "leaf" }
+        val personal = original.copy(aliases = original.aliases + "my alias")
+        tracker.saveType(tracker.snapshot().token,personal)
+        assertTrue(install(tracker,files(retired(),"2",retire())).canApply)
+        assertEquals(personal,tracker.data().types.single { it.id == "leaf" })
+        assertTrue(tracker.data().children("root.code").any { it.id == "leaf" })
+    }
     @Test fun withoutTheReviewedStepAnInstalledTypeIsNotRetired() {
         val tracker = Tracker(MemoryStore(),FakeClock())
         install(tracker,files(v1(),"1",emptyList()))

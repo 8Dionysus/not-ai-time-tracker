@@ -15,8 +15,8 @@ import kotlinx.serialization.json.*
 /** One explicitly reviewed editorial step. [parentMove] allows the new parent to replace the installed one (the type moves
  * in the tree; recorded history keeps its path at write). [alsoFromMeaningSha256] and [previousDefaultNameSha256s] accept
  * older installed catalogs on the same step; a locally renamed entry keeps its personal name. [archive] retires a catalog
- * type that the catalog now ships archived: it leaves the picker only where nothing in the dataset points at it, so cards,
- * plans, goals, reports and history that use it keep working and the entry stays visible to them. */
+ * type that the catalog now ships archived: it leaves the picker only where nothing in the dataset points at it and its
+ * presentation is not personalized, so referenced and personally edited entries remain available. */
 @Serializable data class CatalogEditorialRevision(val kind: String,val id: String,val fromMeaningSha256: String,
     val toMeaningSha256: String,val previousDefaultNameSha256: String? = null,val parentMove: Boolean = false,
     val alsoFromMeaningSha256: List<String> = emptyList(),val previousDefaultNameSha256s: List<String> = emptyList(),

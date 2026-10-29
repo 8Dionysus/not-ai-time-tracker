@@ -2185,18 +2185,22 @@ abstract class ScenarioContract {
         val retiredParent = retired.first { it.id != legacyType.id }
         val personalChild = ActivityType("personal.child.of.retired","Personal child",parentId = retiredParent.id)
         legacy.saveType(legacy.snapshot().token,personalChild)
+        val customizedRetired = retired.first { next -> next.id != legacyType.id && next.id != retiredParent.id &&
+            previous.types.any { old -> old.id == next.id && old.definition == next.definition && old.parentId == next.parentId } }
+        val personalType = previous.types.single { it.id == customizedRetired.id }.let { it.copy(name = "Personal type",aliases = it.aliases + "personal alias") }
+        legacy.saveType(legacy.snapshot().token,personalType)
         val oldData = legacy.data();val upgrade = CatalogImports(legacy) { ready }
         val oldPreview = upgrade.prepare();assertTrue(oldPreview.canApply)
         assertEquals(listOf("activity.movement.exercise_snack"),oldPreview.report.added.map { it.id })
-        // The locally renamed type keeps its personal name, so its rename-only step leaves it as it is.
-        assertEquals(steps.size-1,oldPreview.report.updated.size)
+        // Both locally renamed types keep their personal names without a rename or retirement update.
+        assertEquals(steps.size-2,oldPreview.report.updated.size)
         upgrade.apply(oldPreview)
         val expectedTypes = oldData.types.map { old ->
             val baseline = previous.types.find { it.id == old.id };val next = ready.vocabulary.types.find { it.id == old.id }
             if(baseline == null || next == null) old else old.copy(definition = next.definition,parentId = next.parentId,
                 name = if(old.name == baseline.name) next.name else old.name,
-                // History and a personal child keep their retired types live; unused ones leave the picker.
-                archived = old.archived || (next.archived && old.id != legacyType.id && old.id != retiredParent.id))
+                // History, a personal child or personal presentation keep their retired types live.
+                archived = old.archived || (next.archived && old.id != legacyType.id && old.id != retiredParent.id && old.id != customizedRetired.id))
         }+ready.vocabulary.types.filter { next -> oldData.types.none { it.id == next.id } }
         val expectedAxes = oldData.axes.map { old ->
             val baseline = previous.axes.find { it.id == old.id };val next = ready.vocabulary.axes.find { it.id == old.id }
@@ -2206,6 +2210,7 @@ abstract class ScenarioContract {
             types = expectedTypes,axes = expectedAxes),legacy.data())
         assertFalse(legacy.data().types.single { it.id == retiredParent.id }.archived)
         assertEquals(listOf(personalChild),legacy.data().children(retiredParent.id))
+        assertEquals(personalType,legacy.data().types.single { it.id == customizedRetired.id })
         assertEquals(legacy.data(),reopen(legacy.store).read())
         val importer = CatalogImports(tracker) { ready }
         val before = tracker.data();val preview = importer.prepare()

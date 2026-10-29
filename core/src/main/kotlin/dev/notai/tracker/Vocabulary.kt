@@ -172,9 +172,10 @@ private fun editorialReplacement(previous: Any,entry: Any,revisions: List<Catalo
     val defaults = listOfNotNull(revision.previousDefaultNameSha256)+revision.previousDefaultNameSha256s
     // Names and aliases can be customized independently. Keep installed aliases even when the default name changes.
     val renamed = sha256(previous.name.toByteArray(Charsets.UTF_8)) in defaults
+    val personalPresentation = (!renamed && previous.name != entry.name) || previous.aliases != entry.aliases
     val updated = base.copy(name = if(renamed) entry.name else previous.name,
         aliases = if(renamed) (entry.aliases + previous.aliases).distinct() else previous.aliases,
-        archived = previous.archived || (revision.archive && entry.archived && !inUse(entry.id)))
+        archived = previous.archived || (revision.archive && entry.archived && !personalPresentation && !inUse(entry.id)))
     return updated.takeUnless { it == previous }
 }
 internal fun Dataset.mergeCatalog(incoming: VocabularyData,policy: CatalogInstallPolicy = CatalogInstallPolicy.STRICT,

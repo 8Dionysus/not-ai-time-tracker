@@ -87,6 +87,28 @@ abstract class JournalAScenarioContract {
         assertEquals(card.id,t.snapshot().session!!.selection.cardId)
         assertEquals(1,t.data().cards.count { it.id == card.id })
     }
+    @Test fun originalV1ExporterWithoutTypesRestoresHistory() {
+        // Synthetic data in the exact schema of the first exporter (2664dd9).
+        // The later v1 fixture includes types, which that exporter did not write.
+        val directory = java.io.File(System.getProperty("tracker.samples"))
+        val old = directory.resolve("history-v1-initial.json").readText()
+        val expected = Backups.decode(directory.resolve("history-v1.json").readText())
+        val streamed = StreamingBackup.read { old.byteInputStream() }
+        assertEquals(expected,streamed)
+        assertEquals(expected,Backups.decode(old))
+
+        val target = Tracker(createJournalStore(),FakeClock())
+        target.saveCard(target.snapshot().token,Card(name = "Local before restore"))
+        val before = target.data();val rollback = MemoryRollback();val backups = Backups(target,rollback)
+        val preview = backups.prepare { old.byteInputStream() }
+        assertEquals(before,target.data())
+        assertEquals(expected.backupId,preview.backupId)
+        assertEquals(expected.data.settings,preview.settings)
+        val result = backups.apply(preview)
+        val restored = Tracker(reopenJournalStore(target.store),FakeClock()).data()
+        assertEquals(expected.data.copy(revision = restored.revision,controlBarrier = restored.controlBarrier),restored)
+        assertEquals(before,rollback.readSnapshot(result.rollbackReference).data)
+    }
     @Test fun bothBackupReadersKeepEveryLegacyVersionAndPresentationDefaults() {
         val directory = java.io.File(System.getProperty("tracker.samples"))
         val first = directory.resolve("history-v1.json").readText()

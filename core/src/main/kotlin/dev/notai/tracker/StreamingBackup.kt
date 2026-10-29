@@ -5,9 +5,13 @@ import java.io.OutputStream
 import java.io.Reader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
+import java.io.IOException
 import java.security.DigestInputStream
 import java.security.MessageDigest
+import java.nio.charset.CharacterCodingException
 import java.nio.charset.CodingErrorAction
+import java.util.concurrent.CancellationException
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*
 
 internal const val MAX_BACKUP_RECORD_CHARS = 16*1024*1024
@@ -66,7 +70,7 @@ object StreamingBackup {
                 "backupId" -> id = codec.decodeFromString(json.value())
                 "asOf" -> asOf = codec.decodeFromString(json.value())
                 "data" -> { hasData = true;json.skip() }
-                else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unknown backup field: $key")
+                else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unknown backup field")
             } };json.finish()
         }
         ensure(version in 1..CURRENT_BACKUP_FORMAT && !id.isNullOrBlank() && asOf != null && hasData,"Unsupported backup metadata",ErrorCode.UNSUPPORTED_IMPORT)
@@ -113,20 +117,22 @@ object StreamingBackup {
                     "measurements" -> json.array { measurements += codec.decodeFromString<Measurement>(record()) }
                     "savedReports" -> { ensure(format >= 14,"Saved reports in legacy archive",ErrorCode.UNSUPPORTED_IMPORT);json.array { savedReports += codec.decodeFromString<SavedReportQuery>(record()) } }
                     "goals" -> json.array { goals += codec.decodeFromString<Goal>(record()) }
-                    else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unknown dataset field: $field")
+                    else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unknown dataset field")
                 }
             } };json.finish()
         }
         val sourceHash = firstDigest.digest()
         ensure(sourceHash.contentEquals(secondDigest.digest()),"Backup changed while reading",ErrorCode.UNSUPPORTED_IMPORT)
-        ensure(seen.containsAll(listOf("datasetId","revision","settings","types","cards","favorites","sessions","segments","measurements")),"Missing dataset fields",ErrorCode.UNSUPPORTED_IMPORT)
+        ensure(seen.containsAll(listOf("datasetId","revision","settings","cards","favorites","sessions","segments","measurements")) &&
+            (format == 1 || "types" in seen),"Missing dataset fields",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(if(format == 1) seen.none { it in setOf("axes","metrics","units") } else seen.containsAll(listOf("axes","metrics","units")),"Missing or incompatible dictionary fields",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format < 6 || "goals" in seen,"Missing goals",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format < 7 || "focus" in seen,"Missing Focus",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format < 8 || seen.containsAll(listOf("schedule","transfer")),"Missing schedule",ErrorCode.UNSUPPORTED_IMPORT)
-        val data = Dataset(datasetId = datasetId!!,revision = revision!!,types = types,cards = cards,favorites = favorites,
+        val decoded = Dataset(datasetId = datasetId!!,revision = revision!!,types = types,cards = cards,favorites = favorites,
             sessions = sessions,segments = segments,deletedRecords = deletedRecords,measurements = measurements,settings = settings!!,axes = axes,metrics = metrics,units = units,
             savedReports = savedReports,subjects = subjects,schedule = schedule,transfer = transfer,goals = goals,focus = focus,catalogVersion = catalogVersion,timerEpoch = timerEpoch,controlBarrier = controlBarrier)
+        val data = if(format == 1 && "types" !in seen) decoded.copy(types = originalV1Types(decoded)) else decoded
         ensure(format >= 9 || !data.transfer.hasCompactionState(),"Compaction in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format >= 10 || (data.settings.schedule == ScheduleSettings() && !data.transfer.hasCatalogRoots()),"Functional settings/catalog roots in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
         ensure(format >= 11 || data.settings.surfaces.shortcut,"Shortcut preference in legacy archive",ErrorCode.UNSUPPORTED_IMPORT)
@@ -139,7 +145,11 @@ object StreamingBackup {
         Backup(formatVersion = CURRENT_BACKUP_FORMAT,backupId = id!!,asOf = asOf!!,data = data.frozen()).also {
             validateBackup(it);onVerifiedSource(sourceHash.joinToString("") { byte -> (byte.toInt() and 255).toString(16).padStart(2,'0') })
         }
-    } catch(e: CoreError) { if(e.code == ErrorCode.UNSUPPORTED_IMPORT) throw e else fail(ErrorCode.UNSUPPORTED_IMPORT,"Invalid backup: ${e.message}") }
+    } catch(e: CancellationException) { throw e }
+      catch(e: CoreError) { if(e.code == ErrorCode.UNSUPPORTED_IMPORT) throw e else fail(ErrorCode.UNSUPPORTED_IMPORT,"Invalid backup: ${e.message}") }
+      catch(_: CharacterCodingException) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Backup is not valid UTF-8") }
+      catch(_: SerializationException) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Backup JSON has invalid or unsupported fields") }
+      catch(_: IOException) { fail(ErrorCode.STORAGE,"Unable to read backup file") }
       catch(_: Exception) { fail(ErrorCode.UNSUPPORTED_IMPORT,"Malformed or unreadable backup") }
     private fun reader(input: InputStream): Reader = InputStreamReader(input,Charsets.UTF_8.newDecoder()
         .onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT)).buffered(64*1024)

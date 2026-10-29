@@ -1335,6 +1335,8 @@ class TrackerViewModel internal constructor(private val app: Application,private
                 owner.prepared(request,rt.backups.prepare { file.inputStream() })
             }
         } catch(e: kotlinx.coroutines.CancellationException) { owner.cancel(request);throw e }
+        catch(_: java.io.IOException) { owner.cancel(request);notice(Format.error(CoreError(ErrorCode.STORAGE,"Unable to read backup file")));return null }
+        catch(_: SecurityException) { owner.cancel(request);notice(Format.error(CoreError(ErrorCode.STORAGE,"Unable to read backup file")));return null }
         catch(e: Exception) { owner.cancel(request);notice(Format.error(e));return null }
     }
     fun applyRestore(preview: RestorePreview,owner: RestoreReviewOwner<RestorePreview>? = null) {

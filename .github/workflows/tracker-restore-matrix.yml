@@ -1,0 +1,43 @@
+name: Historical backup restore comparison
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/tracker-restore-matrix.yml'
+      - 'scripts/restore-compat/**'
+      - 'core/src/main/kotlin/dev/notai/tracker/Backup.kt'
+      - 'core/src/main/kotlin/dev/notai/tracker/Migration.kt'
+      - 'core/src/main/kotlin/dev/notai/tracker/Model.kt'
+      - 'core/src/main/kotlin/dev/notai/tracker/StreamingBackup.kt'
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    name: Original exporters and historical readers
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+          overwrite-settings: false
+      - name: Compare exact synthetic exports through historical restore paths
+        env:
+          TRACKER_MATRIX_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: bash scripts/restore-compat/run-matrix.sh
+      - name: Retain comparison and generated synthetic inputs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: tracker-restore-matrix-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/tracker-restore-compat/results/
+          if-no-files-found: warn

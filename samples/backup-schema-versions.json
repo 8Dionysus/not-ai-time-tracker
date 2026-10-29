@@ -1,0 +1,2389 @@
+[
+  {
+    "formatVersion": 2,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": []
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных"
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow"
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": []
+    }
+  },
+  {
+    "formatVersion": 3,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": []
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных"
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow"
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": [],
+          "researchOrigins": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": []
+    }
+  },
+  {
+    "formatVersion": 4,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": []
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных",
+          "importOrigin": null
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow"
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": [],
+          "researchOrigins": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": []
+    }
+  },
+  {
+    "formatVersion": 5,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": []
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных",
+          "importOrigin": null
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow",
+        "surfaces": {
+          "widget": true,
+          "notification": false,
+          "overlay": false
+        }
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": [],
+          "researchOrigins": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": []
+    }
+  },
+  {
+    "formatVersion": 6,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": []
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных",
+          "importOrigin": null
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow",
+        "surfaces": {
+          "widget": true,
+          "notification": false,
+          "overlay": false
+        }
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": [],
+          "researchOrigins": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": [],
+      "goals": []
+    }
+  },
+  {
+    "formatVersion": 7,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": []
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных",
+          "importOrigin": null
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null,
+          "limitMs": null
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow",
+        "surfaces": {
+          "widget": true,
+          "notification": false,
+          "overlay": false,
+          "focusSignal": false
+        },
+        "focusPlan": {
+          "workMs": 1500000,
+          "breakMs": 300000
+        }
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": [],
+          "researchOrigins": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": [],
+      "focus": null,
+      "catalogVersion": null,
+      "timerEpoch": 0,
+      "controlBarrier": "",
+      "goals": []
+    }
+  },
+  {
+    "formatVersion": 8,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": []
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных",
+          "importOrigin": null
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null,
+          "limitMs": null
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow",
+        "surfaces": {
+          "widget": true,
+          "notification": false,
+          "overlay": false,
+          "focusSignal": false
+        },
+        "focusPlan": {
+          "workMs": 1500000,
+          "breakMs": 300000
+        }
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": [],
+          "researchOrigins": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": [],
+      "focus": null,
+      "catalogVersion": null,
+      "timerEpoch": 0,
+      "controlBarrier": "",
+      "goals": [],
+      "schedule": {
+        "series": [],
+        "overrides": [],
+        "links": [],
+        "receipts": []
+      },
+      "transfer": {
+        "origins": [],
+        "operations": []
+      }
+    }
+  },
+  {
+    "formatVersion": 9,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": []
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных",
+          "importOrigin": null
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null,
+          "limitMs": null
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow",
+        "surfaces": {
+          "widget": true,
+          "notification": false,
+          "overlay": false,
+          "focusSignal": false
+        },
+        "focusPlan": {
+          "workMs": 1500000,
+          "breakMs": 300000
+        }
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": [],
+          "researchOrigins": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": [],
+      "focus": null,
+      "catalogVersion": null,
+      "timerEpoch": 0,
+      "controlBarrier": "",
+      "goals": [],
+      "schedule": {
+        "series": [],
+        "overrides": [],
+        "links": [],
+        "receipts": []
+      },
+      "transfer": {
+        "origins": [],
+        "operations": [],
+        "compactions": []
+      }
+    }
+  },
+  {
+    "formatVersion": 10,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": []
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных",
+          "importOrigin": null
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null,
+          "limitMs": null
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow",
+        "surfaces": {
+          "widget": true,
+          "notification": false,
+          "overlay": false,
+          "focusSignal": false
+        },
+        "focusPlan": {
+          "workMs": 1500000,
+          "breakMs": 300000
+        },
+        "schedule": {
+          "day": {
+            "zonePolicy": "FIXED",
+            "zoneId": "Europe/Berlin",
+            "boundary": "04:00"
+          },
+          "quietShadeEnabled": true
+        }
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": [],
+          "researchOrigins": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": [],
+      "focus": null,
+      "catalogVersion": null,
+      "timerEpoch": 0,
+      "controlBarrier": "",
+      "goals": [],
+      "schedule": {
+        "series": [],
+        "overrides": [],
+        "links": [],
+        "receipts": []
+      },
+      "transfer": {
+        "origins": [],
+        "operations": [],
+        "compactions": []
+      }
+    }
+  },
+  {
+    "formatVersion": 11,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": []
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных",
+          "importOrigin": null
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null,
+          "limitMs": null
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow",
+        "surfaces": {
+          "widget": true,
+          "notification": false,
+          "overlay": false,
+          "focusSignal": false,
+          "shortcut": false
+        },
+        "focusPlan": {
+          "workMs": 1500000,
+          "breakMs": 300000
+        },
+        "schedule": {
+          "day": {
+            "zonePolicy": "FIXED",
+            "zoneId": "Europe/Berlin",
+            "boundary": "04:00"
+          },
+          "quietShadeEnabled": true
+        }
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": [],
+          "researchOrigins": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": [],
+      "focus": null,
+      "catalogVersion": null,
+      "timerEpoch": 0,
+      "controlBarrier": "",
+      "goals": [],
+      "schedule": {
+        "series": [],
+        "overrides": [],
+        "links": [],
+        "receipts": []
+      },
+      "transfer": {
+        "origins": [],
+        "operations": [],
+        "compactions": []
+      }
+    }
+  },
+  {
+    "formatVersion": 12,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": []
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных",
+          "importOrigin": null
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null,
+          "limitMs": null,
+          "manualConfirmation": {
+            "confirmedAt": 1791678000000
+          }
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow",
+        "surfaces": {
+          "widget": true,
+          "notification": false,
+          "overlay": false,
+          "focusSignal": false,
+          "shortcut": false
+        },
+        "focusPlan": {
+          "workMs": 1500000,
+          "breakMs": 300000
+        },
+        "schedule": {
+          "day": {
+            "zonePolicy": "FIXED",
+            "zoneId": "Europe/Berlin",
+            "boundary": "04:00"
+          },
+          "quietShadeEnabled": true
+        }
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": [],
+          "researchOrigins": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": [],
+      "focus": null,
+      "catalogVersion": null,
+      "timerEpoch": 0,
+      "controlBarrier": "",
+      "goals": [],
+      "schedule": {
+        "series": [],
+        "overrides": [],
+        "links": [],
+        "receipts": []
+      },
+      "transfer": {
+        "origins": [],
+        "operations": [],
+        "compactions": []
+      }
+    }
+  },
+  {
+    "formatVersion": 13,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": []
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных",
+          "importOrigin": null
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null,
+          "limitMs": null,
+          "manualConfirmation": {
+            "confirmedAt": 1791678000000
+          }
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow",
+        "surfaces": {
+          "widget": true,
+          "notification": false,
+          "overlay": false,
+          "focusSignal": false,
+          "shortcut": false
+        },
+        "focusPlan": {
+          "workMs": 1500000,
+          "breakMs": 300000
+        },
+        "schedule": {
+          "day": {
+            "zonePolicy": "FIXED",
+            "zoneId": "Europe/Berlin",
+            "boundary": "04:00"
+          },
+          "quietShadeEnabled": true
+        },
+        "longRecordReminder": {
+          "enabled": true,
+          "afterMs": 7200000,
+          "snoozeMs": 900000
+        }
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": [],
+          "researchOrigins": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": [],
+      "focus": null,
+      "catalogVersion": null,
+      "timerEpoch": 0,
+      "controlBarrier": "",
+      "goals": [],
+      "schedule": {
+        "series": [],
+        "overrides": [],
+        "links": [],
+        "receipts": []
+      },
+      "transfer": {
+        "origins": [],
+        "operations": [],
+        "compactions": []
+      }
+    }
+  },
+  {
+    "formatVersion": 14,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": [],
+          "personal": {
+            "aliases": [
+              "учёба"
+            ],
+            "order": 5,
+            "notePolicy": "CLEAR"
+          }
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных",
+          "importOrigin": null
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null,
+          "limitMs": null,
+          "manualConfirmation": {
+            "confirmedAt": 1791678000000
+          }
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow",
+        "surfaces": {
+          "widget": true,
+          "notification": false,
+          "overlay": false,
+          "focusSignal": false,
+          "shortcut": false
+        },
+        "focusPlan": {
+          "workMs": 1500000,
+          "breakMs": 300000
+        },
+        "schedule": {
+          "day": {
+            "zonePolicy": "FIXED",
+            "zoneId": "Europe/Berlin",
+            "boundary": "04:00"
+          },
+          "quietShadeEnabled": true
+        },
+        "longRecordReminder": {
+          "enabled": true,
+          "afterMs": 7200000,
+          "snoozeMs": 900000
+        }
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": [],
+          "researchOrigins": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": [],
+      "focus": null,
+      "catalogVersion": null,
+      "timerEpoch": 0,
+      "controlBarrier": "",
+      "goals": [],
+      "schedule": {
+        "series": [],
+        "overrides": [],
+        "links": [],
+        "receipts": []
+      },
+      "transfer": {
+        "origins": [],
+        "operations": [],
+        "compactions": []
+      }
+    }
+  },
+  {
+    "formatVersion": 15,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": [],
+          "personal": {
+            "aliases": [
+              "учёба"
+            ],
+            "order": 5,
+            "notePolicy": "CLEAR"
+          }
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных",
+          "importOrigin": null
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null,
+          "limitMs": null,
+          "manualConfirmation": {
+            "confirmedAt": 1791678000000
+          }
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow",
+        "surfaces": {
+          "widget": true,
+          "notification": false,
+          "overlay": false,
+          "focusSignal": false,
+          "shortcut": false,
+          "notificationPrivacy": "FULL",
+          "widgetBackgroundAlphaPercent": 37,
+          "overlayChooserBackgroundAlphaPercent": 72
+        },
+        "focusPlan": {
+          "workMs": 1500000,
+          "breakMs": 300000
+        },
+        "schedule": {
+          "day": {
+            "zonePolicy": "FIXED",
+            "zoneId": "Europe/Berlin",
+            "boundary": "04:00"
+          },
+          "quietShadeEnabled": true
+        },
+        "longRecordReminder": {
+          "enabled": true,
+          "afterMs": 7200000,
+          "snoozeMs": 900000
+        },
+        "reportDayStartMinute": 275
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": [],
+          "researchOrigins": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": [],
+      "focus": null,
+      "catalogVersion": null,
+      "timerEpoch": 0,
+      "controlBarrier": "",
+      "goals": [],
+      "schedule": {
+        "series": [],
+        "overrides": [],
+        "links": [],
+        "receipts": []
+      },
+      "transfer": {
+        "origins": [],
+        "operations": [],
+        "compactions": []
+      }
+    }
+  },
+  {
+    "formatVersion": 16,
+    "backupId": "example-backup-1",
+    "asOf": 1791678000000,
+    "data": {
+      "datasetId": "example-dataset-v1",
+      "revision": 4,
+      "cards": [
+        {
+          "id": "card-language",
+          "name": "Испанский",
+          "templateId": "language-v1",
+          "details": {
+            "language": "es",
+            "activity": "listening"
+          },
+          "tags": [
+            "learning"
+          ],
+          "archived": false,
+          "activityTypeId": "language",
+          "facets": [],
+          "personal": {
+            "aliases": [
+              "учёба"
+            ],
+            "order": 5,
+            "notePolicy": "CLEAR"
+          }
+        }
+      ],
+      "favorites": [
+        {
+          "id": "favorite-listening",
+          "label": "Слушать испанский",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          }
+        }
+      ],
+      "sessions": [
+        {
+          "id": "session-1",
+          "status": "STOPPED",
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "note": "Пример без персональных данных",
+          "importOrigin": null
+        }
+      ],
+      "segments": [
+        {
+          "id": "segment-1",
+          "sessionId": "session-1",
+          "start": 1791676200000,
+          "end": 1791677400000,
+          "durationMs": 1200000,
+          "selection": {
+            "cardId": "card-language",
+            "name": "Испанский",
+            "details": {
+              "language": "es",
+              "activity": "listening"
+            },
+            "tags": [
+              "learning"
+            ],
+            "activityTypeId": "language",
+            "ancestorPathAtWrite": [
+              "language"
+            ],
+            "facets": []
+          },
+          "anchor": null,
+          "uncertain": false,
+          "observedUntil": null,
+          "limitMs": null,
+          "manualConfirmation": {
+            "confirmedAt": 1791678000000
+          }
+        }
+      ],
+      "measurements": [
+        {
+          "id": "measurement-1",
+          "fieldId": "pages",
+          "meaningVersion": 1,
+          "unit": "page",
+          "scope": "SESSION",
+          "targetId": "session-1",
+          "value": "20",
+          "source": null
+        }
+      ],
+      "settings": {
+        "reportZone": "Europe/Moscow",
+        "surfaces": {
+          "widget": true,
+          "notification": false,
+          "overlay": false,
+          "focusSignal": false,
+          "shortcut": false,
+          "notificationPrivacy": "FULL",
+          "widgetBackgroundAlphaPercent": 37,
+          "overlayChooserBackgroundAlphaPercent": 72
+        },
+        "focusPlan": {
+          "workMs": 1500000,
+          "breakMs": 300000
+        },
+        "schedule": {
+          "day": {
+            "zonePolicy": "FIXED",
+            "zoneId": "Europe/Berlin",
+            "boundary": "04:00"
+          },
+          "quietShadeEnabled": true
+        },
+        "longRecordReminder": {
+          "enabled": true,
+          "afterMs": 7200000,
+          "snoozeMs": 900000
+        },
+        "reportDayStartMinute": 275
+      },
+      "types": [
+        {
+          "id": "language",
+          "name": "Языковая практика",
+          "archived": false,
+          "parentId": null,
+          "selectable": true,
+          "meaningVersion": 1,
+          "aliases": [],
+          "definition": "",
+          "suggestedAxisIds": [],
+          "suggestedMetricIds": [],
+          "researchOrigins": []
+        }
+      ],
+      "axes": [],
+      "metrics": [],
+      "units": [],
+      "focus": null,
+      "catalogVersion": null,
+      "timerEpoch": 0,
+      "controlBarrier": "",
+      "goals": [],
+      "schedule": {
+        "series": [],
+        "overrides": [],
+        "links": [],
+        "receipts": []
+      },
+      "transfer": {
+        "origins": [],
+        "operations": [],
+        "compactions": []
+      }
+    }
+  }
+]

@@ -1,0 +1,23 @@
+package dev.notai.tracker
+
+import java.io.File
+import org.junit.Test
+import kotlin.test.assertEquals
+
+class LegacyMatrixTest {
+    @Test fun produceWithOriginalExporter() {
+        val card = Card(id = "matrix-card",name = "Пример",templateId = "language-v1",partOf = "language")
+        val selection = card.classification()
+        val data = Dataset(datasetId = "matrix-data",revision = 4,cards = listOf(card),
+            favorites = listOf(Favorite("matrix-favorite","Пример",selection)),
+            sessions = listOf(Session("matrix-session",SessionStatus.STOPPED,selection,"Синтетическая заметка")),
+            segments = listOf(Segment("matrix-segment","matrix-session",1000,2000,1000,selection)),
+            measurements = listOf(Measurement("matrix-measurement","pages",1,"page",Scope.SESSION,"matrix-session",20)),
+            settings = Settings("Europe/Moscow"))
+        val tracker = Tracker(MemoryStore(data),FakeClock(wall = 3000))
+        val archive = Backups(tracker,MemoryRollback()).export()
+        val preview = Backups(Tracker(MemoryStore(),FakeClock(wall = 3000)),MemoryRollback()).prepare(archive)
+        assertEquals("matrix-data",preview.datasetId)
+        File(System.getenv("TRACKER_MATRIX_DIR"),"original-v1.json").writeText(archive,Charsets.UTF_8)
+    }
+}

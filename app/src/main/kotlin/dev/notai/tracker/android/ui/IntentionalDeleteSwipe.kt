@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon as M3Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -73,7 +74,8 @@ val LocalSwipeReveal = staticCompositionLocalOf<SwipeReveal?> { null }
     DisposableEffect(key) { onDispose { if (reveal.open == key) reveal.open = null } }
     val deleteLabel = stringResource(R.string.editorial_tracker_draft_98c2a48d88776822811d_v0)
     Box(modifier.onSizeChanged { width = it.width }) {
-        if (offset < 0f) Box(Modifier.matchParentSize().padding(vertical = 4.dp).padding(end = 12.dp), contentAlignment = Alignment.CenterEnd) {
+        // The gesture always moves the row left, so its action must remain on the physical right in RTL as well.
+        if (offset < 0f) Box(Modifier.matchParentSize().padding(vertical = 4.dp).absolutePadding(right = 12.dp), contentAlignment = AbsoluteAlignment.CenterRight) {
             val shown = (-offset / action).coerceIn(0f, 1f)
             Row(Modifier.width(88.dp).fillMaxHeight().graphicsLayer { alpha = shown; scaleX = 0.85f + 0.15f * shown; scaleY = 0.85f + 0.15f * shown }
                 .clip(RoundedCornerShape(14.dp)).background(c.danger)

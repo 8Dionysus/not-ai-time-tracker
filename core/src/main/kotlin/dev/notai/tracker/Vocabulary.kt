@@ -180,10 +180,11 @@ private fun editorialReplacement(previous: Any,entry: Any,revisions: List<Catalo
 internal fun Dataset.mergeCatalog(incoming: VocabularyData,policy: CatalogInstallPolicy = CatalogInstallPolicy.STRICT,
     revisions: List<CatalogEditorialRevision> = emptyList()): Pair<Dataset,CatalogImportReport> {
     val outcomes = mutableListOf<CatalogEntryOutcome>()
-    // A retired type stays live wherever the user's own data names it. The check reads every record outside the vocabulary,
-    // so a new kind of reference can never be missed; it runs only when the catalog actually retires something.
+    // A retired type stays live wherever the user's own data names it, including as a custom type's parent.
+    // Read every record outside the vocabulary so a new kind of reference cannot be missed.
     val references by lazy { codec.encodeToString(Dataset.serializer(),copy(types = emptyList(),axes = emptyList(),metrics = emptyList(),units = emptyList())) }
-    val inUse: (String)->Boolean = { id -> references.contains(kotlinx.serialization.json.JsonPrimitive(id).toString()) }
+    val parentIds by lazy { types.mapNotNull { it.parentId }.toSet() }
+    val inUse: (String)->Boolean = { id -> id in parentIds || references.contains(kotlinx.serialization.json.JsonPrimitive(id).toString()) }
     fun <T> merge(kind: String,old: List<T>,fresh: List<T>,key: (T)->Pair<String,Int?>): List<T> {
         val keys = fresh.map(key)
         ensure(keys.distinct().size == keys.size,"Duplicate $kind key in incoming catalog")

@@ -130,6 +130,16 @@ class CatalogEditorialMoveTest {
         install(tracker,files(retired(),"2",retire()))
         assertFalse(tracker.data().types.single { it.id == "leaf" }.archived)
     }
+    @Test fun aRetiredTypeWithAPersonalChildStaysBrowsable() {
+        val tracker = Tracker(MemoryStore(),FakeClock())
+        install(tracker,files(v1(),"1",emptyList()))
+        val child = ActivityType("personal.child","My activity",parentId = "leaf")
+        tracker.saveType(tracker.snapshot().token,child)
+        assertTrue(install(tracker,files(retired(),"2",retire())).canApply)
+        assertFalse(tracker.data().types.single { it.id == "leaf" }.archived)
+        assertEquals(listOf(child),tracker.data().children("leaf"))
+        assertTrue(tracker.data().children("root.code").any { it.id == "leaf" })
+    }
     @Test fun withoutTheReviewedStepAnInstalledTypeIsNotRetired() {
         val tracker = Tracker(MemoryStore(),FakeClock())
         install(tracker,files(v1(),"1",emptyList()))

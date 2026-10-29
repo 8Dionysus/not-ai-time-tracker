@@ -1,0 +1,20 @@
+package dev.notai.tracker
+
+import java.io.File
+import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+
+class LegacyMatrixTest {
+    @Test fun compareFirstFormatBeforePreview() {
+        val target = Tracker(MemoryStore(),FakeClock(wall = 3000))
+        val before = target.data()
+        val backup = Backups(target,MemoryRollback())
+        val input = File(System.getenv("TRACKER_MATRIX_DIR"),"original-v1.json").readText(Charsets.UTF_8)
+        val error = assertFailsWith<CoreError> { backup.prepare(input) }
+        assertEquals(ErrorCode.UNSUPPORTED_IMPORT,error.code)
+        assertEquals("Malformed or unsupported JSON",error.message)
+        assertEquals(before,target.data())
+        File(System.getenv("TRACKER_MATRIX_DIR"),"v1-first-failure.txt").writeText("68c5947: rejected before preview: ${error.message}\n")
+    }
+}

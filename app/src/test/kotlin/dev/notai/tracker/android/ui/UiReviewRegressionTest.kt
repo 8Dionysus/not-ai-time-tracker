@@ -88,6 +88,17 @@ class UiReviewRegressionTest {
     }
     private fun at(text: String) = Instant.parse(text).toEpochMilli()
 
+    @Test fun restoreProviderFailureDoesNotExposeItsPrivateDiagnostic() = runBlocking {
+        val f = fixture(FakeClock());val before = f.tracker.data()
+        val uri = android.net.Uri.parse("content://synthetic.restore/unavailable")
+        shadowOf(RuntimeEnvironment.getApplication().contentResolver).registerInputStreamSupplier(uri) {
+            throw java.io.FileNotFoundException("private-provider-detail")
+        }
+        assertNull(f.vm.prepareRestore(uri))
+        pump { f.notices.isNotEmpty() }
+        assertEquals(before,f.tracker.data())
+        assertTrue(f.notices.none { it.text.contains("private-provider-detail") })
+    }
     @Test fun recoverySingleDeleteAcknowledgesCommitAndUndoKeepsLaterIndependentEdits() = runBlocking {
         val f = fixture(FakeClock());val t = f.tracker
         t.manual(t.snapshot().token,f.clock.wall-4000,f.clock.wall-3000,Classification(name = "Original"),"Keep note")

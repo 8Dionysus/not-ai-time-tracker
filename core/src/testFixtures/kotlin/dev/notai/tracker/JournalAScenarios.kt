@@ -8,6 +8,8 @@ import kotlinx.serialization.json.*
 abstract class JournalAScenarioContract {
     protected abstract fun createJournalStore(): StateStore
     protected open fun reopenJournalStore(store: StateStore): StateStore = store
+    private val originalV1Builtins = listOf(ActivityType("language","Языковая практика"),ActivityType("fitness","Тренировка"),
+        ActivityType("reading","Чтение"),ActivityType("work","Работа"),ActivityType("rest","Отдых"))
     @Test fun ordinaryCardCreationRollsBackRefusedModesAndPreservesDraftLabelEarlierAndFocus() {
         val clock = FakeClock(10000);val t = Tracker(createJournalStore(),clock)
         val card = Card("ordinary-created","Ordinary created")
@@ -86,6 +88,125 @@ abstract class JournalAScenarioContract {
         t.createCardForChoice(start.token,start.timerTarget!!,card,ChoiceApplication.START)
         assertEquals(card.id,t.snapshot().session!!.selection.cardId)
         assertEquals(1,t.data().cards.count { it.id == card.id })
+    }
+    @Test fun originalV1ExporterWithoutTypesRestoresHistory() {
+        // Synthetic data in the exact schema of the first exporter (2664dd9).
+        // The later v1 fixture includes types, which that exporter did not write.
+        val directory = java.io.File(System.getProperty("tracker.samples"))
+        val old = directory.resolve("history-v1-initial.json").readText()
+        val laterV1 = Backups.decode(directory.resolve("history-v1.json").readText())
+        val expected = laterV1.copy(data = laterV1.data.copy(types = originalV1Builtins))
+        val streamed = StreamingBackup.read { old.byteInputStream() }
+        assertEquals(expected,streamed)
+        assertEquals(expected,Backups.decode(old))
+
+        val target = Tracker(createJournalStore(),FakeClock())
+        target.saveCard(target.snapshot().token,Card(name = "Local before restore"))
+        val before = target.data();val rollback = MemoryRollback();val backups = Backups(target,rollback)
+        val preview = backups.prepare { old.byteInputStream() }
+        assertEquals(before,target.data())
+        assertEquals(expected.backupId,preview.backupId)
+        assertEquals(expected.data.settings,preview.settings)
+        val result = backups.apply(preview)
+        val restored = Tracker(reopenJournalStore(target.store),FakeClock()).data()
+        assertEquals(expected.data.copy(revision = restored.revision,controlBarrier = restored.controlBarrier),restored)
+        assertEquals(before,rollback.readSnapshot(result.rollbackReference).data)
+    }
+    @Test fun originalV1WithoutTypeDefinitionsNeverInventsCustomTypes() {
+        val directory = java.io.File(System.getProperty("tracker.samples"))
+        val old = directory.resolve("history-v1-initial.json").readText()
+        val noTypes = old.replace("\"partOf\": \"language\"","\"partOf\": null")
+        val unclassified = StreamingBackup.read { noTypes.byteInputStream() }
+        assertEquals(originalV1Builtins,unclassified.data.types)
+        assertEquals(unclassified,Backups.decode(noTypes))
+        assertEquals("example-dataset-v1",unclassified.data.datasetId)
+        assertEquals("Europe/Moscow",unclassified.data.settings.reportZone)
+        for((id,name) in listOf("language" to "Языковая практика","fitness" to "Тренировка",
+            "reading" to "Чтение","work" to "Работа","rest" to "Отдых")) {
+            val original = old.replace("\"partOf\": \"language\"","\"partOf\": \"$id\"")
+            val decoded = StreamingBackup.read { original.byteInputStream() }
+            assertEquals(originalV1Builtins,decoded.data.types)
+            assertEquals(name,decoded.data.types.single { it.id == id }.name)
+            assertEquals(decoded,Backups.decode(original))
+        }
+        val root = codec.parseToJsonElement(old).jsonObject
+        val emptyData = root.getValue("data").jsonObject.toMutableMap()
+        for(field in listOf("cards","favorites","sessions","segments","measurements")) emptyData[field] = JsonArray(emptyList())
+        val empty = JsonObject(root+("data" to JsonObject(emptyData))).toString()
+        val emptyBackup = StreamingBackup.read { empty.byteInputStream() }
+        assertEquals(originalV1Builtins,emptyBackup.data.types)
+        assertEquals(emptyBackup,Backups.decode(empty))
+        val emptyTarget = Tracker(createJournalStore(),FakeClock());val emptyRollback = MemoryRollback()
+        val emptyBefore = emptyTarget.data();val emptyBackups = Backups(emptyTarget,emptyRollback)
+        val emptyPreview = emptyBackups.prepare { empty.byteInputStream() }
+        assertEquals(emptyBefore,emptyTarget.data())
+        val emptyResult = emptyBackups.apply(emptyPreview)
+        val emptyRestored = Tracker(reopenJournalStore(emptyTarget.store),FakeClock()).data()
+        assertEquals(originalV1Builtins,emptyRestored.types)
+        assertEquals(emptyBackup.data.settings,emptyRestored.settings)
+        assertEquals(emptyBackup.data.datasetId,emptyRestored.datasetId)
+        assertEquals(emptyBefore,emptyRollback.readSnapshot(emptyResult.rollbackReference).data)
+
+        val custom = old.replace("\"partOf\": \"language\"","\"partOf\": \"private-custom-type\"")
+        val target = Tracker(createJournalStore(),FakeClock());val backup = Backups(target,MemoryRollback())
+        val before = target.data()
+        for(read in listOf<() -> RestorePreview>({ backup.prepare(custom) },{ backup.prepare { custom.byteInputStream() } })) {
+            val error = assertFailsWith<CoreError> { read() }
+            assertEquals(ErrorCode.UNSUPPORTED_IMPORT,error.code)
+            assertFalse(error.message.orEmpty().contains("private-custom-type"))
+            assertEquals(before,target.data())
+        }
+        val v2 = codec.parseToJsonElement(directory.resolve("history-v2.json").readText()).jsonObject
+        val withoutTypes = JsonObject(v2+("data" to JsonObject(v2.getValue("data").jsonObject-"types"))).toString()
+        assertFailsWith<CoreError> { backup.prepare(withoutTypes) }
+        assertFailsWith<CoreError> { backup.prepare { withoutTypes.byteInputStream() } }
+        assertEquals(before,target.data())
+    }
+    @Test fun backupReadErrorsDistinguishEncodingStructureAndIoWithoutPrivateContent() {
+        val text = java.io.File(System.getProperty("tracker.samples"),"history-v1.json").readText()
+        val secret = "private-diagnostic-marker"
+        val badRecord = text.replace("\"status\": \"STOPPED\"","\"status\": \"$secret\"")
+        val error = assertFailsWith<CoreError> { StreamingBackup.read { badRecord.byteInputStream() } }
+        assertEquals(ErrorCode.UNSUPPORTED_IMPORT,error.code)
+        assertEquals("Backup JSON has invalid or unsupported fields",error.message)
+        assertFalse(error.message.orEmpty().contains(secret))
+        val badKey = text.replaceFirst("\"formatVersion\"","\"$secret\"")
+        assertFalse(assertFailsWith<CoreError> { StreamingBackup.read { badKey.byteInputStream() } }.message.orEmpty().contains(secret))
+        val invalidUtf8 = byteArrayOf(0xC3.toByte(),0x28)
+        val encoding = assertFailsWith<CoreError> { StreamingBackup.read { invalidUtf8.inputStream() } }
+        assertEquals(ErrorCode.UNSUPPORTED_IMPORT,encoding.code)
+        assertEquals("Backup is not valid UTF-8",encoding.message)
+        val io = assertFailsWith<CoreError> { StreamingBackup.read { throw java.io.IOException(secret) } }
+        assertEquals(ErrorCode.STORAGE,io.code)
+        assertFalse(io.message.orEmpty().contains(secret))
+        assertFailsWith<java.util.concurrent.CancellationException> { StreamingBackup.read { throw java.util.concurrent.CancellationException(secret) } }
+        assertFailsWith<CoreError> { StreamingBackup.read { text.dropLast(4).byteInputStream() } }
+    }
+    @Test fun historicalExporterSchemasRestoreIdentitiesAndSettings() {
+        // Fixtures reproduce the emitted fields at the documented historical commits,
+        // including non-default preferences where those versions supported them.
+        val file = java.io.File(System.getProperty("tracker.samples"),"backup-schema-versions.json")
+        val archives = codec.parseToJsonElement(file.readText()).jsonArray
+        assertEquals((2..CURRENT_BACKUP_FORMAT).toList(),archives.map { it.jsonObject.getValue("formatVersion").jsonPrimitive.int })
+        for(archive in archives) {
+            val version = archive.jsonObject.getValue("formatVersion").jsonPrimitive.int
+            val text = archive.toString();val expected = Backups.decode(text)
+            assertEquals(expected,StreamingBackup.read { text.byteInputStream() },"Streaming version $version")
+            assertEquals("example-dataset-v1",expected.data.datasetId)
+            assertEquals("card-language",expected.data.cards.single().id)
+            assertEquals("session-1",expected.data.sessions.single().id)
+            assertEquals("segment-1",expected.data.segments.single().id)
+            assertEquals("measurement-1",expected.data.measurements.single().id)
+            assertEquals("Europe/Moscow",expected.data.settings.reportZone)
+            val target = Tracker(createJournalStore(),FakeClock());val rollback = MemoryRollback();val backups = Backups(target,rollback)
+            val before = target.data();val preview = backups.prepare { text.byteInputStream() }
+            assertEquals(before,target.data(),"Preview version $version")
+            assertEquals(expected.data.settings,preview.settings)
+            val result = backups.apply(preview)
+            val restored = Tracker(reopenJournalStore(target.store),FakeClock()).data()
+            assertEquals(expected.data.copy(revision = restored.revision,controlBarrier = restored.controlBarrier),restored,"Restore version $version")
+            assertEquals(before,rollback.readSnapshot(result.rollbackReference).data,"Rollback version $version")
+        }
     }
     @Test fun bothBackupReadersKeepEveryLegacyVersionAndPresentationDefaults() {
         val directory = java.io.File(System.getProperty("tracker.samples"))

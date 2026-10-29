@@ -13,7 +13,8 @@ import java.io.InputStream
  * Restore is a separate OpenDocument -> prepare -> explicit Backups.apply(preview) flow; preparing
  * never replaces data, apply verifies rollback and uses the preview's original token atomically.
  * Do not retain URI grants, enable Auto Backup or add network permissions for this one-shot flow.
- * The SAF restore boundary shares the core byte limit, strict UTF-8 and BOM handling.
+ * The staged SAF restore uses the streaming reader: strict UTF-8, optional BOM and a
+ * per-record bound, without the whole-file limit of the small in-memory helper below.
  */
 internal object BackupDocuments {
     fun prepare(context: android.content.Context,input: InputStream,backups: Backups): RestorePreview {

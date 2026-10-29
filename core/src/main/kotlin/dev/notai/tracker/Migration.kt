@@ -2,6 +2,22 @@ package dev.notai.tracker
 
 import kotlinx.serialization.json.*
 
+/** The very first v1 exporter (2664dd9) had no type table. Its five built-in
+ * template IDs and labels were available independently of saved records.
+ * Do not invent a definition for a custom partOf value: an archive that needs
+ * one cannot be restored without more information. */
+internal fun originalV1Types(data: Dataset): List<ActivityType> {
+    val referenced = (data.cards.mapNotNull { it.activityTypeId } +
+        data.favorites.mapNotNull { it.selection.activityTypeId } +
+        data.sessions.mapNotNull { it.selection.activityTypeId } +
+        data.segments.mapNotNull { it.selection.activityTypeId }).toSet()
+    val builtins = listOf(ActivityType("language","Языковая практика"),ActivityType("fitness","Тренировка"),
+        ActivityType("reading","Чтение"),ActivityType("work","Работа"),ActivityType("rest","Отдых"))
+    ensure(referenced.all { id -> builtins.any { it.id == id } },
+        "Legacy backup references an activity type without a definition",ErrorCode.UNSUPPORTED_IMPORT)
+    return builtins
+}
+
 /** Only the old flat link is known. Preserve it as a one-node historical path, never infer a new parent. */
 fun migrateV1Payload(json: String): String = migrateV1(codec.parseToJsonElement(json)).toString()
 private fun migrateV1(element: JsonElement): JsonElement = when(element) {
@@ -55,9 +71,16 @@ internal fun decodeBackupVersion(json: String): Backup {
         3 -> codec.decodeFromJsonElement<Backup>(root)
         2 -> codec.decodeFromJsonElement<Backup>(root)
         1 -> {
+            val missingTypes = "types" !in root.getValue("data").jsonObject
             val migrated = migrateV1(root).jsonObject.toMutableMap()
             migrated["formatVersion"] = JsonPrimitive(CURRENT_BACKUP_FORMAT)
-            codec.decodeFromJsonElement<Backup>(JsonObject(migrated))
+            if(missingTypes) {
+                val data = migrated.getValue("data").jsonObject.toMutableMap()
+                data["types"] = JsonArray(emptyList())
+                migrated["data"] = JsonObject(data)
+            }
+            val decoded = codec.decodeFromJsonElement<Backup>(JsonObject(migrated))
+            if(missingTypes) decoded.copy(data = decoded.data.copy(types = originalV1Types(decoded.data))) else decoded
         }
         else -> fail(ErrorCode.UNSUPPORTED_IMPORT,"Unsupported backup version")
     }

@@ -26,7 +26,7 @@ import java.nio.file.StandardCopyOption
 @Config(sdk = [35])
 class AutomaticBackupAndroidTest {
     private class Provider: ContentProvider() {
-        var writable = true;var available = true
+        var writable = true;var available = true;var mime = "application/json"
         override fun onCreate() = true
         override fun query(uri: Uri,projection: Array<out String>?,selection: String?,args: Array<out String>?,sort: String?): android.database.Cursor {
             if(!available) throw java.io.FileNotFoundException("synthetic offline")
@@ -40,7 +40,7 @@ class AutomaticBackupAndroidTest {
             }.toTypedArray()
             return MatrixCursor(columns).apply { addRow(values) }
         }
-        override fun getType(uri: Uri) = "application/json"
+        override fun getType(uri: Uri) = mime
         override fun insert(uri: Uri,values: ContentValues?): Uri? = null
         override fun delete(uri: Uri,selection: String?,args: Array<out String>?) = 0
         override fun update(uri: Uri,values: ContentValues?,selection: String?,args: Array<out String>?) = 0
@@ -89,6 +89,47 @@ class AutomaticBackupAndroidTest {
             val preview = restore.prepare { output.toByteArray().inputStream() };restore.apply(preview)
             assertEquals(original.types,target.data().types);assertEquals(original.sessions,target.data().sessions);assertEquals(original.settings,target.data().settings)
             assertFalse(rollback.saved.isEmpty())
+        } finally { databases.forEach { it.close() };DirectoryDurability.sync = sync;DirectoryDurability.rename = rename }
+    }
+    @Test fun restoreStagesOriginalV1ContentUrisWithoutDependingOnFilename() = kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) {
+        val context = RuntimeEnvironment.getApplication();val sync = DirectoryDurability.sync;val rename = DirectoryDurability.rename
+        DirectoryDurability.sync = { d -> java.nio.channels.FileChannel.open(d.toPath(),java.nio.file.StandardOpenOption.READ).use { it.force(true) } }
+        DirectoryDurability.rename = { a,b -> Files.move(a.toPath(),b.toPath(),StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);Unit }
+        val databases = mutableListOf<TrackerDatabase>()
+        fun store() = RoomStore(TrackerDatabase.open(context,"old-restore-${newId()}.db").also { databases += it })
+        try {
+            val root = java.io.File(System.getProperty("tracker.samples"))
+            val bytes = root.resolve("history-v1-initial.json").readBytes()
+            val laterV1 = Backups.decode(root.resolve("history-v1.json").readText())
+            val builtins = listOf(ActivityType("language","Языковая практика"),ActivityType("fitness","Тренировка"),
+                ActivityType("reading","Чтение"),ActivityType("work","Работа"),ActivityType("rest","Отдых"))
+            val expected = laterV1.copy(data = laterV1.data.copy(types = builtins))
+            val resolver = shadowOf(context.contentResolver)
+            val provider = Provider().apply { mime = "application/octet-stream" }
+            provider.attachInfo(context,ProviderInfo().apply { authority = "synthetic.restore";exported = true })
+            ShadowContentResolver.registerProviderInternal("synthetic.restore",provider)
+            val variants = listOf(
+                Uri.parse("content://synthetic.restore/without-extension") to bytes,
+                Uri.parse("content://synthetic.restore/archive.bin") to (byteArrayOf(0xEF.toByte(),0xBB.toByte(),0xBF.toByte())+bytes))
+            for((uri,content) in variants) {
+                resolver.registerInputStreamSupplier(uri) { content.inputStream() }
+                assertEquals("application/octet-stream",context.contentResolver.getType(uri))
+                val target = Tracker(store(),FakeClock());val rollback = MemoryRollback();val backup = Backups(target,rollback)
+                val before = target.data()
+                val preview = requireNotNull(context.contentResolver.openInputStream(uri)).use { BackupDocuments.prepare(context,it,backup) }
+                assertEquals(before,target.data());assertEquals(expected.backupId,preview.backupId)
+                val result = backup.apply(preview)
+                assertEquals(expected.data.copy(revision = target.data().revision,controlBarrier = target.data().controlBarrier),target.data())
+                assertEquals(before,rollback.readSnapshot(result.rollbackReference).data)
+            }
+            val truncated = Uri.parse("content://synthetic.restore/truncated.json")
+            resolver.registerInputStreamSupplier(truncated) { bytes.copyOf(bytes.size-7).inputStream() }
+            val target = Tracker(store(),FakeClock());val before = target.data()
+            try {
+                requireNotNull(context.contentResolver.openInputStream(truncated)).use { BackupDocuments.prepare(context,it,Backups(target,MemoryRollback())) }
+                fail("Truncated backup must not be restored")
+            } catch(e: CoreError) { assertEquals(ErrorCode.UNSUPPORTED_IMPORT,e.code) }
+            assertEquals(before,target.data())
         } finally { databases.forEach { it.close() };DirectoryDurability.sync = sync;DirectoryDurability.rename = rename }
     }
     @Test fun deviceLocalJournalSurvivesNewControllerAndJobsAreOptInUniqueAndCancellable() {

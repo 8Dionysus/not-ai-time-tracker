@@ -614,6 +614,8 @@ class UiScreensTest {
             fun showRow() {
                 compose.waitUntil(5_000) { vm.home.value?.days?.any { day -> day.records.any { it.sessionId == record.id } } == true }
                 compose.onNode(hasScrollAction()).performScrollToKey("$today:${record.id}")
+                // The restored projection can arrive before LazyColumn has composed its keyed row.
+                compose.waitUntil(5_000) { compose.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty() }
                 row().performScrollTo()
             }
             row().performScrollTo()

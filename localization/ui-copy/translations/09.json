@@ -1,0 +1,1456 @@
+{
+"strings": {
+"t_53e131e48c": {
+"en": "“%1$s” now starts with one tap",
+"es": "«%1$s» ya se inicia con un toque",
+"fr": "« %1$s » se lance désormais d’un geste",
+"pt-BR": "“%1$s” agora começa com um toque",
+"de": "„%1$s“ startet jetzt mit einem Tipp",
+"it": "«%1$s» ora si avvia con un tocco",
+"ar": "«%1$s» يبدأ الآن بنقرة واحدة",
+"zh-Hans": "“%1$s”现在可一键开始",
+"ja": "「%1$s」はワンタップで開始できます",
+"ko": "“%1$s”을 이제 한 번에 시작해요",
+"hi": "“%1$s” अब एक टैप में शुरू होगा"
+},
+"t_58d3c60b00": {
+"en": "Removed from today’s plan",
+"es": "Quitado del plan de hoy",
+"fr": "Retiré du plan du jour",
+"pt-BR": "Removido do plano de hoje",
+"de": "Aus dem heutigen Plan entfernt",
+"it": "Tolto dal piano di oggi",
+"ar": "أُزيل من خطة اليوم",
+"zh-Hans": "已从今天的计划中移除",
+"ja": "今日の計画から外しました",
+"ko": "오늘 계획에서 뺐어요",
+"hi": "आज की योजना से हटाया गया"
+},
+"t_5b010e144f": {
+"en": "Couldn’t determine the chosen icon. Choose an available option",
+"es": "No se pudo identificar el icono elegido. Elige una opción disponible",
+"fr": "Impossible d’identifier l’icône choisie. Choisissez une option disponible",
+"pt-BR": "Não foi possível identificar o ícone escolhido. Escolha uma opção disponível",
+"de": "Das gewählte Symbol ließ sich nicht bestimmen. Wähle eine verfügbare Option",
+"it": "Impossibile riconoscere l’icona scelta. Scegli un’opzione disponibile",
+"ar": "تعذّر تحديد الأيقونة المختارة. اختر خيارًا متاحًا",
+"zh-Hans": "无法确定所选图标。请选择可用选项",
+"ja": "選んだアイコンを判別できませんでした。使える候補を選んでください",
+"ko": "고른 아이콘을 확인하지 못했어요. 사용 가능한 항목을 고르세요",
+"hi": "चुना आइकन पहचाना नहीं जा सका। उपलब्ध विकल्प चुनें"
+},
+"t_6492631c6e": {
+"en": "Removed from the plan",
+"es": "Quitado del plan",
+"fr": "Retiré du plan",
+"pt-BR": "Removido do plano",
+"de": "Aus dem Plan entfernt",
+"it": "Tolto dal piano",
+"ar": "أُزيل من الخطة",
+"zh-Hans": "已从计划中移除",
+"ja": "計画から外しました",
+"ko": "계획에서 뺐어요",
+"hi": "योजना से हटाया गया"
+},
+"t_6b08862cb2": {
+"en": "Couldn’t check the app icon",
+"es": "No se pudo comprobar el icono de la app",
+"fr": "Impossible de vérifier l’icône de l’app",
+"pt-BR": "Não foi possível verificar o ícone do app",
+"de": "App-Symbol ließ sich nicht prüfen",
+"it": "Impossibile verificare l’icona dell’app",
+"ar": "تعذّر التحقق من أيقونة التطبيق",
+"zh-Hans": "无法检查应用图标",
+"ja": "アプリのアイコンを確認できませんでした",
+"ko": "앱 아이콘을 확인하지 못했어요",
+"hi": "ऐप आइकन जाँचा नहीं जा सका"
+},
+"t_6ea005bd2d": {
+"en": "Gap recorded",
+"es": "Intervalo registrado",
+"fr": "Créneau enregistré",
+"pt-BR": "Intervalo registrado",
+"de": "Lücke erfasst",
+"it": "Intervallo registrato",
+"ar": "سُجّلت الفجوة",
+"zh-Hans": "空档已记录",
+"ja": "空き時間を記録しました",
+"ko": "빈 시간을 기록했어요",
+"hi": "अंतराल दर्ज हुआ"
+},
+"t_78fb4788c6": {
+"en": "Added %1$s",
+"es": "Añadidos %1$s",
+"fr": "Ajouté : %1$s",
+"pt-BR": "Adicionados %1$s",
+"de": "Hinzugefügt: %1$s",
+"it": "Aggiunte %1$s",
+"ar": "أُضيف %1$s",
+"zh-Hans": "已添加 %1$s",
+"ja": "%1$sを追加しました",
+"ko": "%1$s 추가됨",
+"hi": "%1$s जोड़ी गईं"
+},
+"t_7c379e8e5c": {
+"en": "Report saved",
+"es": "Informe guardado",
+"fr": "Rapport enregistré",
+"pt-BR": "Relatório salvo",
+"de": "Bericht gespeichert",
+"it": "Report salvato",
+"ar": "حُفظ التقرير",
+"zh-Hans": "报告已保存",
+"ja": "レポートを保存しました",
+"ko": "보고서를 저장했어요",
+"hi": "रिपोर्ट सहेजी गई"
+},
+"t_7cc6025206": {
+"en": "Done: %1$s for quick start",
+"es": "Listo: %1$s para inicio rápido",
+"fr": "C’est fait : %1$s en démarrage rapide",
+"pt-BR": "Pronto: %1$s para início rápido",
+"de": "Fertig: %1$s für den Schnellstart",
+"it": "Fatto: %1$s per l’avvio rapido",
+"ar": "تم: %1$s للبدء السريع",
+"zh-Hans": "完成：%1$s 用于快速开始",
+"ja": "完了：クイック開始に%1$s",
+"ko": "완료: 빠른 시작에 %1$s",
+"hi": "हो गया: त्वरित शुरुआत के लिए %1$s"
+},
+"t_80072ed701": {
+"en": "No own activity",
+"es": "Sin actividad propia",
+"fr": "Sans activité perso",
+"pt-BR": "Sem atividade própria",
+"de": "Ohne eigene Aktivität",
+"it": "Senza attività personale",
+"ar": "بلا نشاط خاص",
+"zh-Hans": "无自定义活动",
+"ja": "自分の活動なし",
+"ko": "내 활동 없음",
+"hi": "अपनी गतिविधि नहीं"
+},
+"t_81129d8255": {
+"en": "Goal changed",
+"es": "Objetivo cambiado",
+"fr": "Objectif modifié",
+"pt-BR": "Meta alterada",
+"de": "Ziel geändert",
+"it": "Obiettivo modificato",
+"ar": "تغيّر الهدف",
+"zh-Hans": "目标已更改",
+"ja": "目標を変更しました",
+"ko": "목표를 바꿨어요",
+"hi": "लक्ष्य बदला गया"
+},
+"t_8532eff044": {
+"en": "Cardio",
+"es": "Cardio",
+"fr": "Cardio",
+"pt-BR": "Cardio",
+"de": "Cardio",
+"it": "Cardio",
+"ar": "تمارين القلب",
+"zh-Hans": "有氧运动",
+"ja": "有酸素運動",
+"ko": "유산소",
+"hi": "कार्डियो"
+},
+"t_86d85a0147": {
+"en": "Report time zone: %1$s",
+"es": "Zona horaria de informes: %1$s",
+"fr": "Fuseau des rapports : %1$s",
+"pt-BR": "Fuso dos relatórios: %1$s",
+"de": "Berichtszeitzone: %1$s",
+"it": "Fuso dei report: %1$s",
+"ar": "المنطقة الزمنية للتقارير: %1$s",
+"zh-Hans": "报告时区：%1$s",
+"ja": "レポートのタイムゾーン：%1$s",
+"ko": "보고서 시간대: %1$s",
+"hi": "रिपोर्ट का समय क्षेत्र: %1$s"
+},
+"t_88f778367b": {
+"en": "Writing",
+"es": "Escritura",
+"fr": "Écriture",
+"pt-BR": "Escrita",
+"de": "Schreiben",
+"it": "Scrittura",
+"ar": "الكتابة",
+"zh-Hans": "写作",
+"ja": "執筆",
+"ko": "글쓰기",
+"hi": "लेखन"
+},
+"t_8b78a6e1d6": {
+"en": "Removed from favorites along with duplicates",
+"es": "Quitado de favoritos junto con sus duplicados",
+"fr": "Retiré des favoris avec les doublons",
+"pt-BR": "Removido dos favoritos com os repetidos",
+"de": "Mitsamt Doppelten aus Favoriten entfernt",
+"it": "Tolto dai preferiti insieme ai doppioni",
+"ar": "أُزيل من المفضلة مع المكرر",
+"zh-Hans": "已从收藏中移除（含重复项）",
+"ja": "重複も含めてお気に入りから外しました",
+"ko": "중복 항목과 함께 즐겨찾기에서 뺐어요",
+"hi": "दोहराव सहित पसंदीदा से हटाया गया"
+},
+"t_989911f31c": {
+"en": "Rest",
+"es": "Descanso",
+"fr": "Repos",
+"pt-BR": "Descanso",
+"de": "Erholung",
+"it": "Riposo",
+"ar": "الراحة",
+"zh-Hans": "休息",
+"ja": "休息",
+"ko": "휴식",
+"hi": "आराम"
+},
+"t_99cbe96929": {
+"en": ", duplicates skipped",
+"es": ", se omitieron duplicados",
+"fr": ", doublons ignorés",
+"pt-BR": ", repetidos ignorados",
+"de": ", Doppelte übersprungen",
+"it": ", doppioni saltati",
+"ar": "، وتُخطي المكرر",
+"zh-Hans": "，已跳过重复项",
+"ja": "、重複はスキップ",
+"ko": ", 중복은 건너뜀",
+"hi": ", दोहराव छोड़े गए"
+},
+"t_a9a3e50e7d": {
+"en": "Entry start moved",
+"es": "Inicio del registro movido",
+"fr": "Début de l’entrée déplacé",
+"pt-BR": "Início do registro movido",
+"de": "Beginn des Eintrags verschoben",
+"it": "Inizio della voce spostato",
+"ar": "نُقلت بداية السجل",
+"zh-Hans": "条目开始时间已调整",
+"ja": "記録の開始を移動しました",
+"ko": "기록 시작을 옮겼어요",
+"hi": "प्रविष्टि की शुरुआत खिसकाई गई"
+},
+"t_af39297b7b": {
+"en": ", some time is unknown",
+"es": ", hay tiempo desconocido",
+"fr": ", il y a du temps inconnu",
+"pt-BR": ", há tempo desconhecido",
+"de": ", es gibt unbekannte Zeit",
+"it": ", c’è tempo sconosciuto",
+"ar": "، يوجد وقت غير معروف",
+"zh-Hans": "，有未知时间",
+"ja": "、不明な時間あり",
+"ko": ", 모르는 시간 있음",
+"hi": ", कुछ समय अज्ञात है"
+},
+"t_b4770c7e71": {
+"en": "The day starts at %1$s:%2$s",
+"es": "El día empieza a las %1$s:%2$s",
+"fr": "La journée commence à %1$s:%2$s",
+"pt-BR": "O dia começa às %1$s:%2$s",
+"de": "Der Tag beginnt um %1$s:%2$s",
+"it": "La giornata inizia alle %1$s:%2$s",
+"ar": "يبدأ اليوم في %1$s:%2$s",
+"zh-Hans": "一天从 %1$s:%2$s 开始",
+"ja": "1日は%1$s:%2$sに始まります",
+"ko": "하루는 %1$s:%2$s에 시작해요",
+"hi": "दिन %1$s:%2$s बजे शुरू होता है"
+},
+"t_b727ee7aba": {
+"en": "Couldn’t take this file. Try another one, up to 64 MB",
+"es": "No se pudo usar este archivo. Prueba con otro, de hasta 64 MB",
+"fr": "Impossible d’utiliser ce fichier. Essayez-en un autre, jusqu’à 64 Mo",
+"pt-BR": "Não deu para usar este arquivo. Tente outro, de até 64 MB",
+"de": "Diese Datei ließ sich nicht übernehmen. Versuche eine andere bis 64 MB",
+"it": "Impossibile usare questo file. Provane un altro, fino a 64 MB",
+"ar": "تعذّر أخذ هذا الملف. جرّب ملفًا آخر حتى 64 م.ب",
+"zh-Hans": "无法使用此文件。请换一个不超过 64 MB 的文件",
+"ja": "このファイルは使えませんでした。64 MBまでの別のファイルをお試しください",
+"ko": "이 파일을 쓸 수 없어요. 64MB 이하의 다른 파일을 써 보세요",
+"hi": "यह फ़ाइल नहीं ली जा सकी। 64 MB तक की दूसरी आज़माएँ"
+},
+"t_bbcf06b3c9": {
+"en": "Notes",
+"es": "Notas",
+"fr": "Notes",
+"pt-BR": "Notas",
+"de": "Notizen",
+"it": "Note",
+"ar": "الملاحظات",
+"zh-Hans": "备注",
+"ja": "メモ",
+"ko": "메모",
+"hi": "नोट"
+},
+"t_bbee9680a8": {
+"en": "Unknown time isn’t in the total: ",
+"es": "El tiempo desconocido no cuenta en el total: ",
+"fr": "Le temps inconnu n’est pas compté : ",
+"pt-BR": "O tempo desconhecido não entra no total: ",
+"de": "Unbekannte Zeit zählt nicht mit: ",
+"it": "Il tempo sconosciuto non è nel totale: ",
+"ar": "الوقت غير المعروف خارج الإجمالي: ",
+"zh-Hans": "未知时间不计入合计：",
+"ja": "不明な時間は合計に含まれません：",
+"ko": "모르는 시간은 합계에 없어요: ",
+"hi": "अज्ञात समय कुल में नहीं:"
+},
+"t_c23d5826a3": {
+"en": "%1$s with entries",
+"es": "%1$s con registros",
+"fr": "%1$s avec des entrées",
+"pt-BR": "%1$s com registros",
+"de": "%1$s mit Einträgen",
+"it": "%1$s con voci",
+"ar": "%1$s فيها سجلات",
+"zh-Hans": "有条目的 %1$s",
+"ja": "記録のある%1$s",
+"ko": "기록 있는 %1$s",
+"hi": "प्रविष्टियों वाले %1$s"
+},
+"t_c54788a5e8": {
+"en": "Reading",
+"es": "Lectura",
+"fr": "Lecture",
+"pt-BR": "Leitura",
+"de": "Lesen",
+"it": "Lettura",
+"ar": "القراءة",
+"zh-Hans": "阅读",
+"ja": "読書",
+"ko": "독서",
+"hi": "पढ़ना"
+},
+"t_c54a9c6fb4": {
+"en": "Plan changed",
+"es": "Plan cambiado",
+"fr": "Plan modifié",
+"pt-BR": "Plano alterado",
+"de": "Plan geändert",
+"it": "Piano modificato",
+"ar": "تغيّرت الخطة",
+"zh-Hans": "计划已更改",
+"ja": "計画を変更しました",
+"ko": "계획을 바꿨어요",
+"hi": "योजना बदली गई"
+},
+"t_cd30825052": {
+"en": "Goal set",
+"es": "Objetivo fijado",
+"fr": "Objectif fixé",
+"pt-BR": "Meta definida",
+"de": "Ziel gesetzt",
+"it": "Obiettivo impostato",
+"ar": "ضُبط الهدف",
+"zh-Hans": "目标已设定",
+"ja": "目標を設定しました",
+"ko": "목표를 세웠어요",
+"hi": "लक्ष्य तय हुआ"
+},
+"t_ce3ec6ed08": {
+"en": "within the limit",
+"es": "dentro del límite",
+"fr": "dans la limite",
+"pt-BR": "dentro do limite",
+"de": "im Rahmen",
+"it": "entro il limite",
+"ar": "ضمن الحد",
+"zh-Hans": "在限度内",
+"ja": "範囲内",
+"ko": "한도 안",
+"hi": "सीमा के भीतर"
+},
+"t_ce5fc2ce7f": {
+"en": "Order saved",
+"es": "Orden guardado",
+"fr": "Ordre enregistré",
+"pt-BR": "Ordem salva",
+"de": "Reihenfolge gespeichert",
+"it": "Ordine salvato",
+"ar": "حُفظ الترتيب",
+"zh-Hans": "顺序已保存",
+"ja": "並び順を保存しました",
+"ko": "순서를 저장했어요",
+"hi": "क्रम सहेजा गया"
+},
+"t_cf52c8daf1": {
+"en": "The report time zone follows the device. Entries may move to another day",
+"es": "La zona horaria de informes sigue al dispositivo. Los registros pueden pasar a otro día",
+"fr": "Le fuseau des rapports suit l’appareil. Des entrées peuvent changer de jour",
+"pt-BR": "O fuso dos relatórios segue o aparelho. Registros podem passar para outro dia",
+"de": "Die Berichtszeitzone folgt dem Gerät. Einträge können auf einen anderen Tag fallen",
+"it": "Il fuso dei report segue il dispositivo. Le voci possono passare a un altro giorno",
+"ar": "تتبع المنطقة الزمنية للتقارير الجهاز. قد تنتقل السجلات إلى يوم آخر",
+"zh-Hans": "报告时区跟随设备。条目可能会归入其他日期",
+"ja": "レポートのタイムゾーンは端末に合わせます。記録が別の日に移ることがあります",
+"ko": "보고서 시간대가 기기를 따라가요. 기록이 다른 날로 옮겨질 수 있어요",
+"hi": "रिपोर्ट का समय क्षेत्र डिवाइस के साथ चलता है। प्रविष्टियाँ दूसरे दिन में जा सकती हैं"
+},
+"t_dd63bc14f9": {
+"en": "Changed %1$s",
+"es": "Cambiados %1$s",
+"fr": "Modifié : %1$s",
+"pt-BR": "Alterados %1$s",
+"de": "Geändert: %1$s",
+"it": "Modificate %1$s",
+"ar": "عُدّل %1$s",
+"zh-Hans": "已修改 %1$s",
+"ja": "%1$sを変更しました",
+"ko": "%1$s 변경됨",
+"hi": "%1$s बदली गईं"
+},
+"t_de7dee674e": {
+"en": "This is a backup file. Restore it in “Backup”",
+"es": "Es un archivo de copia de seguridad. Restáuralo en «Copia de seguridad»",
+"fr": "C’est un fichier de sauvegarde. Restaurez-le dans « Sauvegarde »",
+"pt-BR": "Este é um arquivo de backup. Restaure-o em “Backup”",
+"de": "Das ist eine Sicherungsdatei. Stelle sie unter „Datensicherung“ wieder her",
+"it": "È un file di backup. Ripristinalo in «Backup»",
+"ar": "هذا ملف نسخة احتياطية. استعده من «النسخ الاحتياطي»",
+"zh-Hans": "这是备份文件。请在“备份”中恢复",
+"ja": "これはバックアップファイルです。「バックアップ」で復元してください",
+"ko": "백업 파일이에요. “백업”에서 복원하세요",
+"hi": "यह बैकअप फ़ाइल है। इसे “बैकअप” में बहाल करें"
+},
+"t_dfd4e36290": {
+"en": "Couldn’t switch the icon",
+"es": "No se pudo cambiar el icono",
+"fr": "Impossible de changer l’icône",
+"pt-BR": "Não foi possível trocar o ícone",
+"de": "Symbol ließ sich nicht wechseln",
+"it": "Impossibile cambiare l’icona",
+"ar": "تعذّر تبديل الأيقونة",
+"zh-Hans": "无法切换图标",
+"ja": "アイコンを切り替えられませんでした",
+"ko": "아이콘을 바꾸지 못했어요",
+"hi": "आइकन बदला नहीं जा सका"
+},
+"t_e1d7065cb9": {
+"en": "Report changed",
+"es": "Informe cambiado",
+"fr": "Rapport modifié",
+"pt-BR": "Relatório alterado",
+"de": "Bericht geändert",
+"it": "Report modificato",
+"ar": "تغيّر التقرير",
+"zh-Hans": "报告已更改",
+"ja": "レポートを変更しました",
+"ko": "보고서를 바꿨어요",
+"hi": "रिपोर्ट बदली गई"
+},
+"t_e380f43ca4": {
+"en": "Today, %1$s",
+"es": "Hoy, %1$s",
+"fr": "Aujourd’hui, %1$s",
+"pt-BR": "Hoje, %1$s",
+"de": "Heute, %1$s",
+"it": "Oggi, %1$s",
+"ar": "اليوم، %1$s",
+"zh-Hans": "今天，%1$s",
+"ja": "今日、%1$s",
+"ko": "오늘, %1$s",
+"hi": "आज, %1$s"
+},
+"t_ed3f0e507a": {
+"en": "Language",
+"es": "Idioma",
+"fr": "Langue",
+"pt-BR": "Idioma",
+"de": "Sprache",
+"it": "Lingua",
+"ar": "اللغة",
+"zh-Hans": "语言",
+"ja": "言語",
+"ko": "언어",
+"hi": "भाषा"
+},
+"t_f220b98d48": {
+"en": "The activity choice is out of date",
+"es": "La elección de actividad está desactualizada",
+"fr": "Le choix d’activité n’est plus à jour",
+"pt-BR": "A escolha de atividade está desatualizada",
+"de": "Die Aktivitätswahl ist veraltet",
+"it": "La scelta dell’attività non è aggiornata",
+"ar": "اختيار النشاط قديم",
+"zh-Hans": "活动选择已过期",
+"ja": "活動の選択が古くなっています",
+"ko": "활동 선택이 오래됐어요",
+"hi": "गतिविधि का चुनाव पुराना हो गया"
+}
+},
+"plurals": {
+"p_de4636ae79": {
+"en": {
+"one": "%1$d column",
+"other": "%1$d columns"
+},
+"es": {
+"one": "%1$d columna",
+"many": "%1$d columnas",
+"other": "%1$d columnas"
+},
+"fr": {
+"one": "%1$d colonne",
+"many": "%1$d colonnes",
+"other": "%1$d colonnes"
+},
+"pt-BR": {
+"one": "%1$d coluna",
+"many": "%1$d colunas",
+"other": "%1$d colunas"
+},
+"de": {
+"one": "%1$d Spalte",
+"other": "%1$d Spalten"
+},
+"it": {
+"one": "%1$d colonna",
+"many": "%1$d colonne",
+"other": "%1$d colonne"
+},
+"ar": {
+"zero": "%1$d عمود",
+"one": "عمود واحد",
+"two": "عمودان",
+"few": "%1$d أعمدة",
+"many": "%1$d عمودًا",
+"other": "%1$d عمود"
+},
+"zh-Hans": {
+"other": "%1$d 列"
+},
+"ja": {
+"other": "%1$d列"
+},
+"ko": {
+"other": "%1$d개 열"
+},
+"hi": {
+"one": "%1$d कॉलम",
+"other": "%1$d कॉलम"
+}
+},
+"p_09d3aef0c7": {
+"en": {
+"one": "%1$d row",
+"other": "%1$d rows"
+},
+"es": {
+"one": "%1$d fila",
+"many": "%1$d filas",
+"other": "%1$d filas"
+},
+"fr": {
+"one": "%1$d ligne",
+"many": "%1$d lignes",
+"other": "%1$d lignes"
+},
+"pt-BR": {
+"one": "%1$d linha",
+"many": "%1$d linhas",
+"other": "%1$d linhas"
+},
+"de": {
+"one": "%1$d Zeile",
+"other": "%1$d Zeilen"
+},
+"it": {
+"one": "%1$d riga",
+"many": "%1$d righe",
+"other": "%1$d righe"
+},
+"ar": {
+"zero": "%1$d صف",
+"one": "صف واحد",
+"two": "صفان",
+"few": "%1$d صفوف",
+"many": "%1$d صفًا",
+"other": "%1$d صف"
+},
+"zh-Hans": {
+"other": "%1$d 行"
+},
+"ja": {
+"other": "%1$d行"
+},
+"ko": {
+"other": "%1$d개 행"
+},
+"hi": {
+"one": "%1$d पंक्ति",
+"other": "%1$d पंक्तियाँ"
+}
+},
+"p_6c73bc4d74": {
+"en": {
+"one": "%1$d entry",
+"other": "%1$d entries"
+},
+"es": {
+"one": "%1$d registro",
+"many": "%1$d registros",
+"other": "%1$d registros"
+},
+"fr": {
+"one": "%1$d entrée",
+"many": "%1$d entrées",
+"other": "%1$d entrées"
+},
+"pt-BR": {
+"one": "%1$d registro",
+"many": "%1$d registros",
+"other": "%1$d registros"
+},
+"de": {
+"one": "%1$d Eintrag",
+"other": "%1$d Einträge"
+},
+"it": {
+"one": "%1$d voce",
+"many": "%1$d voci",
+"other": "%1$d voci"
+},
+"ar": {
+"zero": "%1$d سجل",
+"one": "سجل واحد",
+"two": "سجلان",
+"few": "%1$d سجلات",
+"many": "%1$d سجلًا",
+"other": "%1$d سجل"
+},
+"zh-Hans": {
+"other": "%1$d 条条目"
+},
+"ja": {
+"other": "%1$d件の記録"
+},
+"ko": {
+"other": "기록 %1$d개"
+},
+"hi": {
+"one": "%1$d प्रविष्टि",
+"other": "%1$d प्रविष्टियाँ"
+}
+},
+"p_299205cb6b": {
+"en": {
+"one": "%1$d time",
+"other": "%1$d times"
+},
+"es": {
+"one": "%1$d vez",
+"many": "%1$d veces",
+"other": "%1$d veces"
+},
+"fr": {
+"one": "%1$d fois",
+"many": "%1$d fois",
+"other": "%1$d fois"
+},
+"pt-BR": {
+"one": "%1$d vez",
+"many": "%1$d vezes",
+"other": "%1$d vezes"
+},
+"de": {
+"one": "%1$d-mal",
+"other": "%1$d-mal"
+},
+"it": {
+"one": "%1$d volta",
+"many": "%1$d volte",
+"other": "%1$d volte"
+},
+"ar": {
+"zero": "%1$d مرة",
+"one": "مرة واحدة",
+"two": "مرتان",
+"few": "%1$d مرات",
+"many": "%1$d مرة",
+"other": "%1$d مرة"
+},
+"zh-Hans": {
+"other": "%1$d 次"
+},
+"ja": {
+"other": "%1$d回"
+},
+"ko": {
+"other": "%1$d회"
+},
+"hi": {
+"one": "%1$d बार",
+"other": "%1$d बार"
+}
+},
+"p_5e0f6cbad4": {
+"en": {
+"one": "%1$d day",
+"other": "%1$d days"
+},
+"es": {
+"one": "%1$d día",
+"many": "%1$d días",
+"other": "%1$d días"
+},
+"fr": {
+"one": "%1$d jour",
+"many": "%1$d jours",
+"other": "%1$d jours"
+},
+"pt-BR": {
+"one": "%1$d dia",
+"many": "%1$d dias",
+"other": "%1$d dias"
+},
+"de": {
+"one": "%1$d Tag",
+"other": "%1$d Tage"
+},
+"it": {
+"one": "%1$d giorno",
+"many": "%1$d giorni",
+"other": "%1$d giorni"
+},
+"ar": {
+"zero": "%1$d يوم",
+"one": "يوم واحد",
+"two": "يومان",
+"few": "%1$d أيام",
+"many": "%1$d يومًا",
+"other": "%1$d يوم"
+},
+"zh-Hans": {
+"other": "%1$d 天"
+},
+"ja": {
+"other": "%1$d日"
+},
+"ko": {
+"other": "%1$d일"
+},
+"hi": {
+"one": "%1$d दिन",
+"other": "%1$d दिन"
+}
+},
+"p_7504653931": {
+"en": {
+"one": "%1$d time",
+"other": "%1$d times"
+},
+"es": {
+"one": "%1$d vez",
+"many": "%1$d veces",
+"other": "%1$d veces"
+},
+"fr": {
+"one": "%1$d fois",
+"many": "%1$d fois",
+"other": "%1$d fois"
+},
+"pt-BR": {
+"one": "%1$d vez",
+"many": "%1$d vezes",
+"other": "%1$d vezes"
+},
+"de": {
+"one": "%1$d-mal",
+"other": "%1$d-mal"
+},
+"it": {
+"one": "%1$d volta",
+"many": "%1$d volte",
+"other": "%1$d volte"
+},
+"ar": {
+"zero": "%1$d مرة",
+"one": "مرة واحدة",
+"two": "مرتين",
+"few": "%1$d مرات",
+"many": "%1$d مرة",
+"other": "%1$d مرة"
+},
+"zh-Hans": {
+"other": "%1$d 次"
+},
+"ja": {
+"other": "%1$d回"
+},
+"ko": {
+"other": "%1$d회"
+},
+"hi": {
+"one": "%1$d बार",
+"other": "%1$d बार"
+}
+},
+"p_032a085f42": {
+"en": {
+"one": "%1$d day",
+"other": "%1$d days"
+},
+"es": {
+"one": "%1$d día",
+"many": "%1$d días",
+"other": "%1$d días"
+},
+"fr": {
+"one": "%1$d jour",
+"many": "%1$d jours",
+"other": "%1$d jours"
+},
+"pt-BR": {
+"one": "%1$d dia",
+"many": "%1$d dias",
+"other": "%1$d dias"
+},
+"de": {
+"one": "%1$d Tag",
+"other": "%1$d Tage"
+},
+"it": {
+"one": "%1$d giorno",
+"many": "%1$d giorni",
+"other": "%1$d giorni"
+},
+"ar": {
+"zero": "%1$d يوم",
+"one": "يوم واحد",
+"two": "يومين",
+"few": "%1$d أيام",
+"many": "%1$d يومًا",
+"other": "%1$d يوم"
+},
+"zh-Hans": {
+"other": "%1$d 天"
+},
+"ja": {
+"other": "%1$d日"
+},
+"ko": {
+"other": "%1$d일"
+},
+"hi": {
+"one": "%1$d दिन",
+"other": "%1$d दिन"
+}
+},
+"p_414e6a20a2": {
+"en": {
+"one": "%1$d favorite",
+"other": "%1$d favorites"
+},
+"es": {
+"one": "%1$d favorito",
+"many": "%1$d favoritos",
+"other": "%1$d favoritos"
+},
+"fr": {
+"one": "%1$d favori",
+"many": "%1$d favoris",
+"other": "%1$d favoris"
+},
+"pt-BR": {
+"one": "%1$d favorito",
+"many": "%1$d favoritos",
+"other": "%1$d favoritos"
+},
+"de": {
+"one": "%1$d Favorit",
+"other": "%1$d Favoriten"
+},
+"it": {
+"one": "%1$d preferito",
+"many": "%1$d preferiti",
+"other": "%1$d preferiti"
+},
+"ar": {
+"zero": "%1$d مفضلة",
+"one": "مفضلة واحدة",
+"two": "مفضلتان",
+"few": "%1$d مفضلات",
+"many": "%1$d مفضلة",
+"other": "%1$d مفضلة"
+},
+"zh-Hans": {
+"other": "%1$d 个收藏"
+},
+"ja": {
+"other": "お気に入り%1$d件"
+},
+"ko": {
+"other": "즐겨찾기 %1$d개"
+},
+"hi": {
+"one": "%1$d पसंदीदा",
+"other": "%1$d पसंदीदा"
+}
+},
+"p_3a9aafb6ad": {
+"en": {
+"one": "%1$d activity",
+"other": "%1$d activities"
+},
+"es": {
+"one": "%1$d actividad",
+"many": "%1$d actividades",
+"other": "%1$d actividades"
+},
+"fr": {
+"one": "%1$d activité",
+"many": "%1$d activités",
+"other": "%1$d activités"
+},
+"pt-BR": {
+"one": "%1$d atividade",
+"many": "%1$d atividades",
+"other": "%1$d atividades"
+},
+"de": {
+"one": "%1$d Aktivität",
+"other": "%1$d Aktivitäten"
+},
+"it": {
+"one": "%1$d attività",
+"many": "%1$d attività",
+"other": "%1$d attività"
+},
+"ar": {
+"zero": "%1$d نشاط",
+"one": "نشاط واحد",
+"two": "نشاطان",
+"few": "%1$d أنشطة",
+"many": "%1$d نشاطًا",
+"other": "%1$d نشاط"
+},
+"zh-Hans": {
+"other": "%1$d 项活动"
+},
+"ja": {
+"other": "%1$d件の活動"
+},
+"ko": {
+"other": "활동 %1$d개"
+},
+"hi": {
+"one": "%1$d गतिविधि",
+"other": "%1$d गतिविधियाँ"
+}
+},
+"p_7722e30027": {
+"en": {
+"one": "%1$d own activity",
+"other": "%1$d own activities"
+},
+"es": {
+"one": "%1$d actividad propia",
+"many": "%1$d actividades propias",
+"other": "%1$d actividades propias"
+},
+"fr": {
+"one": "%1$d activité perso",
+"many": "%1$d activités perso",
+"other": "%1$d activités perso"
+},
+"pt-BR": {
+"one": "%1$d atividade própria",
+"many": "%1$d atividades próprias",
+"other": "%1$d atividades próprias"
+},
+"de": {
+"one": "%1$d eigene Aktivität",
+"other": "%1$d eigene Aktivitäten"
+},
+"it": {
+"one": "%1$d attività personale",
+"many": "%1$d attività personali",
+"other": "%1$d attività personali"
+},
+"ar": {
+"zero": "%1$d نشاط خاص",
+"one": "نشاط خاص واحد",
+"two": "نشاطان خاصان",
+"few": "%1$d أنشطة خاصة",
+"many": "%1$d نشاطًا خاصًا",
+"other": "%1$d نشاط خاص"
+},
+"zh-Hans": {
+"other": "%1$d 项自定义活动"
+},
+"ja": {
+"other": "自分の活動%1$d件"
+},
+"ko": {
+"other": "내 활동 %1$d개"
+},
+"hi": {
+"one": "%1$d अपनी गतिविधि",
+"other": "%1$d अपनी गतिविधियाँ"
+}
+},
+"p_3b59342c88": {
+"en": {
+"one": "%1$d goal",
+"other": "%1$d goals"
+},
+"es": {
+"one": "%1$d objetivo",
+"many": "%1$d objetivos",
+"other": "%1$d objetivos"
+},
+"fr": {
+"one": "%1$d objectif",
+"many": "%1$d objectifs",
+"other": "%1$d objectifs"
+},
+"pt-BR": {
+"one": "%1$d meta",
+"many": "%1$d metas",
+"other": "%1$d metas"
+},
+"de": {
+"one": "%1$d Ziel",
+"other": "%1$d Ziele"
+},
+"it": {
+"one": "%1$d obiettivo",
+"many": "%1$d obiettivi",
+"other": "%1$d obiettivi"
+},
+"ar": {
+"zero": "%1$d هدف",
+"one": "هدف واحد",
+"two": "هدفان",
+"few": "%1$d أهداف",
+"many": "%1$d هدفًا",
+"other": "%1$d هدف"
+},
+"zh-Hans": {
+"other": "%1$d 个目标"
+},
+"ja": {
+"other": "目標%1$d件"
+},
+"ko": {
+"other": "목표 %1$d개"
+},
+"hi": {
+"one": "%1$d लक्ष्य",
+"other": "%1$d लक्ष्य"
+}
+},
+"p_51037d6f51": {
+"en": {
+"one": "%1$d segment",
+"other": "%1$d segments"
+},
+"es": {
+"one": "%1$d tramo",
+"many": "%1$d tramos",
+"other": "%1$d tramos"
+},
+"fr": {
+"one": "%1$d segment",
+"many": "%1$d segments",
+"other": "%1$d segments"
+},
+"pt-BR": {
+"one": "%1$d trecho",
+"many": "%1$d trechos",
+"other": "%1$d trechos"
+},
+"de": {
+"one": "%1$d Abschnitt",
+"other": "%1$d Abschnitte"
+},
+"it": {
+"one": "%1$d segmento",
+"many": "%1$d segmenti",
+"other": "%1$d segmenti"
+},
+"ar": {
+"zero": "%1$d مقطع",
+"one": "مقطع واحد",
+"two": "مقطعان",
+"few": "%1$d مقاطع",
+"many": "%1$d مقطعًا",
+"other": "%1$d مقطع"
+},
+"zh-Hans": {
+"other": "%1$d 个片段"
+},
+"ja": {
+"other": "%1$d区間"
+},
+"ko": {
+"other": "구간 %1$d개"
+},
+"hi": {
+"one": "%1$d खंड",
+"other": "%1$d खंड"
+}
+},
+"p_aaaea1e747": {
+"en": {
+"one": "%1$d measurement",
+"other": "%1$d measurements"
+},
+"es": {
+"one": "%1$d medición",
+"many": "%1$d mediciones",
+"other": "%1$d mediciones"
+},
+"fr": {
+"one": "%1$d mesure",
+"many": "%1$d mesures",
+"other": "%1$d mesures"
+},
+"pt-BR": {
+"one": "%1$d medição",
+"many": "%1$d medições",
+"other": "%1$d medições"
+},
+"de": {
+"one": "%1$d Messung",
+"other": "%1$d Messungen"
+},
+"it": {
+"one": "%1$d misurazione",
+"many": "%1$d misurazioni",
+"other": "%1$d misurazioni"
+},
+"ar": {
+"zero": "%1$d قياس",
+"one": "قياس واحد",
+"two": "قياسان",
+"few": "%1$d قياسات",
+"many": "%1$d قياسًا",
+"other": "%1$d قياس"
+},
+"zh-Hans": {
+"other": "%1$d 项测量"
+},
+"ja": {
+"other": "測定%1$d件"
+},
+"ko": {
+"other": "측정 %1$d개"
+},
+"hi": {
+"one": "%1$d माप",
+"other": "%1$d माप"
+}
+},
+"p_07343fe85c": {
+"en": {
+"one": "%1$d subject link",
+"other": "%1$d subject links"
+},
+"es": {
+"one": "%1$d vínculo con un objeto",
+"many": "%1$d vínculos con objetos",
+"other": "%1$d vínculos con objetos"
+},
+"fr": {
+"one": "%1$d lien à un objet",
+"many": "%1$d liens à des objets",
+"other": "%1$d liens à des objets"
+},
+"pt-BR": {
+"one": "%1$d vínculo com objeto",
+"many": "%1$d vínculos com objetos",
+"other": "%1$d vínculos com objetos"
+},
+"de": {
+"one": "%1$d Verknüpfung mit Gegenstand",
+"other": "%1$d Verknüpfungen mit Gegenständen"
+},
+"it": {
+"one": "%1$d collegamento a un oggetto",
+"many": "%1$d collegamenti a oggetti",
+"other": "%1$d collegamenti a oggetti"
+},
+"ar": {
+"zero": "%1$d ارتباط بعنصر",
+"one": "ارتباط واحد بعنصر",
+"two": "ارتباطان بعناصر",
+"few": "%1$d ارتباطات بعناصر",
+"many": "%1$d ارتباطًا بعناصر",
+"other": "%1$d ارتباط بعناصر"
+},
+"zh-Hans": {
+"other": "%1$d 个对象关联"
+},
+"ja": {
+"other": "対象へのリンク%1$d件"
+},
+"ko": {
+"other": "대상 연결 %1$d개"
+},
+"hi": {
+"one": "%1$d विषय लिंक",
+"other": "%1$d विषय लिंक"
+}
+},
+"p_a03208ce01": {
+"en": {
+"one": "%1$d set record",
+"other": "%1$d set records"
+},
+"es": {
+"one": "%1$d registro de serie",
+"many": "%1$d registros de series",
+"other": "%1$d registros de series"
+},
+"fr": {
+"one": "%1$d série enregistrée",
+"many": "%1$d séries enregistrées",
+"other": "%1$d séries enregistrées"
+},
+"pt-BR": {
+"one": "%1$d registro de série",
+"many": "%1$d registros de séries",
+"other": "%1$d registros de séries"
+},
+"de": {
+"one": "%1$d Satz-Eintrag",
+"other": "%1$d Satz-Einträge"
+},
+"it": {
+"one": "%1$d serie registrata",
+"many": "%1$d serie registrate",
+"other": "%1$d serie registrate"
+},
+"ar": {
+"zero": "%1$d سجل مجموعة",
+"one": "سجل مجموعة واحد",
+"two": "سجلا مجموعة",
+"few": "%1$d سجلات مجموعات",
+"many": "%1$d سجلًا للمجموعات",
+"other": "%1$d سجل مجموعات"
+},
+"zh-Hans": {
+"other": "%1$d 条组数记录"
+},
+"ja": {
+"other": "セット記録%1$d件"
+},
+"ko": {
+"other": "세트 기록 %1$d개"
+},
+"hi": {
+"one": "%1$d सेट रिकॉर्ड",
+"other": "%1$d सेट रिकॉर्ड"
+}
+},
+"p_c70b66af3f": {
+"en": {
+"one": "%1$d event quantity record",
+"other": "%1$d event quantity records"
+},
+"es": {
+"one": "%1$d registro de cantidad",
+"many": "%1$d registros de cantidades",
+"other": "%1$d registros de cantidades"
+},
+"fr": {
+"one": "%1$d quantité d’événement",
+"many": "%1$d quantités d’événement",
+"other": "%1$d quantités d’événement"
+},
+"pt-BR": {
+"one": "%1$d registro de quantidade",
+"many": "%1$d registros de quantidades",
+"other": "%1$d registros de quantidades"
+},
+"de": {
+"one": "%1$d Ereignismenge",
+"other": "%1$d Ereignismengen"
+},
+"it": {
+"one": "%1$d quantità di evento",
+"many": "%1$d quantità di evento",
+"other": "%1$d quantità di evento"
+},
+"ar": {
+"zero": "%1$d سجل كمية",
+"one": "سجل كمية واحد",
+"two": "سجلا كمية",
+"few": "%1$d سجلات كميات",
+"many": "%1$d سجلًا للكميات",
+"other": "%1$d سجل كميات"
+},
+"zh-Hans": {
+"other": "%1$d 条事件数量记录"
+},
+"ja": {
+"other": "イベント量の記録%1$d件"
+},
+"ko": {
+"other": "이벤트 수량 기록 %1$d개"
+},
+"hi": {
+"one": "%1$d घटना मात्रा रिकॉर्ड",
+"other": "%1$d घटना मात्रा रिकॉर्ड"
+}
+},
+"p_c8e097eebc": {
+"en": {
+"one": "%1$d pace input",
+"other": "%1$d pace inputs"
+},
+"es": {
+"one": "%1$d dato de ritmo",
+"many": "%1$d datos de ritmo",
+"other": "%1$d datos de ritmo"
+},
+"fr": {
+"one": "%1$d donnée d’allure",
+"many": "%1$d données d’allure",
+"other": "%1$d données d’allure"
+},
+"pt-BR": {
+"one": "%1$d dado de ritmo",
+"many": "%1$d dados de ritmo",
+"other": "%1$d dados de ritmo"
+},
+"de": {
+"one": "%1$d Tempodatum",
+"other": "%1$d Tempodaten"
+},
+"it": {
+"one": "%1$d dato di ritmo",
+"many": "%1$d dati di ritmo",
+"other": "%1$d dati di ritmo"
+},
+"ar": {
+"zero": "%1$d أساس للوتيرة",
+"one": "أساس واحد للوتيرة",
+"two": "أساسان للوتيرة",
+"few": "%1$d أسس للوتيرة",
+"many": "%1$d أساسًا للوتيرة",
+"other": "%1$d أساس للوتيرة"
+},
+"zh-Hans": {
+"other": "%1$d 条配速数据"
+},
+"ja": {
+"other": "ペースデータ%1$d件"
+},
+"ko": {
+"other": "페이스 데이터 %1$d개"
+},
+"hi": {
+"one": "%1$d गति डेटा",
+"other": "%1$d गति डेटा"
+}
+},
+"p_33de38af49": {
+"en": {
+"one": "%1$d gap",
+"other": "%1$d gaps"
+},
+"es": {
+"one": "%1$d hueco",
+"many": "%1$d huecos",
+"other": "%1$d huecos"
+},
+"fr": {
+"one": "%1$d trou",
+"many": "%1$d trous",
+"other": "%1$d trous"
+},
+"pt-BR": {
+"one": "%1$d intervalo",
+"many": "%1$d intervalos",
+"other": "%1$d intervalos"
+},
+"de": {
+"one": "%1$d Lücke",
+"other": "%1$d Lücken"
+},
+"it": {
+"one": "%1$d vuoto",
+"many": "%1$d vuoti",
+"other": "%1$d vuoti"
+},
+"ar": {
+"zero": "%1$d فجوة",
+"one": "فجوة واحدة",
+"two": "فجوتان",
+"few": "%1$d فجوات",
+"many": "%1$d فجوة",
+"other": "%1$d فجوة"
+},
+"zh-Hans": {
+"other": "%1$d 段空档"
+},
+"ja": {
+"other": "空き時間%1$d件"
+},
+"ko": {
+"other": "빈 시간 %1$d개"
+},
+"hi": {
+"one": "%1$d अंतराल",
+"other": "%1$d अंतराल"
+}
+},
+"p_c9ec2228f3": {
+"en": {
+"one": "%1$d pause",
+"other": "%1$d pauses"
+},
+"es": {
+"one": "%1$d pausa",
+"many": "%1$d pausas",
+"other": "%1$d pausas"
+},
+"fr": {
+"one": "%1$d pause",
+"many": "%1$d pauses",
+"other": "%1$d pauses"
+},
+"pt-BR": {
+"one": "%1$d pausa",
+"many": "%1$d pausas",
+"other": "%1$d pausas"
+},
+"de": {
+"one": "%1$d Pause",
+"other": "%1$d Pausen"
+},
+"it": {
+"one": "%1$d pausa",
+"many": "%1$d pause",
+"other": "%1$d pause"
+},
+"ar": {
+"zero": "%1$d إيقاف",
+"one": "إيقاف واحد",
+"two": "إيقافان",
+"few": "%1$d إيقافات",
+"many": "%1$d إيقافًا",
+"other": "%1$d إيقاف"
+},
+"zh-Hans": {
+"other": "%1$d 次暂停"
+},
+"ja": {
+"other": "一時停止%1$d回"
+},
+"ko": {
+"other": "일시정지 %1$d회"
+},
+"hi": {
+"one": "%1$d विराम",
+"other": "%1$d विराम"
+}
+}
+}
+}

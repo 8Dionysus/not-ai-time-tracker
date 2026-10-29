@@ -53,7 +53,7 @@ object TimerSurfaces {
     }
     /** Visible Russian labels for the same commands; identity stays in the action, never in the text. */
     fun label(command: TimerCommand): String = when(command) {
-        TimerCommand.START -> "Начать"; TimerCommand.PAUSE -> "Пауза"; TimerCommand.RESUME -> "Продолжить"; TimerCommand.STOP -> "Стоп"
+        TimerCommand.START -> L.s(R.string.t_14eaa871df); TimerCommand.PAUSE -> L.s(R.string.t_03498e395a); TimerCommand.RESUME -> L.s(R.string.t_3f75368ab9); TimerCommand.STOP -> L.s(R.string.t_6d714e833d)
     }
     fun notificationsAllowed(c: Context): Boolean = (Build.VERSION.SDK_INT < 33 || c.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) &&
         c.getSystemService(NotificationManager::class.java).let { it.areNotificationsEnabled() && it.getNotificationChannel(CONTROL_CHANNEL)?.importance != NotificationManager.IMPORTANCE_NONE }
@@ -100,8 +100,8 @@ object TimerSurfaces {
     fun open(c: Context): PendingIntent = PendingIntent.getActivity(c,0,Intent(c,MainActivity::class.java),PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
     fun channels(c: Context) {
         c.getSystemService(NotificationManager::class.java).apply {
-            createNotificationChannel(NotificationChannel(CONTROL_CHANNEL,"Таймер в шторке",NotificationManager.IMPORTANCE_LOW).apply { setShowBadge(false) })
-            createNotificationChannel(NotificationChannel(OVERLAY_CHANNEL,"Плавающая кнопка: системный индикатор",NotificationManager.IMPORTANCE_MIN).apply { setShowBadge(false) })
+            createNotificationChannel(NotificationChannel(CONTROL_CHANNEL,L.s(R.string.t_feff16c4bb),NotificationManager.IMPORTANCE_LOW).apply { setShowBadge(false) })
+            createNotificationChannel(NotificationChannel(OVERLAY_CHANNEL,L.s(R.string.t_96c6ac97db),NotificationManager.IMPORTANCE_MIN).apply { setShowBadge(false) })
             deleteNotificationChannel("floating_controls") // replaced by the minimal-importance indicator
         }
     }
@@ -113,7 +113,7 @@ object TimerSurfaces {
     fun overlayNotification(c: Context): Notification {
         channels(c)
         return Notification.Builder(c,OVERLAY_CHANNEL).setSmallIcon(R.drawable.ic_stat_notai).setColor(c.getColor(R.color.widget_amber))
-            .setContentTitle("Плавающая кнопка включена").setContentText("Выключить можно в настройках приложения").setContentIntent(open(c))
+            .setContentTitle(L.s(R.string.t_4edbcc192a)).setContentText(L.s(R.string.t_5e1ad8c5d8)).setContentIntent(open(c))
             .setVisibility(Notification.VISIBILITY_PRIVATE).setOngoing(true).setShowWhen(false).build()
     }
     fun widget(c: Context,view: TrackerView,enabled: Boolean): RemoteViews = SurfaceViews.widget(c,view,enabled)
@@ -126,7 +126,7 @@ object TimerSurfaces {
             .mapIndexed { i,q ->
                 val route = SurfaceChoices.route(Surface.SHORTCUT,s)
                 val title = q.entry.title.ifBlank { view.data.label(q.entry.selection).title }
-                android.content.pm.ShortcutInfo.Builder(c,"timer_favorite_$i").setShortLabel(title.take(24)).setLongLabel((if(s.mode == Mode.IDLE) "Начать: " else "Переключиться: ")+title)
+                android.content.pm.ShortcutInfo.Builder(c,"timer_favorite_$i").setShortLabel(title.take(24)).setLongLabel((if(s.mode == Mode.IDLE) L.s(R.string.t_2c0db2ce7c) else L.s(R.string.t_75cd08a0e5))+title)
                     .setIcon(android.graphics.drawable.Icon.createWithResource(c,R.drawable.ic_shortcut))
                     .setIntent(SurfaceChoices.intent(c,route).putExtra(QuickChoiceReceiver.EXTRA_CHOICE,codec.encodeToString(ChoiceReference.serializer(),q.reference)))
                     .setRank(2+i).build()
@@ -141,15 +141,15 @@ object TimerSurfaces {
         val command = primary(s)
         if(command == null) return {
             retireOpenAlias()
-            manager.disableShortcuts(ids,"Откройте приложение для уточнения времени")
+            manager.disableShortcuts(ids,L.s(R.string.t_7ae1597ae7))
             manager.removeDynamicShortcuts(ids)
         }
         val action = intent(c,SurfaceAction(Surface.SHORTCUT,command,s.token,s.timerTarget)).setClass(c,MainActivity::class.java)
         val info = android.content.pm.ShortcutInfo.Builder(c,"timer_action")
-            .setShortLabel(label(command)).setLongLabel("Таймер: ${label(command).lowercase()}")
+            .setShortLabel(label(command)).setLongLabel(L.s(R.string.t_fd500149d4, label(command).lowercase()))
             .setIcon(android.graphics.drawable.Icon.createWithResource(c,R.drawable.ic_shortcut)).setIntent(action).build()
         val chooser = android.content.pm.ShortcutInfo.Builder(c,"timer_choose")
-            .setShortLabel("Выбрать занятие").setLongLabel("Таймер: выбрать занятие")
+            .setShortLabel(L.s(R.string.t_5916628df1)).setLongLabel(L.s(R.string.t_e46b654bc7))
             .setIcon(android.graphics.drawable.Icon.createWithResource(c,R.drawable.ic_shortcut))
             .setIntent(SurfaceChoices.intent(c,SurfaceChoices.route(Surface.SHORTCUT,s))).setRank(1).build()
         // The first favourites in their saved order, each a one-tap Start (or Switch) through the same stale-safe route.
@@ -161,7 +161,7 @@ object TimerSurfaces {
             retireOpenAlias()
             // Removing a dynamic entry alone leaves pinned copies enabled. Withdraw those too.
             val withdrawn = ids - shownIds
-            if(withdrawn.isNotEmpty()) manager.disableShortcuts(withdrawn,"Откройте приложение для выбора занятия")
+            if(withdrawn.isNotEmpty()) manager.disableShortcuts(withdrawn,L.s(R.string.t_c83889af89))
             if(shownIds.isNotEmpty()) manager.enableShortcuts(shownIds)
             LauncherIconController.withBinding(c) { activity ->
                 manager.setDynamicShortcuts(entries.map { entry ->
@@ -265,7 +265,7 @@ class TimerActionReceiver: BroadcastReceiver() {
                 try { TimerSurfaces.execute(tracker,action,permitted);trace?.mark("command-committed") }
                 catch(e: CoreError) {
                     trace?.mark("command-rejected")
-                    val message = "${e.code}: ${e.message}. Откройте приложение и проверьте текущее состояние."
+                    val message = L.s(R.string.t_08ccc5ba08, e.code, e.message)
                     context.getSharedPreferences("surface-results",Context.MODE_PRIVATE).edit().putString("last",message).putString("lastCode",e.code.name).apply()
                     android.os.Handler(android.os.Looper.getMainLooper()).post { android.widget.Toast.makeText(context,message,android.widget.Toast.LENGTH_LONG).show() }
                 }

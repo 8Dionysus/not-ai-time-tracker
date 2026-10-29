@@ -1,12 +1,21 @@
 package dev.notai.tracker.android.ui
 
+
+import dev.notai.tracker.android.R
+import dev.notai.tracker.android.L
 import android.content.SharedPreferences
 import androidx.compose.ui.graphics.Color
 
 /** The running colour. Amber stays the default; every accent keeps one meaning: time is being recorded now. */
-enum class Accent(val title: String) { AMBER("Янтарь"), TEAL("Бирюза"), LIME("Лайм"), GRAPHITE("Графит") }
-enum class FontChoice(val title: String) { ONEST("Onest"), SYSTEM("Системный"), SERIF("С засечками") }
-enum class TimerDigits(val title: String) { THIN("Тонкие"), REGULAR("Обычные") }
+enum class Accent(private val titleRes: Int) { AMBER(R.string.t_702e03be1e), TEAL(R.string.t_32000365e9), LIME(R.string.t_d4a2324628), GRAPHITE(R.string.t_1a287db9b2);
+    val title: String get() = if (titleRes == 0) "Onest" else L.s(titleRes)
+}
+enum class FontChoice(private val titleRes: Int) { ONEST(0), SYSTEM(R.string.t_eca17171d2), SERIF(R.string.t_8be1fdf75b);
+    val title: String get() = if (titleRes == 0) "Onest" else L.s(titleRes)
+}
+enum class TimerDigits(private val titleRes: Int) { THIN(R.string.t_cf7b338323), REGULAR(R.string.t_1a599143aa);
+    val title: String get() = if (titleRes == 0) "Onest" else L.s(titleRes)
+}
 
 /**
  * How this phone shows the app. Device-local on purpose (like the theme before it): it is not part of the
@@ -25,7 +34,7 @@ data class Appearance(
     val showRibbon: Boolean = true,
 ) {
     companion object {
-        val textScales = listOf(0.9f to "Мельче", 1f to "Обычный", 1.1f to "Крупнее", 1.2f to "Крупный")
+        val textScales get() = listOf(0.9f to L.s(R.string.t_f5fc2f3eb8), 1f to L.s(R.string.t_a2c84dc5a6), 1.1f to L.s(R.string.t_0f73f5a22c), 1.2f to L.s(R.string.t_b84572428f))
         fun read(p: SharedPreferences) = Appearance(
             accent = runCatching { Accent.valueOf(p.getString("accent", null)!!) }.getOrDefault(Accent.AMBER),
             font = runCatching { FontChoice.valueOf(p.getString("font", null)!!) }.getOrDefault(FontChoice.ONEST),

@@ -36,7 +36,8 @@ class PrivateBundledCatalogIntegrationTest {
                 val payload = context.assets.open("catalog/locales/$tag/labels.json").bufferedReader().use { codec.decodeFromString<CatalogContentPayload>(it.readText()) }
                 val shown = adapter.getLocalizedCatalogEntries(keys,tag,captured.data)
                 assertEquals(payload.entries.map { it.text },shown.map { it.display });assertTrue(shown.all { !it.missing && !it.userOverride })
-                val labels = adapter.choiceLabels(tag,captured.data);assertEquals(1919,labels.translatedTypeCount);assertEquals(2493,labels.aliasCount)
+                val labels = adapter.choiceLabels(tag,captured.data);assertEquals(1919,labels.translatedTypeCount)
+                assertEquals(payload.entries.filter { it.key.kind==CatalogContentKind.TYPE }.sumOf { it.text.aliases.size },labels.aliasCount)
                 val view = plain.withCatalogLabels(labels)
                 val row = payload.entries.first { it.key.kind==CatalogContentKind.TYPE && it.text.label.length<=256 }
                 val query = ChoiceQuery(row.text.label,setOf(ChoiceKind.TYPE),includeArchived=true)

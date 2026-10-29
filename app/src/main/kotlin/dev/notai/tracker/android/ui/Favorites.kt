@@ -1,5 +1,7 @@
 package dev.notai.tracker.android.ui
 
+
+import dev.notai.tracker.android.L
 import dev.notai.tracker.android.R
 
 import androidx.compose.ui.res.stringResource
@@ -69,8 +71,8 @@ fun FavoritesSheet(vm: TrackerViewModel, onEdit: (EditTarget) -> Unit, onAdd: ()
     val haptics = LocalHapticFeedback.current
     NotAiSheet(onDismiss) {
         SheetHeader(stringResource(R.string.editorial_tracker_draft_8a016df5c8f3d36a6ece_v0), onDismiss)
-        Text(if (order.isEmpty()) "Отметь звёздочкой занятия, которые начинаешь чаще всего. Они встанут на главный экран и в шторку."
-            else "Первые в списке видны в шторке, на виджете и у плавающей кнопки. Чтобы переставить, зажми и тяни.",
+        Text(if (order.isEmpty()) L.s(R.string.t_58533a0c30)
+            else L.s(R.string.t_2152e4a71f),
             Modifier.padding(horizontal = 20.dp, vertical = 4.dp), style = NotAi.type.caption, color = c.ink2)
         Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 8.dp)) {
             order.forEachIndexed { index, f ->
@@ -96,11 +98,11 @@ fun FavoritesSheet(vm: TrackerViewModel, onEdit: (EditTarget) -> Unit, onAdd: ()
                             onDragEnd = { dragging = null; offset = 0f; commit(order) },
                             onDragCancel = { dragging = null; offset = 0f; commit(order) })
                     }
-                    .pressable({ onEdit(EditTarget.Fav(f.id)) }, label = "Изменить: ${f.title}")
+                    .pressable({ onEdit(EditTarget.Fav(f.id)) }, label = L.s(R.string.t_9a65ca6053, f.title))
                     .semantics {
                         customActions = listOfNotNull(
-                            if (index > 0) CustomAccessibilityAction("Выше") { move(index - 1); commit(order); true } else null,
-                            if (index < order.lastIndex) CustomAccessibilityAction("Ниже") { move(index + 1); commit(order); true } else null)
+                            if (index > 0) CustomAccessibilityAction(L.s(R.string.t_17e44239e9)) { move(index - 1); commit(order); true } else null,
+                            if (index < order.lastIndex) CustomAccessibilityAction(L.s(R.string.t_e0f1717450)) { move(index + 1); commit(order); true } else null)
                     }
                     .padding(start = 4.dp),
                     verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -111,7 +113,7 @@ fun FavoritesSheet(vm: TrackerViewModel, onEdit: (EditTarget) -> Unit, onAdd: ()
                         if (f.title != f.label.title) Text(f.label.title, style = NotAi.type.caption, color = c.ink2, maxLines = 1)
                     }
                     if (index < 4) Text("${index + 1}", style = NotAi.type.caption, color = c.ink3)
-                    IconAction(Icon.Star, "Убрать из избранного: ${f.title}", { vm.removeFavorite(f.id) }, tint = c.amber, size = 17.dp)
+                    IconAction(Icon.Star, L.s(R.string.t_0a33cc879e, f.title), { vm.removeFavorite(f.id) }, tint = c.amber, size = 17.dp)
                 }
                 Hairline()
             }
@@ -138,14 +140,14 @@ fun ActivityEditorSheet(vm: TrackerViewModel, target: EditTarget, onPick: ((Clas
             var label by remember { mutableStateOf(data.label(fav.selection)) }
             val card = selection.cardId?.let { id -> data.cards.firstOrNull { it.id == id } }
             NotAiSheet(onDismiss, fullHeight = false) {
-                SheetHeader(stringResource(R.string.editorial_tracker_draft_8a016df5c8f3d36a6ece_v0), onDismiss, extra = { IconAction(Icon.Trash, "Убрать из избранного", { vm.removeFavorite(fav.id); onDismiss() }, size = 19.dp) })
+                SheetHeader(stringResource(R.string.editorial_tracker_draft_8a016df5c8f3d36a6ece_v0), onDismiss, extra = { IconAction(Icon.Trash, L.s(R.string.t_d9f48a75fd), { vm.removeFavorite(fav.id); onDismiss() }, size = 19.dp) })
                 Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    TextInput("Название на кнопке", title, { title = it }, placeholder = label.title)
+                    TextInput(L.s(R.string.t_b40a4254c7), title, { title = it }, placeholder = label.title)
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(stringResource(R.string.editorial_tracker_draft_1a2c7007a2d3e4977ace_v0), style = NotAi.type.caption, color = c.ink2)
                         ActivityField(label, { onPick { sel, l -> selection = sel; label = l; if (title == fav.label && fav.label == data.label(fav.selection).title) title = l.title } })
                     }
-                    if (card != null) Text("Изменить само занятие «${card.name}»", Modifier.heightIn(min = 36.dp).pressable({ onDismiss(); vm.openEditor(EditTarget.Card(card.id)) })
+                    if (card != null) Text(L.s(R.string.t_738652aa6f, card.name), Modifier.heightIn(min = 36.dp).pressable({ onDismiss(); vm.openEditor(EditTarget.Card(card.id)) })
                         .padding(vertical = 8.dp), style = NotAi.type.bodySmall.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
                 }
                 PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), {
@@ -160,18 +162,18 @@ fun ActivityEditorSheet(vm: TrackerViewModel, target: EditTarget, onPick: ((Clas
             val parentLabel = parent?.let { data.label(Classification(activityTypeId = it)) }
             val favored = data.favorites.any { selectionIdentity(it.selection) == selectionIdentity(card.classification()) }
             NotAiSheet(onDismiss, fullHeight = false) {
-                SheetHeader("Своё занятие", onDismiss)
+                SheetHeader(L.s(R.string.t_0931eb69ad), onDismiss)
                 Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    TextInput("Название", name, { name = it })
+                    TextInput(L.s(R.string.t_3de49828e8), name, { name = it })
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text("Раздел", style = NotAi.type.caption, color = c.ink2)
-                        ActivityField(parentLabel ?: Label("Без раздела", null, null, true), {
+                        Text(L.s(R.string.t_99d406eeba), style = NotAi.type.caption, color = c.ink2)
+                        ActivityField(parentLabel ?: Label(L.s(R.string.t_c0683f8006), null, null, true), {
                             onPick { sel, _ -> sel.activityTypeId?.let { parent = it } }
-                        }, if (parent == null) "Выбрать" else "Изменить")
-                        if (parent != null) Text("Без раздела", Modifier.heightIn(min = 32.dp).pressable({ parent = null }).padding(top = 4.dp),
+                        }, if (parent == null) L.s(R.string.t_fe4b0c80f0) else L.s(R.string.t_9d809f884b))
+                        if (parent != null) Text(L.s(R.string.t_c0683f8006), Modifier.heightIn(min = 32.dp).pressable({ parent = null }).padding(top = 4.dp),
                             style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
                     }
-                    Text("Время занятия войдёт в итог раздела в обзоре и целях. Уже сделанные записи сохранят своё прежнее место.",
+                    Text(L.s(R.string.t_bf4c4f53cb),
                         style = NotAi.type.caption, color = c.ink2)
                     if (!favored) Text(stringResource(R.string.editorial_tracker_draft_b679826bdf312797a5c6_v1), Modifier.heightIn(min = 36.dp).pressable({ vm.saveFavorite(card.name, card.classification()) }).padding(vertical = 8.dp),
                         style = NotAi.type.bodySmall.copy(fontWeight = FontWeight.Medium), color = c.amberInk)

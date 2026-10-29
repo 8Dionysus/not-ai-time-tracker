@@ -1,0 +1,942 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from Kotlin source copy; see localization/ui-copy/README.md. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="t_0076203bff" formatted="false">休憩を開始</string>
+    <string name="t_0077164ed0">エクスポート %1$s：もう一度準備してください。途中のファイルは残っています</string>
+    <string name="t_007f15b539" formatted="false">セッション/区間全体の数量…</string>
+    <string name="t_0087bd0bf7" formatted="false">活動を検索または作成</string>
+    <string name="t_00ad5c791d">、自分の変更との食い違い：%1$s。技術シェルで解決が必要です。</string>
+    <string name="t_017c8c142b" formatted="false">料理</string>
+    <string name="t_0195b83c6c" formatted="false">現在の活動に割り当てる</string>
+    <string name="t_01a3d66b22" formatted="false">Focus：休憩</string>
+    <string name="t_01e118e6e9">%1$sを%2$s早く</string>
+    <string name="t_03498e395a" formatted="false">一時停止</string>
+    <string name="t_03cb42c402">%1$sから進行中。選んでも開始時刻はそのままです。</string>
+    <string name="t_042dbd35f2">このファイルは使えません：%1$s</string>
+    <string name="t_0467ae4bb8" formatted="false">確認</string>
+    <string name="t_04bcedfa9f">%1$sから今まで</string>
+    <string name="t_059b504fa9" formatted="false">フォルダーを選びました。最初のコピーは数分後に作成されます</string>
+    <string name="t_05f4ea7fa6" formatted="false">置き換える前に現在のデータを別に保存します。このコピー以降の記録は消えます。</string>
+    <string name="t_060c91cb5a">%1$s超過</string>
+    <string name="t_067a6eef15" formatted="false">CSVマッピングの前にIDでカードを選んでください</string>
+    <string name="t_06d08263c2" formatted="false">このフォルダーにはコピーを保存できません。別のフォルダーを選んでください</string>
+    <string name="t_0865c10035" formatted="false">以上</string>
+    <string name="t_08ccc5ba08">%1$s：%2$s。アプリを開いて現在の状態を確認してください。</string>
+    <string name="t_08f120e3b9" formatted="false">保存した候補を開始しますか？</string>
+    <string name="t_090fad991e" formatted="false">設定を開く</string>
+    <string name="t_0931eb69ad" formatted="false">自分の活動</string>
+    <string name="t_096312396e">%1$s</string>
+    <string name="t_09804101ad" formatted="false">ゆったり</string>
+    <string name="t_0a33cc879e">お気に入りから外す：%1$s</string>
+    <string name="t_0a7d0c65cc" formatted="false">保存をキャンセルしました</string>
+    <string name="t_0a7e3cd8d9" formatted="false">カタログは最新です</string>
+    <string name="t_0ad4a07529" formatted="false">手動の区間を保存</string>
+    <string name="t_0b5f48821f" formatted="false">うまくいきませんでした</string>
+    <string name="t_0b94cabd4c" formatted="false">日の区切りを1時間早く</string>
+    <string name="t_0bfa7a54cb" formatted="false">日ごとの計画</string>
+    <string name="t_0c15fe2798">フォーカス、作業区間 %1$s</string>
+    <string name="t_0d0c228652" formatted="false">プロバイダーが確認用の読み取りを許可していません。</string>
+    <string name="t_0d6b1a17a4" formatted="false">ブラック</string>
+    <string name="t_0d8700fb2a" formatted="false">記録同士または履歴と重なっています</string>
+    <string name="t_0e974974fb" formatted="false">オンですが、端末の設定で通知がオフです</string>
+    <string name="t_0ec753be8d" formatted="false">キャンセル</string>
+    <string name="t_0f605ae8ff" formatted="false">完全な置き換えを確認</string>
+    <string name="t_0f73f5a22c" formatted="false">大きめ</string>
+    <string name="t_0f9a1db081">%1$s分刻み</string>
+    <string name="t_0faf5fa9ac">残り（全%1$s）</string>
+    <string name="t_0fc242f26d" formatted="false">記録しました</string>
+    <string name="t_1013a729a6" formatted="false">土</string>
+    <string name="t_104053cfbe" formatted="false">お気に入りと過去30日によく使った活動。</string>
+    <string name="t_10729118a0" formatted="false">隠す</string>
+    <string name="t_117ce12b52">CSV追加：%1$s…%2$s / %3$s</string>
+    <string name="t_11bb1b11c0" formatted="false">ホーム画面にあります</string>
+    <string name="t_11d7afb599" formatted="false">時間の長さの書き方</string>
+    <string name="t_1250ceafd1" formatted="false">アイコンのショートカット</string>
+    <string name="t_125737d34a" formatted="false">再インストール後は、ここで自動コピーのフォルダーから任意のファイルを選んでください。コピーは端末間の同期ではありません。</string>
+    <string name="t_1259571a15" formatted="false">開く</string>
+    <string name="t_126d6b9747">ホーム画面：%1$s</string>
+    <string name="t_129d9b9794" formatted="false">端末がリクエストを受け付けませんでした。もう一度お試しください</string>
+    <string name="t_129dc42035" formatted="false">新しいカードを保存</string>
+    <string name="t_12b0be1a44" formatted="false">活動の列</string>
+    <string name="t_12f864ad2e">5回続けて失敗したため一時停止中です。%1$s</string>
+    <string name="t_12fa39305e" formatted="false">完全なJSONをエクスポート</string>
+    <string name="t_137cb582b9" formatted="false">適用する時期</string>
+    <string name="t_13b7c69527" formatted="false">(not)AI フォーカス</string>
+    <string name="t_13c587506e" formatted="false">今日の記録はまだありません。最初の記録ができると概要が自動で表示されます。</string>
+    <string name="t_13f1659f76" formatted="false">時間計測を開始</string>
+    <string name="t_1425330b29" formatted="false">今日から</string>
+    <string name="t_145c3ed6a6" formatted="false">レポートを削除しました</string>
+    <string name="t_147355d342">このファイルはCSVの表ではありません。%1$s</string>
+    <string name="t_14a658ce61" formatted="false">フォルダーを選ぶ</string>
+    <string name="t_14d31156f2" formatted="false">今から詳細を変更</string>
+    <string name="t_14eaa871df" formatted="false">開始</string>
+    <string name="t_156e23f619" formatted="false">Toggl、Clockify、または自分の表から。追加される内容を先に表示します</string>
+    <string name="t_15b056d9f4" formatted="false">フォーカスを終了</string>
+    <string name="t_15dfa124b4" formatted="false">よく使う活動はまだありません。アプリの履歴から選べます。</string>
+    <string name="t_160b172224" formatted="false">活動を保存しました</string>
+    <string name="t_161fe56e51" formatted="false">水</string>
+    <string name="t_163fdcceaa" formatted="false">時刻を指定</string>
+    <string name="t_164b8bb2af" formatted="false">レポートを編集</string>
+    <string name="t_1751103733" formatted="false">1日だけ</string>
+    <string name="t_176ddf9870" formatted="false">タイムゾーンの選択を完了できませんでした。現在のタイムゾーンを確認して選び直してください</string>
+    <string name="t_17e44239e9" formatted="false">上へ</string>
+    <string name="t_181ee397c9" formatted="false">計画から開始済みの記録は履歴に残ります。</string>
+    <string name="t_1827ab0050" formatted="false">深夜0時（カレンダーと同じ）</string>
+    <string name="t_1880e6b0ec" formatted="false">ロック解除なしで活動・時間・ボタンが見えます</string>
+    <string name="t_18c99fb35b" formatted="false">時間を記録中</string>
+    <string name="t_191cacce9c" formatted="false">すべての活動</string>
+    <string name="t_19295833d9" formatted="false">今週</string>
+    <string name="t_19f25d5784" formatted="false">その他</string>
+    <string name="t_1a287db9b2" formatted="false">グラファイト</string>
+    <string name="t_1a3994958c" formatted="false">0時</string>
+    <string name="t_1a54271b7a" formatted="false">完了した履歴はありません</string>
+    <string name="t_1a599143aa" formatted="false">標準</string>
+    <string name="t_1ac5f47619" formatted="false">計画に追加しました</string>
+    <string name="t_1b27ed0870" formatted="false">すべてのデータを置き換えますか？</string>
+    <string name="t_1b702dcc70">ファイルの時刻は %1$s のタイムゾーンで読み取ります</string>
+    <string name="t_1bba9e465a" formatted="false">アプリ外のタイマー</string>
+    <string name="t_1bc5f604f5" formatted="false">1分</string>
+    <string name="t_1bcdac8735">追加：%1$s、重複：%2$s。\n%3$s\nエラー：%4$s\n%5$s\n%6$s\nこれは履歴の追加です。完全なJSON復元はすべてのデータを置き換えます。</string>
+    <string name="t_1bd48e6642">活動：%1$s</string>
+    <string name="t_1c38d1407f" formatted="false">（一時停止の間）</string>
+    <string name="t_1c4b04d710" formatted="false">ホーム画面に追加</string>
+    <string name="t_1c76eec066" formatted="false">データを復元しました。以前のデータは別に保存されています</string>
+    <string name="t_1c8ee71b8e">%1$sまで空き</string>
+    <string name="t_1cd1162258" formatted="false">カタログを更新しますか？</string>
+    <string name="t_1d4961d804" formatted="false">映画とドラマ</string>
+    <string name="t_1deb177f5a">計画：%1$s</string>
+    <string name="t_1df521854e" formatted="false">メモの内容</string>
+    <string name="t_1f1fa1b82e" formatted="false">コピーをタップ：まず中身を表示し、確認後にだけデータを置き換えます</string>
+    <string name="t_1fbd871837" formatted="false">フォルダーは現在使えません：ネットワークがないか、クラウドアプリが応答しません。自動で再試行します</string>
+    <string name="t_1fcbdeecfd">%1$s：減らす</string>
+    <string name="t_1fce9b2e5d">%1$s：%2$s。各列の意味を確認してください —</string>
+    <string name="t_20490f3632" formatted="false">カレンダーの予定を選ぶ…</string>
+    <string name="t_20c87f5908" formatted="false">目標を設定</string>
+    <string name="t_20feaa7e40" formatted="false">活動なし・メモ付きで開始</string>
+    <string name="t_210ed3cd4d" formatted="false">この列はありません</string>
+    <string name="t_212edd982b" formatted="false">見つかった項目</string>
+    <string name="t_2152e4a71f" formatted="false">リストの先頭のものは通知シェード、ウィジェット、フローティングボタンに表示されます。並べ替えるには長押ししてドラッグします。</string>
+    <string name="t_21a4608d93" formatted="false">データが変わりました：もう一度確認してください</string>
+    <string name="t_21afbee12c" formatted="false">表示されませんでした。もう一度試すか、手動で追加してください：ホーム画面を長押し → ウィジェット → (not)AI Time</string>
+    <string name="t_224fe4a4c3">%1$sの記録はありません</string>
+    <string name="t_22615c35f9">「%1$s」を計画から外しますか？</string>
+    <string name="t_22776aacd4" formatted="false">ネオン</string>
+    <string name="t_2373dd4f8d" formatted="false">先週</string>
+    <string name="t_24f866b4ee" formatted="false">切り替え先</string>
+    <string name="t_253cf1644f" formatted="false">準備したエクスポートを取り消す</string>
+    <string name="t_2583e76aee" formatted="false">もっと前に切り替えた：保存</string>
+    <string name="t_27113f7a1e" formatted="false">保存エラーです。再試行の前に現在の状態を確認してください。</string>
+    <string name="t_27546ccb04" formatted="false">フォーカスとリマインダー</string>
+    <string name="t_279c2c3c90" formatted="false">変更</string>
+    <string name="t_27d5f2e22a" formatted="false">カタログを更新しました</string>
+    <string name="t_28061309a5" formatted="false">フォーカス：活動</string>
+    <string name="t_2840f49e22" formatted="false">アクティビティを切り替える／詳細を指定</string>
+    <string name="t_285cc40014" formatted="false">時間</string>
+    <string name="t_288dc99a2b" formatted="false">時間は保存済みです。活動を選ぶだけです。</string>
+    <string name="t_2894da98dd" formatted="false">目標を外しました</string>
+    <string name="t_2960da94e0" formatted="false">空き時間を隠す</string>
+    <string name="t_2972f8b4c4" formatted="false">記録はありません。</string>
+    <string name="t_29f3b29df0" formatted="false">復元</string>
+    <string name="t_2a5e307788" formatted="false">コンパクト</string>
+    <string name="t_2a690e69d2" formatted="false">アイコンは選びましたが、ショートカットはまだ更新されていません</string>
+    <string name="t_2a70012208" formatted="false">"合計 "</string>
+    <string name="t_2b39abab32">「%1$s」。アプリを開いている間ループ再生します</string>
+    <string name="t_2c0db2ce7c" formatted="false">開始：</string>
+    <string name="t_2d2be3f11c" formatted="false">作業区間</string>
+    <string name="t_2d5a644e5c" formatted="false">この区間はありえません：開始と終了を確認してください。</string>
+    <string name="t_2dd965ee95" formatted="false">アクセント</string>
+    <string name="t_2e31dae95f" formatted="false">ファイルを選ぶ</string>
+    <string name="t_2e3c5fdafe" formatted="false">勉強</string>
+    <string name="t_2ea9f562ed" formatted="false">平日</string>
+    <string name="t_2eb808708c" formatted="false">端末のタイムゾーンを使う</string>
+    <string name="t_2f6a9e8aa1" formatted="false">、開始済み</string>
+    <string name="t_2f94692058" formatted="false">IANAタイムゾーンを検索（例：Asia/Tokyo）</string>
+    <string name="t_2fc6caafc1">%1$s以上</string>
+    <string name="t_30796d2694" formatted="false">今月から</string>
+    <string name="t_30c994650d" formatted="false">時刻を修正しました</string>
+    <string name="t_30e1fab800" formatted="false">お気に入りを変更しました</string>
+    <string name="t_30e9845126">ほか%1$s分野：職業と仕事</string>
+    <string name="t_3146141c93" formatted="false">計画</string>
+    <string name="t_315bf156c9" formatted="false">掃除</string>
+    <string name="t_3179b46b9d" formatted="false">この区間は別の記録と重なっています。</string>
+    <string name="t_31990f76f4" formatted="false">切り替えの結果を確認できませんでした</string>
+    <string name="t_32000365e9" formatted="false">ティール</string>
+    <string name="t_322896daf3" formatted="false">次の区間</string>
+    <string name="t_322ce697bb" formatted="false">記録中</string>
+    <string name="t_3296879eac">%1$s分</string>
+    <string name="t_329b31bdca" formatted="false">アイコンのショートカット</string>
+    <string name="t_32b74a3c47" formatted="false">無題</string>
+    <string name="t_32fd384860">%1$sより前の記録は前日として扱います。記録自体は変わりません</string>
+    <string name="t_3371d6e0e9">%1$s · 残り %%s</string>
+    <string name="t_33a79b3bc1" formatted="false">他のアプリの上に半透明の開始/停止を表示。停止後すぐに活動を選べます</string>
+    <string name="t_340342b07a" formatted="false">タイムゾーンの選択を復元できませんでした。もう一度選んでください</string>
+    <string name="t_359168c1d3" formatted="false">カテゴリを保存しました</string>
+    <string name="t_364431ec5a">%1$sより前</string>
+    <string name="t_388cfb0795" formatted="false">「開始」のさそい</string>
+    <string name="t_38a279b292" formatted="false">次のフォーカス区間</string>
+    <string name="t_38dfef435f" formatted="false">前後の記録の中での位置</string>
+    <string name="t_398c7d4f7b" formatted="false">完了</string>
+    <string name="t_3a42cfebfe" formatted="false">通知</string>
+    <string name="t_3ac95324a3" formatted="false">何に切り替えましたか？</string>
+    <string name="t_3af83d8850" formatted="false">データが変わりました。画面を確認してもう一度お試しください。</string>
+    <string name="t_3b97545714" formatted="false">記録を追加しました</string>
+    <string name="t_3bb014825e" formatted="false">選択した記録のメモ</string>
+    <string name="t_3bfd577967">%1$sを%2$s遅く</string>
+    <string name="t_3c244ffaa5">カレンダー：%1$s。履歴は変更なし</string>
+    <string name="t_3c6332622c" formatted="false">アプリを開く</string>
+    <string name="t_3cd7d0dd3c" formatted="false">日別の時間：</string>
+    <string name="t_3d51050347" formatted="false">達成</string>
+    <string name="t_3da1c7d83d" formatted="false">目標を外しますか？</string>
+    <string name="t_3de49828e8" formatted="false">名前</string>
+    <string name="t_3dfcd2dc31" formatted="false">散歩</string>
+    <string name="t_3e32dd6cfd">メモ：「%1$s」</string>
+    <string name="t_3e36db582a" formatted="false">ロック解除しないと、記録中であることだけが見えます</string>
+    <string name="t_3e5ab0f642" formatted="false">ホーム画面</string>
+    <string name="t_3f75368ab9" formatted="false">再開</string>
+    <string name="t_3fa9f851cc" formatted="false">今週から</string>
+    <string name="t_41a9abce27" formatted="false">フォーカスを開始</string>
+    <string name="t_41f23bd106" formatted="false">レポートのタイムゾーンを固定しました</string>
+    <string name="t_4208a1afd0" formatted="false">タイムゾーンが見つかりません</string>
+    <string name="t_421fbcd348" formatted="false">ホーム画面で追加を確認してください</string>
+    <string name="t_42f85ce119" formatted="false">今日</string>
+    <string name="t_4301919e86">%1$sが終わりました。開いて続けてください</string>
+    <string name="t_4304ef48ab" formatted="false">フローティングボタン：システムの許可がありません。タイマーはアプリで使えます</string>
+    <string name="t_434e93a022" formatted="false">IDでカードを選ぶ…</string>
+    <string name="t_43c9451f7e" formatted="false">現在のエクスポートを完了するか取り消してください</string>
+    <string name="t_43f3c7181c">もう%1$sです。タイマーを忘れていませんか？</string>
+    <string name="t_440d3db6ca">活動「%1$s」を作成しました</string>
+    <string name="t_44b6bfd761">%1$sを変更しますか？</string>
+    <string name="t_455a50db4a">%1$s分</string>
+    <string name="t_457969b009" formatted="false">確認</string>
+    <string name="t_45e673c416">メモ「%1$s」が既存のメモを置き換えます。</string>
+    <string name="t_45ec81da8a" formatted="false">選択中</string>
+    <string name="t_46404668d3" formatted="false">長い記録</string>
+    <string name="t_46a1378615" formatted="false">日数</string>
+    <string name="t_46e27e2f0a" formatted="false">カタログ</string>
+    <string name="t_474488d799">目標：%1$s</string>
+    <string name="t_476c9846a6" formatted="false">以下</string>
+    <string name="t_4784c38b90" formatted="false">読み込み中…</string>
+    <string name="t_47947a0c46" formatted="false">タイムゾーン</string>
+    <string name="t_4864057d62" formatted="false">保存</string>
+    <string name="t_488cfa5f88" formatted="false">日数は週または月ごとに数えます。</string>
+    <string name="t_488dd14a85" formatted="false">ライセンス</string>
+    <string name="t_489dd4cb3d" formatted="false">カタログからカードを選択…</string>
+    <string name="t_48b72fd474" formatted="false">自動コピー</string>
+    <string name="t_490aa0241e" formatted="false">終了が開始より前です</string>
+    <string name="t_494ef4deb5" formatted="false">フローティングボタン＋必須のサービス通知</string>
+    <string name="t_49a37138c8">開始 %1$s、終了は不明</string>
+    <string name="t_49b9985de4" formatted="false">作業区間のあいだ</string>
+    <string name="t_49c5f1afe2" formatted="false">すぐに時間計測が始まります。\nアクティビティは後で選べます。</string>
+    <string name="t_49f64bd23b">、エラーあり：%1$s</string>
+    <string name="t_4a81786403" formatted="false">例：toggl:personal</string>
+    <string name="t_4ac8d095fb" formatted="false">準備済みのエクスポートはありません</string>
+    <string name="t_4ae50d3073" formatted="false">閉じる</string>
+    <string name="t_4bae800626" formatted="false">開いて終了時刻を入力</string>
+    <string name="t_4be730321c" formatted="false">記録</string>
+    <string name="t_4c70fed089" formatted="false">お気に入りを選んで開始…</string>
+    <string name="t_4d1cb9fd4a">あと%1$s</string>
+    <string name="t_4d397a20ed">%1$s 記録の時間は変わりません。直後に元に戻せます。</string>
+    <string name="t_4d92a280cc" formatted="false">タイムゾーンの選択が完了しないまま設定が変わりました。タイムゾーンを確認して選び直してください</string>
+    <string name="t_4e1936db2d" formatted="false">筋トレ</string>
+    <string name="t_4e895fd70d" formatted="false">終了</string>
+    <string name="t_4ea0639432" formatted="false">並べ替えとすべてのお気に入り</string>
+    <string name="t_4ebd720453" formatted="false">開始／切り替え時刻：ISO-8601</string>
+    <string name="t_4ebf488399">保存したフォームを読み込めませんでした：%1$s</string>
+    <string name="t_4edbcc192a" formatted="false">フローティングボタンはオンです</string>
+    <string name="t_4ef8132cf3">%1$s：増やす</string>
+    <string name="t_4fc1809d7d" formatted="false">選んだフォルダー</string>
+    <string name="t_5075c29ca7" formatted="false">並び順、ボタンの名前、重複の削除。通知シェード・ウィジェット・ボタンで同じ順番です</string>
+    <string name="t_50a62e5c0f" formatted="false">長さが開始・終了と一致しません</string>
+    <string name="t_50abb9831d" formatted="false">ファイルがフォルダーに作成されたか不明です。再試行するか、このコピーをスキップしてください</string>
+    <string name="t_50ac9ea6c3">%1$s、バージョン %2$s。タップして更新を確認</string>
+    <string name="t_5123c9c552" formatted="false">火</string>
+    <string name="t_51403c82de" formatted="false">昨日</string>
+    <string name="t_51d6a3da35" formatted="false">何をしていましたか？</string>
+    <string name="t_51f805f925">新しいカードを選択 · %1$s</string>
+    <string name="t_5203402af7">メモ「%1$s」はメモがない記録に追加されます。</string>
+    <string name="t_52da7c24f6" formatted="false">フォーカス一時停止中</string>
+    <string name="t_53e131e48c">「%1$s」はワンタップで開始できます</string>
+    <string name="t_542c2cd5f6" formatted="false">フォルダーへの自動コピー</string>
+    <string name="t_544a30f1ea" formatted="false">ウィジェット（launcherから追加）</string>
+    <string name="t_549bc063f3" formatted="false">アクティビティを選んで開始</string>
+    <string name="t_54fe5cc440" formatted="false">タイマーの数字</string>
+    <string name="t_550c7a6d12" formatted="false">記録はまだありません。ここに各区間が表示されます。</string>
+    <string name="t_552d1cca6b" formatted="false">この日のカレンダーには時刻のある予定がありません。</string>
+    <string name="t_559a87f7cc" formatted="false">追加</string>
+    <string name="t_55c44eb122">%2$sの前に%1$sが追加されます。</string>
+    <string name="t_55cd7a55ed" formatted="false">端末の許可が足りない項目があります</string>
+    <string name="t_55e920546e" formatted="false">フローティングボタンをオフにしました</string>
+    <string name="t_5695330ffb" formatted="false">自動</string>
+    <string name="t_569ffccaa8">%1$sから空き</string>
+    <string name="t_57792c3ae8" formatted="false">行IDが重複しているか、ありません</string>
+    <string name="t_5779709c59" formatted="false">ソースを利用できません</string>
+    <string name="t_57fe19481c" formatted="false">記録のない空き時間を隠す</string>
+    <string name="t_580b6b1b3e" formatted="false">アプリで次の区間を選んでください</string>
+    <string name="t_58533a0c30" formatted="false">よく始める活動に星を付けましょう。ホーム画面と通知シェードに表示されます。</string>
+    <string name="t_5873f87916" formatted="false">不明なIANAタイムゾーン</string>
+    <string name="t_58847603b8" formatted="false">新しいコピーは保存されましたが、古いものを削除できませんでした</string>
+    <string name="t_58a3c5f495">%1$s：内訳</string>
+    <string name="t_58d3c60b00" formatted="false">今日の計画から外しました</string>
+    <string name="t_58e6634696" formatted="false">新しい目標</string>
+    <string name="t_5905870dba" formatted="false">計画とよく使う活動</string>
+    <string name="t_5916628df1" formatted="false">アクティビティを選択</string>
+    <string name="t_596144b0e6" formatted="false">記録数</string>
+    <string name="t_59ef713872">セッション：%1$s、区間：%2$s。置き換え前に現在のDB/WAL/SHMを検証済みハッシュ付きで保存します。古いコピーは残ります。</string>
+    <string name="t_5a1413e92d">最新 %1$s、ファイル確認済み</string>
+    <string name="t_5a1d0660ef" formatted="false">選択が変わりました。記録を確認してもう一度お試しください。</string>
+    <string name="t_5a7fa46600" formatted="false">詳細なし</string>
+    <string name="t_5b010e144f" formatted="false">選んだアイコンを判別できませんでした。使える候補を選んでください</string>
+    <string name="t_5b76112f5b" formatted="false">基本</string>
+    <string name="t_5bb00e40b9" formatted="false">アーカイブ済み</string>
+    <string name="t_5c65c982d1" formatted="false">時間不明</string>
+    <string name="t_5c675dcb97" formatted="false">活動なしで開始</string>
+    <string name="t_5cd8e48ad3" formatted="false">切り替えの時刻</string>
+    <string name="t_5d09029804" formatted="false">記録のない空き時間を表示</string>
+    <string name="t_5d38673a55" formatted="false">さらに追加</string>
+    <string name="t_5d5d2ea20a" formatted="false">今日</string>
+    <string name="t_5d762fa56e" formatted="false">日付または時刻を選んだ形式で読み取れません</string>
+    <string name="t_5da9e0e83b" formatted="false">お気に入りへ</string>
+    <string name="t_5de1eb4784">新規：%1$s、詳細：%2$s、競合：%3$s。ローカルの名前、アーカイブ状態、履歴は保持されます。</string>
+    <string name="t_5e1ad8c5d8" formatted="false">アプリの設定でオフにできます</string>
+    <string name="t_5e94c97f99" formatted="false">すべての活動を数える</string>
+    <string name="t_5ec7b0f52b" formatted="false">手動</string>
+    <string name="t_5f0968991b" formatted="false">開始列</string>
+    <string name="t_5f239661cc" formatted="false">区間と一時停止を表示</string>
+    <string name="t_5f9a6b6230" formatted="false">各日の記録の上に区間の帯</string>
+    <string name="t_5fb4185cca" formatted="false">中に含まれるものすべてを含む</string>
+    <string name="t_5fc35f86af">%1$sと同じ</string>
+    <string name="t_5fdf8988d5" formatted="false">アプリ · Apache 2.0</string>
+    <string name="t_6090cecf2d">元は%1$s</string>
+    <string name="t_60a8361ac8" formatted="false">オフです。新しいコピーは保存されず、以前のものはフォルダーに残ります</string>
+    <string name="t_60e27c596a">%1$s時間%2$s分</string>
+    <string name="t_61394d0185" formatted="false">いつ始めましたか？</string>
+    <string name="t_6155f92695" formatted="false">複数選択</string>
+    <string name="t_616bb19d6c" formatted="false">許可</string>
+    <string name="t_617d07376f">%1$s日間</string>
+    <string name="t_61af667ee0">%2$sより%1$s多い</string>
+    <string name="t_61ce62df94">%1$s：%2$sパーセント</string>
+    <string name="t_6213880977" formatted="false">今すぐ保存</string>
+    <string name="t_624e55535f" formatted="false">リストの密度</string>
+    <string name="t_6257137741" formatted="false">、まだ期間中</string>
+    <string name="t_629e3bb846" formatted="false">duration列</string>
+    <string name="t_62c204df09" formatted="false">メモを含める</string>
+    <string name="t_63833f7ebd" formatted="false">これをスキップ</string>
+    <string name="t_6400526c15" formatted="false">CSVから履歴を追加…</string>
+    <string name="t_6492631c6e" formatted="false">計画から外しました</string>
+    <string name="t_64d9c34819" formatted="false">ファイルに列がありません</string>
+    <string name="t_64eb81c370">%1$s以下</string>
+    <string name="t_64ed62742f" formatted="false">タイムゾーン、日の始まり、カタログ、CSV</string>
+    <string name="t_654fad1c18" formatted="false">終了時刻（別の列にある場合）</string>
+    <string name="t_657703c887" formatted="false">カタログ全体を検索</string>
+    <string name="t_66c789d74f" formatted="false">詳細：例 listening</string>
+    <string name="t_67946fca81">活動「%1$s」を作成</string>
+    <string name="t_67a887cea0" formatted="false">目標を外す</string>
+    <string name="t_680a3249f0" formatted="false">編集中のメモを受け取ったテキストに置き換えますか？</string>
+    <string name="t_69d66ab891" formatted="false">計画に活動を追加</string>
+    <string name="t_69e5b8a8c6" formatted="false">0以上のDecimal、区切りはピリオド</string>
+    <string name="t_6a0e6066b0" formatted="false">もっと前に切り替えた</string>
+    <string name="t_6ae7f2feef" formatted="false">終日</string>
+    <string name="t_6b08862cb2" formatted="false">アプリのアイコンを確認できませんでした</string>
+    <string name="t_6b8910932e" formatted="false">ステータスバーのアイコンを非表示</string>
+    <string name="t_6cde6c34a0" formatted="false">今日の計画</string>
+    <string name="t_6d06e4bbc8" formatted="false">カレンダーから</string>
+    <string name="t_6d4aeaf49a" formatted="false">自分のレポート：活動と期間</string>
+    <string name="t_6d714e833d" formatted="false">停止</string>
+    <string name="t_6d7bb5e932">1日%1$s以上</string>
+    <string name="t_6d95221406" formatted="false">Focusのバックグラウンド通知（OSによって遅れる場合があります）</string>
+    <string name="t_6e166fe43b">繰り返す：%1$s</string>
+    <string name="t_6e65291421">「%1$s」の活動を選ぶ</string>
+    <string name="t_6e84391a2f" formatted="false">許可がないとカレンダーは使えません</string>
+    <string name="t_6ea005bd2d" formatted="false">空き時間を記録しました</string>
+    <string name="t_6eb7540d7c" formatted="false">オフ</string>
+    <string name="t_6f65bc34a3" formatted="false">この長さは次回以降も使われます。</string>
+    <string name="t_6fb5a32ea5" formatted="false">毎日</string>
+    <string name="t_702e03be1e" formatted="false">アンバー</string>
+    <string name="t_70b8d5d8d5" formatted="false">活動</string>
+    <string name="t_716e5371c7" formatted="false">選択をやめる</string>
+    <string name="t_71790fdb53" formatted="false">サイレントモード</string>
+    <string name="t_72aecd9ad8" formatted="false">エラー</string>
+    <string name="t_72f931bda2" formatted="false">バックアップ</string>
+    <string name="t_731f2bdc1e" formatted="false">カレンダーから時刻を取る</string>
+    <string name="t_734bcf2003" formatted="false">ステータスバーのアイコン</string>
+    <string name="t_735877a9aa" formatted="false">休憩</string>
+    <string name="t_737fe33491" formatted="false">エクスポートをキャンセルしました。準備済みコピーから再試行できます</string>
+    <string name="t_738652aa6f">活動そのものを編集：「%1$s」</string>
+    <string name="t_73a0a9afdc" formatted="false">活動なしで続ける</string>
+    <string name="t_741870459d" formatted="false">自動</string>
+    <string name="t_747942b4fa" formatted="false">時刻の形式</string>
+    <string name="t_74b69f961b" formatted="false">作業を開始</string>
+    <string name="t_750b471214" formatted="false">お気に入りの順番</string>
+    <string name="t_751e31256e">%1$s。端末のタイムゾーンが変わると、履歴と概要の日の区切りもそれに従います。記録と目標のタイムゾーンは変わりません。</string>
+    <string name="t_75436e3162" formatted="false">作業</string>
+    <string name="t_75cd08a0e5" formatted="false">切り替え：</string>
+    <string name="t_762d7d64da" formatted="false">昨日</string>
+    <string name="t_76393b3245" formatted="false">ローカルのロールバック用コピー…</string>
+    <string name="t_766e7cabf7" formatted="false">減らす</string>
+    <string name="t_768af67762" formatted="false">適用</string>
+    <string name="t_768fee24c8" formatted="false">活動カタログ：更新があります</string>
+    <string name="t_76dcf737a6" formatted="false">送信</string>
+    <string name="t_781ebc1c5f" formatted="false">Overlayはアプリを表示しているときにのみ起動します</string>
+    <string name="t_782c5a40e3" formatted="false">セミコロン</string>
+    <string name="t_784e60ff6a">%1$s KB</string>
+    <string name="t_78fb4788c6">%1$sを追加しました</string>
+    <string name="t_793720ff06">%2$sより%1$s少ない</string>
+    <string name="t_794d0309cf" formatted="false">時間は保存済み</string>
+    <string name="t_79eb55406f" formatted="false">タイムゾーンの選択を完了できませんでした。設定でもう一度選んでください</string>
+    <string name="t_79fb04fd8b">技術シェル · Room %1$s\n%2$s\n%3$s ms · リビジョン %4$s\n%5$s%6$s\n%7$s</string>
+    <string name="t_7ae0e67853" formatted="false">端末のタイムゾーンを使いますか？</string>
+    <string name="t_7ae1597ae7" formatted="false">時間を確認するにはアプリを開いてください</string>
+    <string name="t_7aeae28ae9" formatted="false">カードなし</string>
+    <string name="t_7b11e988e1" formatted="false">今日は外す</string>
+    <string name="t_7b47d9e19e" formatted="false">Startには現在時刻を使用します。手動記録では開始・終了時刻の指定が必要です。終日予定では作業時間を指定できません。</string>
+    <string name="t_7c379e8e5c" formatted="false">レポートを保存しました</string>
+    <string name="t_7cc6025206">完了：クイック開始に%1$s</string>
+    <string name="t_7d3ea0e679" formatted="false">履歴の日付</string>
+    <string name="t_7d4b8f8a7e">選択：%1$s</string>
+    <string name="t_7d87e4d658" formatted="false">作業中はアプリ独自のサイレントモードルール（優先通知のみ）をオンにします。例外は端末で設定します。作業が終わるとルールを解除します</string>
+    <string name="t_7da3c34069">ローカルデータベースを使えません：%1$s\n元のファイルは保持されています。復旧でコピーを選んでください。</string>
+    <string name="t_7ddb544bcd">時間が不明な区間があります：%1$s。確定するまで合計に含まれません。</string>
+    <string name="t_7dfbff730f" formatted="false">木</string>
+    <string name="t_7eb07227f1" formatted="false">行ID列</string>
+    <string name="t_7ec7c94cc1" formatted="false">メモ列</string>
+    <string name="t_7f12cd4599" formatted="false">オンですが、端末がまだアプリのサイレントモードを許可していません</string>
+    <string name="t_7f17c7c62a" formatted="false">設定</string>
+    <string name="t_7f76296ba9" formatted="false">終了した記録区間はありません</string>
+    <string name="t_7f7a71c089">コピーの内容：%1$s、%2$s、</string>
+    <string name="t_7fa01b6e34" formatted="false">復元したコピーではオンです。この端末で確認が必要です</string>
+    <string name="t_80072ed701" formatted="false">自分の活動なし</string>
+    <string name="t_806764743a" formatted="false">複数の活動</string>
+    <string name="t_8080010c5e" formatted="false">ライト</string>
+    <string name="t_80e474035b" formatted="false">時刻にタイムゾーンが含まれる</string>
+    <string name="t_81129d8255" formatted="false">目標を変更しました</string>
+    <string name="t_8125e2fba0" formatted="false">すべての行を選択済みのカードに割り当て。未選択の場合は、元の名前を種類なしで使用</string>
+    <string name="t_817dfa0bfc">（列「%1$s」）</string>
+    <string name="t_819f3ba9d1" formatted="false">前の記録の終わりから</string>
+    <string name="t_81b26ab0d7" formatted="false">停止後の選択画面の背景</string>
+    <string name="t_81d3d38d5c" formatted="false">確認するまでの時間</string>
+    <string name="t_820b711796" formatted="false">1.5 時間</string>
+    <string name="t_8213ed5bbc" formatted="false">このデバイスでは権限設定を開けません</string>
+    <string name="t_8241e9552e" formatted="false">このセクションに自分の活動を追加：検索に名前を入力</string>
+    <string name="t_832c48f416" formatted="false">サードパーティのコンポーネント</string>
+    <string name="t_838a5669f7" formatted="false">集計を共有</string>
+    <string name="t_83a2768955" formatted="false">すべて置き換え</string>
+    <string name="t_83ae5f756d" formatted="false">ファイルが大きすぎます</string>
+    <string name="t_84707b7a44" formatted="false">同じアカウントの繰り返しエクスポートには同じ名前、別のソースには別の名前を。</string>
+    <string name="t_84f85ce506" formatted="false">見つかりません</string>
+    <string name="t_851c0ae977" formatted="false">そのまま</string>
+    <string name="t_851c871818">バージョン %1$s。新しい活動：%2$s、詳細：%3$s</string>
+    <string name="t_852778be6d" formatted="false">計算中…</string>
+    <string name="t_8532eff044" formatted="false">有酸素運動</string>
+    <string name="t_853744f144" formatted="false">現在の期間は以前の目標のまま数えます。</string>
+    <string name="t_8543530f12">最新 %1$s</string>
+    <string name="t_85d33d64d6" formatted="false">行の列数が違います</string>
+    <string name="t_85e8a3404b" formatted="false">この端末からはまだファイルを保存していません</string>
+    <string name="t_86042e468b" formatted="false">測定、カレンダー、データベースの復旧</string>
+    <string name="t_861bd8760b" formatted="false">Onestフォント · SIL Open Font License</string>
+    <string name="t_8633c34c71">" · ファイル内：%1$s"</string>
+    <string name="t_86652580fd" formatted="false">先月</string>
+    <string name="t_8690f98524" formatted="false">、まだ1日の途中</string>
+    <string name="t_86d85a0147">レポートのタイムゾーン：%1$s</string>
+    <string name="t_86ea33aef5" formatted="false">削除</string>
+    <string name="t_86ee6df7f5" formatted="false">秒</string>
+    <string name="t_86fde46076" formatted="false">最後に記録したものを再度実行（保存済み。アーカイブ設定を含む）</string>
+    <string name="t_877c853fa7" formatted="false">許可済み</string>
+    <string name="t_87a5f792b0">%1$sバイト書き込みました。%2$s</string>
+    <string name="t_886ebf7a3e">復元しました。ロールバック用コピー：%1$s</string>
+    <string name="t_88c6fe08c7" formatted="false">フローティングボタン</string>
+    <string name="t_88f1a5a112" formatted="false">表示</string>
+    <string name="t_88f778367b" formatted="false">執筆</string>
+    <string name="t_892f07c05f" formatted="false">この期間の記録はありません。記録ができると概要が自動で表示されます。</string>
+    <string name="t_8940504c4b">バージョン %1$s：わかりやすい名前と整理されたセクション。自分の名前と履歴はそのままです。タップして確認</string>
+    <string name="t_894c240b90" formatted="false">区間をたたむ</string>
+    <string name="t_8972ce6fc3">保存されていません：%1$s。フォームを直すか、キャンセルしてください</string>
+    <string name="t_89aa29a273" formatted="false">通知</string>
+    <string name="t_8a22f78e9c" formatted="false">記録を修正</string>
+    <string name="t_8abcbc93e4" formatted="false">メモは個人的な内容のこともあるため、既定では含めません</string>
+    <string name="t_8af28e7685" formatted="false">先に不明な時間を確定してください。</string>
+    <string name="t_8b4d031cf9" formatted="false">この時間は別の記録で使われています。もっと遅い開始を選んでください。</string>
+    <string name="t_8b78a6e1d6" formatted="false">重複も含めてお気に入りから外しました</string>
+    <string name="t_8ba7dc1120" formatted="false">フォルダーへのアクセスが失われました。もう一度選んでください</string>
+    <string name="t_8be1fdf75b" formatted="false">セリフ体</string>
+    <string name="t_8cc9628cfb" formatted="false">自動コピーはオンです。最初のコピーはまもなく作成されます</string>
+    <string name="t_8ce3643f16" formatted="false">記録していないあいだ、かっこがゆっくり呼吸します</string>
+    <string name="t_8e273a8a05" formatted="false">活動と確認</string>
+    <string name="t_8e6839a84e" formatted="false">記録はこの端末に保存され、コピーは保存した場所にあります</string>
+    <string name="t_8f12fe23f2" formatted="false">空欄のみ</string>
+    <string name="t_8f44a068d2" formatted="false">時刻にタイムゾーンがありません：タイムゾーンなしの形式を選んでください</string>
+    <string name="t_8ff0d08fec" formatted="false">テキストから新しい記録</string>
+    <string name="t_90078dfa30" formatted="false">月</string>
+    <string name="t_909a83238c" formatted="false">記録を追加</string>
+    <string name="t_909baadb08" formatted="false">もっと前に始めた</string>
+    <string name="t_90d0002e66" formatted="false">日付を指定</string>
+    <string name="t_914b6dca6d" formatted="false">自分のタイムゾーン</string>
+    <string name="t_917b58362c" formatted="false">メモ</string>
+    <string name="t_91b707a9d1" formatted="false">ローカルコピーはまだありません</string>
+    <string name="t_91d993d35c" formatted="false">トラッカーでの名前</string>
+    <string name="t_9207563dab" formatted="false">週</string>
+    <string name="t_92a5d7dc45" formatted="false">ウィジェット</string>
+    <string name="t_92c584ce74" formatted="false">CSVソースを利用できません</string>
+    <string name="t_930489be30" formatted="false">長さを選んだ形式で読み取れません</string>
+    <string name="t_937cbcbd50">フォームは保存されていません：%1$s：%2$s</string>
+    <string name="t_9395be84e8" formatted="false">フォーカス</string>
+    <string name="t_93a176ef21" formatted="false">端末がオンにすることを許可しませんでした。もう一度お試しください</string>
+    <string name="t_93b302d32f" formatted="false">今より後にはできません</string>
+    <string name="t_93be31b630" formatted="false">記録していません</string>
+    <string name="t_93eb0c0182" formatted="false">%.1f MB</string>
+    <string name="t_93f389d809" formatted="false">カードなし</string>
+    <string name="t_94405e99a7" formatted="false">完全なJSONを復元…</string>
+    <string name="t_946ee08764" formatted="false">セクション</string>
+    <string name="t_948200fea3" formatted="false">自分のファイルのノイズ、雨音、音楽。アプリを開いている間再生します</string>
+    <string name="t_94b8df93b6" formatted="false">ファイル</string>
+    <string name="t_9582d40584" formatted="false">自動コピーを保存中</string>
+    <string name="t_95a6a49b6e" formatted="false">端末のタイムゾーンに合わせる</string>
+    <string name="t_95bd330f2a">計画どおり開始：%1$s</string>
+    <string name="t_9627af1c25" formatted="false">一時停止</string>
+    <string name="t_963e150816">通知：%1$s\n%2$s</string>
+    <string name="t_964e56ab98">レポート「%1$s」を削除しますか？</string>
+    <string name="t_964fb00c4e" formatted="false">要求済みですが、システム/チャンネルで禁止されています</string>
+    <string name="t_9694192342" formatted="false">フォーカスの区間が終了</string>
+    <string name="t_96a0b3fc1d" formatted="false">時刻なし：その日のうちに</string>
+    <string name="t_96a64755de">レポートのタイムゾーンを%1$sに変更しますか？</string>
+    <string name="t_96c6ac97db" formatted="false">フローティングボタン：システム通知</string>
+    <string name="t_9711f6b5b7" formatted="false">終了：ISO-8601</string>
+    <string name="t_9760f4a429" formatted="false">お気に入り済み</string>
+    <string name="t_97a9f0590a">フォーカス %1$s + %2$s分</string>
+    <string name="t_97bcfbe748">完了 · %1$s</string>
+    <string name="t_989911f31c" formatted="false">休息</string>
+    <string name="t_98b2073ed1" formatted="false">クリア</string>
+    <string name="t_98dc4a887a" formatted="false">エリアなし</string>
+    <string name="t_98e4a9f4dd" formatted="false">タイマー停止中</string>
+    <string name="t_991e307efa">テーマ：%1$s</string>
+    <string name="t_9924fc6aa9" formatted="false">自分のレポート</string>
+    <string name="t_9978ac34b2" formatted="false">操作</string>
+    <string name="t_99cbe96929" formatted="false">、重複はスキップ</string>
+    <string name="t_99d406eeba" formatted="false">セクション</string>
+    <string name="t_99dbea8209" formatted="false">日</string>
+    <string name="t_9a4e6f0e95">選択中：%1$s</string>
+    <string name="t_9a65ca6053">編集：%1$s</string>
+    <string name="t_9ac9a4c129">エクスポート結果を確認できません：%1$s</string>
+    <string name="t_9b1c9a0216" formatted="false">修正</string>
+    <string name="t_9b4ee5c556" formatted="false">数える対象</string>
+    <string name="t_9bc1f05bd8" formatted="false">測定値のID</string>
+    <string name="t_9bcc818ccb" formatted="false">操作用の通知</string>
+    <string name="t_9c7449bfd1" formatted="false">外す</string>
+    <string name="t_9cae6690eb" formatted="false">可能な修正を元に戻す</string>
+    <string name="t_9d5b844654" formatted="false">記録の操作</string>
+    <string name="t_9d809f884b" formatted="false">変更</string>
+    <string name="t_9d9f294850" formatted="false">通知シェードから開始・停止、活動をすばやく選択</string>
+    <string name="t_9dd3e6ec21" formatted="false">日の区切りを1時間遅く</string>
+    <string name="t_9de49a7593" formatted="false">ファイルに記録が見つかりませんでした</string>
+    <string name="t_9e4e767ad0">月%1$s以上</string>
+    <string name="t_9e506acb19" formatted="false">再試行</string>
+    <string name="t_9e512e4de6" formatted="false">ファイルのままにする</string>
+    <string name="t_9e8bfc9912" formatted="false">新しいカード名</string>
+    <string name="t_9e97224af0" formatted="false">現在の内容を保存</string>
+    <string name="t_9eb9a9691b" formatted="false">終了時刻の列</string>
+    <string name="t_9ebe3ac111" formatted="false">フォーカスを設定</string>
+    <string name="t_9f431f2a5f" formatted="false">合図</string>
+    <string name="t_9f4988d59a">現在：%1$s</string>
+    <string name="t_9f4e577f1f" formatted="false">例：月曜と水曜に英語。その日はホーム画面で待っています</string>
+    <string name="t_9f8007cba2" formatted="false">終了時刻不明</string>
+    <string name="t_a0113f46a3" formatted="false">今月</string>
+    <string name="t_a083e020a0" formatted="false">端末がコピーの予約を許可しませんでした。「今すぐ保存」をタップしてください</string>
+    <string name="t_a1103b6e0c" formatted="false">今すぐ Start</string>
+    <string name="t_a12db4c166">選択：%1$s · ID %2$s</string>
+    <string name="t_a1725f1b08" formatted="false">この時間は計測ではなく、あなたが入力したものとして記録されます。</string>
+    <string name="t_a18bb83bf1">%3$s全体に%1$s %2$sを保存しました</string>
+    <string name="t_a23f334099" formatted="false">、長い記録を確認</string>
+    <string name="t_a2503487b7">「%2$s」に「%1$s」を作成</string>
+    <string name="t_a2c84dc5a6" formatted="false">標準</string>
+    <string name="t_a34678cc0a" formatted="false">例：プロジェクト「アルファ」</string>
+    <string name="t_a3ffcb3ac5" formatted="false">カレンダーが応答していません。</string>
+    <string name="t_a4ac32f350" formatted="false">ソースの固定namespace</string>
+    <string name="t_a5363d1b5f" formatted="false">バックアップファイル</string>
+    <string name="t_a5515a2b98" formatted="false">時刻の書き方</string>
+    <string name="t_a582d409b1" formatted="false">ゆったり</string>
+    <string name="t_a5b1429034">週%1$s以下</string>
+    <string name="t_a683d51495" formatted="false">記録はまだ進行中です</string>
+    <string name="t_a6a3fb1ef7" formatted="false">記録はすでに変わっています。アプリで修正してください</string>
+    <string name="t_a773a5edc6">ほか %1$s 件</string>
+    <string name="t_a7e3c8ee69" formatted="false">この期間、ここに記録はありません。</string>
+    <string name="t_a8f8d66a1b" formatted="false">ファイルを保存し、検証しました</string>
+    <string name="t_a901fbebb1">ファイルは削除されていません。技術シェルでデータベースを復元するか、コピーを選べます。詳細：%1$s</string>
+    <string name="t_a94e60234f">%1$sを追加</string>
+    <string name="t_a9a3e50e7d" formatted="false">記録の開始を移動しました</string>
+    <string name="t_aa447181f4">エクスポートの準備が始まりませんでした：%1$s</string>
+    <string name="t_aa9fc365f5" formatted="false">準備済みのエクスポートを再試行…</string>
+    <string name="t_aab4eaebc4">活動は「%1$s」になります。</string>
+    <string name="t_ab0662026d" formatted="false">CSVから履歴</string>
+    <string name="t_ab0b3ff312">記録が%1$s時間を超えたら、通知シェードでタイマーの忘れがないかそっと確認します</string>
+    <string name="t_abfb46281b">(not)AI Time Tracker %1$s。すべての記録はこの端末に保存されます</string>
+    <string name="t_ac72e3a247">%1$s\nセッション：%2$s、区間：%3$s、目標：%4$s。進行中の末尾：%5$s、フォーカス：%6$s</string>
+    <string name="t_ace6b66d31" formatted="false">未来の記録です</string>
+    <string name="t_ad2b7927cc" formatted="false">新しく開始</string>
+    <string name="t_ad7d8c2a5f">月%1$s以下</string>
+    <string name="t_adcdc4ad41" formatted="false">時刻が許容範囲外です</string>
+    <string name="t_ae6b38edaf" formatted="false">別の日</string>
+    <string name="t_aee593f748">計画に%1$s</string>
+    <string name="t_af39297b7b" formatted="false">、不明な時間あり</string>
+    <string name="t_afa3b81f25">1日%1$s以下</string>
+    <string name="t_afb9a7edd6" formatted="false">区切り文字</string>
+    <string name="t_afbca25eab" formatted="false">、ファイル確認済み</string>
+    <string name="t_afd78e8296" formatted="false">計画どおり開始</string>
+    <string name="t_aff922a637" formatted="false">活動なし</string>
+    <string name="t_aff9f84f58" formatted="false">タイムゾーンの変更は確認が必要です。アプリを開いたときに確認します</string>
+    <string name="t_affff57571" formatted="false">区切り文字を選択</string>
+    <string name="t_b08e96f6ad" formatted="false">フォーカスの合図</string>
+    <string name="t_b1a72b8b91" formatted="false">フォーカス：時間の確定が必要です</string>
+    <string name="t_b1dd9c744d" formatted="false">計画かタイマーがすでに変わりました。もう一度確認してください</string>
+    <string name="t_b1e23e1ff0" formatted="false">文字サイズ</string>
+    <string name="t_b20271fb06" formatted="false">現在の記録は今終わり、新しい記録がこの分から始まります。</string>
+    <string name="t_b2822e2bb3" formatted="false">期間</string>
+    <string name="t_b2dde7fe6e">最新 %1$s。自動コピーはオフです</string>
+    <string name="t_b32615689f" formatted="false">メモを外す</string>
+    <string name="t_b34e097643" formatted="false">別のファイル</string>
+    <string name="t_b363aeb862" formatted="false">表計算用に全履歴を出力します。バックアップではありません</string>
+    <string name="t_b371499aaa" formatted="false">増やす</string>
+    <string name="t_b402c34a3b" formatted="false">CSVにエクスポート</string>
+    <string name="t_b40a4254c7" formatted="false">ボタンの名前</string>
+    <string name="t_b433c5110e" formatted="false">最初のコピーは数分後に作成されます</string>
+    <string name="t_b4479f84f1">%1$s、数字は%2$s、</string>
+    <string name="t_b45bbb4570" formatted="false">ライトテーマ</string>
+    <string name="t_b467c6658f" formatted="false">ファイルを保存しました。読み込んで検証することはできません</string>
+    <string name="t_b4770c7e71">1日は%1$s:%2$sに始まります</string>
+    <string name="t_b4efdc2013" formatted="false">元の単位のID</string>
+    <string name="t_b5ef1ca9d4" formatted="false">アプリのアイコン</string>
+    <string name="t_b62da03c51" formatted="false">フォーカス：休憩</string>
+    <string name="t_b6305bf26a" formatted="false">長さはゼロより大きくしてください</string>
+    <string name="t_b67fbff66e" formatted="false">レポートのタイムゾーン：例 Europe/Moscow</string>
+    <string name="t_b6cee6b950" formatted="false">このビルドでは使えません</string>
+    <string name="t_b6ef08401f" formatted="false">日</string>
+    <string name="t_b715493906" formatted="false">フォーカスボタン</string>
+    <string name="t_b71833f660" formatted="false">タイマー一時停止中</string>
+    <string name="t_b727ee7aba" formatted="false">このファイルは使えませんでした。64 MBまでの別のファイルをお試しください</string>
+    <string name="t_b740f2a2e2" formatted="false">アイコンを長押し：開始・停止、活動の選択、お気に入りの先頭2つ</string>
+    <string name="t_b747495fc3">%1$s · %2$s\n%3$s。お気に入りはアーカイブ済みを含む保存済みの設定を使います。</string>
+    <string name="t_b74904694d" formatted="false">アプリの設定でオンにしてください</string>
+    <string name="t_b788b8485e" formatted="false">不明な区間は計上されませんでした</string>
+    <string name="t_b79a6fe480" formatted="false">コピーが中断しました。自動で続けます</string>
+    <string name="t_b84572428f" formatted="false">大</string>
+    <string name="t_b84fd84e60" formatted="false">明日から</string>
+    <string name="t_b8540eb5bb" formatted="false">Android 10以降が必要です</string>
+    <string name="t_b880e6a105" formatted="false">お気に入り</string>
+    <string name="t_b8b15fe0c2" formatted="false">計画の操作</string>
+    <string name="t_b905452397" formatted="false">既存の履歴の日の区切りとレポート表示が変わります。実際の区間と個別に保存した目標のタイムゾーンは保持されます。選んだタイムゾーンは固定され、自動選択はオフになります。</string>
+    <string name="t_b932f7eea5">うまくいきませんでした：%1$s</string>
+    <string name="t_b97a3fd699" formatted="false">フォーカス：作業区間</string>
+    <string name="t_b9c9ff652d" formatted="false">アプリについて</string>
+    <string name="t_ba2ec9712b" formatted="false">何をしていますか？</string>
+    <string name="t_ba7631ff32" formatted="false">曜日ごと</string>
+    <string name="t_ba9db63b9d">カタログ %1$s</string>
+    <string name="t_babd8e081b" formatted="false">履歴と概要の日の区切りが変わります。記録と目標のタイムゾーンは変わりません。</string>
+    <string name="t_bbb0e8e8cd" formatted="false">ミリ秒</string>
+    <string name="t_bbcf06b3c9" formatted="false">メモ</string>
+    <string name="t_bbee9680a8" formatted="false">不明な時間は合計に含まれません：</string>
+    <string name="t_bc28baf5fc" formatted="false">昨日の記録はありません</string>
+    <string name="t_bc4d1d35af" formatted="false">ファイルのまま</string>
+    <string name="t_bc5431b599" formatted="false">フォルダー</string>
+    <string name="t_bd16b23470" formatted="false">ダーク</string>
+    <string name="t_bd4538e3c6" formatted="false">不透明</string>
+    <string name="t_bd81e0c895" formatted="false">書き込んだコピーがデータと一致しませんでした。自動で再試行します</string>
+    <string name="t_bdcb031d09" formatted="false">休憩が終了しました</string>
+    <string name="t_bdcd78489d">進行中の記録にこの名前が付きます。開始は%1$sのままです。</string>
+    <string name="t_be0773c924" formatted="false">フォント、数字、ホーム画面</string>
+    <string name="t_be8f714a0e" formatted="false">選んだフォルダーに完全なコピーを自動で保存します：端末内、またはクラウドアプリがフォルダーを提供していればクラウドに。このコピーはアプリを削除しても残ります</string>
+    <string name="t_bea0873d5e" formatted="false">クイックボタン</string>
+    <string name="t_bedfedb4d0" formatted="false">オフ</string>
+    <string name="t_befab85c9e" formatted="false">オンですが、通知の許可がありません</string>
+    <string name="t_bf38c3fd75">予定を利用できません：%1$s</string>
+    <string name="t_bf4c4f53cb" formatted="false">この活動の時間は概要と目標でセクションの合計に含まれます。既存の記録は元の場所のままです。</string>
+    <string name="t_c0634e4cb3" formatted="false">すべての活動</string>
+    <string name="t_c0683f8006" formatted="false">セクションなし</string>
+    <string name="t_c0b04d97ff" formatted="false">タブ</string>
+    <string name="t_c0ed5f4dda" formatted="false">行の引用符が閉じていません</string>
+    <string name="t_c12ee51dd9" formatted="false">全期間</string>
+    <string name="t_c14f88246c">残り %1$s</string>
+    <string name="t_c161a7bb23" formatted="false">終了していない記録は「時間不明」として入り、確定が必要になります。</string>
+    <string name="t_c23d5826a3">記録のある%1$s</string>
+    <string name="t_c25bd1a7c6" formatted="false">休憩をスキップ</string>
+    <string name="t_c2bf13bbb1" formatted="false">自分のレポート</string>
+    <string name="t_c2f668e54f" formatted="false">更新</string>
+    <string name="t_c2fcd7ada4" formatted="false">週末</string>
+    <string name="t_c33b203048" formatted="false">現在の期間は新しい目標で数え直します。過去の期間はそのままです。</string>
+    <string name="t_c344c6222f" formatted="false">読み取りでコピーを確認しました。</string>
+    <string name="t_c372165452">カレンダー：%1$s</string>
+    <string name="t_c3c366f704">%1$s %2$s</string>
+    <string name="t_c4dca81d48" formatted="false">計画に追加</string>
+    <string name="t_c54788a5e8" formatted="false">読書</string>
+    <string name="t_c54a9c6fb4" formatted="false">計画を変更しました</string>
+    <string name="t_c595cae565" formatted="false">下書きを置き換えますか？</string>
+    <string name="t_c619870299" formatted="false">選択したテキスト</string>
+    <string name="t_c650387bcb" formatted="false">作業インターバルが終了しました</string>
+    <string name="t_c67ba2d89b">%1$sまでは現在の活動、%2$sから選んだ活動になります。</string>
+    <string name="t_c67ed0b774" formatted="false">ソースのタイムゾーン。明示的に確認してください</string>
+    <string name="t_c6e0ce16b9" formatted="false">区間が終わったら通知します。端末の都合で少し遅れることがあります</string>
+    <string name="t_c736a598e7" formatted="false">古いコピーは、新しいコピーの確認後にだけ削除されます。</string>
+    <string name="t_c7d650974b" formatted="false">来月から</string>
+    <string name="t_c80d7e8172" formatted="false">時間</string>
+    <string name="t_c82a0d4427" formatted="false">計画から外す</string>
+    <string name="t_c8317c85b2" formatted="false">開始時刻の列</string>
+    <string name="t_c83889af89" formatted="false">アプリを開いて活動を選んでください</string>
+    <string name="t_c85eb5f581" formatted="false">90日間</string>
+    <string name="t_c927b86cfb" formatted="false">カタログと表</string>
+    <string name="t_ca7830c42f" formatted="false">削除する記録はありません</string>
+    <string name="t_cabb0c6d9b">%1$s行目：</string>
+    <string name="t_cb26bdc6c6" formatted="false">開始</string>
+    <string name="t_cbc6fa3d6a" formatted="false">ウィジェット</string>
+    <string name="t_cbeb716470" formatted="false">設定に戻る</string>
+    <string name="t_cc5d5d0fd4">%1$s（%2$s）の合計：%3$s ms、未確定：%4$s\nカード：%5$s\nセッション：%6$s、区間：%7$s\n%8$s</string>
+    <string name="t_cc6d018f5b" formatted="false">今日のCSVレポート（完全なバックアップではありません）</string>
+    <string name="t_cca1d52e45" formatted="false">未完了の復元を完了</string>
+    <string name="t_ccb2375542" formatted="false">ウィジェットはオフです</string>
+    <string name="t_cd30825052" formatted="false">目標を設定しました</string>
+    <string name="t_cd93b2e0f1" formatted="false">オンですが、端末の許可がありません</string>
+    <string name="t_ce12182bac" formatted="false">量のID</string>
+    <string name="t_ce3ec6ed08" formatted="false">範囲内</string>
+    <string name="t_ce5fc2ce7f" formatted="false">並び順を保存しました</string>
+    <string name="t_ced07fd144" formatted="false">なし</string>
+    <string name="t_cefdb75984" formatted="false">終了列（またはduration）</string>
+    <string name="t_cf113217ae">%1$s：%2$s 分</string>
+    <string name="t_cf3a8f3ca2" formatted="false">記録を開始</string>
+    <string name="t_cf52c8daf1" formatted="false">レポートのタイムゾーンは端末に合わせます。記録が別の日に移ることがあります</string>
+    <string name="t_cf7b338323" formatted="false">細い</string>
+    <string name="t_cfafc18b42" formatted="false">計画はホーム画面に表示されるだけです。活動をタップすると時間が始まります。</string>
+    <string name="t_d002f83ddc" formatted="false">変更があると、端末がバックグラウンド処理を許可したときに数分以内にコピーを保存します。変更がなくても1日1回保存します。</string>
+    <string name="t_d015e9be93" formatted="false">このレポートの活動は削除またはアーカイブされました。過去の記録だけを数えます。</string>
+    <string name="t_d0d7180292" formatted="false">お気に入りに追加しました</string>
+    <string name="t_d0dd940c4c" formatted="false">データなし</string>
+    <string name="t_d0fde8b6ec">自動コピー %1$s</string>
+    <string name="t_d0ff90f238" formatted="false">ロック画面</string>
+    <string name="t_d111e0cd52" formatted="false">レポート上の日の区切り</string>
+    <string name="t_d129caabe1" formatted="false">編集用の下書きに入力しますか？</string>
+    <string name="t_d149e0338b" formatted="false">カテゴリまたはクライアント</string>
+    <string name="t_d176283db1">%1$s秒</string>
+    <string name="t_d184a16515" formatted="false">選択から外す</string>
+    <string name="t_d1f9b48826" formatted="false">端末の空き容量またはメモリが不足しています。自動で再試行します</string>
+    <string name="t_d223a16aed" formatted="false">カテゴリ列</string>
+    <string name="t_d25786deda" formatted="false">英語 · 14:05から</string>
+    <string name="t_d261564113" formatted="false">入力</string>
+    <string name="t_d2aa318afd">記録 %1$s</string>
+    <string name="t_d2e9881a72">追加されるもの：%1$s</string>
+    <string name="t_d349cb398d">経過 %1$s</string>
+    <string name="t_d37c15b206" formatted="false">自分で変えた名前はそのまま残り、過去の記録も変わりません。</string>
+    <string name="t_d398842570" formatted="false">指定したインターバルで未確定部分を確定</string>
+    <string name="t_d3c8e2e155" formatted="false">タイムゾーンを変更しました。確認は保存されなかったため、アプリを開いたときにやり直します</string>
+    <string name="t_d40fecd7ad" formatted="false">もう一度試す</string>
+    <string name="t_d4168ace06" formatted="false">長さ</string>
+    <string name="t_d41ba2c06d" formatted="false">列、時刻、durationの単位を確認してください</string>
+    <string name="t_d458ec4c77" formatted="false">来週から</string>
+    <string name="t_d47aa86141" formatted="false">コンパクト</string>
+    <string name="t_d4993a1dc7" formatted="false">時間不明</string>
+    <string name="t_d4a2324628" formatted="false">ライム</string>
+    <string name="t_d4a88f5588" formatted="false">期間を変えると新しい目標になります。</string>
+    <string name="t_d4f447c130" formatted="false">停止</string>
+    <string name="t_d524af03ac">新しい活動には使えません：%1$s</string>
+    <string name="t_d5627f6a61" formatted="false">目標</string>
+    <string name="t_d6035dc6ed" formatted="false">分</string>
+    <string name="t_d6140e7bc5" formatted="false">0分</string>
+    <string name="t_d64f83a24b" formatted="false">コピーを選択してください。現在のデータが置き換わるのはプレビュー後です</string>
+    <string name="t_d66df6cc7f" formatted="false">利用できないデータベースを復元</string>
+    <string name="t_d70f2e079b" formatted="false">すべて</string>
+    <string name="t_d73bef6ef5" formatted="false">Focusフェーズをスキップ</string>
+    <string name="t_d772cc53be" formatted="false">置き換える</string>
+    <string name="t_d7748bfad0" formatted="false">レポート</string>
+    <string name="t_d7907f4d43" formatted="false">詳細</string>
+    <string name="t_d8aac38d84" formatted="false">活動と計画</string>
+    <string name="t_d8e26625e7" formatted="false">基準</string>
+    <string name="t_d9017ada66" formatted="false">保持するコピー数</string>
+    <string name="t_d9a13b5014">%1$s</string>
+    <string name="t_d9e72beb20" formatted="false">CSVのソース（サービスとアカウント）</string>
+    <string name="t_d9f48a75fd" formatted="false">お気に入りから外す</string>
+    <string name="t_d9ffbbb760">時刻を選ぶ：%1$s</string>
+    <string name="t_da4b8e5644" formatted="false">フォーカス：区間が終了</string>
+    <string name="t_dab89894aa" formatted="false">記録を停止</string>
+    <string name="t_db1042f51d" formatted="false">一日のタイムライン</string>
+    <string name="t_db70b53fc3" formatted="false">選択した記録はすでにこの状態です</string>
+    <string name="t_db922448f7">週%1$s以上</string>
+    <string name="t_dbbafdd074">レポートのタイムゾーンを%1$sに変更しますか？</string>
+    <string name="t_dc417ebce7" formatted="false">読み込み中…</string>
+    <string name="t_dd15d6eecb" formatted="false">何を始めますか？</string>
+    <string name="t_dd27b7de89" formatted="false">ライセンスを開けませんでした</string>
+    <string name="t_dd63bc14f9">%1$sを変更しました</string>
+    <string name="t_ddca6f4db2" formatted="false">（記録なし）</string>
+    <string name="t_ddcbc8c167" formatted="false">区間を変更しました</string>
+    <string name="t_de5d4764e8" formatted="false">target全体の量。日ごとの期間は合算されません</string>
+    <string name="t_de5eb09e17" formatted="false">活動を変更</string>
+    <string name="t_de7dee674e" formatted="false">これはバックアップファイルです。「バックアップ」で復元してください</string>
+    <string name="t_de8f3c16b9" formatted="false">計上しない</string>
+    <string name="t_dee20b519a" formatted="false">ロック中はカードを表示しません</string>
+    <string name="t_deleted_on">削除日 · %1$s</string>
+    <string name="t_df12865c09" formatted="false">フォント</string>
+    <string name="t_dfd4e36290" formatted="false">アイコンを切り替えられませんでした</string>
+    <string name="t_e0382438fe">フォーカス：作業%1$s分</string>
+    <string name="t_e06ca859e1" formatted="false">フローティングボタンを要求しました。システムのサービス表示が必要です</string>
+    <string name="t_e0997b4d01" formatted="false">記録は変わらず、目標だけがなくなります。</string>
+    <string name="t_e0c6838299" formatted="false">まだコピーはありません。フォルダーへの自動コピーをオンにしてください</string>
+    <string name="t_e0f1717450" formatted="false">下へ</string>
+    <string name="t_e1d7065cb9" formatted="false">レポートを変更しました</string>
+    <string name="t_e2e41650a0">%1$sから</string>
+    <string name="t_e380f43ca4">今日、%1$s</string>
+    <string name="t_e3af18c937" formatted="false">技術シェル</string>
+    <string name="t_e3b9331301" formatted="false">次へ</string>
+    <string name="t_e3eed8bfd8" formatted="false">フォーカスの長さ</string>
+    <string name="t_e3fc5b6cc7" formatted="false">どの活動？</string>
+    <string name="t_e43c291b9c" formatted="false">刻み ±</string>
+    <string name="t_e46b654bc7" formatted="false">タイマー：活動を選ぶ</string>
+    <string name="t_e46c179ddb" formatted="false">端末の画面</string>
+    <string name="t_e4c06f14a4" formatted="false">ローカル日時のPattern。空欄の場合はoffset付きISO形式</string>
+    <string name="t_e5451eea1b" formatted="false">レポートのタイムゾーンを保存…</string>
+    <string name="t_e558fb6e24" formatted="false">月</string>
+    <string name="t_e5e4253129" formatted="false">クイック開始の下。長押しで長さを設定</string>
+    <string name="t_e5ff32f6ae" formatted="false">金</string>
+    <string name="t_e65da6ce30" formatted="false">7日間</string>
+    <string name="t_e6794c0df6" formatted="false">お気に入りに追加</string>
+    <string name="t_e699415c6e" formatted="false">記録は履歴に追加され、既存のものは置き換えられません。同じソースからの重複はスキップされます。</string>
+    <string name="t_e6aa58192b" formatted="false">次の Start はカードなしで開始</string>
+    <string name="t_e6d3fcd043" formatted="false">まだホーム画面にありません</string>
+    <string name="t_e7672250d5" formatted="false">別の目標</string>
+    <string name="t_e8255d5bdc" formatted="false">各機能の権限を確認</string>
+    <string name="t_e82d057d74" formatted="false">すべてのエリア</string>
+    <string name="t_e887e93303" formatted="false">計画なし</string>
+    <string name="t_e8a76312ff" formatted="false">終了または長さの列が必要です</string>
+    <string name="t_e962d6d168">、既存：%1$s</string>
+    <string name="t_e965da5858" formatted="false">CSVから取り込む</string>
+    <string name="t_e97aa645db" formatted="false">すべてオフ：記録はアプリ内のみ</string>
+    <string name="t_e98d66a21e" formatted="false">未確定部分を除外</string>
+    <string name="t_ea707316fd" formatted="false">フローティングボタン</string>
+    <string name="t_eaa484fa5d" formatted="false">新しい記録を開始しました</string>
+    <string name="t_eb467ef147" formatted="false">カンマ</string>
+    <string name="t_ec1c55d866" formatted="false">ダークテーマ</string>
+    <string name="t_ec3bd8ce7a">%1$s時間</string>
+    <string name="t_eca17171d2" formatted="false">システム</string>
+    <string name="t_eca2a38089" formatted="false">カレンダー：現在と今後の予定</string>
+    <string name="t_ed3f0e507a" formatted="false">言語</string>
+    <string name="t_ed4b9d4acc" formatted="false">時間の確定が必要です</string>
+    <string name="t_ed5033902e" formatted="false">システムがフローティングボタンの起動を許可しませんでした。タイマーはアプリで使えます</string>
+    <string name="t_ed52dd3411" formatted="false">タップして活動かセクションを1つ選ぶ</string>
+    <string name="t_ed6e1d0308" formatted="false">検索</string>
+    <string name="t_edd23ab082" formatted="false">計画の次</string>
+    <string name="t_eded3f55f1" formatted="false">選択を開けませんでした。記録は保存済みです</string>
+    <string name="t_eeee074ac3" formatted="false">準備済みカタログを更新…</string>
+    <string name="t_ef34d1807a" formatted="false">未記録</string>
+    <string name="t_ef5ff32a17" formatted="false">現在の活動を指定</string>
+    <string name="t_efc885e934" formatted="false">削除済み</string>
+    <string name="t_f0caca47ee" formatted="false">Focusを開始</string>
+    <string name="t_f10728b46b" formatted="false">ホーム画面にあり、ボタンはオフ</string>
+    <string name="t_f109cea920" formatted="false">お気に入りはまだありません</string>
+    <string name="t_f1157816a0" formatted="false">自分のサウンド</string>
+    <string name="t_f11be88b10" formatted="false">選択したお気に入りを記憶</string>
+    <string name="t_f127f2a1ee" formatted="false">わかりました</string>
+    <string name="t_f220b98d48" formatted="false">活動の選択が古くなっています</string>
+    <string name="t_f2351a24d5">記録が%1$s時間続くと、通知シェードで続ける・あとで・停止を確認します</string>
+    <string name="t_f2a9788239" formatted="false">この空き時間を記録</string>
+    <string name="t_f2f63c2213" formatted="false">フォーカス：区間が終わりました。次を選んでください</string>
+    <string name="t_f3503a3e3f" formatted="false">お気に入りから削除しました</string>
+    <string name="t_f36036b6cf" formatted="false">一時停止 · %s</string>
+    <string name="t_f3ff661a74" formatted="false">別のレポート</string>
+    <string name="t_f46e3488b5" formatted="false">フォルダー内のコピー</string>
+    <string name="t_f48645430a" formatted="false">保存したレポートだけが削除されます。記録は変わりません。</string>
+    <string name="t_f4ca346393" formatted="false">フォーカス区間は静かに</string>
+    <string name="t_f4f34092fb" formatted="false">インターバルをスキップ</string>
+    <string name="t_f55832ba89" formatted="false">ウィジェットの背景</string>
+    <string name="t_f5fc2f3eb8" formatted="false">小さめ</string>
+    <string name="t_f62e9fd860" formatted="false">タイムゾーン付き（ISO）</string>
+    <string name="t_f6bfe94a14" formatted="false">コピーを保存中</string>
+    <string name="t_f6dab074d7" formatted="false">戻る</string>
+    <string name="t_f6de15c50a" formatted="false">明日</string>
+    <string name="t_f6f1e5272f" formatted="false">並べ替え</string>
+    <string name="t_f6f369d3a0" formatted="false">記録を修正しました</string>
+    <string name="t_f70eab72a9" formatted="false">時刻はリストの並び順のためだけです</string>
+    <string name="t_f713a587ea" formatted="false">エクスポートをキャンセルしました。準備済みファイルは保持されています。新しいコピーを準備できます。</string>
+    <string name="t_f8310658c7" formatted="false">開始時刻（別の列にある場合）</string>
+    <string name="t_f8ebe73afe">記録済み：%1$s</string>
+    <string name="t_f8fe850a57" formatted="false">タイマーが変わりました。通知をもう一度開いてください</string>
+    <string name="t_f9444ff8c6" formatted="false">簡易</string>
+    <string name="t_f94b15c5ce" formatted="false">一時停止中。一時停止時間はアクティビティの計測時間に含まれません。</string>
+    <string name="t_f9c8ab7dd1" formatted="false">活動カタログ</string>
+    <string name="t_fa1296f402" formatted="false">元に戻す</string>
+    <string name="t_fa620acedb" formatted="false">活動カタログの更新があります</string>
+    <string name="t_fa633fd3a2" formatted="false">フォルダーを選び直す必要があります</string>
+    <string name="t_fb27c3e29b">%1$s、合計</string>
+    <string name="t_fb925c5d79" formatted="false">30日間</string>
+    <string name="t_fc355fea11" formatted="false">見出しから候補を設定済みです。</string>
+    <string name="t_fc60b6a6e0" formatted="false">時刻が時計の切り替えに当たります</string>
+    <string name="t_fc656a1da4" formatted="false">アイコンを隠して通知シェードのカードだけ残すには、この通知の設定で「最小化」または「アイコンなし」をオンにしてください</string>
+    <string name="t_fc8e4e2d1c" formatted="false">すぐに開始</string>
+    <string name="t_fca9d98cd9" formatted="false">タイマーが変わりました。もう一度タップしてください</string>
+    <string name="t_fd042c9a3a" formatted="false">あとで</string>
+    <string name="t_fd3cb2ebef" formatted="false">現在の区間は開始時の設定のまま終わり、新しい長さは次から適用されます。</string>
+    <string name="t_fd500149d4">タイマー：%1$s</string>
+    <string name="t_fd7707e6f0">%1$s以降を除外</string>
+    <string name="t_fdc5b65acf" formatted="false">一時停止 · 残り %s</string>
+    <string name="t_fdfa49e623" formatted="false">最後に終了した区間を修正</string>
+    <string name="t_fe4b0c80f0" formatted="false">選ぶ</string>
+    <string name="t_fe63f1e035" formatted="false">書き込んだコピーを読み直せませんでした。自動で再試行します</string>
+    <string name="t_fe68cb28be" formatted="false">活動、開始、終了または長さが必要です</string>
+    <string name="t_fe97f5bc85" formatted="false">このホーム画面はアプリからウィジェットを追加できません。手動で追加してください：ホーム画面を長押し → ウィジェット → (not)AI Time</string>
+    <string name="t_fea5f3ca7c" formatted="false">活動はあとで選べます</string>
+    <string name="t_fee1dd80dd">現在のテキスト：「%1$s」\n新しいテキスト：「%2$s」</string>
+    <string name="t_feff16c4bb" formatted="false">通知シェードのタイマー</string>
+    <string name="t_restore_all">すべて復元（%1$s）</string>
+    <string name="t_restore_all_body" formatted="false">記録は履歴の元の場所に戻ります。</string>
+    <string name="t_restore_all_confirm" formatted="false">復元</string>
+    <string name="t_restore_all_done">復元した記録：%1$s</string>
+    <string name="t_restore_all_title">%1$sを復元しますか？</string>
+    <plurals name="p_032a085f42">
+        <item quantity="other">%1$d日</item>
+    </plurals>
+    <plurals name="p_07343fe85c">
+        <item quantity="other">対象へのリンク%1$d件</item>
+    </plurals>
+    <plurals name="p_09d3aef0c7">
+        <item quantity="other">%1$d行</item>
+    </plurals>
+    <plurals name="p_299205cb6b">
+        <item quantity="other">%1$d回</item>
+    </plurals>
+    <plurals name="p_33de38af49">
+        <item quantity="other">空き時間%1$d件</item>
+    </plurals>
+    <plurals name="p_3a9aafb6ad">
+        <item quantity="other">%1$d件の活動</item>
+    </plurals>
+    <plurals name="p_3b59342c88">
+        <item quantity="other">目標%1$d件</item>
+    </plurals>
+    <plurals name="p_414e6a20a2">
+        <item quantity="other">お気に入り%1$d件</item>
+    </plurals>
+    <plurals name="p_51037d6f51">
+        <item quantity="other">%1$d区間</item>
+    </plurals>
+    <plurals name="p_5e0f6cbad4">
+        <item quantity="other">%1$d日</item>
+    </plurals>
+    <plurals name="p_6c73bc4d74">
+        <item quantity="other">%1$d件の記録</item>
+    </plurals>
+    <plurals name="p_7504653931">
+        <item quantity="other">%1$d回</item>
+    </plurals>
+    <plurals name="p_7722e30027">
+        <item quantity="other">自分の活動%1$d件</item>
+    </plurals>
+    <plurals name="p_a03208ce01">
+        <item quantity="other">セット記録%1$d件</item>
+    </plurals>
+    <plurals name="p_aaaea1e747">
+        <item quantity="other">測定%1$d件</item>
+    </plurals>
+    <plurals name="p_c70b66af3f">
+        <item quantity="other">イベント量の記録%1$d件</item>
+    </plurals>
+    <plurals name="p_c8e097eebc">
+        <item quantity="other">ペースデータ%1$d件</item>
+    </plurals>
+    <plurals name="p_c9ec2228f3">
+        <item quantity="other">一時停止%1$d回</item>
+    </plurals>
+    <plurals name="p_de4636ae79">
+        <item quantity="other">%1$d列</item>
+    </plurals>
+</resources>

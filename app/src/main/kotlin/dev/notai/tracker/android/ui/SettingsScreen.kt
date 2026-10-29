@@ -1,5 +1,7 @@
 package dev.notai.tracker.android.ui
 
+
+import dev.notai.tracker.android.L
 import androidx.compose.ui.res.stringResource
 
 import dev.notai.tracker.android.RestoreReviewOwner
@@ -56,9 +58,9 @@ import java.time.Instant
 import java.time.ZoneId
 
 /** Settings pages. The first one is short: appearance up front, then each section with its live state on one line. */
-enum class SettingsPage(private val originalTitle: String) {
-    ROOT("Настройки"), APPEARANCE("Вид"), SURFACES("Таймер вне приложения"), BACKUP("Резервная копия"),
-    PLAN("Занятия и план"), FOCUS("Фокус и напоминания"), MORE("Ещё"), DELETED("Удалённое")
+enum class SettingsPage(private val originalTitle: Int) {
+    ROOT(R.string.t_7f17c7c62a), APPEARANCE(R.string.t_88f1a5a112), SURFACES(R.string.t_1bba9e465a), BACKUP(R.string.t_72f931bda2),
+    PLAN(R.string.t_d8aac38d84), FOCUS(R.string.t_27546ccb04), MORE(R.string.t_19f25d5784), DELETED(R.string.t_efc885e934)
 ;
     val title: String @Composable get() = when(this) {
         ROOT -> stringResource(R.string.editorial_tracker_draft_8a99e65a404198a79d0c_v0)
@@ -67,7 +69,7 @@ enum class SettingsPage(private val originalTitle: String) {
         BACKUP -> stringResource(R.string.editorial_tracker_draft_38c243c25f6bfac24d2b_v0)
         MORE -> stringResource(R.string.editorial_tracker_draft_0a5a50aed9713aca797c_v0)
         DELETED -> stringResource(R.string.deleted_title)
-        else -> originalTitle
+        else -> L.s(originalTitle)
     }
 }
 
@@ -154,56 +156,56 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
         if (s.surfaces.overlay && caps?.overlay?.permitted == true) activity?.let { FloatingTimerService.fromVisibleActivity(it, s.surfaces) }
     }
     val today = Instant.ofEpochMilli(vm.now()).atZone(zone).toLocalDate()
-    fun whenText(at: Long) = "${Format.dayTitle(Instant.ofEpochMilli(at).atZone(zone).toLocalDate(), today).lowercase()} в ${Format.clock(at, zone)}"
+    fun whenText(at: Long) = L.s(R.string.t_c3c366f704, Format.dayTitle(Instant.ofEpochMilli(at).atZone(zone).toLocalDate(), today).lowercase(), Format.clock(at, zone))
 
     androidx.compose.animation.AnimatedContent(page, modifier.fillMaxSize(), label = "settings-page",
         transitionSpec = { androidx.compose.animation.fadeIn(androidx.compose.animation.core.tween(160)) togetherWith
             androidx.compose.animation.fadeOut(androidx.compose.animation.core.tween(120)) }) { shown ->
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 32.dp)) {
         Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = if (shown == SettingsPage.ROOT) 4.dp else 0.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (shown != SettingsPage.ROOT) IconAction(Icon.ChevronLeft, "Назад к настройкам", { back() }, tint = c.ink)
+            if (shown != SettingsPage.ROOT) IconAction(Icon.ChevronLeft, L.s(R.string.t_cbeb716470), { back() }, tint = c.ink)
             Text(shown.title, style = if (shown == SettingsPage.ROOT) NotAi.type.title else NotAi.type.title.copy(fontSize = 23.sp, lineHeight = 30.sp), color = c.ink, maxLines = 1,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
         }
         when (shown) {
         SettingsPage.ROOT -> {
             AppearanceGroup(vm, theme) { page = SettingsPage.APPEARANCE }
-            Group("Разделы") {
-                val on = listOfNotNull("уведомление".takeIf { surfaces?.notification == true }, "плавающая кнопка".takeIf { surfaces?.overlay == true },
-                    "виджет".takeIf { surfaces?.widget == true }, "ярлык на значке".takeIf { surfaces?.shortcut == true })
+            Group(L.s(R.string.t_946ee08764)) {
+                val on = listOfNotNull(L.s(R.string.t_89aa29a273).takeIf { surfaces?.notification == true }, L.s(R.string.t_88c6fe08c7).takeIf { surfaces?.overlay == true },
+                    L.s(R.string.t_cbc6fa3d6a).takeIf { surfaces?.widget == true }, L.s(R.string.t_1250ceafd1).takeIf { surfaces?.shortcut == true })
                 val problem = listOf(caps?.notification, caps?.overlay, caps?.focusSignal).any { it.problemShown() } ||
                     (caps?.overlay?.enabled == true && caps?.overlay?.permitted == false)
                 SectionRow(rememberVectorPainter(Icon.Bell), SettingsPage.SURFACES.title,
-                    if (problem) "Чему-то не хватает разрешения телефона" else if (on.isEmpty()) "Всё выключено: учёт только в приложении"
+                    if (problem) L.s(R.string.t_55cd7a55ed) else if (on.isEmpty()) L.s(R.string.t_e97aa645db)
                         else on.joinToString(", ").replaceFirstChar { it.uppercase() }, problem) { page = SettingsPage.SURFACES }
                 Divider()
                 val a = auto?.state
                 val (backupLine, backupWarn) = when {
                     a?.enabled == true && a.error != null -> Format.backupProblem(a.error!!) to true
-                    a?.enabled == true && a.pending != null -> "Автокопия сохраняется" to false
-                    a?.enabled == true && a.lastSuccess != null -> "Автокопия ${whenText(a.lastSuccess!!.verifiedAt)}" to false
-                    a?.enabled == true -> "Автокопия включена, первая скоро появится" to false
-                    last != null -> "Последняя ${whenText(last!!.at)}. Автокопия выключена" to (vm.now() - last!!.at > 7 * 86_400_000L)
-                    else -> "Копий ещё не было. Включи автокопию в папку" to true
+                    a?.enabled == true && a.pending != null -> L.s(R.string.t_9582d40584) to false
+                    a?.enabled == true && a.lastSuccess != null -> L.s(R.string.t_d0fde8b6ec, whenText(a.lastSuccess!!.verifiedAt)) to false
+                    a?.enabled == true -> L.s(R.string.t_8cc9628cfb) to false
+                    last != null -> L.s(R.string.t_b2dde7fe6e, whenText(last!!.at)) to (vm.now() - last!!.at > 7 * 86_400_000L)
+                    else -> L.s(R.string.t_e0c6838299) to true
                 }
                 SectionRow(rememberVectorPainter(Icon.Shield), SettingsPage.BACKUP.title, backupLine, backupWarn) { page = SettingsPage.BACKUP }
                 Divider()
                 val plans = vm.planSeries(view).size; val favs = view?.data?.favorites?.size ?: 0
                 SectionRow(rememberVectorPainter(Icon.Star), SettingsPage.PLAN.title,
-                    listOf(if (favs > 0) Format.plural(favs, "избранное", "избранных", "избранных") else "Избранного пока нет",
-                        if (plans > 0) "в плане ${Format.plural(plans, "занятие", "занятия", "занятий")}" else "плана нет").joinToString(", "), false) { page = SettingsPage.PLAN }
+                    listOf(if (favs > 0) L.p(R.plurals.p_414e6a20a2, favs) else L.s(R.string.t_f109cea920),
+                        if (plans > 0) L.s(R.string.t_aee593f748, L.p(R.plurals.p_3a9aafb6ad, plans)) else L.s(R.string.t_e887e93303)).joinToString(", "), false) { page = SettingsPage.PLAN }
                 Divider()
                 val plan = settings?.focusPlan
                 SectionRow(painterResource(R.drawable.act_focus), SettingsPage.FOCUS.title,
-                    (plan?.let { "Фокус ${it.workMs / 60_000L} + ${it.breakMs / 60_000L} мин" } ?: "Фокус") +
-                        (if (settings?.longRecordReminder?.enabled == true) ", спросит о долгой записи" else ""),
+                    (plan?.let { L.s(R.string.t_97a9f0590a, it.workMs / 60_000L, it.breakMs / 60_000L) } ?: L.s(R.string.t_9395be84e8)) +
+                        (if (settings?.longRecordReminder?.enabled == true) L.s(R.string.t_a23f334099) else ""),
                     caps?.focusSignal.problemShown() || longRecord?.confirmationRequired == true) { page = SettingsPage.FOCUS }
                 Divider()
                 val bundled by produceState<String?>(null) { value = vm.bundledCatalogVersion() }
                 val installed = view?.data?.catalogVersion
                 val update = bundled != null && installed != null && bundled != installed
                 SectionRow(rememberVectorPainter(Icon.More), SettingsPage.MORE.title,
-                    if (update) "Есть обновление каталога занятий" else "Часовой пояс, начало дня, каталог, CSV", update) { page = SettingsPage.MORE }
+                    if (update) L.s(R.string.t_fa620acedb) else L.s(R.string.t_64ed62742f), update) { page = SettingsPage.MORE }
             }
             Group(stringResource(R.string.data_language)) {
                 val deleted = view?.data?.deletedRecords?.size ?: 0
@@ -213,21 +215,21 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 LanguageSettingsRow(vm)
             }
             val version = remember { runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() }
-            Text("(not)AI Time Tracker ${version.orEmpty()}. Все записи хранятся на этом телефоне".replace("  ", " "),
+            Text(L.s(R.string.t_abfb46281b, version.orEmpty()).replace("  ", " "),
                 Modifier.padding(start = 4.dp, top = 18.dp), style = NotAi.type.caption, color = c.ink3)
         }
 
         SettingsPage.APPEARANCE -> AppearancePage(vm)
         SettingsPage.DELETED -> DeletedRecordsPage(vm,view)
 
-        SettingsPage.SURFACES -> Group("На экранах телефона") {
+        SettingsPage.SURFACES -> Group(L.s(R.string.t_e46c179ddb)) {
             val n = caps?.notification
-            SettingRow(rememberVectorPainter(Icon.Bell), "Уведомление",
-                status = surfaceStatus(n, "Старт и стоп из шторки, быстрый выбор занятия"),
+            SettingRow(rememberVectorPainter(Icon.Bell), L.s(R.string.t_3a42cfebfe),
+                status = surfaceStatus(n, L.s(R.string.t_9d9f294850)),
                 warn = n.problemShown(),
                 action = when (n?.takeIf { it.enabled }?.problem) {
-                    SurfaceProblem.PERMISSION_REQUIRED -> "Разрешить" to ::askNotifications
-                    SurfaceProblem.CHANNEL_BLOCKED -> "Открыть настройки" to { system(SurfaceSettingsAction.OPEN_NOTIFICATION_SETTINGS) }
+                    SurfaceProblem.PERMISSION_REQUIRED -> L.s(R.string.t_616bb19d6c) to ::askNotifications
+                    SurfaceProblem.CHANNEL_BLOCKED -> L.s(R.string.t_090fad991e) to { system(SurfaceSettingsAction.OPEN_NOTIFICATION_SETTINGS) }
                     else -> null
                 },
                 checked = surfaces?.notification == true) { on ->
@@ -239,43 +241,43 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
             }
             Divider()
             val o = caps?.overlay
-            SettingRow(rememberVectorPainter(Icon.Floating), "Плавающая кнопка",
-                status = surfaceStatus(o, "Полупрозрачный старт и стоп поверх приложений. После стопа можно сразу выбрать занятие"),
+            SettingRow(rememberVectorPainter(Icon.Floating), L.s(R.string.t_ea707316fd),
+                status = surfaceStatus(o, L.s(R.string.t_33a79b3bc1)),
                 warn = o.problemShown(),
-                action = if (o?.enabled == true && !o.permitted) "Разрешить" to { system(SurfaceSettingsAction.OPEN_OVERLAY_PERMISSION) } else null,
+                action = if (o?.enabled == true && !o.permitted) L.s(R.string.t_616bb19d6c) to { system(SurfaceSettingsAction.OPEN_OVERLAY_PERMISSION) } else null,
                 checked = surfaces?.overlay == true) { on ->
                 vm.setSurfaceEnabled(Surface.OVERLAY, on)
                 if (on && o?.permitted == false) system(SurfaceSettingsAction.OPEN_OVERLAY_PERMISSION)
             }
-            if (surfaces?.overlay == true) AlphaRow("Фон окна выбора после стопа", surfaces.overlayChooserBackgroundAlphaPercent) { v ->
+            if (surfaces?.overlay == true) AlphaRow(L.s(R.string.t_81b26ab0d7), surfaces.overlayChooserBackgroundAlphaPercent) { v ->
                 vm.setSurfaces { it.copy(overlayChooserBackgroundAlphaPercent = v) }
             }
             Divider()
             val w = caps?.widgetPlacement
             val placement = widgetRequest?.takeIf { it.requestId == w?.requestId && it.problem != null }?.let { it.placement } ?: w?.placement
             val canAdd = surfaces?.widget == true && placement in setOf(WidgetPlacement.AVAILABLE, WidgetPlacement.UNCONFIRMED, WidgetPlacement.FAILED)
-            SettingRow(rememberVectorPainter(Icon.Widget), "Виджет",
+            SettingRow(rememberVectorPainter(Icon.Widget), L.s(R.string.t_92a5d7dc45),
                 status = when {
-                    surfaces?.widget != true && placement == WidgetPlacement.PINNED -> "На главном экране, кнопки выключены"
-                    surfaces?.widget != true -> "Выключен"
-                    placement == WidgetPlacement.PINNED -> if ((w?.ids?.size ?: 0) > 1) "На главном экране: ${w?.ids?.size}" else "На главном экране"
-                    placement == WidgetPlacement.PENDING -> "Подтверди добавление на рабочем столе"
-                    placement == WidgetPlacement.UNCONFIRMED -> "Не появился. Попробуй ещё раз или добавь вручную: долгое нажатие на рабочем столе → Виджеты → (not)AI Time"
-                    placement == WidgetPlacement.UNSUPPORTED -> "Рабочий стол не умеет добавлять виджеты из приложений. Добавь вручную: долгое нажатие на рабочем столе → Виджеты → (not)AI Time"
-                    placement == WidgetPlacement.FAILED -> "Телефон не принял запрос. Попробуй ещё раз"
-                    else -> "Ещё не на главном экране"
+                    surfaces?.widget != true && placement == WidgetPlacement.PINNED -> L.s(R.string.t_f10728b46b)
+                    surfaces?.widget != true -> L.s(R.string.t_6eb7540d7c)
+                    placement == WidgetPlacement.PINNED -> if ((w?.ids?.size ?: 0) > 1) L.s(R.string.t_126d6b9747, w?.ids?.size) else L.s(R.string.t_11bb1b11c0)
+                    placement == WidgetPlacement.PENDING -> L.s(R.string.t_421fbcd348)
+                    placement == WidgetPlacement.UNCONFIRMED -> L.s(R.string.t_21afbee12c)
+                    placement == WidgetPlacement.UNSUPPORTED -> L.s(R.string.t_fe97f5bc85)
+                    placement == WidgetPlacement.FAILED -> L.s(R.string.t_129d9b9794)
+                    else -> L.s(R.string.t_e6d3fcd043)
                 },
                 warn = surfaces?.widget == true && placement in setOf(WidgetPlacement.UNCONFIRMED, WidgetPlacement.FAILED, WidgetPlacement.UNSUPPORTED),
-                action = if (canAdd) (if (placement == WidgetPlacement.AVAILABLE) "Добавить на экран" else "Попробовать ещё раз") to ::addWidget else null,
+                action = if (canAdd) (if (placement == WidgetPlacement.AVAILABLE) L.s(R.string.t_1c4b04d710) else L.s(R.string.t_d40fecd7ad)) to ::addWidget else null,
                 checked = surfaces?.widget == true) { on ->
                 vm.setSurfaceEnabled(Surface.WIDGET, on)
                 if (on && placement == WidgetPlacement.AVAILABLE) addWidget()
             }
-            if (surfaces?.widget == true) AlphaRow("Фон виджета", surfaces.widgetBackgroundAlphaPercent) { v ->
+            if (surfaces?.widget == true) AlphaRow(L.s(R.string.t_f55832ba89), surfaces.widgetBackgroundAlphaPercent) { v ->
                 vm.setSurfaces { it.copy(widgetBackgroundAlphaPercent = v) }
             }
             Divider()
-            SettingRow(rememberVectorPainter(Icon.TabTimer), "Ярлык на значке", status = "Долгое нажатие на значок: старт и стоп, выбор занятия и два первых избранных",
+            SettingRow(rememberVectorPainter(Icon.TabTimer), L.s(R.string.t_329b31bdca), status = L.s(R.string.t_b740f2a2e2),
                 warn = false, action = null, checked = surfaces?.shortcut == true) { on -> vm.setSurfaceEnabled(Surface.SHORTCUT, on) }
         }
 
@@ -294,37 +296,37 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
                 val obs = androidx.lifecycle.LifecycleEventObserver { _, e -> if (e == androidx.lifecycle.Lifecycle.Event.ON_RESUME) vm.refreshFocusEffects() }
                 lifecycle.lifecycle.addObserver(obs); onDispose { lifecycle.lifecycle.removeObserver(obs) }
             }
-            Group("Во время отрезка работы") {
+            Group(L.s(R.string.t_49b9985de4)) {
                 val needAccess = fx.choice.dnd && !fx.dndAccess
-                SettingRow(rememberVectorPainter(Icon.Moon), "Не беспокоить",
+                SettingRow(rememberVectorPainter(Icon.Moon), L.s(R.string.t_71790fdb53),
                     status = when {
-                        !fx.dndSupported -> "Нужен Android 10 или новее"
-                        needAccess -> "Включено, но телефон ещё не разрешил приложению режим «Не беспокоить»"
-                        else -> "На время работы приложение включает своё правило «Не беспокоить» с приоритетными уведомлениями. Исключения задаёт телефон. После работы приложение снимает своё правило"
+                        !fx.dndSupported -> L.s(R.string.t_b8540eb5bb)
+                        needAccess -> L.s(R.string.t_7f12cd4599)
+                        else -> L.s(R.string.t_7d87e4d658)
                     }, warn = needAccess,
-                    action = if (needAccess) "Разрешить" to { runCatching { context.startActivity(android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) } } else null,
+                    action = if (needAccess) L.s(R.string.t_616bb19d6c) to { runCatching { context.startActivity(android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) } } else null,
                     checked = fx.choice.dnd && fx.dndSupported) { on ->
                     if (!fx.dndSupported) return@SettingRow
                     vm.setFocusEffects { it.copy(dnd = on) }
                     if (on && !fx.dndAccess) runCatching { context.startActivity(android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)) }
                 }
                 Divider()
-                SettingRow(rememberVectorPainter(Icon.Note), "Свой звук",
-                    status = fx.choice.musicName?.let { "«$it». Играет по кругу, пока приложение открыто" }
-                        ?: "Шум, дождь или музыка из твоего файла. Играет, пока приложение открыто",
-                    warn = false, action = (if (fx.choice.musicId == null) "Выбрать файл" else "Другой файл") to { audio.launch(arrayOf("audio/*")) },
+                SettingRow(rememberVectorPainter(Icon.Note), L.s(R.string.t_f1157816a0),
+                    status = fx.choice.musicName?.let { L.s(R.string.t_2b39abab32, it) }
+                        ?: L.s(R.string.t_948200fea3),
+                    warn = false, action = (if (fx.choice.musicId == null) L.s(R.string.t_2e31dae95f) else L.s(R.string.t_b34e097643)) to { audio.launch(arrayOf("audio/*")) },
                     checked = fx.choice.music && fx.choice.musicId != null) { on ->
                     if (on && fx.choice.musicId == null) audio.launch(arrayOf("audio/*")) else vm.setFocusEffects { it.copy(music = on) }
                 }
             }
-            Group("Сигналы") {
+            Group(L.s(R.string.t_9f431f2a5f)) {
                 val f = caps?.focusSignal
-                SettingRow(painterResource(R.drawable.act_focus), "Сигнал Фокуса",
-                    status = surfaceStatus(f, "Уведомить, когда отрезок закончился. Телефон может немного задержать сигнал"),
+                SettingRow(painterResource(R.drawable.act_focus), L.s(R.string.t_b08e96f6ad),
+                    status = surfaceStatus(f, L.s(R.string.t_c6e0ce16b9)),
                     warn = f.problemShown(),
                     action = when (f?.takeIf { it.enabled }?.problem) {
-                        SurfaceProblem.PERMISSION_REQUIRED -> "Разрешить" to ::askNotifications
-                        SurfaceProblem.CHANNEL_BLOCKED -> "Открыть настройки" to { system(SurfaceSettingsAction.OPEN_NOTIFICATION_SETTINGS) }
+                        SurfaceProblem.PERMISSION_REQUIRED -> L.s(R.string.t_616bb19d6c) to ::askNotifications
+                        SurfaceProblem.CHANNEL_BLOCKED -> L.s(R.string.t_090fad991e) to { system(SurfaceSettingsAction.OPEN_NOTIFICATION_SETTINGS) }
                         else -> null
                     },
                     checked = surfaces?.focusSignal == true) { on ->
@@ -337,48 +339,48 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
         }
 
         SettingsPage.MORE -> {
-            Group("Дни в истории") {
-                NavRow(rememberVectorPainter(Icon.Globe), "Часовой пояс",
-                    note = (if (automaticZone) "Автоматически" else "Вручную") + " · " + zoneSummary(zone, vm.now()),
+            Group(L.s(R.string.t_7d3ea0e679)) {
+                NavRow(rememberVectorPainter(Icon.Globe), L.s(R.string.t_47947a0c46),
+                    note = (if (automaticZone) L.s(R.string.t_741870459d) else L.s(R.string.t_5ec7b0f52b)) + " · " + zoneSummary(zone, vm.now()),
                     onClick = { chooseZone = true })
                 reportZoneProblem?.let { Text(it,Modifier.padding(16.dp),style = NotAi.type.caption,color = c.danger) }
                 val boundary = settings?.reportDayStartMinute ?: 0
                 if (boundary != 0) {
                     Divider()
-                    NavRow(rememberVectorPainter(Icon.Moon), "Граница отчётного дня", value = boundaryClock(boundary),
+                    NavRow(rememberVectorPainter(Icon.Moon), L.s(R.string.t_d111e0cd52), value = boundaryClock(boundary),
                         onClick = { editDayBoundary = true })
                 }
                 if (boundary == 0) {
                     Divider()
-                    NavRow(rememberVectorPainter(Icon.More), "Дополнительно", onClick = { advancedDays = !advancedDays })
-                    if (advancedDays) NavRow(rememberVectorPainter(Icon.Moon), "Граница отчётного дня", value = boundaryClock(boundary),
+                    NavRow(rememberVectorPainter(Icon.More), L.s(R.string.t_d7907f4d43), onClick = { advancedDays = !advancedDays })
+                    if (advancedDays) NavRow(rememberVectorPainter(Icon.Moon), L.s(R.string.t_d111e0cd52), value = boundaryClock(boundary),
                         onClick = { editDayBoundary = true })
                 }
             }
-            Group("Каталог и таблицы") {
+            Group(L.s(R.string.t_c927b86cfb)) {
                 val types = view?.data?.types?.size ?: 0
                 val bundled by produceState<String?>(null) { value = vm.bundledCatalogVersion() }
                 val installed = view?.data?.catalogVersion
                 val update = bundled != null && installed != null && bundled != installed
-                NavRow(rememberVectorPainter(Icon.Layers), if (update) "Каталог занятий: есть обновление" else "Каталог занятий",
-                    note = if (update) "Версия $bundled: понятные названия и разделы по местам. Твои названия и история останутся. Нажми, чтобы посмотреть"
-                        else "${Format.plural(types, "занятие", "занятия", "занятий").replace(Regex("^(\\d)(\\d{3})"), "$1 $2")}, версия ${installed ?: "базовая"}. Нажми, чтобы проверить обновление",
+                NavRow(rememberVectorPainter(Icon.Layers), if (update) L.s(R.string.t_768fee24c8) else L.s(R.string.t_f9c8ab7dd1),
+                    note = if (update) L.s(R.string.t_8940504c4b, bundled)
+                        else L.s(R.string.t_50ac9ea6c3, L.p(R.plurals.p_3a9aafb6ad, types).let { if (L.locale.language == "ru") it.replace(Regex("^(\\d)(\\d{3})"), "$1 $2") else it }, installed ?: L.s(R.string.t_5b76112f5b)),
                     onClick = { scope.launch { busy = true; catalog = vm.prepareCatalog(); busy = false } })
                 Divider()
-                NavRow(rememberVectorPainter(Icon.Table), "Экспорт в CSV", note = "Вся история для таблиц. Это не резервная копия", onClick = { vm.requestExport(csv = true) })
+                NavRow(rememberVectorPainter(Icon.Table), L.s(R.string.t_b402c34a3b), note = L.s(R.string.t_b363aeb862), onClick = { vm.requestExport(csv = true) })
                 Divider()
-                NavRow(rememberVectorPainter(Icon.Upload), "Импорт из CSV", note = "Из Toggl, Clockify или своей таблицы. Сначала покажу, что добавится",
+                NavRow(rememberVectorPainter(Icon.Upload), L.s(R.string.t_e965da5858), note = L.s(R.string.t_156e23f619),
                     onClick = { csvFile.launch(arrayOf("text/*", "application/csv", "text/csv", "*/*")) })
             }
-            Group("О приложении") {
-                NavRow(painterResource(R.drawable.act_tools), "Техническая оболочка", note = "Измерения, календарь, восстановление базы",
+            Group(L.s(R.string.t_b9c9ff652d)) {
+                NavRow(painterResource(R.drawable.act_tools), L.s(R.string.t_e3af18c937), note = L.s(R.string.t_86042e468b),
                     onClick = openTechnical)
                 Divider()
                 val version = remember { runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() }
                 NavRow(rememberVectorPainter(Icon.Info), "(not)AI Time Tracker ${version.orEmpty()}".trim(),
-                    note = "Записи хранятся на этом телефоне; копии — там, куда ты их сохранишь")
+                    note = L.s(R.string.t_8e6839a84e))
                 Divider()
-                NavRow(rememberVectorPainter(Icon.Info), "Лицензии", onClick = { showLicenses = true })
+                NavRow(rememberVectorPainter(Icon.Info), L.s(R.string.t_488dd14a85), onClick = { showLicenses = true })
             }
         }
         }
@@ -386,33 +388,33 @@ fun SettingsScreen(vm: TrackerViewModel, view: TrackerView?, theme: ThemeChoice,
     }
 
     restore?.let { p ->
-        ConfirmDialog("Заменить все данные?",
-            "В копии ${Format.plural(p.sessions, "запись", "записи", "записей")}, ${Format.plural(p.cards, "своё занятие", "своих занятия", "своих занятий")}, " +
-                "${Format.plural(p.goals, "цель", "цели", "целей")}." +
-                (if (p.unfinishedTail || p.unfinishedFocus) " Незакрытая запись придёт как «время неизвестно», её нужно будет уточнить." else "") +
-                " Текущие данные будут сохранены отдельно перед заменой. Записи, сделанные после этой копии, исчезнут.",
-            "Заменить", { vm.applyRestore(p,restoreOwner); restore = null }, { restoreOwner.discard(p);restore = null }, destructive = true)
+        ConfirmDialog(L.s(R.string.t_1b27ed0870),
+            L.s(R.string.t_7f7a71c089, L.p(R.plurals.p_6c73bc4d74, p.sessions), L.p(R.plurals.p_7722e30027, p.cards)) +
+                "${L.p(R.plurals.p_3b59342c88, p.goals)}." +
+                (if (p.unfinishedTail || p.unfinishedFocus) L.s(R.string.t_c161a7bb23) else "") +
+                L.s(R.string.t_05f4ea7fa6),
+            L.s(R.string.t_d772cc53be), { vm.applyRestore(p,restoreOwner); restore = null }, { restoreOwner.discard(p);restore = null }, destructive = true)
     }
     catalog?.let { p ->
         val r = p.report
-        ConfirmDialog(if (r.added.isEmpty() && r.updated.isEmpty()) "Каталог уже актуален" else "Обновить каталог?",
-            "Версия ${p.version}. Новых занятий: ${r.added.size}, уточнений: ${r.updated.size}" +
-                (if (r.conflicts.isNotEmpty()) ", расхождений со своими изменениями: ${r.conflicts.size}. Они требуют разбора в технической оболочке." else ".") +
-                (if (r.updated.isNotEmpty()) " Названия, которые ты менял сам, останутся твоими; прошлые записи не меняются." else ""),
-            if (p.canApply && (r.added.isNotEmpty() || r.updated.isNotEmpty())) "Обновить" else null, { vm.applyCatalog(p); catalog = null }, { catalog = null })
+        ConfirmDialog(if (r.added.isEmpty() && r.updated.isEmpty()) L.s(R.string.t_0a7e3cd8d9) else L.s(R.string.t_1cd1162258),
+            L.s(R.string.t_851c871818, p.version, r.added.size, r.updated.size) +
+                (if (r.conflicts.isNotEmpty()) L.s(R.string.t_00ad5c791d, r.conflicts.size) else ".") +
+                (if (r.updated.isNotEmpty()) L.s(R.string.t_d37c15b206) else ""),
+            if (p.canApply && (r.added.isNotEmpty() || r.updated.isNotEmpty())) L.s(R.string.t_c2f668e54f) else null, { vm.applyCatalog(p); catalog = null }, { catalog = null })
     }
     zoneConfirm?.let { z ->
-        ConfirmDialog("Сменить часовой пояс отчётов на $z?",
-            "Изменятся границы дней в истории и обзоре. Сами записи и зоны целей не меняются.", "Сменить",
+        ConfirmDialog(L.s(R.string.t_dbbafdd074, z),
+            L.s(R.string.t_babd8e081b), L.s(R.string.t_279c2c3c90),
             { vm.setReportZone(z); zoneConfirm = null }, { zoneConfirm = null })
     }
     if (chooseZone) ReportZoneSheet(automaticZone, zone, vm.now(), reportingZoneHost != null,
         onAutomatic = { chooseZone = false; confirmAutomaticZone = true },
         onManual = { z -> chooseZone = false; if (automaticZone || z != zone.id) zoneConfirm = z },
         onDismiss = { chooseZone = false })
-    if (confirmAutomaticZone) ConfirmDialog("Использовать пояс телефона?",
-        "${zoneSummary(ZoneId.systemDefault(), vm.now())}. При смене пояса телефона границы дней в истории и обзоре будут следовать ему. Сами записи и зоны целей не меняются.",
-        "Автоматически", { reportingZoneHost?.useAutomaticReportZone(); confirmAutomaticZone = false }, { confirmAutomaticZone = false })
+    if (confirmAutomaticZone) ConfirmDialog(L.s(R.string.t_7ae0e67853),
+        L.s(R.string.t_751e31256e, zoneSummary(ZoneId.systemDefault(), vm.now())),
+        L.s(R.string.t_741870459d), { reportingZoneHost?.useAutomaticReportZone(); confirmAutomaticZone = false }, { confirmAutomaticZone = false })
     if (editDayBoundary) DayBoundarySheet(settings?.reportDayStartMinute ?: 0, vm::setDayStart) { editDayBoundary = false }
     if (showLicenses) LicensesSheet { showLicenses = false }
 }
@@ -442,9 +444,9 @@ private fun SurfaceCapability?.problemShown() = this != null && enabled && probl
 
 private fun surfaceStatus(cap: SurfaceCapability?, describe: String): String = when {
     cap == null || !cap.enabled -> describe
-    cap.problem == SurfaceProblem.PERMISSION_REQUIRED -> "Включено, но нет разрешения телефона"
-    cap.problem == SurfaceProblem.CHANNEL_BLOCKED -> "Включено, но уведомления выключены в настройках телефона"
-    cap.problem == SurfaceProblem.PLATFORM_FAILURE -> "Телефон не дал включить. Попробуй ещё раз"
+    cap.problem == SurfaceProblem.PERMISSION_REQUIRED -> L.s(R.string.t_cd93b2e0f1)
+    cap.problem == SurfaceProblem.CHANNEL_BLOCKED -> L.s(R.string.t_0e974974fb)
+    cap.problem == SurfaceProblem.PLATFORM_FAILURE -> L.s(R.string.t_93a176ef21)
     else -> describe
 }
 
@@ -459,7 +461,7 @@ private fun AppearanceGroup(vm: TrackerViewModel, theme: ThemeChoice, more: () -
                 ThemeChoice.entries.forEach { t -> ThemeSwatch(t, t == theme, a.accent) { vm.setTheme(t) } }
             }
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("Акцент", Modifier.weight(1f), style = NotAi.type.body, color = c.ink)
+                Text(L.s(R.string.t_2dd965ee95), Modifier.weight(1f), style = NotAi.type.body, color = c.ink)
                 Accent.entries.forEach { ac ->
                     val set = accentSet(ac, c.isDark); val on = ac == a.accent
                     Box(Modifier.size(36.dp).clip(CircleShape).border(if (on) 2.dp else 1.dp, if (on) c.ink else c.rule, CircleShape).padding(5.dp)
@@ -468,13 +470,13 @@ private fun AppearanceGroup(vm: TrackerViewModel, theme: ThemeChoice, more: () -
                 }
             }
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("Размер текста", style = NotAi.type.body, color = c.ink)
+                Text(L.s(R.string.t_b1e23e1ff0), style = NotAi.type.body, color = c.ink)
                 Segmented(Appearance.textScales, a.textScale, { s -> vm.setAppearance { it.copy(textScale = s) } }, Modifier.fillMaxWidth())
             }
         }
         Divider()
-        NavRow(rememberVectorPainter(Icon.Palette), "Шрифт, цифры и главный экран", note = "${a.font.title}, цифры ${a.digits.title.lowercase()}, " +
-            (if (a.compact) "компактно" else "просторно"), onClick = more)
+        NavRow(rememberVectorPainter(Icon.Palette), L.s(R.string.t_be0773c924), note = L.s(R.string.t_b4479f84f1, a.font.title, a.digits.title.lowercase()) +
+            (if (a.compact) L.s(R.string.t_2a5e307788) else L.s(R.string.t_a582d409b1)), onClick = more)
     }
 }
 
@@ -486,7 +488,7 @@ private fun ThemeSwatch(t: ThemeChoice, on: Boolean, accent: Accent, onClick: ()
         ThemeChoice.DARK -> DarkColors; ThemeChoice.AMOLED -> AmoledColors; ThemeChoice.NEON -> NeonColors }
     val dot = accentSet(accent, colors.isDark).accent
     Column(Modifier.widthIn(min = 52.dp).semantics(mergeDescendants = true) { selected = on }
-        .pressable(onClick, role = androidx.compose.ui.semantics.Role.RadioButton, label = "Тема: ${t.title}"),
+        .pressable(onClick, role = androidx.compose.ui.semantics.Role.RadioButton, label = L.s(R.string.t_991e307efa, t.title)),
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Box(Modifier.size(46.dp).clip(RoundedCornerShape(14.dp)).border(if (on) 2.dp else 1.dp, if (on) c.ink else c.rule, RoundedCornerShape(14.dp))
             .padding(3.dp).clip(RoundedCornerShape(11.dp)).background(
@@ -514,18 +516,18 @@ private fun AppearancePage(vm: TrackerViewModel) {
                 IntervalFrame(IntervalState.RUNNING, bracketWidth = 14.dp, bracketHeight = 60.dp, stroke = 1.8.dp, gap = 10.dp, opening = false) {
                     Text("1:24", style = NotAi.type.timer.copy(fontSize = 44.sp, lineHeight = 48.sp), color = c.ink)
                 }
-                Text("Английский · с 14:05", style = NotAi.type.caption, color = c.ink2)
+                Text(L.s(R.string.t_d25786deda), style = NotAi.type.caption, color = c.ink2)
             }
         }
-        Labeled("Шрифт") { Segmented(FontChoice.entries.map { it to it.title }, a.font, { f -> vm.setAppearance { it.copy(font = f) } }, Modifier.fillMaxWidth()) }
-        Labeled("Цифры таймера") { Segmented(TimerDigits.entries.map { it to it.title }, a.digits, { d -> vm.setAppearance { it.copy(digits = d) } }, Modifier.fillMaxWidth()) }
-        Labeled("Плотность списков") { Segmented(listOf(false to "Просторно", true to "Компактно"), a.compact, { v -> vm.setAppearance { it.copy(compact = v) } }, Modifier.fillMaxWidth()) }
-        Labeled("Главный экран") {
-            Toggle("Приглашение на «Начать»", "Скобки медленно дышат, пока учёт не идёт", a.pulse) { v -> vm.setAppearance { it.copy(pulse = v) } }
-            Toggle("Кнопка Фокуса", "Под быстрым стартом. Долгое нажатие — длительности", a.showFocus) { v -> vm.setAppearance { it.copy(showFocus = v) } }
-            Toggle(stringResource(R.string.editorial_tracker_draft_8ea4fb27aad7e440c15e_v0), "Полоска из отрезков над записями каждого дня", a.showRibbon) { v -> vm.setAppearance { it.copy(showRibbon = v) } }
+        Labeled(L.s(R.string.t_df12865c09)) { Segmented(FontChoice.entries.map { it to it.title }, a.font, { f -> vm.setAppearance { it.copy(font = f) } }, Modifier.fillMaxWidth()) }
+        Labeled(L.s(R.string.t_54fe5cc440)) { Segmented(TimerDigits.entries.map { it to it.title }, a.digits, { d -> vm.setAppearance { it.copy(digits = d) } }, Modifier.fillMaxWidth()) }
+        Labeled(L.s(R.string.t_624e55535f)) { Segmented(listOf(false to L.s(R.string.t_09804101ad), true to L.s(R.string.t_d47aa86141)), a.compact, { v -> vm.setAppearance { it.copy(compact = v) } }, Modifier.fillMaxWidth()) }
+        Labeled(L.s(R.string.t_3e5ab0f642)) {
+            Toggle(L.s(R.string.t_388cfb0795), L.s(R.string.t_8ce3643f16), a.pulse) { v -> vm.setAppearance { it.copy(pulse = v) } }
+            Toggle(L.s(R.string.t_b715493906), L.s(R.string.t_e5e4253129), a.showFocus) { v -> vm.setAppearance { it.copy(showFocus = v) } }
+            Toggle(stringResource(R.string.editorial_tracker_draft_8ea4fb27aad7e440c15e_v0), L.s(R.string.t_5f9a6b6230), a.showRibbon) { v -> vm.setAppearance { it.copy(showRibbon = v) } }
         }
-        PillButton("Вернуть как было", { vm.setAppearance { Appearance() } }, Modifier.fillMaxWidth(), ButtonKind.TONAL, height = 44.dp)
+        PillButton(L.s(R.string.t_fa1296f402), { vm.setAppearance { Appearance() } }, Modifier.fillMaxWidth(), ButtonKind.TONAL, height = 44.dp)
         (vm as? LauncherIconsUiHost)?.let { LauncherIconSettings(it) }
     }
 }
@@ -552,21 +554,21 @@ private fun NotificationDetails(surfaces: dev.notai.tracker.SurfaceSettings, tim
                                 setPrivacy: (dev.notai.tracker.NotificationPrivacy) -> Unit, openChannel: () -> Unit) {
     val c = NotAi.colors
     Column(Modifier.fillMaxWidth().padding(start = 52.dp, end = 16.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text("На экране блокировки", style = NotAi.type.caption, color = c.ink2)
+        Text(L.s(R.string.t_d0ff90f238), style = NotAi.type.caption, color = c.ink2)
         val p = surfaces.notificationPrivacy ?: dev.notai.tracker.NotificationPrivacy.PRIVATE
-        Segmented(listOf(dev.notai.tracker.NotificationPrivacy.FULL to "Полностью", dev.notai.tracker.NotificationPrivacy.PRIVATE to "Кратко",
-            dev.notai.tracker.NotificationPrivacy.HIDDEN to "Скрыть"), p, setPrivacy, Modifier.fillMaxWidth(), height = 34.dp)
-        Text(when (p) { dev.notai.tracker.NotificationPrivacy.FULL -> "Занятие, время и кнопки видны без разблокировки"
-            dev.notai.tracker.NotificationPrivacy.PRIVATE -> "Без разблокировки видно только, что учёт идёт"
-            dev.notai.tracker.NotificationPrivacy.HIDDEN -> "На заблокированном экране карточки нет" }, style = NotAi.type.caption, color = c.ink2)
+        Segmented(listOf(dev.notai.tracker.NotificationPrivacy.FULL to L.s(R.string.t_d70f2e079b), dev.notai.tracker.NotificationPrivacy.PRIVATE to L.s(R.string.t_f9444ff8c6),
+            dev.notai.tracker.NotificationPrivacy.HIDDEN to L.s(R.string.t_10729118a0)), p, setPrivacy, Modifier.fillMaxWidth(), height = 34.dp)
+        Text(when (p) { dev.notai.tracker.NotificationPrivacy.FULL -> L.s(R.string.t_1880e6b0ec)
+            dev.notai.tracker.NotificationPrivacy.PRIVATE -> L.s(R.string.t_3e36db582a)
+            dev.notai.tracker.NotificationPrivacy.HIDDEN -> L.s(R.string.t_dee20b519a) }, style = NotAi.type.caption, color = c.ink2)
         val icon = timer?.statusBarIconRequested
-        Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).pressable(openChannel, label = "Значок в строке состояния"), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).pressable(openChannel, label = L.s(R.string.t_734bcf2003)), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(if (icon == false) "Значок в строке состояния скрыт" else "Значок в строке состояния", style = NotAi.type.bodySmall, color = c.ink)
-                Text("Чтобы скрыть его и оставить карточку в шторке, включи «Свернуть» или «Без значка» в настройках этого уведомления",
+                Text(if (icon == false) L.s(R.string.t_6b8910932e) else L.s(R.string.t_734bcf2003), style = NotAi.type.bodySmall, color = c.ink)
+                Text(L.s(R.string.t_fc656a1da4),
                     style = NotAi.type.caption, color = c.ink2)
             }
-            Text("Открыть", style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk, modifier = Modifier.padding(start = 8.dp))
+            Text(L.s(R.string.t_1259571a15), style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk, modifier = Modifier.padding(start = 8.dp))
         }
     }
 }
@@ -580,10 +582,10 @@ private fun AlphaRow(title: String, percent: Int, onChange: (Int) -> Unit) {
     Column(Modifier.fillMaxWidth().padding(start = 52.dp, end = 16.dp, bottom = 12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(title, Modifier.weight(1f), style = NotAi.type.caption, color = c.ink2)
-            Text(if (v == 100) "непрозрачный" else "$v %", style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.ink)
+            Text(if (v == 100) L.s(R.string.t_bd4538e3c6) else "$v %", style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.ink)
         }
         androidx.compose.material3.Slider(v.toFloat(), { v = (Math.round(it / 10f) * 10) }, valueRange = 0f..100f, steps = 9,
-            modifier = Modifier.semantics { contentDescription = "$title: $v процентов" },
+            modifier = Modifier.semantics { contentDescription = L.s(R.string.t_61ce62df94, title, v) },
             colors = androidx.compose.material3.SliderDefaults.colors(thumbColor = c.ink, activeTrackColor = c.ink2, inactiveTrackColor = c.sunk,
                 activeTickColor = c.ink3, inactiveTickColor = c.rule))
     }
@@ -600,28 +602,28 @@ private fun LongRecordRow(vm: TrackerViewModel, pref: dev.notai.tracker.LongReco
     val blockers = state?.availability?.blockers.orEmpty()
     val confirm = state?.confirmationRequired == true
     val (status, warn, action) = when {
-        !pref.enabled -> Triple("Если запись идёт дольше $hours ч, тихо спросить в шторке, не забыт ли таймер", false, null)
-        confirm -> Triple("Включено в восстановленной копии. На этом телефоне нужно подтвердить", true, "Подтвердить" to vm::confirmLongRecord)
-        dev.notai.tracker.ScheduleDeliveryBlocker.PERMISSION in blockers -> Triple("Включено, но нет разрешения на уведомления", true, "Разрешить" to askNotifications)
-        dev.notai.tracker.ScheduleDeliveryBlocker.CHANNEL in blockers -> Triple("Включено, но уведомления выключены в настройках телефона", true, "Открыть настройки" to openChannel)
-        else -> Triple("Через $hours ч записи спросит в шторке: продолжить, отложить или остановить", false, null)
+        !pref.enabled -> Triple(L.s(R.string.t_ab0b3ff312, hours), false, null)
+        confirm -> Triple(L.s(R.string.t_7fa01b6e34), true, L.s(R.string.t_0467ae4bb8) to vm::confirmLongRecord)
+        dev.notai.tracker.ScheduleDeliveryBlocker.PERMISSION in blockers -> Triple(L.s(R.string.t_befab85c9e), true, L.s(R.string.t_616bb19d6c) to askNotifications)
+        dev.notai.tracker.ScheduleDeliveryBlocker.CHANNEL in blockers -> Triple(L.s(R.string.t_0e974974fb), true, L.s(R.string.t_090fad991e) to openChannel)
+        else -> Triple(L.s(R.string.t_f2351a24d5, hours), false, null)
     }
-    SettingRow(rememberVectorPainter(Icon.Bell), "Долгая запись", status, warn, action, pref.enabled) { on ->
+    SettingRow(rememberVectorPainter(Icon.Bell), L.s(R.string.t_46404668d3), status, warn, action, pref.enabled) { on ->
         vm.configureLongRecord(pref.copy(enabled = on))
         if (on && dev.notai.tracker.ScheduleDeliveryBlocker.PERMISSION in blockers) askNotifications()
     }
-    if (pref.enabled) StepRow(rememberVectorPainter(Icon.TabTimer), "Спросить через", h, { h = (h - 1).coerceAtLeast(1) }, { h = (h + 1).coerceAtMost(12) }, unit = "ч")
+    if (pref.enabled) StepRow(rememberVectorPainter(Icon.TabTimer), L.s(R.string.t_81d3d38d5c), h, { h = (h - 1).coerceAtLeast(1) }, { h = (h + 1).coerceAtMost(12) }, unit = L.s(R.string.t_285cc40014))
 }
 
 /** Quick buttons and the optional plan for days. Each plan entry reads as one line; tapping opens it. */
 @Composable
 private fun PlanGroup(series: List<PlanSeriesUi>, open: (PlanSeriesUi?) -> Unit, favorites: Int, openFavorites: () -> Unit) {
     val c = NotAi.colors
-    Group("Быстрые кнопки") {
-        NavRow(rememberVectorPainter(Icon.Star), "Избранное", value = if (favorites > 0) "$favorites" else null,
-            note = "Порядок, названия на кнопках, удаление повторов. Тот же порядок в шторке, виджете и на кнопке", onClick = openFavorites)
+    Group(L.s(R.string.t_bea0873d5e)) {
+        NavRow(rememberVectorPainter(Icon.Star), L.s(R.string.t_b880e6a105), value = if (favorites > 0) "$favorites" else null,
+            note = L.s(R.string.t_5075c29ca7), onClick = openFavorites)
     }
-    Group("План по дням") {
+    Group(L.s(R.string.t_0bfa7a54cb)) {
         series.forEach { p ->
             Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).pressable({ open(p) }, label = p.label.title).padding(horizontal = 16.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -634,8 +636,8 @@ private fun PlanGroup(series: List<PlanSeriesUi>, open: (PlanSeriesUi?) -> Unit,
             }
             Divider()
         }
-        NavRow(rememberVectorPainter(Icon.Plus), if (series.isEmpty()) "Добавить занятие в план" else "Добавить ещё",
-            note = if (series.isEmpty()) "Например, английский по понедельникам и средам. В эти дни он будет ждать на главном экране" else null,
+        NavRow(rememberVectorPainter(Icon.Plus), if (series.isEmpty()) L.s(R.string.t_69d66ab891) else L.s(R.string.t_5d38673a55),
+            note = if (series.isEmpty()) L.s(R.string.t_9f4e577f1f) else null,
             onClick = { open(null) })
     }
 }
@@ -650,24 +652,24 @@ private fun FocusGroup(vm: TrackerViewModel, work: Int, rest: Int) {
         delay(700)
         vm.configureFocus(w, b)
     }
-    Group("Длительности Фокуса") {
-        StepRow(painterResource(R.drawable.act_focus), "Отрезок работы", w, { w = (w - 5).coerceAtLeast(5) }, { w = (w + 5).coerceAtMost(180) })
+    Group(L.s(R.string.t_e3eed8bfd8)) {
+        StepRow(painterResource(R.drawable.act_focus), L.s(R.string.t_2d2be3f11c), w, { w = (w - 5).coerceAtLeast(5) }, { w = (w + 5).coerceAtMost(180) })
         Divider()
-        StepRow(painterResource(R.drawable.act_cup), "Перерыв", b, { b = if (b > 5) b - 5 else (b - 1).coerceAtLeast(1) }, { b = if (b >= 5) (b + 5).coerceAtMost(60) else b + 1 })
+        StepRow(painterResource(R.drawable.act_cup), L.s(R.string.t_735877a9aa), b, { b = if (b > 5) b - 5 else (b - 1).coerceAtLeast(1) }, { b = if (b >= 5) (b + 5).coerceAtMost(60) else b + 1 })
     }
 }
 
 @Composable
-private fun StepRow(icon: Painter, title: String, minutes: Int, minus: () -> Unit, plus: () -> Unit, unit: String = "мин") {
+private fun StepRow(icon: Painter, title: String, minutes: Int, minus: () -> Unit, plus: () -> Unit, unit: String = L.s(R.string.t_d6035dc6ed)) {
     val c = NotAi.colors
     Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(start = 16.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         M3Icon(icon, null, Modifier.size(22.dp), tint = c.ink2)
         Spacer(Modifier.width(14.dp))
         Text(title, Modifier.weight(1f), style = NotAi.type.body, color = c.ink)
-        IconAction(Icon.Minus, "$title: меньше", minus, size = 16.dp, tint = c.ink)
+        IconAction(Icon.Minus, L.s(R.string.t_1fcbdeecfd, title), minus, size = 16.dp, tint = c.ink)
         Text("$minutes $unit".trim(), Modifier.widthIn(min = 64.dp).semantics { contentDescription = "$title: $minutes $unit".trim() }, style = NotAi.type.body.copy(fontWeight = FontWeight.Medium),
             color = c.ink, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-        IconAction(Icon.Plus, "$title: больше", plus, size = 16.dp, tint = c.ink)
+        IconAction(Icon.Plus, L.s(R.string.t_4ef8132cf3, title), plus, size = 16.dp, tint = c.ink)
     }
 }
 
@@ -725,7 +727,7 @@ fun ConfirmDialog(title: String, text: String, confirm: String?, onConfirm: () -
                 Text(confirm, style = NotAi.type.button, color = if (destructive) c.danger else c.amberInk)
             }
         },
-        dismissButton = { PillButton(if (confirm != null) "Отмена" else "Понятно", onDismiss, kind = ButtonKind.TEXT, height = 44.dp) })
+        dismissButton = { PillButton(if (confirm != null) L.s(R.string.t_0ec753be8d) else L.s(R.string.t_f127f2a1ee), onDismiss, kind = ButtonKind.TEXT, height = 44.dp) })
 }
 
 /**
@@ -736,57 +738,57 @@ fun ConfirmDialog(title: String, text: String, confirm: String?, onConfirm: () -
 private fun BackupPage(vm: TrackerViewModel, auto: AutoBackupUi?, last: BackupInfo?, view: TrackerView?, zone: ZoneId, today: java.time.LocalDate,
                        busy: Boolean, chooseFolder: () -> Unit, restoreFile: () -> Unit, restoreVersion: (String) -> Unit) {
     val c = NotAi.colors
-    fun whenText(at: Long) = "${Format.dayTitle(Instant.ofEpochMilli(at).atZone(zone).toLocalDate(), today).lowercase()} в ${Format.clock(at, zone)}"
+    fun whenText(at: Long) = L.s(R.string.t_c3c366f704, Format.dayTitle(Instant.ofEpochMilli(at).atZone(zone).toLocalDate(), today).lowercase(), Format.clock(at, zone))
     val s = auto?.state
-    Group("Автокопия в папку") {
+    Group(L.s(R.string.t_542c2cd5f6)) {
         if (auto == null || s == null) {
-            NavRow(rememberVectorPainter(Icon.Folder), "Автокопия", note = "Недоступна в этой сборке")
+            NavRow(rememberVectorPainter(Icon.Folder), L.s(R.string.t_48b72fd474), note = L.s(R.string.t_b6cee6b950))
             return@Group
         }
         val err = s.error.takeIf { s.enabled }
         val suspended = s.enabled && s.consecutiveFailures >= 5
         val status = when {
-            !s.enabled && s.destination == null -> "Сама сохраняет полную копию в выбранную папку: на телефоне или в облаке, если приложение облака даёт папку. Такая копия переживёт удаление приложения"
-            !s.enabled -> "Выключена. Новые копии не сохраняются, прежние остаются в папке"
-            suspended -> "Приостановлена после пяти неудач подряд. ${err?.let { Format.backupProblem(it) } ?: ""}".trim()
+            !s.enabled && s.destination == null -> L.s(R.string.t_be8f714a0e)
+            !s.enabled -> L.s(R.string.t_60a8361ac8)
+            suspended -> L.s(R.string.t_12f864ad2e, err?.let { Format.backupProblem(it) } ?: "").trim()
             err != null -> Format.backupProblem(err)
-            s.pending != null -> "Сохраняю копию"
-            s.lastSuccess != null -> "Последняя ${whenText(s.lastSuccess!!.verifiedAt)}, файл проверен"
-            else -> "Первая копия появится через пару минут"
+            s.pending != null -> L.s(R.string.t_f6bfe94a14)
+            s.lastSuccess != null -> L.s(R.string.t_5a1413e92d, whenText(s.lastSuccess!!.verifiedAt))
+            else -> L.s(R.string.t_b433c5110e)
         }
         val action: Pair<String, () -> Unit>? = when {
             !s.enabled -> null
             err in setOf(dev.notai.tracker.android.AutomaticBackupError.GRANT_REVOKED, dev.notai.tracker.android.AutomaticBackupError.REQUIRES_SELECTION,
-                dev.notai.tracker.android.AutomaticBackupError.UNSUPPORTED) -> "Выбрать папку" to chooseFolder
-            err != null || suspended -> "Повторить" to { vm.retryAutoBackup() }
+                dev.notai.tracker.android.AutomaticBackupError.UNSUPPORTED) -> L.s(R.string.t_14a658ce61) to chooseFolder
+            err != null || suspended -> L.s(R.string.t_9e506acb19) to { vm.retryAutoBackup() }
             else -> null
         }
-        SettingRow(rememberVectorPainter(Icon.Folder), "Автокопия", status, warn = err != null || suspended, action = action, checked = s.enabled) { on ->
+        SettingRow(rememberVectorPainter(Icon.Folder), L.s(R.string.t_48b72fd474), status, warn = err != null || suspended, action = action, checked = s.enabled) { on ->
             if (on && s.destination == null) chooseFolder() else vm.setAutoBackup(on)
         }
         if (s.destination != null) {
             Divider()
-            NavRow(rememberVectorPainter(Icon.Folder), "Папка", value = "Сменить", note = auto.folder ?: "Выбранная папка", onClick = chooseFolder)
+            NavRow(rememberVectorPainter(Icon.Folder), L.s(R.string.t_bc5431b599), value = L.s(R.string.t_279c2c3c90), note = auto.folder ?: L.s(R.string.t_4fc1809d7d), onClick = chooseFolder)
         }
         if (s.enabled) {
             Divider()
             var keep by remember(s.policy.retain) { mutableIntStateOf(s.policy.retain) }
             LaunchedEffect(keep) { if (keep == s.policy.retain) return@LaunchedEffect; delay(700); vm.setBackupRetention(keep) }
-            StepRow(rememberVectorPainter(Icon.Layers), "Хранить копий", keep, { keep = (keep - 1).coerceAtLeast(1) }, { keep = (keep + 1).coerceAtMost(30) }, unit = "")
+            StepRow(rememberVectorPainter(Icon.Layers), L.s(R.string.t_d9017ada66), keep, { keep = (keep - 1).coerceAtLeast(1) }, { keep = (keep + 1).coerceAtMost(30) }, unit = "")
             Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("После изменений копия сохраняется через пару минут, когда телефон разрешит фоновую работу. Раз в сутки — даже без изменений. " +
-                    "Старые копии убираются, только когда новая проверена.", style = NotAi.type.caption, color = c.ink2)
+                Text(L.s(R.string.t_d002f83ddc) +
+                    L.s(R.string.t_c736a598e7), style = NotAi.type.caption, color = c.ink2)
                 ButtonPair(spacing = 8.dp) { m ->
-                    PillButton("Сохранить сейчас", { vm.backupNow() }, m, ButtonKind.TONAL, height = 42.dp, enabled = s.pending == null)
+                    PillButton(L.s(R.string.t_6213880977), { vm.backupNow() }, m, ButtonKind.TONAL, height = 42.dp, enabled = s.pending == null)
                     val uncertain = s.pending?.takeIf { err == dev.notai.tracker.android.AutomaticBackupError.CREATION_UNCERTAIN }
-                    if (uncertain != null) PillButton("Пропустить эту", { vm.skipUncertainBackup(uncertain.id) }, m, ButtonKind.TEXT, height = 42.dp)
+                    if (uncertain != null) PillButton(L.s(R.string.t_63833f7ebd), { vm.skipUncertainBackup(uncertain.id) }, m, ButtonKind.TEXT, height = 42.dp)
                 }
             }
         }
     }
     val versions = s?.versions.orEmpty().filter { it.destination == s?.destination }.sortedByDescending { it.verifiedAt }
-    if (versions.isNotEmpty()) Group("Копии в папке") {
-        Text("Нажми на копию: сначала покажу, что в ней, заменю данные только после подтверждения",
+    if (versions.isNotEmpty()) Group(L.s(R.string.t_f46e3488b5)) {
+        Text(L.s(R.string.t_1f1fa1b82e),
             Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp), style = NotAi.type.caption, color = c.ink2)
         versions.forEachIndexed { i, v ->
             if (i > 0) Divider()
@@ -794,17 +796,17 @@ private fun BackupPage(vm: TrackerViewModel, auto: AutoBackupUi?, last: BackupIn
                 value = sizeText(v.snapshot.bytes), onClick = if (busy) null else ({ restoreVersion(v.operationId) }))
         }
     }
-    Group("Вручную") {
+    Group(L.s(R.string.t_5ec7b0f52b)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                 M3Icon(Icon.Download, null, Modifier.size(22.dp), tint = c.ink2)
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text("Файл копии", style = NotAi.type.body, color = c.ink)
-                    Text(last?.let { "Последний ${whenText(it.at)}" + if (it.verified) ", файл проверен" else "" } ?: "С этого телефона файлов ещё не сохраняли",
+                    Text(L.s(R.string.t_a5363d1b5f), style = NotAi.type.body, color = c.ink)
+                    Text(last?.let { L.s(R.string.t_8543530f12, whenText(it.at)) + if (it.verified) L.s(R.string.t_afbca25eab) else "" } ?: L.s(R.string.t_85e8a3404b),
                         style = NotAi.type.caption, color = c.ink2)
                     view?.data?.let { d ->
-                        Text(Format.plural(d.sessions.size, "запись", "записи", "записей") + ", " + Format.plural(d.cards.size, "своё занятие", "своих занятия", "своих занятий") +
-                            ", " + Format.plural(d.goals.size, "цель", "цели", "целей"), style = NotAi.type.caption, color = c.ink2)
+                        Text(L.p(R.plurals.p_6c73bc4d74, d.sessions.size) + ", " + L.p(R.plurals.p_7722e30027, d.cards.size) +
+                            ", " + L.p(R.plurals.p_3b59342c88, d.goals.size), style = NotAi.type.caption, color = c.ink2)
                     }
                 }
             }
@@ -812,13 +814,13 @@ private fun BackupPage(vm: TrackerViewModel, auto: AutoBackupUi?, last: BackupIn
                 PillButton(stringResource(R.string.editorial_tracker_draft_8f4fc15539624b530640_v0), { vm.requestExport() }, m, ButtonKind.PRIMARY, height = 44.dp, enabled = !busy)
                 PillButton(stringResource(R.string.editorial_tracker_draft_86dfb8c919ec425b6196_v0), restoreFile, m, ButtonKind.TONAL, height = 44.dp, enabled = !busy)
             }
-            Text("После переустановки выбери здесь любой файл из папки автокопий. Копия — не синхронизация между телефонами.",
+            Text(L.s(R.string.t_125737d34a),
                 style = NotAi.type.caption, color = c.ink2)
         }
     }
 }
 
 private fun sizeText(bytes: Long): String = when {
-    bytes >= 1_048_576 -> String.format(java.util.Locale.forLanguageTag("ru"), "%.1f МБ", bytes / 1_048_576.0)
-    else -> "${(bytes + 1023) / 1024} КБ"
+    bytes >= 1_048_576 -> String.format(L.locale, L.s(R.string.t_93eb0c0182), bytes / 1_048_576.0)
+    else -> L.s(R.string.t_784e60ff6a, (bytes + 1023) / 1024)
 }

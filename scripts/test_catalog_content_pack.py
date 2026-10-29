@@ -24,7 +24,7 @@ class CatalogPackPreparationTest(unittest.TestCase):
         values = [row["key"] for row in self.original["entries"] if row["key"]["kind"] == "VALUE"]
         self.assertEqual(53, len({key["stableId"] for key in values}))
         self.assertEqual(130, len({pack.identity(key) for key in values}))
-        self.assertEqual("aec8933181894f0c40679fe8a4b68b70083963d8b430785071efe275c03e156a", self.manifest["sha256"])
+        self.assertEqual("4a3505ad79e0c204137ef68e0835ef01a771736716cf508012008ff927418bc2", self.manifest["sha256"])
 
     def test_partial_aliases_and_unknown_or_duplicate_identities_refuse(self):
         for mutation in ("alias", "missing", "duplicate", "parent", "version", "schema"):

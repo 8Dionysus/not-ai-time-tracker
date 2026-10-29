@@ -1,6 +1,7 @@
 package dev.notai.tracker.android.ui
 
 import android.graphics.Bitmap
+import androidx.compose.ui.semantics.getOrNull
 import android.graphics.Canvas
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.captureToImage
@@ -20,6 +21,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.ui.test.performScrollToKey
@@ -53,6 +55,7 @@ import dev.notai.tracker.android.newInstallData
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -108,6 +111,7 @@ class UiScreensTest {
         override val backups = Backups(tracker, MemoryRollback())
         override val focusDue = FocusDueSignals()
         override val runtime: TrackerRuntime? = null
+        override val catalogContent = dev.notai.tracker.android.CatalogContentAdapter(ApplicationProvider.getApplicationContext(), catalog)
         override fun prepareCatalog() = CatalogImports(tracker) { catalog }.prepare()
         override fun applyCatalog(preview: CatalogPreview) = CatalogImports(tracker) { catalog }.apply(preview)
         override fun submitShortcut(action: SurfaceAction) = CompletableDeferred<Result<Tracker.Change>>(Result.failure(IllegalStateException("no shortcuts")))
@@ -209,6 +213,21 @@ class UiScreensTest {
         assertTrue("startup trace hook fires once controls are live", actionReady > 0)
         return vm
     }
+
+    /** Swipe a history row open once the list has settled; a scroll still in progress folds it back by design. */
+    private fun reveal(sessionId: String) {
+        val row = compose.onNodeWithTag("history-record:$sessionId")
+        repeat(3) {
+            row.performScrollTo();compose.waitForIdle();compose.mainClock.advanceTimeBy(500);compose.waitForIdle()
+            row.performTouchInput { swipeLeft() };compose.waitForIdle()
+            if (compose.onAllNodesWithTag("swipe-delete:$sessionId").fetchSemanticsNodes().isNotEmpty()) return
+        }
+        throw AssertionError("Swipe did not uncover Delete for $sessionId")
+    }
+
+    /** The uncovered Delete button of the one row that a swipe opened. */
+    private fun revealedDelete() = compose.onAllNodes(androidx.compose.ui.test.SemanticsMatcher("swipe delete") { n ->
+        n.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.TestTag)?.startsWith("swipe-delete:") == true }).onFirst()
 
     private fun waitText(text: String) {
         compose.waitUntil(15_000) { compose.onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty() }
@@ -519,6 +538,11 @@ class UiScreensTest {
         compose.waitUntil(5_000) { compose.onAllNodesWithText("9:10–11:02", substring = true).fetchSemanticsNodes().isEmpty() }
         compose.waitForIdle()
         compose.onAllNodesWithText("8:30–8:55", substring = true).onFirst().performTouchInput { swipeLeft() }
+        // A swipe only uncovers the button; nothing is deleted until it is tapped.
+        compose.waitForIdle();compose.mainClock.advanceTimeBy(1_000)
+        assertTrue(seed.tracker.data().sessions.size == before - 1)
+        shot("08-swipe-revealed", vm)
+        revealedDelete().performClick()
         compose.waitUntil(5_000) { seed.tracker.data().sessions.size == before - 2 }
         compose.waitUntil(5_000) { compose.onAllNodesWithText("8:30–8:55", substring = true).fetchSemanticsNodes().isEmpty() }
     }
@@ -590,6 +614,8 @@ class UiScreensTest {
             fun showRow() {
                 compose.waitUntil(5_000) { vm.home.value?.days?.any { day -> day.records.any { it.sessionId == record.id } } == true }
                 compose.onNode(hasScrollAction()).performScrollToKey("$today:${record.id}")
+                // The restored projection can arrive before LazyColumn has composed its keyed row.
+                compose.waitUntil(5_000) { compose.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty() }
                 row().performScrollTo()
             }
             row().performScrollTo()
@@ -605,7 +631,8 @@ class UiScreensTest {
             row().performTouchInput { swipe(Offset(width * 0.8f,centerY),Offset(width * 0.5f,centerY),300) }
             assertTrue(original == t.data())
             repeat(2) {
-                row().performScrollTo();row().performTouchInput { swipeLeft() }
+                reveal(record.id)
+                assertTrue(t.data().sessions.any { it.id == record.id });compose.onNodeWithTag("swipe-delete:${record.id}").performClick()
                 compose.waitUntil(5_000) { t.data().sessions.none { it.id == record.id } }
                 waitText("Запись перемещена в «Удалённое»")
                 if(it == 1) t.saveCard(t.snapshot().token,Card("later-ui-edit","Keep later independent edit"))
@@ -618,7 +645,8 @@ class UiScreensTest {
                 if(it == 1) assertTrue(t.data().cards.any { card -> card.id == "later-ui-edit" })
             }
             shot("recovery-restored-history",vm)
-            row().performScrollTo();row().performTouchInput { swipeLeft() }
+            reveal(record.id)
+            compose.onNodeWithTag("swipe-delete:${record.id}").performClick()
             compose.waitUntil(5_000) { t.data().deletedRecords.size == 1 }
             compose.onNodeWithText("Настройки").performClick()
             compose.onNodeWithText("Удалённое").performScrollTo().performClick()
@@ -666,6 +694,78 @@ class UiScreensTest {
             assertTrue(t.data().segments.filter { it.sessionId == target.sessionId } == before.segments.filter { it.sessionId == target.sessionId })
             assertTrue(compose.onAllNodesWithText("さらに表示").fetchSemanticsNodes().isEmpty())
         } finally { vm.viewModelScope.cancel();db.close();app.deleteDatabase(dbName) }
+    }
+
+    /** Every visible line of every main screen, after switching language: nothing Russian except the person's own values. */
+    @Test @Config(qualifiers = "ru-rRU-w400dp-h1300dp-xhdpi") fun languageSweepLeavesNoRussianCopy() {
+        val s = seed(false);val vm = render(s)
+        val d = s.tracker.data()
+        val own = (d.cards.map { it.name } + d.favorites.map { it.label } + d.goals.map { it.name } + d.sessions.mapNotNull { it.note } +
+            d.sessions.flatMap { it.selection.details.values } + listOf("Отпуск коллеги", "Созвон с командой", "Облако · not-ai")).filter { it.isNotBlank() }.sortedByDescending { it.length }
+        val cyr = Regex("[А-Яа-яЁё]")
+        fun texts(): List<String> = compose.onAllNodes(androidx.compose.ui.test.isRoot(), useUnmergedTree = true).fetchSemanticsNodes().flatMap { root ->
+            fun walk(n: androidx.compose.ui.semantics.SemanticsNode): List<String> =
+                (n.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.Text).orEmpty().map { it.text } +
+                    n.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.ContentDescription).orEmpty() +
+                    listOfNotNull(n.config.getOrNull(androidx.compose.ui.semantics.SemanticsActions.OnClick)?.label)) + n.children.flatMap(::walk)
+            walk(root)
+        }
+        fun check(where: String, lang: String) {
+            repeat(2) { compose.waitForIdle(); org.robolectric.shadows.ShadowLooper.idleMainLooper() }
+            val bad = texts().map { t -> own.fold(t) { acc, v -> acc.replace(v, "") } }.filter { cyr.containsMatchIn(it) }.distinct()
+            assertTrue("$lang/$where still shows Russian: $bad", bad.isEmpty())
+        }
+        val languages = listOf("en", "ja", "es", "fr", "pt-BR", "de", "it", "ar", "zh-Hans", "ko", "hi")
+        fun str(lang: String, id: Int) = ApplicationProvider.getApplicationContext<android.content.Context>().createConfigurationContext(
+            android.content.res.Configuration().apply { setLocale(java.util.Locale.forLanguageTag(lang)) }).getString(id)
+        assertEquals(dev.notai.tracker.android.AppLanguage.supported - "ru", languages.toSet())
+        for (lang in languages) {
+            compose.runOnIdle { vm.setLanguage(lang) }
+            repeat(2) { compose.waitForIdle(); org.robolectric.shadows.ShadowLooper.idleMainLooper() }
+            val (timer, overview, settings) = Tab.entries.map { str(lang, it.titleRes) }
+            if (lang == "en") assertEquals(listOf("Timer", "Overview", "Settings"), listOf(timer, overview, settings))
+            if (lang == "ja") assertEquals(listOf("タイマー", "概要", "設定"), listOf(timer, overview, settings))
+            waitText(settings)
+            // The language flow invalidates history on IO. Wait for the seeded unclassified record's
+            // new label as well as the tab copy, so this check observes the rebuilt projection.
+            val unclassified = str(lang, dev.notai.tracker.android.R.string.t_aff922a637)
+            compose.waitUntil(15_000) {
+                vm.language.value.resolvedLocaleTag == lang && vm.home.value?.days?.any { day ->
+                    day.entries.any { it.label.unclassified && it.label.title == unclassified }
+                } == true
+            }
+            compose.onNode(hasText(timer) and androidx.compose.ui.test.hasClickAction()).performClick();check("timer", lang)
+            if (lang == "en" || lang == "ja") shotAs("language-$lang-timer", vm, ThemeChoice.LIGHT)
+            if (lang != "en") {
+                // Every pack: the picker shows the catalog in that language, with nothing left in Russian.
+                compose.onNode(hasText(str(lang, dev.notai.tracker.android.R.string.t_c0634e4cb3)) and androidx.compose.ui.test.hasClickAction()).performClick()
+                repeat(2) { compose.waitForIdle(); org.robolectric.shadows.ShadowLooper.idleMainLooper() }
+                check("picker", lang)
+                if (lang == "ja") shotAs("language-ja-picker", vm, ThemeChoice.LIGHT)
+                compose.onAllNodesWithContentDescription(str(lang, dev.notai.tracker.android.R.string.t_4ae50d3073)).onFirst().performClick();compose.waitForIdle()
+            }
+            if (lang == "en") {
+                compose.onNode(hasText("All activities") and androidx.compose.ui.test.hasClickAction()).performClick()
+                waitText("Find or create an activity");check("picker", lang);shotAs("language-en-picker", vm, ThemeChoice.LIGHT)
+                compose.onAllNodesWithContentDescription("Close").onFirst().performClick();compose.waitForIdle()
+                compose.onAllNodes(androidx.compose.ui.test.SemanticsMatcher("history record") { n ->
+                    n.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.TestTag)?.startsWith("history-record:") == true }).onFirst().performScrollTo().performClick()
+                waitText("Edit entry");check("entry", lang)
+                compose.onAllNodesWithContentDescription("Close").onFirst().performClick();compose.waitForIdle()
+            }
+            compose.onNode(hasScrollAction()).performScrollToIndex(6);check("history", lang)
+            compose.onNode(hasText(overview) and androidx.compose.ui.test.hasClickAction()).performClick();check("overview", lang)
+            if (lang == "en" || lang == "ja") shotAs("language-$lang-overview", vm, ThemeChoice.LIGHT)
+            if (lang == "en") for (p in listOf("7 days", "30 days")) { compose.onNodeWithText(p).performClick();check("overview-$p", lang) }
+            compose.onNode(hasText(settings) and androidx.compose.ui.test.hasClickAction()).performClick();check("settings", lang)
+            if (lang == "en") shotAs("language-en-settings", vm, ThemeChoice.LIGHT)
+            for (page in listOf("Timer outside the app", "Backup", "Activities and plan", "Focus and reminders", "More", "Deleted").takeIf { lang == "en" }.orEmpty()) {
+                compose.onNodeWithText(page).performScrollTo().performClick();check(page, lang)
+                compose.onNodeWithContentDescription("Back to settings").performClick()
+            }
+        }
+        compose.runOnIdle { vm.setLanguage(null) }
+        waitText("Настройки")
     }
 
     @Test fun recoveryLanguagePickerChangesVisibleControlsWithoutChangingRecords() {

@@ -1,0 +1,961 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from Kotlin source copy; see localization/ui-copy/README.md. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="t_0076203bff" formatted="false">विराम शुरू करें</string>
+    <string name="t_0077164ed0">निर्यात %1$s: फिर से तैयार करें; आंशिक फ़ाइल रखी गई है</string>
+    <string name="t_007f15b539" formatted="false">पूरे सत्र/खंड की मात्रा…</string>
+    <string name="t_0087bd0bf7" formatted="false">गतिविधि खोजें या बनाएँ</string>
+    <string name="t_00ad5c791d">, आपके बदलावों से टकराव: %1$s। इन्हें तकनीकी इंटरफ़ेस में सुलझाना होगा।</string>
+    <string name="t_017c8c142b" formatted="false">खाना बनाना</string>
+    <string name="t_0195b83c6c" formatted="false">मौजूदा गतिविधि को दें</string>
+    <string name="t_01a3d66b22" formatted="false">फ़ोकस, विराम</string>
+    <string name="t_01e118e6e9">%1$s %2$s पहले</string>
+    <string name="t_03498e395a" formatted="false">विराम</string>
+    <string name="t_03cb42c402">%1$s से चल रहा है। चुनने पर शुरुआत वही रहेगी।</string>
+    <string name="t_042dbd35f2">यह फ़ाइल उपयुक्त नहीं: %1$s</string>
+    <string name="t_0467ae4bb8" formatted="false">पुष्टि करें</string>
+    <string name="t_04bcedfa9f">%1$s और अभी के बीच</string>
+    <string name="t_059b504fa9" formatted="false">फ़ोल्डर चुना गया। पहली कॉपी कुछ मिनट में बनेगी</string>
+    <string name="t_05f4ea7fa6" formatted="false">" बदलने से पहले मौजूदा डेटा अलग से सहेजा जाएगा। इस कॉपी के बाद की प्रविष्टियाँ हट जाएँगी।"</string>
+    <string name="t_060c91cb5a">%1$s ज़्यादा</string>
+    <string name="t_067a6eef15" formatted="false">CSV मैपिंग से पहले ID से कार्ड चुनें</string>
+    <string name="t_06d08263c2" formatted="false">इस फ़ोल्डर में कॉपी सहेजी नहीं जा सकतीं। दूसरा चुनें</string>
+    <string name="t_0865c10035" formatted="false">कम से कम</string>
+    <string name="t_08ccc5ba08">%1$s: %2$s। ऐप खोलें और मौजूदा स्थिति जाँचें।</string>
+    <string name="t_08f120e3b9" formatted="false">सहेजा विकल्प शुरू करें?</string>
+    <string name="t_090fad991e" formatted="false">सेटिंग खोलें</string>
+    <string name="t_0931eb69ad" formatted="false">अपनी गतिविधि</string>
+    <string name="t_096312396e">%1$s में</string>
+    <string name="t_09804101ad" formatted="false">खुला</string>
+    <string name="t_0a33cc879e">पसंदीदा से हटाएँ: %1$s</string>
+    <string name="t_0a7d0c65cc" formatted="false">सहेजना रद्द हुआ</string>
+    <string name="t_0a7e3cd8d9" formatted="false">कैटलॉग अद्यतित है</string>
+    <string name="t_0ad4a07529" formatted="false">मैन्युअल अंतराल सहेजें</string>
+    <string name="t_0b5f48821f" formatted="false">नहीं हो सका</string>
+    <string name="t_0b94cabd4c" formatted="false">दिन की सीमा एक घंटा पहले</string>
+    <string name="t_0bfa7a54cb" formatted="false">दिन के अनुसार योजना</string>
+    <string name="t_0c15fe2798">फ़ोकस, काम का चरण %1$s</string>
+    <string name="t_0d0c228652" formatted="false">प्रदाता जाँच के लिए परिणाम पढ़ने नहीं देता।</string>
+    <string name="t_0d6b1a17a4" formatted="false">काला</string>
+    <string name="t_0d8700fb2a" formatted="false">प्रविष्टियाँ आपस में या इतिहास से टकराती हैं</string>
+    <string name="t_0e974974fb" formatted="false">चालू है, पर फ़ोन की सेटिंग में सूचनाएँ बंद हैं</string>
+    <string name="t_0ec753be8d" formatted="false">रद्द करें</string>
+    <string name="t_0f605ae8ff" formatted="false">पूरी तरह बदलने की पुष्टि करें</string>
+    <string name="t_0f73f5a22c" formatted="false">बड़ा</string>
+    <string name="t_0f9a1db081">%1$s मिनट का चरण</string>
+    <string name="t_0faf5fa9ac">%1$s में से बाकी</string>
+    <string name="t_0fc242f26d" formatted="false">सहेजा गया</string>
+    <string name="t_1013a729a6" formatted="false">शनि</string>
+    <string name="t_104053cfbe" formatted="false">पसंदीदा और पिछले 30 दिनों की अक्सर की जाने वाली गतिविधियाँ।</string>
+    <string name="t_10729118a0" formatted="false">छिपाएँ</string>
+    <string name="t_117ce12b52">CSV जोड़ना: %3$s में से %1$s…%2$s</string>
+    <string name="t_11bb1b11c0" formatted="false">होम स्क्रीन पर</string>
+    <string name="t_11d7afb599" formatted="false">अवधि इस रूप में लिखी है</string>
+    <string name="t_1250ceafd1" formatted="false">आइकन शॉर्टकट</string>
+    <string name="t_125737d34a" formatted="false">दोबारा इंस्टॉल करने के बाद यहाँ स्वचालित कॉपी फ़ोल्डर से कोई भी फ़ाइल चुनें। कॉपी फ़ोनों के बीच सिंक नहीं है।</string>
+    <string name="t_1259571a15" formatted="false">खोलें</string>
+    <string name="t_126d6b9747">होम स्क्रीन पर: %1$s</string>
+    <string name="t_129d9b9794" formatted="false">फ़ोन ने अनुरोध स्वीकार नहीं किया। फिर कोशिश करें</string>
+    <string name="t_129dc42035" formatted="false">नया कार्ड सहेजें</string>
+    <string name="t_12b0be1a44" formatted="false">गतिविधि कॉलम</string>
+    <string name="t_12f864ad2e">लगातार पाँच विफलताओं के बाद रोकी गई। %1$s</string>
+    <string name="t_12fa39305e" formatted="false">पूरा JSON निर्यात करें</string>
+    <string name="t_137cb582b9" formatted="false">कब लागू करें</string>
+    <string name="t_13b7c69527" formatted="false">(not)AI फ़ोकस</string>
+    <string name="t_13c587506e" formatted="false">आज अभी कोई प्रविष्टि नहीं। पहली प्रविष्टि आते ही सारांश अपने आप बन जाएगा।</string>
+    <string name="t_13f1659f76" formatted="false">समय ट्रैक करना शुरू करें</string>
+    <string name="t_1425330b29" formatted="false">आज से</string>
+    <string name="t_145c3ed6a6" formatted="false">रिपोर्ट हटाई गई</string>
+    <string name="t_147355d342">यह फ़ाइल CSV तालिका नहीं है। %1$s</string>
+    <string name="t_14a658ce61" formatted="false">फ़ोल्डर चुनें</string>
+    <string name="t_14d31156f2" formatted="false">अब से विवरण बदलें</string>
+    <string name="t_14eaa871df" formatted="false">शुरू करें</string>
+    <string name="t_156e23f619" formatted="false">Toggl, Clockify या अपनी तालिका से। पहले दिखाऊँगा कि क्या जुड़ेगा</string>
+    <string name="t_15b056d9f4" formatted="false">फ़ोकस खत्म करें</string>
+    <string name="t_15dfa124b4" formatted="false">अभी कोई बार-बार की गतिविधि नहीं। ऐप में इतिहास से चुन सकते हैं।</string>
+    <string name="t_160b172224" formatted="false">गतिविधि सहेजी गई</string>
+    <string name="t_161fe56e51" formatted="false">बुध</string>
+    <string name="t_163fdcceaa" formatted="false">तय समय पर</string>
+    <string name="t_164b8bb2af" formatted="false">रिपोर्ट बदलें</string>
+    <string name="t_1751103733" formatted="false">एक दिन</string>
+    <string name="t_176ddf9870" formatted="false">समय क्षेत्र चुनना पूरा नहीं हुआ। मौजूदा क्षेत्र जाँचें और फिर से चुनें</string>
+    <string name="t_17e44239e9" formatted="false">ऊपर ले जाएँ</string>
+    <string name="t_181ee397c9" formatted="false">योजना से शुरू हो चुकी प्रविष्टियाँ इतिहास में रहेंगी।</string>
+    <string name="t_1827ab0050" formatted="false">आधी रात को, कैलेंडर की तरह</string>
+    <string name="t_1880e6b0ec" formatted="false">अनलॉक किए बिना गतिविधि, समय और बटन दिखते हैं</string>
+    <string name="t_18c99fb35b" formatted="false">समय दर्ज हो रहा है</string>
+    <string name="t_191cacce9c" formatted="false">कोई भी गतिविधि</string>
+    <string name="t_19295833d9" formatted="false">यह सप्ताह</string>
+    <string name="t_19f25d5784" formatted="false">और</string>
+    <string name="t_1a287db9b2" formatted="false">ग्रेफ़ाइट</string>
+    <string name="t_1a3994958c" formatted="false">आधी रात को</string>
+    <string name="t_1a54271b7a" formatted="false">कोई पूरा इतिहास नहीं</string>
+    <string name="t_1a599143aa" formatted="false">सामान्य</string>
+    <string name="t_1ac5f47619" formatted="false">योजना में जोड़ा गया</string>
+    <string name="t_1b27ed0870" formatted="false">सारा डेटा बदलें?</string>
+    <string name="t_1b702dcc70">फ़ाइल का समय %1$s समय क्षेत्र में पढ़ा जाता है</string>
+    <string name="t_1bba9e465a" formatted="false">ऐप के बाहर टाइमर</string>
+    <string name="t_1bc5f604f5" formatted="false">1 मिनट</string>
+    <string name="t_1bcdac8735">जुड़ेंगे: %1$s; दोहराव: %2$s।\n%3$s\nत्रुटियाँ: %4$s\n%5$s\n%6$s\nयह इतिहास जोड़ता है; पूरा JSON रिस्टोर सारा संग्रह बदल देता है।</string>
+    <string name="t_1bd48e6642">गतिविधि: %1$s</string>
+    <string name="t_1c38d1407f" formatted="false">" विरामों के बीच"</string>
+    <string name="t_1c4b04d710" formatted="false">होम स्क्रीन पर जोड़ें</string>
+    <string name="t_1c76eec066" formatted="false">डेटा पुनर्स्थापित किया गया। पिछला डेटा अलग से सहेजा गया है।</string>
+    <string name="t_1c8ee71b8e">%1$s तक खाली</string>
+    <string name="t_1cd1162258" formatted="false">कैटलॉग अपडेट करें?</string>
+    <string name="t_1d4961d804" formatted="false">फ़िल्में और सीरीज़</string>
+    <string name="t_1deb177f5a">योजना के अनुसार: %1$s</string>
+    <string name="t_1df521854e" formatted="false">नोट का पाठ</string>
+    <string name="t_1f1fa1b82e" formatted="false">किसी कॉपी पर टैप करें: पहले उसकी सामग्री दिखाऊँगा, पुष्टि के बाद ही डेटा बदलूँगा</string>
+    <string name="t_1fbd871837" formatted="false">फ़ोल्डर अभी उपलब्ध नहीं: नेटवर्क नहीं है या क्लाउड ऐप जवाब नहीं दे रहा। मैं खुद फिर कोशिश करूँगा</string>
+    <string name="t_1fcbdeecfd">%1$s: कम करें</string>
+    <string name="t_1fce9b2e5d">%1$s: %2$s. हर कॉलम का अर्थ जाँचें —</string>
+    <string name="t_20490f3632" formatted="false">कैलेंडर से घटना चुनें…</string>
+    <string name="t_20c87f5908" formatted="false">लक्ष्य तय करें</string>
+    <string name="t_20feaa7e40" formatted="false">बिना गतिविधि, नोट के साथ शुरू करें</string>
+    <string name="t_210ed3cd4d" formatted="false">ऐसा कोई कॉलम नहीं</string>
+    <string name="t_212edd982b" formatted="false">मिले</string>
+    <string name="t_2152e4a71f" formatted="false">सूची की शुरुआती गतिविधियाँ नोटिफ़िकेशन शेड, विजेट और फ़्लोटिंग बटन पर दिखती हैं। क्रम बदलने के लिए दबाकर खींचें।</string>
+    <string name="t_21a4608d93" formatted="false">डेटा बदल गया: फिर से जाँचें</string>
+    <string name="t_21afbee12c" formatted="false">नहीं दिखा। फिर कोशिश करें या खुद जोड़ें: होम स्क्रीन पर देर तक दबाएँ → विजेट → (not)AI Time</string>
+    <string name="t_224fe4a4c3">%1$s में कोई प्रविष्टि नहीं</string>
+    <string name="t_22615c35f9">“%1$s” को योजना से हटाएँ?</string>
+    <string name="t_22776aacd4" formatted="false">नियॉन</string>
+    <string name="t_2373dd4f8d" formatted="false">पिछला सप्ताह</string>
+    <string name="t_24f866b4ee" formatted="false">इस पर बदलें</string>
+    <string name="t_253cf1644f" formatted="false">तैयार निर्यात रद्द करें</string>
+    <string name="t_2583e76aee" formatted="false">मैं पहले बदल गया था: सहेजें</string>
+    <string name="t_27113f7a1e" formatted="false">संग्रहण त्रुटि। दोबारा कोशिश से पहले मौजूदा स्थिति जाँचें।</string>
+    <string name="t_27546ccb04" formatted="false">फ़ोकस और रिमाइंडर</string>
+    <string name="t_279c2c3c90" formatted="false">बदलें</string>
+    <string name="t_27d5f2e22a" formatted="false">कैटलॉग अपडेट हुआ</string>
+    <string name="t_28061309a5" formatted="false">फ़ोकस: गतिविधि</string>
+    <string name="t_2840f49e22" formatted="false">गतिविधि बदलें या स्पष्ट करें</string>
+    <string name="t_285cc40014" formatted="false">घं</string>
+    <string name="t_288dc99a2b" formatted="false">समय सहेजा जा चुका है, बस गतिविधि चुनें।</string>
+    <string name="t_2894da98dd" formatted="false">लक्ष्य हटाया गया</string>
+    <string name="t_2960da94e0" formatted="false">अंतराल छिपाएँ</string>
+    <string name="t_2972f8b4c4" formatted="false">कोई रिकॉर्ड नहीं।</string>
+    <string name="t_29f3b29df0" formatted="false">बहाल करें</string>
+    <string name="t_2a5e307788" formatted="false">सघन</string>
+    <string name="t_2a690e69d2" formatted="false">आइकन चुना गया, पर शॉर्टकट अभी अपडेट नहीं हुए</string>
+    <string name="t_2a70012208" formatted="false">कुल</string>
+    <string name="t_2b39abab32">“%1$s”. ऐप खुला रहने तक बार-बार बजेगा</string>
+    <string name="t_2c0db2ce7c" formatted="false">शुरू करें:</string>
+    <string name="t_2d2be3f11c" formatted="false">काम का चरण</string>
+    <string name="t_2d5a644e5c" formatted="false">ऐसा अंतराल संभव नहीं: शुरुआत और अंत जाँचें।</string>
+    <string name="t_2dd965ee95" formatted="false">एक्सेंट</string>
+    <string name="t_2e31dae95f" formatted="false">फ़ाइल चुनें</string>
+    <string name="t_2e3c5fdafe" formatted="false">पढ़ाई</string>
+    <string name="t_2ea9f562ed" formatted="false">कार्यदिवसों में</string>
+    <string name="t_2eb808708c" formatted="false">फ़ोन का समय क्षेत्र इस्तेमाल करें</string>
+    <string name="t_2f6a9e8aa1" formatted="false">, पहले से शुरू</string>
+    <string name="t_2f94692058" formatted="false">IANA क्षेत्र खोजें, जैसे Asia/Kolkata</string>
+    <string name="t_2fc6caafc1">कम से कम %1$s</string>
+    <string name="t_30796d2694" formatted="false">इस महीने से</string>
+    <string name="t_30c994650d" formatted="false">समय स्पष्ट किया गया</string>
+    <string name="t_30e1fab800" formatted="false">पसंदीदा बदले गए</string>
+    <string name="t_30e9845126">%1$s और क्षेत्र: पेशे और काम</string>
+    <string name="t_3146141c93" formatted="false">योजना</string>
+    <string name="t_315bf156c9" formatted="false">सफ़ाई</string>
+    <string name="t_3179b46b9d" formatted="false">यह अंतराल दूसरी प्रविष्टि से टकराता है।</string>
+    <string name="t_31990f76f4" formatted="false">बदलाव का परिणाम जाँचा नहीं जा सका</string>
+    <string name="t_32000365e9" formatted="false">फ़िरोज़ी</string>
+    <string name="t_322896daf3" formatted="false">अगले अंतराल</string>
+    <string name="t_322ce697bb" formatted="false">ट्रैकिंग चल रही है</string>
+    <string name="t_3296879eac">%1$s मिनट</string>
+    <string name="t_329b31bdca" formatted="false">आइकन शॉर्टकट</string>
+    <string name="t_32b74a3c47" formatted="false">बिना शीर्षक</string>
+    <string name="t_32fd384860">%1$s से पहले की प्रविष्टियाँ पिछले दिन में गिनी जाती हैं। प्रविष्टियाँ नहीं बदलतीं</string>
+    <string name="t_3371d6e0e9">%1$s · %%s बाकी</string>
+    <string name="t_33a79b3bc1" formatted="false">दूसरे ऐप के ऊपर पारदर्शी शुरू और रोकें। रोकने के बाद तुरंत गतिविधि चुन सकते हैं</string>
+    <string name="t_340342b07a" formatted="false">समय क्षेत्र का चुनाव बहाल नहीं हुआ। फिर से चुनें</string>
+    <string name="t_359168c1d3" formatted="false">श्रेणी सहेजी गई</string>
+    <string name="t_364431ec5a">%1$s से पहले</string>
+    <string name="t_388cfb0795" formatted="false">“शुरू करें” पर आमंत्रण</string>
+    <string name="t_38a279b292" formatted="false">अगला फ़ोकस चरण</string>
+    <string name="t_38dfef435f" formatted="false">पड़ोसी प्रविष्टियों के बीच स्थान</string>
+    <string name="t_398c7d4f7b" formatted="false">हो गया</string>
+    <string name="t_3a42cfebfe" formatted="false">सूचना</string>
+    <string name="t_3ac95324a3" formatted="false">आप किस पर बदले?</string>
+    <string name="t_3af83d8850" formatted="false">डेटा बदल गया। स्क्रीन जाँचें और फिर कोशिश करें।</string>
+    <string name="t_3b97545714" formatted="false">रिकॉर्ड जोड़ा गया</string>
+    <string name="t_3bb014825e" formatted="false">चुनी गई प्रविष्टियों के लिए नोट</string>
+    <string name="t_3bfd577967">%1$s %2$s बाद</string>
+    <string name="t_3c244ffaa5">कैलेंडर: %1$s; इतिहास अपरिवर्तित</string>
+    <string name="t_3c6332622c" formatted="false">ऐप खोलें</string>
+    <string name="t_3cd7d0dd3c" formatted="false">दिन के अनुसार समय:</string>
+    <string name="t_3d51050347" formatted="false">पूरा</string>
+    <string name="t_3da1c7d83d" formatted="false">लक्ष्य हटाएँ?</string>
+    <string name="t_3de49828e8" formatted="false">नाम</string>
+    <string name="t_3dfcd2dc31" formatted="false">टहलना</string>
+    <string name="t_3e32dd6cfd">नोट: “%1$s”</string>
+    <string name="t_3e36db582a" formatted="false">बिना अनलॉक के केवल यह दिखता है कि ट्रैकिंग चल रही है</string>
+    <string name="t_3e5ab0f642" formatted="false">मुख्य स्क्रीन</string>
+    <string name="t_3f75368ab9" formatted="false">जारी रखें</string>
+    <string name="t_3fa9f851cc" formatted="false">इस सप्ताह से</string>
+    <string name="t_41a9abce27" formatted="false">फ़ोकस शुरू करें</string>
+    <string name="t_41f23bd106" formatted="false">रिपोर्ट का समय क्षेत्र तय हुआ</string>
+    <string name="t_4208a1afd0" formatted="false">समय क्षेत्र नहीं मिला</string>
+    <string name="t_421fbcd348" formatted="false">होम स्क्रीन पर जोड़ने की पुष्टि करें</string>
+    <string name="t_42f85ce119" formatted="false">आज</string>
+    <string name="t_4301919e86">%1$s पूरा हुआ। जारी रखने के लिए खोलें</string>
+    <string name="t_4304ef48ab" formatted="false">फ़्लोटिंग बटन: सिस्टम अनुमति नहीं मिली; टाइमर ऐप में उपलब्ध है</string>
+    <string name="t_434e93a022" formatted="false">ID से कार्ड चुनें…</string>
+    <string name="t_43c9451f7e" formatted="false">मौजूदा निर्यात पूरा या रद्द करें</string>
+    <string name="t_43f3c7181c">%1$s हो गए। टाइमर तो नहीं भूले?</string>
+    <string name="t_440d3db6ca">गतिविधि “%1$s” बनाई गई</string>
+    <string name="t_44b6bfd761">%1$s बदलें?</string>
+    <string name="t_455a50db4a">%1$s मि</string>
+    <string name="t_457969b009" formatted="false">जाँच</string>
+    <string name="t_45e673c416">नोट “%1$s” पुराने नोट की जगह लेगा।</string>
+    <string name="t_45ec81da8a" formatted="false">चुना गया</string>
+    <string name="t_46404668d3" formatted="false">लंबी प्रविष्टि</string>
+    <string name="t_46a1378615" formatted="false">दिन</string>
+    <string name="t_46e27e2f0a" formatted="false">कैटलॉग</string>
+    <string name="t_474488d799">लक्ष्य: %1$s</string>
+    <string name="t_476c9846a6" formatted="false">अधिकतम</string>
+    <string name="t_4784c38b90" formatted="false">पढ़ रहे हैं…</string>
+    <string name="t_47947a0c46" formatted="false">समय क्षेत्र</string>
+    <string name="t_4864057d62" formatted="false">सहेजें</string>
+    <string name="t_488cfa5f88" formatted="false">दिन सप्ताह या महीने के हिसाब से गिने जाते हैं।</string>
+    <string name="t_488dd14a85" formatted="false">लाइसेंस</string>
+    <string name="t_489dd4cb3d" formatted="false">कैटलॉग कार्ड…</string>
+    <string name="t_48b72fd474" formatted="false">स्वचालित कॉपी</string>
+    <string name="t_490aa0241e" formatted="false">अंत शुरुआत से पहले है</string>
+    <string name="t_494ef4deb5" formatted="false">फ़्लोटिंग बटन + आवश्यक सेवा संकेतक</string>
+    <string name="t_49a37138c8">शुरुआत %1$s, अंत अज्ञात</string>
+    <string name="t_49b9985de4" formatted="false">काम के चरण के दौरान</string>
+    <string name="t_49c5f1afe2" formatted="false">टाइमर तुरंत शुरू होगा। गतिविधि बाद में चुनी जा सकती है।</string>
+    <string name="t_49f64bd23b">, त्रुटियों सहित: %1$s</string>
+    <string name="t_4a81786403" formatted="false">जैसे, toggl:personal</string>
+    <string name="t_4ac8d095fb" formatted="false">कोई तैयार निर्यात नहीं है</string>
+    <string name="t_4ae50d3073" formatted="false">बंद करें</string>
+    <string name="t_4bae800626" formatted="false">खत्म होने का समय बताने के लिए खोलें</string>
+    <string name="t_4be730321c" formatted="false">दर्ज करें</string>
+    <string name="t_4c70fed089" formatted="false">पसंदीदा चुनें और शुरू करें…</string>
+    <string name="t_4d1cb9fd4a">%1$s बाकी</string>
+    <string name="t_4d397a20ed">%1$s प्रविष्टियों का समय नहीं बदलेगा। तुरंत बाद पूर्ववत कर सकते हैं।</string>
+    <string name="t_4d92a280cc" formatted="false">समय क्षेत्र का चुनाव पूरा नहीं हुआ और इस बीच सेटिंग बदल गईं। क्षेत्र जाँचें और फिर से चुनें</string>
+    <string name="t_4e1936db2d" formatted="false">शक्ति व्यायाम</string>
+    <string name="t_4e895fd70d" formatted="false">अंत</string>
+    <string name="t_4ea0639432" formatted="false">क्रम और सभी पसंदीदा</string>
+    <string name="t_4ebd720453" formatted="false">शुरुआत / बदलने का समय: ISO-8601</string>
+    <string name="t_4ebf488399">सहेजा फ़ॉर्म नहीं पढ़ा जा सका: %1$s</string>
+    <string name="t_4edbcc192a" formatted="false">फ़्लोटिंग बटन चालू है</string>
+    <string name="t_4ef8132cf3">%1$s: बढ़ाएँ</string>
+    <string name="t_4fc1809d7d" formatted="false">चुना गया फ़ोल्डर</string>
+    <string name="t_5075c29ca7" formatted="false">क्रम, बटन के नाम, दोहराव हटाना। शेड, विजेट और बटन में एक ही क्रम</string>
+    <string name="t_50a62e5c0f" formatted="false">अवधि शुरुआत और अंत से मेल नहीं खाती</string>
+    <string name="t_50abb9831d" formatted="false">पता नहीं फ़ाइल फ़ोल्डर में बनी या नहीं। फिर कोशिश करें या यह कॉपी छोड़ें</string>
+    <string name="t_50ac9ea6c3">%1$s, संस्करण %2$s। अपडेट जाँचने के लिए टैप करें</string>
+    <string name="t_5123c9c552" formatted="false">मंगल</string>
+    <string name="t_51403c82de" formatted="false">कल</string>
+    <string name="t_51d6a3da35" formatted="false">आप क्या कर रहे थे?</string>
+    <string name="t_51f805f925">नया कार्ड चुना · %1$s</string>
+    <string name="t_5203402af7">नोट “%1$s” वहाँ जुड़ेगा जहाँ कोई नोट नहीं था।</string>
+    <string name="t_52da7c24f6" formatted="false">फ़ोकस रुका है</string>
+    <string name="t_53e131e48c">“%1$s” अब एक टैप में शुरू होगा</string>
+    <string name="t_542c2cd5f6" formatted="false">फ़ोल्डर में स्वचालित कॉपी</string>
+    <string name="t_544a30f1ea" formatted="false">विजेट (ऐप लॉन्चर से जोड़ें)</string>
+    <string name="t_549bc063f3" formatted="false">गतिविधि के साथ शुरू करें</string>
+    <string name="t_54fe5cc440" formatted="false">टाइमर के अंक</string>
+    <string name="t_550c7a6d12" formatted="false">अभी तक कोई रिकॉर्ड नहीं है। हर खंड यहाँ दिखाई देगा।</string>
+    <string name="t_552d1cca6b" formatted="false">इस दिन कैलेंडर में समय वाला कोई इवेंट नहीं है।</string>
+    <string name="t_559a87f7cc" formatted="false">जोड़ें</string>
+    <string name="t_55c44eb122">%2$s से पहले %1$s जुड़ेगा।</string>
+    <string name="t_55cd7a55ed" formatted="false">किसी चीज़ को फ़ोन की अनुमति नहीं मिली</string>
+    <string name="t_55e920546e" formatted="false">फ़्लोटिंग बटन बंद किया गया</string>
+    <string name="t_5695330ffb" formatted="false">ऑटो</string>
+    <string name="t_569ffccaa8">%1$s से खाली</string>
+    <string name="t_57792c3ae8" formatted="false">पंक्ति ID दोहराई गई या गायब है</string>
+    <string name="t_5779709c59" formatted="false">स्रोत उपलब्ध नहीं</string>
+    <string name="t_57fe19481c" formatted="false">बिना प्रविष्टि वाले अंतराल छिपाएँ</string>
+    <string name="t_580b6b1b3e" formatted="false">ऐप में अगला चरण चुनें</string>
+    <string name="t_58533a0c30" formatted="false">जिन गतिविधियों को आप सबसे अधिक शुरू करते हैं, उन पर तारा लगाएँ। वे मुख्य स्क्रीन और नोटिफ़िकेशन शेड में दिखेंगी।</string>
+    <string name="t_5873f87916" formatted="false">अज्ञात IANA समय क्षेत्र</string>
+    <string name="t_58847603b8" formatted="false">नई कॉपी सहेजी गई, पर पुरानी हटाई नहीं जा सकीं</string>
+    <string name="t_58a3c5f495">%1$s: किससे बना है</string>
+    <string name="t_58d3c60b00" formatted="false">आज की योजना से हटाया गया</string>
+    <string name="t_58e6634696" formatted="false">नया लक्ष्य</string>
+    <string name="t_5905870dba" formatted="false">योजना और अक्सर की</string>
+    <string name="t_5916628df1" formatted="false">गतिविधि चुनें</string>
+    <string name="t_596144b0e6" formatted="false">प्रविष्टियाँ</string>
+    <string name="t_59ef713872">सत्र: %1$s; खंड: %2$s। बदलने से पहले मौजूदा DB/WAL/SHM जाँचे गए हैश के साथ सहेजे जाएँगे। पुरानी कॉपी रहेंगी।</string>
+    <string name="t_5a1413e92d">अंतिम %1$s, फ़ाइल जाँची गई</string>
+    <string name="t_5a1d0660ef" formatted="false">चयन बदल गया। प्रविष्टियाँ जाँचें और फिर कोशिश करें।</string>
+    <string name="t_5a7fa46600" formatted="false">बिना विवरण</string>
+    <string name="t_5b010e144f" formatted="false">चुना आइकन पहचाना नहीं जा सका। उपलब्ध विकल्प चुनें</string>
+    <string name="t_5b76112f5b" formatted="false">मूल</string>
+    <string name="t_5bb00e40b9" formatted="false">संग्रहीत</string>
+    <string name="t_5c65c982d1" formatted="false">समय अज्ञात</string>
+    <string name="t_5c675dcb97" formatted="false">बिना गतिविधि शुरू करें</string>
+    <string name="t_5cd8e48ad3" formatted="false">बदलने का समय</string>
+    <string name="t_5d09029804" formatted="false">बिना प्रविष्टि वाले अंतराल दिखाएँ</string>
+    <string name="t_5d38673a55" formatted="false">और जोड़ें</string>
+    <string name="t_5d5d2ea20a" formatted="false">आज</string>
+    <string name="t_5d762fa56e" formatted="false">चुने प्रारूप में तारीख या समय नहीं पढ़ा जा सकता</string>
+    <string name="t_5da9e0e83b" formatted="false">पसंदीदा में</string>
+    <string name="t_5de1eb4784">नई: %1$s; परिशोधन: %2$s; टकराव: %3$s। स्थानीय नाम, संग्रह स्थिति और इतिहास बने रहेंगे।</string>
+    <string name="t_5e1ad8c5d8" formatted="false">इसे ऐप की सेटिंग में बंद किया जा सकता है</string>
+    <string name="t_5e94c97f99" formatted="false">कोई भी गतिविधि गिनें</string>
+    <string name="t_5ec7b0f52b" formatted="false">मैन्युअल</string>
+    <string name="t_5f0968991b" formatted="false">शुरुआत का कॉलम</string>
+    <string name="t_5f239661cc" formatted="false">खंड और विराम दिखाएँ</string>
+    <string name="t_5f9a6b6230" formatted="false">हर दिन की प्रविष्टियों के ऊपर खंडों की पट्टी</string>
+    <string name="t_5fb4185cca" formatted="false">अंदर की हर चीज़ के साथ</string>
+    <string name="t_5fc35f86af">%1$s जितना ही</string>
+    <string name="t_5fdf8988d5" formatted="false">ऐप · Apache 2.0</string>
+    <string name="t_6090cecf2d">पहले %1$s</string>
+    <string name="t_60a8361ac8" formatted="false">बंद। नई कॉपी नहीं सहेजी जातीं, पुरानी फ़ोल्डर में रहती हैं</string>
+    <string name="t_60e27c596a">%1$s घं %2$s मि</string>
+    <string name="t_61394d0185" formatted="false">आपने कब शुरू किया?</string>
+    <string name="t_6155f92695" formatted="false">कई चुनें</string>
+    <string name="t_616bb19d6c" formatted="false">अनुमति दें</string>
+    <string name="t_617d07376f">%1$s दिन</string>
+    <string name="t_61af667ee0">%2$s से %1$s अधिक</string>
+    <string name="t_61ce62df94">%1$s: %2$s प्रतिशत</string>
+    <string name="t_6213880977" formatted="false">अभी सहेजें</string>
+    <string name="t_624e55535f" formatted="false">सूची का घनत्व</string>
+    <string name="t_6257137741" formatted="false">, अवधि अभी जारी है</string>
+    <string name="t_629e3bb846" formatted="false">duration का कॉलम</string>
+    <string name="t_62c204df09" formatted="false">नोट जोड़ें</string>
+    <string name="t_63833f7ebd" formatted="false">इसे छोड़ें</string>
+    <string name="t_6400526c15" formatted="false">CSV से इतिहास आयात करें…</string>
+    <string name="t_6492631c6e" formatted="false">योजना से हटाया गया</string>
+    <string name="t_64d9c34819" formatted="false">फ़ाइल में कॉलम नहीं है</string>
+    <string name="t_64eb81c370">अधिकतम %1$s</string>
+    <string name="t_64ed62742f" formatted="false">समय क्षेत्र, दिन की शुरुआत, कैटलॉग, CSV</string>
+    <string name="t_654fad1c18" formatted="false">अंत का समय, अगर अलग कॉलम में हो</string>
+    <string name="t_657703c887" formatted="false">पूरे कैटलॉग में खोजें</string>
+    <string name="t_66c789d74f" formatted="false">विवरण: उदाहरण के लिए, listening</string>
+    <string name="t_67946fca81">गतिविधि “%1$s” बनाएँ</string>
+    <string name="t_67a887cea0" formatted="false">लक्ष्य हटाएँ</string>
+    <string name="t_680a3249f0" formatted="false">मौजूदा संपादन योग्य नोट को भेजे गए पाठ से बदलें?</string>
+    <string name="t_69d66ab891" formatted="false">योजना में गतिविधि जोड़ें</string>
+    <string name="t_69e5b8a8c6" formatted="false">गैर-ऋणात्मक Decimal, दशमलव के लिए बिंदु</string>
+    <string name="t_6a0e6066b0" formatted="false">पहले बदल गया</string>
+    <string name="t_6ae7f2feef" formatted="false">पूरा दिन</string>
+    <string name="t_6b08862cb2" formatted="false">ऐप आइकन जाँचा नहीं जा सका</string>
+    <string name="t_6b8910932e" formatted="false">स्टेटस बार आइकन छिपा है</string>
+    <string name="t_6cde6c34a0" formatted="false">आज की योजना</string>
+    <string name="t_6d06e4bbc8" formatted="false">कैलेंडर से</string>
+    <string name="t_6d4aeaf49a" formatted="false">अपनी रिपोर्ट: गतिविधि और अवधि</string>
+    <string name="t_6d714e833d" formatted="false">रोकें</string>
+    <string name="t_6d7bb5e932">रोज़ कम से कम %1$s</string>
+    <string name="t_6d95221406" formatted="false">फ़ोकस का पृष्ठभूमि संकेत (सूचना; OS में देरी हो सकती है)</string>
+    <string name="t_6e166fe43b">दोहराएँ: %1$s</string>
+    <string name="t_6e65291421">“%1$s” के लिए गतिविधि चुनें</string>
+    <string name="t_6e84391a2f" formatted="false">अनुमति के बिना कैलेंडर उपलब्ध नहीं</string>
+    <string name="t_6ea005bd2d" formatted="false">अंतराल दर्ज हुआ</string>
+    <string name="t_6eb7540d7c" formatted="false">बंद</string>
+    <string name="t_6f65bc34a3" formatted="false">ये अवधियाँ अगली बार के लिए भी रहेंगी।</string>
+    <string name="t_6fb5a32ea5" formatted="false">हर दिन</string>
+    <string name="t_702e03be1e" formatted="false">एम्बर</string>
+    <string name="t_70b8d5d8d5" formatted="false">गतिविधि</string>
+    <string name="t_716e5371c7" formatted="false">चयन रद्द करें</string>
+    <string name="t_71790fdb53" formatted="false">परेशान न करें</string>
+    <string name="t_72aecd9ad8" formatted="false">त्रुटि</string>
+    <string name="t_72f931bda2" formatted="false">बैकअप</string>
+    <string name="t_731f2bdc1e" formatted="false">कैलेंडर से समय लें</string>
+    <string name="t_734bcf2003" formatted="false">स्टेटस बार आइकन</string>
+    <string name="t_735877a9aa" formatted="false">विराम</string>
+    <string name="t_737fe33491" formatted="false">निर्यात रद्द हुआ; तैयार प्रति दोबारा इस्तेमाल की जा सकती है</string>
+    <string name="t_738652aa6f">गतिविधि “%1$s” को ही बदलें</string>
+    <string name="t_73a0a9afdc" formatted="false">बिना गतिविधि जारी रखें</string>
+    <string name="t_741870459d" formatted="false">स्वचालित</string>
+    <string name="t_747942b4fa" formatted="false">समय का प्रारूप</string>
+    <string name="t_74b69f961b" formatted="false">काम शुरू करें</string>
+    <string name="t_750b471214" formatted="false">पसंदीदा का क्रम</string>
+    <string name="t_751e31256e">%1$s। फ़ोन का समय क्षेत्र बदलने पर इतिहास और सारांश में दिन की सीमाएँ उसके साथ चलेंगी। प्रविष्टियाँ और लक्ष्यों के क्षेत्र नहीं बदलते।</string>
+    <string name="t_75436e3162" formatted="false">काम</string>
+    <string name="t_75cd08a0e5" formatted="false">बदलें:</string>
+    <string name="t_762d7d64da" formatted="false">कल</string>
+    <string name="t_76393b3245" formatted="false">स्थानीय रोलबैक प्रतियाँ…</string>
+    <string name="t_766e7cabf7" formatted="false">कम</string>
+    <string name="t_768af67762" formatted="false">लागू करें</string>
+    <string name="t_768fee24c8" formatted="false">गतिविधि कैटलॉग: अपडेट उपलब्ध</string>
+    <string name="t_76dcf737a6" formatted="false">भेजें</string>
+    <string name="t_781ebc1c5f" formatted="false">ओवरले केवल खुले ऐप से शुरू किया जा सकता है</string>
+    <string name="t_782c5a40e3" formatted="false">अर्धविराम</string>
+    <string name="t_784e60ff6a">%1$s KB</string>
+    <string name="t_78fb4788c6">%1$s जोड़ी गईं</string>
+    <string name="t_793720ff06">%2$s से %1$s कम</string>
+    <string name="t_794d0309cf" formatted="false">समय पहले ही सहेजा गया</string>
+    <string name="t_79eb55406f" formatted="false">समय क्षेत्र चुनना पूरा नहीं हुआ। सेटिंग में फिर से चुनें</string>
+    <string name="t_79fb04fd8b">तकनीकी इंटरफ़ेस · Room %1$s\n%2$s\n%3$s ms · संशोधन %4$s\n%5$s%6$s\n%7$s</string>
+    <string name="t_7ae0e67853" formatted="false">फ़ोन का समय क्षेत्र इस्तेमाल करें?</string>
+    <string name="t_7ae1597ae7" formatted="false">समय ठीक करने के लिए ऐप खोलें</string>
+    <string name="t_7aeae28ae9" formatted="false">बिना कार्ड</string>
+    <string name="t_7b11e988e1" formatted="false">आज के लिए हटाएँ</string>
+    <string name="t_7b47d9e19e" formatted="false">शुरुआत में वर्तमान समय लगेगा। मैन्युअल प्रविष्टि के लिए स्पष्ट समय-सीमाएँ चाहिए; पूरे दिन का इवेंट काम की अवधि तय नहीं करता।</string>
+    <string name="t_7c379e8e5c" formatted="false">रिपोर्ट सहेजी गई</string>
+    <string name="t_7cc6025206">हो गया: त्वरित शुरुआत के लिए %1$s</string>
+    <string name="t_7d3ea0e679" formatted="false">इतिहास में दिन</string>
+    <string name="t_7d4b8f8a7e">चयन: %1$s</string>
+    <string name="t_7d87e4d658" formatted="false">काम के दौरान ऐप प्राथमिक सूचनाओं के साथ अपना “परेशान न करें” नियम चालू करता है। अपवाद फ़ोन तय करता है। काम के बाद ऐप अपना नियम हटा देता है</string>
+    <string name="t_7da3c34069">स्थानीय डेटाबेस उपलब्ध नहीं: %1$s\nमूल फ़ाइलें रखी गई हैं। बहाली में कॉपी चुनें।</string>
+    <string name="t_7ddb544bcd">कुछ खंडों का समय अज्ञात है: %1$s। जब तक आप तय न करें, वे कुल में नहीं गिने जाते।</string>
+    <string name="t_7dfbff730f" formatted="false">गुरु</string>
+    <string name="t_7eb07227f1" formatted="false">पंक्ति ID का कॉलम</string>
+    <string name="t_7ec7c94cc1" formatted="false">नोट का कॉलम</string>
+    <string name="t_7f12cd4599" formatted="false">चालू है, पर फ़ोन ने अभी ऐप को “परेशान न करें” की अनुमति नहीं दी</string>
+    <string name="t_7f17c7c62a" formatted="false">सेटिंग</string>
+    <string name="t_7f76296ba9" formatted="false">कोई बंद दर्ज खंड नहीं</string>
+    <string name="t_7f7a71c089">कॉपी में %1$s, %2$s,</string>
+    <string name="t_7fa01b6e34" formatted="false">बहाल कॉपी में चालू है। इस फ़ोन पर पुष्टि करनी होगी</string>
+    <string name="t_80072ed701" formatted="false">अपनी गतिविधि नहीं</string>
+    <string name="t_806764743a" formatted="false">अलग-अलग गतिविधियाँ</string>
+    <string name="t_8080010c5e" formatted="false">हल्की</string>
+    <string name="t_80e474035b" formatted="false">समय में ही समय क्षेत्र दिया है</string>
+    <string name="t_81129d8255" formatted="false">लक्ष्य बदला गया</string>
+    <string name="t_8125e2fba0" formatted="false">सभी पंक्तियाँ → चुना हुआ कार्ड; अन्यथा बिना प्रकार के स्रोत नाम</string>
+    <string name="t_817dfa0bfc">" (कॉलम “%1$s”)"</string>
+    <string name="t_819f3ba9d1" formatted="false">पिछली प्रविष्टि के अंत से</string>
+    <string name="t_81b26ab0d7" formatted="false">रोकने के बाद चुनाव विंडो की पृष्ठभूमि</string>
+    <string name="t_81d3d38d5c" formatted="false">इसके बाद पूछें</string>
+    <string name="t_820b711796" formatted="false">1.5 घं</string>
+    <string name="t_8213ed5bbc" formatted="false">इस डिवाइस पर अनुमति की सेटिंग उपलब्ध नहीं है</string>
+    <string name="t_8241e9552e" formatted="false">इस अनुभाग में अपनी गतिविधि: खोज में नाम लिखना शुरू करें</string>
+    <string name="t_832c48f416" formatted="false">तृतीय-पक्ष घटक</string>
+    <string name="t_838a5669f7" formatted="false">सारांश साझा करें</string>
+    <string name="t_83a2768955" formatted="false">सभी में बदलें</string>
+    <string name="t_83ae5f756d" formatted="false">फ़ाइल बहुत बड़ी है</string>
+    <string name="t_84707b7a44" formatted="false">एक ही खाते के बार-बार के निर्यात के लिए एक नाम; अलग स्रोतों के लिए अलग नाम।</string>
+    <string name="t_84f85ce506" formatted="false">कुछ नहीं मिला</string>
+    <string name="t_851c0ae977" formatted="false">पहले जैसी</string>
+    <string name="t_851c871818">संस्करण %1$s। नई गतिविधियाँ: %2$s, परिशोधन: %3$s</string>
+    <string name="t_852778be6d" formatted="false">गिन रहे हैं…</string>
+    <string name="t_8532eff044" formatted="false">कार्डियो</string>
+    <string name="t_853744f144" formatted="false">मौजूदा अवधि पुराने लक्ष्य के अनुसार पूरी गिनी जाएगी।</string>
+    <string name="t_8543530f12">अंतिम %1$s</string>
+    <string name="t_85d33d64d6" formatted="false">पंक्ति में कॉलम की संख्या अलग है</string>
+    <string name="t_85e8a3404b" formatted="false">इस फ़ोन से अभी कोई फ़ाइल नहीं सहेजी गई</string>
+    <string name="t_86042e468b" formatted="false">माप, कैलेंडर, डेटाबेस बहाली</string>
+    <string name="t_861bd8760b" formatted="false">Onest फ़ॉन्ट · SIL Open Font License</string>
+    <string name="t_8633c34c71">" · फ़ाइल में: %1$s"</string>
+    <string name="t_86652580fd" formatted="false">पिछला महीना</string>
+    <string name="t_8690f98524" formatted="false">, दिन अभी जारी है</string>
+    <string name="t_86d85a0147">रिपोर्ट का समय क्षेत्र: %1$s</string>
+    <string name="t_86ea33aef5" formatted="false">हटाएँ</string>
+    <string name="t_86ee6df7f5" formatted="false">सेकंड</string>
+    <string name="t_86fde46076" formatted="false">पिछली दर्ज प्रविष्टि दोहराएँ (सहेजी गई सेटिंग्स, संग्रहित सेटिंग्स सहित)</string>
+    <string name="t_877c853fa7" formatted="false">अनुमति है</string>
+    <string name="t_87a5f792b0">%1$s बाइट लिखे गए। %2$s</string>
+    <string name="t_886ebf7a3e">बहाल हुआ। रोलबैक कॉपी: %1$s</string>
+    <string name="t_88c6fe08c7" formatted="false">फ़्लोटिंग बटन</string>
+    <string name="t_88f1a5a112" formatted="false">रूप</string>
+    <string name="t_88f778367b" formatted="false">लेखन</string>
+    <string name="t_892f07c05f" formatted="false">इन दिनों की कोई प्रविष्टि नहीं। प्रविष्टियाँ आते ही सारांश अपने आप बन जाएगा।</string>
+    <string name="t_8940504c4b">संस्करण %1$s: स्पष्ट नाम और सही जगह अनुभाग। आपके नाम और इतिहास बने रहेंगे। देखने के लिए टैप करें</string>
+    <string name="t_894c240b90" formatted="false">खंड समेटें</string>
+    <string name="t_8972ce6fc3">सहेजा नहीं गया: %1$s; फ़ॉर्म ठीक करें या रद्द करें</string>
+    <string name="t_89aa29a273" formatted="false">सूचना</string>
+    <string name="t_8a22f78e9c" formatted="false">प्रविष्टि ठीक करें</string>
+    <string name="t_8abcbc93e4" formatted="false">नोट निजी हो सकते हैं, इसलिए डिफ़ॉल्ट रूप से शामिल नहीं होते</string>
+    <string name="t_8af28e7685" formatted="false">पहले अज्ञात समय बताएँ।</string>
+    <string name="t_8b4d031cf9" formatted="false">यह समय दूसरी प्रविष्टि में है। बाद की शुरुआत चुनें।</string>
+    <string name="t_8b78a6e1d6" formatted="false">दोहराव सहित पसंदीदा से हटाया गया</string>
+    <string name="t_8ba7dc1120" formatted="false">फ़ोल्डर की पहुँच चली गई। उसे फिर से चुनें</string>
+    <string name="t_8be1fdf75b" formatted="false">सेरिफ़</string>
+    <string name="t_8cc9628cfb" formatted="false">स्वचालित कॉपी चालू है, पहली जल्द बनेगी</string>
+    <string name="t_8ce3643f16" formatted="false">ट्रैकिंग बंद रहने पर कोष्ठक धीरे-धीरे साँस लेते हैं</string>
+    <string name="t_8e273a8a05" formatted="false">गतिविधियाँ और जाँच</string>
+    <string name="t_8e6839a84e" formatted="false">प्रविष्टियाँ इसी फ़ोन पर रहती हैं; कॉपी वहाँ जहाँ आप सहेजें</string>
+    <string name="t_8f12fe23f2" formatted="false">केवल जहाँ खाली हो</string>
+    <string name="t_8f44a068d2" formatted="false">समय में समय क्षेत्र नहीं: बिना क्षेत्र वाला प्रारूप चुनें</string>
+    <string name="t_8ff0d08fec" formatted="false">पाठ से नई प्रविष्टि</string>
+    <string name="t_90078dfa30" formatted="false">सोम</string>
+    <string name="t_909a83238c" formatted="false">प्रविष्टि जोड़ें</string>
+    <string name="t_909baadb08" formatted="false">पहले शुरू किया</string>
+    <string name="t_90d0002e66" formatted="false">अपनी तारीखें</string>
+    <string name="t_914b6dca6d" formatted="false">मेरा समय क्षेत्र</string>
+    <string name="t_917b58362c" formatted="false">नोट</string>
+    <string name="t_91b707a9d1" formatted="false">अभी तक कोई स्थानीय प्रति नहीं है</string>
+    <string name="t_91d993d35c" formatted="false">ट्रैकर में इसका नाम</string>
+    <string name="t_9207563dab" formatted="false">सप्ताह</string>
+    <string name="t_92a5d7dc45" formatted="false">विजेट</string>
+    <string name="t_92c584ce74" formatted="false">CSV स्रोत उपलब्ध नहीं</string>
+    <string name="t_930489be30" formatted="false">चुने प्रारूप में अवधि नहीं पढ़ी जा सकती</string>
+    <string name="t_937cbcbd50">फ़ॉर्म नहीं सहेजा गया: %1$s: %2$s</string>
+    <string name="t_9395be84e8" formatted="false">फ़ोकस</string>
+    <string name="t_93a176ef21" formatted="false">फ़ोन ने चालू नहीं होने दिया। फिर कोशिश करें</string>
+    <string name="t_93b302d32f" formatted="false">अभी से बाद नहीं</string>
+    <string name="t_93be31b630" formatted="false">ट्रैकिंग नहीं चल रही</string>
+    <string name="t_93eb0c0182" formatted="false">%.1f MB</string>
+    <string name="t_93f389d809" formatted="false">कोई कार्ड नहीं</string>
+    <string name="t_94405e99a7" formatted="false">पूरा JSON पुनर्स्थापित करें…</string>
+    <string name="t_946ee08764" formatted="false">अनुभाग</string>
+    <string name="t_948200fea3" formatted="false">अपनी फ़ाइल से शोर, बारिश या संगीत। ऐप खुला रहने तक बजता है</string>
+    <string name="t_94b8df93b6" formatted="false">फ़ाइल</string>
+    <string name="t_9582d40584" formatted="false">स्वचालित कॉपी सहेजी जा रही है</string>
+    <string name="t_95a6a49b6e" formatted="false">फ़ोन के समय क्षेत्र के साथ चलें</string>
+    <string name="t_95bd330f2a">योजना से शुरू करें: %1$s</string>
+    <string name="t_9627af1c25" formatted="false">विराम</string>
+    <string name="t_963e150816">सूचना: %1$s\n%2$s</string>
+    <string name="t_964e56ab98">रिपोर्ट “%1$s” हटाएँ?</string>
+    <string name="t_964fb00c4e" formatted="false">अनुरोध किया, पर सिस्टम/चैनल ने रोका</string>
+    <string name="t_9694192342" formatted="false">फ़ोकस अंतराल पूरा</string>
+    <string name="t_96a0b3fc1d" formatted="false">बिना समय: बस इस दिन</string>
+    <string name="t_96a64755de">रिपोर्ट क्षेत्र %1$s करें?</string>
+    <string name="t_96c6ac97db" formatted="false">फ़्लोटिंग बटन: सिस्टम संकेतक</string>
+    <string name="t_9711f6b5b7" formatted="false">समाप्ति: ISO-8601</string>
+    <string name="t_9760f4a429" formatted="false">पसंदीदा में</string>
+    <string name="t_97a9f0590a">फ़ोकस %1$s + %2$s मि</string>
+    <string name="t_97bcfbe748">हो गया · %1$s</string>
+    <string name="t_989911f31c" formatted="false">आराम</string>
+    <string name="t_98b2073ed1" formatted="false">साफ़ करें</string>
+    <string name="t_98dc4a887a" formatted="false">कोई क्षेत्र नहीं</string>
+    <string name="t_98e4a9f4dd" formatted="false">टाइमर रुका है</string>
+    <string name="t_991e307efa">थीम: %1$s</string>
+    <string name="t_9924fc6aa9" formatted="false">अपनी रिपोर्ट</string>
+    <string name="t_9978ac34b2" formatted="false">कार्रवाइयाँ</string>
+    <string name="t_99cbe96929" formatted="false">, दोहराव छोड़े गए</string>
+    <string name="t_99d406eeba" formatted="false">अनुभाग</string>
+    <string name="t_99dbea8209" formatted="false">रवि</string>
+    <string name="t_9a4e6f0e95">चुने गए: %1$s</string>
+    <string name="t_9a65ca6053">बदलें: %1$s</string>
+    <string name="t_9ac9a4c129">निर्यात परिणाम की पुष्टि नहीं: %1$s</string>
+    <string name="t_9b1c9a0216" formatted="false">संपादित करें</string>
+    <string name="t_9b4ee5c556" formatted="false">क्या गिनें</string>
+    <string name="t_9bc1f05bd8" formatted="false">पूरे सत्र या खंड का ID</string>
+    <string name="t_9bcc818ccb" formatted="false">नियंत्रण सूचना</string>
+    <string name="t_9c7449bfd1" formatted="false">हटाएँ</string>
+    <string name="t_9cae6690eb" formatted="false">उपलब्ध बदलाव पूर्ववत करें</string>
+    <string name="t_9d5b844654" formatted="false">रिकॉर्ड की कार्रवाइयाँ</string>
+    <string name="t_9d809f884b" formatted="false">बदलें</string>
+    <string name="t_9d9f294850" formatted="false">शेड से शुरू और बंद करें, गतिविधि जल्दी चुनें</string>
+    <string name="t_9dd3e6ec21" formatted="false">दिन की सीमा एक घंटा बाद</string>
+    <string name="t_9de49a7593" formatted="false">फ़ाइल में कोई प्रविष्टि नहीं मिली</string>
+    <string name="t_9e4e767ad0">महीने में कम से कम %1$s</string>
+    <string name="t_9e506acb19" formatted="false">फिर कोशिश करें</string>
+    <string name="t_9e512e4de6" formatted="false">फ़ाइल जैसा ही रखें</string>
+    <string name="t_9e8bfc9912" formatted="false">नए कार्ड का नाम</string>
+    <string name="t_9e97224af0" formatted="false">मौजूदा नोट रखें</string>
+    <string name="t_9eb9a9691b" formatted="false">समाप्ति के समय का अलग कॉलम</string>
+    <string name="t_9ebe3ac111" formatted="false">फ़ोकस सेट करें</string>
+    <string name="t_9f431f2a5f" formatted="false">संकेत</string>
+    <string name="t_9f4988d59a">अभी: %1$s</string>
+    <string name="t_9f4e577f1f" formatted="false">जैसे, सोमवार और बुधवार को अंग्रेज़ी। उन दिनों यह मुख्य स्क्रीन पर इंतज़ार करेगी</string>
+    <string name="t_9f8007cba2" formatted="false">समाप्ति अज्ञात</string>
+    <string name="t_a0113f46a3" formatted="false">यह महीना</string>
+    <string name="t_a083e020a0" formatted="false">फ़ोन ने कॉपी शेड्यूल नहीं होने दी। “अभी सहेजें” पर टैप करें</string>
+    <string name="t_a1103b6e0c" formatted="false">अभी शुरू करें</string>
+    <string name="t_a12db4c166">चुना गया: %1$s · ID %2$s</string>
+    <string name="t_a1725f1b08" formatted="false">यह समय मापा हुआ नहीं, आपका बताया हुआ दर्ज होगा।</string>
+    <string name="t_a18bb83bf1">पूरे %3$s के लिए %1$s %2$s सहेजा</string>
+    <string name="t_a23f334099" formatted="false">, लंबी प्रविष्टि पर पूछेगा</string>
+    <string name="t_a2503487b7">“%2$s” में “%1$s” बनाएँ</string>
+    <string name="t_a2c84dc5a6" formatted="false">सामान्य</string>
+    <string name="t_a34678cc0a" formatted="false">जैसे, प्रोजेक्ट “अल्फ़ा”</string>
+    <string name="t_a3ffcb3ac5" formatted="false">कैलेंडर अभी जवाब नहीं दे रहा।</string>
+    <string name="t_a4ac32f350" formatted="false">स्रोत का स्थिर namespace</string>
+    <string name="t_a5363d1b5f" formatted="false">बैकअप फ़ाइल</string>
+    <string name="t_a5515a2b98" formatted="false">समय कैसे लिखा है</string>
+    <string name="t_a582d409b1" formatted="false">खुला</string>
+    <string name="t_a5b1429034">सप्ताह में अधिकतम %1$s</string>
+    <string name="t_a683d51495" formatted="false">प्रविष्टि अभी भी चल रही है</string>
+    <string name="t_a6a3fb1ef7" formatted="false">प्रविष्टि बदल चुकी है। ऐप में ठीक करें</string>
+    <string name="t_a773a5edc6">और %1$s</string>
+    <string name="t_a7e3c8ee69" formatted="false">इस अवधि में यहाँ कोई प्रविष्टि नहीं।</string>
+    <string name="t_a8f8d66a1b" formatted="false">फ़ाइल सहेजी और सत्यापित की गई</string>
+    <string name="t_a901fbebb1">कोई फ़ाइल नहीं हटाई गई। तकनीकी इंटरफ़ेस में डेटाबेस बहाल करें या कॉपी चुनें। विवरण: %1$s</string>
+    <string name="t_a94e60234f">%1$s जोड़ें</string>
+    <string name="t_a9a3e50e7d" formatted="false">प्रविष्टि की शुरुआत खिसकाई गई</string>
+    <string name="t_aa447181f4">निर्यात की तैयारी शुरू नहीं हुई: %1$s</string>
+    <string name="t_aa9fc365f5" formatted="false">तैयार निर्यात फिर से करें…</string>
+    <string name="t_aab4eaebc4">गतिविधि “%1$s” हो जाएगी।</string>
+    <string name="t_ab0662026d" formatted="false">CSV से इतिहास</string>
+    <string name="t_ab0b3ff312">अगर प्रविष्टि %1$s घंटे से लंबी चले, तो शेड में धीरे से पूछें कि टाइमर भूले तो नहीं</string>
+    <string name="t_abfb46281b">(not)AI Time Tracker %1$s। सभी प्रविष्टियाँ इसी फ़ोन पर रहती हैं</string>
+    <string name="t_ac72e3a247">%1$s\nसत्र: %2$s; खंड: %3$s; लक्ष्य: %4$s। सक्रिय अंत: %5$s; फ़ोकस: %6$s</string>
+    <string name="t_ace6b66d31" formatted="false">प्रविष्टि भविष्य की है</string>
+    <string name="t_ad2b7927cc" formatted="false">नई शुरू करें</string>
+    <string name="t_ad7d8c2a5f">महीने में अधिकतम %1$s</string>
+    <string name="t_adcdc4ad41" formatted="false">समय अनुमत सीमा से बाहर है</string>
+    <string name="t_ae6b38edaf" formatted="false">कोई और दिन</string>
+    <string name="t_aee593f748">योजना में %1$s</string>
+    <string name="t_af39297b7b" formatted="false">, कुछ समय अज्ञात है</string>
+    <string name="t_afa3b81f25">रोज़ अधिकतम %1$s</string>
+    <string name="t_afb9a7edd6" formatted="false">विभाजक</string>
+    <string name="t_afbca25eab" formatted="false">, फ़ाइल जाँची गई</string>
+    <string name="t_afd78e8296" formatted="false">योजना से शुरू करें</string>
+    <string name="t_aff922a637" formatted="false">कोई गतिविधि नहीं</string>
+    <string name="t_aff9f84f58" formatted="false">समय क्षेत्र बदलाव की जाँच ज़रूरी है। ऐप खुलने पर जाँच करेगा</string>
+    <string name="t_affff57571" formatted="false">विभाजक चुनें</string>
+    <string name="t_b08e96f6ad" formatted="false">फ़ोकस संकेत</string>
+    <string name="t_b1a72b8b91" formatted="false">फ़ोकस: समय बताना होगा</string>
+    <string name="t_b1dd9c744d" formatted="false">योजना या टाइमर बदल चुका है। फिर से देखें</string>
+    <string name="t_b1e23e1ff0" formatted="false">टेक्स्ट का आकार</string>
+    <string name="t_b20271fb06" formatted="false">मौजूदा प्रविष्टि अभी खत्म होगी, नई इसी मिनट से शुरू होगी।</string>
+    <string name="t_b2822e2bb3" formatted="false">अवधि</string>
+    <string name="t_b2dde7fe6e">अंतिम %1$s। स्वचालित कॉपी बंद है</string>
+    <string name="t_b32615689f" formatted="false">नोट हटाएँ</string>
+    <string name="t_b34e097643" formatted="false">दूसरी फ़ाइल</string>
+    <string name="t_b363aeb862" formatted="false">स्प्रेडशीट के लिए पूरा इतिहास। यह बैकअप नहीं है</string>
+    <string name="t_b371499aaa" formatted="false">अधिक</string>
+    <string name="t_b402c34a3b" formatted="false">CSV में निर्यात करें</string>
+    <string name="t_b40a4254c7" formatted="false">बटन पर नाम</string>
+    <string name="t_b433c5110e" formatted="false">पहली कॉपी कुछ मिनट में बनेगी</string>
+    <string name="t_b4479f84f1">%1$s, अंक %2$s,</string>
+    <string name="t_b45bbb4570" formatted="false">हल्की थीम</string>
+    <string name="t_b467c6658f" formatted="false">फ़ाइल सहेजी गई। उसे पढ़कर सत्यापित करना संभव नहीं है।</string>
+    <string name="t_b4770c7e71">दिन %1$s:%2$s बजे शुरू होता है</string>
+    <string name="t_b4efdc2013" formatted="false">स्रोत इकाई ID</string>
+    <string name="t_b5ef1ca9d4" formatted="false">ऐप आइकन</string>
+    <string name="t_b62da03c51" formatted="false">फ़ोकस: विराम</string>
+    <string name="t_b6305bf26a" formatted="false">अवधि शून्य से अधिक होनी चाहिए</string>
+    <string name="t_b67fbff66e" formatted="false">रिपोर्ट का समय क्षेत्र: उदाहरण के लिए, Europe/Moscow</string>
+    <string name="t_b6cee6b950" formatted="false">इस बिल्ड में उपलब्ध नहीं</string>
+    <string name="t_b6ef08401f" formatted="false">दिन</string>
+    <string name="t_b715493906" formatted="false">फ़ोकस बटन</string>
+    <string name="t_b71833f660" formatted="false">टाइमर विराम पर है</string>
+    <string name="t_b727ee7aba" formatted="false">यह फ़ाइल नहीं ली जा सकी। 64 MB तक की दूसरी आज़माएँ</string>
+    <string name="t_b740f2a2e2" formatted="false">आइकन देर तक दबाएँ: शुरू और बंद, गतिविधि चुनना और पहले दो पसंदीदा</string>
+    <string name="t_b747495fc3">%1$s · %2$s\n%3$s। पसंदीदा सहेजे पैरामीटर इस्तेमाल करते हैं, संग्रहीत भी।</string>
+    <string name="t_b74904694d" formatted="false">इसे ऐप सेटिंग में चालू करें</string>
+    <string name="t_b788b8485e" formatted="false">अज्ञात खंड शामिल नहीं किया गया</string>
+    <string name="t_b79a6fe480" formatted="false">कॉपी रुक गई। मैं खुद जारी रखूँगा</string>
+    <string name="t_b84572428f" formatted="false">बहुत बड़ा</string>
+    <string name="t_b84fd84e60" formatted="false">कल से</string>
+    <string name="t_b8540eb5bb" formatted="false">Android 10 या नया ज़रूरी है</string>
+    <string name="t_b880e6a105" formatted="false">पसंदीदा</string>
+    <string name="t_b8b15fe0c2" formatted="false">योजना की कार्रवाइयाँ</string>
+    <string name="t_b905452397" formatted="false">मौजूदा इतिहास की दिन सीमाएँ और रिपोर्ट दृश्य बदलेंगे। वास्तविक अंतराल और अलग सहेजे लक्ष्य क्षेत्र बने रहेंगे। चुना क्षेत्र तय हो जाएगा; स्वचालित चुनाव बंद होगा।</string>
+    <string name="t_b932f7eea5">नहीं हो सका: %1$s</string>
+    <string name="t_b97a3fd699" formatted="false">फ़ोकस: काम का चरण</string>
+    <string name="t_b9c9ff652d" formatted="false">ऐप के बारे में</string>
+    <string name="t_ba2ec9712b" formatted="false">आप क्या कर रहे हैं?</string>
+    <string name="t_ba7631ff32" formatted="false">सप्ताह के दिनों पर</string>
+    <string name="t_ba9db63b9d">कैटलॉग %1$s</string>
+    <string name="t_babd8e081b" formatted="false">इतिहास और सारांश में दिन की सीमाएँ बदलेंगी। प्रविष्टियाँ और लक्ष्यों के क्षेत्र नहीं बदलते।</string>
+    <string name="t_bbb0e8e8cd" formatted="false">मि.से.</string>
+    <string name="t_bbcf06b3c9" formatted="false">नोट</string>
+    <string name="t_bbee9680a8" formatted="false">अज्ञात समय कुल में नहीं:</string>
+    <string name="t_bc28baf5fc" formatted="false">कल कोई प्रविष्टि नहीं</string>
+    <string name="t_bc4d1d35af" formatted="false">फ़ाइल जैसा</string>
+    <string name="t_bc5431b599" formatted="false">फ़ोल्डर</string>
+    <string name="t_bd16b23470" formatted="false">गहरी</string>
+    <string name="t_bd4538e3c6" formatted="false">अपारदर्शी</string>
+    <string name="t_bd81e0c895" formatted="false">लिखी गई कॉपी डेटा से मेल नहीं खाई। मैं खुद फिर कोशिश करूँगा</string>
+    <string name="t_bdcb031d09" formatted="false">विराम पूरा हुआ</string>
+    <string name="t_bdcd78489d">चल रही प्रविष्टि को यह नाम मिलेगा। शुरुआत %1$s ही रहेगी।</string>
+    <string name="t_be0773c924" formatted="false">फ़ॉन्ट, अंक और मुख्य स्क्रीन</string>
+    <string name="t_be8f714a0e" formatted="false">चुने फ़ोल्डर में अपने आप पूरी कॉपी सहेजती है: फ़ोन पर या क्लाउड में, अगर क्लाउड ऐप फ़ोल्डर देता है। ऐसी कॉपी ऐप हटाने के बाद भी बची रहती है</string>
+    <string name="t_bea0873d5e" formatted="false">त्वरित बटन</string>
+    <string name="t_bedfedb4d0" formatted="false">बंद</string>
+    <string name="t_befab85c9e" formatted="false">चालू है, पर सूचना की अनुमति नहीं</string>
+    <string name="t_bf38c3fd75">घटना उपलब्ध नहीं: %1$s</string>
+    <string name="t_bf4c4f53cb" formatted="false">इस गतिविधि का समय सारांश और लक्ष्यों में अनुभाग के कुल में गिना जाएगा। मौजूदा प्रविष्टियाँ अपनी पुरानी जगह पर रहेंगी।</string>
+    <string name="t_c0634e4cb3" formatted="false">सभी गतिविधियाँ</string>
+    <string name="t_c0683f8006" formatted="false">कोई अनुभाग नहीं</string>
+    <string name="t_c0b04d97ff" formatted="false">टैब</string>
+    <string name="t_c0ed5f4dda" formatted="false">पंक्ति में उद्धरण चिह्न बंद नहीं हैं</string>
+    <string name="t_c12ee51dd9" formatted="false">पूरा समय</string>
+    <string name="t_c14f88246c">%1$s बाकी</string>
+    <string name="t_c161a7bb23" formatted="false">" अधूरी प्रविष्टि “समय अज्ञात” के रूप में आएगी और उसे बताना होगा।"</string>
+    <string name="t_c23d5826a3">प्रविष्टियों वाले %1$s</string>
+    <string name="t_c25bd1a7c6" formatted="false">विराम छोड़ें</string>
+    <string name="t_c2bf13bbb1" formatted="false">अपनी रिपोर्टें</string>
+    <string name="t_c2f668e54f" formatted="false">अपडेट करें</string>
+    <string name="t_c2fcd7ada4" formatted="false">सप्ताहांत में</string>
+    <string name="t_c33b203048" formatted="false">मौजूदा अवधि नए लक्ष्य के अनुसार दोबारा गिनी जाएगी। पिछली अवधियाँ वैसी ही रहेंगी।</string>
+    <string name="t_c344c6222f" formatted="false">कॉपी पढ़कर जाँची गई।</string>
+    <string name="t_c372165452">कैलेंडर: %1$s</string>
+    <string name="t_c3c366f704">%1$s %2$s बजे</string>
+    <string name="t_c4dca81d48" formatted="false">योजना में जोड़ें</string>
+    <string name="t_c54788a5e8" formatted="false">पढ़ना</string>
+    <string name="t_c54a9c6fb4" formatted="false">योजना बदली गई</string>
+    <string name="t_c595cae565" formatted="false">मसौदा बदलें?</string>
+    <string name="t_c619870299" formatted="false">चुना हुआ पाठ</string>
+    <string name="t_c650387bcb" formatted="false">काम का चरण पूरा हुआ</string>
+    <string name="t_c67ba2d89b">%1$s तक मौजूदा गतिविधि रहेगी, %2$s से चुनी गई शुरू होगी।</string>
+    <string name="t_c67ed0b774" formatted="false">स्रोत का समय क्षेत्र; स्पष्ट रूप से पुष्टि करें</string>
+    <string name="t_c6e0ce16b9" formatted="false">चरण खत्म होने पर सूचित करें। फ़ोन संकेत में थोड़ी देर कर सकता है</string>
+    <string name="t_c736a598e7" formatted="false">पुरानी कॉपी तभी हटती हैं जब नई जाँच ली जाए।</string>
+    <string name="t_c7d650974b" formatted="false">अगले महीने से</string>
+    <string name="t_c80d7e8172" formatted="false">समय</string>
+    <string name="t_c82a0d4427" formatted="false">योजना से हटाएँ</string>
+    <string name="t_c8317c85b2" formatted="false">शुरुआत के समय का अलग कॉलम</string>
+    <string name="t_c83889af89" formatted="false">गतिविधि चुनने के लिए ऐप खोलें</string>
+    <string name="t_c85eb5f581" formatted="false">90 दिन</string>
+    <string name="t_c927b86cfb" formatted="false">कैटलॉग और तालिकाएँ</string>
+    <string name="t_ca7830c42f" formatted="false">हटाने के लिए कोई प्रविष्टि नहीं</string>
+    <string name="t_cabb0c6d9b">पंक्ति %1$s:</string>
+    <string name="t_cb26bdc6c6" formatted="false">शुरुआत</string>
+    <string name="t_cbc6fa3d6a" formatted="false">विजेट</string>
+    <string name="t_cbeb716470" formatted="false">सेटिंग पर वापस जाएँ</string>
+    <string name="t_cc5d5d0fd4">%1$s (%2$s) का कुल: %3$s ms; अनिर्णीत: %4$s\nकार्ड: %5$s\nसत्र: %6$s; खंड: %7$s\n%8$s</string>
+    <string name="t_cc6d018f5b" formatted="false">आज की CSV रिपोर्ट (पूरा बैकअप नहीं)</string>
+    <string name="t_cca1d52e45" formatted="false">अधूरी बहाली पूरी करें</string>
+    <string name="t_ccb2375542" formatted="false">विजेट बंद है</string>
+    <string name="t_cd30825052" formatted="false">लक्ष्य तय हुआ</string>
+    <string name="t_cd93b2e0f1" formatted="false">चालू है, पर फ़ोन ने अनुमति नहीं दी</string>
+    <string name="t_ce12182bac" formatted="false">माप ID</string>
+    <string name="t_ce3ec6ed08" formatted="false">सीमा के भीतर</string>
+    <string name="t_ce5fc2ce7f" formatted="false">क्रम सहेजा गया</string>
+    <string name="t_ced07fd144" formatted="false">कोई नहीं</string>
+    <string name="t_cefdb75984" formatted="false">समाप्ति का कॉलम (या duration)</string>
+    <string name="t_cf113217ae">%1$s: %2$s मिनट</string>
+    <string name="t_cf3a8f3ca2" formatted="false">ट्रैकिंग शुरू करें</string>
+    <string name="t_cf52c8daf1" formatted="false">रिपोर्ट का समय क्षेत्र डिवाइस के साथ चलता है। प्रविष्टियाँ दूसरे दिन में जा सकती हैं</string>
+    <string name="t_cf7b338323" formatted="false">पतले</string>
+    <string name="t_cfafc18b42" formatted="false">योजना केवल मुख्य स्क्रीन पर दिखती है। गतिविधि पर टैप करने पर समय शुरू होता है।</string>
+    <string name="t_d002f83ddc" formatted="false">बदलाव के बाद, फ़ोन बैकग्राउंड काम की अनुमति दे तो कुछ मिनट में कॉपी सहेजी जाती है। दिन में एक बार — बिना बदलाव के भी।</string>
+    <string name="t_d015e9be93" formatted="false">इस रिपोर्ट की गतिविधि हटाई या संग्रहीत की गई। रिपोर्ट केवल उसकी पिछली प्रविष्टियाँ गिनती है।</string>
+    <string name="t_d0d7180292" formatted="false">पसंदीदा में जोड़ा गया</string>
+    <string name="t_d0dd940c4c" formatted="false">कोई डेटा नहीं</string>
+    <string name="t_d0fde8b6ec">स्वचालित कॉपी %1$s</string>
+    <string name="t_d0ff90f238" formatted="false">लॉक स्क्रीन पर</string>
+    <string name="t_d111e0cd52" formatted="false">रिपोर्ट दिन की सीमा</string>
+    <string name="t_d129caabe1" formatted="false">संपादन योग्य ड्राफ़्ट भरें?</string>
+    <string name="t_d149e0338b" formatted="false">श्रेणी या ग्राहक</string>
+    <string name="t_d176283db1">%1$s से</string>
+    <string name="t_d184a16515" formatted="false">चयन से हटाएँ</string>
+    <string name="t_d1f9b48826" formatted="false">फ़ोन में जगह या मेमोरी कम पड़ गई। मैं खुद फिर कोशिश करूँगा</string>
+    <string name="t_d223a16aed" formatted="false">श्रेणी का कॉलम</string>
+    <string name="t_d25786deda" formatted="false">अंग्रेज़ी · 14:05 से</string>
+    <string name="t_d261564113" formatted="false">भरें</string>
+    <string name="t_d2aa318afd">दर्ज %1$s</string>
+    <string name="t_d2e9881a72">जोड़े जाएँगे: %1$s</string>
+    <string name="t_d349cb398d">%1$s बीते</string>
+    <string name="t_d37c15b206" formatted="false">" आपके बदले नाम आपके ही रहेंगे; पिछली प्रविष्टियाँ नहीं बदलेंगी।"</string>
+    <string name="t_d398842570" formatted="false">निर्दिष्ट समय के साथ अज्ञात खंड की पुष्टि करें</string>
+    <string name="t_d3c8e2e155" formatted="false">समय क्षेत्र बदल गया। पुष्टि सहेजी नहीं गई; ऐप खुलने पर फिर करेगा</string>
+    <string name="t_d40fecd7ad" formatted="false">फिर कोशिश करें</string>
+    <string name="t_d4168ace06" formatted="false">अवधि</string>
+    <string name="t_d41ba2c06d" formatted="false">कॉलम, समय और duration की इकाइयों की पुष्टि करें</string>
+    <string name="t_d458ec4c77" formatted="false">अगले सप्ताह से</string>
+    <string name="t_d47aa86141" formatted="false">सघन</string>
+    <string name="t_d4993a1dc7" formatted="false">समय अज्ञात</string>
+    <string name="t_d4a2324628" formatted="false">लाइम</string>
+    <string name="t_d4a88f5588" formatted="false">अलग अवधि का मतलब नया लक्ष्य है।</string>
+    <string name="t_d4f447c130" formatted="false">रोकें</string>
+    <string name="t_d524af03ac">नई गतिविधि के लिए उपलब्ध नहीं: %1$s</string>
+    <string name="t_d5627f6a61" formatted="false">लक्ष्य</string>
+    <string name="t_d6035dc6ed" formatted="false">मि</string>
+    <string name="t_d6140e7bc5" formatted="false">0 मि</string>
+    <string name="t_d64f83a24b" formatted="false">कोई प्रति चुनें; पूर्वावलोकन के बाद ही मौजूदा डेटा बदला जाएगा</string>
+    <string name="t_d66df6cc7f" formatted="false">अनुपलब्ध डेटाबेस पुनर्स्थापित करें</string>
+    <string name="t_d70f2e079b" formatted="false">पूरा</string>
+    <string name="t_d73bef6ef5" formatted="false">फ़ोकस चरण छोड़ें</string>
+    <string name="t_d772cc53be" formatted="false">बदलें</string>
+    <string name="t_d7748bfad0" formatted="false">रिपोर्ट</string>
+    <string name="t_d7907f4d43" formatted="false">उन्नत</string>
+    <string name="t_d8aac38d84" formatted="false">गतिविधियाँ और योजना</string>
+    <string name="t_d8e26625e7" formatted="false">सीमा</string>
+    <string name="t_d9017ada66" formatted="false">रखी जाने वाली कॉपी</string>
+    <string name="t_d9a13b5014">%1$s</string>
+    <string name="t_d9e72beb20" formatted="false">CSV स्रोत (सेवा और खाता)</string>
+    <string name="t_d9f48a75fd" formatted="false">पसंदीदा से हटाएँ</string>
+    <string name="t_d9ffbbb760">समय चुनें: %1$s</string>
+    <string name="t_da4b8e5644" formatted="false">फ़ोकस: अंतराल पूरा</string>
+    <string name="t_dab89894aa" formatted="false">ट्रैकिंग रोकें</string>
+    <string name="t_db1042f51d" formatted="false">दिन की समयरेखा</string>
+    <string name="t_db70b53fc3" formatted="false">चुनी गई प्रविष्टियाँ पहले से ऐसी हैं</string>
+    <string name="t_db922448f7">सप्ताह में कम से कम %1$s</string>
+    <string name="t_dbbafdd074">रिपोर्ट का समय क्षेत्र %1$s करें?</string>
+    <string name="t_dc417ebce7" formatted="false">लोड हो रहा है…</string>
+    <string name="t_dd15d6eecb" formatted="false">क्या शुरू करें?</string>
+    <string name="t_dd27b7de89" formatted="false">लाइसेंस नहीं खुल सका</string>
+    <string name="t_dd63bc14f9">%1$s बदली गईं</string>
+    <string name="t_ddca6f4db2" formatted="false">" बिना प्रविष्टि"</string>
+    <string name="t_ddcbc8c167" formatted="false">खंड बदले गए</string>
+    <string name="t_de5d4764e8" formatted="false">लक्ष्य की कुल मात्रा; दैनिक अवधियों को जोड़कर कुल न निकालें</string>
+    <string name="t_de5eb09e17" formatted="false">गतिविधि बदलें</string>
+    <string name="t_de7dee674e" formatted="false">यह बैकअप फ़ाइल है। इसे “बैकअप” में बहाल करें</string>
+    <string name="t_de8f3c16b9" formatted="false">शामिल न करें</string>
+    <string name="t_dee20b519a" formatted="false">लॉक स्क्रीन पर कोई कार्ड नहीं</string>
+    <string name="t_deleted_on">हटाए गए · %1$s</string>
+    <string name="t_df12865c09" formatted="false">फ़ॉन्ट</string>
+    <string name="t_dfd4e36290" formatted="false">आइकन बदला नहीं जा सका</string>
+    <string name="t_e0382438fe">फ़ोकस: %1$s मि काम</string>
+    <string name="t_e06ca859e1" formatted="false">फ़्लोटिंग बटन का अनुरोध किया गया; सिस्टम सेवा संकेतक ज़रूरी है</string>
+    <string name="t_e0997b4d01" formatted="false">प्रविष्टियाँ नहीं बदलेंगी, केवल लक्ष्य हटेगा।</string>
+    <string name="t_e0c6838299" formatted="false">अभी कोई कॉपी नहीं। फ़ोल्डर में स्वचालित कॉपी चालू करें</string>
+    <string name="t_e0f1717450" formatted="false">नीचे ले जाएँ</string>
+    <string name="t_e1d7065cb9" formatted="false">रिपोर्ट बदली गई</string>
+    <string name="t_e2e41650a0">%1$s से</string>
+    <string name="t_e380f43ca4">आज, %1$s</string>
+    <string name="t_e3af18c937" formatted="false">तकनीकी इंटरफ़ेस</string>
+    <string name="t_e3b9331301" formatted="false">आगे</string>
+    <string name="t_e3eed8bfd8" formatted="false">फ़ोकस की अवधि</string>
+    <string name="t_e3fc5b6cc7" formatted="false">कौन-सी गतिविधि?</string>
+    <string name="t_e43c291b9c" formatted="false">चरण ±</string>
+    <string name="t_e46b654bc7" formatted="false">टाइमर: गतिविधि चुनें</string>
+    <string name="t_e46c179ddb" formatted="false">फ़ोन की स्क्रीन पर</string>
+    <string name="t_e4c06f14a4" formatted="false">स्थानीय तारीख/समय का फ़ॉर्मैट; खाली = offset वाला ISO</string>
+    <string name="t_e5451eea1b" formatted="false">रिपोर्ट का समय क्षेत्र सहेजें…</string>
+    <string name="t_e558fb6e24" formatted="false">महीना</string>
+    <string name="t_e5e4253129" formatted="false">त्वरित शुरुआत के नीचे। अवधि के लिए देर तक दबाएँ</string>
+    <string name="t_e5ff32f6ae" formatted="false">शुक्र</string>
+    <string name="t_e65da6ce30" formatted="false">7 दिन</string>
+    <string name="t_e6794c0df6" formatted="false">पसंदीदा में जोड़ें</string>
+    <string name="t_e699415c6e" formatted="false">प्रविष्टियाँ इतिहास में जुड़ती हैं, मौजूदा कुछ नहीं बदलता। उसी स्रोत की दोहराई गई प्रविष्टियाँ छोड़ दी जाती हैं।</string>
+    <string name="t_e6aa58192b" formatted="false">अगली शुरुआत बिना कार्ड के होगी</string>
+    <string name="t_e6d3fcd043" formatted="false">अभी होम स्क्रीन पर नहीं</string>
+    <string name="t_e7672250d5" formatted="false">एक और लक्ष्य</string>
+    <string name="t_e8255d5bdc" formatted="false">सतहों की अनुमतियाँ जाँचें</string>
+    <string name="t_e82d057d74" formatted="false">पूरा क्षेत्र</string>
+    <string name="t_e887e93303" formatted="false">कोई योजना नहीं</string>
+    <string name="t_e8a76312ff" formatted="false">अंत या अवधि का कॉलम चाहिए</string>
+    <string name="t_e962d6d168">, पहले से मौजूद: %1$s</string>
+    <string name="t_e965da5858" formatted="false">CSV से आयात करें</string>
+    <string name="t_e97aa645db" formatted="false">सब बंद: ट्रैकिंग केवल ऐप में</string>
+    <string name="t_e98d66a21e" formatted="false">अज्ञात खंड को शामिल न करें</string>
+    <string name="t_ea707316fd" formatted="false">फ़्लोटिंग बटन</string>
+    <string name="t_eaa484fa5d" formatted="false">नई प्रविष्टि शुरू हुई</string>
+    <string name="t_eb467ef147" formatted="false">अल्पविराम</string>
+    <string name="t_ec1c55d866" formatted="false">गहरी थीम</string>
+    <string name="t_ec3bd8ce7a">%1$s घं</string>
+    <string name="t_eca17171d2" formatted="false">सिस्टम</string>
+    <string name="t_eca2a38089" formatted="false">कैलेंडर: वर्तमान और आने वाले इवेंट</string>
+    <string name="t_ed3f0e507a" formatted="false">भाषा</string>
+    <string name="t_ed4b9d4acc" formatted="false">समय बताना होगा</string>
+    <string name="t_ed5033902e" formatted="false">सिस्टम ने फ़्लोटिंग बटन शुरू नहीं होने दिया; टाइमर ऐप में उपलब्ध है</string>
+    <string name="t_ed52dd3411" formatted="false">एक गतिविधि या अनुभाग चुनने के लिए टैप करें</string>
+    <string name="t_ed6e1d0308" formatted="false">खोजें</string>
+    <string name="t_edd23ab082" formatted="false">योजना में आगे</string>
+    <string name="t_eded3f55f1" formatted="false">चुनाव नहीं खुल सका। प्रविष्टि सहेजी गई है</string>
+    <string name="t_eeee074ac3" formatted="false">शामिल कैटलॉग अपडेट करें…</string>
+    <string name="t_ef34d1807a" formatted="false">दर्ज नहीं</string>
+    <string name="t_ef5ff32a17" formatted="false">मौजूदा गतिविधि बताएँ</string>
+    <string name="t_efc885e934" formatted="false">हटाए गए रिकॉर्ड</string>
+    <string name="t_f0caca47ee" formatted="false">फ़ोकस शुरू करें</string>
+    <string name="t_f10728b46b" formatted="false">होम स्क्रीन पर; बटन बंद</string>
+    <string name="t_f109cea920" formatted="false">अभी कोई पसंदीदा नहीं</string>
+    <string name="t_f1157816a0" formatted="false">अपनी ध्वनि</string>
+    <string name="t_f11be88b10" formatted="false">चुना हुआ पसंदीदा सहेजें</string>
+    <string name="t_f127f2a1ee" formatted="false">समझ गया</string>
+    <string name="t_f220b98d48" formatted="false">गतिविधि का चुनाव पुराना हो गया</string>
+    <string name="t_f2351a24d5">प्रविष्टि के %1$s घंटे बाद शेड में पूछेगा: जारी रखें, टालें या रोकें</string>
+    <string name="t_f2a9788239" formatted="false">यह अंतराल दर्ज करें</string>
+    <string name="t_f2f63c2213" formatted="false">फ़ोकस: चरण पूरा हुआ, अगला चुनें</string>
+    <string name="t_f3503a3e3f" formatted="false">पसंदीदा से हटाया गया</string>
+    <string name="t_f36036b6cf" formatted="false">विराम · %s</string>
+    <string name="t_f3ff661a74" formatted="false">एक और रिपोर्ट</string>
+    <string name="t_f46e3488b5" formatted="false">फ़ोल्डर में कॉपी</string>
+    <string name="t_f48645430a" formatted="false">केवल सहेजी रिपोर्ट हटेगी। प्रविष्टियाँ नहीं बदलेंगी।</string>
+    <string name="t_f4ca346393" formatted="false">फ़ोकस चरण के दौरान शांति</string>
+    <string name="t_f4f34092fb" formatted="false">काम का चरण छोड़ें</string>
+    <string name="t_f55832ba89" formatted="false">विजेट की पृष्ठभूमि</string>
+    <string name="t_f5fc2f3eb8" formatted="false">छोटा</string>
+    <string name="t_f62e9fd860" formatted="false">समय क्षेत्र सहित (ISO)</string>
+    <string name="t_f6bfe94a14" formatted="false">कॉपी सहेज रहे हैं</string>
+    <string name="t_f6dab074d7" formatted="false">वापस</string>
+    <string name="t_f6de15c50a" formatted="false">कल</string>
+    <string name="t_f6f1e5272f" formatted="false">क्रम</string>
+    <string name="t_f6f369d3a0" formatted="false">रिकॉर्ड ठीक किया गया</string>
+    <string name="t_f70eab72a9" formatted="false">समय केवल सूची के क्रम के लिए है</string>
+    <string name="t_f713a587ea" formatted="false">निर्यात रद्द हुआ; तैयार फ़ाइलें सुरक्षित हैं। आप नई कॉपी तैयार कर सकते हैं।</string>
+    <string name="t_f8310658c7" formatted="false">शुरुआत का समय, अगर अलग कॉलम में हो</string>
+    <string name="t_f8ebe73afe">सहेजा गया: %1$s</string>
+    <string name="t_f8fe850a57" formatted="false">टाइमर बदल गया। सूचना फिर से खोलें</string>
+    <string name="t_f9444ff8c6" formatted="false">संक्षिप्त</string>
+    <string name="t_f94b15c5ce" formatted="false">रुका हुआ। विराम का समय गतिविधि के समय में शामिल नहीं होता।</string>
+    <string name="t_f9c8ab7dd1" formatted="false">गतिविधि कैटलॉग</string>
+    <string name="t_fa1296f402" formatted="false">पहले जैसा करें</string>
+    <string name="t_fa620acedb" formatted="false">गतिविधि कैटलॉग का अपडेट उपलब्ध है</string>
+    <string name="t_fa633fd3a2" formatted="false">फ़ोल्डर फिर से चुनना होगा</string>
+    <string name="t_fb27c3e29b">%1$s, कुल</string>
+    <string name="t_fb925c5d79" formatted="false">30 दिन</string>
+    <string name="t_fc355fea11" formatted="false">शीर्षकों से सुझाव पहले ही लगा दिए गए हैं।</string>
+    <string name="t_fc60b6a6e0" formatted="false">समय घड़ी बदलने के समय पड़ता है</string>
+    <string name="t_fc656a1da4" formatted="false">इसे छिपाकर शेड में कार्ड रखने के लिए इस सूचना की सेटिंग में “छोटा करें” या “बिना आइकन” चालू करें</string>
+    <string name="t_fc8e4e2d1c" formatted="false">अभी शुरू करें</string>
+    <string name="t_fca9d98cd9" formatted="false">टाइमर बदल गया। फिर से टैप करें</string>
+    <string name="t_fd042c9a3a" formatted="false">बाद में</string>
+    <string name="t_fd3cb2ebef" formatted="false">मौजूदा चरण जैसे शुरू हुआ वैसे ही पूरा होगा; नई अवधियाँ अगले से लागू होंगी।</string>
+    <string name="t_fd500149d4">टाइमर: %1$s</string>
+    <string name="t_fd7707e6f0">%1$s से न गिनें</string>
+    <string name="t_fdc5b65acf" formatted="false">विराम · %s बाकी</string>
+    <string name="t_fdfa49e623" formatted="false">आखिरी बंद खंड ठीक करें</string>
+    <string name="t_fe4b0c80f0" formatted="false">चुनें</string>
+    <string name="t_fe63f1e035" formatted="false">लिखी गई कॉपी दोबारा नहीं पढ़ी जा सकी। मैं खुद फिर कोशिश करूँगा</string>
+    <string name="t_fe68cb28be" formatted="false">गतिविधि, शुरुआत और अंत या अवधि ज़रूरी है</string>
+    <string name="t_fe97f5bc85" formatted="false">होम स्क्रीन ऐप से विजेट नहीं जोड़ सकती। खुद जोड़ें: होम स्क्रीन पर देर तक दबाएँ → विजेट → (not)AI Time</string>
+    <string name="t_fea5f3ca7c" formatted="false">गतिविधि बाद में चुनेंगे</string>
+    <string name="t_fee1dd80dd">मौजूदा पाठ: “%1$s”\nनया पाठ: “%2$s”</string>
+    <string name="t_feff16c4bb" formatted="false">सूचना पट्टी में टाइमर</string>
+    <string name="t_restore_all">सभी बहाल करें (%1$s)</string>
+    <string name="t_restore_all_body" formatted="false">प्रविष्टियाँ इतिहास में अपनी पुरानी जगह लौट आएँगी।</string>
+    <string name="t_restore_all_confirm" formatted="false">बहाल करें</string>
+    <string name="t_restore_all_done">बहाल प्रविष्टियाँ: %1$s</string>
+    <string name="t_restore_all_title">%1$s बहाल करें?</string>
+    <plurals name="p_032a085f42">
+        <item quantity="one">%1$d दिन</item>
+        <item quantity="other">%1$d दिन</item>
+    </plurals>
+    <plurals name="p_07343fe85c">
+        <item quantity="one">%1$d विषय लिंक</item>
+        <item quantity="other">%1$d विषय लिंक</item>
+    </plurals>
+    <plurals name="p_09d3aef0c7">
+        <item quantity="one">%1$d पंक्ति</item>
+        <item quantity="other">%1$d पंक्तियाँ</item>
+    </plurals>
+    <plurals name="p_299205cb6b">
+        <item quantity="one">%1$d बार</item>
+        <item quantity="other">%1$d बार</item>
+    </plurals>
+    <plurals name="p_33de38af49">
+        <item quantity="one">%1$d अंतराल</item>
+        <item quantity="other">%1$d अंतराल</item>
+    </plurals>
+    <plurals name="p_3a9aafb6ad">
+        <item quantity="one">%1$d गतिविधि</item>
+        <item quantity="other">%1$d गतिविधियाँ</item>
+    </plurals>
+    <plurals name="p_3b59342c88">
+        <item quantity="one">%1$d लक्ष्य</item>
+        <item quantity="other">%1$d लक्ष्य</item>
+    </plurals>
+    <plurals name="p_414e6a20a2">
+        <item quantity="one">%1$d पसंदीदा</item>
+        <item quantity="other">%1$d पसंदीदा</item>
+    </plurals>
+    <plurals name="p_51037d6f51">
+        <item quantity="one">%1$d खंड</item>
+        <item quantity="other">%1$d खंड</item>
+    </plurals>
+    <plurals name="p_5e0f6cbad4">
+        <item quantity="one">%1$d दिन</item>
+        <item quantity="other">%1$d दिन</item>
+    </plurals>
+    <plurals name="p_6c73bc4d74">
+        <item quantity="one">%1$d प्रविष्टि</item>
+        <item quantity="other">%1$d प्रविष्टियाँ</item>
+    </plurals>
+    <plurals name="p_7504653931">
+        <item quantity="one">%1$d बार</item>
+        <item quantity="other">%1$d बार</item>
+    </plurals>
+    <plurals name="p_7722e30027">
+        <item quantity="one">%1$d अपनी गतिविधि</item>
+        <item quantity="other">%1$d अपनी गतिविधियाँ</item>
+    </plurals>
+    <plurals name="p_a03208ce01">
+        <item quantity="one">%1$d सेट रिकॉर्ड</item>
+        <item quantity="other">%1$d सेट रिकॉर्ड</item>
+    </plurals>
+    <plurals name="p_aaaea1e747">
+        <item quantity="one">%1$d माप</item>
+        <item quantity="other">%1$d माप</item>
+    </plurals>
+    <plurals name="p_c70b66af3f">
+        <item quantity="one">%1$d घटना मात्रा रिकॉर्ड</item>
+        <item quantity="other">%1$d घटना मात्रा रिकॉर्ड</item>
+    </plurals>
+    <plurals name="p_c8e097eebc">
+        <item quantity="one">%1$d गति डेटा</item>
+        <item quantity="other">%1$d गति डेटा</item>
+    </plurals>
+    <plurals name="p_c9ec2228f3">
+        <item quantity="one">%1$d विराम</item>
+        <item quantity="other">%1$d विराम</item>
+    </plurals>
+    <plurals name="p_de4636ae79">
+        <item quantity="one">%1$d कॉलम</item>
+        <item quantity="other">%1$d कॉलम</item>
+    </plurals>
+</resources>

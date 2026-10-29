@@ -2,6 +2,8 @@
 
 package dev.notai.tracker.android.ui
 
+
+import dev.notai.tracker.android.L
 import dev.notai.tracker.android.R
 
 import androidx.compose.ui.res.stringResource
@@ -39,6 +41,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun NotAiSheet(onDismiss: () -> Unit, fullHeight: Boolean = true, content: @Composable ColumnScope.() -> Unit) {
     val c = NotAi.colors
+    // A sheet is its own window: carry the chosen language and direction into it.
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val direction = androidx.compose.ui.platform.LocalLayoutDirection.current
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -46,17 +52,20 @@ fun NotAiSheet(onDismiss: () -> Unit, fullHeight: Boolean = true, content: @Comp
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         dragHandle = { Box(Modifier.padding(top = 10.dp, bottom = 8.dp).size(36.dp, 4.dp).clip(RoundedCornerShape(2.dp)).background(c.rule)) },
     ) {
-        Column(if (fullHeight) Modifier.fillMaxHeight(0.88f) else Modifier, content = content)
+        androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalContext provides context,
+            androidx.compose.ui.platform.LocalConfiguration provides configuration, androidx.compose.ui.platform.LocalLayoutDirection provides direction) {
+            Column(if (fullHeight) Modifier.fillMaxHeight(0.88f) else Modifier, content = content)
+        }
     }
 }
 
 @Composable
 fun SheetHeader(title: String, onClose: () -> Unit, back: (() -> Unit)? = null, extra: (@Composable () -> Unit)? = null) {
     Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).padding(start = if (back == null) 20.dp else 8.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        if (back != null) IconAction(Icon.ChevronLeft, "Назад", back, tint = NotAi.colors.ink)
+        if (back != null) IconAction(Icon.ChevronLeft, L.s(R.string.t_f6dab074d7), back, tint = NotAi.colors.ink)
         Text(title, Modifier.weight(1f), style = NotAi.type.sheetTitle, color = NotAi.colors.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
         extra?.invoke()
-        IconAction(Icon.Close, "Закрыть", onClose)
+        IconAction(Icon.Close, L.s(R.string.t_4ae50d3073), onClose)
     }
 }
 
@@ -72,7 +81,7 @@ fun SearchField(value: String, onChange: (String) -> Unit, placeholder: String, 
                 textStyle = NotAi.type.body.copy(color = c.ink), cursorBrush = SolidColor(c.amber),
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Search))
         }
-        if (value.isNotEmpty()) IconAction(Icon.Close, "Очистить", { onChange("") }, size = 16.dp)
+        if (value.isNotEmpty()) IconAction(Icon.Close, L.s(R.string.t_98b2073ed1), { onChange("") }, size = 16.dp)
     }
 }
 
@@ -135,42 +144,42 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
 
     NotAiSheet(onDismiss) {
         val title = when (effective) {
-            PickMode.START -> if (draft != null) "Новая запись из текста" else "Что начинаем?"
-            PickMode.SWITCH, PickMode.LABEL -> "Чем занят?"
-            PickMode.EARLIER -> "На что переключился?"
-            PickMode.FOCUS -> "Фокус: занятие"
-            PickMode.MANUAL -> "Занятие"
+            PickMode.START -> if (draft != null) L.s(R.string.t_8ff0d08fec) else L.s(R.string.t_dd15d6eecb)
+            PickMode.SWITCH, PickMode.LABEL -> L.s(R.string.t_ba2ec9712b)
+            PickMode.EARLIER -> L.s(R.string.t_3ac95324a3)
+            PickMode.FOCUS -> L.s(R.string.t_28061309a5)
+            PickMode.MANUAL -> L.s(R.string.t_70b8d5d8d5)
         }
         SheetHeader(if (parent != null && query.isBlank()) parent.label.title else title, onDismiss,
             back = if (parent != null && query.isBlank()) ({ stack = stack.dropLast(1) }) else null)
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (surfaceRoute == null && active && (mode == PickMode.SWITCH || mode == PickMode.LABEL)) {
-                Segmented(listOf(PickMode.SWITCH to "Начать новое", PickMode.LABEL to "Уточнить текущее"), effective, { effective = it })
-                Text(if (effective == PickMode.SWITCH) "Текущая запись закончится сейчас, новая начнётся с этой минуты."
-                     else "Название получит уже идущая запись. Начало остаётся ${startClock ?: "прежним"}.",
+                Segmented(listOf(PickMode.SWITCH to L.s(R.string.t_ad2b7927cc), PickMode.LABEL to L.s(R.string.t_ef5ff32a17)), effective, { effective = it })
+                Text(if (effective == PickMode.SWITCH) L.s(R.string.t_b20271fb06)
+                     else L.s(R.string.t_bdcd78489d, startClock ?: L.s(R.string.t_851c0ae977)),
                     style = NotAi.type.caption, color = c.ink2)
             }
             if (effective == PickMode.EARLIER && boundaryClock != null)
-                Text("До $boundaryClock остаётся текущее занятие, с $boundaryClock начнётся выбранное.", style = NotAi.type.caption, color = c.ink2)
+                Text(L.s(R.string.t_c67ba2d89b, boundaryClock, boundaryClock), style = NotAi.type.caption, color = c.ink2)
             draft?.note?.takeIf { surfaceRoute == null && onReturn == null && effective != PickMode.EARLIER }?.let { note ->
                 Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(c.amberWash).padding(start = 14.dp, top = 4.dp, bottom = 4.dp),
                     verticalAlignment = Alignment.CenterVertically) {
-                    Text("Заметка: «$note»", Modifier.weight(1f), style = NotAi.type.bodySmall, color = c.ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    IconAction(Icon.Close, "Убрать заметку", vm::dropDraft, size = 16.dp)
+                    Text(L.s(R.string.t_3e32dd6cfd, note), Modifier.weight(1f), style = NotAi.type.bodySmall, color = c.ink, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    IconAction(Icon.Close, L.s(R.string.t_b32615689f), vm::dropDraft, size = 16.dp)
                 }
             }
-            SearchField(query, { query = it }, "Найти или создать занятие", Modifier.padding(top = 4.dp))
+            SearchField(query, { query = it }, L.s(R.string.t_0087bd0bf7), Modifier.padding(top = 4.dp))
         }
         LazyColumn(Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 16.dp)) {
             when {
                 query.isNotBlank() -> {
-                    item { SectionLabel(if (results.isEmpty()) "Ничего не нашлось" else "Найдено", Modifier.padding(top = 14.dp, bottom = 4.dp)) }
+                    item { SectionLabel(if (results.isEmpty()) L.s(R.string.t_84f85ce506) else L.s(R.string.t_212edd982b), Modifier.padding(top = 14.dp, bottom = 4.dp)) }
                     items(results, key = { "r-" + it.entry.id }) { r -> ChoiceRow(r, ::pick, onEdit = editAction(r)) }
                     item {
                         Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).pressable({ create(query) }), verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             M3Icon(Icon.Plus, null, Modifier.size(16.dp), tint = c.amberInk)
-                            Text(if (parent != null && section != null) "Создать «${query.trim()}» в разделе «${parent.label.title}»" else "Создать занятие «${query.trim()}»",
+                            Text(if (parent != null && section != null) L.s(R.string.t_a2503487b7, query.trim(), parent.label.title) else L.s(R.string.t_67946fca81, query.trim()),
                                 style = NotAi.type.body.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
                         }
                     }
@@ -185,7 +194,7 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
                         ChoiceRow(ch, ::pick, onEdit = editAction(ch), categoryRoot = categoryRoot)
                     }
                     if (section != null) item(key = "own") {
-                        Text("Своё занятие в этом разделе: начни вводить название в поиске", Modifier.padding(vertical = 14.dp), style = NotAi.type.caption, color = c.ink2)
+                        Text(L.s(R.string.t_8241e9552e), Modifier.padding(vertical = 14.dp), style = NotAi.type.caption, color = c.ink2)
                     }
                 }
                 else -> {
@@ -196,8 +205,8 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
                             items(d.recents, key = { "h-" + it.entry.id }) { r ->
                                 val on = starred(r)
                                 ChoiceRow(r, ::pick, onEdit = editAction(r), trailing = {
-                                    if (on) IconAction(Icon.Star, "Убрать из избранного", { vm.removeFavorites(vm.favoriteIds(r.entry.selection)) }, tint = c.amber, size = 16.dp)
-                                    else IconAction(Icon.StarLine, "В избранное", { vm.saveFavorite(r.label.title, r.entry.selection) }, size = 16.dp)
+                                    if (on) IconAction(Icon.Star, L.s(R.string.t_d9f48a75fd), { vm.removeFavorites(vm.favoriteIds(r.entry.selection)) }, tint = c.amber, size = 16.dp)
+                                    else IconAction(Icon.StarLine, L.s(R.string.t_5da9e0e83b), { vm.saveFavorite(r.label.title, r.entry.selection) }, size = 16.dp)
                                 })
                             }
                         }
@@ -205,13 +214,13 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
                             item {
                                 Row(Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                                     SectionLabel(stringResource(R.string.editorial_tracker_draft_8a016df5c8f3d36a6ece_v0), Modifier.weight(1f))
-                                    Text("Порядок", Modifier.heightIn(min = 32.dp).pressable({ vm.openFavorites(true) }, label = "Порядок избранного").padding(horizontal = 4.dp, vertical = 6.dp),
+                                    Text(L.s(R.string.t_f6f1e5272f), Modifier.heightIn(min = 32.dp).pressable({ vm.openFavorites(true) }, label = L.s(R.string.t_750b471214)).padding(horizontal = 4.dp, vertical = 6.dp),
                                         style = NotAi.type.caption.copy(fontWeight = FontWeight.Medium), color = c.amberInk)
                                 }
                             }
                             items(d.favorites, key = { "f-" + it.entry.id }) { f ->
                                 ChoiceRow(f, ::pick, title = f.entry.title, onEdit = { vm.openEditor(EditTarget.Fav(f.entry.sourceId)) }, trailing = {
-                                    IconAction(Icon.Star, "Убрать из избранного", { vm.removeFavorite(f.entry.sourceId) }, tint = c.amber, size = 16.dp)
+                                    IconAction(Icon.Star, L.s(R.string.t_d9f48a75fd), { vm.removeFavorite(f.entry.sourceId) }, tint = c.amber, size = 16.dp)
                                 })
                             }
                         }
@@ -221,7 +230,7 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
                             if (showMore) items(d.moreAreas, key = { "m-" + it.entry.id }) { a -> ChoiceRow(a, ::pick, square = true) }
                             else item {
                                 Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).pressable({ showMore = true }), verticalAlignment = Alignment.CenterVertically) {
-                                    Text("Ещё ${d.moreAreas.size} областей: профессии и работа", style = NotAi.type.body, color = c.ink2)
+                                    Text(L.s(R.string.t_30e9845126, d.moreAreas.size), style = NotAi.type.body, color = c.ink2)
                                 }
                             }
                         }
@@ -231,7 +240,7 @@ fun PickerSheet(vm: TrackerViewModel, mode: PickMode, active: Boolean, startCloc
         }
         if (surfaceRoute == null && effective == PickMode.START && onReturn == null) {
             Hairline()
-            PillButton(if (draft != null) "Начать без занятия, с заметкой" else "Начать без занятия", {
+            PillButton(if (draft != null) L.s(R.string.t_20feaa7e40) else L.s(R.string.t_5c675dcb97), {
                 if (draft != null) vm.startDraftBlank() else vm.startBlank(); onDismiss()
             }, Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 20.dp))
         }
@@ -245,9 +254,9 @@ private fun ChoiceRow(item: PickerItem, onPick: (PickerItem) -> Unit, title: Str
     val group = !item.whole && (item.entry.availability == ChoiceAvailability.GROUP || (item.count ?: 0) > 0)
     val enabled = group || item.entry.canStart
     ListRow(title, detail = if (group || square || (item.whole && categoryRoot != null)) null else item.label.detailInCategory(categoryRoot),
-        subtitle = if (!enabled) "в архиве" else null,
+        subtitle = if (!enabled) L.s(R.string.t_5bb00e40b9) else null,
         onClick = { onPick(item) },
-        onLongClick = onEdit, longClickLabel = "Изменить",
+        onLongClick = onEdit, longClickLabel = L.s(R.string.t_9d809f884b),
         leading = { ActivityGlyph(item.label) },
         trailing = {
             if (trailing != null) trailing()

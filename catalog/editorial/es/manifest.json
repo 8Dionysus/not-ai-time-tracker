@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "catalogId": "tracker.catalog",
-  "catalogRevision": "0.9.2.0",
-  "catalogSha256": "aec8933181894f0c40679fe8a4b68b70083963d8b430785071efe275c03e156a",
+  "catalogRevision": "0.9.3.0",
+  "catalogSha256": "4a3505ad79e0c204137ef68e0835ef01a771736716cf508012008ff927418bc2",
   "localeTag": "es",
   "sourceLocaleTag": "ru",
   "release": "es-editorial-draft-2db9965c",
@@ -13,10 +13,10 @@
   "license": null,
   "rightsStatus": "source_rights_review_pending",
   "translator": "Spanish editorial candidate 2db9965c2aed877151ed3c84b864832c83ddd70101c4a862cc23b500e7f03093",
-  "editor": "Coordinator-reported independent semantic review; draft provenance retained",
+  "editor": "Coordinator-reported independent semantic review; draft provenance retained; Short activity names rewritten for 0.9.3.0 from the reviewed labels to match the short Russian names; the previous label is kept as an alias. Native review of the short names is pending.",
   "payload": {
     "file": "labels.json",
-    "bytes": 1265587,
-    "sha256": "d011f5d5d6d2ce4620c383235c1309f1d4f2578a175d381267f8581fe372cf47"
+    "bytes": 1312873,
+    "sha256": "1cdad360488d4f6489de46ded2ce96afe47720f792a94521fb0a28acc2438477"
   }
 }

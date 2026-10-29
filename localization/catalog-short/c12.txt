@@ -1,0 +1,140 @@
+1521 ‖ Jump rope ‖ Comba ‖ Corde à sauter ‖ Pular corda ‖ Seilspringen ‖ Salto con la corda ‖ نط الحبل ‖ 跳绳 ‖ 縄跳び ‖ 줄넘기 ‖ रस्सी कूद
+1522 ‖ Nordic walking ‖ Marcha nórdica ‖ Marche nordique ‖ Caminhada nórdica ‖ Nordic Walking ‖ Nordic walking ‖ المشي الاسكندنافي ‖ 北欧式健走 ‖ ノルディックウォーキング ‖ 노르딕 워킹 ‖ नॉर्डिक वॉकिंग
+1523 ‖ Mixed cardio ‖ Cardio mixto ‖ Cardio mixte ‖ Cardio misto ‖ Gemischtes Cardio ‖ Cardio misto ‖ تمارين قلب متنوعة ‖ 混合有氧 ‖ ミックス有酸素 ‖ 혼합 유산소 ‖ मिश्रित कार्डियो
+1524 ‖ Step aerobics ‖ Step ‖ Step ‖ Step ‖ Step-Aerobic ‖ Step ‖ أيروبكس الدرج ‖ 踏板操 ‖ ステップエアロ ‖ 스텝 에어로빅 ‖ स्टेप एरोबिक्स
+1525 ‖ Stair stepper ‖ Escaladora ‖ Stepper ‖ Simulador de escada ‖ Stepper ‖ Stepper ‖ جهاز الدرج ‖ 踏步机 ‖ ステッパー ‖ 스테퍼 ‖ स्टेपर
+1526 ‖ Track workout ‖ Entrenamiento en pista ‖ Séance sur piste ‖ Treino na pista ‖ Bahntraining ‖ Allenamento in pista ‖ تمرين في المضمار ‖ 田径场训练 ‖ トラック練習 ‖ 트랙 훈련 ‖ ट्रैक वर्कआउट
+1527 ‖ Walking workout ‖ Caminata de entrenamiento ‖ Marche d’entraînement ‖ Treino de caminhada ‖ Walking-Training ‖ Allenamento di camminata ‖ تمرين المشي ‖ 步行训练 ‖ ウォーキングトレーニング ‖ 걷기 운동 ‖ वॉकिंग वर्कआउट
+1528 ‖ Fitness game ‖ Juego de fitness ‖ Jeu fitness ‖ Jogo de fitness ‖ Fitnessspiel ‖ Gioco fitness ‖ لعبة لياقة ‖ 健身游戏 ‖ フィットネスゲーム ‖ 피트니스 게임 ‖ फ़िटनेस गेम
+1529 ‖ Fitness walking ‖ Marcha fitness ‖ Marche sportive ‖ Caminhada fitness ‖ Fitnesswalking ‖ Fitness walking ‖ مشي اللياقة ‖ 健身步行 ‖ フィットネスウォーキング ‖ 피트니스 걷기 ‖ फ़िटनेस वॉकिंग
+1530 ‖ Elliptical ‖ Elíptica ‖ Vélo elliptique ‖ Elíptico ‖ Crosstrainer ‖ Ellittica ‖ جهاز الإهليلجي ‖ 椭圆机 ‖ クロストレーナー ‖ 일립티컬 ‖ एलिप्टिकल
+1531 ‖ Rehabilitation ‖ Rehabilitación ‖ Rééducation ‖ Reabilitação ‖ Rehabilitation ‖ Riabilitazione ‖ إعادة التأهيل ‖ 康复训练 ‖ リハビリ ‖ 재활 ‖ पुनर्वास
+1532 ‖ Therapeutic exercise ‖ Ejercicio terapéutico ‖ Gymnastique médicale ‖ Exercício terapêutico ‖ Heilgymnastik ‖ Ginnastica terapeutica ‖ التمارين العلاجية ‖ 医疗体操 ‖ 運動療法 ‖ 운동 치료 ‖ चिकित्सीय व्यायाम
+1533 ‖ Balance ‖ Equilibrio ‖ Équilibre ‖ Equilíbrio ‖ Gleichgewicht ‖ Equilibrio ‖ التوازن ‖ 平衡训练 ‖ バランス ‖ 균형 ‖ संतुलन
+1534 ‖ Post-injury exercises ‖ Ejercicios tras una lesión ‖ Exercices après blessure ‖ Exercícios pós-lesão ‖ Übungen nach Verletzung ‖ Esercizi post-infortunio ‖ تمارين ما بعد الإصابة ‖ 伤后训练 ‖ ケガ後の運動 ‖ 부상 후 운동 ‖ चोट के बाद व्यायाम
+1535 ‖ Home physiotherapy ‖ Fisioterapia en casa ‖ Kiné à domicile ‖ Fisioterapia em casa ‖ Physiotherapie zu Hause ‖ Fisioterapia a casa ‖ العلاج الطبيعي في المنزل ‖ 居家理疗 ‖ 自宅での理学療法 ‖ 홈 물리치료 ‖ घर पर फ़िज़ियोथेरेपी
+1536 ‖ Strength and conditioning ‖ Fuerza y preparación física ‖ Force et préparation physique ‖ Força e condicionamento ‖ Kraft und Athletik ‖ Forza e preparazione fisica ‖ القوة واللياقة ‖ 力量与体能 ‖ 筋力と体力づくり ‖ 근력과 체력 ‖ ताक़त और कंडीशनिंग
+1537 ‖ Bodybuilding ‖ Culturismo ‖ Bodybuilding ‖ Fisiculturismo ‖ Bodybuilding ‖ Bodybuilding ‖ كمال الأجسام ‖ 健美 ‖ ボディビル ‖ 보디빌딩 ‖ बॉडीबिल्डिंग
+1538 ‖ Street workout ‖ Street workout ‖ Street workout ‖ Street workout ‖ Street Workout ‖ Street workout ‖ تمارين الساحات ‖ 户外器械健身 ‖ ストリートワークアウト ‖ 야외 맨몸운동 ‖ स्ट्रीट वर्कआउट
+1539 ‖ Calisthenics ‖ Calistenia ‖ Callisthénie ‖ Calistenia ‖ Calisthenics ‖ Calisthenics ‖ تمارين وزن الجسم ‖ 自重训练 ‖ 自重トレーニング ‖ 맨몸운동 ‖ कैलिस्थेनिक्स
+1540 ‖ CrossFit ‖ CrossFit ‖ CrossFit ‖ CrossFit ‖ CrossFit ‖ CrossFit ‖ الكروس فت ‖ 综合体能训练 ‖ クロスフィット ‖ 크로스핏 ‖ क्रॉसफ़िट
+1541 ‖ Core training ‖ Core ‖ Gainage ‖ Core ‖ Rumpftraining ‖ Core ‖ تمارين عضلات الجذع ‖ 核心训练 ‖ 体幹トレーニング ‖ 코어 운동 ‖ कोर ट्रेनिंग
+1542 ‖ Powerlifting ‖ Powerlifting ‖ Force athlétique ‖ Levantamento de peso básico ‖ Kraftdreikampf ‖ Powerlifting ‖ رفع الأثقال القوي ‖ 力量举 ‖ パワーリフティング ‖ 파워리프팅 ‖ पावरलिफ़्टिंग
+1543 ‖ Muscular endurance ‖ Resistencia muscular ‖ Endurance musculaire ‖ Resistência muscular ‖ Kraftausdauer ‖ Resistenza muscolare ‖ التحمل العضلي ‖ 肌肉耐力 ‖ 筋持久力 ‖ 근지구력 ‖ मांसपेशी सहनशक्ति
+1544 ‖ Station strength circuit ‖ Circuito de fuerza ‖ Circuit de musculation ‖ Circuito de força ‖ Kraftzirkel ‖ Circuito di forza ‖ تمارين القوة بالمحطات ‖ 力量循环训练 ‖ ステーション筋トレ ‖ 스테이션 근력 운동 ‖ स्टेशन शक्ति सर्किट
+1545 ‖ Weight machines ‖ Máquinas de fuerza ‖ Machines de musculation ‖ Aparelhos de musculação ‖ Kraftgeräte ‖ Macchine isotoniche ‖ أجهزة القوة ‖ 力量器械 ‖ マシントレーニング ‖ 근력 기구 ‖ वेट मशीनें
+1546 ‖ Strongman ‖ Strongman ‖ Strongman ‖ Strongman ‖ Strongman ‖ Strongman ‖ الرجل الحديدي ‖ 大力士 ‖ ストロングマン ‖ 스트롱맨 ‖ स्ट्रॉन्गमैन
+1547 ‖ Weightlifting ‖ Halterofilia ‖ Haltérophilie ‖ Levantamento olímpico ‖ Gewichtheben ‖ Sollevamento pesi ‖ رفع الأثقال ‖ 举重 ‖ ウエイトリフティング ‖ 역도 ‖ भारोत्तोलन
+1548 ‖ Functional training ‖ Entrenamiento funcional ‖ Entraînement fonctionnel ‖ Treino funcional ‖ Funktionelles Training ‖ Allenamento funzionale ‖ التدريب الوظيفي ‖ 功能性训练 ‖ ファンクショナルトレーニング ‖ 기능성 운동 ‖ फ़ंक्शनल ट्रेनिंग
+1549 ‖ Barbell, dumbbells and kettlebells ‖ Barra, mancuernas y pesas rusas ‖ Barre, haltères et kettlebells ‖ Barra, halteres e kettlebells ‖ Langhantel, Kurzhanteln und Kettlebells ‖ Bilanciere, manubri e kettlebell ‖ البار والدمبل والكيتل بل ‖ 杠铃、哑铃与壶铃 ‖ バーベル・ダンベル・ケトルベル ‖ 바벨·덤벨·케틀벨 ‖ बारबेल, डम्बल और केटलबेल
+1550 ‖ Creativity and crafts ‖ Creatividad y artesanía ‖ Création et artisanat ‖ Criação e artesanato ‖ Kreatives und Handwerk ‖ Creatività e artigianato ‖ الإبداع والحِرَف ‖ 创作与手工 ‖ 創作とクラフト ‖ 창작과 공예 ‖ रचनात्मकता और शिल्प
+1551 ‖ 3D, games and interactive ‖ 3D, juegos e interactivos ‖ 3D, jeux et interactif ‖ 3D, jogos e interativos ‖ 3D, Spiele und Interaktives ‖ 3D, giochi e interattivo ‖ ثلاثي الأبعاد والألعاب والتفاعل ‖ 3D、游戏与互动 ‖ 3D・ゲーム・インタラクティブ ‖ 3D·게임·인터랙티브 ‖ 3D, गेम और इंटरैक्टिव
+1552 ‖ 3D animation ‖ Animación 3D ‖ Animation 3D ‖ Animação 3D ‖ 3D-Animation ‖ Animazione 3D ‖ الرسوم المتحركة ثلاثية الأبعاد ‖ 3D 动画 ‖ 3Dアニメーション ‖ 3D 애니메이션 ‖ 3D एनीमेशन
+1553 ‖ 3D modeling and sculpting ‖ Modelado y escultura 3D ‖ Modélisation et sculpture 3D ‖ Modelagem e escultura 3D ‖ 3D-Modellierung und Sculpting ‖ Modellazione e scultura 3D ‖ النمذجة والنحت ثلاثي الأبعاد ‖ 3D 建模与雕刻 ‖ 3Dモデリングとスカルプト ‖ 3D 모델링과 스컬프팅 ‖ 3D मॉडलिंग और स्कल्प्टिंग
+1554 ‖ 3D simulation ‖ Simulación 3D ‖ Simulation 3D ‖ Simulação 3D ‖ 3D-Simulation ‖ Simulazione 3D ‖ المحاكاة ثلاثية الأبعاد ‖ 3D 模拟 ‖ 3Dシミュレーション ‖ 3D 시뮬레이션 ‖ 3D सिमुलेशन
+1555 ‖ UV unwrapping and textures ‖ Mapeado UV y texturas ‖ Dépliage UV et textures ‖ Mapeamento UV e texturas ‖ UV-Abwicklung und Texturen ‖ UV unwrap e texture ‖ فرد UV والخامات ‖ UV 展开与贴图 ‖ UV展開とテクスチャ ‖ UV 전개와 텍스처 ‖ UV अनरैपिंग और टेक्सचर
+1556 ‖ Game design ‖ Diseño de juegos ‖ Game design ‖ Game design ‖ Gamedesign ‖ Game design ‖ تصميم الألعاب ‖ 游戏设计 ‖ ゲームデザイン ‖ 게임 디자인 ‖ गेम डिज़ाइन
+1557 ‖ Level design ‖ Diseño de niveles ‖ Level design ‖ Design de níveis ‖ Leveldesign ‖ Level design ‖ تصميم المراحل ‖ 关卡设计 ‖ レベルデザイン ‖ 레벨 디자인 ‖ लेवल डिज़ाइन
+1558 ‖ Game prototype ‖ Prototipo de juego ‖ Prototype de jeu ‖ Protótipo de jogo ‖ Spielprototyp ‖ Prototipo di gioco ‖ نموذج أولي للعبة ‖ 游戏原型 ‖ ゲームのプロトタイプ ‖ 게임 프로토타입 ‖ गेम प्रोटोटाइप
+1559 ‖ Game assets ‖ Recursos de juego ‖ Assets de jeu ‖ Assets de jogo ‖ Spiel-Assets ‖ Asset di gioco ‖ أصول اللعبة ‖ 游戏素材 ‖ ゲームアセット ‖ 게임 에셋 ‖ गेम एसेट
+1560 ‖ Game dialogue and narrative ‖ Diálogos y narrativa de juego ‖ Dialogues et narration de jeu ‖ Diálogos e narrativa de jogo ‖ Spieldialoge und Erzählung ‖ Dialoghi e narrativa di gioco ‖ حوارات اللعبة وسردها ‖ 游戏对白与叙事 ‖ ゲームの会話とシナリオ ‖ 게임 대사와 서사 ‖ गेम संवाद और कथा
+1561 ‖ Game engine integration ‖ Integración en el motor ‖ Intégration au moteur de jeu ‖ Integração na engine ‖ Integration in die Engine ‖ Integrazione nel motore di gioco ‖ الدمج في محرك اللعبة ‖ 引擎集成 ‖ ゲームエンジンへの組み込み ‖ 게임 엔진 통합 ‖ गेम इंजन में जोड़ना
+1562 ‖ Interactive prototype ‖ Prototipo interactivo ‖ Prototype interactif ‖ Protótipo interativo ‖ Interaktiver Prototyp ‖ Prototipo interattivo ‖ نموذج أولي تفاعلي ‖ 交互原型 ‖ インタラクティブなプロトタイプ ‖ 인터랙티브 프로토타입 ‖ इंटरैक्टिव प्रोटोटाइप
+1563 ‖ Render compositing ‖ Composición del render ‖ Compositing du rendu ‖ Composição de render ‖ Render-Compositing ‖ Compositing del render ‖ تركيب لقطات العرض ‖ 渲染合成 ‖ レンダーのコンポジット ‖ 렌더 합성 ‖ रेंडर कंपोज़िटिंग
+1564 ‖ 3D object concept ‖ Concepto de objeto 3D ‖ Concept d’objet 3D ‖ Conceito de objeto 3D ‖ Konzept für 3D-Objekt ‖ Concept di oggetto 3D ‖ مفهوم مجسم ثلاثي الأبعاد ‖ 3D 物体概念设计 ‖ 3Dオブジェクトのコンセプト ‖ 3D 오브젝트 콘셉트 ‖ 3D ऑब्जेक्ट कॉन्सेप्ट
+1565 ‖ Creative coding ‖ Programación creativa ‖ Creative coding ‖ Programação criativa ‖ Creative Coding ‖ Creative coding ‖ البرمجة الإبداعية ‖ 创意编程 ‖ クリエイティブコーディング ‖ 크리에이티브 코딩 ‖ क्रिएटिव कोडिंग
+1566 ‖ Playtest ‖ Prueba de juego ‖ Playtest ‖ Playtest ‖ Playtest ‖ Playtest ‖ اختبار اللعب ‖ 试玩测试 ‖ テストプレイ ‖ 플레이테스트 ‖ प्लेटेस्ट
+1567 ‖ 3D print prep ‖ Preparación para impresión 3D ‖ Préparation à l’impression 3D ‖ Preparação para impressão 3D ‖ 3D-Druck vorbereiten ‖ Preparazione alla stampa 3D ‖ التحضير للطباعة ثلاثية الأبعاد ‖ 3D 打印准备 ‖ 3Dプリントの準備 ‖ 3D 프린팅 준비 ‖ 3D प्रिंट की तैयारी
+1568 ‖ Rigging ‖ Rigging ‖ Rigging ‖ Rigging ‖ Rigging ‖ Rigging ‖ التحريك الهيكلي ‖ 绑定 ‖ リギング ‖ 리깅 ‖ रिगिंग
+1569 ‖ Game build and release ‖ Compilación y lanzamiento del juego ‖ Build et sortie du jeu ‖ Build e lançamento do jogo ‖ Spiel bauen und veröffentlichen ‖ Build e rilascio del gioco ‖ بناء اللعبة وإصدارها ‖ 游戏构建与发布 ‖ ゲームのビルドとリリース ‖ 게임 빌드와 출시 ‖ गेम बिल्ड और रिलीज़
+1570 ‖ Lighting, camera and render ‖ Luz, cámara y render ‖ Lumière, caméra et rendu ‖ Luz, câmera e render ‖ Licht, Kamera und Rendering ‖ Luci, camera e render ‖ الإضاءة والكاميرا والعرض ‖ 灯光、摄像机与渲染 ‖ ライト・カメラ・レンダー ‖ 조명·카메라·렌더 ‖ लाइट, कैमरा और रेंडर
+1571 ‖ Testing an interactive product ‖ Probar un producto interactivo ‖ Tester un produit interactif ‖ Testar um produto interativo ‖ Interaktives Produkt testen ‖ Testare un prodotto interattivo ‖ اختبار منتج تفاعلي ‖ 测试互动产品 ‖ インタラクティブ製品のテスト ‖ 인터랙티브 제품 테스트 ‖ इंटरैक्टिव उत्पाद का परीक्षण
+1572 ‖ Video and animation ‖ Vídeo y animación ‖ Vidéo et animation ‖ Vídeo e animação ‖ Video und Animation ‖ Video e animazione ‖ الفيديو والرسوم المتحركة ‖ 视频与动画 ‖ 映像とアニメーション ‖ 영상과 애니메이션 ‖ वीडियो और एनीमेशन
+1573 ‖ 2D animation ‖ Animación 2D ‖ Animation 2D ‖ Animação 2D ‖ 2D-Animation ‖ Animazione 2D ‖ الرسوم المتحركة ثنائية الأبعاد ‖ 2D 动画 ‖ 2Dアニメーション ‖ 2D 애니메이션 ‖ 2D एनीमेशन
+1574 ‖ 3D animation for video ‖ Animación 3D para vídeo ‖ Animation 3D pour la vidéo ‖ Animação 3D para vídeo ‖ 3D-Animation für Video ‖ Animazione 3D per video ‖ رسوم ثلاثية الأبعاد للفيديو ‖ 视频 3D 动画 ‖ 映像用3Dアニメーション ‖ 영상용 3D 애니메이션 ‖ वीडियो के लिए 3D एनीमेशन
+1575 ‖ Project and source archive ‖ Archivo del proyecto y fuentes ‖ Archivage du projet et des sources ‖ Arquivo do projeto e fontes ‖ Projekt und Quelldateien archivieren ‖ Archivio di progetto e sorgenti ‖ أرشفة المشروع والمصادر ‖ 归档项目与素材 ‖ プロジェクトと素材のアーカイブ ‖ 프로젝트·원본 보관 ‖ प्रोजेक्ट और स्रोत संग्रह
+1576 ‖ VFX and compositing ‖ Efectos visuales y composición ‖ Effets visuels et compositing ‖ Efeitos visuais e composição ‖ VFX und Compositing ‖ Effetti visivi e compositing ‖ المؤثرات البصرية والتركيب ‖ 视效与合成 ‖ VFXとコンポジット ‖ VFX와 합성 ‖ VFX और कंपोज़िटिंग
+1577 ‖ Sound for video ‖ Sonido para vídeo ‖ Son pour la vidéo ‖ Som para vídeo ‖ Ton für Video ‖ Audio per video ‖ الصوت للفيديو ‖ 视频音效 ‖ 映像の音 ‖ 영상 사운드 ‖ वीडियो के लिए ध्वनि
+1578 ‖ Video or film concept ‖ Concepto de vídeo o película ‖ Concept de vidéo ou de film ‖ Conceito de vídeo ou filme ‖ Video- oder Filmkonzept ‖ Concept di video o film ‖ فكرة فيديو أو فيلم ‖ 视频或电影构思 ‖ 動画・映画の企画 ‖ 영상·영화 콘셉트 ‖ वीडियो या फ़िल्म की अवधारणा
+1579 ‖ Video editing ‖ Edición de vídeo ‖ Montage vidéo ‖ Edição de vídeo ‖ Videoschnitt ‖ Montaggio video ‖ مونتاج الفيديو ‖ 视频剪辑 ‖ 動画編集 ‖ 영상 편집 ‖ वीडियो एडिटिंग
+1580 ‖ Selecting takes ‖ Selección de tomas ‖ Choix des prises ‖ Seleção de takes ‖ Takes auswählen ‖ Scelta delle riprese ‖ اختيار اللقطات ‖ 选片 ‖ テイク選び ‖ 테이크 선별 ‖ टेक चुनना
+1581 ‖ Footage transfer and backup ‖ Copia y respaldo del material ‖ Transfert et sauvegarde des rushes ‖ Transferência e backup do material ‖ Material übertragen und sichern ‖ Trasferimento e backup del girato ‖ نقل المواد ونسخها احتياطيًا ‖ 素材转存与备份 ‖ 素材の取り込みとバックアップ ‖ 소스 복사·백업 ‖ फ़ुटेज ट्रांसफ़र और बैकअप
+1582 ‖ Shoot planning ‖ Planificación del rodaje ‖ Préparation du tournage ‖ Planejamento da filmagem ‖ Drehplanung ‖ Pianificazione delle riprese ‖ التخطيط للتصوير ‖ 拍摄计划 ‖ 撮影計画 ‖ 촬영 계획 ‖ शूट की योजना
+1583 ‖ Shoot research and location ‖ Preparación del rodaje: tema y lugar ‖ Repérages et recherches ‖ Pesquisa e locação ‖ Recherche und Drehort ‖ Ricerca e location ‖ البحث وموقع التصوير ‖ 拍摄调研与选址 ‖ 撮影の下調べとロケハン ‖ 촬영 조사와 장소 ‖ शूट शोध और लोकेशन
+1584 ‖ Video production ‖ Producción de vídeo ‖ Production vidéo ‖ Produção de vídeo ‖ Videoproduktion ‖ Produzione video ‖ إنتاج الفيديو ‖ 视频制片 ‖ 映像の制作進行 ‖ 영상 제작 관리 ‖ वीडियो प्रोडक्शन
+1585 ‖ Cut review and notes ‖ Revisión del montaje y notas ‖ Visionnage du montage et notes ‖ Revisão do corte e notas ‖ Schnittabnahme und Notizen ‖ Revisione del montaggio e note ‖ مراجعة المونتاج والملاحظات ‖ 审片与批注 ‖ 編集のチェックとコメント ‖ 편집본 검토와 코멘트 ‖ कट की समीक्षा और टिप्पणियाँ
+1586 ‖ Publishing video ‖ Publicar vídeo ‖ Publier une vidéo ‖ Publicar vídeo ‖ Video veröffentlichen ‖ Pubblicare video ‖ نشر الفيديو ‖ 发布视频 ‖ 動画の公開 ‖ 영상 게시 ‖ वीडियो प्रकाशित करना
+1587 ‖ Storyboard ‖ Guion gráfico ‖ Storyboard ‖ Storyboard ‖ Storyboard ‖ Storyboard ‖ القصة المصورة ‖ 分镜 ‖ 絵コンテ ‖ 스토리보드 ‖ स्टोरीबोर्ड
+1588 ‖ Directing on set ‖ Dirección en rodaje ‖ Réalisation sur le plateau ‖ Direção no set ‖ Regie am Set ‖ Regia sul set ‖ الإخراج في موقع التصوير ‖ 现场导演 ‖ 撮影現場の演出 ‖ 현장 연출 ‖ सेट पर निर्देशन
+1589 ‖ Subtitles ‖ Subtítulos ‖ Sous-titres ‖ Legendas ‖ Untertitel ‖ Sottotitoli ‖ الترجمة المرئية ‖ 字幕 ‖ 字幕 ‖ 자막 ‖ उपशीर्षक
+1590 ‖ Video script ‖ Guion de vídeo ‖ Script vidéo ‖ Roteiro de vídeo ‖ Videoskript ‖ Sceneggiatura video ‖ نص الفيديو ‖ 视频脚本 ‖ 動画の台本 ‖ 영상 대본 ‖ वीडियो स्क्रिप्ट
+1591 ‖ Filming ‖ Grabación de vídeo ‖ Tournage vidéo ‖ Filmagem ‖ Filmen ‖ Riprese video ‖ تصوير الفيديو ‖ 拍摄视频 ‖ 動画撮影 ‖ 영상 촬영 ‖ वीडियो शूटिंग
+1592 ‖ Titles and motion graphics ‖ Títulos y motion graphics ‖ Titres et motion design ‖ Títulos e motion graphics ‖ Titel und Motion Graphics ‖ Titoli e motion graphics ‖ العناوين والرسوم المتحركة ‖ 字幕与动态图形 ‖ タイトルとモーショングラフィックス ‖ 타이틀과 모션그래픽 ‖ टाइटल और मोशन ग्राफ़िक्स
+1593 ‖ Color grading ‖ Etalonaje ‖ Étalonnage ‖ Correção de cor ‖ Farbkorrektur ‖ Color grading ‖ تصحيح الألوان ‖ 调色 ‖ カラーグレーディング ‖ 색 보정 ‖ कलर ग्रेडिंग
+1594 ‖ Video export and delivery ‖ Exportar y entregar el vídeo ‖ Export et livraison vidéo ‖ Exportação e entrega do vídeo ‖ Video exportieren und abgeben ‖ Esportazione e consegna del video ‖ تصدير الفيديو وتسليمه ‖ 导出与交付视频 ‖ 動画の書き出しと納品 ‖ 영상 내보내기와 납품 ‖ वीडियो एक्सपोर्ट और डिलीवरी
+1595 ‖ Computer audio and music ‖ Audio y música en el ordenador ‖ Son et musique sur ordinateur ‖ Áudio e música no computador ‖ Audio und Musik am Computer ‖ Audio e musica al computer ‖ الصوت والموسيقى على الحاسوب ‖ 电脑音频与音乐 ‖ PCでの音と音楽 ‖ 컴퓨터 오디오와 음악 ‖ कंप्यूटर पर ऑडियो और संगीत
+1596 ‖ Arranging ‖ Arreglos ‖ Arrangement ‖ Arranjo ‖ Arrangement ‖ Arrangiamento ‖ التوزيع الموسيقي ‖ 编曲 ‖ アレンジ ‖ 편곡 ‖ संगीत संयोजन
+1597 ‖ Audio release ‖ Lanzamiento de audio ‖ Sortie audio ‖ Lançamento de áudio ‖ Audio-Release ‖ Uscita audio ‖ إصدار صوتي ‖ 音频发行 ‖ 音源のリリース ‖ 음원 발매 ‖ ऑडियो रिलीज़
+1598 ‖ Conducting ‖ Dirección de orquesta ‖ Direction d’orchestre ‖ Regência ‖ Dirigieren ‖ Direzione d’orchestra ‖ قيادة الأوركسترا ‖ 指挥 ‖ 指揮 ‖ 지휘 ‖ संचालन
+1599 ‖ Audio recording ‖ Grabación de audio ‖ Enregistrement audio ‖ Gravação de áudio ‖ Audioaufnahme ‖ Registrazione audio ‖ التسجيل الصوتي ‖ 录音 ‖ 録音 ‖ 녹음 ‖ ऑडियो रिकॉर्डिंग
+1600 ‖ Recording a talk or podcast ‖ Grabar una charla o pódcast ‖ Enregistrer une discussion ou un podcast ‖ Gravar conversa ou podcast ‖ Gespräch oder Podcast aufnehmen ‖ Registrare una conversazione o un podcast ‖ تسجيل حوار أو بودكاست ‖ 录制对谈或播客 ‖ 対談・ポッドキャストの収録 ‖ 대화·팟캐스트 녹음 ‖ बातचीत या पॉडकास्ट रिकॉर्ड करना
+1601 ‖ Sound effects ‖ Efectos de sonido ‖ Effets sonores ‖ Efeitos sonoros ‖ Soundeffekte ‖ Effetti sonori ‖ المؤثرات الصوتية ‖ 音效 ‖ 効果音 ‖ 효과음 ‖ ध्वनि प्रभाव
+1602 ‖ Composing ‖ Composición ‖ Composition ‖ Composição ‖ Komponieren ‖ Composizione ‖ التأليف الموسيقي ‖ 作曲 ‖ 作曲 ‖ 작곡 ‖ संगीत रचना
+1603 ‖ Mastering ‖ Masterización ‖ Mastering ‖ Masterização ‖ Mastering ‖ Mastering ‖ الماسترينغ ‖ 母带处理 ‖ マスタリング ‖ 마스터링 ‖ मास्टरिंग
+1604 ‖ Podcast editing ‖ Edición de pódcast ‖ Montage de podcast ‖ Edição de podcast ‖ Podcastschnitt ‖ Montaggio del podcast ‖ مونتاج البودكاست ‖ 播客剪辑 ‖ ポッドキャストの編集 ‖ 팟캐스트 편집 ‖ पॉडकास्ट एडिटिंग
+1605 ‖ Podcast topic research ‖ Preparar el tema del pódcast ‖ Préparer le sujet du podcast ‖ Pesquisa de pauta do podcast ‖ Podcastthema recherchieren ‖ Preparare il tema del podcast ‖ تحضير موضوع البودكاست ‖ 播客选题调研 ‖ ポッドキャストのテーマ調べ ‖ 팟캐스트 주제 조사 ‖ पॉडकास्ट विषय पर शोध
+1606 ‖ Instrument or vocal practice ‖ Práctica de instrumento o canto ‖ Pratique d’un instrument ou du chant ‖ Prática de instrumento ou canto ‖ Instrument oder Gesang üben ‖ Pratica di strumento o canto ‖ التدرب على آلة أو الغناء ‖ 乐器或声乐练习 ‖ 楽器・ボーカルの練習 ‖ 악기·보컬 연습 ‖ वाद्य या गायन अभ्यास
+1607 ‖ Audio editing ‖ Edición de audio ‖ Montage audio ‖ Edição de áudio ‖ Audiobearbeitung ‖ Editing audio ‖ تحرير الصوت ‖ 音频编辑 ‖ 音声編集 ‖ 오디오 편집 ‖ ऑडियो एडिटिंग
+1608 ‖ Rehearsal ‖ Ensayo ‖ Répétition ‖ Ensaio ‖ Probe ‖ Prove ‖ البروفة ‖ 排练 ‖ リハーサル ‖ 리허설 ‖ रिहर्सल
+1609 ‖ Mixing ‖ Mezcla ‖ Mixage ‖ Mixagem ‖ Mischen ‖ Mixaggio ‖ مزج المسارات ‖ 混音 ‖ ミキシング ‖ 믹싱 ‖ मिक्सिंग
+1610 ‖ Podcast script ‖ Guion de pódcast ‖ Script de podcast ‖ Roteiro de podcast ‖ Podcastskript ‖ Scaletta del podcast ‖ نص البودكاست ‖ 播客脚本 ‖ ポッドキャストの台本 ‖ 팟캐스트 대본 ‖ पॉडकास्ट स्क्रिप्ट
+1611 ‖ Visual arts ‖ Artes visuales ‖ Arts visuels ‖ Artes visuais ‖ Bildende Kunst ‖ Arti visive ‖ الفنون البصرية ‖ 视觉艺术 ‖ 美術 ‖ 시각 예술 ‖ दृश्य कला
+1612 ‖ Videography ‖ Videografía ‖ Vidéographie ‖ Videografia ‖ Videografie ‖ Videografia ‖ التصوير بالفيديو ‖ 摄像 ‖ ビデオ撮影 ‖ 영상 촬영 ‖ वीडियोग्राफ़ी
+1613 ‖ Graphic design and posters ‖ Diseño gráfico y carteles ‖ Graphisme et affiches ‖ Design gráfico e cartazes ‖ Grafikdesign und Plakate ‖ Grafica e poster ‖ التصميم الجرافيكي والملصقات ‖ 平面设计与海报 ‖ グラフィックデザインとポスター ‖ 그래픽 디자인과 포스터 ‖ ग्राफ़िक डिज़ाइन और पोस्टर
+1614 ‖ Painting ‖ Pintura ‖ Peinture ‖ Pintura ‖ Malerei ‖ Pittura ‖ الرسم بالألوان ‖ 绘画 ‖ 絵画 ‖ 그림 그리기 ‖ चित्रकारी
+1615 ‖ Illustration ‖ Ilustración ‖ Illustration ‖ Ilustração ‖ Illustration ‖ Illustrazione ‖ الرسم التوضيحي ‖ 插画 ‖ イラスト ‖ 일러스트 ‖ चित्रण
+1616 ‖ Calligraphy and lettering ‖ Caligrafía y lettering ‖ Calligraphie et lettering ‖ Caligrafia e lettering ‖ Kalligrafie und Lettering ‖ Calligrafia e lettering ‖ الخط والكتابة الفنية ‖ 书法与字体设计 ‖ カリグラフィーとレタリング ‖ 캘리그래피와 레터링 ‖ सुलेख और लेटरिंग
+1617 ‖ Collage and scrapbooking ‖ Collage y scrapbooking ‖ Collage et scrapbooking ‖ Colagem e scrapbooking ‖ Collage und Scrapbooking ‖ Collage e scrapbooking ‖ الكولاج وألبومات القصاصات ‖ 拼贴与手账 ‖ コラージュとスクラップブック ‖ 콜라주와 스크랩북 ‖ कोलाज और स्क्रैपबुकिंग
+1618 ‖ Video editing and grading ‖ Montaje y etalonaje de vídeo ‖ Montage et étalonnage vidéo ‖ Edição e cor de vídeo ‖ Videoschnitt und Farbkorrektur ‖ Montaggio e color grading ‖ مونتاج الفيديو وتصحيح ألوانه ‖ 视频剪辑与调色 ‖ 動画編集とカラー補正 ‖ 영상 편집과 색 보정 ‖ वीडियो एडिटिंग और कलर ग्रेडिंग
+1619 ‖ Photo editing ‖ Edición de fotos ‖ Retouche photo ‖ Edição de fotos ‖ Fotobearbeitung ‖ Fotoritocco ‖ تعديل الصور ‖ 修图 ‖ 写真の編集 ‖ 사진 보정 ‖ फ़ोटो एडिटिंग
+1620 ‖ Printmaking and linocut ‖ Grabado y linograbado ‖ Gravure et linogravure ‖ Gravura e linoleogravura ‖ Druckgrafik und Linolschnitt ‖ Incisione e linoleografia ‖ الطباعة الفنية والحفر على اللينوليوم ‖ 版画与麻胶版画 ‖ 版画とリノカット ‖ 판화와 리놀컷 ‖ प्रिंटमेकिंग और लिनोकट
+1621 ‖ Film photography ‖ Fotografía analógica ‖ Photo argentique ‖ Fotografia analógica ‖ Analogfotografie ‖ Fotografia analogica ‖ التصوير بالفيلم ‖ 胶片摄影 ‖ フィルム写真 ‖ 필름 사진 ‖ फ़िल्म फ़ोटोग्राफ़ी
+1622 ‖ Stop motion ‖ Stop motion ‖ Stop motion ‖ Stop motion ‖ Stop-Motion ‖ Stop motion ‖ تحريك الإطارات ‖ 定格动画 ‖ コマ撮りアニメ ‖ 스톱모션 ‖ स्टॉप मोशन
+1623 ‖ Developing and printing photos ‖ Revelado y copias de fotos ‖ Développement et tirage photo ‖ Revelação e ampliação de fotos ‖ Fotos entwickeln und abziehen ‖ Sviluppo e stampa di foto ‖ تحميض الصور وطباعتها ‖ 冲洗与冲印照片 ‖ 写真の現像とプリント ‖ 사진 현상과 인화 ‖ फ़ोटो डेवलप और प्रिंट करना
+1624 ‖ Drawing and sketching ‖ Dibujo y bocetos ‖ Dessin et croquis ‖ Desenho e esboço ‖ Zeichnen und Skizzieren ‖ Disegno e schizzi ‖ الرسم والتخطيط ‖ 素描与速写 ‖ デッサンとスケッチ ‖ 드로잉과 스케치 ‖ ड्रॉइंग और स्केचिंग
+1625 ‖ Making comics ‖ Hacer cómics ‖ Création de BD ‖ Criação de quadrinhos ‖ Comics zeichnen ‖ Creare fumetti ‖ رسم القصص المصورة ‖ 创作漫画 ‖ 漫画制作 ‖ 만화 그리기 ‖ कॉमिक्स बनाना
+1626 ‖ Photography ‖ Fotografía ‖ Photographie ‖ Fotografia ‖ Fotografie ‖ Fotografia ‖ التصوير الفوتوغرافي ‖ 摄影 ‖ 写真 ‖ 사진 ‖ फ़ोटोग्राफ़ी
+1627 ‖ Digital 3D sculpture ‖ Escultura digital 3D ‖ Sculpture numérique 3D ‖ Escultura digital 3D ‖ Digitale 3D-Skulptur ‖ Scultura digitale 3D ‖ النحت الرقمي ثلاثي الأبعاد ‖ 数字 3D 雕刻 ‖ デジタル3D彫刻 ‖ 디지털 3D 조각 ‖ डिजिटल 3D मूर्तिकला
+1628 ‖ Digital drawing ‖ Dibujo digital ‖ Dessin numérique ‖ Desenho digital ‖ Digitales Zeichnen ‖ Disegno digitale ‖ الرسم الرقمي ‖ 数字绘画 ‖ デジタルイラスト ‖ 디지털 드로잉 ‖ डिजिटल ड्रॉइंग
+1629 ‖ Collecting ‖ Coleccionismo ‖ Collection ‖ Colecionismo ‖ Sammeln ‖ Collezionismo ‖ جمع المقتنيات ‖ 收藏 ‖ コレクション ‖ 수집 ‖ संग्रह करना
+1630 ‖ Collection ‖ Colección ‖ Collection ‖ Coleção ‖ Sammlung ‖ Collezione ‖ المجموعة ‖ 藏品整理 ‖ コレクションの整理 ‖ 컬렉션 ‖ संग्रह
+1631 ‖ Sculpting, ceramics and materials ‖ Modelado, cerámica y materiales ‖ Modelage, céramique et matières ‖ Modelagem, cerâmica e materiais ‖ Modellieren, Keramik und Materialien ‖ Modellato, ceramica e materiali ‖ النحت والخزف والمواد ‖ 雕塑、陶艺与材料 ‖ 造形・陶芸・素材 ‖ 조형·도예·재료 ‖ मूर्तिकला, सिरेमिक और सामग्री
+1632 ‖ Pottery and ceramics ‖ Alfarería y cerámica ‖ Poterie et céramique ‖ Cerâmica ‖ Töpfern und Keramik ‖ Ceramica ‖ الفخار والخزف ‖ 陶艺 ‖ 陶芸 ‖ 도예 ‖ मिट्टी के बर्तन और सिरेमिक
+1633 ‖ Leathercraft ‖ Marroquinería ‖ Maroquinerie ‖ Artigos de couro ‖ Lederarbeiten ‖ Pelletteria ‖ المصنوعات الجلدية ‖ 皮具制作 ‖ レザークラフト ‖ 가죽 공예 ‖ चमड़े का काम
+1634 ‖ Modeling and sculpture ‖ Modelado y escultura ‖ Modelage et sculpture ‖ Modelagem e escultura ‖ Modellieren und Bildhauen ‖ Modellato e scultura ‖ التشكيل والنحت ‖ 泥塑与雕塑 ‖ 粘土細工と彫刻 ‖ 조소와 조각 ‖ मूर्ति बनाना
+1635 ‖ Models and miniatures ‖ Maquetas y miniaturas ‖ Maquettes et miniatures ‖ Maquetes e miniaturas ‖ Modelle und Miniaturen ‖ Modellini e miniature ‖ المجسمات والمصغرات ‖ 模型与微缩 ‖ 模型とミニチュア ‖ 모형과 미니어처 ‖ मॉडल और लघु रूप
+1636 ‖ Scale models and dioramas ‖ Modelismo y dioramas ‖ Modèles réduits et dioramas ‖ Modelismo e dioramas ‖ Modellbau und Dioramen ‖ Modellismo e diorami ‖ النماذج المصغرة والديوراما ‖ 比例模型与场景 ‖ スケールモデルとジオラマ ‖ 스케일 모델과 디오라마 ‖ स्केल मॉडल और डायोरामा
+1637 ‖ Metalwork and blacksmithing ‖ Metal y forja ‖ Métal et forge ‖ Metal e ferraria ‖ Metallarbeit und Schmieden ‖ Metallo e forgiatura ‖ الأعمال المعدنية والحدادة ‖ 金工与锻造 ‖ 金工と鍛冶 ‖ 금속 공예와 대장일 ‖ धातु और लोहारी
+1638 ‖ Mosaic ‖ Mosaico ‖ Mosaïque ‖ Mosaico ‖ Mosaik ‖ Mosaico ‖ الفسيفساء ‖ 马赛克 ‖ モザイク ‖ 모자이크 ‖ मोज़ेक
+1639 ‖ Origami and paper crafts ‖ Origami y manualidades de papel ‖ Origami et papier ‖ Origami e papel ‖ Origami und Papierbasteln ‖ Origami e carta ‖ الأوريغامي وحرف الورق ‖ 折纸与纸艺 ‖ 折り紙とペーパークラフト ‖ 종이접기와 페이퍼 크래프트 ‖ ओरिगामी और काग़ज़ शिल्प
+1640 ‖ Bookbinding ‖ Encuadernación ‖ Reliure ‖ Encadernação ‖ Buchbinden ‖ Legatoria ‖ تجليد الكتب ‖ 书籍装订 ‖ 製本 ‖ 제본 ‖ जिल्दसाज़ी
+1641 ‖ Carving ‖ Tallado ‖ Sculpture sur matière ‖ Entalhe ‖ Schnitzen ‖ Intaglio ‖ النقش ‖ 雕刻 ‖ 彫り物 ‖ 조각 ‖ नक़्क़ाशी
+1642 ‖ Wood carving ‖ Talla en madera ‖ Sculpture sur bois ‖ Entalhe em madeira ‖ Holzschnitzen ‖ Intaglio del legno ‖ النحت على الخشب ‖ 木雕 ‖ 木彫 ‖ 목각 ‖ लकड़ी पर नक़्क़ाशी
+1643 ‖ Props ‖ Atrezo ‖ Accessoires ‖ Adereços ‖ Requisiten ‖ Oggetti di scena ‖ الإكسسوارات المسرحية ‖ 道具制作 ‖ 小道具 ‖ 소품 ‖ प्रॉप्स
+1644 ‖ Furniture restoration ‖ Restauración de muebles ‖ Restauration de meubles ‖ Restauração de móveis ‖ Möbelrestaurierung ‖ Restauro di mobili ‖ ترميم الأثاث ‖ 家具修复 ‖ 家具の修復 ‖ 가구 복원 ‖ फ़र्नीचर बहाली
+1645 ‖ Assembling and painting miniatures ‖ Montar y pintar miniaturas ‖ Montage et peinture de figurines ‖ Montar e pintar miniaturas ‖ Miniaturen bauen und bemalen ‖ Montare e dipingere miniature ‖ تجميع المصغرات وتلوينها ‖ 拼装与涂装模型 ‖ ミニチュアの組立と塗装 ‖ 미니어처 조립·도색 ‖ लघु मॉडल जोड़ना और रंगना
+1646 ‖ Handmade candles, soap and paper ‖ Velas, jabón y papel artesanales ‖ Bougies, savons et papier artisanaux ‖ Velas, sabão e papel artesanais ‖ Kerzen, Seife und Papier selbst machen ‖ Candele, sapone e carta artigianali ‖ الشموع والصابون والورق اليدوي ‖ 手工蜡烛、肥皂与纸 ‖ 手作りのキャンドル・石けん・紙 ‖ 수제 초·비누·종이 ‖ हस्तनिर्मित मोमबत्ती, साबुन और काग़ज़
+1647 ‖ Glass and stained glass ‖ Vidrio y vidrieras ‖ Verre et vitrail ‖ Vidro e vitral ‖ Glas und Glasmalerei ‖ Vetro e vetrate ‖ الزجاج والزجاج المعشق ‖ 玻璃与彩色玻璃 ‖ ガラスとステンドグラス ‖ 유리와 스테인드글라스 ‖ काँच और रंगीन काँच
+1648 ‖ Woodworking ‖ Carpintería ‖ Menuiserie ‖ Marcenaria ‖ Tischlern ‖ Falegnameria ‖ النجارة ‖ 木工 ‖ 木工 ‖ 목공 ‖ बढ़ईगिरी
+1649 ‖ Wood turning ‖ Torneado de madera ‖ Tournage sur bois ‖ Torneamento de madeira ‖ Drechseln ‖ Tornitura del legno ‖ الخراطة الخشبية ‖ 木工车削 ‖ 木工旋盤 ‖ 목선반 ‖ लकड़ी की ख़रादी
+1650 ‖ Jewelry and beading ‖ Joyería y abalorios ‖ Bijoux et perles ‖ Bijuteria e miçangas ‖ Schmuck und Perlen ‖ Gioielli e perline ‖ المجوهرات والخرز ‖ 首饰与串珠 ‖ アクセサリーとビーズ ‖ 액세서리와 비즈 ‖ गहने और मोती का काम
+1651 ‖ Workshop and repairs ‖ Taller y arreglos ‖ Atelier et réparations ‖ Oficina e consertos ‖ Werkstatt und Reparaturen ‖ Laboratorio e riparazioni ‖ الورشة والتصليح ‖ 工坊与修理 ‖ 工作と修理 ‖ 작업실과 수리 ‖ वर्कशॉप और मरम्मत
+1652 ‖ 3D modeling and CAD ‖ Modelado 3D y CAD ‖ Modélisation 3D et CAO ‖ Modelagem 3D e CAD ‖ 3D-Modellierung und CAD ‖ Modellazione 3D e CAD ‖ النمذجة ثلاثية الأبعاد والتصميم بالحاسوب ‖ 3D 建模与 CAD ‖ 3DモデリングとCAD ‖ 3D 모델링과 CAD ‖ 3D मॉडलिंग और CAD
+1653 ‖ 3D printing ‖ Impresión 3D ‖ Impression 3D ‖ Impressão 3D ‖ 3D-Druck ‖ Stampa 3D ‖ الطباعة ثلاثية الأبعاد ‖ 3D 打印 ‖ 3Dプリント ‖ 3D 프린팅 ‖ 3D प्रिंटिंग
+1654 ‖ Woodworking projects ‖ Trabajo en madera ‖ Travail du bois ‖ Trabalho em madeira ‖ Holzbearbeitung ‖ Lavorazione del legno ‖ أشغال الخشب ‖ 木工制作 ‖ 木工作 ‖ 목공 작업 ‖ लकड़ी का काम
+1655 ‖ DIY home project ‖ Proyecto casero de bricolaje ‖ Projet de bricolage ‖ Projeto faça-você-mesmo ‖ Heimwerkerprojekt ‖ Progetto fai da te ‖ مشروع منزلي بيدي ‖ 家庭 DIY 项目 ‖ 家のDIY ‖ 집 DIY 프로젝트 ‖ घर का DIY प्रोजेक्ट
+1656 ‖ Home lab ‖ Laboratorio en casa ‖ Labo maison ‖ Laboratório em casa ‖ Heimlabor ‖ Laboratorio domestico ‖ المختبر المنزلي ‖ 家庭实验室 ‖ 自宅ラボ ‖ 홈 랩 ‖ घरेलू प्रयोगशाला
+1657 ‖ Maker project ‖ Proyecto maker ‖ Projet maker ‖ Projeto maker ‖ Maker-Projekt ‖ Progetto maker ‖ مشروع صناعة يدوية ‖ 创客项目 ‖ メイカープロジェクト ‖ 메이커 프로젝트 ‖ मेकर प्रोजेक्ट
+1658 ‖ Microcontrollers ‖ Microcontroladores ‖ Microcontrôleurs ‖ Microcontroladores ‖ Mikrocontroller ‖ Microcontrollori ‖ المتحكمات الدقيقة ‖ 单片机 ‖ マイコン ‖ 마이크로컨트롤러 ‖ माइक्रोकंट्रोलर
+1659 ‖ Bike maintenance ‖ Mantenimiento de la bici ‖ Entretien du vélo ‖ Manutenção da bike ‖ Fahrradwartung ‖ Manutenzione della bici ‖ صيانة الدراجة ‖ 自行车保养 ‖ 自転車の整備 ‖ 자전거 정비 ‖ साइकिल रखरखाव
+1660 ‖ Upcycling ‖ Reciclaje creativo ‖ Upcycling ‖ Upcycling ‖ Upcycling ‖ Upcycling ‖ إعادة تدوير الأغراض ‖ 旧物改造 ‖ リメイク ‖ 업사이클링 ‖ पुरानी चीज़ों का नया रूप

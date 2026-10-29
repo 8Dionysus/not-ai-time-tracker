@@ -33,15 +33,15 @@ internal object ProductionReminderNotices {
      * at post time goes with each action, so a press after the timer changed is refused, never re-targeted. */
     val longRecord = LongRecordNoticeFactory { context,ticket,snapshot ->
         val minutes = snapshot.trustedDurationMs/60_000L
-        val elapsed = if(minutes >= 60) "${minutes/60} ч ${(minutes%60).toString().padStart(2,'0')} мин" else "$minutes мин"
+        val elapsed = if(minutes >= 60) L.s(R.string.t_60e27c596a, minutes/60, (minutes%60).toString().padStart(2,'0')) else L.s(R.string.t_455a50db4a, minutes)
         val builder = Notification.Builder(context,AndroidLongRecordPlatform.CHANNEL).setSmallIcon(R.drawable.ic_stat_notai)
-            .setColor(context.getColor(R.color.widget_amber)).setContentTitle("Запись всё ещё идёт")
-            .setContentText("Уже $elapsed. Таймер не забыт?")
+            .setColor(context.getColor(R.color.widget_amber)).setContentTitle(L.s(R.string.t_a683d51495))
+            .setContentText(L.s(R.string.t_43f3c7181c, elapsed))
             .setContentIntent(TimerSurfaces.open(context)).setShowWhen(false).setAutoCancel(true)
             .setOnlyAlertOnce(true).setCategory(Notification.CATEGORY_REMINDER).setVisibility(Notification.VISIBILITY_PRIVATE)
             .setPublicVersion(Notification.Builder(context,AndroidLongRecordPlatform.CHANNEL).setSmallIcon(R.drawable.ic_stat_notai)
                 .setContentTitle(context.getString(R.string.app_name)).setContentIntent(TimerSurfaces.open(context)).setShowWhen(false).build())
-        listOf(LongRecordAction.CONTINUE to "Продолжить",LongRecordAction.SNOOZE to "Позже",LongRecordAction.STOP to "Остановить").forEach { (action,title) ->
+        listOf(LongRecordAction.CONTINUE to L.s(R.string.t_3f75368ab9),LongRecordAction.SNOOZE to L.s(R.string.t_fd042c9a3a),LongRecordAction.STOP to L.s(R.string.t_d4f447c130)).forEach { (action,title) ->
             builder.addAction(Notification.Action.Builder(null,title,LongRecordActions.pending(context,ticket.hash,snapshot.token,action)).build())
         }
         builder.build()

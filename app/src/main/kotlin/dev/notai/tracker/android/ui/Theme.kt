@@ -1,6 +1,14 @@
 package dev.notai.tracker.android.ui
 
+
+import dev.notai.tracker.android.L
 import android.provider.Settings
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -107,19 +115,24 @@ fun typography(family: FontFamily = Onest, thinTimer: Boolean = true) = NotAiTyp
 
 val NotAiTypography = typography()
 
-enum class ThemeChoice(val title: String) { SYSTEM("Авто"), LIGHT("Светлая"), DARK("Тёмная"), AMOLED("Чёрная"), NEON("Неон") }
+enum class ThemeChoice(private val titleRes: Int) { SYSTEM(R.string.t_5695330ffb), LIGHT(R.string.t_8080010c5e), DARK(R.string.t_bd16b23470), AMOLED(R.string.t_0d6b1a17a4), NEON(R.string.t_22776aacd4);
+    val title: String get() = L.s(titleRes)
+}
 
 val LocalColors = staticCompositionLocalOf { LightColors }
 val LocalType = staticCompositionLocalOf { NotAiTypography }
 /** True when the system animator scale is 0: no breathing, no entrance motion. */
 val LocalReducedMotion = staticCompositionLocalOf { false }
 val LocalAppearance = staticCompositionLocalOf { Appearance() }
+/** Neon only: one shared slow pulse, 0..1. Read it inside draw lambdas so it repaints without recomposing. */
+val LocalNeonPulse = staticCompositionLocalOf<androidx.compose.runtime.State<Float>> { androidx.compose.runtime.mutableFloatStateOf(0.5f) }
 
 object NotAi {
     val colors: NotAiColors @Composable get() = LocalColors.current
     val type: NotAiType @Composable get() = LocalType.current
     val reducedMotion: Boolean @Composable get() = LocalReducedMotion.current
     val appearance: Appearance @Composable get() = LocalAppearance.current
+    val neonPulse: androidx.compose.runtime.State<Float> @Composable get() = LocalNeonPulse.current
 }
 
 @Composable
@@ -152,8 +165,13 @@ fun NotAiTheme(choice: ThemeChoice = ThemeChoice.SYSTEM, reducedMotion: Boolean?
     )
     val density = LocalDensity.current
     val scaled = if (appearance.textScale == 1f) density else Density(density.density, density.fontScale * appearance.textScale)
+    // A visible breath, not a flicker: 3.4 s each way. Static at the midpoint when animations are off.
+    val pulse: androidx.compose.runtime.State<Float> = if (colors.glow && !reduced) {
+        val transition = rememberInfiniteTransition(label = "neonPulse")
+        transition.animateFloat(0f, 1f, infiniteRepeatable(tween(3400, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "neonPulseValue")
+    } else remember { androidx.compose.runtime.mutableFloatStateOf(0.5f) }
     CompositionLocalProvider(LocalColors provides colors, LocalType provides type, LocalReducedMotion provides reduced,
-        LocalAppearance provides appearance, LocalDensity provides scaled) {
+        LocalAppearance provides appearance, LocalDensity provides scaled, LocalNeonPulse provides pulse) {
         MaterialTheme(colorScheme = scheme, content = content)
     }
 }

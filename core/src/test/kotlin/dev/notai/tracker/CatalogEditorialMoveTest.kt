@@ -102,6 +102,74 @@ class CatalogEditorialMoveTest {
         assertEquals("Написание кода",leaf.name);assertEquals(definition,leaf.definition)
     }
 
+    /** 0.9.3 retires a few catalog entries. An unused one leaves the picker; one the user's own data names stays live. */
+    private fun retired() = v1().map { if(it.id == "leaf") it.copy(archived = true) else it }
+    private fun retire(): List<CatalogEditorialRevision> {
+        val leaf = v1().single { it.id == "leaf" }
+        return listOf(CatalogEditorialRevision("type","leaf",catalogMeaningFingerprint(leaf),catalogMeaningFingerprint(leaf),archive = true))
+    }
+    @Test fun anUnusedRetiredTypeLeavesThePicker() {
+        val tracker = Tracker(MemoryStore(),FakeClock())
+        install(tracker,files(v1(),"1",emptyList()))
+        val preview = install(tracker,files(retired(),"2",retire()))
+        assertTrue(preview.canApply);assertEquals(listOf("leaf"),preview.report.updated.map { it.id })
+        assertTrue(tracker.data().types.single { it.id == "leaf" }.archived)
+        assertTrue(tracker.data().children("root.code").none { it.id == "leaf" })
+    }
+    @Test fun aRetiredTypeTheUserTrackedStaysLive() {
+        val (tracker,_) = withHistory()
+        val preview = install(tracker,files(retired(),"2",retire()))
+        assertTrue(preview.canApply);assertTrue(preview.report.conflicts.isEmpty())
+        assertFalse(tracker.data().types.single { it.id == "leaf" }.archived)
+        tracker.start(tracker.snapshot().token,Classification(activityTypeId = "leaf"))
+    }
+    @Test fun aRetiredTypeOnACardStaysLive() {
+        val tracker = Tracker(MemoryStore(),FakeClock())
+        install(tracker,files(v1(),"1",emptyList()))
+        tracker.saveCard(tracker.snapshot().token,tracker.data().cardFromType("leaf"))
+        install(tracker,files(retired(),"2",retire()))
+        assertFalse(tracker.data().types.single { it.id == "leaf" }.archived)
+    }
+    @Test fun aRetiredTypeWithAPersonalChildStaysBrowsable() {
+        val tracker = Tracker(MemoryStore(),FakeClock())
+        install(tracker,files(v1(),"1",emptyList()))
+        val child = ActivityType("personal.child","My activity",parentId = "leaf")
+        tracker.saveType(tracker.snapshot().token,child)
+        assertTrue(install(tracker,files(retired(),"2",retire())).canApply)
+        assertFalse(tracker.data().types.single { it.id == "leaf" }.archived)
+        assertEquals(listOf(child),tracker.data().children("leaf"))
+        assertTrue(tracker.data().children("root.code").any { it.id == "leaf" })
+    }
+    @Test fun aPersonallyRenamedRetiredTypeStaysBrowsable() {
+        val tracker = Tracker(MemoryStore(),FakeClock())
+        install(tracker,files(v1(),"1",emptyList()))
+        val personal = tracker.data().types.single { it.id == "leaf" }.copy(name = "My activity")
+        tracker.saveType(tracker.snapshot().token,personal)
+        assertTrue(install(tracker,files(retired(),"2",retire())).canApply)
+        assertEquals(personal,tracker.data().types.single { it.id == "leaf" })
+        assertTrue(tracker.data().children("root.code").any { it.id == "leaf" })
+    }
+    @Test fun aRetiredTypeWithPersonalAliasesStaysBrowsable() {
+        val tracker = Tracker(MemoryStore(),FakeClock())
+        install(tracker,files(v1(),"1",emptyList()))
+        val original = tracker.data().types.single { it.id == "leaf" }
+        val personal = original.copy(aliases = original.aliases + "my alias")
+        tracker.saveType(tracker.snapshot().token,personal)
+        assertTrue(install(tracker,files(retired(),"2",retire())).canApply)
+        assertEquals(personal,tracker.data().types.single { it.id == "leaf" })
+        assertTrue(tracker.data().children("root.code").any { it.id == "leaf" })
+    }
+    @Test fun withoutTheReviewedStepAnInstalledTypeIsNotRetired() {
+        val tracker = Tracker(MemoryStore(),FakeClock())
+        install(tracker,files(v1(),"1",emptyList()))
+        assertTrue(install(tracker,files(retired(),"2",emptyList())).canApply)
+        assertFalse(tracker.data().types.single { it.id == "leaf" }.archived)
+    }
+    @Test fun onlyAnArchivedCatalogTypeMayBeRetired() {
+        val source = files(v1(),"1",retire())
+        assertEquals(ErrorCode.UNSUPPORTED_IMPORT,assertFailsWith<CoreError> { ReadyCatalog.read { source.getValue(it).inputStream() } }.code)
+    }
+
     @Test fun onlyTypesMayMove() {
         val bad = listOf(CatalogEditorialRevision("axis","x","0".repeat(64),"0".repeat(64),parentMove = true))
         val source = files(v1(),"1",bad)

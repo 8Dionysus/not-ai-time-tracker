@@ -2,7 +2,7 @@
 <resources>
     <string name="language_title">Язык</string>
     <string name="language_system">Системный</string>
-    <string name="language_partial">Часть прежних экранов пока остаётся на русском. Личные названия и записи не переводятся.</string>
+    <string name="language_partial">Твои названия и заметки остаются как написаны. Готовые занятия из каталога переводятся.</string>
     <string name="language_save_error">Не удалось сохранить язык. Повтори выбор.</string>
     <string name="deleted_title">Удалённое</string>
     <string name="deleted_empty">Удалённых записей нет</string>

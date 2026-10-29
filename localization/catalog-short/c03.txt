@@ -1,0 +1,140 @@
+261 ‖ Arrowword ‖ Autodefinido ‖ Mots fléchés ‖ Cruzadinha direta ‖ Schwedenrätsel ‖ Cruciverba a schema libero ‖ كلمات متقاطعة مصورة ‖ 箭头填字 ‖ スケルトンクロス ‖ 화살표 퍼즐 ‖ एरोवर्ड पहेली
+262 ‖ Word games ‖ Juegos de palabras ‖ Jeux de lettres ‖ Jogos de palavras ‖ Wortspiele ‖ Giochi di parole ‖ ألعاب الكلمات ‖ 文字游戏 ‖ 言葉遊び ‖ 단어 게임 ‖ शब्दों के खेल
+263 ‖ Sudoku ‖ Sudoku ‖ Sudoku ‖ Sudoku ‖ Sudoku ‖ Sudoku ‖ سودوكو ‖ 数独 ‖ 数独 ‖ 스도쿠 ‖ सुडोकू
+264 ‖ Board and card games ‖ Juegos de mesa y cartas ‖ Jeux de société et de cartes ‖ Jogos de tabuleiro e cartas ‖ Brett- und Kartenspiele ‖ Giochi da tavolo e di carte ‖ ألعاب الطاولة والورق ‖ 桌游与纸牌 ‖ ボードゲームとカード ‖ 보드게임과 카드 ‖ बोर्ड और ताश के खेल
+265 ‖ Bridge ‖ Bridge ‖ Bridge ‖ Bridge ‖ Bridge ‖ Bridge ‖ البريدج ‖ 桥牌 ‖ ブリッジ ‖ 브리지 ‖ ब्रिज
+266 ‖ Miniature wargame ‖ Wargame de miniaturas ‖ Wargame avec figurines ‖ Wargame de miniaturas ‖ Tabletop-Wargame ‖ Wargame con miniature ‖ لعبة حرب بالمجسمات ‖ 微缩战棋 ‖ ミニチュアウォーゲーム ‖ 미니어처 워게임 ‖ मिनिएचर वॉरगेम
+267 ‖ Game master ‖ Máster de rol ‖ Meneur de jeu ‖ Mestre de RPG ‖ Spielleitung ‖ Master di gioco di ruolo ‖ مدير لعبة الأدوار ‖ 跑团主持 ‖ ゲームマスター ‖ 게임 마스터 ‖ गेम मास्टर
+268 ‖ Trick-taking card games ‖ Juegos de bazas ‖ Jeux de levées ‖ Jogos de vaza ‖ Stichspiele ‖ Giochi di prese ‖ ألعاب ورق الأكلات ‖ 吃墩纸牌游戏 ‖ トリックテイキング ‖ 트릭테이킹 카드 게임 ‖ ट्रिक-टेकिंग ताश खेल
+269 ‖ Go ‖ Go ‖ Go ‖ Go ‖ Go ‖ Go ‖ لعبة غو ‖ 围棋 ‖ 囲碁 ‖ 바둑 ‖ गो
+270 ‖ Deck-building ‖ Construcción de mazos ‖ Deck-building ‖ Deck-building ‖ Deckbuilding ‖ Deck-building ‖ بناء مجموعة الورق ‖ 卡组构筑 ‖ デッキ構築 ‖ 덱빌딩 ‖ डेक-बिल्डिंग
+271 ‖ Dominoes ‖ Dominó ‖ Dominos ‖ Dominó ‖ Domino ‖ Domino ‖ الدومينو ‖ 多米诺 ‖ ドミノ ‖ 도미노 ‖ डोमिनो
+272 ‖ LARP ‖ Rol en vivo (LARP) ‖ GN (jeu de rôle grandeur nature) ‖ LARP ‖ LARP ‖ LARP ‖ لعب الأدوار الحي ‖ 实景角色扮演 ‖ LARP ‖ 라이브 롤플레잉 ‖ लाइव रोलप्ले (LARP)
+273 ‖ Living card games (LCG) ‖ Juegos de cartas vivos (LCG) ‖ Jeux de cartes évolutifs (JCE) ‖ Living card games (LCG) ‖ Living Card Games (LCG) ‖ Living card game (LCG) ‖ ألعاب الورق الحية ‖ 生存卡牌游戏 (LCG) ‖ LCG ‖ LCG 카드 게임 ‖ लिविंग कार्ड गेम (LCG)
+274 ‖ Party games ‖ Juegos para grupos ‖ Jeux d’ambiance ‖ Jogos para grupo ‖ Partyspiele ‖ Giochi di società ‖ ألعاب جماعية ‖ 聚会游戏 ‖ パーティーゲーム ‖ 파티 게임 ‖ पार्टी गेम
+275 ‖ Historical wargame ‖ Wargame histórico ‖ Wargame historique ‖ Wargame histórico ‖ Historisches Wargame ‖ Wargame storico ‖ لعبة حرب تاريخية ‖ 历史战棋 ‖ 歴史ウォーゲーム ‖ 역사 워게임 ‖ ऐतिहासिक वॉरगेम
+276 ‖ Card games ‖ Juegos de cartas ‖ Jeux de cartes ‖ Jogos de cartas ‖ Kartenspiele ‖ Giochi di carte ‖ ألعاب الورق ‖ 纸牌游戏 ‖ カードゲーム ‖ 카드 게임 ‖ ताश के खेल
+277 ‖ Collectible card games ‖ Juegos de cartas coleccionables ‖ Jeux de cartes à collectionner ‖ Cards colecionáveis ‖ Sammelkartenspiele ‖ Giochi di carte collezionabili ‖ ألعاب الورق القابلة للجمع ‖ 集换式卡牌 ‖ トレーディングカードゲーム ‖ 트레이딩 카드 게임 ‖ संग्रहणीय कार्ड गेम
+278 ‖ Mahjong ‖ Mahjong ‖ Mahjong ‖ Mahjong ‖ Mahjong ‖ Mahjong ‖ ماهجونغ ‖ 麻将 ‖ 麻雀 ‖ 마작 ‖ माहजोंग
+279 ‖ Mafia and deduction games ‖ Mafia y juegos de deducción ‖ Loup-garou et jeux de déduction ‖ Máfia e jogos de dedução ‖ Werwolf und Deduktionsspiele ‖ Lupus e giochi di deduzione ‖ المافيا وألعاب الاستنتاج ‖ 狼人杀与推理游戏 ‖ 人狼と推理ゲーム ‖ 마피아와 추리 게임 ‖ माफ़िया और अनुमान वाले खेल
+280 ‖ Miniatures games ‖ Juegos de miniaturas ‖ Jeux de figurines ‖ Jogos de miniaturas ‖ Miniaturenspiele ‖ Giochi con miniature ‖ ألعاب المجسمات ‖ 微缩模型游戏 ‖ ミニチュアゲーム ‖ 미니어처 게임 ‖ मिनिएचर गेम
+281 ‖ Backgammon ‖ Backgammon ‖ Backgammon ‖ Gamão ‖ Backgammon ‖ Backgammon ‖ الطاولة (النرد) ‖ 双陆棋 ‖ バックギャモン ‖ 백개먼 ‖ बैकगैमन
+282 ‖ Board game ‖ Juego de mesa ‖ Jeu de société ‖ Jogo de tabuleiro ‖ Brettspiel ‖ Gioco da tavolo ‖ لعبة لوحية ‖ 桌游 ‖ ボードゲーム ‖ 보드게임 ‖ बोर्ड गेम
+283 ‖ Tabletop RPG ‖ Rol de mesa ‖ Jeu de rôle sur table ‖ RPG de mesa ‖ Pen-and-Paper-Rollenspiel ‖ Gioco di ruolo da tavolo ‖ لعبة أدوار على الطاولة ‖ 桌面角色扮演 ‖ テーブルトークRPG ‖ TRPG ‖ टेबलटॉप रोलप्ले
+284 ‖ Play-by-post RPG ‖ Rol por foro ‖ Jeu de rôle par forum ‖ RPG por fórum ‖ Forenrollenspiel ‖ Gioco di ruolo per forum ‖ لعب أدوار بالمراسلة ‖ 文字跑团 ‖ 掲示板RPG ‖ 텍스트 롤플레잉 ‖ पत्राचार से रोलप्ले
+285 ‖ Miniature skirmish ‖ Escaramuza de miniaturas ‖ Escarmouche avec figurines ‖ Skirmish de miniaturas ‖ Skirmish mit Miniaturen ‖ Schermaglia con miniature ‖ مناوشة بالمجسمات ‖ 微缩小规模战斗 ‖ ミニチュアスカーミッシュ ‖ 미니어처 스커미시 ‖ मिनिएचर स्कर्मिश
+286 ‖ Chess ‖ Ajedrez ‖ Échecs ‖ Xadrez ‖ Schach ‖ Scacchi ‖ الشطرنج ‖ 国际象棋 ‖ チェス ‖ 체스 ‖ शतरंज
+287 ‖ Socializing ‖ Vida social ‖ Vie sociale ‖ Vida social ‖ Soziales ‖ Vita sociale ‖ التواصل الاجتماعي ‖ 社交 ‖ 人づきあい ‖ 교류 ‖ मेल-जोल
+288 ‖ Meeting people ‖ Quedar con gente ‖ Voir des gens ‖ Encontrar pessoas ‖ Leute treffen ‖ Vedere gente ‖ لقاء الناس ‖ 与人见面 ‖ 人と会う ‖ 사람 만나기 ‖ लोगों से मिलना
+289 ‖ Other socializing ‖ Otra vida social ‖ Autres échanges ‖ Outra interação social ‖ Anderer Austausch ‖ Altre relazioni ‖ تواصل آخر ‖ 其他社交 ‖ その他の交流 ‖ 기타 교류 ‖ अन्य मेल-जोल
+290 ‖ Call or video chat ‖ Llamada o videollamada ‖ Appel ou visio ‖ Ligação ou videochamada ‖ Anruf oder Videochat ‖ Chiamata o videochiamata ‖ مكالمة أو مكالمة فيديو ‖ 打电话或视频 ‖ 通話・ビデオ通話 ‖ 통화·영상통화 ‖ कॉल या वीडियो कॉल
+291 ‖ Personal correspondence ‖ Correspondencia personal ‖ Correspondance personnelle ‖ Correspondência pessoal ‖ Private Korrespondenz ‖ Corrispondenza personale ‖ مراسلات شخصية ‖ 私人通信 ‖ 私的なやりとり ‖ 개인 연락 ‖ निजी पत्राचार
+292 ‖ Personal messages ‖ Mensajes personales ‖ Messages personnels ‖ Mensagens pessoais ‖ Private Nachrichten ‖ Messaggi personali ‖ رسائل شخصية ‖ 私信 ‖ 個人的なメッセージ ‖ 개인 메시지 ‖ निजी संदेश
+293 ‖ Talking in person ‖ Charlar en persona ‖ Discuter en personne ‖ Conversar pessoalmente ‖ Persönliches Gespräch ‖ Parlare di persona ‖ الحديث وجهًا لوجه ‖ 当面交流 ‖ 対面での会話 ‖ 직접 대화 ‖ आमने-सामने बात
+294 ‖ Hugs and kisses ‖ Abrazos y besos ‖ Câlins et bisous ‖ Abraços e beijos ‖ Umarmungen und Küsse ‖ Abbracci e baci ‖ عناق وقبلات ‖ 拥抱亲吻 ‖ ハグとキス ‖ 포옹과 키스 ‖ गले मिलना और चूमना
+295 ‖ Conversation ‖ Conversación ‖ Conversation ‖ Conversa ‖ Gespräch ‖ Conversazione ‖ محادثة ‖ 聊天 ‖ 会話 ‖ 대화 ‖ बातचीत
+296 ‖ Shared event ‖ Evento con otros ‖ Événement partagé ‖ Evento com outras pessoas ‖ Gemeinsame Veranstaltung ‖ Evento condiviso ‖ حدث مشترك ‖ 共同活动 ‖ みんなでの行事 ‖ 함께하는 행사 ‖ साझा कार्यक्रम
+297 ‖ Writing and notes ‖ Escritura y notas ‖ Écriture et notes ‖ Escrita e anotações ‖ Schreiben und Notizen ‖ Scrittura e appunti ‖ الكتابة والملاحظات ‖ 写作与记录 ‖ 書くこととメモ ‖ 글쓰기와 기록 ‖ लेखन और नोट्स
+298 ‖ Journal ‖ Diario ‖ Journal ‖ Diário ‖ Tagebuch ‖ Diario ‖ اليوميات ‖ 日记 ‖ 日記 ‖ 일기 ‖ डायरी
+299 ‖ Notes ‖ Notas ‖ Notes ‖ Anotações ‖ Notizen ‖ Appunti ‖ ملاحظات ‖ 笔记 ‖ メモ ‖ 메모 ‖ नोट्स
+300 ‖ Correspondence ‖ Correspondencia ‖ Correspondance ‖ Correspondência ‖ Korrespondenz ‖ Corrispondenza ‖ المراسلات ‖ 书信往来 ‖ 手紙のやりとり ‖ 서신 ‖ पत्राचार
+301 ‖ Writing or editing text ‖ Escribir o editar un texto ‖ Écrire ou réviser un texte ‖ Escrever ou editar texto ‖ Text schreiben oder bearbeiten ‖ Scrivere o rivedere un testo ‖ كتابة نص أو تحريره ‖ 写作或编辑文字 ‖ 文章の執筆・編集 ‖ 글 쓰기·고치기 ‖ लिखना या संपादन
+302 ‖ Writing, editing, translation ‖ Textos, edición y traducción ‖ Écriture, révision, traduction ‖ Textos, revisão e tradução ‖ Texte, Lektorat, Übersetzung ‖ Testi, revisione, traduzione ‖ الكتابة والتحرير والترجمة ‖ 写作、编辑、翻译 ‖ 執筆・編集・翻訳 ‖ 글, 편집, 번역 ‖ लेखन, संपादन, अनुवाद
+303 ‖ Glossary and style guide ‖ Glosario y guía de estilo ‖ Glossaire et guide de style ‖ Glossário e guia de estilo ‖ Glossar und Styleguide ‖ Glossario e guida di stile ‖ المسرد ودليل الأسلوب ‖ 术语表与风格指南 ‖ 用語集とスタイルガイド ‖ 용어집과 스타일 가이드 ‖ शब्दावली और स्टाइल गाइड
+304 ‖ Business writing ‖ Texto profesional ‖ Écrit professionnel ‖ Texto profissional ‖ Geschäftstext ‖ Testo professionale ‖ نص تجاري ‖ 商务文书 ‖ ビジネス文書 ‖ 업무 문서 ‖ व्यावसायिक लेखन
+305 ‖ Journalism piece ‖ Pieza periodística ‖ Article journalistique ‖ Matéria jornalística ‖ Journalistischer Beitrag ‖ Pezzo giornalistico ‖ مادة صحفية ‖ 新闻稿件 ‖ 記事 ‖ 기사 ‖ पत्रकारिता लेख
+306 ‖ Grant or scholarship application ‖ Solicitud de beca o subvención ‖ Demande de bourse ou de subvention ‖ Pedido de bolsa ou financiamento ‖ Förder- oder Stipendienantrag ‖ Domanda di borsa o finanziamento ‖ طلب منحة ‖ 申请资助或奖学金 ‖ 助成金・奨学金の申請 ‖ 지원금·장학금 신청 ‖ अनुदान या छात्रवृत्ति आवेदन
+307 ‖ Researching for a text ‖ Documentarse para un texto ‖ Recherche pour un texte ‖ Pesquisa para um texto ‖ Recherche für einen Text ‖ Ricerche per un testo ‖ البحث لأجل نص ‖ 为写作查资料 ‖ 執筆のための調べもの ‖ 글을 위한 조사 ‖ लेख के लिए शोध
+308 ‖ Copyediting ‖ Corrección ‖ Correction ‖ Revisão ‖ Korrektorat ‖ Correzione di bozze ‖ التدقيق اللغوي ‖ 校对 ‖ 校正 ‖ 교정 ‖ प्रूफ़ संपादन
+309 ‖ Localization ‖ Localización ‖ Localisation ‖ Localização ‖ Lokalisierung ‖ Localizzazione ‖ التوطين ‖ 本地化 ‖ ローカライズ ‖ 현지화 ‖ स्थानीयकरण
+310 ‖ Marketing copy ‖ Textos de marketing ‖ Textes marketing ‖ Textos de marketing ‖ Werbetexte ‖ Testi di marketing ‖ نصوص تسويقية ‖ 营销文案 ‖ マーケティング文 ‖ 마케팅 카피 ‖ मार्केटिंग कॉपी
+311 ‖ Sketches and ideas ‖ Bocetos e ideas ‖ Ébauches et idées ‖ Rascunhos e ideias ‖ Skizzen und Ideen ‖ Bozze e idee ‖ مسودات وأفكار ‖ 草稿与灵感 ‖ 下書きとアイデア ‖ 메모와 아이디어 ‖ ख़ाके और विचार
+312 ‖ Academic writing ‖ Texto académico ‖ Texte scientifique ‖ Texto acadêmico ‖ Wissenschaftlicher Text ‖ Testo accademico ‖ نص أكاديمي ‖ 学术写作 ‖ 学術文書 ‖ 학술 글 ‖ अकादमिक लेखन
+313 ‖ Written translation ‖ Traducción escrita ‖ Traduction écrite ‖ Tradução escrita ‖ Schriftliche Übersetzung ‖ Traduzione scritta ‖ الترجمة الكتابية ‖ 笔译 ‖ 翻訳 ‖ 번역 ‖ लिखित अनुवाद
+314 ‖ Letter or message ‖ Carta o mensaje ‖ Lettre ou message ‖ Carta ou mensagem ‖ Brief oder Nachricht ‖ Lettera o messaggio ‖ رسالة ‖ 书信或消息 ‖ 手紙やメッセージ ‖ 편지나 메시지 ‖ पत्र या संदेश
+315 ‖ Outline ‖ Esquema del texto ‖ Plan du texte ‖ Roteiro do texto ‖ Gliederung ‖ Scaletta ‖ مخطط النص ‖ 写作提纲 ‖ 構成案 ‖ 글 개요 ‖ लेख की रूपरेखा
+316 ‖ Manuscript prep ‖ Preparar un manuscrito ‖ Préparer un manuscrit ‖ Preparar manuscrito ‖ Manuskript vorbereiten ‖ Preparare un manoscritto ‖ تجهيز مخطوطة ‖ 准备稿件 ‖ 原稿の準備 ‖ 원고 준비 ‖ पांडुलिपि तैयार करना
+317 ‖ Transcription ‖ Transcripción ‖ Transcription ‖ Transcrição ‖ Transkription ‖ Trascrizione ‖ التفريغ النصي ‖ 听写转录 ‖ 文字起こし ‖ 녹취 ‖ ट्रांसक्रिप्शन
+318 ‖ Citations and bibliography ‖ Citas y bibliografía ‖ Références et bibliographie ‖ Referências e bibliografia ‖ Zitate und Literaturverzeichnis ‖ Citazioni e bibliografia ‖ المراجع والببليوغرافيا ‖ 引用与参考文献 ‖ 引用と参考文献 ‖ 인용과 참고문헌 ‖ संदर्भ और ग्रंथसूची
+319 ‖ Line editing ‖ Corrección de estilo ‖ Révision stylistique ‖ Revisão de estilo ‖ Stilistisches Lektorat ‖ Revisione stilistica ‖ التحرير الأسلوبي ‖ 文字润色 ‖ 文章の推敲 ‖ 문장 다듬기 ‖ शैलीगत संपादन
+320 ‖ Structural editing ‖ Edición estructural ‖ Révision structurelle ‖ Edição estrutural ‖ Strukturelles Lektorat ‖ Revisione strutturale ‖ التحرير البنيوي ‖ 结构修改 ‖ 構成の見直し ‖ 구조 편집 ‖ संरचनात्मक संपादन
+321 ‖ Script ‖ Guion ‖ Scénario ‖ Roteiro ‖ Drehbuch ‖ Sceneggiatura ‖ سيناريو ‖ 剧本 ‖ 脚本 ‖ 대본 ‖ पटकथा
+322 ‖ Creative writing ‖ Escritura creativa ‖ Écriture créative ‖ Escrita criativa ‖ Kreatives Schreiben ‖ Scrittura creativa ‖ الكتابة الإبداعية ‖ 创意写作 ‖ 創作 ‖ 창작 글쓰기 ‖ रचनात्मक लेखन
+323 ‖ Topics and ideas ‖ Temas e ideas ‖ Sujets et idées ‖ Temas e ideias ‖ Themen und Ideen ‖ Temi e idee ‖ مواضيع وأفكار ‖ 选题与构思 ‖ テーマとアイデア ‖ 주제와 아이디어 ‖ विषय और विचार
+324 ‖ Technical documentation ‖ Documentación técnica ‖ Documentation technique ‖ Documentação técnica ‖ Technische Dokumentation ‖ Documentazione tecnica ‖ التوثيق التقني ‖ 技术文档 ‖ 技術文書 ‖ 기술 문서 ‖ तकनीकी दस्तावेज़
+325 ‖ Fact-checking ‖ Verificación de datos ‖ Vérification des faits ‖ Checagem de fatos ‖ Faktencheck ‖ Fact-checking ‖ التحقق من الحقائق ‖ 事实核查 ‖ ファクトチェック ‖ 사실 확인 ‖ तथ्य जाँच
+326 ‖ Final proofread ‖ Revisión final ‖ Relecture finale ‖ Revisão final ‖ Schlusskorrektur ‖ Rilettura finale ‖ المراجعة النهائية ‖ 终校 ‖ 最終校正 ‖ 최종 교정 ‖ अंतिम प्रूफ़
+327 ‖ First draft ‖ Borrador ‖ Brouillon ‖ Rascunho ‖ Entwurf ‖ Bozza ‖ المسودة الأولى ‖ 初稿 ‖ 下書き ‖ 초고 ‖ पहला मसौदा
+328 ‖ Shopping, services and errands ‖ Compras, servicios y trámites ‖ Achats, services et démarches ‖ Compras, serviços e tarefas ‖ Einkäufe, Dienste und Erledigungen ‖ Acquisti, servizi e commissioni ‖ التسوق والخدمات والمشاوير ‖ 购物、服务与杂事 ‖ 買い物・サービス・用事 ‖ 쇼핑, 서비스, 용무 ‖ ख़रीदारी, सेवाएँ और काम
+329 ‖ Banking and personal finance ‖ Banco y finanzas personales ‖ Banque et finances perso ‖ Banco e finanças pessoais ‖ Bank und Finanzen ‖ Banca e finanze personali ‖ البنك والمال الشخصي ‖ 银行与个人理财 ‖ 銀行と家計 ‖ 은행과 개인 재무 ‖ बैंक और निजी वित्त
+330 ‖ Government services ‖ Trámites públicos ‖ Services publics ‖ Serviços públicos ‖ Behördengänge ‖ Servizi pubblici ‖ الخدمات الحكومية ‖ 政务服务 ‖ 行政サービス ‖ 공공 서비스 ‖ सरकारी सेवाएँ
+331 ‖ Taxes and fees ‖ Impuestos y tasas ‖ Impôts et taxes ‖ Impostos e taxas ‖ Steuern und Gebühren ‖ Tasse e imposte ‖ الضرائب والرسوم ‖ 税费 ‖ 税金と手数料 ‖ 세금과 수수료 ‖ कर और शुल्क
+332 ‖ Official paperwork ‖ Trámites oficiales ‖ Démarches administratives ‖ Documentos em órgãos públicos ‖ Amtliche Formalitäten ‖ Pratiche negli uffici pubblici ‖ المعاملات الرسمية ‖ 政府文件手续 ‖ 役所の手続き ‖ 관공서 서류 ‖ सरकारी काग़ज़ी काम
+333 ‖ Documents and personal affairs ‖ Documentos y asuntos personales ‖ Papiers et affaires personnelles ‖ Documentos e assuntos pessoais ‖ Dokumente und persönliche Angelegenheiten ‖ Documenti e pratiche personali ‖ الوثائق والشؤون الشخصية ‖ 证件与个人事务 ‖ 書類と身の回りの用事 ‖ 서류와 개인 용무 ‖ दस्तावेज़ और निजी काम
+334 ‖ Accessible route ‖ Ruta accesible ‖ Itinéraire accessible ‖ Rota acessível ‖ Barrierefreie Route ‖ Percorso accessibile ‖ مسار ميسّر ‖ 无障碍路线 ‖ バリアフリーの経路 ‖ 접근 가능한 경로 ‖ सुगम मार्ग
+335 ‖ Booking a service ‖ Pedir cita ‖ Prendre rendez-vous ‖ Agendar um serviço ‖ Termin buchen ‖ Prenotare un servizio ‖ حجز موعد خدمة ‖ 预约服务 ‖ 予約 ‖ 서비스 예약 ‖ सेवा बुक करना
+336 ‖ Personal documents and forms ‖ Documentos y formularios personales ‖ Papiers et formulaires ‖ Documentos e formulários pessoais ‖ Persönliche Dokumente und Formulare ‖ Documenti e moduli personali ‖ الوثائق والنماذج الشخصية ‖ 个人证件与表格 ‖ 個人の書類と申込書 ‖ 개인 서류와 양식 ‖ निजी दस्तावेज़ और फ़ॉर्म
+337 ‖ Waiting for a reply or call ‖ Esperar respuesta o llamada ‖ Attendre une réponse ou un appel ‖ Esperar resposta ou ligação ‖ Auf Antwort oder Rückruf warten ‖ Attendere risposta o chiamata ‖ انتظار رد أو مكالمة ‖ 等待回复或来电 ‖ 返事や電話を待つ ‖ 답장·전화 기다리기 ‖ जवाब या कॉल का इंतज़ार
+338 ‖ Interpreting for accessibility ‖ Interpretación o comunicación accesible ‖ Interprétation ou communication accessible ‖ Interpretação ou comunicação acessível ‖ Dolmetschen oder barrierefreie Kommunikation ‖ Interpretariato o comunicazione accessibile ‖ الترجمة أو التواصل الميسّر ‖ 无障碍翻译或沟通 ‖ 通訳・情報保障の手配 ‖ 통역·접근성 소통 ‖ सुगमता के लिए दुभाषिया या संचार
+339 ‖ Contractors and providers ‖ Contratistas y proveedores ‖ Prestataires et artisans ‖ Prestadores e fornecedores ‖ Dienstleister und Handwerker ‖ Fornitori e artigiani ‖ المقاولون ومقدمو الخدمات ‖ 承包商与服务商 ‖ 業者とのやりとり ‖ 업체와 서비스 제공자 ‖ ठेकेदार और सेवा प्रदाता
+340 ‖ Pick up or drop off ‖ Recoger o llevar algo ‖ Récupérer ou déposer ‖ Buscar ou levar algo ‖ Abholen oder bringen ‖ Ritirare o consegnare ‖ استلام أو توصيل ‖ 取送东西 ‖ 受け取り・届け ‖ 가져오기·갖다주기 ‖ लेना या पहुँचाना
+341 ‖ Ordering services ‖ Contratar y recibir servicios ‖ Commander et recevoir des services ‖ Contratar e receber serviços ‖ Dienste bestellen und erhalten ‖ Ordinare e ricevere servizi ‖ طلب الخدمات واستلامها ‖ 订购与接受服务 ‖ サービスの依頼と受け取り ‖ 서비스 주문과 이용 ‖ सेवाएँ मँगाना और लेना
+342 ‖ Waiting for a courier ‖ Esperar al mensajero ‖ Attendre un livreur ‖ Esperar o entregador ‖ Auf Kurier warten ‖ Aspettare il corriere ‖ انتظار المندوب ‖ 等快递 ‖ 配達を待つ ‖ 택배 기다리기 ‖ कूरियर का इंतज़ार
+343 ‖ Waiting for a technician ‖ Esperar al técnico ‖ Attendre un technicien ‖ Esperar o técnico ‖ Auf Handwerker warten ‖ Aspettare il tecnico ‖ انتظار الفني ‖ 等师傅上门 ‖ 業者を待つ ‖ 기사 기다리기 ‖ मिस्त्री का इंतज़ार
+344 ‖ Waiting for transport or help ‖ Esperar transporte o ayuda ‖ Attendre un transport ou de l’aide ‖ Esperar transporte ou ajuda ‖ Auf Fahrdienst oder Hilfe warten ‖ Aspettare trasporto o aiuto ‖ انتظار وسيلة نقل أو مساعدة ‖ 等交通或协助 ‖ 送迎や介助を待つ ‖ 교통편·도움 기다리기 ‖ वाहन या मदद का इंतज़ार
+345 ‖ Queue ‖ Cola ‖ File d’attente ‖ Fila ‖ Warteschlange ‖ Coda ‖ الطابور ‖ 排队 ‖ 行列 ‖ 줄 서기 ‖ कतार
+346 ‖ Shopping ‖ Compras ‖ Achats ‖ Compras ‖ Einkaufen ‖ Acquisti ‖ التسوق ‖ 购物 ‖ 買い物 ‖ 쇼핑 ‖ ख़रीदारी
+347 ‖ Returns and warranty ‖ Devoluciones y garantía ‖ Retours et garantie ‖ Trocas e garantia ‖ Rückgabe und Garantie ‖ Resi e garanzia ‖ الإرجاع والضمان ‖ 退换与保修 ‖ 返品と保証 ‖ 반품과 보증 ‖ वापसी और वारंटी
+348 ‖ Picking up a parcel ‖ Recoger un paquete ‖ Retirer un colis ‖ Retirar encomenda ‖ Paket abholen ‖ Ritirare un pacco ‖ استلام طرد ‖ 取包裹 ‖ 荷物の受け取り ‖ 택배 찾기 ‖ पार्सल लेना
+349 ‖ Shopping for home and self ‖ Compras para casa y para uno ‖ Achats pour la maison et soi ‖ Compras para casa e para si ‖ Einkäufe für Haushalt und sich ‖ Acquisti per casa e per sé ‖ مشتريات للمنزل وللنفس ‖ 家庭与个人购物 ‖ 家や自分の買い物 ‖ 집과 나를 위한 쇼핑 ‖ घर और अपने लिए ख़रीदारी
+350 ‖ In-store shopping ‖ Compras en tienda ‖ Achats en magasin ‖ Compras na loja ‖ Einkaufen im Laden ‖ Acquisti in negozio ‖ التسوق في المتجر ‖ 实体店购物 ‖ 店での買い物 ‖ 매장 쇼핑 ‖ दुकान से ख़रीदारी
+351 ‖ Online shopping ‖ Compras en línea ‖ Achats en ligne ‖ Compras online ‖ Online-Shopping ‖ Acquisti online ‖ التسوق عبر الإنترنت ‖ 网购 ‖ ネットショッピング ‖ 온라인 쇼핑 ‖ ऑनलाइन ख़रीदारी
+352 ‖ Comparing products and prices ‖ Comparar productos y precios ‖ Comparer produits et prix ‖ Comparar produtos e preços ‖ Produkte und Preise vergleichen ‖ Confrontare prodotti e prezzi ‖ مقارنة المنتجات والأسعار ‖ 比较商品与价格 ‖ 商品と価格の比較 ‖ 상품·가격 비교 ‖ सामान और दाम की तुलना
+353 ‖ Check-in and access ‖ Registro y acceso ‖ Enregistrement et contrôle d’accès ‖ Check-in e acesso ‖ Check-in und Einlass ‖ Registrazione e accesso ‖ التسجيل والدخول ‖ 登记与通行 ‖ 受付と入館 ‖ 체크인과 출입 ‖ चेक-इन और प्रवेश
+354 ‖ Service or appointment ‖ Servicio o cita ‖ Service ou rendez-vous ‖ Serviço ou consulta ‖ Dienstleistung oder Termin ‖ Servizio o appuntamento ‖ خدمة أو موعد ‖ 服务或预约 ‖ サービスや予約 ‖ 서비스나 약속 ‖ सेवा या मुलाक़ात
+355 ‖ Receiving a service ‖ Recibir un servicio ‖ Recevoir un service ‖ Receber um serviço ‖ Dienstleistung in Anspruch nehmen ‖ Ricevere un servizio ‖ تلقي خدمة ‖ 接受服务 ‖ サービスを受ける ‖ 서비스 받기 ‖ सेवा लेना
+356 ‖ Legal and admin matters ‖ Asuntos legales y administrativos ‖ Démarches juridiques et administratives ‖ Assuntos jurídicos e administrativos ‖ Rechtliches und Verwaltung ‖ Pratiche legali e amministrative ‖ الشؤون القانونية والإدارية ‖ 法律与行政事务 ‖ 法律・事務手続き ‖ 법률·행정 업무 ‖ क़ानूनी और प्रशासनिक काम
+357 ‖ Nature and travel ‖ Naturaleza y viajes ‖ Nature et voyages ‖ Natureza e viagens ‖ Natur und Reisen ‖ Natura e viaggi ‖ الطبيعة والسفر ‖ 自然与旅行 ‖ 自然と旅 ‖ 자연과 여행 ‖ प्रकृति और यात्रा
+358 ‖ Outdoor recreation ‖ Actividades al aire libre ‖ Activités de plein air ‖ Atividades ao ar livre ‖ Aktiv in der Natur ‖ Attività all’aperto ‖ أنشطة في الطبيعة ‖ 户外活动 ‖ アウトドア ‖ 야외 활동 ‖ प्रकृति में सक्रिय मनोरंजन
+359 ‖ Via ferrata ‖ Vía ferrata ‖ Via ferrata ‖ Via ferrata ‖ Klettersteig ‖ Via ferrata ‖ فيا فيراتا ‖ 飞拉达 ‖ ヴィア・フェラータ ‖ 비아 페라타 ‖ विया फ़ेराटा
+360 ‖ Kite flying ‖ Volar cometa ‖ Cerf-volant ‖ Soltar pipa ‖ Drachensteigen ‖ Aquilone ‖ الطائرة الورقية ‖ 放风筝 ‖ 凧揚げ ‖ 연날리기 ‖ पतंग उड़ाना
+361 ‖ Sledding and tubing ‖ Bajar en trineo o flotador ‖ Glisse en luge ou bouée ‖ Descer de trenó ou boia ‖ Rodeln und Tubing ‖ Slittino e tubing ‖ التزلج على الزلاجات ‖ 滑雪圈与滑坡 ‖ そり遊び ‖ 썰매 타기 ‖ स्लेज और ट्यूबिंग
+362 ‖ Leisure kayak or SUP ‖ Kayak o SUP de paseo ‖ Balade en kayak ou paddle ‖ Passeio de caiaque ou SUP ‖ Kajak- oder SUP-Ausflug ‖ Kayak o SUP per svago ‖ نزهة بالكاياك أو اللوح ‖ 休闲皮划艇或桨板 ‖ カヤック・SUPさんぽ ‖ 카약·SUP 나들이 ‖ कयाक या SUP की सैर
+363 ‖ Boating ‖ Paseo en barca ‖ Sortie en bateau ‖ Passeio de barco ‖ Bootfahren ‖ Gita in barca ‖ ركوب القارب ‖ 划船出游 ‖ ボート遊び ‖ 보트 타기 ‖ नाव की सैर
+364 ‖ Recreational hunting ‖ Caza recreativa ‖ Chasse de loisir ‖ Caça recreativa ‖ Freizeitjagd ‖ Caccia ricreativa ‖ الصيد الترفيهي ‖ 休闲狩猎 ‖ レジャー狩猟 ‖ 레저 사냥 ‖ मनोरंजन के लिए शिकार
+365 ‖ Horseback ride ‖ Paseo a caballo ‖ Balade à cheval ‖ Passeio a cavalo ‖ Ausritt ‖ Passeggiata a cavallo ‖ نزهة على الخيل ‖ 骑马漫游 ‖ 乗馬散歩 ‖ 승마 산책 ‖ घुड़सवारी की सैर
+366 ‖ Leisure sailing ‖ Vela de recreo ‖ Voile de loisir ‖ Vela de lazer ‖ Freizeitsegeln ‖ Vela da diporto ‖ إبحار ترفيهي ‖ 休闲帆船 ‖ レジャーセーリング ‖ 레저 요트 ‖ मनोरंजन के लिए नौकायन
+367 ‖ Rod fishing ‖ Pesca con caña ‖ Pêche à la ligne ‖ Pesca com vara ‖ Angeln mit der Rute ‖ Pesca con la canna ‖ الصيد بالصنارة ‖ 垂钓 ‖ 竿釣り ‖ 낚싯대 낚시 ‖ बंसी से मछली पकड़ना
+368 ‖ Snorkeling to watch sea life ‖ Esnórquel para observar ‖ Snorkeling d’observation ‖ Snorkel para observar ‖ Schnorcheln zum Beobachten ‖ Snorkeling di osservazione ‖ الغطس السطحي للمشاهدة ‖ 浮潜观察 ‖ 観察シュノーケリング ‖ 관찰 스노클링 ‖ समुद्री जीवन देखने के लिए स्नॉर्कलिंग
+369 ‖ Citizen science ‖ Ciencia ciudadana ‖ Science participative ‖ Ciência cidadã ‖ Bürgerwissenschaft ‖ Citizen science ‖ علم المواطن ‖ 公民科学 ‖ 市民科学 ‖ 시민 과학 ‖ नागरिक विज्ञान
+370 ‖ In the field ‖ En el campo ‖ Sur le terrain ‖ Em campo ‖ Im Gelände ‖ Sul campo ‖ في الميدان ‖ 野外 ‖ 野外で ‖ 현장에서 ‖ मैदान में
+371 ‖ BioBlitz ‖ BioBlitz ‖ BioBlitz ‖ BioBlitz ‖ BioBlitz ‖ BioBlitz ‖ بيوبليتز ‖ 生物快速调查 ‖ バイオブリッツ ‖ 바이오블리츠 ‖ बायोब्लिट्ज़
+372 ‖ Logging an observation ‖ Registrar una observación ‖ Noter une observation ‖ Registrar uma observação ‖ Beobachtung erfassen ‖ Registrare un’osservazione ‖ تسجيل ملاحظة ‖ 记录观察 ‖ 観察の記録 ‖ 관찰 기록 ‖ अवलोकन दर्ज करना
+373 ‖ Weather observations for a project ‖ Observaciones meteorológicas para un proyecto ‖ Relevés météo pour un projet ‖ Observações do tempo para um projeto ‖ Wetterbeobachtung für ein Projekt ‖ Osservazioni meteo per un progetto ‖ رصد الطقس لمشروع ‖ 为项目观测天气 ‖ プロジェクトの気象観測 ‖ 프로젝트 기상 관측 ‖ परियोजना के लिए मौसम अवलोकन
+374 ‖ Night birding by ear ‖ Aves nocturnas por el canto ‖ Oiseaux de nuit à l’oreille ‖ Aves noturnas pelo canto ‖ Nachtzug nach Gehör ‖ Uccelli notturni dal canto ‖ تمييز الطيور ليلًا بأصواتها ‖ 夜间听声识鸟 ‖ 夜の鳥の声の記録 ‖ 밤 새소리 관찰 ‖ रात में आवाज़ से पक्षी पहचानना
+375 ‖ Bird checklist ‖ Lista de aves ‖ Liste d’oiseaux observés ‖ Lista de aves ‖ Vogel-Checkliste ‖ Lista di uccelli ‖ قائمة الطيور المرصودة ‖ 观鸟清单 ‖ 野鳥リスト ‖ 새 관찰 목록 ‖ पक्षियों की सूची
+376 ‖ Environmental monitoring ‖ Monitoreo ambiental ‖ Suivi environnemental ‖ Monitoramento ambiental ‖ Umweltmonitoring ‖ Monitoraggio ambientale ‖ الرصد البيئي ‖ 环境监测 ‖ 環境モニタリング ‖ 환경 모니터링 ‖ पर्यावरण निगरानी
+377 ‖ At a computer ‖ En el ordenador ‖ Sur ordinateur ‖ No computador ‖ Am Computer ‖ Al computer ‖ على الحاسوب ‖ 在电脑前 ‖ パソコンで ‖ 컴퓨터로 ‖ कंप्यूटर पर
+378 ‖ Identifying others’ sightings ‖ Identificar observaciones ajenas ‖ Identifier les observations d’autres ‖ Identificar observações de outros ‖ Fremde Beobachtungen bestimmen ‖ Identificare osservazioni altrui ‖ تحديد ملاحظات الآخرين ‖ 鉴定他人的观察 ‖ 他人の観察の同定 ‖ 남의 관찰 동정 ‖ दूसरों के अवलोकन पहचानना
+379 ‖ Checking observation quality ‖ Revisar la calidad de observaciones ‖ Vérifier la qualité des observations ‖ Verificar a qualidade das observações ‖ Beobachtungen prüfen ‖ Verificare la qualità delle osservazioni ‖ التحقق من جودة الملاحظات ‖ 检查观察质量 ‖ 観察データの品質確認 ‖ 관찰 품질 확인 ‖ अवलोकन की गुणवत्ता जाँचना
+380 ‖ Verifying IDs ‖ Verificar identificaciones ‖ Vérifier les identifications ‖ Verificar identificações ‖ Bestimmungen prüfen ‖ Verificare le identificazioni ‖ التحقق من التعريفات ‖ 核对鉴定 ‖ 同定の確認 ‖ 동정 확인 ‖ पहचान की पुष्टि
+381 ‖ Tagging photos and sounds ‖ Etiquetar fotos y sonidos ‖ Annoter photos et sons ‖ Marcar fotos e sons ‖ Fotos und Töne markieren ‖ Etichettare foto e suoni ‖ وسم الصور والأصوات ‖ 标注照片与声音 ‖ 写真と音のタグ付け ‖ 사진·소리 라벨링 ‖ फ़ोटो और ध्वनियाँ टैग करना
+382 ‖ Transcribing archives ‖ Transcribir archivos ‖ Transcrire des archives ‖ Transcrever arquivos ‖ Archive transkribieren ‖ Trascrivere archivi ‖ تفريغ الأرشيفات ‖ 转录档案 ‖ 古文書の翻刻 ‖ 기록물 옮겨 적기 ‖ अभिलेख लिप्यंतरण
+383 ‖ Nature watching ‖ Observar la naturaleza ‖ Observer la nature ‖ Observação da natureza ‖ Naturbeobachtung ‖ Osservare la natura ‖ مراقبة الطبيعة ‖ 观察自然 ‖ 自然観察 ‖ 자연 관찰 ‖ प्रकृति अवलोकन
+384 ‖ Botanical walk ‖ Paseo botánico ‖ Balade botanique ‖ Passeio botânico ‖ Botanischer Spaziergang ‖ Passeggiata botanica ‖ نزهة نباتية ‖ 植物漫步 ‖ 植物散策 ‖ 식물 산책 ‖ वनस्पति भ्रमण
+385 ‖ Genealogy ‖ Genealogía ‖ Généalogie ‖ Genealogia ‖ Ahnenforschung ‖ Genealogia ‖ علم الأنساب ‖ 家谱研究 ‖ 家系調べ ‖ 족보 연구 ‖ वंशावली
+386 ‖ Geocaching ‖ Geocaching ‖ Géocaching ‖ Geocaching ‖ Geocaching ‖ Geocaching ‖ البحث الجغرافي عن الكنوز ‖ 地理寻宝 ‖ ジオキャッシング ‖ 지오캐싱 ‖ जियोकैशिंग
+387 ‖ Wildlife ‖ Fauna salvaje ‖ Faune sauvage ‖ Vida selvagem ‖ Wildtiere ‖ Fauna selvatica ‖ الحياة البرية ‖ 野生动物 ‖ 野生動物 ‖ 야생동물 ‖ वन्यजीव
+388 ‖ Stargazing and astronomy ‖ Estrellas y astronomía ‖ Étoiles et astronomie ‖ Estrelas e astronomia ‖ Sterne und Astronomie ‖ Stelle e astronomia ‖ النجوم والفلك ‖ 观星与天文 ‖ 星空と天文 ‖ 별과 천문 ‖ तारे और खगोल विज्ञान
+389 ‖ Scavenger hunt ‖ Búsqueda del tesoro ‖ Chasse au trésor ‖ Caça ao tesouro ‖ Schnitzeljagd ‖ Caccia al tesoro ‖ البحث عن الكنز ‖ 寻宝游戏 ‖ 宝探し ‖ 보물찾기 ‖ ख़ज़ाने की खोज
+390 ‖ Letterboxing ‖ Letterboxing ‖ Letterboxing ‖ Letterboxing ‖ Letterboxing ‖ Letterboxing ‖ ليتربوكسينغ ‖ 信箱寻宝 ‖ レターボクシング ‖ 레터박싱 ‖ लेटरबॉक्सिंग
+391 ‖ Meteor shower ‖ Lluvia de estrellas ‖ Pluie d’étoiles filantes ‖ Chuva de meteoros ‖ Sternschnuppen ‖ Sciame meteorico ‖ زخة الشهب ‖ 流星雨 ‖ 流星群 ‖ 유성우 ‖ उल्का वर्षा
+392 ‖ Birdwatching ‖ Observación de aves ‖ Observation des oiseaux ‖ Observação de aves ‖ Vogelbeobachtung ‖ Birdwatching ‖ مراقبة الطيور ‖ 观鸟 ‖ バードウォッチング ‖ 탐조 ‖ पक्षी दर्शन
+393 ‖ Insects ‖ Insectos ‖ Insectes ‖ Insetos ‖ Insekten ‖ Insetti ‖ الحشرات ‖ 昆虫 ‖ 昆虫 ‖ 곤충 ‖ कीट-पतंगे
+394 ‖ Plant identification ‖ Identificar plantas ‖ Identifier les plantes ‖ Identificar plantas ‖ Pflanzenbestimmung ‖ Riconoscere le piante ‖ التعرف على النباتات ‖ 识别植物 ‖ 植物の同定 ‖ 식물 동정 ‖ पौधों की पहचान
+395 ‖ Plein air ‖ Pintura al aire libre ‖ Plein air ‖ Pintura ao ar livre ‖ Freilichtmalerei ‖ En plein air ‖ الرسم في الهواء الطلق ‖ 户外写生 ‖ 屋外スケッチ ‖ 야외 스케치 ‖ खुले में चित्रकारी
+396 ‖ Weather ‖ Meteorología ‖ Météo ‖ Tempo ‖ Wetter ‖ Meteo ‖ الطقس ‖ 天气观察 ‖ 天気観察 ‖ 날씨 관찰 ‖ मौसम अवलोकन
+397 ‖ Rockhounding and fossils ‖ Minerales y fósiles ‖ Minéraux et fossiles ‖ Minerais e fósseis ‖ Mineralien und Fossilien ‖ Minerali e fossili ‖ المعادن والأحافير ‖ 寻找矿物与化石 ‖ 鉱物・化石探し ‖ 광물·화석 찾기 ‖ खनिज और जीवाश्म खोज
+398 ‖ Tide pools ‖ Pozas de marea ‖ Estran ‖ Poças de maré ‖ Gezeitentümpel ‖ Pozze di marea ‖ برك المد والجزر ‖ 潮池 ‖ 磯遊び ‖ 조수 웅덩이 ‖ ज्वारीय तालाब
+399 ‖ Urban nature ‖ Naturaleza urbana ‖ Nature en ville ‖ Natureza na cidade ‖ Stadtnatur ‖ Natura in città ‖ الطبيعة في المدينة ‖ 城市自然 ‖ 都市の自然 ‖ 도시 자연 ‖ शहर में प्रकृति
+400 ‖ Birding by ear ‖ Aves por el canto ‖ Oiseaux à l’oreille ‖ Aves pelo canto ‖ Vögel nach Gehör ‖ Uccelli dal canto ‖ تمييز الطيور بأصواتها ‖ 听声识鸟 ‖ 鳥の声の聞き分け ‖ 새소리로 새 찾기 ‖ आवाज़ से पक्षी पहचानना

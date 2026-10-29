@@ -40,13 +40,15 @@ class PrivateCatalogPackIntegrationTest {
             assertEquals(CatalogRightsStatus.SOURCE_RIGHTS_REVIEW_PENDING,status.manifest!!.rightsStatus);assertNull(status.manifest!!.license)
             val payload = codec.decodeFromString<CatalogContentPayload>(root.resolve("catalog/locales/$tag/labels.json").readText())
             assertEquals(originals.map { it.key },payload.entries.map { it.key })
-            assertEquals(6798,payload.entries.sumOf { 1+it.text.aliases.size+(if(it.text.description.isNotBlank()) 1 else 0) })
+            // A complete pack keeps every source alias slot; the 0.9.3 short names keep the previous label as one more alias.
+            assertTrue(payload.entries.sumOf { 1+it.text.aliases.size+(if(it.text.description.isNotBlank()) 1 else 0) } >= 6798)
             val displayed = packs.getLocalizedCatalogEntries("tracker.catalog",originals.map { it.key },tag)
             assertEquals(payload.entries.map { it.text },displayed.map { it.display })
             assertTrue(displayed.all { !it.missing && it.resolvedLocaleTag==tag })
             val labels = packs.choiceLabels(before,tag)
-            assertEquals(1919,labels.translatedTypeCount);assertEquals(2493,labels.aliasCount)
             val types = payload.entries.filter { it.key.kind==CatalogContentKind.TYPE }
+            assertEquals(1919,labels.translatedTypeCount);assertEquals(types.sumOf { it.text.aliases.size },labels.aliasCount)
+            assertTrue(labels.aliasCount >= 2493)
             assertEquals(types.associate { it.key.stableId to listOf(it.text.label)+it.text.aliases },labels.typeFields.mapValues { (_,fields)->fields.map { it.original } })
             val view = plain.withCatalogLabels(labels)
             val byLabel = types.first { it.text.label.length<=256 }

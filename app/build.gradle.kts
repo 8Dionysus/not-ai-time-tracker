@@ -11,7 +11,7 @@ android {
     compileSdk = 36
     ndkVersion = "30.0.16248370"
     externalNativeBuild { ndkBuild { path = rootProject.file("core/src/main/c/Android.mk") } }
-    defaultConfig { applicationId = "dev.notai.tracker"; minSdk = 26; targetSdk = 36; versionCode = 18; versionName = "0.16.0";testInstrumentationRunner = "dev.notai.tracker.android.ArchiveInstrumentation" }
+    defaultConfig { applicationId = "dev.notai.tracker"; minSdk = 26; targetSdk = 36; versionCode = 19; versionName = "0.17.0";testInstrumentationRunner = "dev.notai.tracker.android.ArchiveInstrumentation" }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true }

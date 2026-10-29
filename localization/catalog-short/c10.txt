@@ -1,0 +1,140 @@
+1241 ‖ Basque pelota: xare ‖ Pelota vasca: xare ‖ Pelote basque : xare ‖ Pelota basca: xare ‖ Baskische Pelota: Xare ‖ Pelota basca: xare ‖ البيلوتا الباسكية: الشبكة ‖ 巴斯克回力球：网兜 ‖ バスクペロタ：シャレ ‖ 바스크 펠로타: 샤레 ‖ बास्क पेलोटा: शारे
+1242 ‖ Disc distance throw ‖ Lanzamiento de disco a distancia ‖ Lancer de disque en distance ‖ Lançamento de disco a distância ‖ Scheiben-Weitwurf ‖ Lancio del disco in distanza ‖ رمي القرص لأبعد مسافة ‖ 飞盘远投 ‖ ディスク遠投 ‖ 디스크 멀리 던지기 ‖ डिस्क दूरी थ्रो
+1243 ‖ Disc accuracy throw ‖ Lanzamiento de disco de precisión ‖ Lancer de disque de précision ‖ Lançamento de disco de precisão ‖ Scheiben-Zielwurf ‖ Lancio del disco di precisione ‖ رمي القرص بدقة ‖ 飞盘精准投掷 ‖ ディスク精度投げ ‖ 디스크 정확도 던지기 ‖ डिस्क सटीक थ्रो
+1244 ‖ Rescue line throw ‖ Lanzamiento de cuerda de rescate ‖ Lancer de corde de sauvetage ‖ Lançamento de corda de resgate ‖ Rettungsleinenwurf ‖ Lancio della corda di salvataggio ‖ رمي حبل الإنقاذ ‖ 抛救生绳 ‖ レスキューロープ投げ ‖ 구조 로프 던지기 ‖ बचाव रस्सी फेंकना
+1245 ‖ Manikin tow ‖ Remolque de maniquí ‖ Remorquage de mannequin ‖ Reboque de manequim ‖ Puppe schleppen ‖ Trasporto del manichino ‖ سحب الدمية ‖ 拖带假人 ‖ マネキン曳行 ‖ 마네킹 운반 ‖ पुतला खींचना
+1246 ‖ Guts ‖ Guts ‖ Guts ‖ Guts ‖ Guts ‖ Guts ‖ غاتس ‖ 飞盘 Guts ‖ ガッツ ‖ 거츠 ‖ गट्स
+1247 ‖ Goaltimate ‖ Goaltimate ‖ Goaltimate ‖ Goaltimate ‖ Goaltimate ‖ Goaltimate ‖ غولتيميت ‖ Goaltimate 飞盘 ‖ ゴールティメット ‖ 골티밋 ‖ गोलटिमेट
+1248 ‖ Rescue board race ‖ Carrera de tabla de rescate ‖ Course de planche de sauvetage ‖ Corrida de prancha de resgate ‖ Rettungsbrett-Rennen ‖ Gara con tavola di salvataggio ‖ سباق لوح الإنقاذ ‖ 救生板竞速 ‖ レスキューボードレース ‖ 구조 보드 경주 ‖ बचाव बोर्ड रेस
+1249 ‖ Surf boat race ‖ Carrera de bote de rescate ‖ Course de bateau de sauvetage ‖ Corrida de barco de resgate ‖ Rettungsboot-Rennen ‖ Gara di barca di salvataggio ‖ سباق قارب الإنقاذ ‖ 救生艇竞速 ‖ サーフボートレース ‖ 구조정 경주 ‖ सर्फ़ बोट रेस
+1250 ‖ Rescue ski race ‖ Carrera de kayak de rescate ‖ Course de surf-ski de sauvetage ‖ Corrida de caiaque de resgate ‖ Rettungs-Ski-Rennen ‖ Gara di kayak di salvataggio ‖ سباق قارب الإنقاذ الفردي ‖ 救生艇单人赛 ‖ レスキュースキーレース ‖ 구조 카약 경주 ‖ बचाव कयाक रेस
+1251 ‖ Double Disc Court ‖ Double Disc Court ‖ Double Disc Court ‖ Double Disc Court ‖ Double Disc Court ‖ Double Disc Court ‖ دبل ديسك كورت ‖ 双盘场地赛 ‖ ダブルディスクコート ‖ 더블 디스크 코트 ‖ डबल डिस्क कोर्ट
+1252 ‖ Discathon ‖ Discathon ‖ Discathon ‖ Discathon ‖ Discathon ‖ Discathon ‖ ديسكاثون ‖ 飞盘越野 ‖ ディスカソン ‖ 디스카톤 ‖ डिस्काथॉन
+1253 ‖ Discflect ‖ Discflect ‖ Discflect ‖ Discflect ‖ Discflect ‖ Discflect ‖ ديسكفليكت ‖ Discflect 飞盘 ‖ ディスクフレクト ‖ 디스크플렉트 ‖ डिस्कफ़्लेक्ट
+1254 ‖ Martial arts ‖ Artes marciales ‖ Sports de combat ‖ Lutas ‖ Kampfsport ‖ Sport da combattimento ‖ الفنون القتالية ‖ 格斗 ‖ 格闘技 ‖ 격투기 ‖ मार्शल आर्ट्स
+1255 ‖ Aikido ‖ Aikido ‖ Aïkido ‖ Aikido ‖ Aikido ‖ Aikido ‖ الأيكيدو ‖ 合气道 ‖ 合気道 ‖ 합기도 ‖ ऐकिडो
+1256 ‖ Boxing ‖ Boxeo ‖ Boxe ‖ Boxe ‖ Boxen ‖ Pugilato ‖ الملاكمة ‖ 拳击 ‖ ボクシング ‖ 복싱 ‖ मुक्केबाज़ी
+1257 ‖ Belt wrestling ‖ Lucha de cinturón ‖ Lutte à la ceinture ‖ Luta de cinturão ‖ Gürtelringen ‖ Lotta con cintura ‖ المصارعة بالحزام ‖ 腰带摔跤 ‖ ベルトレスリング ‖ 벨트 레슬링 ‖ बेल्ट कुश्ती
+1258 ‖ BJJ and grappling ‖ BJJ y grappling ‖ JJB et grappling ‖ Jiu-jitsu e grappling ‖ BJJ und Grappling ‖ BJJ e grappling ‖ الجوجيتسو البرازيلي والمصارعة الأرضية ‖ 巴西柔术与缠斗 ‖ ブラジリアン柔術とグラップリング ‖ 주짓수와 그래플링 ‖ BJJ और ग्रैपलिंग
+1259 ‖ Wai Kru ‖ Wai Kru ‖ Wai Kru ‖ Wai Kru ‖ Wai Kru ‖ Wai Kru ‖ واي كرو ‖ 拜师舞 ‖ ワイクルー ‖ 와이크루 ‖ वाई क्रू
+1260 ‖ Freestyle wrestling ‖ Lucha libre olímpica ‖ Lutte libre ‖ Luta livre olímpica ‖ Freistilringen ‖ Lotta libera ‖ المصارعة الحرة ‖ 自由式摔跤 ‖ フリースタイルレスリング ‖ 자유형 레슬링 ‖ फ़्रीस्टाइल कुश्ती
+1261 ‖ Greco-Roman wrestling ‖ Lucha grecorromana ‖ Lutte gréco-romaine ‖ Luta greco-romana ‖ Griechisch-römisches Ringen ‖ Lotta greco-romana ‖ المصارعة الرومانية ‖ 古典式摔跤 ‖ グレコローマン ‖ 그레코로만형 레슬링 ‖ ग्रीको-रोमन कुश्ती
+1262 ‖ Judo ‖ Judo ‖ Judo ‖ Judô ‖ Judo ‖ Judo ‖ الجودو ‖ 柔道 ‖ 柔道 ‖ 유도 ‖ जूडो
+1263 ‖ Kazakh kures ‖ Kazaksha kures ‖ Qazaq kuresi ‖ Qazaq kuresi ‖ Kasachisches Kures ‖ Qazaq kuresi ‖ المصارعة الكازاخية ‖ 哈萨克式摔跤 ‖ カザフ・クレス ‖ 카자흐 쿠레스 ‖ कज़ाख कुरेस
+1264 ‖ Capoeira ‖ Capoeira ‖ Capoeira ‖ Capoeira ‖ Capoeira ‖ Capoeira ‖ الكابويرا ‖ 卡波耶拉 ‖ カポエイラ ‖ 카포에라 ‖ कैपोएरा
+1265 ‖ Karate ‖ Kárate ‖ Karaté ‖ Caratê ‖ Karate ‖ Karate ‖ الكاراتيه ‖ 空手道 ‖ 空手 ‖ 가라테 ‖ कराटे
+1266 ‖ Judo kata ‖ Kata de judo ‖ Kata de judo ‖ Kata de judô ‖ Judo-Kata ‖ Kata di judo ‖ كاتا الجودو ‖ 柔道形 ‖ 柔道の形 ‖ 유도 본 ‖ जूडो काटा
+1267 ‖ Karate kata ‖ Kata de kárate ‖ Kata de karaté ‖ Kata de caratê ‖ Karate-Kata ‖ Kata di karate ‖ كاتا الكاراتيه ‖ 空手形 ‖ 空手の形 ‖ 가라테 카타 ‖ कराटे काटा
+1268 ‖ Kendo ‖ Kendo ‖ Kendo ‖ Kendô ‖ Kendo ‖ Kendo ‖ الكيندو ‖ 剑道 ‖ 剣道 ‖ 검도 ‖ केंडो
+1269 ‖ Kickboxing ‖ Kickboxing ‖ Kickboxing ‖ Kickboxing ‖ Kickboxen ‖ Kickboxing ‖ الكيك بوكسينغ ‖ 踢拳 ‖ キックボクシング ‖ 킥복싱 ‖ किकबॉक्सिंग
+1270 ‖ Krabi krabong ‖ Krabi krabong ‖ Krabi krabong ‖ Krabi krabong ‖ Krabi Krabong ‖ Krabi krabong ‖ كرابي كرابونغ ‖ 泰式兵器术 ‖ クラビー・クラボーン ‖ 크라비 크라봉 ‖ क्राबी क्राबोंग
+1271 ‖ Kumite ‖ Kumite ‖ Kumite ‖ Kumitê ‖ Kumite ‖ Kumite ‖ الكوميتيه ‖ 空手对练 ‖ 組手 ‖ 구미테 ‖ कुमिते
+1272 ‖ MMA ‖ MMA ‖ MMA ‖ MMA ‖ MMA ‖ MMA ‖ الفنون القتالية المختلطة ‖ 综合格斗 ‖ 総合格闘技 ‖ 종합격투기 ‖ MMA
+1273 ‖ Muay Talay ‖ Muay Talay ‖ Muay Talay ‖ Muay Talay ‖ Muay Talay ‖ Muay Talay ‖ مواي تالاي ‖ 海滩泰拳 ‖ ムエタレー ‖ 무에탈레이 ‖ मुए तलाय
+1274 ‖ Muay Thai ‖ Muay thai ‖ Boxe thaï ‖ Muay thai ‖ Muay Thai ‖ Muay thai ‖ المواي تاي ‖ 泰拳 ‖ ムエタイ ‖ 무에타이 ‖ मुए थाई
+1275 ‖ Kickboxing musical forms ‖ Formas musicales de kickboxing ‖ Formes musicales de kickboxing ‖ Formas musicais de kickboxing ‖ Musikformen im Kickboxen ‖ Forme musicali di kickboxing ‖ العروض الموسيقية في الكيك بوكسينغ ‖ 踢拳音乐套路 ‖ キックボクシングの音楽演武 ‖ 킥복싱 뮤지컬 폼 ‖ किकबॉक्सिंग संगीत फ़ॉर्म
+1276 ‖ Technique drills ‖ Entrenar la técnica ‖ Travail technique ‖ Treino de técnica ‖ Techniktraining ‖ Allenamento tecnico ‖ التدريب على التقنية ‖ 技术练习 ‖ 技の稽古 ‖ 기술 연습 ‖ तकनीक का अभ्यास
+1277 ‖ Pankration ‖ Pancracio ‖ Pancrace ‖ Pancrácio ‖ Pankration ‖ Pancrazio ‖ البانكراتيون ‖ 潘克拉辛 ‖ パンクラチオン ‖ 판크라티온 ‖ पैंक्रेशन
+1278 ‖ Pahlavani ‖ Pahlavani ‖ Pahlavani ‖ Pahlavani ‖ Pahlavani ‖ Pahlavani ‖ البهلواني ‖ 伊朗传统摔跤 ‖ パフラヴァーニー ‖ 팔라바니 ‖ पहलवानी
+1279 ‖ Beach wrestling ‖ Lucha en playa ‖ Lutte sur sable ‖ Luta de praia ‖ Strandringen ‖ Lotta da spiaggia ‖ مصارعة الشاطئ ‖ 沙滩摔跤 ‖ ビーチレスリング ‖ 비치 레슬링 ‖ बीच कुश्ती
+1280 ‖ Poomsae ‖ Poomsae ‖ Poomsae ‖ Poomsae ‖ Poomsae ‖ Poomsae ‖ البومسي ‖ 跆拳道品势 ‖ プムセ ‖ 품새 ‖ पूमसे
+1281 ‖ Sambo ‖ Sambo ‖ Sambo ‖ Sambo ‖ Sambo ‖ Sambo ‖ السامبو ‖ 桑搏 ‖ サンボ ‖ 삼보 ‖ सैम्बो
+1282 ‖ Sanda ‖ Sanda ‖ Sanda ‖ Sanda ‖ Sanda ‖ Sanda ‖ الساندا ‖ 散打 ‖ 散打 ‖ 산타 ‖ सांडा
+1283 ‖ Sparring ‖ Sparring ‖ Sparring ‖ Sparring ‖ Sparring ‖ Sparring ‖ المنازلة التدريبية ‖ 实战对练 ‖ スパーリング ‖ 스파링 ‖ स्पैरिंग
+1284 ‖ Sumo ‖ Sumo ‖ Sumo ‖ Sumô ‖ Sumo ‖ Sumo ‖ السومو ‖ 相扑 ‖ 相撲 ‖ 스모 ‖ सूमो
+1285 ‖ Taekwondo ‖ Taekwondo ‖ Taekwondo ‖ Taekwondo ‖ Taekwondo ‖ Taekwondo ‖ التايكوندو ‖ 跆拳道 ‖ テコンドー ‖ 태권도 ‖ ताइक्वांडो
+1286 ‖ Wushu and kung fu ‖ Wushu y kung-fu ‖ Wushu et kung-fu ‖ Wushu e kung fu ‖ Wushu und Kung-Fu ‖ Wushu e kung fu ‖ الووشو والكونغ فو ‖ 武术与功夫 ‖ 武術とカンフー ‖ 우슈와 쿵후 ‖ वुशु और कुंग फ़ू
+1287 ‖ Fencing ‖ Esgrima ‖ Escrime ‖ Esgrima ‖ Fechten ‖ Scherma ‖ المبارزة ‖ 击剑 ‖ フェンシング ‖ 펜싱 ‖ तलवारबाज़ी
+1288 ‖ Team rescue simulation ‖ Simulación de rescate por equipos ‖ Simulation de sauvetage en équipe ‖ Simulação de resgate em equipe ‖ Team-Rettungssimulation ‖ Simulazione di salvataggio a squadre ‖ محاكاة إنقاذ جماعية ‖ 团队救生模拟 ‖ チームレスキュー演習 ‖ 팀 구조 시뮬레이션 ‖ टीम बचाव सिमुलेशन
+1289 ‖ Team ball games ‖ Juegos de pelota en equipo ‖ Jeux de ballon en équipe ‖ Jogos de bola em equipe ‖ Mannschaftsballspiele ‖ Giochi di squadra con la palla ‖ ألعاب الكرة الجماعية ‖ 团队球类 ‖ チーム球技 ‖ 팀 구기 ‖ टीम गेंद खेल
+1290 ‖ Australian football ‖ Fútbol australiano ‖ Football australien ‖ Futebol australiano ‖ Australian Football ‖ Football australiano ‖ كرة القدم الأسترالية ‖ 澳式足球 ‖ オーストラリアンフットボール ‖ 오스트레일리안 풋볼 ‖ ऑस्ट्रेलियाई फ़ुटबॉल
+1291 ‖ Ultimate frisbee ‖ Ultimate ‖ Ultimate ‖ Ultimate frisbee ‖ Ultimate Frisbee ‖ Ultimate frisbee ‖ الألتيميت فريسبي ‖ 极限飞盘 ‖ アルティメット ‖ 얼티밋 프리스비 ‖ अल्टीमेट फ़्रिस्बी
+1292 ‖ American football ‖ Fútbol americano ‖ Football américain ‖ Futebol americano ‖ American Football ‖ Football americano ‖ كرة القدم الأمريكية ‖ 美式橄榄球 ‖ アメリカンフットボール ‖ 미식축구 ‖ अमेरिकी फ़ुटबॉल
+1293 ‖ Basketball ‖ Baloncesto ‖ Basket ‖ Basquete ‖ Basketball ‖ Basket ‖ كرة السلة ‖ 篮球 ‖ バスケットボール ‖ 농구 ‖ बास्केटबॉल
+1294 ‖ 3x3 basketball ‖ Baloncesto 3x3 ‖ Basket 3x3 ‖ Basquete 3x3 ‖ 3x3-Basketball ‖ Basket 3x3 ‖ كرة السلة 3×3 ‖ 三人篮球 ‖ 3x3バスケットボール ‖ 3대3 농구 ‖ 3x3 बास्केटबॉल
+1295 ‖ Baseball ‖ Béisbol ‖ Baseball ‖ Beisebol ‖ Baseball ‖ Baseball ‖ البيسبول ‖ 棒球 ‖ 野球 ‖ 야구 ‖ बेसबॉल
+1296 ‖ Baseball5 ‖ Baseball5 ‖ Baseball5 ‖ Baseball5 ‖ Baseball5 ‖ Baseball5 ‖ بيسبول 5 ‖ 五人制棒球 ‖ ベースボール5 ‖ 베이스볼5 ‖ बेसबॉल5
+1297 ‖ Box lacrosse ‖ Lacrosse en pista ‖ Crosse en enclos ‖ Lacrosse indoor ‖ Box-Lacrosse ‖ Box lacrosse ‖ لاكروس الصالات ‖ 室内长曲棍球 ‖ ボックスラクロス ‖ 박스 라크로스 ‖ बॉक्स लैक्रोस
+1298 ‖ Water polo ‖ Waterpolo ‖ Water-polo ‖ Polo aquático ‖ Wasserball ‖ Pallanuoto ‖ كرة الماء ‖ 水球 ‖ 水球 ‖ 수구 ‖ वॉटर पोलो
+1299 ‖ Volleyball ‖ Voleibol ‖ Volley-ball ‖ Vôlei ‖ Volleyball ‖ Pallavolo ‖ الكرة الطائرة ‖ 排球 ‖ バレーボール ‖ 배구 ‖ वॉलीबॉल
+1300 ‖ Snow volleyball ‖ Vóley nieve ‖ Volley sur neige ‖ Vôlei na neve ‖ Schneevolleyball ‖ Snow volley ‖ الكرة الطائرة على الثلج ‖ 雪地排球 ‖ スノーバレー ‖ 스노 발리볼 ‖ बर्फ़ पर वॉलीबॉल
+1301 ‖ Dodgeball ‖ Balón prisionero ‖ Balle aux prisonniers ‖ Queimada ‖ Völkerball ‖ Palla avvelenata ‖ لعبة المراوغة بالكرة ‖ 躲避球 ‖ ドッジボール ‖ 피구 ‖ डॉजबॉल
+1302 ‖ Handball ‖ Balonmano ‖ Handball ‖ Handebol ‖ Handball ‖ Pallamano ‖ كرة اليد ‖ 手球 ‖ ハンドボール ‖ 핸드볼 ‖ हैंडबॉल
+1303 ‖ Gaelic football ‖ Fútbol gaélico ‖ Football gaélique ‖ Futebol gaélico ‖ Gaelic Football ‖ Calcio gaelico ‖ كرة القدم الغيلية ‖ 盖尔式足球 ‖ ゲーリックフットボール ‖ 게일릭 풋볼 ‖ गेलिक फ़ुटबॉल
+1304 ‖ Flying disc games ‖ Juegos con disco volador ‖ Jeux de disque volant ‖ Jogos com disco ‖ Frisbeespiele ‖ Giochi con il disco ‖ ألعاب القرص الطائر ‖ 飞盘运动 ‖ フライングディスク競技 ‖ 플라잉디스크 경기 ‖ फ़्लाइंग डिस्क खेल
+1305 ‖ Indoor hockey ‖ Hockey sala ‖ Hockey en salle ‖ Hóquei indoor ‖ Hallenhockey ‖ Hockey indoor ‖ الهوكي داخل الصالات ‖ 室内曲棍球 ‖ インドアホッケー ‖ 실내 하키 ‖ इंडोर हॉकी
+1306 ‖ Canoe polo ‖ Kayak polo ‖ Kayak-polo ‖ Canoagem polo ‖ Kanupolo ‖ Canoa polo ‖ بولو الكانوي ‖ 独木舟水球 ‖ カヌーポロ ‖ 카누 폴로 ‖ कैनो पोलो
+1307 ‖ Kickball ‖ Kickball ‖ Kickball ‖ Kickball ‖ Kickball ‖ Kickball ‖ الكيك بول ‖ 踢球棒球 ‖ キックベース ‖ 발야구 ‖ किकबॉल
+1308 ‖ Korfball ‖ Korfball ‖ Korfbal ‖ Corfebol ‖ Korfball ‖ Korfball ‖ الكورفبول ‖ 合球 ‖ コーフボール ‖ 코프볼 ‖ कॉर्फ़बॉल
+1309 ‖ Cricket ‖ Críquet ‖ Cricket ‖ Críquete ‖ Cricket ‖ Cricket ‖ الكريكيت ‖ 板球 ‖ クリケット ‖ 크리켓 ‖ क्रिकेट
+1310 ‖ Lacrosse ‖ Lacrosse ‖ Crosse ‖ Lacrosse ‖ Lacrosse ‖ Lacrosse ‖ اللاكروس ‖ 长曲棍球 ‖ ラクロス ‖ 라크로스 ‖ लैक्रोस
+1311 ‖ Lacrosse sixes ‖ Lacrosse sixes ‖ Crosse à six ‖ Lacrosse sixes ‖ Lacrosse Sixes ‖ Lacrosse sixes ‖ اللاكروس السداسي ‖ 六人制长曲棍球 ‖ ラクロス シックス ‖ 라크로스 식스 ‖ लैक्रोस सिक्सेस
+1312 ‖ Table football ‖ Futbolín ‖ Baby-foot ‖ Pebolim ‖ Tischfußball ‖ Calcio balilla ‖ كرة القدم الطاولة ‖ 桌上足球 ‖ テーブルサッカー ‖ 테이블 축구 ‖ टेबल फ़ुटबॉल
+1313 ‖ Netball ‖ Netball ‖ Netball ‖ Netball ‖ Netball ‖ Netball ‖ كرة الشبكة ‖ 无挡板篮球 ‖ ネットボール ‖ 넷볼 ‖ नेटबॉल
+1314 ‖ Beach volleyball ‖ Vóley playa ‖ Beach-volley ‖ Vôlei de praia ‖ Beachvolleyball ‖ Beach volley ‖ الكرة الطائرة الشاطئية ‖ 沙滩排球 ‖ ビーチバレー ‖ 비치발리볼 ‖ बीच वॉलीबॉल
+1315 ‖ Beach handball ‖ Balonmano playa ‖ Beach handball ‖ Handebol de praia ‖ Beachhandball ‖ Beach handball ‖ كرة اليد الشاطئية ‖ 沙滩手球 ‖ ビーチハンドボール ‖ 비치 핸드볼 ‖ बीच हैंडबॉल
+1316 ‖ Beach soccer ‖ Fútbol playa ‖ Beach soccer ‖ Futebol de areia ‖ Beachsoccer ‖ Beach soccer ‖ كرة القدم الشاطئية ‖ 沙滩足球 ‖ ビーチサッカー ‖ 비치 사커 ‖ बीच फ़ुटबॉल
+1317 ‖ Beach hockey ‖ Hockey playa ‖ Hockey sur sable ‖ Hóquei de praia ‖ Beachhockey ‖ Hockey da spiaggia ‖ الهوكي الشاطئي ‖ 沙滩曲棍球 ‖ ビーチホッケー ‖ 비치 하키 ‖ बीच हॉकी
+1318 ‖ Field lacrosse ‖ Lacrosse de campo ‖ Crosse au champ ‖ Lacrosse de campo ‖ Feldlacrosse ‖ Lacrosse da campo ‖ لاكروس الملعب ‖ 草地长曲棍球 ‖ フィールドラクロス ‖ 필드 라크로스 ‖ फ़ील्ड लैक्रोस
+1319 ‖ Rugby union ‖ Rugby ‖ Rugby à XV ‖ Rúgbi ‖ Rugby Union ‖ Rugby a 15 ‖ الرغبي ‖ 英式橄榄球 ‖ ラグビー ‖ 럭비 ‖ रग्बी
+1320 ‖ Rugby sevens ‖ Rugby 7 ‖ Rugby à 7 ‖ Rúgbi de sete ‖ 7er-Rugby ‖ Rugby a 7 ‖ الرغبي السباعي ‖ 七人制橄榄球 ‖ 7人制ラグビー ‖ 7인제 럭비 ‖ रग्बी सेवन्स
+1321 ‖ Rugby league ‖ Rugby league ‖ Rugby à XIII ‖ Rúgbi league ‖ Rugby League ‖ Rugby a 13 ‖ رغبي الدوري ‖ 联盟式橄榄球 ‖ ラグビーリーグ ‖ 럭비 리그 ‖ रग्बी लीग
+1322 ‖ Sepak takraw ‖ Sepak takraw ‖ Sepak takraw ‖ Sepaktakraw ‖ Sepak Takraw ‖ Sepak takraw ‖ سيباك تاكرو ‖ 藤球 ‖ セパタクロー ‖ 세팍타크로 ‖ सेपक टकरॉ
+1323 ‖ Softball ‖ Sóftbol ‖ Softball ‖ Softbol ‖ Softball ‖ Softball ‖ الكرة اللينة ‖ 垒球 ‖ ソフトボール ‖ 소프트볼 ‖ सॉफ़्टबॉल
+1324 ‖ Flag football ‖ Flag football ‖ Flag football ‖ Flag football ‖ Flag Football ‖ Flag football ‖ كرة العلم ‖ 腰旗橄榄球 ‖ フラッグフットボール ‖ 플래그 풋볼 ‖ फ़्लैग फ़ुटबॉल
+1325 ‖ Floorball ‖ Floorball ‖ Floorball ‖ Floorball ‖ Unihockey ‖ Floorball ‖ الفلوربول ‖ 福乐球 ‖ フロアボール ‖ 플로어볼 ‖ फ़्लोरबॉल
+1326 ‖ Football ‖ Fútbol ‖ Football ‖ Futebol ‖ Fußball ‖ Calcio ‖ كرة القدم ‖ 足球 ‖ サッカー ‖ 축구 ‖ फ़ुटबॉल
+1327 ‖ Futsal ‖ Fútbol sala ‖ Futsal ‖ Futsal ‖ Futsal ‖ Calcio a 5 ‖ كرة الصالات ‖ 五人制足球 ‖ フットサル ‖ 풋살 ‖ फ़ुटसल
+1328 ‖ Field hockey ‖ Hockey hierba ‖ Hockey sur gazon ‖ Hóquei sobre grama ‖ Feldhockey ‖ Hockey su prato ‖ هوكي الميدان ‖ 曲棍球 ‖ フィールドホッケー ‖ 필드하키 ‖ फ़ील्ड हॉकी
+1329 ‖ Ice hockey game ‖ Hockey con disco ‖ Hockey au palet ‖ Hóquei com disco ‖ Eishockeyspiel ‖ Hockey con il disco ‖ مباراة هوكي الجليد ‖ 冰球比赛 ‖ アイスホッケーの試合 ‖ 아이스하키 경기 ‖ आइस हॉकी मैच
+1330 ‖ Hockey5s ‖ Hockey 5 ‖ Hockey à 5 ‖ Hóquei 5 ‖ Hockey5s ‖ Hockey 5 ‖ الهوكي الخماسي ‖ 五人制曲棍球 ‖ 5人制ホッケー ‖ 5인제 하키 ‖ हॉकी5
+1331 ‖ Equestrian and motorsport ‖ Hípica y motor ‖ Équitation et sports mécaniques ‖ Hipismo e automobilismo ‖ Reit- und Motorsport ‖ Equitazione e motori ‖ الفروسية ورياضة المحركات ‖ 马术与赛车 ‖ 馬術とモータースポーツ ‖ 승마와 모터스포츠 ‖ घुड़सवारी और मोटर खेल
+1332 ‖ Autocross ‖ Autocross ‖ Autocross ‖ Autocross ‖ Autocross ‖ Autocross ‖ الأوتوكروس ‖ 汽车越野 ‖ オートクロス ‖ 오토크로스 ‖ ऑटोक्रॉस
+1333 ‖ Auto slalom ‖ Slalom automovilístico ‖ Slalom automobile ‖ Slalom automobilístico ‖ Autoslalom ‖ Slalom automobilistico ‖ التعرج بالسيارات ‖ 汽车绕桩 ‖ ジムカーナ ‖ 자동차 슬라럼 ‖ ऑटो स्लैलम
+1334 ‖ Barrel racing ‖ Carrera de barriles ‖ Barrel racing ‖ Tambor ‖ Barrel Racing ‖ Barrel racing ‖ سباق البراميل ‖ 绕桶赛 ‖ バレルレース ‖ 배럴 레이싱 ‖ बैरल रेसिंग
+1335 ‖ Horseback riding ‖ Equitación ‖ Équitation ‖ Cavalgada ‖ Reiten ‖ Equitazione ‖ ركوب الخيل ‖ 骑马 ‖ 乗馬 ‖ 승마 ‖ घुड़सवारी
+1336 ‖ Snowmobile racing ‖ Carreras de motos de nieve ‖ Course de motoneige ‖ Corrida de snowmobile ‖ Schneemobilrennen ‖ Gare di motoslitta ‖ سباقات الدراجات الثلجية ‖ 雪地摩托赛 ‖ スノーモービルレース ‖ 스노모빌 경주 ‖ स्नोमोबाइल रेस
+1337 ‖ Karting ‖ Karting ‖ Karting ‖ Kart ‖ Kartfahren ‖ Kart ‖ الكارتينغ ‖ 卡丁车 ‖ カート ‖ 카트 ‖ कार्टिंग
+1338 ‖ ATVs ‖ Quads ‖ Quad ‖ Quadriciclo ‖ Quad fahren ‖ Quad ‖ الدراجات الرباعية ‖ 全地形车 ‖ バギー ‖ ATV ‖ एटीवी
+1339 ‖ Show jumping, dressage, eventing ‖ Salto, doma y concurso completo ‖ Saut, dressage, concours complet ‖ Salto, adestramento e CCE ‖ Springen, Dressur, Vielseitigkeit ‖ Salto, dressage, completo ‖ قفز الحواجز والترويض والمسابقة الثلاثية ‖ 场地障碍、盛装舞步、三项赛 ‖ 障害・馬場馬術・総合 ‖ 장애물·마장마술·종합 ‖ शो जंपिंग, ड्रेसेज, इवेंटिंग
+1340 ‖ Equestrian vaulting ‖ Volteo ‖ Voltige équestre ‖ Volteio ‖ Voltigieren ‖ Volteggio ‖ الجمباز على الخيل ‖ 马上技巧 ‖ 馬上体操 ‖ 마상 체조 ‖ घोड़े पर करतब
+1341 ‖ Horse polo ‖ Polo ‖ Polo ‖ Polo ‖ Polo ‖ Polo ‖ البولو ‖ 马球 ‖ ポロ ‖ 폴로 ‖ पोलो
+1342 ‖ Endurance riding ‖ Raid ecuestre ‖ Endurance équestre ‖ Enduro equestre ‖ Distanzreiten ‖ Endurance equestre ‖ سباق التحمل للخيل ‖ 耐力骑 ‖ エンデュランス馬術 ‖ 지구력 승마 ‖ धीरज घुड़सवारी
+1343 ‖ Calf roping ‖ Laceo de terneros ‖ Prise au lasso ‖ Laço de bezerro ‖ Kälberfangen ‖ Cattura del vitello ‖ صيد العجول بالحبل ‖ 套小牛 ‖ カーフローピング ‖ 송아지 올가미 ‖ बछड़ा लासो
+1344 ‖ Motorcycle rally raid ‖ Rally raid en moto ‖ Rallye-raid moto ‖ Rally raid de moto ‖ Motorrad-Rallye-Raid ‖ Rally raid in moto ‖ رالي الدراجات النارية ‖ 摩托拉力 ‖ バイクのラリーレイド ‖ 모터사이클 랠리 레이드 ‖ मोटरसाइकिल रैली रेड
+1345 ‖ Track motorcycle racing ‖ Motociclismo en circuito ‖ Moto sur circuit ‖ Motociclismo em pista ‖ Motorradrennen auf der Strecke ‖ Moto in pista ‖ سباق الدراجات النارية على المضمار ‖ 摩托车场地赛 ‖ サーキット走行 ‖ 서킷 모터사이클 ‖ ट्रैक मोटरसाइकिल रेस
+1346 ‖ Motocross and enduro ‖ Motocross y enduro ‖ Motocross et enduro ‖ Motocross e enduro ‖ Motocross und Enduro ‖ Motocross ed enduro ‖ الموتوكروس والإندورو ‖ 越野摩托 ‖ モトクロスとエンデューロ ‖ 모토크로스와 엔듀로 ‖ मोटोक्रॉस और एंड्यूरो
+1347 ‖ Motorcycle trials ‖ Trial en moto ‖ Trial moto ‖ Trial de moto ‖ Motorradtrial ‖ Trial in moto ‖ تريال الدراجات النارية ‖ 摩托攀爬 ‖ バイクトライアル ‖ 모터사이클 트라이얼 ‖ मोटरसाइकिल ट्रायल
+1348 ‖ Rally ‖ Rally ‖ Rallye ‖ Rali ‖ Rallye ‖ Rally ‖ الرالي ‖ 拉力赛 ‖ ラリー ‖ 랠리 ‖ रैली
+1349 ‖ Rally raid and off-road racing ‖ Rally raid y todoterreno ‖ Rallye-raid et tout-terrain ‖ Rally raid e off-road ‖ Rallye-Raid und Offroad-Rennen ‖ Rally raid e fuoristrada ‖ رالي الصحراء والطرق الوعرة ‖ 越野拉力 ‖ ラリーレイドとオフロード ‖ 랠리 레이드와 오프로드 ‖ रैली रेड और ऑफ़-रोड
+1350 ‖ Rodeo ‖ Rodeo ‖ Rodéo ‖ Rodeio ‖ Rodeo ‖ Rodeo ‖ الروديو ‖ 牛仔竞技 ‖ ロデオ ‖ 로데오 ‖ रोडियो
+1351 ‖ Stock car and drag racing ‖ Stock car y drag racing ‖ Stock-car et dragster ‖ Stock car e arrancada ‖ Stockcar und Dragrennen ‖ Stock car e drag racing ‖ سباقات السيارات المعدلة والتسارع ‖ 改装车与直线加速赛 ‖ ストックカーとドラッグレース ‖ 스톡카와 드래그 레이스 ‖ स्टॉक कार और ड्रैग रेसिंग
+1352 ‖ Carriage driving ‖ Enganche ‖ Attelage ‖ Atrelagem ‖ Fahrsport ‖ Attacchi ‖ قيادة العربات ‖ 驾车赛 ‖ 馬車競技 ‖ 마차 몰기 ‖ घोड़ागाड़ी चलाना
+1353 ‖ Athletics and gymnastics ‖ Atletismo y gimnasia ‖ Athlétisme et gymnastique ‖ Atletismo e ginástica ‖ Leichtathletik und Turnen ‖ Atletica e ginnastica ‖ ألعاب القوى والجمباز ‖ 田径与体操 ‖ 陸上競技と体操 ‖ 육상과 체조 ‖ एथलेटिक्स और जिमनास्टिक्स
+1354 ‖ Acrobatics ‖ Acrobacia ‖ Acrobatie ‖ Acrobacia ‖ Akrobatik ‖ Acrobatica ‖ الألعاب البهلوانية ‖ 杂技 ‖ アクロバット ‖ 곡예 ‖ कलाबाज़ी
+1355 ‖ Acrobatic gymnastics ‖ Gimnasia acrobática ‖ Gymnastique acrobatique ‖ Ginástica acrobática ‖ Sportakrobatik ‖ Ginnastica acrobatica ‖ الجمباز الإيقاعي البهلواني ‖ 技巧体操 ‖ アクロ体操 ‖ 아크로바틱 체조 ‖ एक्रोबैटिक जिमनास्टिक्स
+1356 ‖ Hurdles ‖ Vallas ‖ Haies ‖ Corrida com barreiras ‖ Hürdenlauf ‖ Ostacoli ‖ سباق الحواجز ‖ 跨栏 ‖ ハードル ‖ 허들 ‖ बाधा दौड़
+1357 ‖ Trampoline ‖ Trampolín ‖ Trampoline ‖ Trampolim ‖ Trampolin ‖ Trampolino ‖ الترامبولين ‖ 蹦床 ‖ トランポリン ‖ 트램펄린 ‖ ट्रैम्पोलिन
+1358 ‖ Track running and relays ‖ Pista y relevos ‖ Course sur piste et relais ‖ Pista e revezamentos ‖ Bahnlauf und Staffeln ‖ Corsa su pista e staffette ‖ الجري والتتابع على المضمار ‖ 径赛与接力 ‖ トラック走とリレー ‖ 트랙 달리기와 계주 ‖ ट्रैक दौड़ और रिले
+1359 ‖ Aerial arts and pole ‖ Acrobacia aérea y pole ‖ Arts aériens et pole ‖ Tecido acrobático e pole ‖ Luftakrobatik und Pole ‖ Aerea e pole ‖ الجمباز الهوائي ورياضة العمود ‖ 空中技巧与钢管运动 ‖ エアリアルとポール ‖ 에어리얼과 폴 스포츠 ‖ एरियल आर्ट्स और पोल
+1360 ‖ Artistic and rhythmic gymnastics ‖ Gimnasia artística y rítmica ‖ Gymnastique artistique et rythmique ‖ Ginástica artística e rítmica ‖ Kunstturnen und Rhythmische Gymnastik ‖ Ginnastica artistica e ritmica ‖ الجمباز الفني والإيقاعي ‖ 竞技与艺术体操 ‖ 体操と新体操 ‖ 기계체조와 리듬체조 ‖ कलात्मक और लयबद्ध जिमनास्टिक्स
+1361 ‖ Throwing events ‖ Lanzamientos ‖ Lancers ‖ Arremessos ‖ Wurfdisziplinen ‖ Lanci ‖ مسابقات الرمي ‖ 投掷 ‖ 投てき ‖ 투척 ‖ फेंक स्पर्धाएँ
+1362 ‖ Combined events ‖ Pruebas combinadas ‖ Épreuves combinées ‖ Provas combinadas ‖ Mehrkampf ‖ Prove multiple ‖ المسابقات المركبة ‖ 全能 ‖ 混成競技 ‖ 혼성 경기 ‖ बहु-स्पर्धा
+1363 ‖ Jumps ‖ Saltos ‖ Sauts ‖ Saltos ‖ Sprünge ‖ Salti ‖ مسابقات القفز ‖ 跳跃 ‖ 跳躍 ‖ 도약 ‖ कूद
+1364 ‖ Aerobic gymnastics ‖ Gimnasia aeróbica ‖ Gymnastique aérobic ‖ Ginástica aeróbica ‖ Sportaerobic ‖ Ginnastica aerobica ‖ الجمباز الهوائي الإيقاعي ‖ 健美操 ‖ エアロビック競技 ‖ 에어로빅 체조 ‖ एरोबिक जिमनास्टिक्स
+1365 ‖ Artistic gymnastics ‖ Gimnasia artística ‖ Gymnastique artistique ‖ Ginástica artística ‖ Kunstturnen ‖ Ginnastica artistica ‖ الجمباز الفني ‖ 竞技体操 ‖ 器械体操 ‖ 기계체조 ‖ कलात्मक जिमनास्टिक्स
+1366 ‖ Race walking ‖ Marcha atlética ‖ Marche athlétique ‖ Marcha atlética ‖ Gehen ‖ Marcia ‖ المشي الرياضي ‖ 竞走 ‖ 競歩 ‖ 경보 ‖ पैदल चाल
+1367 ‖ Sprint ‖ Sprint ‖ Sprint ‖ Velocidade ‖ Sprint ‖ Velocità ‖ العدو السريع ‖ 短跑 ‖ 短距離走 ‖ 단거리 ‖ स्प्रिंट
+1368 ‖ Rhythmic gymnastics ‖ Gimnasia rítmica ‖ Gymnastique rythmique ‖ Ginástica rítmica ‖ Rhythmische Gymnastik ‖ Ginnastica ritmica ‖ الجمباز الإيقاعي ‖ 艺术体操 ‖ 新体操 ‖ 리듬체조 ‖ लयबद्ध जिमनास्टिक्स
+1369 ‖ Cheerleading ‖ Porrismo ‖ Cheerleading ‖ Cheerleading ‖ Cheerleading ‖ Cheerleading ‖ التشجيع الاستعراضي ‖ 啦啦操 ‖ チアリーディング ‖ 치어리딩 ‖ चीयरलीडिंग
+1370 ‖ Relay ‖ Relevos ‖ Relais ‖ Revezamento ‖ Staffel ‖ Staffetta ‖ سباق التتابع ‖ 接力 ‖ リレー ‖ 계주 ‖ रिले
+1371 ‖ Disc throwing ‖ Lanzamiento de disco ‖ Lancer de disque ‖ Lançamento de disco ‖ Scheibenwurf ‖ Lancio del disco ‖ رمي القرص ‖ 投掷飞盘 ‖ ディスク投げ ‖ 디스크 던지기 ‖ डिस्क फेंकना
+1372 ‖ Precision and aim ‖ Precisión y puntería ‖ Précision et adresse ‖ Precisão e pontaria ‖ Präzision und Zielen ‖ Precisione e mira ‖ الدقة والتصويب ‖ 精准与瞄准 ‖ 精度と狙い ‖ 정확성과 조준 ‖ सटीकता और निशाना
+1373 ‖ English billiards ‖ Billar inglés ‖ Billard anglais ‖ Bilhar inglês ‖ English Billiards ‖ Biliardo inglese ‖ البلياردو الإنجليزي ‖ 英式台球 ‖ イングリッシュビリヤード ‖ 잉글리시 빌리어드 ‖ इंग्लिश बिलियर्ड्स
+1374 ‖ Billiards ‖ Billar ‖ Billard ‖ Bilhar ‖ Billard ‖ Biliardo ‖ البلياردو ‖ 台球 ‖ ビリヤード ‖ 당구 ‖ बिलियर्ड्स
+1375 ‖ Bowling ‖ Bolos ‖ Bowling ‖ Boliche ‖ Bowling ‖ Bowling ‖ البولينغ ‖ 保龄球 ‖ ボウリング ‖ 볼링 ‖ बॉलिंग
+1376 ‖ Golf ‖ Golf ‖ Golf ‖ Golfe ‖ Golf ‖ Golf ‖ الغولف ‖ 高尔夫 ‖ ゴルフ ‖ 골프 ‖ गोल्फ़
+1377 ‖ Darts ‖ Dardos ‖ Fléchettes ‖ Dardos ‖ Darts ‖ Freccette ‖ رمي السهام ‖ 飞镖 ‖ ダーツ ‖ 다트 ‖ डार्ट्स
+1378 ‖ Disc golf ‖ Disc golf ‖ Disc golf ‖ Disc golf ‖ Discgolf ‖ Disc golf ‖ غولف القرص ‖ 飞盘高尔夫 ‖ ディスクゴルフ ‖ 디스크 골프 ‖ डिस्क गोल्फ़
+1379 ‖ Driving range ‖ Campo de prácticas ‖ Practice de golf ‖ Driving range ‖ Driving Range ‖ Campo pratica ‖ ملعب تدريب الغولف ‖ 高尔夫练习场 ‖ 打ちっ放し ‖ 골프 연습장 ‖ ड्राइविंग रेंज
+1380 ‖ Carom billiards ‖ Billar a tres bandas ‖ Billard carambole ‖ Bilhar carambola ‖ Karambolage ‖ Biliardo a carambola ‖ بلياردو الكارامبول ‖ 开伦台球 ‖ キャロム ‖ 캐롬 당구 ‖ कैरम बिलियर्ड्स

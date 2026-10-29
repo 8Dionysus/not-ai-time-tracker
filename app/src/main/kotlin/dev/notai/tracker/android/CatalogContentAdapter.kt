@@ -45,6 +45,16 @@ class CatalogContentAdapter(context: Context,catalog: ReadyCatalog) {
         for(tag in localeFallbacks(displayLocaleTag)) { ensureLocale(tag);if(tag in packs.installedReviewedLocales()) break }
         return packs.choiceLabels(data,displayLocaleTag)
     }
+    /** Shown names of preset types in [displayLocaleTag]: type id to (translated label, source label). Personal renames
+     * and custom types are left out, so callers keep showing them verbatim. Nothing here writes to the Dataset. */
+    fun localizedTypeNames(displayLocaleTag: String,data: Dataset): Map<String,Pair<String,String>> {
+        for(tag in localeFallbacks(displayLocaleTag)) { ensureLocale(tag);if(tag in packs.installedReviewedLocales()) break }
+        val known = packs.sourceEntries().mapTo(HashSet()) { it.key }
+        val keys = data.types.map { CatalogContentKey(CatalogContentKind.TYPE,it.id,it.meaningVersion) }.filter { it in known }
+        return packs.getLocalizedCatalogEntries("tracker.catalog",keys,displayLocaleTag,packs.userOverrides(data))
+            .filter { !it.userOverride && it.resolvedLocaleTag != null && it.resolvedLocaleTag != it.sourceLocaleTag }
+            .associate { it.key.stableId to (it.display.label to it.original.label) }
+    }
     fun getLocalizedCatalogEntries(keys: List<CatalogContentKey>,displayLocaleTag: String,data: Dataset): List<CatalogDisplayEntry> {
         for(tag in localeFallbacks(displayLocaleTag)) { ensureLocale(tag);if(tag in packs.installedReviewedLocales()) break }
         return packs.getLocalizedCatalogEntries("tracker.catalog",keys,displayLocaleTag,packs.userOverrides(data))

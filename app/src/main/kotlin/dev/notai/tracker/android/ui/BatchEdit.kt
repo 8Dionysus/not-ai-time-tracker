@@ -1,5 +1,7 @@
 package dev.notai.tracker.android.ui
 
+
+import dev.notai.tracker.android.L
 import dev.notai.tracker.android.R
 
 import androidx.compose.ui.res.stringResource
@@ -44,18 +46,18 @@ fun BatchBar(vm: TrackerViewModel, count: Int, pickActivity: ((Classification, L
     BackHandler(enabled = deletion == null && !deleting) { vm.clearPicked() }
     fun preview(sel: Classification?, note: MetadataNoteEdit?, replace: Boolean, describe: String) = scope.launch {
         vm.previewBatch(sel, note, replace).onSuccess { p ->
-            if (p.changes.isEmpty()) problem = "У выбранных записей это уже так" else confirm = p to describe
+            if (p.changes.isEmpty()) problem = L.s(R.string.t_db70b53fc3) else confirm = p to describe
         }.onFailure { problem = Format.error(it) }
     }
     Column(Modifier.fillMaxWidth().background(c.paper)) {
         Hairline()
         Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(start = 12.dp, end = 12.dp, bottom = 8.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                IconAction(Icon.Close, "Отменить выбор", vm::clearPicked, tint = c.ink)
-                Text("Выбрано: $sessionCount", style = NotAi.type.body.copy(fontWeight = FontWeight.Medium), color = c.ink)
+                IconAction(Icon.Close, L.s(R.string.t_716e5371c7), vm::clearPicked, tint = c.ink)
+                Text(L.s(R.string.t_9a4e6f0e95, sessionCount), style = NotAi.type.body.copy(fontWeight = FontWeight.Medium), color = c.ink)
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                PillButton(stringResource(R.string.editorial_tracker_draft_1a2c7007a2d3e4977ace_v0), { pickActivity { sel, label -> preview(sel, null, true, "Занятие станет «${label.title}».") } },
+                PillButton(stringResource(R.string.editorial_tracker_draft_1a2c7007a2d3e4977ace_v0), { pickActivity { sel, label -> preview(sel, null, true, L.s(R.string.t_aab4eaebc4, label.title)) } },
                     Modifier.weight(1f), kind = ButtonKind.TONAL, height = 40.dp)
                 PillButton(stringResource(R.string.editorial_tracker_draft_25a310c49fcbc14afa82_v0), { noteDialog = true }, Modifier.weight(1f), kind = ButtonKind.TONAL, height = 40.dp)
                 PillButton(if (preparingDeletion) "…" else "$deleteLabel · $sessionCount", {
@@ -66,8 +68,8 @@ fun BatchBar(vm: TrackerViewModel, count: Int, pickActivity: ((Classification, L
                         try {
                             host.previewPickedDeletion().onSuccess { review ->
                                 when {
-                                    review.sessionIds.isEmpty() -> problem = "Нет записей для удаления"
-                                    review.sessionIds != vm.picked.value -> problem = "Выбор успел измениться. Проверь записи и повтори."
+                                    review.sessionIds.isEmpty() -> problem = L.s(R.string.t_ca7830c42f)
+                                    review.sessionIds != vm.picked.value -> problem = L.s(R.string.t_5a1d0660ef)
                                     else -> deletion = review
                                 }
                             }.onFailure { problem = Format.error(it) }
@@ -81,12 +83,12 @@ fun BatchBar(vm: TrackerViewModel, count: Int, pickActivity: ((Classification, L
     if (noteDialog) NoteDialog(onDismiss = { noteDialog = false }) { text, all ->
         noteDialog = false
         preview(null, MetadataNoteEdit(text, if (all) MetadataFillPolicy.REPLACE else MetadataFillPolicy.EMPTY_ONLY), all,
-            if (all) "Заметка «$text» заменит прежние." else "Заметка «$text» появится там, где её не было.")
+            if (all) L.s(R.string.t_45e673c416, text) else L.s(R.string.t_5203402af7, text))
     }
     confirm?.let { (p, describe) ->
         val n = p.changes.map { it.sessionId }.distinct().size
-        ConfirmDialog("Изменить ${Format.plural(n, "запись", "записи", "записей")}?", "$describe Время записей не меняется. Отменить можно сразу после.",
-            "Изменить", { vm.applyBatch(p); confirm = null }, { confirm = null })
+        ConfirmDialog(L.s(R.string.t_44b6bfd761, L.p(R.plurals.p_6c73bc4d74, n)), L.s(R.string.t_4d397a20ed, describe),
+            L.s(R.string.t_9d809f884b), { vm.applyBatch(p); confirm = null }, { confirm = null })
     }
     deletion?.let { review ->
         ConfirmDialog(stringResource(R.string.delete_title,review.sessionIds.size),
@@ -104,7 +106,7 @@ fun BatchBar(vm: TrackerViewModel, count: Int, pickActivity: ((Classification, L
                 }
             }, { if (!deleting) deletion = null }, destructive = true)
     }
-    problem?.let { ConfirmDialog("Не получилось", it, null, {}, { problem = null }) }
+    problem?.let { ConfirmDialog(L.s(R.string.t_0b5f48821f), it, null, {}, { problem = null }) }
 }
 
 @Composable
@@ -112,10 +114,10 @@ private fun NoteDialog(onDismiss: () -> Unit, onDone: (String, Boolean) -> Unit)
     var text by remember { mutableStateOf("") }
     var all by remember { mutableStateOf(false) }
     NotAiSheet(onDismiss, fullHeight = false) {
-        SheetHeader("Заметка для выбранных", onDismiss)
+        SheetHeader(L.s(R.string.t_3bb014825e), onDismiss)
         Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            TextInput("Текст заметки", text, { text = it }, placeholder = "Например, проект «Альфа»")
-            Segmented(listOf(false to "Только где пусто", true to "Заменить у всех"), all, { all = it }, Modifier.fillMaxWidth())
+            TextInput(L.s(R.string.t_1df521854e), text, { text = it }, placeholder = L.s(R.string.t_a34678cc0a))
+            Segmented(listOf(false to L.s(R.string.t_8f12fe23f2), true to L.s(R.string.t_83a2768955)), all, { all = it }, Modifier.fillMaxWidth())
             PillButton(stringResource(R.string.editorial_tracker_draft_b4e3665f8905663a0236_v0), { onDone(text.trim(), all) }, Modifier.fillMaxWidth(), ButtonKind.PRIMARY, enabled = text.isNotBlank())
         }
     }

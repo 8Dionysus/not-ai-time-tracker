@@ -28,4 +28,14 @@ object AppLanguage {
             override fun getAssets() = localized.assets
         }
     }
+    /** Also switch the Activity's own resources in place: system-drawn parts of sheets and dialogs (their
+     * accessibility labels, date pickers) read them, not the composition's localized context. */
+    @Suppress("DEPRECATION")
+    fun applyTo(activityResources: Resources, tag: String) {
+        val config = Configuration(activityResources.configuration)
+        if (config.locales.toLanguageTags() == LocaleList.forLanguageTags(tag).toLanguageTags()) return
+        config.setLocales(LocaleList.forLanguageTags(tag))
+        config.setLayoutDirection(Locale.forLanguageTag(tag))
+        activityResources.updateConfiguration(config, activityResources.displayMetrics)
+    }
 }

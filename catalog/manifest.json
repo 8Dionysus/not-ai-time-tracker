@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
-  "catalogVersion": "0.9.2.0",
+  "catalogVersion": "0.9.3.0",
   "file": "runtime-catalog.json",
-  "bytes": 1954134,
-  "sha256": "aec8933181894f0c40679fe8a4b68b70083963d8b430785071efe275c03e156a",
+  "bytes": 1954057,
+  "sha256": "4a3505ad79e0c204137ef68e0835ef01a771736716cf508012008ff927418bc2",
   "compatibility": {
     "file": "compatibility.json",
-    "bytes": 661341,
-    "sha256": "f0370b6d067822e0f412e42254761e42c64331142720bce5f904bee4828b7d95"
+    "bytes": 661992,
+    "sha256": "6cb4f02bb3667ca76a52f650c33321832e10c6d5f5b4f1f01caaad08d635e49b"
   }
 }

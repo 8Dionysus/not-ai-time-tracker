@@ -13,7 +13,7 @@ import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [36])
+@Config(sdk = [36], qualifiers = "ru-rRU")
 class SurfaceStorageOutcomeTest {
     private fun check(source: Surface) {
         val app = RuntimeEnvironment.getApplication();shadowOf(app).grantPermissions(android.Manifest.permission.POST_NOTIFICATIONS);TimerSurfaces.channels(app)

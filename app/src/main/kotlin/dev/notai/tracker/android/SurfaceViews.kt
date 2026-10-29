@@ -40,29 +40,29 @@ object SurfaceViews {
     /** Simple START/STOP is the main button everywhere outside the app; pause/resume sits beside it. */
     private fun row(d: Dataset, s: Snapshot, plan: List<PlannedChoice> = emptyList()): Row {
         val label = s.session?.let { d.label(it.selection) }
-        val name = label?.let { l -> listOfNotNull(l.title, l.detail).joinToString(" ") } ?: "Без занятия"
+        val name = label?.let { l -> listOfNotNull(l.title, l.detail).joinToString(" ") } ?: L.s(R.string.t_aff922a637)
         val glyph = when { label == null -> R.drawable.act_unclassified; label.unclassified -> R.drawable.act_unclassified; else -> label.glyph }
         val tint = when { label == null || label.unclassified -> R.color.widget_amber_ink; label.slot != null -> areaColors[label.slot!!]; else -> R.color.widget_ink2 }
         val f = s.focus
         val now = SystemClock.elapsedRealtime()
         return when {
             s.mode == Mode.RECOVERY || f?.mode == FocusMode.RECOVERY ->
-                Row(R.drawable.act_unclassified, R.color.widget_amber_ink, "Время неизвестно", "Открой, чтобы указать, когда закончил", null, null, null)
+                Row(R.drawable.act_unclassified, R.color.widget_amber_ink, L.s(R.string.t_5c65c982d1), L.s(R.string.t_4bae800626), null, null, null)
             f != null -> {
-                val phase = if (f.phase == FocusPhase.WORK) "Работа" else "Перерыв"
+                val phase = if (f.phase == FocusPhase.WORK) L.s(R.string.t_75436e3162) else L.s(R.string.t_735877a9aa)
                 when (f.mode) {
-                    FocusMode.DUE -> Row(glyph, tint, name, "$phase закончилась. Открой, чтобы продолжить", null, TimerCommand.STOP, null)
-                    FocusMode.PAUSED -> Row(glyph, tint, name, null, Chrono(now + f.remainingMs, false, true, "Пауза · осталось %s"), TimerCommand.STOP, TimerCommand.RESUME)
-                    else -> Row(glyph, tint, name, null, Chrono(now + f.remainingMs, true, true, "$phase · осталось %s"), TimerCommand.STOP, TimerCommand.PAUSE)
+                    FocusMode.DUE -> Row(glyph, tint, name, L.s(R.string.t_4301919e86, phase), null, TimerCommand.STOP, null)
+                    FocusMode.PAUSED -> Row(glyph, tint, name, null, Chrono(now + f.remainingMs, false, true, L.s(R.string.t_fdc5b65acf)), TimerCommand.STOP, TimerCommand.RESUME)
+                    else -> Row(glyph, tint, name, null, Chrono(now + f.remainingMs, true, true, L.s(R.string.t_3371d6e0e9, phase)), TimerCommand.STOP, TimerCommand.PAUSE)
                 }
             }
             s.mode == Mode.RUNNING -> Row(glyph, tint, name, null, Chrono(now - s.trustedDurationMs, true, false, null), TimerCommand.STOP, TimerCommand.PAUSE)
-            s.mode == Mode.PAUSED -> Row(glyph, tint, name, null, Chrono(now - s.trustedDurationMs, false, false, "Пауза · %s"), TimerCommand.STOP, TimerCommand.RESUME)
+            s.mode == Mode.PAUSED -> Row(glyph, tint, name, null, Chrono(now - s.trustedDurationMs, false, false, L.s(R.string.t_f36036b6cf)), TimerCommand.STOP, TimerCommand.RESUME)
             else -> {
                 // Idle with a plan: the next planned activity is named, and the widget gets a button for it.
                 val next = plan.firstOrNull()
-                Row(R.drawable.ic_stat_notai, R.color.widget_ink2, "Учёт не идёт",
-                    next?.let { "По плану: ${it.title}" + (it.time?.let { t -> ", $t" } ?: "") } ?: "Занятие выберешь потом", null, TimerCommand.START, null, next)
+                Row(R.drawable.ic_stat_notai, R.color.widget_ink2, L.s(R.string.t_93be31b630),
+                    next?.let { L.s(R.string.t_1deb177f5a, it.title) + (it.time?.let { t -> ", $t" } ?: "") } ?: L.s(R.string.t_fea5f3ca7c), null, TimerCommand.START, null, next)
             }
         }
     }
@@ -89,7 +89,7 @@ object SurfaceViews {
             rv.setViewVisibility(R.id.surface_secondary, View.VISIBLE)
             rv.setImageViewResource(R.id.surface_secondary, planned.glyph)
             rv.setInt(R.id.surface_secondary, "setColorFilter", c.getColor(planned.slot?.let { areaColors[it] } ?: R.color.widget_ink))
-            rv.setContentDescription(R.id.surface_secondary, "Начать по плану: ${planned.title}")
+            rv.setContentDescription(R.id.surface_secondary, L.s(R.string.t_95bd330f2a, planned.title))
             rv.setOnClickPendingIntent(R.id.surface_secondary, PlanSurfaces.pending(c, planned, s, 9))
         } else button(c, rv, R.id.surface_secondary, r.secondary, s, source)
         rv.setOnClickPendingIntent(R.id.surface_row, TimerSurfaces.open(c))
@@ -124,8 +124,8 @@ object SurfaceViews {
             ChipItem(p.title + (p.time?.let { " $it" } ?: ""), p.glyph, p.slot?.let { areaColors[it] } ?: R.color.widget_ink2) { ctx, i -> PlanSurfaces.pending(ctx, p, s, i) }
         }
         val merged = (plan + items).take(chips.size)
-        val label = when { plan.isEmpty() -> if (route.application == ChoiceApplication.START) "Начать сразу" else "Переключиться на"
-            plan.size >= merged.size -> "По плану на сегодня"; else -> "По плану и часто" }
+        val label = when { plan.isEmpty() -> if (route.application == ChoiceApplication.START) L.s(R.string.t_fc8e4e2d1c) else L.s(R.string.t_24f866b4ee)
+            plan.size >= merged.size -> L.s(R.string.t_6cde6c34a0); else -> L.s(R.string.t_5905870dba) }
         // Keep the full chooser reachable even when no compact suggestion is available.
         return Quick(route, label, merged)
     }
@@ -214,13 +214,13 @@ object SurfaceViews {
         val builder = Notification.Builder(c, TimerSurfaces.CONTROL_CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_notai).setColor(c.getColor(R.color.widget_amber))
             .setStyle(Notification.DecoratedCustomViewStyle()).setCustomContentView(small)
-            .setContentTitle(r.title).setContentText(s.safeLabel).setContentIntent(TimerSurfaces.open(c))
+            .setContentTitle(r.title).setContentText(dev.notai.tracker.android.ui.Format.stateLine(s)).setContentIntent(TimerSurfaces.open(c))
             .setOnlyAlertOnce(true).setOngoing(true).setShowWhen(false).setCategory(Notification.CATEGORY_STATUS)
             .setVisibility(lockScreenVisibility)
         if (lockScreenVisibility == Notification.VISIBILITY_PRIVATE) builder.setPublicVersion(
             Notification.Builder(c, TimerSurfaces.CONTROL_CHANNEL).setSmallIcon(R.drawable.ic_stat_notai)
                 .setVisibility(Notification.VISIBILITY_PUBLIC).setShowWhen(false)
-                .setColor(c.getColor(R.color.widget_amber)).setContentTitle(if (s.mode == Mode.IDLE && s.focus == null) "(not)AI Time" else "Учёт идёт").build())
+                .setColor(c.getColor(R.color.widget_amber)).setContentTitle(if (s.mode == Mode.IDLE && s.focus == null) "(not)AI Time" else L.s(R.string.t_322ce697bb)).build())
         if (big != null) builder.setCustomBigContentView(big)
         return builder.build()
     }
@@ -236,7 +236,7 @@ object SurfaceViews {
     fun widget(c: Context, view: TrackerView, enabled: Boolean, backgroundAlphaPercent: Int = view.data.settings.surfaces.widgetBackgroundAlphaPercent): RemoteViews = RemoteViews(c.packageName, R.layout.timer_widget).also { rv ->
         val s = view.snapshot()
         val r = if (enabled) row(view.data, s, PlanSurfaces.open(view))
-            else Row(R.drawable.ic_stat_notai, R.color.widget_ink2, "Виджет выключен", "Включи его в настройках приложения", null, null, null)
+            else Row(R.drawable.ic_stat_notai, R.color.widget_ink2, L.s(R.string.t_ccb2375542), L.s(R.string.t_b74904694d), null, null, null)
         bind(c, rv, r, s, Surface.WIDGET)
         widgetBackgroundAlpha(rv,R.id.widget_background,backgroundAlphaPercent)
     }
@@ -258,7 +258,7 @@ class QuickChoiceReceiver : BroadcastReceiver() {
                 try { SurfaceChoices.choose(context, runtime.tracker, route, reference) }
                 catch (e: CoreError) {
                     android.os.Handler(android.os.Looper.getMainLooper()).post {
-                        android.widget.Toast.makeText(context, "Таймер уже изменился. Открой уведомление ещё раз", android.widget.Toast.LENGTH_SHORT).show()
+                        android.widget.Toast.makeText(context, L.s(R.string.t_f8fe850a57), android.widget.Toast.LENGTH_SHORT).show()
                     }
                 }
                 TimerSurfaces.refresh(context, runtime.tracker)

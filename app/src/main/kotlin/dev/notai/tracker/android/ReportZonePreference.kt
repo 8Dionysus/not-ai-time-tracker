@@ -22,7 +22,7 @@ class ReportZonePreference(context: Context,private val tracker: Tracker,newStor
     init {
         if(!prefs.contains("automatic")) save(prefs.edit().putBoolean("automatic",newStore))
         try { pending = prefs.getString("pending",null)?.let { codec.decodeFromString(PendingReportZone.serializer(),it) } }
-        catch(_: Exception) { unreadablePending = true;recoveryProblem = "Не удалось восстановить выбор пояса. Выбери пояс ещё раз" }
+        catch(_: Exception) { unreadablePending = true;recoveryProblem = L.s(R.string.t_340342b07a) }
     }
     // A confirmed durable intent wins over the previous mode even if final acknowledgement failed.
     val automatic: Boolean get() = pending?.automatic ?: prefs.getBoolean("automatic",false)
@@ -35,7 +35,7 @@ class ReportZonePreference(context: Context,private val tracker: Tracker,newStor
     private fun finish(intent: PendingReportZone) {
         try { save(prefs.edit().putBoolean("automatic",intent.automatic).remove("pending")) }
         catch(e: Exception) {
-            recoveryProblem = "Пояс изменён. Подтверждение настройки не сохранилось; приложение повторит его при открытии"
+            recoveryProblem = L.s(R.string.t_d3c8e2e155)
             throw e
         }
         pending = null;unreadablePending = false;recoveryProblem = null
@@ -54,8 +54,8 @@ class ReportZonePreference(context: Context,private val tracker: Tracker,newStor
             // may have lost the acknowledgement; retain its durable intent for observation/recovery.
             if(e is CoreError && e.code != ErrorCode.STORAGE) {
                 try { save(prefs.edit().remove("pending"));pending = null }
-                catch(_: Exception) { recoveryProblem = "Не удалось завершить выбор пояса. Проверь текущий пояс и выбери его ещё раз" }
-            } else recoveryProblem = "Результат смены пояса требует проверки. Приложение проверит его при открытии"
+                catch(_: Exception) { recoveryProblem = L.s(R.string.t_176ddf9870) }
+            } else recoveryProblem = L.s(R.string.t_aff9f84f58)
             throw e
         }
         finish(intent)
@@ -87,14 +87,14 @@ class ReportZonePreference(context: Context,private val tracker: Tracker,newStor
                     data.datasetId == intent.expected.datasetId && data.revision > intent.expected.revision &&
                         data.settings.reportZone == intent.zone && data.settings.reportDayStartMinute == intent.startMinute -> Unit
                     else -> {
-                        recoveryProblem = "Выбор пояса не завершён, а настройки успели измениться. Проверь пояс и выбери его ещё раз"
+                        recoveryProblem = L.s(R.string.t_4d92a280cc)
                         return null
                     }
                 }
                 finish(intent)
             } catch(e: Exception) {
                 if(e is java.util.concurrent.CancellationException) throw e
-                recoveryProblem = recoveryProblem ?: "Не удалось завершить выбор пояса. Повтори выбор в настройках"
+                recoveryProblem = recoveryProblem ?: L.s(R.string.t_79eb55406f)
                 return recovered
             }
         }

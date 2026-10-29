@@ -1,0 +1,5557 @@
+{
+ "strings": {
+  "t_340342b07a": {
+   "ru": "Не удалось восстановить выбор пояса. Выбери пояс ещё раз",
+   "ctx": [
+    "ReportZonePreference.kt"
+   ]
+  },
+  "t_d3c8e2e155": {
+   "ru": "Пояс изменён. Подтверждение настройки не сохранилось; приложение повторит его при открытии",
+   "ctx": [
+    "ReportZonePreference.kt"
+   ]
+  },
+  "t_176ddf9870": {
+   "ru": "Не удалось завершить выбор пояса. Проверь текущий пояс и выбери его ещё раз",
+   "ctx": [
+    "ReportZonePreference.kt"
+   ]
+  },
+  "t_aff9f84f58": {
+   "ru": "Результат смены пояса требует проверки. Приложение проверит его при открытии",
+   "ctx": [
+    "ReportZonePreference.kt"
+   ]
+  },
+  "t_4d92a280cc": {
+   "ru": "Выбор пояса не завершён, а настройки успели измениться. Проверь пояс и выбери его ещё раз",
+   "ctx": [
+    "ReportZonePreference.kt"
+   ]
+  },
+  "t_79eb55406f": {
+   "ru": "Не удалось завершить выбор пояса. Повтори выбор в настройках",
+   "ctx": [
+    "ReportZonePreference.kt"
+   ]
+  },
+  "t_f62e9fd860": {
+   "ru": "С поясом (ISO)",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_ab0662026d": {
+   "ru": "История из CSV",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_8e273a8a05": {
+   "ru": "Занятия и проверка",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_94b8df93b6": {
+   "ru": "Файл",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_1fce9b2e5d": {
+   "ru": "%1$s: %2$s. Проверь, что означает каждая — ",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_fc355fea11": {
+   "ru": "подсказки уже расставлены по заголовкам.",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_afb9a7edd6": {
+   "ru": "Разделитель",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_c0b04d97ff": {
+   "ru": "Табуляция",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_eb467ef147": {
+   "ru": "Запятая",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_782c5a40e3": {
+   "ru": "Точка с запятой",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_d9e72beb20": {
+   "ru": "Источник CSV (сервис и аккаунт)",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_4a81786403": {
+   "ru": "Например, toggl:личный",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_84707b7a44": {
+   "ru": "Одно имя для повторных выгрузок аккаунта; разные имена для разных источников.",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_70b8d5d8d5": {
+   "ru": "Занятие",
+   "ctx": [
+    "CsvImport.kt",
+    "PickerSheet.kt"
+   ]
+  },
+  "t_d149e0338b": {
+   "ru": "Категория или клиент",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_cb26bdc6c6": {
+   "ru": "Начало",
+   "ctx": [
+    "CsvImport.kt",
+    "Forms.kt"
+   ]
+  },
+  "t_f8310658c7": {
+   "ru": "Время начала, если отдельной колонкой",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_4e895fd70d": {
+   "ru": "Конец",
+   "ctx": [
+    "CsvImport.kt",
+    "Forms.kt"
+   ]
+  },
+  "t_654fad1c18": {
+   "ru": "Время конца, если отдельной колонкой",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_d4168ace06": {
+   "ru": "Длительность",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_11d7afb599": {
+   "ru": "Длительность записана как",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_820b711796": {
+   "ru": "1.5 ч",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_86ee6df7f5": {
+   "ru": "секунды",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_bbb0e8e8cd": {
+   "ru": "мс",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_917b58362c": {
+   "ru": "Заметка",
+   "ctx": [
+    "CsvImport.kt",
+    "Forms.kt",
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_a5515a2b98": {
+   "ru": "Как записано время",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_8633c34c71": {
+   "ru": " · в файле: %1$s",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_914b6dca6d": {
+   "ru": "Мой пояс",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_80e474035b": {
+   "ru": "Пояс указан в самом времени",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_1b702dcc70": {
+   "ru": "Время в файле считается по поясу %1$s",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_fe68cb28be": {
+   "ru": "Нужны занятие, начало и конец или длительность",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_91d993d35c": {
+   "ru": "Как это назвать в трекере",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_6e65291421": {
+   "ru": "Выбрать занятие для «%1$s»",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_32b74a3c47": {
+   "ru": "Без названия",
+   "ctx": [
+    "CsvImport.kt",
+    "Forms.kt",
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_9e512e4de6": {
+   "ru": "Оставить как в файле",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_457969b009": {
+   "ru": "Проверка",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_852778be6d": {
+   "ru": "Считаю…",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_d2e9881a72": {
+   "ru": "Добавится %1$s",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_e962d6d168": {
+   "ru": ", уже есть: %1$s",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_49f64bd23b": {
+   "ru": ", с ошибками: %1$s",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_aff922a637": {
+   "ru": "Без занятия",
+   "ctx": [
+    "CsvImport.kt",
+    "Presentation.kt",
+    "Forms.kt",
+    "FloatingTimerService.kt",
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_a773a5edc6": {
+   "ru": "и ещё %1$s",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_e699415c6e": {
+   "ru": "Записи добавятся к истории, ничего существующего не заменится. Повторы из этого же источника пропускаются.",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_4784c38b90": {
+   "ru": "Читаю…",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_e3b9331301": {
+   "ru": "Дальше",
+   "ctx": [
+    "CsvImport.kt",
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_9de49a7593": {
+   "ru": "В файле не нашлось ни одной записи",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_a94e60234f": {
+   "ru": "Добавить %1$s",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_559a87f7cc": {
+   "ru": "Добавить",
+   "ctx": [
+    "CsvImport.kt",
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_210ed3cd4d": {
+   "ru": "Нет такой колонки",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_747942b4fa": {
+   "ru": "Формат времени",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_db70b53fc3": {
+   "ru": "У выбранных записей это уже так",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_716e5371c7": {
+   "ru": "Отменить выбор",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_9a4e6f0e95": {
+   "ru": "Выбрано: %1$s",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_aab4eaebc4": {
+   "ru": "Занятие станет «%1$s».",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_ca7830c42f": {
+   "ru": "Нет записей для удаления",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_5a1d0660ef": {
+   "ru": "Выбор успел измениться. Проверь записи и повтори.",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_45e673c416": {
+   "ru": "Заметка «%1$s» заменит прежние.",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_5203402af7": {
+   "ru": "Заметка «%1$s» появится там, где её не было.",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_44b6bfd761": {
+   "ru": "Изменить %1$s?",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_4d397a20ed": {
+   "ru": "%1$s Время записей не меняется. Отменить можно сразу после.",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_9d809f884b": {
+   "ru": "Изменить",
+   "ctx": [
+    "BatchEdit.kt",
+    "PickerSheet.kt",
+    "Favorites.kt",
+    "Forms.kt",
+    "Editors.kt",
+    "TimerScreen.kt"
+   ]
+  },
+  "t_0b5f48821f": {
+   "ru": "Не получилось",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_3bb014825e": {
+   "ru": "Заметка для выбранных",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_1df521854e": {
+   "ru": "Текст заметки",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_a34678cc0a": {
+   "ru": "Например, проект «Альфа»",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_8f12fe23f2": {
+   "ru": "Только где пусто",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_83a2768955": {
+   "ru": "Заменить у всех",
+   "ctx": [
+    "BatchEdit.kt"
+   ]
+  },
+  "t_f6dab074d7": {
+   "ru": "Назад",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_4ae50d3073": {
+   "ru": "Закрыть",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_98b2073ed1": {
+   "ru": "Очистить",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_8ff0d08fec": {
+   "ru": "Новая запись из текста",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_dd15d6eecb": {
+   "ru": "Что начинаем?",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_ba2ec9712b": {
+   "ru": "Чем занят?",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_3ac95324a3": {
+   "ru": "На что переключился?",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_28061309a5": {
+   "ru": "Фокус: занятие",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_ad2b7927cc": {
+   "ru": "Начать новое",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_ef5ff32a17": {
+   "ru": "Уточнить текущее",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_b20271fb06": {
+   "ru": "Текущая запись закончится сейчас, новая начнётся с этой минуты.",
+   "ctx": [
+    "PickerSheet.kt",
+    "App.kt"
+   ]
+  },
+  "t_851c0ae977": {
+   "ru": "прежним",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_bdcd78489d": {
+   "ru": "Название получит уже идущая запись. Начало остаётся %1$s.",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_c67ba2d89b": {
+   "ru": "До %1$s остаётся текущее занятие, с %2$s начнётся выбранное.",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_3e32dd6cfd": {
+   "ru": "Заметка: «%1$s»",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_b32615689f": {
+   "ru": "Убрать заметку",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_0087bd0bf7": {
+   "ru": "Найти или создать занятие",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_84f85ce506": {
+   "ru": "Ничего не нашлось",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_212edd982b": {
+   "ru": "Найдено",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_a2503487b7": {
+   "ru": "Создать «%1$s» в разделе «%2$s»",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_67946fca81": {
+   "ru": "Создать занятие «%1$s»",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_8241e9552e": {
+   "ru": "Своё занятие в этом разделе: начни вводить название в поиске",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_d9f48a75fd": {
+   "ru": "Убрать из избранного",
+   "ctx": [
+    "PickerSheet.kt",
+    "Favorites.kt",
+    "TimerScreen.kt"
+   ]
+  },
+  "t_5da9e0e83b": {
+   "ru": "В избранное",
+   "ctx": [
+    "PickerSheet.kt",
+    "TimerScreen.kt"
+   ]
+  },
+  "t_f6f1e5272f": {
+   "ru": "Порядок",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_750b471214": {
+   "ru": "Порядок избранного",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_30e9845126": {
+   "ru": "Ещё %1$s областей: профессии и работа",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_20feaa7e40": {
+   "ru": "Начать без занятия, с заметкой",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_5c675dcb97": {
+   "ru": "Начать без занятия",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_5bb00e40b9": {
+   "ru": "в архиве",
+   "ctx": [
+    "PickerSheet.kt"
+   ]
+  },
+  "t_58533a0c30": {
+   "ru": "Отметь звёздочкой занятия, которые начинаешь чаще всего. Они встанут на главный экран и в шторку.",
+   "ctx": [
+    "Favorites.kt"
+   ]
+  },
+  "t_2152e4a71f": {
+   "ru": "Первые в списке видны в шторке, на виджете и у плавающей кнопки. Чтобы переставить, зажми и тяни.",
+   "ctx": [
+    "Favorites.kt"
+   ]
+  },
+  "t_9a65ca6053": {
+   "ru": "Изменить: %1$s",
+   "ctx": [
+    "Favorites.kt"
+   ]
+  },
+  "t_17e44239e9": {
+   "ru": "Выше",
+   "ctx": [
+    "Favorites.kt"
+   ]
+  },
+  "t_e0f1717450": {
+   "ru": "Ниже",
+   "ctx": [
+    "Favorites.kt"
+   ]
+  },
+  "t_0a33cc879e": {
+   "ru": "Убрать из избранного: %1$s",
+   "ctx": [
+    "Favorites.kt"
+   ]
+  },
+  "t_b40a4254c7": {
+   "ru": "Название на кнопке",
+   "ctx": [
+    "Favorites.kt"
+   ]
+  },
+  "t_738652aa6f": {
+   "ru": "Изменить само занятие «%1$s»",
+   "ctx": [
+    "Favorites.kt"
+   ]
+  },
+  "t_0931eb69ad": {
+   "ru": "Своё занятие",
+   "ctx": [
+    "Favorites.kt"
+   ]
+  },
+  "t_3de49828e8": {
+   "ru": "Название",
+   "ctx": [
+    "Favorites.kt",
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_99d406eeba": {
+   "ru": "Раздел",
+   "ctx": [
+    "Favorites.kt"
+   ]
+  },
+  "t_c0683f8006": {
+   "ru": "Без раздела",
+   "ctx": [
+    "Favorites.kt"
+   ]
+  },
+  "t_fe4b0c80f0": {
+   "ru": "Выбрать",
+   "ctx": [
+    "Favorites.kt",
+    "Editors.kt",
+    "TimerScreen.kt"
+   ]
+  },
+  "t_bf4c4f53cb": {
+   "ru": "Время занятия войдёт в итог раздела в обзоре и целях. Уже сделанные записи сохранят своё прежнее место.",
+   "ctx": [
+    "Favorites.kt"
+   ]
+  },
+  "t_838a5669f7": {
+   "ru": "Поделиться итогом",
+   "ctx": [
+    "OverviewScreen.kt",
+    "Editors.kt"
+   ]
+  },
+  "t_5d5d2ea20a": {
+   "ru": "Сегодня",
+   "ctx": [
+    "OverviewScreen.kt",
+    "Presentation.kt",
+    "Editors.kt"
+   ]
+  },
+  "t_8690f98524": {
+   "ru": ", день ещё идёт",
+   "ctx": [
+    "OverviewScreen.kt",
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_762d7d64da": {
+   "ru": "вчера",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_bc28baf5fc": {
+   "ru": "Вчера записей нет",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_224fe4a4c3": {
+   "ru": "За %1$s записей нет",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_d9a13b5014": {
+   "ru": "за %1$s",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_61af667ee0": {
+   "ru": "на %1$s больше, чем %2$s",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_793720ff06": {
+   "ru": "на %1$s меньше, чем %2$s",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_5fc35f86af": {
+   "ru": "столько же, сколько %1$s",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_13c587506e": {
+   "ru": "Сегодня записей пока нет. Обзор соберётся сам, как только появится первая.",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_892f07c05f": {
+   "ru": "За эти дни записей нет. Обзор соберётся сам, как только они появятся.",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_7ddb544bcd": {
+   "ru": "Есть отрезки с неизвестным временем: %1$s. В итог они не входят, пока ты их не уточнишь.",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_58a3c5f495": {
+   "ru": "%1$s: из чего состоит",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_a7e3c8ee69": {
+   "ru": "За этот период здесь записей нет.",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_20c87f5908": {
+   "ru": "Поставить цель",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_e7672250d5": {
+   "ru": "Ещё цель",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_3cd7d0dd3c": {
+   "ru": "Время по дням: ",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_ec3bd8ce7a": {
+   "ru": "%1$s ч",
+   "ctx": [
+    "OverviewScreen.kt",
+    "Presentation.kt"
+   ]
+  },
+  "t_42f85ce119": {
+   "ru": "сегодня",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_47947a0c46": {
+   "ru": "Часовой пояс",
+   "ctx": [
+    "ReportingSettings.kt",
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_741870459d": {
+   "ru": "Автоматически",
+   "ctx": [
+    "ReportingSettings.kt",
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_5ec7b0f52b": {
+   "ru": "Вручную",
+   "ctx": [
+    "ReportingSettings.kt",
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_95a6a49b6e": {
+   "ru": "Следовать часовому поясу телефона",
+   "ctx": [
+    "ReportingSettings.kt"
+   ]
+  },
+  "t_2eb808708c": {
+   "ru": "Использовать пояс телефона",
+   "ctx": [
+    "ReportingSettings.kt"
+   ]
+  },
+  "t_9f4988d59a": {
+   "ru": "Сейчас: %1$s",
+   "ctx": [
+    "ReportingSettings.kt"
+   ]
+  },
+  "t_2f94692058": {
+   "ru": "Найти пояс IANA, например Europe/Moscow",
+   "ctx": [
+    "ReportingSettings.kt"
+   ]
+  },
+  "t_4208a1afd0": {
+   "ru": "Пояс не найден",
+   "ctx": [
+    "ReportingSettings.kt"
+   ]
+  },
+  "t_45ec81da8a": {
+   "ru": "Выбран",
+   "ctx": [
+    "ReportingSettings.kt",
+    "LauncherIconSettings.kt"
+   ]
+  },
+  "t_d111e0cd52": {
+   "ru": "Граница отчётного дня",
+   "ctx": [
+    "ReportingSettings.kt",
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_0b94cabd4c": {
+   "ru": "Граница дня на час раньше",
+   "ctx": [
+    "ReportingSettings.kt"
+   ]
+  },
+  "t_9dd3e6ec21": {
+   "ru": "Граница дня на час позже",
+   "ctx": [
+    "ReportingSettings.kt"
+   ]
+  },
+  "t_1827ab0050": {
+   "ru": "В полночь, как в календаре",
+   "ctx": [
+    "ReportingSettings.kt"
+   ]
+  },
+  "t_32fd384860": {
+   "ru": "Записи до %1$s относятся к предыдущему дню. Сами записи не меняются",
+   "ctx": [
+    "ReportingSettings.kt"
+   ]
+  },
+  "t_1a3994958c": {
+   "ru": "В полночь",
+   "ctx": [
+    "ReportingSettings.kt"
+   ]
+  },
+  "t_b5ef1ca9d4": {
+   "ru": "Значок приложения",
+   "ctx": [
+    "LauncherIconSettings.kt"
+   ]
+  },
+  "t_d6140e7bc5": {
+   "ru": "0 мин",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_d176283db1": {
+   "ru": "%1$s с",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_60e27c596a": {
+   "ru": "%1$s ч %2$s мин",
+   "ctx": [
+    "Presentation.kt",
+    "ProductionReminderNotices.kt"
+   ]
+  },
+  "t_455a50db4a": {
+   "ru": "%1$s мин",
+   "ctx": [
+    "Presentation.kt",
+    "Forms.kt",
+    "Editors.kt",
+    "ProductionReminderNotices.kt"
+   ]
+  },
+  "t_51403c82de": {
+   "ru": "Вчера",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_90078dfa30": {
+   "ru": "пн",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_5123c9c552": {
+   "ru": "вт",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_161fe56e51": {
+   "ru": "ср",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_7dfbff730f": {
+   "ru": "чт",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_e5ff32f6ae": {
+   "ru": "пт",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_1013a729a6": {
+   "ru": "сб",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_99dbea8209": {
+   "ru": "вс",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_6fb5a32ea5": {
+   "ru": "каждый день",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_2ea9f562ed": {
+   "ru": "по будням",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_c2fcd7ada4": {
+   "ru": "по выходным",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_6d7bb5e932": {
+   "ru": "от %1$s в день",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_afa3b81f25": {
+   "ru": "не больше %1$s в день",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_db922448f7": {
+   "ru": "от %1$s в неделю",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_a5b1429034": {
+   "ru": "не больше %1$s в неделю",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_9e4e767ad0": {
+   "ru": "от %1$s в месяц",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_ad7d8c2a5f": {
+   "ru": "не больше %1$s в месяц",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_2fc6caafc1": {
+   "ru": "от %1$s",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_64eb81c370": {
+   "ru": "не больше %1$s",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_3af83d8850": {
+   "ru": "Данные успели измениться. Проверь экран и повтори.",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_2d5a644e5c": {
+   "ru": "Такой интервал невозможен: проверь начало и конец.",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_3179b46b9d": {
+   "ru": "Интервал пересекается с другой записью.",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_8af28e7685": {
+   "ru": "Сначала уточни неизвестное время.",
+   "ctx": [
+    "Presentation.kt",
+    "Forms.kt"
+   ]
+  },
+  "t_27113f7a1e": {
+   "ru": "Ошибка хранения. Проверьте текущее состояние перед повтором.",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_042dbd35f2": {
+   "ru": "Этот файл не подходит: %1$s",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_b932f7eea5": {
+   "ru": "Не получилось: %1$s",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_5d762fa56e": {
+   "ru": "дата или время не читаются в выбранном формате",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_817dfa0bfc": {
+   "ru": " (колонка «%1$s»)",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_8f44a068d2": {
+   "ru": "у времени нет часового пояса: выбери формат без пояса",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_adcdc4ad41": {
+   "ru": "время вне допустимого диапазона",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_490aa0241e": {
+   "ru": "конец раньше начала",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_e8a76312ff": {
+   "ru": "нужна колонка конца или длительности",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_50a62e5c0f": {
+   "ru": "длительность не совпадает с началом и концом",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_930489be30": {
+   "ru": "длительность не читается в выбранном формате",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_b6305bf26a": {
+   "ru": "длительность должна быть больше нуля",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_fc60b6a6e0": {
+   "ru": "время попадает на перевод часов",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_ace6b66d31": {
+   "ru": "запись в будущем",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_85d33d64d6": {
+   "ru": "в строке другое число колонок",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_64d9c34819": {
+   "ru": "в файле нет колонки",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_57792c3ae8": {
+   "ru": "повторяется или пропущен ID строки",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_83ae5f756d": {
+   "ru": "файл слишком большой",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_c0ed5f4dda": {
+   "ru": "кавычки в строке не закрыты",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_0d8700fb2a": {
+   "ru": "записи пересекаются друг с другом или с историей",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_21a4608d93": {
+   "ru": "данные успели измениться: проверь ещё раз",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_cabb0c6d9b": {
+   "ru": "Строка %1$s: ",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_fa633fd3a2": {
+   "ru": "Нужно выбрать папку заново",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_06d08263c2": {
+   "ru": "В эту папку нельзя сохранять копии. Выбери другую",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_8ba7dc1120": {
+   "ru": "Доступ к папке пропал. Выбери её снова",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_1fbd871837": {
+   "ru": "Папка сейчас недоступна: нет сети или приложение облака не отвечает. Повторю сам",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_fe63f1e035": {
+   "ru": "Не удалось перечитать записанную копию. Повторю сам",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_bd81e0c895": {
+   "ru": "Записанная копия не совпала с данными. Повторю сам",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_b79a6fe480": {
+   "ru": "Копия прервалась. Продолжу сам",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_50abb9831d": {
+   "ru": "Неясно, появился ли файл в папке. Повтори или пропусти эту копию",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_58847603b8": {
+   "ru": "Новая копия сохранена, а старые убрать не вышло",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_a083e020a0": {
+   "ru": "Телефон не дал запланировать копию. Нажми «Сохранить сейчас»",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_d1f9b48826": {
+   "ru": "Не хватило места или памяти на телефоне. Повторю сам",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_1bc5f604f5": {
+   "ru": "1 минуту",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_3296879eac": {
+   "ru": "%1$s минут",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_01e118e6e9": {
+   "ru": "%1$s раньше на %2$s",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_d9ffbbb760": {
+   "ru": "Выбрать время: %1$s",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_3bfd577967": {
+   "ru": "%1$s позже на %2$s",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_de5eb09e17": {
+   "ru": "Изменить занятие",
+   "ctx": [
+    "Forms.kt",
+    "TimerScreen.kt"
+   ]
+  },
+  "t_38dfef435f": {
+   "ru": "Положение записи среди соседних",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_8a22f78e9c": {
+   "ru": "Исправить запись",
+   "ctx": [
+    "Forms.kt",
+    "TimerScreen.kt"
+   ]
+  },
+  "t_f2a9788239": {
+   "ru": "Записать промежуток",
+   "ctx": [
+    "Forms.kt",
+    "TimerScreen.kt"
+   ]
+  },
+  "t_909a83238c": {
+   "ru": "Добавить запись",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_6090cecf2d": {
+   "ru": "было %1$s",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_569ffccaa8": {
+   "ru": "свободно с %1$s",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_1c8ee71b8e": {
+   "ru": "свободно до %1$s",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_fb27c3e29b": {
+   "ru": "%1$s, итог",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_9760f4a429": {
+   "ru": "В избранном",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_e6794c0df6": {
+   "ru": "Добавить в избранное",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_e43c291b9c": {
+   "ru": "Шаг ±",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_0f9a1db081": {
+   "ru": "Шаг %1$s мин",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_5cd8e48ad3": {
+   "ru": "Момент переключения",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_04bcedfa9f": {
+   "ru": "между %1$s и сейчас",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_61394d0185": {
+   "ru": "Когда ты начал?",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_819f3ba9d1": {
+   "ru": "С конца прошлой записи",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_364431ec5a": {
+   "ru": "раньше, чем %1$s",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_55c44eb122": {
+   "ru": "Добавится %1$s до %2$s. ",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_a1725f1b08": {
+   "ru": "Это время отметится как указанное тобой, а не замеренное.",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_8b4d031cf9": {
+   "ru": "Это время уже занято другой записью. Выбери начало позже.",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_d2aa318afd": {
+   "ru": "записано %1$s",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_93b302d32f": {
+   "ru": "не позже, чем сейчас",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_731f2bdc1e": {
+   "ru": "Взять время из календаря",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_6e84391a2f": {
+   "ru": "Календарь недоступен без разрешения",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_6d06e4bbc8": {
+   "ru": "Из календаря",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_c372165452": {
+   "ru": "Календарь: %1$s",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_a3ffcb3ac5": {
+   "ru": "Календарь сейчас не отвечает.",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_552d1cca6b": {
+   "ru": "В этот день в календаре нет событий со временем.",
+   "ctx": [
+    "Forms.kt"
+   ]
+  },
+  "t_5fdf8988d5": {
+   "ru": "Приложение · Apache 2.0",
+   "ctx": [
+    "LicensesSheet.kt"
+   ]
+  },
+  "t_861bd8760b": {
+   "ru": "Шрифт Onest · SIL Open Font License",
+   "ctx": [
+    "LicensesSheet.kt"
+   ]
+  },
+  "t_832c48f416": {
+   "ru": "Сторонние компоненты",
+   "ctx": [
+    "LicensesSheet.kt"
+   ]
+  },
+  "t_dd27b7de89": {
+   "ru": "Не удалось открыть лицензию",
+   "ctx": [
+    "LicensesSheet.kt"
+   ]
+  },
+  "t_488dd14a85": {
+   "ru": "Лицензии",
+   "ctx": [
+    "LicensesSheet.kt",
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_dc417ebce7": {
+   "ru": "Загружаю…",
+   "ctx": [
+    "LicensesSheet.kt"
+   ]
+  },
+  "t_e3fc5b6cc7": {
+   "ru": "Какое занятие?",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_c4dca81d48": {
+   "ru": "Добавить в план",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_3146141c93": {
+   "ru": "План",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_c82a0d4427": {
+   "ru": "Убрать из плана",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_ba7631ff32": {
+   "ru": "По дням недели",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_1751103733": {
+   "ru": "Один день",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_f6de15c50a": {
+   "ru": "Завтра",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_ae6b38edaf": {
+   "ru": "Другой день",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_163fdcceaa": {
+   "ru": "Ко времени",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_f70eab72a9": {
+   "ru": "Время только для порядка в списке",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_96a0b3fc1d": {
+   "ru": "Без времени: просто в этот день",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_c80d7e8172": {
+   "ru": "Время",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_cfafc18b42": {
+   "ru": "План только показывается на главном экране. Время пойдёт, когда ты нажмёшь на занятие.",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_22615c35f9": {
+   "ru": "Убрать «%1$s» из плана?",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_181ee397c9": {
+   "ru": "Записи, уже начатые по плану, останутся в истории.",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_9c7449bfd1": {
+   "ru": "Убрать",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_d5627f6a61": {
+   "ru": "Цель",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_58e6634696": {
+   "ru": "Новая цель",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_67a887cea0": {
+   "ru": "Убрать цель",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_191cacce9c": {
+   "ru": "Любое занятие",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_5e94c97f99": {
+   "ru": "Считать любое занятие",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_9b4ee5c556": {
+   "ru": "Что считать",
+   "ctx": [
+    "Editors.kt",
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_596144b0e6": {
+   "ru": "Записи",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_46a1378615": {
+   "ru": "Дни",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_b2822e2bb3": {
+   "ru": "Период",
+   "ctx": [
+    "Editors.kt",
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_d4a88f5588": {
+   "ru": "Другой период — это новая цель.",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_b6ef08401f": {
+   "ru": "День",
+   "ctx": [
+    "Editors.kt",
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_9207563dab": {
+   "ru": "Неделя",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_e558fb6e24": {
+   "ru": "Месяц",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_d8e26625e7": {
+   "ru": "Граница",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_0865c10035": {
+   "ru": "Не меньше",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_476c9846a6": {
+   "ru": "Не больше",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_766e7cabf7": {
+   "ru": "Меньше",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_474488d799": {
+   "ru": "Цель: %1$s",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_b371499aaa": {
+   "ru": "Больше",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_488cfa5f88": {
+   "ru": "Дни считаются за неделю или месяц.",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_137cb582b9": {
+   "ru": "Когда применить",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_b84fd84e60": {
+   "ru": "С завтрашнего дня",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_1425330b29": {
+   "ru": "Уже сегодня",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_d458ec4c77": {
+   "ru": "Со следующей недели",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_3fa9f851cc": {
+   "ru": "С этой недели",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_c7d650974b": {
+   "ru": "Со следующего месяца",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_30796d2694": {
+   "ru": "С этого месяца",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_853744f144": {
+   "ru": "Текущий период досчитается по прежней цели.",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_c33b203048": {
+   "ru": "Текущий период пересчитается по новой цели. Прошлые останутся как были.",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_c12ee51dd9": {
+   "ru": "Всё время",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_3da1c7d83d": {
+   "ru": "Убрать цель?",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_e0997b4d01": {
+   "ru": "Записи не изменятся, исчезнет только сама цель.",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_62c204df09": {
+   "ru": "Добавить заметки",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_8abcbc93e4": {
+   "ru": "Заметки бывают личными, поэтому по умолчанию их нет",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_76dcf737a6": {
+   "ru": "Отправить",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_75436e3162": {
+   "ru": "Работа",
+   "ctx": [
+    "Editors.kt",
+    "TrackerViewModel.kt",
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_735877a9aa": {
+   "ru": "Перерыв",
+   "ctx": [
+    "Editors.kt",
+    "SettingsScreen.kt",
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_fd3cb2ebef": {
+   "ru": "Текущий отрезок досчитается как начат, новые длительности — со следующего.",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_6f65bc34a3": {
+   "ru": "Длительности сохранятся и для следующих раз.",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_1fcbdeecfd": {
+   "ru": "%1$s: меньше",
+   "ctx": [
+    "Editors.kt",
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_cf113217ae": {
+   "ru": "%1$s: %2$s минут",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_4ef8132cf3": {
+   "ru": "%1$s: больше",
+   "ctx": [
+    "Editors.kt",
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_7f17c7c62a": {
+   "ru": "Настройки",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_88f1a5a112": {
+   "ru": "Вид",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_1bba9e465a": {
+   "ru": "Таймер вне приложения",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_72f931bda2": {
+   "ru": "Резервная копия",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_d8aac38d84": {
+   "ru": "Занятия и план",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_27546ccb04": {
+   "ru": "Фокус и напоминания",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_19f25d5784": {
+   "ru": "Ещё",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_efc885e934": {
+   "ru": "Удалённое",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_c3c366f704": {
+   "ru": "%1$s в %2$s",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_cbeb716470": {
+   "ru": "Назад к настройкам",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_946ee08764": {
+   "ru": "Разделы",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_89aa29a273": {
+   "ru": "уведомление",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_88c6fe08c7": {
+   "ru": "плавающая кнопка",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_cbc6fa3d6a": {
+   "ru": "виджет",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_1250ceafd1": {
+   "ru": "ярлык на значке",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_55cd7a55ed": {
+   "ru": "Чему-то не хватает разрешения телефона",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_e97aa645db": {
+   "ru": "Всё выключено: учёт только в приложении",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_9582d40584": {
+   "ru": "Автокопия сохраняется",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_d0fde8b6ec": {
+   "ru": "Автокопия %1$s",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_8cc9628cfb": {
+   "ru": "Автокопия включена, первая скоро появится",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_b2dde7fe6e": {
+   "ru": "Последняя %1$s. Автокопия выключена",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_e0c6838299": {
+   "ru": "Копий ещё не было. Включи автокопию в папку",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_f109cea920": {
+   "ru": "Избранного пока нет",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_aee593f748": {
+   "ru": "в плане %1$s",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_e887e93303": {
+   "ru": "плана нет",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_97a9f0590a": {
+   "ru": "Фокус %1$s + %2$s мин",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_9395be84e8": {
+   "ru": "Фокус",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_a23f334099": {
+   "ru": ", спросит о долгой записи",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_fa620acedb": {
+   "ru": "Есть обновление каталога занятий",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_64ed62742f": {
+   "ru": "Часовой пояс, начало дня, каталог, CSV",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_abfb46281b": {
+   "ru": "(not)AI Time Tracker %1$s. Все записи хранятся на этом телефоне",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_e46c179ddb": {
+   "ru": "На экранах телефона",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_3a42cfebfe": {
+   "ru": "Уведомление",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_9d9f294850": {
+   "ru": "Старт и стоп из шторки, быстрый выбор занятия",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_616bb19d6c": {
+   "ru": "Разрешить",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_090fad991e": {
+   "ru": "Открыть настройки",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_ea707316fd": {
+   "ru": "Плавающая кнопка",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_33a79b3bc1": {
+   "ru": "Полупрозрачный старт и стоп поверх приложений. После стопа можно сразу выбрать занятие",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_81b26ab0d7": {
+   "ru": "Фон окна выбора после стопа",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_92a5d7dc45": {
+   "ru": "Виджет",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_f10728b46b": {
+   "ru": "На главном экране, кнопки выключены",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_6eb7540d7c": {
+   "ru": "Выключен",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_126d6b9747": {
+   "ru": "На главном экране: %1$s",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_11bb1b11c0": {
+   "ru": "На главном экране",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_421fbcd348": {
+   "ru": "Подтверди добавление на рабочем столе",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_21afbee12c": {
+   "ru": "Не появился. Попробуй ещё раз или добавь вручную: долгое нажатие на рабочем столе → Виджеты → (not)AI Time",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_fe97f5bc85": {
+   "ru": "Рабочий стол не умеет добавлять виджеты из приложений. Добавь вручную: долгое нажатие на рабочем столе → Виджеты → (not)AI Time",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_129d9b9794": {
+   "ru": "Телефон не принял запрос. Попробуй ещё раз",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_e6d3fcd043": {
+   "ru": "Ещё не на главном экране",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_1c4b04d710": {
+   "ru": "Добавить на экран",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_d40fecd7ad": {
+   "ru": "Попробовать ещё раз",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_f55832ba89": {
+   "ru": "Фон виджета",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_329b31bdca": {
+   "ru": "Ярлык на значке",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_b740f2a2e2": {
+   "ru": "Долгое нажатие на значок: старт и стоп, выбор занятия и два первых избранных",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_49b9985de4": {
+   "ru": "Во время отрезка работы",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_71790fdb53": {
+   "ru": "Не беспокоить",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_b8540eb5bb": {
+   "ru": "Нужен Android 10 или новее",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_7f12cd4599": {
+   "ru": "Включено, но телефон ещё не разрешил приложению режим «Не беспокоить»",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_7d87e4d658": {
+   "ru": "На время работы приложение включает своё правило «Не беспокоить» с приоритетными уведомлениями. Исключения задаёт телефон. После работы приложение снимает своё правило",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_f1157816a0": {
+   "ru": "Свой звук",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_2b39abab32": {
+   "ru": "«%1$s». Играет по кругу, пока приложение открыто",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_948200fea3": {
+   "ru": "Шум, дождь или музыка из твоего файла. Играет, пока приложение открыто",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_2e31dae95f": {
+   "ru": "Выбрать файл",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_b34e097643": {
+   "ru": "Другой файл",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_9f431f2a5f": {
+   "ru": "Сигналы",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_b08e96f6ad": {
+   "ru": "Сигнал Фокуса",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_c6e0ce16b9": {
+   "ru": "Уведомить, когда отрезок закончился. Телефон может немного задержать сигнал",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_7d3ea0e679": {
+   "ru": "Дни в истории",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_d7907f4d43": {
+   "ru": "Дополнительно",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_c927b86cfb": {
+   "ru": "Каталог и таблицы",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_768fee24c8": {
+   "ru": "Каталог занятий: есть обновление",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_f9c8ab7dd1": {
+   "ru": "Каталог занятий",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_8940504c4b": {
+   "ru": "Версия %1$s: понятные названия и разделы по местам. Твои названия и история останутся. Нажми, чтобы посмотреть",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_5b76112f5b": {
+   "ru": "базовая",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_50ac9ea6c3": {
+   "ru": "%1$s, версия %2$s. Нажми, чтобы проверить обновление",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_b402c34a3b": {
+   "ru": "Экспорт в CSV",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_b363aeb862": {
+   "ru": "Вся история для таблиц. Это не резервная копия",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_e965da5858": {
+   "ru": "Импорт из CSV",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_156e23f619": {
+   "ru": "Из Toggl, Clockify или своей таблицы. Сначала покажу, что добавится",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_b9c9ff652d": {
+   "ru": "О приложении",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_e3af18c937": {
+   "ru": "Техническая оболочка",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_86042e468b": {
+   "ru": "Измерения, календарь, восстановление базы",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_8e6839a84e": {
+   "ru": "Записи хранятся на этом телефоне; копии — там, куда ты их сохранишь",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_1b27ed0870": {
+   "ru": "Заменить все данные?",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_7f7a71c089": {
+   "ru": "В копии %1$s, %2$s, ",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_c161a7bb23": {
+   "ru": " Незакрытая запись придёт как «время неизвестно», её нужно будет уточнить.",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_05f4ea7fa6": {
+   "ru": " Текущие данные будут сохранены отдельно перед заменой. Записи, сделанные после этой копии, исчезнут.",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_d772cc53be": {
+   "ru": "Заменить",
+   "ctx": [
+    "SettingsScreen.kt",
+    "App.kt",
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_0a7e3cd8d9": {
+   "ru": "Каталог уже актуален",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_1cd1162258": {
+   "ru": "Обновить каталог?",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_851c871818": {
+   "ru": "Версия %1$s. Новых занятий: %2$s, уточнений: %3$s",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_00ad5c791d": {
+   "ru": ", расхождений со своими изменениями: %1$s. Они требуют разбора в технической оболочке.",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_d37c15b206": {
+   "ru": " Названия, которые ты менял сам, останутся твоими; прошлые записи не меняются.",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_c2f668e54f": {
+   "ru": "Обновить",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_dbbafdd074": {
+   "ru": "Сменить часовой пояс отчётов на %1$s?",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_babd8e081b": {
+   "ru": "Изменятся границы дней в истории и обзоре. Сами записи и зоны целей не меняются.",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_279c2c3c90": {
+   "ru": "Сменить",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_7ae0e67853": {
+   "ru": "Использовать пояс телефона?",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_751e31256e": {
+   "ru": "%1$s. При смене пояса телефона границы дней в истории и обзоре будут следовать ему. Сами записи и зоны целей не меняются.",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_cd93b2e0f1": {
+   "ru": "Включено, но нет разрешения телефона",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_0e974974fb": {
+   "ru": "Включено, но уведомления выключены в настройках телефона",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_93a176ef21": {
+   "ru": "Телефон не дал включить. Попробуй ещё раз",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_2dd965ee95": {
+   "ru": "Акцент",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_b1e23e1ff0": {
+   "ru": "Размер текста",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_be0773c924": {
+   "ru": "Шрифт, цифры и главный экран",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_b4479f84f1": {
+   "ru": "%1$s, цифры %2$s, ",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_2a5e307788": {
+   "ru": "компактно",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_a582d409b1": {
+   "ru": "просторно",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_991e307efa": {
+   "ru": "Тема: %1$s",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_d25786deda": {
+   "ru": "Английский · с 14:05",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_df12865c09": {
+   "ru": "Шрифт",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_54fe5cc440": {
+   "ru": "Цифры таймера",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_624e55535f": {
+   "ru": "Плотность списков",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_09804101ad": {
+   "ru": "Просторно",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_d47aa86141": {
+   "ru": "Компактно",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_3e5ab0f642": {
+   "ru": "Главный экран",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_388cfb0795": {
+   "ru": "Приглашение на «Начать»",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_8ce3643f16": {
+   "ru": "Скобки медленно дышат, пока учёт не идёт",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_b715493906": {
+   "ru": "Кнопка Фокуса",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_e5e4253129": {
+   "ru": "Под быстрым стартом. Долгое нажатие — длительности",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_5f9a6b6230": {
+   "ru": "Полоска из отрезков над записями каждого дня",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_fa1296f402": {
+   "ru": "Вернуть как было",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_d0ff90f238": {
+   "ru": "На экране блокировки",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_d70f2e079b": {
+   "ru": "Полностью",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_f9444ff8c6": {
+   "ru": "Кратко",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_10729118a0": {
+   "ru": "Скрыть",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_1880e6b0ec": {
+   "ru": "Занятие, время и кнопки видны без разблокировки",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_3e36db582a": {
+   "ru": "Без разблокировки видно только, что учёт идёт",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_dee20b519a": {
+   "ru": "На заблокированном экране карточки нет",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_734bcf2003": {
+   "ru": "Значок в строке состояния",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_6b8910932e": {
+   "ru": "Значок в строке состояния скрыт",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_fc656a1da4": {
+   "ru": "Чтобы скрыть его и оставить карточку в шторке, включи «Свернуть» или «Без значка» в настройках этого уведомления",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_1259571a15": {
+   "ru": "Открыть",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_bd4538e3c6": {
+   "ru": "непрозрачный",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_61ce62df94": {
+   "ru": "%1$s: %2$s процентов",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_ab0b3ff312": {
+   "ru": "Если запись идёт дольше %1$s ч, тихо спросить в шторке, не забыт ли таймер",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_7fa01b6e34": {
+   "ru": "Включено в восстановленной копии. На этом телефоне нужно подтвердить",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_0467ae4bb8": {
+   "ru": "Подтвердить",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_befab85c9e": {
+   "ru": "Включено, но нет разрешения на уведомления",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_f2351a24d5": {
+   "ru": "Через %1$s ч записи спросит в шторке: продолжить, отложить или остановить",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_46404668d3": {
+   "ru": "Долгая запись",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_81d3d38d5c": {
+   "ru": "Спросить через",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_285cc40014": {
+   "ru": "ч",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_bea0873d5e": {
+   "ru": "Быстрые кнопки",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_b880e6a105": {
+   "ru": "Избранное",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_5075c29ca7": {
+   "ru": "Порядок, названия на кнопках, удаление повторов. Тот же порядок в шторке, виджете и на кнопке",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_0bfa7a54cb": {
+   "ru": "План по дням",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_69d66ab891": {
+   "ru": "Добавить занятие в план",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_5d38673a55": {
+   "ru": "Добавить ещё",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_9f4e577f1f": {
+   "ru": "Например, английский по понедельникам и средам. В эти дни он будет ждать на главном экране",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_e3eed8bfd8": {
+   "ru": "Длительности Фокуса",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_2d2be3f11c": {
+   "ru": "Отрезок работы",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_d6035dc6ed": {
+   "ru": "мин",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_0ec753be8d": {
+   "ru": "Отмена",
+   "ctx": [
+    "SettingsScreen.kt",
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_f127f2a1ee": {
+   "ru": "Понятно",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_542c2cd5f6": {
+   "ru": "Автокопия в папку",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_48b72fd474": {
+   "ru": "Автокопия",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_b6cee6b950": {
+   "ru": "Недоступна в этой сборке",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_be8f714a0e": {
+   "ru": "Сама сохраняет полную копию в выбранную папку: на телефоне или в облаке, если приложение облака даёт папку. Такая копия переживёт удаление приложения",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_60a8361ac8": {
+   "ru": "Выключена. Новые копии не сохраняются, прежние остаются в папке",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_12f864ad2e": {
+   "ru": "Приостановлена после пяти неудач подряд. %1$s",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_f6bfe94a14": {
+   "ru": "Сохраняю копию",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_5a1413e92d": {
+   "ru": "Последняя %1$s, файл проверен",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_b433c5110e": {
+   "ru": "Первая копия появится через пару минут",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_14a658ce61": {
+   "ru": "Выбрать папку",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_9e506acb19": {
+   "ru": "Повторить",
+   "ctx": [
+    "SettingsScreen.kt",
+    "TimerScreen.kt"
+   ]
+  },
+  "t_bc5431b599": {
+   "ru": "Папка",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_4fc1809d7d": {
+   "ru": "Выбранная папка",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_d9017ada66": {
+   "ru": "Хранить копий",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_d002f83ddc": {
+   "ru": "После изменений копия сохраняется через пару минут, когда телефон разрешит фоновую работу. Раз в сутки — даже без изменений. ",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_c736a598e7": {
+   "ru": "Старые копии убираются, только когда новая проверена.",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_6213880977": {
+   "ru": "Сохранить сейчас",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_63833f7ebd": {
+   "ru": "Пропустить эту",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_f46e3488b5": {
+   "ru": "Копии в папке",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_1f1fa1b82e": {
+   "ru": "Нажми на копию: сначала покажу, что в ней, заменю данные только после подтверждения",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_a5363d1b5f": {
+   "ru": "Файл копии",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_8543530f12": {
+   "ru": "Последний %1$s",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_afbca25eab": {
+   "ru": ", файл проверен",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_85e8a3404b": {
+   "ru": "С этого телефона файлов ещё не сохраняли",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_125737d34a": {
+   "ru": "После переустановки выбери здесь любой файл из папки автокопий. Копия — не синхронизация между телефонами.",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_93eb0c0182": {
+   "ru": "%.1f МБ",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_784e60ff6a": {
+   "ru": "%1$s КБ",
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "t_5695330ffb": {
+   "ru": "Авто",
+   "ctx": [
+    "Theme.kt"
+   ]
+  },
+  "t_8080010c5e": {
+   "ru": "Светлая",
+   "ctx": [
+    "Theme.kt"
+   ]
+  },
+  "t_bd16b23470": {
+   "ru": "Тёмная",
+   "ctx": [
+    "Theme.kt"
+   ]
+  },
+  "t_0d6b1a17a4": {
+   "ru": "Чёрная",
+   "ctx": [
+    "Theme.kt"
+   ]
+  },
+  "t_22776aacd4": {
+   "ru": "Неон",
+   "ctx": [
+    "Theme.kt"
+   ]
+  },
+  "t_db1042f51d": {
+   "ru": "Лента дня",
+   "ctx": [
+    "Components.kt"
+   ]
+  },
+  "t_9978ac34b2": {
+   "ru": "Действия",
+   "ctx": [
+    "Components.kt"
+   ]
+  },
+  "t_e82d057d74": {
+   "ru": "Вся область",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_e65da6ce30": {
+   "ru": "7 дней",
+   "ctx": [
+    "TrackerViewModel.kt",
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_fb925c5d79": {
+   "ru": "30 дней",
+   "ctx": [
+    "TrackerViewModel.kt",
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_2e3c5fdafe": {
+   "ru": "Учёба",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_ed3f0e507a": {
+   "ru": "Язык",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_c54788a5e8": {
+   "ru": "Чтение",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_88f778367b": {
+   "ru": "Письмо",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_4e1936db2d": {
+   "ru": "Силовая",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_8532eff044": {
+   "ru": "Кардио",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_3dfcd2dc31": {
+   "ru": "Прогулка",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_017c8c142b": {
+   "ru": "Готовка",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_315bf156c9": {
+   "ru": "Уборка",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_1d4961d804": {
+   "ru": "Кино и сериалы",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_989911f31c": {
+   "ru": "Отдых",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_1c38d1407f": {
+   "ru": " между паузами",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_5b010e144f": {
+   "ru": "Не удалось определить выбранный значок. Выбери доступный вариант",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_6b08862cb2": {
+   "ru": "Не удалось проверить значок приложения",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_2a690e69d2": {
+   "ru": "Значок выбран, но ярлыки пока не обновились",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_dfd4e36290": {
+   "ru": "Не удалось переключить значок",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_31990f76f4": {
+   "ru": "Не удалось проверить результат переключения",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_58d3c60b00": {
+   "ru": "Убрано из плана на сегодня",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_1ac5f47619": {
+   "ru": "Добавлено в план",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_c54a9c6fb4": {
+   "ru": "План изменён",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_6492631c6e": {
+   "ru": "Убрано из плана",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_f220b98d48": {
+   "ru": "Выбор занятия устарел",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_0fc242f26d": {
+   "ru": "Записано",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_440d3db6ca": {
+   "ru": "Занятие «%1$s» создано",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_eaa484fa5d": {
+   "ru": "Новая запись начата",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_30c994650d": {
+   "ru": "Время уточнено",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_b788b8485e": {
+   "ru": "Неизвестный отрезок не учтён",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_ddcbc8c167": {
+   "ru": "Отрезки изменены",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_d0d7180292": {
+   "ru": "Добавлено в избранное",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_f3503a3e3f": {
+   "ru": "Убрано из избранного",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_8b78a6e1d6": {
+   "ru": "Убрано из избранного вместе с повторами",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_ce5fc2ce7f": {
+   "ru": "Порядок сохранён",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_30e1fab800": {
+   "ru": "Избранное изменено",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_160b172224": {
+   "ru": "Занятие сохранено",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_359168c1d3": {
+   "ru": "Категория сохранена",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_53e131e48c": {
+   "ru": "«%1$s» — теперь старт в одно касание",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_7cc6025206": {
+   "ru": "Готово: %1$s для быстрого старта",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_d0dd940c4c": {
+   "ru": "Нет данных",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_f6f369d3a0": {
+   "ru": "Запись исправлена",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_3b97545714": {
+   "ru": "Запись добавлена",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_6ea005bd2d": {
+   "ru": "Промежуток записан",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_a9a3e50e7d": {
+   "ru": "Начало записи перенесено",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_98dc4a887a": {
+   "ru": "Без области",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_4d1cb9fd4a": {
+   "ru": "осталось %1$s",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_3d51050347": {
+   "ru": "есть",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_ce3ec6ed08": {
+   "ru": "в пределах",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_060c91cb5a": {
+   "ru": "больше на %1$s",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_c23d5826a3": {
+   "ru": "%1$s с записями",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_af39297b7b": {
+   "ru": ", есть неизвестное время",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_cd30825052": {
+   "ru": "Цель поставлена",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_81129d8255": {
+   "ru": "Цель изменена",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_2894da98dd": {
+   "ru": "Цель убрана",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_80072ed701": {
+   "ru": "Без своего занятия",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_7c379e8e5c": {
+   "ru": "Отчёт сохранён",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_e1d7065cb9": {
+   "ru": "Отчёт изменён",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_145c3ed6a6": {
+   "ru": "Отчёт удалён",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_e380f43ca4": {
+   "ru": "Сегодня, %1$s",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_2a70012208": {
+   "ru": "Всего ",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_bbee9680a8": {
+   "ru": "Неизвестное время не входит в итог: ",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_bbcf06b3c9": {
+   "ru": "Заметки",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_86d85a0147": {
+   "ru": "Часовой пояс отчётов: %1$s",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_cf52c8daf1": {
+   "ru": "Часовой пояс отчётов следует за устройством. Записи могут перейти на другой день",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_41f23bd106": {
+   "ru": "Часовой пояс отчётов закреплён",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_b4770c7e71": {
+   "ru": "День начинается в %1$s:%2$s",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_0a7d0c65cc": {
+   "ru": "Сохранение отменено",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_a8f8d66a1b": {
+   "ru": "Файл сохранён и проверен",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_b467c6658f": {
+   "ru": "Файл сохранён. Проверить его чтением нельзя",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_1c76eec066": {
+   "ru": "Данные восстановлены. Прежние сохранены отдельно",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_b727ee7aba": {
+   "ru": "Не удалось взять этот файл. Попробуй другой, до 64 МБ",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_dd63bc14f9": {
+   "ru": "Изменено %1$s",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_de7dee674e": {
+   "ru": "Это файл резервной копии. Восстанови его в разделе «Резервная копия»",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_147355d342": {
+   "ru": "Этот файл не таблица CSV. %1$s",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_78fb4788c6": {
+   "ru": "Добавлено %1$s",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_99cbe96929": {
+   "ru": ", повторы пропущены",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_059b504fa9": {
+   "ru": "Папка выбрана. Первая копия появится через пару минут",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_27d5f2e22a": {
+   "ru": "Каталог обновлён",
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "t_702e03be1e": {
+   "ru": "Янтарь",
+   "ctx": [
+    "Appearance.kt"
+   ]
+  },
+  "t_32000365e9": {
+   "ru": "Бирюза",
+   "ctx": [
+    "Appearance.kt"
+   ]
+  },
+  "t_d4a2324628": {
+   "ru": "Лайм",
+   "ctx": [
+    "Appearance.kt"
+   ]
+  },
+  "t_1a287db9b2": {
+   "ru": "Графит",
+   "ctx": [
+    "Appearance.kt"
+   ]
+  },
+  "t_eca17171d2": {
+   "ru": "Системный",
+   "ctx": [
+    "Appearance.kt"
+   ]
+  },
+  "t_8be1fdf75b": {
+   "ru": "С засечками",
+   "ctx": [
+    "Appearance.kt"
+   ]
+  },
+  "t_cf7b338323": {
+   "ru": "Тонкие",
+   "ctx": [
+    "Appearance.kt"
+   ]
+  },
+  "t_1a599143aa": {
+   "ru": "Обычные",
+   "ctx": [
+    "Appearance.kt"
+   ]
+  },
+  "t_f5fc2f3eb8": {
+   "ru": "Мельче",
+   "ctx": [
+    "Appearance.kt"
+   ]
+  },
+  "t_a2c84dc5a6": {
+   "ru": "Обычный",
+   "ctx": [
+    "Appearance.kt"
+   ]
+  },
+  "t_0f73f5a22c": {
+   "ru": "Крупнее",
+   "ctx": [
+    "Appearance.kt"
+   ]
+  },
+  "t_b84572428f": {
+   "ru": "Крупный",
+   "ctx": [
+    "Appearance.kt"
+   ]
+  },
+  "t_19295833d9": {
+   "ru": "Эта неделя",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_2373dd4f8d": {
+   "ru": "Прошлая неделя",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_a0113f46a3": {
+   "ru": "Этот месяц",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_86652580fd": {
+   "ru": "Прошлый месяц",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_c85eb5f581": {
+   "ru": "90 дней",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_617d07376f": {
+   "ru": "%1$s дней",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_c2bf13bbb1": {
+   "ru": "Свои отчёты",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_9924fc6aa9": {
+   "ru": "Свой отчёт",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_6d4aeaf49a": {
+   "ru": "Свой отчёт: занятие и период",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_f3ff661a74": {
+   "ru": "Ещё отчёт",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_6257137741": {
+   "ru": ", период ещё идёт",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_1bd48e6642": {
+   "ru": "Занятие: %1$s",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_d015e9be93": {
+   "ru": "Занятие этого отчёта удалено или в архиве. Отчёт считает только его прошлые записи.",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_964e56ab98": {
+   "ru": "Удалить отчёт «%1$s»?",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_f48645430a": {
+   "ru": "Удалится только сохранённый отчёт. Записи не меняются.",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_86ea33aef5": {
+   "ru": "Удалить",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_c0634e4cb3": {
+   "ru": "Все занятия",
+   "ctx": [
+    "SavedReportsUi.kt",
+    "TimerScreen.kt",
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_164b8bb2af": {
+   "ru": "Изменить отчёт",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_ed52dd3411": {
+   "ru": "Нажми, чтобы выбрать одно занятие или раздел",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_5fb4185cca": {
+   "ru": "Вместе со всем, что внутри",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_d7748bfad0": {
+   "ru": "Отчёт",
+   "ctx": [
+    "SavedReportsUi.kt"
+   ]
+  },
+  "t_b45bbb4570": {
+   "ru": "Светлая тема",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_ec1c55d866": {
+   "ru": "Тёмная тема",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_13f1659f76": {
+   "ru": "Начать учёт времени",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_49c5f1afe2": {
+   "ru": "Время пойдёт сразу.\nЗанятие можно выбрать потом.",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_6cde6c34a0": {
+   "ru": "По плану на сегодня",
+   "ctx": [
+    "TimerScreen.kt",
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_fc8e4e2d1c": {
+   "ru": "Начать сразу",
+   "ctx": [
+    "TimerScreen.kt",
+    "App.kt",
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_549bc063f3": {
+   "ru": "Начать с занятием",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_d349cb398d": {
+   "ru": "Прошло %1$s",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_5916628df1": {
+   "ru": "Выбрать занятие",
+   "ctx": [
+    "TimerScreen.kt",
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_2840f49e22": {
+   "ru": "Сменить или уточнить занятие",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_f94b15c5ce": {
+   "ru": "На паузе. Пауза не входит во время занятия.",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_e2e41650a0": {
+   "ru": "С %1$s",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_03cb42c402": {
+   "ru": "Идёт с %1$s. Начало сохранится при выборе.",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_03498e395a": {
+   "ru": "Пауза",
+   "ctx": [
+    "TimerScreen.kt",
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_3f75368ab9": {
+   "ru": "Продолжить",
+   "ctx": [
+    "TimerScreen.kt",
+    "TimerSurfaces.kt",
+    "ProductionReminderNotices.kt"
+   ]
+  },
+  "t_909baadb08": {
+   "ru": "Начал раньше",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_6a0e6066b0": {
+   "ru": "Переключился раньше",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_edd23ab082": {
+   "ru": "Дальше по плану",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_41a9abce27": {
+   "ru": "Начать Фокус",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_9ebe3ac111": {
+   "ru": "Настроить Фокус",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_e0382438fe": {
+   "ru": "Фокус: %1$s мин работы",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_4ea0639432": {
+   "ru": "Порядок и всё избранное",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_afd78e8296": {
+   "ru": "Начать по плану",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_b8b15fe0c2": {
+   "ru": "Действия с планом",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_2f6a9e8aa1": {
+   "ru": ", уже начато",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_7b11e988e1": {
+   "ru": "Убрать на сегодня",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_49a37138c8": {
+   "ru": "Начало %1$s, конец неизвестен",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_9f8007cba2": {
+   "ru": "Конец неизвестен",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_5c65c982d1": {
+   "ru": "Время неизвестно",
+   "ctx": [
+    "TimerScreen.kt",
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_fd7707e6f0": {
+   "ru": "Не учитывать с %1$s",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_de8f3c16b9": {
+   "ru": "Не учитывать",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_0c15fe2798": {
+   "ru": "Фокус, отрезок работы %1$s",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_01a3d66b22": {
+   "ru": "Фокус, перерыв",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_c14f88246c": {
+   "ru": "Осталось %1$s",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_c650387bcb": {
+   "ru": "Отрезок работы закончился",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_bdcb031d09": {
+   "ru": "Перерыв закончился",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_0faf5fa9ac": {
+   "ru": "осталось из %1$s",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_0076203bff": {
+   "ru": "Начать перерыв",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_74b69f961b": {
+   "ru": "Начать работу",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_f4f34092fb": {
+   "ru": "Пропустить отрезок",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_c25bd1a7c6": {
+   "ru": "Пропустить перерыв",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_550c7a6d12": {
+   "ru": "Записей пока нет. Здесь появится каждый отрезок.",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_2972f8b4c4": {
+   "ru": "Записей нет.",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_2960da94e0": {
+   "ru": "Скрыть промежутки",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_ddca6f4db2": {
+   "ru": " без записи",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_57fe19481c": {
+   "ru": "Скрыть промежутки без записи",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_5d09029804": {
+   "ru": "Показать промежутки без записи",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_d184a16515": {
+   "ru": "Убрать из выбранных",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_9d5b844654": {
+   "ru": "Действия с записью",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_6e166fe43b": {
+   "ru": "Повторить: %1$s",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_894c240b90": {
+   "ru": "Свернуть отрезки",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_5f239661cc": {
+   "ru": "Показать отрезки и паузы",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_806764743a": {
+   "ru": "разные занятия",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_9627af1c25": {
+   "ru": "пауза",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_ef34d1807a": {
+   "ru": "не записано",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_d4993a1dc7": {
+   "ru": "время неизвестно",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_4be730321c": {
+   "ru": "Записать",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_9b1c9a0216": {
+   "ru": "Исправить",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_6155f92695": {
+   "ru": "Выбрать несколько",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_398c7d4f7b": {
+   "ru": "Готово",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_97bcfbe748": {
+   "ru": "Готово · %1$s",
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "t_a901fbebb1": {
+   "ru": "Файлы не удалены. Восстановить базу или выбрать копию можно в технической оболочке. Подробности: %1$s",
+   "ctx": [
+    "App.kt"
+   ]
+  },
+  "t_c595cae565": {
+   "ru": "Заменить черновик?",
+   "ctx": [
+    "App.kt"
+   ]
+  },
+  "t_fee1dd80dd": {
+   "ru": "Текущий текст: «%1$s»\nНовый текст: «%2$s»",
+   "ctx": [
+    "App.kt"
+   ]
+  },
+  "t_51d6a3da35": {
+   "ru": "Чем ты был занят?",
+   "ctx": [
+    "App.kt",
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_24f866b4ee": {
+   "ru": "Переключиться на",
+   "ctx": [
+    "App.kt",
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_288dc99a2b": {
+   "ru": "Время уже сохранено, осталось выбрать занятие.",
+   "ctx": [
+    "App.kt"
+   ]
+  },
+  "t_104053cfbe": {
+   "ru": "Избранное и частые занятия за 30 дней.",
+   "ctx": [
+    "App.kt"
+   ]
+  },
+  "t_73a0a9afdc": {
+   "ru": "Оставить без занятия",
+   "ctx": [
+    "App.kt"
+   ]
+  },
+  "t_14eaa871df": {
+   "ru": "Начать",
+   "ctx": [
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_6d714e833d": {
+   "ru": "Стоп",
+   "ctx": [
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_feff16c4bb": {
+   "ru": "Таймер в шторке",
+   "ctx": [
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_96c6ac97db": {
+   "ru": "Плавающая кнопка: системный индикатор",
+   "ctx": [
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_4edbcc192a": {
+   "ru": "Плавающая кнопка включена",
+   "ctx": [
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_5e1ad8c5d8": {
+   "ru": "Выключить можно в настройках приложения",
+   "ctx": [
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_2c0db2ce7c": {
+   "ru": "Начать: ",
+   "ctx": [
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_75cd08a0e5": {
+   "ru": "Переключиться: ",
+   "ctx": [
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_7ae1597ae7": {
+   "ru": "Откройте приложение для уточнения времени",
+   "ctx": [
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_fd500149d4": {
+   "ru": "Таймер: %1$s",
+   "ctx": [
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_e46b654bc7": {
+   "ru": "Таймер: выбрать занятие",
+   "ctx": [
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_c83889af89": {
+   "ru": "Откройте приложение для выбора занятия",
+   "ctx": [
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_08ccc5ba08": {
+   "ru": "%1$s: %2$s. Откройте приложение и проверьте текущее состояние.",
+   "ctx": [
+    "TimerSurfaces.kt"
+   ]
+  },
+  "t_da4b8e5644": {
+   "ru": "Focus: интервал завершён",
+   "ctx": [
+    "FocusSignals.kt"
+   ]
+  },
+  "t_580b6b1b3e": {
+   "ru": "Выберите следующий этап в приложении",
+   "ctx": [
+    "FocusSignals.kt"
+   ]
+  },
+  "t_9694192342": {
+   "ru": "Завершение интервала Focus",
+   "ctx": [
+    "FocusSignals.kt"
+   ]
+  },
+  "t_13b7c69527": {
+   "ru": "Фокус (not)AI",
+   "ctx": [
+    "FocusEffects.kt"
+   ]
+  },
+  "t_f4ca346393": {
+   "ru": "Тишина на время отрезка Фокуса",
+   "ctx": [
+    "FocusEffects.kt"
+   ]
+  },
+  "t_b1dd9c744d": {
+   "ru": "План или таймер уже изменились. Посмотри ещё раз",
+   "ctx": [
+    "PlanSurfaces.kt"
+   ]
+  },
+  "t_fca9d98cd9": {
+   "ru": "Таймер уже изменился. Нажми ещё раз",
+   "ctx": [
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_eded3f55f1": {
+   "ru": "Открыть выбор не удалось. Запись сохранена",
+   "ctx": [
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_f8ebe73afe": {
+   "ru": "Записано: %1$s",
+   "ctx": [
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_a6a3fb1ef7": {
+   "ru": "Запись уже изменилась. Исправь её в приложении",
+   "ctx": [
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_55e920546e": {
+   "ru": "Плавающая кнопка выключена",
+   "ctx": [
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_4304ef48ab": {
+   "ru": "Плавающая кнопка: разрешение ОС не предоставлено; таймер доступен в приложении",
+   "ctx": [
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_e06ca859e1": {
+   "ru": "Плавающая кнопка запрошена; системный индикатор сервиса обязателен",
+   "ctx": [
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_ed5033902e": {
+   "ru": "ОС не разрешила запуск плавающей кнопки; таймер доступен в приложении",
+   "ctx": [
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_cf3a8f3ca2": {
+   "ru": "Начать учёт",
+   "ctx": [
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_dab89894aa": {
+   "ru": "Остановить учёт",
+   "ctx": [
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_3c6332622c": {
+   "ru": "Открыть приложение",
+   "ctx": [
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_794d0309cf": {
+   "ru": "время уже сохранено",
+   "ctx": [
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_15dfa124b4": {
+   "ru": "Частых занятий пока нет. Выбрать можно в приложении, в истории.",
+   "ctx": [
+    "FloatingTimerService.kt"
+   ]
+  },
+  "t_4bae800626": {
+   "ru": "Открой, чтобы указать, когда закончил",
+   "ctx": [
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_4301919e86": {
+   "ru": "%1$s закончилась. Открой, чтобы продолжить",
+   "ctx": [
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_fdc5b65acf": {
+   "ru": "Пауза · осталось %s",
+   "ctx": [
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_3371d6e0e9": {
+   "ru": "%1$s · осталось %%s",
+   "ctx": [
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_f36036b6cf": {
+   "ru": "Пауза · %s",
+   "ctx": [
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_93be31b630": {
+   "ru": "Учёт не идёт",
+   "ctx": [
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_1deb177f5a": {
+   "ru": "По плану: %1$s",
+   "ctx": [
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_fea5f3ca7c": {
+   "ru": "Занятие выберешь потом",
+   "ctx": [
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_95bd330f2a": {
+   "ru": "Начать по плану: %1$s",
+   "ctx": [
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_5905870dba": {
+   "ru": "По плану и часто",
+   "ctx": [
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_322ce697bb": {
+   "ru": "Учёт идёт",
+   "ctx": [
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_ccb2375542": {
+   "ru": "Виджет выключен",
+   "ctx": [
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_b74904694d": {
+   "ru": "Включи его в настройках приложения",
+   "ctx": [
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_f8fe850a57": {
+   "ru": "Таймер уже изменился. Открой уведомление ещё раз",
+   "ctx": [
+    "SurfaceViews.kt"
+   ]
+  },
+  "t_9e8bfc9912": {
+   "ru": "Имя новой карточки",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_66c789d74f": {
+   "ru": "Уточнение: например listening",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_4ebd720453": {
+   "ru": "Начало / момент переключения: ISO-8601",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_9711f6b5b7": {
+   "ru": "Конец: ISO-8601",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_b67fbff66e": {
+   "ru": "Зона отчётов: например Europe/Moscow",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_4ebf488399": {
+   "ru": "Не удалось прочитать сохранённую форму: %1$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_7da3c34069": {
+   "ru": "Локальная база недоступна: %1$s\nИсходные файлы сохранены. Выберите копию в восстановлении.",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_129dc42035": {
+   "ru": "Сохранить новую карточку",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_51f805f925": {
+   "ru": "Выбрана новая карточка · %1$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_434e93a022": {
+   "ru": "Выбрать карточку по ID…",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_93f389d809": {
+   "ru": "Без карточки",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_e6aa58192b": {
+   "ru": "Следующий Start — без карточки",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_489dd4cb3d": {
+   "ru": "Карточка из каталога…",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_eeee074ac3": {
+   "ru": "Обновить готовый каталог…",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_ba9db63b9d": {
+   "ru": "Каталог %1$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_5de1eb4784": {
+   "ru": "Новых: %1$s; уточнений: %2$s; конфликтов: %3$s. Локальные имена, архивность и история сохраняются.",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_768af67762": {
+   "ru": "Применить",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_0195b83c6c": {
+   "ru": "Назначить текущему занятию",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_14d31156f2": {
+   "ru": "Изменить уточнение с этого момента",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_86fde46076": {
+   "ru": "Повторить последнее записанное (сохранённые, включая архивные параметры)",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_1a54271b7a": {
+   "ru": "Нет завершённой истории",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_f11be88b10": {
+   "ru": "Запомнить выбранное избранное",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_5a7fa46600": {
+   "ru": "Без уточнения",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_4c70fed089": {
+   "ru": "Выбрать и запустить избранное…",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_08f120e3b9": {
+   "ru": "Запустить сохранённый вариант?",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_b747495fc3": {
+   "ru": "%1$s · %2$s\n%3$s. Избранное использует сохранённые параметры, в том числе архивные.",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_a1103b6e0c": {
+   "ru": "Start сейчас",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_0ad4a07529": {
+   "ru": "Сохранить ручной интервал",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_2583e76aee": {
+   "ru": "Переключился раньше: сохранить",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_fdfa49e623": {
+   "ru": "Исправить последний закрытый сегмент",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_7f76296ba9": {
+   "ru": "Нет закрытого записанного сегмента",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_9cae6690eb": {
+   "ru": "Отменить доступную правку",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_d398842570": {
+   "ru": "Подтвердить хвост указанным интервалом",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_e98d66a21e": {
+   "ru": "Исключить неопределённый хвост",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_e5451eea1b": {
+   "ru": "Сохранить зону отчётов…",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_5873f87916": {
+   "ru": "Неизвестная IANA зона",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_96a64755de": {
+   "ru": "Изменить зону отчётов на %1$s?",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_b905452397": {
+   "ru": "Изменятся границы дней и вид отчётов по существующей истории. Физические интервалы и отдельные сохранённые зоны целей сохраняются. Выбранный пояс будет закреплён; автоматический выбор отключится.",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_4864057d62": {
+   "ru": "Сохранить",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_12fa39305e": {
+   "ru": "Экспорт полного JSON",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_aa9fc365f5": {
+   "ru": "Повторить подготовленный экспорт…",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_253cf1644f": {
+   "ru": "Отменить подготовленный экспорт",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_cc6d018f5b": {
+   "ru": "CSV отчёт за сегодня (не полная копия)",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_a12db4c166": {
+   "ru": "Выбрана: %1$s · ID %2$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_657703c887": {
+   "ru": "Поиск в полном каталоге",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_46e27e2f0a": {
+   "ru": "Каталог",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_ed6e1d0308": {
+   "ru": "Найти",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_d524af03ac": {
+   "ru": "Недоступно для нового занятия: %1$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_7d4b8f8a7e": {
+   "ru": "Выбор: %1$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_6400526c15": {
+   "ru": "Добавить историю CSV…",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_007f15b539": {
+   "ru": "Количество для целой сессии/сегмента…",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_ce12182bac": {
+   "ru": "ID величины",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_b4efdc2013": {
+   "ru": "ID исходной единицы",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_69e5b8a8c6": {
+   "ru": "Неотрицательное Decimal, точка",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_9bc1f05bd8": {
+   "ru": "ID всей сессии или сегмента",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_de5d4764e8": {
+   "ru": "Количество всего target; дневные окна не складываются",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_8972ce6fc3": {
+   "ru": "Не сохранено: %1$s; исправьте форму или отмените",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_a18bb83bf1": {
+   "ru": "Сохранено %1$s %2$s для всего %3$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_affff57571": {
+   "ru": "Выберите разделитель",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_a4ac32f350": {
+   "ru": "Стабильный namespace источника",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_12b0be1a44": {
+   "ru": "Колонка занятия",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_5f0968991b": {
+   "ru": "Колонка начала",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_cefdb75984": {
+   "ru": "Колонка конца (или duration)",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_629e3bb846": {
+   "ru": "Колонка duration",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_c8317c85b2": {
+   "ru": "Отдельная колонка времени начала",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_9eb9a9691b": {
+   "ru": "Отдельная колонка времени конца",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_d223a16aed": {
+   "ru": "Колонка категории",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_7ec7c94cc1": {
+   "ru": "Колонка заметки",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_7eb07227f1": {
+   "ru": "Колонка ID строки",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_e4c06f14a4": {
+   "ru": "Pattern локальной даты/времени; пусто = ISO с offset",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_c67ed0b774": {
+   "ru": "Зона времени источника; подтвердите явно",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_8125e2fba0": {
+   "ru": "Все строки → выбранная карточка; иначе исходные имена без типа",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_d41ba2c06d": {
+   "ru": "Подтвердите колонки, время и единицы duration",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_067a6eef15": {
+   "ru": "Выберите карточку по ID перед CSV mapping",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_117ce12b52": {
+   "ru": "CSV append: %1$s…%2$s из %3$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_1bcdac8735": {
+   "ru": "Добавится: %1$s; повторов: %2$s.\n%3$s\nОшибок: %4$s\n%5$s\n%6$s\nДобавление истории; полный JSON restore заменяет всё хранилище.",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_322896daf3": {
+   "ru": "Следующие интервалы",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_f0caca47ee": {
+   "ru": "Начать Focus",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_38a279b292": {
+   "ru": "Следующий этап Focus",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_d73bef6ef5": {
+   "ru": "Пропустить этап Focus",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_15b056d9f4": {
+   "ru": "Завершить Focus",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_6d95221406": {
+   "ru": "Фоновый сигнал Focus (уведомление, ОС может задержать)",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_20490f3632": {
+   "ru": "Выбрать occurrence из календаря…",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_3c244ffaa5": {
+   "ru": "Календарь: %1$s; история не изменена",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_eca2a38089": {
+   "ru": "Календарь: текущие и ближайшие occurrences",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_bf38c3fd75": {
+   "ru": "Occurrence недоступен: %1$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_d129caabe1": {
+   "ru": "Заполнить редактируемый черновик?",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_7b47d9e19e": {
+   "ru": "Start использует текущее время. Ручная запись требует явных границ; all-day не задаёт рабочий интервал.",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_d261564113": {
+   "ru": "Заполнить",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_544a30f1ea": {
+   "ru": "Виджет (добавить через launcher)",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_9bcc818ccb": {
+   "ru": "Управляющее уведомление",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_494ef4deb5": {
+   "ru": "Плавающая кнопка + обязательный индикатор сервиса",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_8213ed5bbc": {
+   "ru": "Настройки разрешения недоступны на этом устройстве",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_e8255d5bdc": {
+   "ru": "Проверить разрешения поверхностей",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_781ebc1c5f": {
+   "ru": "Overlay запускается только из видимого приложения",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_bedfedb4d0": {
+   "ru": "выключено",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_877c853fa7": {
+   "ru": "разрешено",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_964fb00c4e": {
+   "ru": "запрошено, но запрещено ОС/каналом",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_963e150816": {
+   "ru": "Уведомление: %1$s\n%2$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_937cbcbd50": {
+   "ru": "Форма не сохранена: %1$s: %2$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_c619870299": {
+   "ru": "Выделенный текст",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_680a3249f0": {
+   "ru": "Заменить текущую редактируемую заметку присланным текстом?",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_9e97224af0": {
+   "ru": "Сохранить текущую",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_cc5d5d0fd4": {
+   "ru": "Итоги на %1$s (%2$s): %3$s ms; неопределённых: %4$s\nКарточки: %5$s\nСессий: %6$s; сегментов: %7$s\n%8$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_79fb04fd8b": {
+   "ru": "Техническая оболочка · Room %1$s\n%2$s\n%3$s ms · ревизия %4$s\n%5$s%6$s\n%7$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_43c9451f7e": {
+   "ru": "Завершите или отмените текущий экспорт",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_aa447181f4": {
+   "ru": "Подготовка экспорта не началась: %1$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_f713a587ea": {
+   "ru": "Экспорт отменён; файлы сохранены. Можно подготовить новую копию.",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_4ac8d095fb": {
+   "ru": "Нет подготовленного экспорта",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_0077164ed0": {
+   "ru": "Экспорт %1$s: повторите подготовку; частичный файл сохранён",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_0f605ae8ff": {
+   "ru": "Подтвердить полную замену",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_ac72e3a247": {
+   "ru": "%1$s\nСессий: %2$s; сегментов: %3$s; целей: %4$s. Активный хвост: %5$s; Focus: %6$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_886ebf7a3e": {
+   "ru": "Восстановлено. Откатная копия: %1$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_d66df6cc7f": {
+   "ru": "Восстановить недоступную базу",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_59ef713872": {
+   "ru": "Сессий: %1$s; сегментов: %2$s. Текущие DB/WAL/SHM будут сохранены с проверенными хешами до замены. Старые копии сохраняются.",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_29f3b29df0": {
+   "ru": "Восстановить",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_94405e99a7": {
+   "ru": "Восстановить полный JSON…",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_76393b3245": {
+   "ru": "Локальные rollback копии…",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_91b707a9d1": {
+   "ru": "Локальных копий пока нет",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_d64f83a24b": {
+   "ru": "Выберите копию; текущие данные заменяются только после preview",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_cca1d52e45": {
+   "ru": "Завершить незавершённое восстановление",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_9ac9a4c129": {
+   "ru": "Результат экспорта не подтверждён: %1$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_737fe33491": {
+   "ru": "Экспорт отменён; подготовленная копия доступна для повтора",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_c344c6222f": {
+   "ru": "Копия проверена чтением.",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_0d0c228652": {
+   "ru": "Provider не позволяет прочитать результат для проверки.",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_87a5f792b0": {
+   "ru": "Записано %1$s bytes. %2$s",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_92c584ce74": {
+   "ru": "Источник CSV недоступен",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_5779709c59": {
+   "ru": "Источник недоступен",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_a683d51495": {
+   "ru": "Запись всё ещё идёт",
+   "ctx": [
+    "ProductionReminderNotices.kt"
+   ]
+  },
+  "t_43f3c7181c": {
+   "ru": "Уже %1$s. Таймер не забыт?",
+   "ctx": [
+    "ProductionReminderNotices.kt"
+   ]
+  },
+  "t_fd042c9a3a": {
+   "ru": "Позже",
+   "ctx": [
+    "ProductionReminderNotices.kt"
+   ]
+  },
+  "t_d4f447c130": {
+   "ru": "Остановить",
+   "ctx": [
+    "ProductionReminderNotices.kt"
+   ]
+  },
+  "t_98e4a9f4dd": {
+   "ru": "Таймер остановлен",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_18c99fb35b": {
+   "ru": "Идёт учёт времени",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_b71833f660": {
+   "ru": "Таймер на паузе",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_ed4b9d4acc": {
+   "ru": "Требуется уточнить время",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_b1a72b8b91": {
+   "ru": "Фокус: нужно уточнить время",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_f2f63c2213": {
+   "ru": "Фокус: отрезок закончился, выбери следующий",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_52da7c24f6": {
+   "ru": "Фокус на паузе",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_b97a3fd699": {
+   "ru": "Фокус: отрезок работы",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_b62da03c51": {
+   "ru": "Фокус: перерыв",
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "t_restore_all": {
+   "ru": "Восстановить все (%1$s)",
+   "ctx": [
+    "DeletedRecordsPage.kt"
+   ]
+  },
+  "t_deleted_on": {
+   "ru": "Удалено · %1$s",
+   "ctx": [
+    "DeletedRecordsPage.kt"
+   ]
+  },
+  "t_restore_all_title": {
+   "ru": "Восстановить %1$s?",
+   "ctx": [
+    "DeletedRecordsPage.kt"
+   ]
+  },
+  "t_restore_all_body": {
+   "ru": "Записи вернутся в историю на свои прежние места.",
+   "ctx": [
+    "DeletedRecordsPage.kt"
+   ]
+  },
+  "t_restore_all_confirm": {
+   "ru": "Восстановить",
+   "ctx": [
+    "DeletedRecordsPage.kt"
+   ]
+  },
+  "t_restore_all_done": {
+   "ru": "Восстановлено записей: %1$s",
+   "ctx": [
+    "DeletedRecordsPage.kt"
+   ]
+  },
+  "t_bc4d1d35af": {
+   "ru": "как в файле",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_ced07fd144": {
+   "ru": "нет",
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "t_096312396e": {
+   "ru": "За %1$s",
+   "ctx": [
+    "OverviewScreen.kt"
+   ]
+  },
+  "t_90d0002e66": {
+   "ru": "Свои даты",
+   "ctx": [
+    "Editors.kt"
+   ]
+  },
+  "t_7aeae28ae9": {
+   "ru": "без карточки",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_6ae7f2feef": {
+   "ru": "весь день",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  },
+  "t_72aecd9ad8": {
+   "ru": "Ошибка",
+   "ctx": [
+    "TechnicalActivity.kt"
+   ]
+  }
+ },
+ "plurals": {
+  "p_de4636ae79": {
+   "ru": [
+    "колонка",
+    "колонки",
+    "колонок"
+   ],
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "p_09d3aef0c7": {
+   "ru": [
+    "строка",
+    "строки",
+    "строк"
+   ],
+   "ctx": [
+    "CsvImport.kt"
+   ]
+  },
+  "p_6c73bc4d74": {
+   "ru": [
+    "запись",
+    "записи",
+    "записей"
+   ],
+   "ctx": [
+    "CsvImport.kt",
+    "BatchEdit.kt",
+    "SettingsScreen.kt",
+    "TrackerViewModel.kt"
+   ]
+  },
+  "p_299205cb6b": {
+   "ru": [
+    "раз",
+    "раза",
+    "раз"
+   ],
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "p_5e0f6cbad4": {
+   "ru": [
+    "день",
+    "дня",
+    "дней"
+   ],
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "p_7504653931": {
+   "ru": [
+    "раза",
+    "раз",
+    "раз"
+   ],
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "p_032a085f42": {
+   "ru": [
+    "дня",
+    "дней",
+    "дней"
+   ],
+   "ctx": [
+    "Presentation.kt"
+   ]
+  },
+  "p_414e6a20a2": {
+   "ru": [
+    "избранное",
+    "избранных",
+    "избранных"
+   ],
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "p_3a9aafb6ad": {
+   "ru": [
+    "занятие",
+    "занятия",
+    "занятий"
+   ],
+   "ctx": [
+    "SettingsScreen.kt",
+    "TrackerViewModel.kt"
+   ]
+  },
+  "p_7722e30027": {
+   "ru": [
+    "своё занятие",
+    "своих занятия",
+    "своих занятий"
+   ],
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "p_3b59342c88": {
+   "ru": [
+    "цель",
+    "цели",
+    "целей"
+   ],
+   "ctx": [
+    "SettingsScreen.kt"
+   ]
+  },
+  "p_51037d6f51": {
+   "ru": [
+    "отрезок",
+    "отрезка",
+    "отрезков"
+   ],
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "p_aaaea1e747": {
+   "ru": [
+    "измерение",
+    "измерения",
+    "измерений"
+   ],
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "p_07343fe85c": {
+   "ru": [
+    "связь с предметом",
+    "связи с предметами",
+    "связей с предметами"
+   ],
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "p_a03208ce01": {
+   "ru": [
+    "запись подхода",
+    "записи подходов",
+    "записей подходов"
+   ],
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "p_c70b66af3f": {
+   "ru": [
+    "запись событийной величины",
+    "записи событийных величин",
+    "записей событийных величин"
+   ],
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "p_c8e097eebc": {
+   "ru": [
+    "основание темпа",
+    "основания темпа",
+    "оснований темпа"
+   ],
+   "ctx": [
+    "TrackerViewModel.kt"
+   ]
+  },
+  "p_33de38af49": {
+   "ru": [
+    "промежуток",
+    "промежутка",
+    "промежутков"
+   ],
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  },
+  "p_c9ec2228f3": {
+   "ru": [
+    "пауза",
+    "паузы",
+    "пауз"
+   ],
+   "ctx": [
+    "TimerScreen.kt"
+   ]
+  }
+ }
+}

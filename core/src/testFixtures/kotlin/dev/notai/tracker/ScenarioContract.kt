@@ -2165,11 +2165,15 @@ abstract class ScenarioContract {
         assertTrue(renamed.size > 1800)
         for((old,_) in renamed) assertTrue(sha256(old.name.toByteArray()) in steps.getValue("type" to old.id).let { listOfNotNull(it.previousDefaultNameSha256)+it.previousDefaultNameSha256s },old.id)
         val moved = previous.types.zip(ready.vocabulary.types).filter { (old,next) -> old.parentId != next.parentId }
-        assertEquals(62,moved.size);assertTrue(moved.all { (old,_) -> steps.getValue("type" to old.id).parentMove })
+        assertEquals(64,moved.size);assertTrue(moved.all { (old,_) -> steps.getValue("type" to old.id).parentMove })
+        // 0.9.3 retires a few unfitting or duplicate entries; each one has its own reviewed archive step.
+        val retired = ready.vocabulary.types.filter { it.archived }
+        assertEquals(41,retired.size);assertTrue(retired.all { steps.getValue("type" to it.id).archive })
+        assertTrue(retired.none { r -> ready.vocabulary.types.any { it.parentId == r.id } })
         assertEquals(1,previous.axes.zip(ready.vocabulary.axes).count { (old,next) -> old.name != next.name })
         assertEquals(listOf("activity.movement.exercise_snack"),ready.vocabulary.types.drop(previous.types.size).map { it.id })
         for((old,next) in previous.types.zip(ready.vocabulary.types))
-            assertEquals(old,next.copy(name = old.name,definition = old.definition,parentId = old.parentId,researchOrigins = old.researchOrigins))
+            assertEquals(old,next.copy(name = old.name,definition = old.definition,parentId = old.parentId,researchOrigins = old.researchOrigins,archived = old.archived))
         for((old,next) in previous.axes.zip(ready.vocabulary.axes))
             assertEquals(old,next.copy(name = old.name,researchOrigins = old.researchOrigins))
         val legacy = Tracker(createStore(),clock)
@@ -2178,16 +2182,25 @@ abstract class ScenarioContract {
         legacy.start(legacy.snapshot().token,legacy.typeSelection(legacyType.id));clock.advance(1000);legacy.stop(legacy.snapshot().token)
         legacy.saveFavorite(legacy.snapshot().token,Favorite(label = "Old favourite",selection = legacy.data().sessions.last().selection))
         legacy.saveType(legacy.snapshot().token,legacyType.copy(name = "My old title",archived = true,aliases = listOf("old local alias")))
+        val retiredParent = retired.first { it.id != legacyType.id }
+        val personalChild = ActivityType("personal.child.of.retired","Personal child",parentId = retiredParent.id)
+        legacy.saveType(legacy.snapshot().token,personalChild)
+        val customizedRetired = retired.first { next -> next.id != legacyType.id && next.id != retiredParent.id &&
+            previous.types.any { old -> old.id == next.id && old.definition == next.definition && old.parentId == next.parentId } }
+        val personalType = previous.types.single { it.id == customizedRetired.id }.let { it.copy(name = "Personal type",aliases = it.aliases + "personal alias") }
+        legacy.saveType(legacy.snapshot().token,personalType)
         val oldData = legacy.data();val upgrade = CatalogImports(legacy) { ready }
         val oldPreview = upgrade.prepare();assertTrue(oldPreview.canApply)
         assertEquals(listOf("activity.movement.exercise_snack"),oldPreview.report.added.map { it.id })
-        // The locally renamed type keeps its personal name, so its rename-only step leaves it as it is.
-        assertEquals(steps.size-1,oldPreview.report.updated.size)
+        // Both locally renamed types keep their personal names without a rename or retirement update.
+        assertEquals(steps.size-2,oldPreview.report.updated.size)
         upgrade.apply(oldPreview)
         val expectedTypes = oldData.types.map { old ->
             val baseline = previous.types.find { it.id == old.id };val next = ready.vocabulary.types.find { it.id == old.id }
             if(baseline == null || next == null) old else old.copy(definition = next.definition,parentId = next.parentId,
-                name = if(old.name == baseline.name) next.name else old.name)
+                name = if(old.name == baseline.name) next.name else old.name,
+                // History, a personal child or personal presentation keep their retired types live.
+                archived = old.archived || (next.archived && old.id != legacyType.id && old.id != retiredParent.id && old.id != customizedRetired.id))
         }+ready.vocabulary.types.filter { next -> oldData.types.none { it.id == next.id } }
         val expectedAxes = oldData.axes.map { old ->
             val baseline = previous.axes.find { it.id == old.id };val next = ready.vocabulary.axes.find { it.id == old.id }
@@ -2195,6 +2208,9 @@ abstract class ScenarioContract {
         }
         assertEquals(oldData.copy(revision = legacy.data().revision,catalogVersion = ready.manifest.catalogVersion,
             types = expectedTypes,axes = expectedAxes),legacy.data())
+        assertFalse(legacy.data().types.single { it.id == retiredParent.id }.archived)
+        assertEquals(listOf(personalChild),legacy.data().children(retiredParent.id))
+        assertEquals(personalType,legacy.data().types.single { it.id == customizedRetired.id })
         assertEquals(legacy.data(),reopen(legacy.store).read())
         val importer = CatalogImports(tracker) { ready }
         val before = tracker.data();val preview = importer.prepare()

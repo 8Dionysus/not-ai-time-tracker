@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "catalogId": "tracker.catalog",
-  "catalogRevision": "0.9.2.0",
-  "catalogSha256": "aec8933181894f0c40679fe8a4b68b70083963d8b430785071efe275c03e156a",
+  "catalogRevision": "0.9.3.0",
+  "catalogSha256": "4a3505ad79e0c204137ef68e0835ef01a771736716cf508012008ff927418bc2",
   "localeTag": "de",
   "sourceLocaleTag": "ru",
   "release": "coordinator-full-semantic-review-2026-10-16",
@@ -13,10 +13,10 @@
   "license": null,
   "rightsStatus": "source_rights_review_pending",
   "translator": "Existing supplied translation; no retranslation by integrator",
-  "editor": "Coordinator accepted independent full semantic pass; compact package6f0806c5 and current system Page seq66 blockdc1d2a63",
+  "editor": "Coordinator accepted independent full semantic pass; compact package6f0806c5 and current system Page seq66 blockdc1d2a63; Short activity names rewritten for 0.9.3.0 from the reviewed labels to match the short Russian names; the previous label is kept as an alias. Native review of the short names is pending.",
   "payload": {
     "file": "labels.json",
-    "bytes": 1271471,
-    "sha256": "87232c1e6136a4678e05d75f5e2fff60fbedb65e5cfa676948194c8cd1a5c24b"
+    "bytes": 1319588,
+    "sha256": "c09bb4ec709d83b80e4cd780788a0bf42527a1f45aa0cbe258121d012ead3948"
   }
 }

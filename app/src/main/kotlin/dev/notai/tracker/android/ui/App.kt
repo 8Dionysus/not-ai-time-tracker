@@ -1,5 +1,7 @@
 package dev.notai.tracker.android.ui
 
+
+import dev.notai.tracker.android.L
 import dev.notai.tracker.android.R
 
 import androidx.compose.ui.res.stringResource
@@ -71,6 +73,8 @@ fun TrackerApp(vm: TrackerViewModel, openTechnical: () -> Unit, reducedMotion: B
     val language by vm.language.collectAsStateWithLifecycle()
     val baseContext = androidx.compose.ui.platform.LocalContext.current
     val localeContext = remember(baseContext,language.resolvedLocaleTag) { dev.notai.tracker.android.AppLanguage.context(baseContext,language.resolvedLocaleTag) }
+    remember(baseContext,language.resolvedLocaleTag) {
+        if(baseContext is Activity) runCatching { dev.notai.tracker.android.AppLanguage.applyTo(baseContext.resources,language.resolvedLocaleTag) };true }
     CompositionLocalProvider(androidx.compose.ui.platform.LocalContext provides localeContext,
         androidx.compose.ui.platform.LocalConfiguration provides localeContext.resources.configuration,
         androidx.compose.ui.platform.LocalLayoutDirection provides if(localeContext.resources.configuration.layoutDirection == android.view.View.LAYOUT_DIRECTION_RTL)
@@ -112,7 +116,7 @@ private fun Failed(message: String, retry: () -> Unit, openTechnical: () -> Unit
         horizontalAlignment = Alignment.CenterHorizontally) {
         IntervalFrame(IntervalState.UNKNOWN, bracketWidth = 18.dp, bracketHeight = 72.dp, opening = false) { Text("?", style = NotAi.type.big, color = c.ink2) }
         Text(stringResource(R.string.editorial_tracker_draft_f342d1b57d57bb649441_v0), style = NotAi.type.sheetTitle, color = c.ink, textAlign = TextAlign.Center)
-        Text("Файлы не удалены. Восстановить базу или выбрать копию можно в технической оболочке. Подробности: $message",
+        Text(L.s(R.string.t_a901fbebb1, message),
             style = NotAi.type.bodySmall, color = c.ink2, textAlign = TextAlign.Center)
         PillButton(stringResource(R.string.editorial_tracker_draft_7fcd795d8bfbf628e8e5_v0), openTechnical, Modifier.fillMaxWidth(), ButtonKind.PRIMARY)
         PillButton(stringResource(R.string.editorial_tracker_draft_cbdba5990922e31fc5a1_v0), retry, Modifier.fillMaxWidth(), ButtonKind.TONAL)
@@ -250,8 +254,8 @@ private fun Main(vm: TrackerViewModel, theme: ThemeChoice, openTechnical: () -> 
             stringResource(R.string.editorial_tracker_draft_98c2a48d88776822811d_v0), onConfirm = { vm.applyDeleteSession(r.preview); confirmDelete = null }, onDismiss = { confirmDelete = null }, destructive = true)
     }
     incomingDrafts.firstOrNull()?.let { incoming ->
-        ConfirmDialog("Заменить черновик?", "Текущий текст: «${draft?.note.orEmpty()}»\nНовый текст: «${incoming.draft.note.orEmpty()}»",
-            "Заменить",onConfirm = { vm.resolveIncomingDraft(incoming.id,true) },onDismiss = { vm.resolveIncomingDraft(incoming.id,false) })
+        ConfirmDialog(L.s(R.string.t_c595cae565), L.s(R.string.t_fee1dd80dd, draft?.note.orEmpty(), incoming.draft.note.orEmpty()),
+            L.s(R.string.t_d772cc53be),onConfirm = { vm.resolveIncomingDraft(incoming.id,true) },onDismiss = { vm.resolveIncomingDraft(incoming.id,false) })
     }
     focusEditor?.let { plan -> FocusEditorSheet(vm, plan, snapshot?.focus != null, onDismiss = vm::closeFocusEditor) }
     when (val e = editor) {
@@ -282,7 +286,7 @@ private fun BottomBar(tab: Tab, onSelect: (Tab) -> Unit, live: Boolean) {
                 Column(Modifier.weight(1f).fillMaxHeight().semantics { selected = on }.pressable({ onSelect(t) }, role = Role.Tab, label = t.title),
                     horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     Box(contentAlignment = Alignment.Center) {
-                        M3Icon(icon, null, Modifier.size(22.dp), tint = if (on) c.ink else c.ink2)
+                        M3Icon(icon, null, Modifier.size(22.dp), tint = if (on && c.glow) c.amberInk else if (on) c.ink else c.ink2)
                         if (t == Tab.TIMER) Box(Modifier.size(4.dp).clip(CircleShape).background(if (live) c.amber else if (on) c.ink else c.ink2))
                     }
                     Spacer(Modifier.height(3.dp))
@@ -301,10 +305,10 @@ private fun QuickPickSheet(state: dev.notai.tracker.android.SurfacePickerState, 
     val assignment = state.assignment != null
     val switch = state.route.application == dev.notai.tracker.ChoiceApplication.SWITCH
     NotAiSheet(onDismiss, fullHeight = false) {
-        SheetHeader(when { assignment -> "Чем ты был занят?"; switch -> "Переключиться на"; else -> "Начать сразу" }, onDismiss)
+        SheetHeader(when { assignment -> L.s(R.string.t_51d6a3da35); switch -> L.s(R.string.t_24f866b4ee); else -> L.s(R.string.t_fc8e4e2d1c) }, onDismiss)
         Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(when { assignment -> "Время уже сохранено, осталось выбрать занятие."; switch -> "Текущая запись закончится сейчас, новая начнётся с этой минуты."
-                else -> "Избранное и частые занятия за 30 дней." }, style = NotAi.type.bodySmall, color = c.ink2, modifier = Modifier.padding(bottom = 6.dp))
+            Text(when { assignment -> L.s(R.string.t_288dc99a2b); switch -> L.s(R.string.t_b20271fb06)
+                else -> L.s(R.string.t_104053cfbe) }, style = NotAi.type.bodySmall, color = c.ink2, modifier = Modifier.padding(bottom = 6.dp))
             state.choices.filter { it.entry.canStart && !d.label(it.entry.selection).unclassified }.forEach { q ->
                 val l = d.label(q.entry.selection)
                 ListRow(if (q.entry.kind == dev.notai.tracker.ChoiceKind.FAVORITE) q.entry.title else l.title,
@@ -313,7 +317,7 @@ private fun QuickPickSheet(state: dev.notai.tracker.android.SurfacePickerState, 
             }
             if (state.choices.isEmpty()) Text(stringResource(R.string.editorial_tracker_draft_957459cf20f2e483f3a0_v0), style = NotAi.type.body, color = c.ink2)
             PillButton(stringResource(R.string.editorial_tracker_draft_d0f2db9385d5fd9998ae_v0), onAll, Modifier.fillMaxWidth().padding(top = 8.dp), ButtonKind.TONAL, height = 48.dp)
-            if (assignment) PillButton("Оставить без занятия", onDismiss, Modifier.fillMaxWidth().padding(top = 8.dp), ButtonKind.TONAL, height = 48.dp)
+            if (assignment) PillButton(L.s(R.string.t_73a0a9afdc), onDismiss, Modifier.fillMaxWidth().padding(top = 8.dp), ButtonKind.TONAL, height = 48.dp)
         }
     }
 }

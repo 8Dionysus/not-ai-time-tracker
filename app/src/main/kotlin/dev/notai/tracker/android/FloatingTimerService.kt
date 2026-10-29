@@ -177,7 +177,7 @@ class FloatingTimerService : Service() {
                 change.assignment?.let { offer -> offerAssignment(t, change, offer) }
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
-                Toast.makeText(this@FloatingTimerService, "Таймер уже изменился. Нажми ещё раз", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@FloatingTimerService, L.s(R.string.t_fca9d98cd9), Toast.LENGTH_SHORT).show()
             } finally { busy.value = false }
         }
     }
@@ -229,7 +229,7 @@ class FloatingTimerService : Service() {
             startActivity(SurfaceChoices.intent(this,route).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             hidePanel()
         } catch (_: RuntimeException) {
-            Toast.makeText(this,"Открыть выбор не удалось. Запись сохранена",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this,L.s(R.string.t_eded3f55f1),Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -240,7 +240,7 @@ class FloatingTimerService : Service() {
         scope.launch {
             val result = withContext(Dispatchers.IO) { runCatching { SurfaceChoices.choose(this@FloatingTimerService, t, a.route, choice.choice.reference) } }
             hidePanel()
-            Toast.makeText(this@FloatingTimerService, if (result.isSuccess) "Записано: ${choice.title}" else "Запись уже изменилась. Исправь её в приложении",
+            Toast.makeText(this@FloatingTimerService, if (result.isSuccess) L.s(R.string.t_f8ebe73afe, choice.title) else L.s(R.string.t_a6a3fb1ef7),
                 Toast.LENGTH_SHORT).show()
         }
     }
@@ -274,12 +274,12 @@ class FloatingTimerService : Service() {
 
         /** Only the resumed Activity calls this; never rely on a background-start exemption. */
         fun fromVisibleActivity(activity: Activity, settings: SurfaceSettings): String {
-            if (!settings.overlay) { activity.stopService(Intent(activity, FloatingTimerService::class.java)); return "Плавающая кнопка выключена" }
-            if (!TimerSurfaces.overlayAllowed(activity)) return "Плавающая кнопка: разрешение ОС не предоставлено; таймер доступен в приложении"
+            if (!settings.overlay) { activity.stopService(Intent(activity, FloatingTimerService::class.java)); return L.s(R.string.t_55e920546e) }
+            if (!TimerSurfaces.overlayAllowed(activity)) return L.s(R.string.t_4304ef48ab)
             return try {
                 activity.startForegroundService(Intent(activity, FloatingTimerService::class.java))
-                "Плавающая кнопка запрошена; системный индикатор сервиса обязателен"
-            } catch (_: RuntimeException) { "ОС не разрешила запуск плавающей кнопки; таймер доступен в приложении" }
+                L.s(R.string.t_e06ca859e1)
+            } catch (_: RuntimeException) { L.s(R.string.t_ed5033902e) }
         }
     }
 }
@@ -309,7 +309,7 @@ internal fun Puck(s: Snapshot?, busy: Boolean, onTap: () -> Unit, onDrag: (Float
     var pressed by remember { mutableStateOf(false) }
     val opacity by animateFloatAsState(when { pressed -> 0.95f; active -> 0.78f; else -> 0.55f }, tween(180), label = "puck")
     val amber = Color(0xFFFFB23C)
-    val label = when (command) { TimerCommand.START -> "Начать учёт"; TimerCommand.STOP -> "Остановить учёт"; else -> "Открыть приложение" }
+    val label = when (command) { TimerCommand.START -> L.s(R.string.t_cf3a8f3ca2); TimerCommand.STOP -> L.s(R.string.t_dab89894aa); else -> L.s(R.string.t_3c6332622c) }
     Box(Modifier.size(52.dp).padding(4.dp).alpha(opacity).shadow(6.dp, CircleShape).clip(CircleShape).background(Color(0xFF1D2024))
         .border(1.dp, Color.White.copy(alpha = 0.22f), CircleShape)
         .semantics { contentDescription = label; role = Role.Button; onClick(label) { onTap(); true } }
@@ -348,8 +348,8 @@ internal fun AssignmentCard(a: OverlayAssignment, onChoose: (OverlayChoice) -> U
         Column(Modifier.widthIn(max = 420.dp).fillMaxWidth().then(if (backgroundAlpha >= 0.95f) Modifier.shadow(16.dp, RoundedCornerShape(24.dp)) else Modifier).clip(RoundedCornerShape(24.dp))
             .background(c.raised.copy(alpha = c.raised.alpha * backgroundAlpha)).border(1.dp, c.rule, RoundedCornerShape(24.dp)).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text("Чем ты был занят?", style = NotAi.type.sheetTitle, color = c.ink)
-                Text(listOfNotNull(a.range, "время уже сохранено").joinToString(" · "), style = NotAi.type.caption, color = c.ink2)
+                Text(L.s(R.string.t_51d6a3da35), style = NotAi.type.sheetTitle, color = c.ink)
+                Text(listOfNotNull(a.range, L.s(R.string.t_794d0309cf)).joinToString(" · "), style = NotAi.type.caption, color = c.ink2)
             }
             a.choices.chunked(2).forEach { pair ->
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -364,11 +364,11 @@ internal fun AssignmentCard(a: OverlayAssignment, onChoose: (OverlayChoice) -> U
                     if (pair.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
-            if (a.choices.isEmpty()) Text("Частых занятий пока нет. Выбрать можно в приложении, в истории.", style = NotAi.type.bodySmall, color = c.ink2)
+            if (a.choices.isEmpty()) Text(L.s(R.string.t_15dfa124b4), style = NotAi.type.bodySmall, color = c.ink2)
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                if (onAll != null) PillButton("Все занятия", onAll, kind = ButtonKind.TEXT, height = 40.dp)
+                if (onAll != null) PillButton(L.s(R.string.t_c0634e4cb3), onAll, kind = ButtonKind.TEXT, height = 40.dp)
                 Spacer(Modifier.weight(1f))
-                PillButton("Без занятия", onLeave, kind = ButtonKind.TEXT, height = 40.dp)
+                PillButton(L.s(R.string.t_aff922a637), onLeave, kind = ButtonKind.TEXT, height = 40.dp)
             }
         }
     }

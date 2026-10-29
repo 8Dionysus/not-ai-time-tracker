@@ -1,0 +1,140 @@
+1381 ‖ Equestrian sport ‖ Hípica ‖ Sports équestres ‖ Hipismo ‖ Pferdesport ‖ Sport equestri ‖ رياضة الفروسية ‖ 马术运动 ‖ 馬術 ‖ 승마 경기 ‖ घुड़सवारी खेल
+1382 ‖ Croquet ‖ Croquet ‖ Croquet ‖ Croquet ‖ Krocket ‖ Croquet ‖ الكروكيه ‖ 槌球 ‖ クロッケー ‖ 크로케 ‖ क्रोके
+1383 ‖ Laser shooting ‖ Tiro láser ‖ Tir laser ‖ Tiro a laser ‖ Laserschießen ‖ Tiro laser ‖ الرماية بالليزر ‖ 激光射击 ‖ レーザー射撃 ‖ 레이저 사격 ‖ लेज़र शूटिंग
+1384 ‖ Ski orienteering ‖ Orientación en esquí ‖ Course d’orientation à ski ‖ Orientação de esqui ‖ Ski-Orientierungslauf ‖ Sci orientamento ‖ التوجيه بالتزلج ‖ 滑雪定向 ‖ スキーオリエンテーリング ‖ 스키 오리엔티어링 ‖ स्की ओरिएंटियरिंग
+1385 ‖ Orienteering ‖ Orientación ‖ Orientation ‖ Orientação ‖ Orientierungslauf ‖ Orientamento ‖ التوجيه ‖ 定向 ‖ オリエンテーリング ‖ 오리엔티어링 ‖ ओरिएंटियरिंग
+1386 ‖ Bike orienteering ‖ Orientación en bici ‖ Orientation à VTT ‖ Orientação de bike ‖ Rad-Orientierungsfahren ‖ Orientamento in MTB ‖ التوجيه بالدراجة ‖ 山地车定向 ‖ MTBオリエンテーリング ‖ 자전거 오리엔티어링 ‖ साइकिल ओरिएंटियरिंग
+1387 ‖ Pétanque and bocce ‖ Petanca y bochas ‖ Pétanque et boules ‖ Petanca e bocha ‖ Boule und Boccia ‖ Petanque e bocce ‖ البيتانك والبوتشي ‖ 地掷球与滚球 ‖ ペタンクとボッチェ ‖ 페탕크와 보체 ‖ पेटैंक और बोचे
+1388 ‖ Horseshoes ‖ Herraduras ‖ Lancer de fers à cheval ‖ Malha ‖ Hufeisenwerfen ‖ Lancio dei ferri di cavallo ‖ رمي حدوات الخيل ‖ 掷马蹄铁 ‖ 蹄鉄投げ ‖ 편자 던지기 ‖ घोड़े की नाल फेंकना
+1389 ‖ Horse racing (jockey) ‖ Carreras de caballos (jockey) ‖ Courses hippiques (jockey) ‖ Turfe (jóquei) ‖ Pferderennen (Jockey) ‖ Ippica (fantino) ‖ سباق الخيل (فارس) ‖ 赛马（骑师） ‖ 競馬（騎手） ‖ 경마(기수) ‖ घुड़दौड़ (जॉकी)
+1390 ‖ Sport fishing ‖ Pesca deportiva ‖ Pêche sportive ‖ Pesca esportiva ‖ Angeln ‖ Pesca sportiva ‖ الصيد الرياضي ‖ 休闲钓鱼 ‖ 釣り ‖ 낚시 ‖ खेल मछली पकड़ना
+1391 ‖ Shooting sports ‖ Tiro deportivo ‖ Tir sportif ‖ Tiro esportivo ‖ Sportschießen ‖ Tiro sportivo ‖ الرماية الرياضية ‖ 射击 ‖ 射撃 ‖ 사격 ‖ निशानेबाज़ी
+1392 ‖ Shooting and throwing events ‖ Tiro y lanzamiento ‖ Tir et lancer ‖ Tiro e arremesso ‖ Schießen und Werfen ‖ Tiro e lancio ‖ الرماية والرمي ‖ 射击与投掷 ‖ 射撃と投てき ‖ 사격과 투척 ‖ निशानेबाज़ी और फेंक
+1393 ‖ Archery ‖ Tiro con arco ‖ Tir à l’arc ‖ Tiro com arco ‖ Bogenschießen ‖ Tiro con l’arco ‖ الرماية بالقوس ‖ 射箭 ‖ アーチェリー ‖ 양궁 ‖ तीरंदाज़ी
+1394 ‖ Flight archery ‖ Tiro con arco a distancia ‖ Tir à l’arc en distance ‖ Tiro com arco a distância ‖ Weitschießen mit dem Bogen ‖ Tiro con l’arco a distanza ‖ الرماية بالقوس لأبعد مسافة ‖ 远距离射箭 ‖ 遠射アーチェリー ‖ 원거리 양궁 ‖ दूरी तीरंदाज़ी
+1395 ‖ Air rifle shooting ‖ Tiro con aire comprimido ‖ Tir à air comprimé ‖ Tiro com arma de pressão ‖ Luftgewehrschießen ‖ Tiro ad aria compressa ‖ الرماية بالبندقية الهوائية ‖ 气枪射击 ‖ エアライフル射撃 ‖ 공기총 사격 ‖ एयर राइफ़ल शूटिंग
+1396 ‖ Biathlon range shooting ‖ Tiro de biatlón ‖ Tir au biathlon ‖ Tiro de biatlo ‖ Biathlon-Schießstand ‖ Tiro al poligono di biathlon ‖ الرماية في ميدان البياثلون ‖ 冬季两项射击 ‖ バイアスロン射撃 ‖ 바이애슬론 사격 ‖ बायथलॉन शूटिंग
+1397 ‖ Trail-O ‖ Trail-O ‖ Trail-O ‖ Trail-O ‖ Trail-O ‖ Trail-O ‖ توجيه المسارات ‖ 精确定向 ‖ トレイルオリエンテーリング ‖ 트레일 오리엔티어링 ‖ ट्रेल-O
+1398 ‖ Multisport ‖ Multideporte ‖ Multisport ‖ Multiesporte ‖ Mehrkampf und Multisport ‖ Multisport ‖ الرياضات المتعددة ‖ 多项运动 ‖ 複合競技 ‖ 복합 종목 ‖ बहु-खेल
+1399 ‖ Aquabike ‖ Acuabike ‖ Aquabike ‖ Aquabike ‖ Aquabike ‖ Aquabike ‖ أكوابايك ‖ 游泳骑行两项 ‖ アクアバイク ‖ 아쿠아바이크 ‖ एक्वाबाइक
+1400 ‖ Aquathlon ‖ Acuatlón ‖ Aquathlon ‖ Aquatlo ‖ Aquathlon ‖ Aquathlon ‖ الأكواثلون ‖ 游跑两项 ‖ アクアスロン ‖ 아쿠아슬론 ‖ एक्वाथलॉन
+1401 ‖ Run archery ‖ Carrera con tiro con arco ‖ Run archery ‖ Corrida com tiro com arco ‖ Laufbogenschießen ‖ Run archery ‖ الجري مع الرماية بالقوس ‖ 跑步射箭 ‖ ランアーチェリー ‖ 런 아처리 ‖ रन आर्चरी
+1402 ‖ Biathle ‖ Biathle ‖ Biathle ‖ Biathle ‖ Biathle ‖ Biathle ‖ البياثل ‖ 跑游两项 ‖ バイアスル ‖ 바이애슬 ‖ बायथल
+1403 ‖ Biathlon ‖ Biatlón ‖ Biathlon ‖ Biatlo ‖ Biathlon ‖ Biathlon ‖ البياثلون ‖ 冬季两项 ‖ バイアスロン ‖ 바이애슬론 ‖ बायथलॉन
+1404 ‖ Duathlon ‖ Duatlón ‖ Duathlon ‖ Duatlo ‖ Duathlon ‖ Duathlon ‖ الدواثلون ‖ 铁人两项 ‖ デュアスロン ‖ 듀애슬론 ‖ ड्युएथलॉन
+1405 ‖ Winter duathlon ‖ Duatlón de invierno ‖ Duathlon d’hiver ‖ Duatlo de inverno ‖ Winterduathlon ‖ Duathlon invernale ‖ الدواثلون الشتوي ‖ 冬季两项赛 ‖ ウィンターデュアスロン ‖ 동계 듀애슬론 ‖ शीतकालीन ड्युएथलॉन
+1406 ‖ Winter triathlon ‖ Triatlón de invierno ‖ Triathlon d’hiver ‖ Triatlo de inverno ‖ Wintertriathlon ‖ Triathlon invernale ‖ الترايثلون الشتوي ‖ 冬季铁人三项 ‖ ウィンタートライアスロン ‖ 동계 트라이애슬론 ‖ शीतकालीन ट्रायथलॉन
+1407 ‖ Cross duathlon ‖ Duatlón cros ‖ Cross duathlon ‖ Duatlo cross ‖ Crossduathlon ‖ Duathlon cross ‖ الدواثلون الضاحية ‖ 越野两项 ‖ クロスデュアスロン ‖ 크로스 듀애슬론 ‖ क्रॉस ड्युएथलॉन
+1408 ‖ Cross triathlon ‖ Triatlón cros ‖ Cross triathlon ‖ Triatlo cross ‖ Crosstriathlon ‖ Triathlon cross ‖ الترايثلون الضاحية ‖ 越野铁人三项 ‖ クロストライアスロン ‖ 크로스 트라이애슬론 ‖ क्रॉस ट्रायथलॉन
+1409 ‖ Laser run ‖ Laser run ‖ Laser run ‖ Laser run ‖ Laser Run ‖ Laser run ‖ ليزر ران ‖ 激光跑 ‖ レーザーラン ‖ 레이저 런 ‖ लेज़र रन
+1410 ‖ Obstacle laser run ‖ Laser run con obstáculos ‖ Laser run avec obstacles ‖ Laser run com obstáculos ‖ Laser Run mit Hindernissen ‖ Laser run con ostacoli ‖ ليزر ران مع عوائق ‖ 障碍激光跑 ‖ 障害物レーザーラン ‖ 장애물 레이저 런 ‖ बाधा लेज़र रन
+1411 ‖ Ski archery ‖ Esquí con tiro con arco ‖ Ski-arc ‖ Esqui com tiro com arco ‖ Skibogenschießen ‖ Sci con arco ‖ التزلج مع الرماية بالقوس ‖ 滑雪射箭 ‖ スキーアーチェリー ‖ 스키 아처리 ‖ स्की आर्चरी
+1412 ‖ Nordic combined ‖ Combinada nórdica ‖ Combiné nordique ‖ Combinado nórdico ‖ Nordische Kombination ‖ Combinata nordica ‖ التزلج النوردي المزدوج ‖ 北欧两项 ‖ ノルディック複合 ‖ 노르딕 복합 ‖ नॉर्डिक कम्बाइंड
+1413 ‖ Multisport race ‖ Carrera multideporte ‖ Course multisport ‖ Corrida multiesporte ‖ Multisportrennen ‖ Gara multisport ‖ سباق متعدد الرياضات ‖ 多项运动赛 ‖ マルチスポーツレース ‖ 멀티스포츠 레이스 ‖ मल्टीस्पोर्ट रेस
+1414 ‖ Swimrun ‖ Swimrun ‖ Swimrun ‖ Swimrun ‖ Swimrun ‖ Swimrun ‖ سويم ران ‖ 游跑交替赛 ‖ スイムラン ‖ 스윔런 ‖ स्विमरन
+1415 ‖ Mixed workout ‖ Entrenamiento mixto ‖ Entraînement mixte ‖ Treino misto ‖ Gemischtes Training ‖ Allenamento misto ‖ تمرين مختلط ‖ 混合训练 ‖ ミックストレーニング ‖ 혼합 운동 ‖ मिश्रित वर्कआउट
+1416 ‖ Modern pentathlon ‖ Pentatlón moderno ‖ Pentathlon moderne ‖ Pentatlo moderno ‖ Moderner Fünfkampf ‖ Pentathlon moderno ‖ الخماسي الحديث ‖ 现代五项 ‖ 近代五種 ‖ 근대 5종 ‖ आधुनिक पेंटाथलॉन
+1417 ‖ Target sprint ‖ Target sprint ‖ Target sprint ‖ Target sprint ‖ Target Sprint ‖ Target sprint ‖ تارغت سبرينت ‖ 跑射联项 ‖ ターゲットスプリント ‖ 타깃 스프린트 ‖ टारगेट स्प्रिंट
+1418 ‖ Tetrathlon ‖ Tetratlón ‖ Tétrathlon ‖ Tetratlo ‖ Vierkampf ‖ Tetrathlon ‖ الرباعي ‖ 四项全能 ‖ 四種競技 ‖ 4종 경기 ‖ टेट्राथलॉन
+1419 ‖ Triathle ‖ Triathle ‖ Triathle ‖ Triathle ‖ Triathle ‖ Triathle ‖ الترايثل ‖ 三项全能赛 ‖ トライアスル ‖ 트라이애슬 ‖ ट्रायथल
+1420 ‖ Triathlon ‖ Triatlón ‖ Triathlon ‖ Triatlo ‖ Triathlon ‖ Triathlon ‖ الترايثلون ‖ 铁人三项 ‖ トライアスロン ‖ 트라이애슬론 ‖ ट्रायथलॉन
+1421 ‖ Tug of war ‖ Sogatira ‖ Tir à la corde ‖ Cabo de guerra ‖ Tauziehen ‖ Tiro alla fune ‖ شد الحبل ‖ 拔河 ‖ 綱引き ‖ 줄다리기 ‖ रस्साकशी
+1422 ‖ Obstacle swimming ‖ Natación con obstáculos ‖ Nage avec obstacles ‖ Natação com obstáculos ‖ Hindernisschwimmen ‖ Nuoto a ostacoli ‖ السباحة مع العوائق ‖ 障碍游泳 ‖ 障害物スイム ‖ 장애물 수영 ‖ बाधा तैराकी
+1423 ‖ Racquet and net sports ‖ Raqueta y red ‖ Raquette et filet ‖ Raquete e rede ‖ Rückschlagspiele ‖ Racchetta e rete ‖ رياضات المضرب والشبكة ‖ 球拍与网类运动 ‖ ラケットとネット ‖ 라켓·네트 종목 ‖ रैकेट और नेट खेल
+1424 ‖ Badminton ‖ Bádminton ‖ Badminton ‖ Badminton ‖ Badminton ‖ Badminton ‖ الريشة الطائرة ‖ 羽毛球 ‖ バドミントン ‖ 배드민턴 ‖ बैडमिंटन
+1425 ‖ Real tennis ‖ Jeu de paume ‖ Jeu de paume ‖ Jeu de paume ‖ Jeu de Paume ‖ Pallacorda ‖ التنس الملكي ‖ 室内网球 ‖ ジュ・ド・ポーム ‖ 리얼 테니스 ‖ रियल टेनिस
+1426 ‖ Table tennis ‖ Tenis de mesa ‖ Tennis de table ‖ Tênis de mesa ‖ Tischtennis ‖ Tennis tavolo ‖ تنس الطاولة ‖ 乒乓球 ‖ 卓球 ‖ 탁구 ‖ टेबल टेनिस
+1427 ‖ Padel ‖ Pádel ‖ Padel ‖ Padel ‖ Padel ‖ Padel ‖ البادل ‖ 板式网球 ‖ パデル ‖ 파델 ‖ पैडल
+1428 ‖ Pickleball ‖ Pickleball ‖ Pickleball ‖ Pickleball ‖ Pickleball ‖ Pickleball ‖ البيكلبول ‖ 匹克球 ‖ ピックルボール ‖ 피클볼 ‖ पिकलबॉल
+1429 ‖ Platform tennis ‖ Tenis de plataforma ‖ Tennis sur plateforme ‖ Tênis de plataforma ‖ Plattformtennis ‖ Platform tennis ‖ تنس المنصة ‖ 平台网球 ‖ プラットフォームテニス ‖ 플랫폼 테니스 ‖ प्लेटफ़ॉर्म टेनिस
+1430 ‖ Beach tennis ‖ Tenis playa ‖ Beach tennis ‖ Beach tennis ‖ Beachtennis ‖ Beach tennis ‖ التنس الشاطئي ‖ 沙滩网球 ‖ ビーチテニス ‖ 비치 테니스 ‖ बीच टेनिस
+1431 ‖ POP tennis ‖ POP tennis ‖ POP tennis ‖ POP tennis ‖ POP-Tennis ‖ POP tennis ‖ بوب تنس ‖ POP 网球 ‖ POPテニス ‖ POP 테니스 ‖ पॉप टेनिस
+1432 ‖ Racquetball ‖ Ráquetbol ‖ Racquetball ‖ Raquetebol ‖ Racquetball ‖ Racquetball ‖ الراكيت بول ‖ 壁球式手球 ‖ ラケットボール ‖ 라켓볼 ‖ रैकेटबॉल
+1433 ‖ Squash ‖ Squash ‖ Squash ‖ Squash ‖ Squash ‖ Squash ‖ الإسكواش ‖ 壁球 ‖ スカッシュ ‖ 스쿼시 ‖ स्क्वैश
+1434 ‖ Squash 57 ‖ Squash 57 ‖ Squash 57 ‖ Squash 57 ‖ Squash 57 ‖ Squash 57 ‖ إسكواش 57 ‖ 57 壁球 ‖ スカッシュ57 ‖ 스쿼시 57 ‖ स्क्वैश 57
+1435 ‖ Tennis ‖ Tenis ‖ Tennis ‖ Tênis ‖ Tennis ‖ Tennis ‖ التنس ‖ 网球 ‖ テニス ‖ 테니스 ‖ टेनिस
+1436 ‖ Self-caught flight ‖ Autoatrapada de disco ‖ Lancer-rattraper ‖ Autorrecepção do disco ‖ Self-Caught Flight ‖ Self-caught flight ‖ رمي القرص والتقاطه ذاتيًا ‖ 自抛自接飞盘 ‖ セルフキャッチ ‖ 셀프 캐치 ‖ ख़ुद पकड़ना डिस्क
+1437 ‖ Surf rescue race ‖ Carrera de rescate en la rompiente ‖ Course de sauvetage dans les vagues ‖ Corrida de resgate no mar ‖ Rettungsrennen in der Brandung ‖ Gara di salvataggio in mare ‖ سباق الإنقاذ في الأمواج ‖ 海浪救生赛 ‖ サーフレスキューレース ‖ 파도 구조 경주 ‖ लहरों में बचाव दौड़
+1438 ‖ IRB rescue race ‖ Carrera de rescate en lancha ‖ Course de sauvetage en bateau à moteur ‖ Corrida de resgate em bote ‖ Rettungsrennen mit Motorboot ‖ Gara di salvataggio in gommone ‖ سباق الإنقاذ بالقارب السريع ‖ 救生艇竞速赛 ‖ IRBレスキューレース ‖ IRB 구조 경주 ‖ मोटरबोट बचाव रेस
+1439 ‖ Pool lifesaving combined ‖ Combinada de salvamento ‖ Combiné de sauvetage aquatique ‖ Combinado de salvamento ‖ Rettungsmehrkampf ‖ Combinata di salvamento ‖ مسابقة الإنقاذ المركبة ‖ 救生综合项目 ‖ ライフセービング複合 ‖ 인명구조 복합 ‖ जल बचाव बहु-स्पर्धा
+1440 ‖ Rescue boat races ‖ Carreras de rescate en bote ‖ Courses de sauvetage en bateau ‖ Corridas de resgate em barco ‖ Rettungsbootrennen ‖ Gare di salvataggio in barca ‖ سباقات قوارب الإنقاذ ‖ 救生艇赛 ‖ レスキューボートレース ‖ 구조정 레이스 ‖ बचाव नौका दौड़
+1441 ‖ Beach and ocean lifesaving ‖ Salvamento en playa y mar ‖ Sauvetage côtier ‖ Salvamento de praia e mar ‖ Rettungssport an Strand und Meer ‖ Salvamento in spiaggia e in mare ‖ الإنقاذ على الشاطئ وفي المحيط ‖ 海滩与海洋救生 ‖ ビーチ・オーシャンライフセービング ‖ 해변·해양 인명구조 ‖ समुद्र तट और सागर बचाव
+1442 ‖ Pool lifesaving ‖ Salvamento en piscina ‖ Sauvetage sportif en piscine ‖ Salvamento esportivo em piscina ‖ Rettungsschwimmen im Becken ‖ Salvamento in piscina ‖ الإنقاذ الرياضي في المسبح ‖ 泳池救生 ‖ プールライフセービング ‖ 수영장 인명구조 ‖ पूल बचाव खेल
+1443 ‖ Disc freestyle ‖ Freestyle con disco ‖ Freestyle au disque ‖ Freestyle com disco ‖ Frisbee-Freestyle ‖ Freestyle con il disco ‖ الحركات الحرة بالقرص ‖ 花式飞盘 ‖ ディスクフリースタイル ‖ 디스크 프리스타일 ‖ डिस्क फ़्रीस्टाइल
+1444 ‖ Cardio ‖ Cardio ‖ Cardio ‖ Cardio ‖ Cardio ‖ Cardio ‖ تمارين القلب ‖ 有氧运动 ‖ 有酸素運動 ‖ 유산소 운동 ‖ कार्डियो
+1445 ‖ Quick warm-up ‖ Calentamiento breve ‖ Échauffement rapide ‖ Aquecimento rápido ‖ Kurzes Aufwärmen ‖ Riscaldamento breve ‖ إحماء قصير ‖ 简短热身 ‖ ちょっとした運動 ‖ 짧은 몸풀기 ‖ छोटा वार्म-अप
+1446 ‖ Air and adventure ‖ Aire y aventura ‖ Air et aventure ‖ Ar e aventura ‖ Luft und Abenteuer ‖ Aria e avventura ‖ الجو والمغامرة ‖ 空中与探险 ‖ 空とアドベンチャー ‖ 하늘과 모험 ‖ आकाश और रोमांच
+1447 ‖ Aeromodelling ‖ Aeromodelismo ‖ Aéromodélisme ‖ Aeromodelismo ‖ Modellflug ‖ Aeromodellismo ‖ نمذجة الطائرات ‖ 航空模型 ‖ 模型航空 ‖ 모형 항공 ‖ एयरोमॉडलिंग
+1448 ‖ Flying a model aircraft ‖ Volar un aeromodelo ‖ Piloter un modèle réduit ‖ Pilotar aeromodelo ‖ Modellflugzeug fliegen ‖ Pilotare un aeromodello ‖ قيادة طائرة نموذجية ‖ 操控航模飞行 ‖ 模型飛行機の操縦 ‖ 모형 비행기 조종 ‖ मॉडल विमान उड़ाना
+1449 ‖ Bungee jumping ‖ Puenting ‖ Saut à l’élastique ‖ Bungee jump ‖ Bungee-Jumping ‖ Bungee jumping ‖ القفز بالحبل المطاطي ‖ 蹦极 ‖ バンジージャンプ ‖ 번지점프 ‖ बंजी जंपिंग
+1450 ‖ BASE jumping ‖ Salto BASE ‖ BASE jump ‖ Base jump ‖ Basejumping ‖ BASE jumping ‖ القفز من المرتفعات الثابتة ‖ 低空跳伞 ‖ ベースジャンプ ‖ 베이스점프 ‖ बेस जंपिंग
+1451 ‖ Helicopter sport ‖ Deporte en helicóptero ‖ Hélicoptère sportif ‖ Esporte com helicóptero ‖ Hubschraubersport ‖ Elicottero sportivo ‖ رياضة المروحيات ‖ 直升机运动 ‖ ヘリコプター競技 ‖ 헬리콥터 스포츠 ‖ हेलिकॉप्टर खेल
+1452 ‖ Hot-air balloon ‖ Globo aerostático ‖ Montgolfière ‖ Balão ‖ Ballonfahren ‖ Mongolfiera ‖ المنطاد ‖ 热气球 ‖ 熱気球 ‖ 열기구 ‖ गर्म हवा का गुब्बारा
+1453 ‖ Aerobatics ‖ Acrobacia aérea ‖ Voltige aérienne ‖ Acrobacia aérea ‖ Kunstflug ‖ Acrobazia aerea ‖ الألعاب الجوية البهلوانية ‖ 特技飞行 ‖ 曲技飛行 ‖ 곡예비행 ‖ एरोबैटिक्स
+1454 ‖ Hang gliding ‖ Ala delta ‖ Deltaplane ‖ Asa-delta ‖ Drachenfliegen ‖ Deltaplano ‖ الطيران الشراعي المعلّق ‖ 悬挂滑翔 ‖ ハンググライダー ‖ 행글라이딩 ‖ हैंग ग्लाइडिंग
+1455 ‖ Drone racing ‖ Carreras de drones ‖ Course de drones ‖ Corrida de drones ‖ Drohnenrennen ‖ Gare di droni ‖ سباق الطائرات المسيّرة ‖ 无人机竞速 ‖ ドローンレース ‖ 드론 레이싱 ‖ ड्रोन रेसिंग
+1456 ‖ Zipline and ropes course ‖ Tirolina y parque de cuerdas ‖ Tyrolienne et accrobranche ‖ Tirolesa e arvorismo ‖ Seilrutsche und Kletterpark ‖ Zipline e parco avventura ‖ الحبل المنزلق وحديقة الحبال ‖ 滑索与绳索乐园 ‖ ジップラインとロープコース ‖ 짚라인과 로프 코스 ‖ ज़िपलाइन और रोप कोर्स
+1457 ‖ Microlight ‖ Ultraligero ‖ ULM ‖ Ultraleve ‖ Ultraleichtflug ‖ Ultraleggero ‖ الطائرة الخفيفة ‖ 超轻型飞机 ‖ マイクロライト ‖ 초경량 비행기 ‖ माइक्रोलाइट
+1458 ‖ Paramotor ‖ Paramotor ‖ Paramoteur ‖ Paramotor ‖ Motorschirm ‖ Paramotore ‖ المظلة الآلية ‖ 动力伞 ‖ パラモーター ‖ 패러모터 ‖ पैरामोटर
+1459 ‖ Paragliding ‖ Parapente ‖ Parapente ‖ Parapente ‖ Gleitschirmfliegen ‖ Parapendio ‖ الطيران المظلي ‖ 滑翔伞 ‖ パラグライダー ‖ 패러글라이딩 ‖ पैराग्लाइडिंग
+1460 ‖ Microlight or paramotor flights ‖ Vuelo en ultraligero o paramotor ‖ Vol en ULM ou paramoteur ‖ Voo de ultraleve ou paramotor ‖ Ultraleicht- oder Motorschirmflug ‖ Volo in ultraleggero o paramotore ‖ الطيران الخفيف أو بالمظلة الآلية ‖ 超轻机或动力伞飞行 ‖ マイクロライトやパラモーター ‖ 초경량기·패러모터 비행 ‖ माइक्रोलाइट या पैरामोटर उड़ान
+1461 ‖ Gliding ‖ Vuelo sin motor ‖ Vol à voile ‖ Voo a vela ‖ Segelfliegen ‖ Volo a vela ‖ الطيران الشراعي ‖ 滑翔机飞行 ‖ グライダー ‖ 글라이더 비행 ‖ ग्लाइडर उड़ान
+1462 ‖ Adventure racing ‖ Carreras de aventura ‖ Raids aventure ‖ Corridas de aventura ‖ Abenteuerrennen ‖ Gare di avventura ‖ سباقات المغامرة ‖ 探险竞赛 ‖ アドベンチャーレース ‖ 어드벤처 레이스 ‖ एडवेंचर रेस
+1463 ‖ Skydiving ‖ Paracaidismo ‖ Parachutisme ‖ Paraquedismo ‖ Fallschirmspringen ‖ Paracadutismo ‖ القفز بالمظلة ‖ 跳伞 ‖ スカイダイビング ‖ 스카이다이빙 ‖ स्काइडाइविंग
+1464 ‖ Mobility and stretching ‖ Movilidad y estiramientos ‖ Mobilité et étirements ‖ Mobilidade e alongamento ‖ Mobilität und Dehnen ‖ Mobilità e stretching ‖ المرونة والإطالة ‖ 灵活性与拉伸 ‖ 可動域とストレッチ ‖ 가동성과 스트레칭 ‖ गतिशीलता और स्ट्रेचिंग
+1465 ‖ Strength training ‖ Entrenamiento de fuerza ‖ Musculation ‖ Musculação ‖ Krafttraining ‖ Allenamento di forza ‖ تمارين القوة ‖ 力量训练 ‖ 筋トレ ‖ 근력 운동 ‖ शक्ति प्रशिक्षण
+1466 ‖ Sport practice ‖ Práctica deportiva ‖ Pratique sportive ‖ Prática esportiva ‖ Sporttraining ‖ Pratica sportiva ‖ الممارسة الرياضية ‖ 体育练习 ‖ スポーツの練習 ‖ 스포츠 연습 ‖ खेल अभ्यास
+1467 ‖ Dance ‖ Baile ‖ Danse ‖ Dança ‖ Tanz ‖ Danza ‖ الرقص ‖ 舞蹈 ‖ ダンス ‖ 춤 ‖ नृत्य
+1468 ‖ Acrobatic rock and roll ‖ Rock acrobático ‖ Rock acrobatique ‖ Rock acrobático ‖ Akrobatischer Rock ’n’ Roll ‖ Rock acrobatico ‖ الروك أند رول البهلواني ‖ 技巧摇滚舞 ‖ アクロバティック・ロックンロール ‖ 애크러배틱 로큰롤 ‖ एक्रोबैटिक रॉक एंड रोल
+1469 ‖ Ballet ‖ Ballet ‖ Ballet ‖ Balé ‖ Ballett ‖ Danza classica ‖ الباليه ‖ 芭蕾 ‖ バレエ ‖ 발레 ‖ बैले
+1470 ‖ Ballroom dancing ‖ Baile de salón ‖ Danse de salon ‖ Dança de salão ‖ Gesellschaftstanz ‖ Ballo da sala ‖ الرقص الكلاسيكي الثنائي ‖ 国标舞 ‖ 社交ダンス ‖ 볼룸댄스 ‖ बॉलरूम नृत्य
+1471 ‖ Bollywood ‖ Bollywood ‖ Bollywood ‖ Bollywood ‖ Bollywood ‖ Bollywood ‖ رقص بوليوود ‖ 宝莱坞舞 ‖ ボリウッド ‖ 볼리우드 ‖ बॉलीवुड
+1472 ‖ Breaking ‖ Breaking ‖ Breaking ‖ Breaking ‖ Breaking ‖ Breaking ‖ البريك دانس ‖ 霹雳舞 ‖ ブレイキン ‖ 브레이킹 ‖ ब्रेकिंग
+1473 ‖ Bugg ‖ Bugg ‖ Bugg ‖ Bugg ‖ Bugg ‖ Bugg ‖ رقص البغ ‖ 瑞典摇摆舞 ‖ バッグ ‖ 부그 ‖ बग
+1474 ‖ Boogie-woogie ‖ Boogie-woogie ‖ Boogie-woogie ‖ Boogie-woogie ‖ Boogie-Woogie ‖ Boogie-woogie ‖ البوغي ووغي ‖ 布吉伍吉 ‖ ブギウギ ‖ 부기우기 ‖ बूगी-वूगी
+1475 ‖ Jazz dance ‖ Danza jazz ‖ Modern jazz ‖ Jazz dance ‖ Jazztanz ‖ Danza jazz ‖ رقص الجاز ‖ 爵士舞 ‖ ジャズダンス ‖ 재즈댄스 ‖ जैज़ नृत्य
+1476 ‖ Disco ‖ Disco ‖ Disco ‖ Disco ‖ Disco ‖ Disco ‖ الديسكو ‖ 迪斯科 ‖ ディスコ ‖ 디스코 ‖ डिस्को
+1477 ‖ Contemporary ‖ Contemporáneo ‖ Contemporain ‖ Contemporâneo ‖ Contemporary ‖ Contemporaneo ‖ الرقص المعاصر ‖ 现代舞 ‖ コンテンポラリー ‖ 컨템퍼러리 ‖ समकालीन नृत्य
+1478 ‖ Merengue ‖ Merengue ‖ Merengue ‖ Merengue ‖ Merengue ‖ Merengue ‖ الميرينغي ‖ 梅伦格舞 ‖ メレンゲ ‖ 메렝게 ‖ मेरेंगे
+1479 ‖ Folk dance ‖ Danzas folclóricas ‖ Danses folkloriques ‖ Danças folclóricas ‖ Volkstanz ‖ Danze popolari ‖ الرقص الشعبي ‖ 民族舞 ‖ 民族舞踊 ‖ 민속춤 ‖ लोक नृत्य
+1480 ‖ Practicing a routine ‖ Ensayar una coreografía ‖ Travailler un enchaînement ‖ Ensaiar uma sequência ‖ Choreografie üben ‖ Provare una coreografia ‖ التدرب على حركات ‖ 练习组合动作 ‖ 振り付けの練習 ‖ 안무 연습 ‖ स्टेप्स का अभ्यास
+1481 ‖ Partner dance ‖ Baile en pareja ‖ Danse à deux ‖ Dança a dois ‖ Paartanz ‖ Ballo di coppia ‖ الرقص الثنائي ‖ 双人舞 ‖ ペアダンス ‖ 커플 댄스 ‖ जोड़ी नृत्य
+1482 ‖ Pole and aerial dance ‖ Pole y danza aérea ‖ Pole dance et danse aérienne ‖ Pole e dança aérea ‖ Pole und Luftakrobatik ‖ Pole e danza aerea ‖ رقص العمود والرقص الهوائي ‖ 钢管舞与空中舞蹈 ‖ ポールとエアリアル ‖ 폴댄스와 에어리얼 ‖ पोल और एरियल डांस
+1483 ‖ Rehearsing a piece ‖ Ensayo del número ‖ Répétition du numéro ‖ Ensaio do número ‖ Nummer proben ‖ Prova del numero ‖ التدرب على العرض ‖ 排练节目 ‖ 演目のリハーサル ‖ 작품 리허설 ‖ प्रस्तुति का रिहर्सल
+1484 ‖ American rhythm ‖ Rhythm americano ‖ Rythmes américains ‖ Rhythm americano ‖ American Rhythm ‖ American rhythm ‖ الإيقاع الأمريكي ‖ 美式节奏舞 ‖ アメリカンリズム ‖ 아메리칸 리듬 ‖ अमेरिकन रिदम
+1485 ‖ Salsa, bachata, tango and swing ‖ Salsa, bachata, tango y swing ‖ Salsa, bachata, tango et swing ‖ Salsa, bachata, tango e swing ‖ Salsa, Bachata, Tango und Swing ‖ Salsa, bachata, tango e swing ‖ السالسا والباتشاتا والتانغو والسوينغ ‖ 萨尔萨、巴恰塔、探戈与摇摆舞 ‖ サルサ・バチャータ・タンゴ・スウィング ‖ 살사·바차타·탱고·스윙 ‖ साल्सा, बचाटा, टैंगो और स्विंग
+1486 ‖ American smooth ‖ Smooth americano ‖ Smooth américain ‖ Smooth americano ‖ American Smooth ‖ American smooth ‖ السموث الأمريكي ‖ 美式平滑舞 ‖ アメリカンスムース ‖ 아메리칸 스무스 ‖ अमेरिकन स्मूथ
+1487 ‖ Social dancing ‖ Baile social ‖ Danses de société ‖ Dança social ‖ Gesellschaftliches Tanzen ‖ Balli sociali ‖ الرقص الاجتماعي ‖ 社交舞 ‖ ソーシャルダンス ‖ 소셜 댄스 ‖ सामाजिक नृत्य
+1488 ‖ Tap dance ‖ Claqué ‖ Claquettes ‖ Sapateado ‖ Stepptanz ‖ Tip tap ‖ رقص النقر ‖ 踢踏舞 ‖ タップダンス ‖ 탭댄스 ‖ टैप डांस
+1489 ‖ Dance cardio ‖ Cardio de baile ‖ Cardio dansé ‖ Cardio dance ‖ Tanz-Cardio ‖ Cardio dance ‖ تمارين القلب بالرقص ‖ 舞蹈有氧 ‖ ダンスカーディオ ‖ 댄스 카디오 ‖ डांस कार्डियो
+1490 ‖ Hip-hop ‖ Hip-hop ‖ Hip-hop ‖ Hip-hop ‖ Hip-Hop ‖ Hip hop ‖ الهيب هوب ‖ 街舞 ‖ ヒップホップ ‖ 힙합 ‖ हिप-हॉप
+1491 ‖ Training hike ‖ Caminata de entrenamiento ‖ Randonnée d’entraînement ‖ Trilha de treino ‖ Trainingswanderung ‖ Escursione di allenamento ‖ مسير تدريبي ‖ 训练徒步 ‖ トレーニング登山 ‖ 훈련 산행 ‖ प्रशिक्षण पैदल यात्रा
+1492 ‖ Fitness ‖ Fitness ‖ Fitness ‖ Fitness ‖ Fitness ‖ Fitness ‖ اللياقة البدنية ‖ 健身 ‖ フィットネス ‖ 피트니스 ‖ फ़िटनेस
+1493 ‖ Flexibility and mindful movement ‖ Flexibilidad y movimiento consciente ‖ Souplesse et mouvement conscient ‖ Flexibilidade e movimento consciente ‖ Beweglichkeit und achtsame Bewegung ‖ Flessibilità e movimento consapevole ‖ المرونة والحركة الواعية ‖ 柔韧与正念运动 ‖ 柔軟性とマインドフルな動き ‖ 유연성과 마음챙김 운동 ‖ लचीलापन और सजग गति
+1494 ‖ Barre ‖ Barre ‖ Barre ‖ Barre ‖ Barre ‖ Barre ‖ تمارين البار ‖ 芭蕾把杆 ‖ バー・ワークアウト ‖ 바레 ‖ बार वर्कआउट
+1495 ‖ Gymnastics ‖ Gimnasia ‖ Gymnastique ‖ Ginástica ‖ Gymnastik ‖ Ginnastica ‖ التمارين البدنية ‖ 体操 ‖ 体操 ‖ 체조 ‖ व्यायाम
+1496 ‖ Breathing exercises ‖ Ejercicios de respiración ‖ Exercices de respiration ‖ Exercícios de respiração ‖ Atemübungen ‖ Esercizi di respirazione ‖ تمارين التنفس ‖ 呼吸练习 ‖ 呼吸法 ‖ 호흡 운동 ‖ साँस के व्यायाम
+1497 ‖ Cool-down and recovery ‖ Vuelta a la calma y recuperación ‖ Retour au calme et récupération ‖ Desaquecimento e recuperação ‖ Cool-down und Regeneration ‖ Defaticamento e recupero ‖ التهدئة والاستشفاء ‖ 放松与恢复 ‖ クールダウンと回復 ‖ 정리 운동과 회복 ‖ कूल-डाउन और रिकवरी
+1498 ‖ Yoga ‖ Yoga ‖ Yoga ‖ Ioga ‖ Yoga ‖ Yoga ‖ اليوغا ‖ 瑜伽 ‖ ヨガ ‖ 요가 ‖ योग
+1499 ‖ Callanetics ‖ Callanetics ‖ Callanetics ‖ Callanetics ‖ Callanetics ‖ Callanetics ‖ الكالانيتكس ‖ 卡兰尼蒂克斯 ‖ キャラネティクス ‖ 캘러네틱스 ‖ कैलानेटिक्स
+1500 ‖ Pilates ‖ Pilates ‖ Pilates ‖ Pilates ‖ Pilates ‖ Pilates ‖ البيلاتس ‖ 普拉提 ‖ ピラティス ‖ 필라테스 ‖ पिलाटेस
+1501 ‖ Stretching ‖ Estiramientos ‖ Étirements ‖ Alongamento ‖ Dehnen ‖ Stretching ‖ الإطالة ‖ 拉伸 ‖ ストレッチ ‖ 스트레칭 ‖ स्ट्रेचिंग
+1502 ‖ Joint mobility ‖ Movilidad articular ‖ Mobilité articulaire ‖ Mobilidade articular ‖ Gelenkgymnastik ‖ Mobilità articolare ‖ تمارين المفاصل ‖ 关节操 ‖ 関節体操 ‖ 관절 운동 ‖ जोड़ों का व्यायाम
+1503 ‖ Tai chi ‖ Taichí ‖ Tai-chi ‖ Tai chi ‖ Tai-Chi ‖ Tai chi ‖ التاي تشي ‖ 太极 ‖ 太極拳 ‖ 태극권 ‖ ताई ची
+1504 ‖ Dance aerobics ‖ Aeróbic de baile ‖ Aérobic dansé ‖ Aeróbica dançada ‖ Tanzaerobic ‖ Aerobica dance ‖ الأيروبكس الراقص ‖ 舞蹈健身操 ‖ ダンスエアロビクス ‖ 댄스 에어로빅 ‖ डांस एरोबिक्स
+1505 ‖ Qigong ‖ Qigong ‖ Qi gong ‖ Qigong ‖ Qigong ‖ Qigong ‖ التشي غونغ ‖ 气功 ‖ 気功 ‖ 기공 ‖ चीगोंग
+1506 ‖ Qigong and kung fu exercises ‖ Qigong y ejercicios de kung-fu ‖ Qi gong et exercices de kung-fu ‖ Qigong e exercícios de kung fu ‖ Qigong und Kung-Fu-Übungen ‖ Qigong ed esercizi di kung fu ‖ التشي غونغ وتمارين الكونغ فو ‖ 气功与功夫练习 ‖ 気功とカンフー体操 ‖ 기공과 쿵후 체조 ‖ चीगोंग और कुंग फ़ू अभ्यास
+1507 ‖ Cardio and aerobics ‖ Cardio y aeróbic ‖ Cardio et aérobic ‖ Cardio e aeróbica ‖ Cardio und Aerobic ‖ Cardio e aerobica ‖ تمارين القلب والأيروبكس ‖ 有氧与健身操 ‖ 有酸素とエアロビクス ‖ 유산소와 에어로빅 ‖ कार्डियो और एरोबिक्स
+1508 ‖ HIIT ‖ HIIT ‖ HIIT ‖ HIIT ‖ HIIT ‖ HIIT ‖ التمارين المتقطعة عالية الشدة ‖ HIIT ‖ HIIT ‖ HIIT ‖ HIIT
+1509 ‖ Water aerobics ‖ Aquaeróbic ‖ Aquagym ‖ Hidroginástica ‖ Wassergymnastik ‖ Acquagym ‖ التمارين المائية ‖ 水中健身操 ‖ 水中エアロビクス ‖ 아쿠아로빅 ‖ जल एरोबिक्स
+1510 ‖ Aerobics ‖ Aeróbic ‖ Aérobic ‖ Aeróbica ‖ Aerobic ‖ Aerobica ‖ الأيروبكس ‖ 有氧操 ‖ エアロビクス ‖ 에어로빅 ‖ एरोबिक्स
+1511 ‖ Jogging ‖ Trotar ‖ Footing ‖ Trote ‖ Joggen ‖ Jogging ‖ الهرولة ‖ 慢跑 ‖ ジョギング ‖ 조깅 ‖ जॉगिंग
+1512 ‖ Treadmill ‖ Cinta de correr ‖ Tapis de course ‖ Esteira ‖ Laufband ‖ Tapis roulant ‖ جهاز الجري ‖ 跑步机 ‖ ランニングマシン ‖ 러닝머신 ‖ ट्रेडमिल
+1513 ‖ Bootcamp ‖ Bootcamp ‖ Bootcamp ‖ Bootcamp ‖ Bootcamp ‖ Bootcamp ‖ معسكر اللياقة ‖ 训练营 ‖ ブートキャンプ ‖ 부트캠프 ‖ बूटकैंप
+1514 ‖ Indoor cycling ‖ Bicicleta estática y spinning ‖ Vélo d’appartement et cycling ‖ Bicicleta ergométrica e spinning ‖ Heimtrainer und Indoor-Cycling ‖ Cyclette e spinning ‖ الدراجة الثابتة والسبينينغ ‖ 动感单车 ‖ エアロバイクとスピニング ‖ 실내 자전거 ‖ स्टेशनरी साइकिलिंग
+1515 ‖ Outdoor bike workout ‖ Entrenamiento en bici al aire libre ‖ Sortie vélo d’entraînement ‖ Treino de bike na rua ‖ Radtraining draußen ‖ Allenamento in bici all’aperto ‖ تمرين الدراجة في الخارج ‖ 户外骑行训练 ‖ 屋外での自転車トレーニング ‖ 야외 자전거 훈련 ‖ बाहर साइकिल वर्कआउट
+1516 ‖ Rowing machine ‖ Remoergómetro ‖ Rameur ‖ Remo ergômetro ‖ Rudergerät ‖ Vogatore ‖ جهاز التجديف ‖ 划船机 ‖ ローイングマシン ‖ 로잉머신 ‖ रोइंग मशीन
+1517 ‖ Long run ‖ Tirada larga ‖ Sortie longue ‖ Longão ‖ Langer Lauf ‖ Lungo ‖ جري لمسافة طويلة ‖ 长距离跑 ‖ ロング走 ‖ 장거리 달리기 ‖ लंबी दौड़
+1518 ‖ Interval running ‖ Series ‖ Fractionné ‖ Treino intervalado ‖ Intervalllauf ‖ Ripetute ‖ الجري المتقطع ‖ 间歇跑 ‖ インターバル走 ‖ 인터벌 달리기 ‖ अंतराल दौड़
+1519 ‖ Circuit training ‖ Entrenamiento en circuito ‖ Circuit training ‖ Treino em circuito ‖ Zirkeltraining ‖ Circuit training ‖ التمارين الدائرية ‖ 循环训练 ‖ サーキットトレーニング ‖ 서킷 트레이닝 ‖ सर्किट ट्रेनिंग
+1520 ‖ Swim workout ‖ Entrenamiento de natación ‖ Entraînement de natation ‖ Treino de natação ‖ Schwimmtraining ‖ Allenamento di nuoto ‖ تمرين السباحة ‖ 游泳训练 ‖ 水泳トレーニング ‖ 수영 훈련 ‖ तैराकी वर्कआउट

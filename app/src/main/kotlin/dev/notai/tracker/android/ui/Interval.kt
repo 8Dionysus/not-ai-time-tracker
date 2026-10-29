@@ -38,8 +38,9 @@ enum class IntervalState { IDLE, RUNNING, PAUSED, UNKNOWN }
 /** One parenthesis drawn from the design path (viewBox 26×120). */
 @Composable
 fun Bracket(left: Boolean, color: Color, modifier: Modifier = Modifier, width: Dp = 28.dp, height: Dp = 120.dp,
-            stroke: Dp = 2.2.dp, dotted: Boolean = false, glow: Boolean = false) {
+            stroke: Dp = 2.2.dp, dotted: Boolean = false, glow: Boolean = false, glowColor: Color = color, glowStrength: Float = 1f) {
     val density = LocalDensity.current
+    val pulse = NotAi.neonPulse
     Canvas(modifier.size(width, height)) {
         val sx = size.width / 26f; val sy = size.height / 120f
         val path = Path().apply {
@@ -48,10 +49,13 @@ fun Bracket(left: Boolean, color: Color, modifier: Modifier = Modifier, width: D
         }
         val w = with(density) { stroke.toPx() }
         val effect = if (dotted) PathEffect.dashPathEffect(floatArrayOf(0.1f, w * 4.2f)) else null
-        // Neon: two wide, faint strokes under the line read as light, without blur or extra layers.
+        // Neon: three widening strokes under the line read as light, without blur or extra layers. They breathe with
+        // the shared pulse, so the halo is plainly alive but never flashes.
         if (glow && !dotted) {
-            drawPath(path, color.copy(alpha = color.alpha * 0.10f), style = Stroke(width = w * 5f, cap = StrokeCap.Round))
-            drawPath(path, color.copy(alpha = color.alpha * 0.20f), style = Stroke(width = w * 2.2f, cap = StrokeCap.Round))
+            val p = pulse.value; val k = glowStrength
+            drawPath(path, glowColor.copy(alpha = (0.05f + 0.05f * p) * k), style = Stroke(width = w * 11f, cap = StrokeCap.Round))
+            drawPath(path, glowColor.copy(alpha = (0.12f + 0.12f * p) * k), style = Stroke(width = w * 5.5f, cap = StrokeCap.Round))
+            drawPath(path, glowColor.copy(alpha = (0.30f + 0.15f * p) * k), style = Stroke(width = w * 2.4f, cap = StrokeCap.Round))
         }
         drawPath(path, color, style = Stroke(width = if (dotted) w * 1.2f else w, cap = StrokeCap.Round, pathEffect = effect))
     }
@@ -86,12 +90,15 @@ fun IntervalFrame(state: IntervalState, modifier: Modifier = Modifier, bracketWi
     val shiftPx = with(density) { breathe.toPx() } * phase * (if (inviting) -0.75f else 1f)
     val fade = if (inviting) 0.3f else 0.55f
     val openPx = with(density) { 54.dp.toPx() } * open.value
+    // Neon: the accent lights the brackets fully while recording, faintly at rest, and not at all when paused.
+    val glowStrength = when (state) { IntervalState.RUNNING -> 1f; IntervalState.IDLE, IntervalState.UNKNOWN -> 0.55f; IntervalState.PAUSED -> 0.25f }
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(gap), verticalAlignment = Alignment.CenterVertically) {
         Bracket(true, color, Modifier.graphicsLayer { translationX = openPx - shiftPx; alpha = (1f - fade * phase) * (1f - open.value) },
-            width = bracketWidth, height = bracketHeight, stroke = stroke, glow = c.glow)
+            width = bracketWidth, height = bracketHeight, stroke = stroke, glow = c.glow, glowColor = c.amber, glowStrength = glowStrength)
         content()
         Bracket(false, if (state == IntervalState.UNKNOWN) c.ink3 else color,
             Modifier.graphicsLayer { translationX = -openPx + shiftPx; alpha = (1f - fade * phase) * (1f - open.value) },
-            width = bracketWidth, height = bracketHeight, stroke = stroke, dotted = state == IntervalState.UNKNOWN, glow = c.glow)
+            width = bracketWidth, height = bracketHeight, stroke = stroke, dotted = state == IntervalState.UNKNOWN, glow = c.glow, glowColor = c.amber,
+            glowStrength = glowStrength)
     }
 }

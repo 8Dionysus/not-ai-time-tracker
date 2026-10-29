@@ -59,7 +59,7 @@ object FocusEffects {
     fun install(c: Context) {
         val app = c.applicationContext
         FocusEnvironmentBinding.rule = FocusRuleConfiguration(ComponentName(app, FocusRuleConfigurationActivity::class.java),
-            "Фокус (not)AI", "Тишина на время отрезка Фокуса")
+            L.s(R.string.t_13b7c69527), L.s(R.string.t_f4ca346393))
         FocusEnvironmentBinding.localFile = { id -> file(app, id) }
     }
 

@@ -2,7 +2,7 @@
 <resources>
     <string name="language_title">Language</string>
     <string name="language_system">System default</string>
-    <string name="language_partial">Some existing screens still use Russian. Personal names and records are not translated.</string>
+    <string name="language_partial">Your own names and notes stay as written. Preset catalog activities are translated.</string>
     <string name="language_save_error">Could not save the language. Choose again.</string>
     <string name="deleted_title">Deleted</string>
     <string name="deleted_empty">No deleted records</string>

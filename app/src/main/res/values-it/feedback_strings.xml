@@ -2,7 +2,7 @@
 <resources>
     <string name="language_title">Lingua</string>
     <string name="language_system">Lingua di sistema</string>
-    <string name="language_partial">Alcune schermate sono ancora in russo. I nomi personali e le registrazioni non vengono tradotti.</string>
+    <string name="language_partial">I tuoi nomi e le note restano come li hai scritti. Le attività del catalogo vengono tradotte.</string>
     <string name="language_save_error">Impossibile salvare la lingua. Riprova.</string>
     <string name="deleted_title">Eliminati</string>
     <string name="deleted_empty">Nessuna registrazione eliminata</string>

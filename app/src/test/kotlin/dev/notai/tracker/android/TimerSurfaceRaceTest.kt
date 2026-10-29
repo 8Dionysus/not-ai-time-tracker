@@ -23,7 +23,7 @@ import org.robolectric.annotation.Config
 
 /** Actual notification/widget/launcher effects, isolated stores and deterministic preparation barriers. */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [36])
+@Config(sdk = [36], qualifiers = "ru-rRU")
 class TimerSurfaceRaceTest {
     private val factory = TimerSurfaces.notificationFactory
     @After fun reset() { TimerSurfaces.notificationFactory=factory;TimerSurfaces.refreshPrepared=null }

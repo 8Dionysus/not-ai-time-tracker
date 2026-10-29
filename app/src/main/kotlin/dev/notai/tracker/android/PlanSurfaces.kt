@@ -100,7 +100,7 @@ class PlanStartReceiver: BroadcastReceiver() {
                 try { PlanSurfaces.start(runtime.tracker,runtime.schedule,tap.key,tap.seriesRevision,tap.overrideRevision,tap.token) }
                 catch(e: CoreError) {
                     android.os.Handler(android.os.Looper.getMainLooper()).post {
-                        android.widget.Toast.makeText(context,"План или таймер уже изменились. Посмотри ещё раз",android.widget.Toast.LENGTH_SHORT).show()
+                        android.widget.Toast.makeText(context,L.s(R.string.t_b1dd9c744d),android.widget.Toast.LENGTH_SHORT).show()
                     }
                 }
                 TimerSurfaces.refresh(context,runtime.tracker)

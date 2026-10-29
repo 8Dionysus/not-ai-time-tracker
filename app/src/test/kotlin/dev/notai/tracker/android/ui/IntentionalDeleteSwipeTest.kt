@@ -58,30 +58,32 @@ class IntentionalDeleteSwipeTest {
         }
 
         fun row() = compose.onNodeWithTag("row")
-        fun closed() {
+        fun closed(stage: String) {
             compose.waitForIdle()
             assertTrue(compose.onAllNodesWithTag("delete").fetchSemanticsNodes().isEmpty())
             assertEquals(0, deletes.get())
+            assertEquals("row click after $stage", 0, rowClicks.get())
         }
         fun open() {
             row().performTouchInput { swipeLeft() }
             compose.waitForIdle()
             assertEquals(0, deletes.get())
             assertEquals(1, compose.onAllNodesWithTag("delete").fetchSemanticsNodes().size)
+            assertEquals("row click while opening", 0, rowClicks.get())
         }
 
         // A cancelled or short drag settles closed; an open row can be closed and opened again.
         row().performTouchInput {
             down(Offset(width * 0.8f, centerY))
-            moveTo(Offset(width * 0.7f, centerY))
+            moveTo(Offset(width * 0.65f, centerY))
             cancel()
         }
-        closed()
-        row().performTouchInput { swipe(Offset(width * 0.8f, centerY), Offset(width * 0.72f, centerY), 300) }
-        closed()
+        closed("cancellation")
+        row().performTouchInput { swipe(Offset(width * 0.8f, centerY), Offset(width * 0.65f, centerY), 300) }
+        closed("short swipe")
         open()
         row().performTouchInput { swipeRight() }
-        closed()
+        closed("closing swipe")
         open()
 
         val rowBounds = row().fetchSemanticsNode().boundsInRoot
@@ -91,6 +93,6 @@ class IntentionalDeleteSwipeTest {
         compose.onRoot().performTouchInput { click(actionBounds.center) }
         compose.waitForIdle()
         assertEquals(1, deletes.get())
-        assertEquals(0, rowClicks.get())
+        assertEquals("row click while tapping Delete", 0, rowClicks.get())
     }
 }
